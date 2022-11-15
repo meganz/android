@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
@@ -95,6 +96,7 @@ class ManagerViewModel @Inject constructor(
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivity: MonitorConnectivity,
+    private val broadcastUploadPauseState: BroadcastUploadPauseState,
 ) : ViewModel() {
 
     /**
@@ -401,6 +403,15 @@ class ManagerViewModel @Inject constructor(
                     shouldSendCameraBroadcastEvent = result.shouldSendEvent,
                 )
             }
+        }
+    }
+
+    /**
+     * broadcast upload pause status
+     */
+    fun broadcastUploadPauseStatus() {
+        viewModelScope.launch {
+            broadcastUploadPauseState()
         }
     }
 }
