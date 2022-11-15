@@ -1,11 +1,15 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.UserSetMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.set.UserSet
@@ -62,11 +66,27 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
+    override fun monitorUserSetsUpdate(): Flow<List<UserSet>> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
+        .mapNotNull { (sets) ->
+            sets?.map { set ->
+                userSetMapper(set.id(), set.name(), set.cover(), set.ts())
+            }
+        }
+
     override suspend fun getAlbumElementIDs(albumId: AlbumId): List<NodeId> =
         withContext(ioDispatcher) {
             val elementList = megaApiGateway.getSetElements(sid = albumId.id)
             (0 until elementList.size()).map {
                 NodeId(elementList.get(it).node())
+            }
+        }
+
+    override fun monitorAlbumElementIds(): Flow<List<NodeId>> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
+        .mapNotNull { (elements) ->
+            elements?.map { element ->
+                NodeId(id = element.node())
             }
         }
 

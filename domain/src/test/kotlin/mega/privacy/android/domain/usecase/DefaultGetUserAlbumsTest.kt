@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -34,6 +35,7 @@ class DefaultGetUserAlbumsTest {
     fun `test that user albums collect is working`() = runTest {
         val userSets = (1..3).map { createUserSet(id = it.toLong()) }
         whenever(albumRepository.getAllUserSets()).thenReturn(userSets)
+        whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf())
 
         underTest().test {
             val actualUserAlbums = awaitItem()
