@@ -17,6 +17,14 @@ interface AlbumRepository {
     suspend fun getAllUserSets(): List<UserSet>
 
     /**
+     * Get a user set
+     *
+     * @param albumId is the album's id to get the user set
+     * @return the user set if exist
+     */
+    suspend fun getUserSet(albumId: AlbumId): UserSet?
+
+    /**
      * Get album element ids
      *
      * @param albumId the id of the album which elements we want to get

@@ -4,10 +4,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.CacheFacade
-import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
+import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.MegaApiFacade
@@ -15,6 +16,7 @@ import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -133,4 +135,12 @@ internal abstract class GatewayModule {
      */
     @Binds
     abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
+
+    /**
+     * Provide default implementation of [AppEventGateway]
+     */
+    @Binds
+    @Singleton
+    abstract fun bindAppEventGateway(implementation: AppEventFacade): AppEventGateway
+
 }

@@ -8,8 +8,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
-import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
@@ -30,8 +28,6 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
-import mega.privacy.android.domain.usecase.MonitorBackupFolder
 
 /**
  * Util wrapper module
@@ -40,14 +36,8 @@ import mega.privacy.android.domain.usecase.MonitorBackupFolder
  * need to be removed during the refactoring process.
  */
 @Module
-@InstallIn(FragmentComponent::class, SingletonComponent::class, ServiceComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class UtilWrapperModule {
-
-    /**
-     * Bind monitor backup folder
-     */
-    @Binds
-    abstract fun bindMonitorBackupFolder(implementation: DefaultMonitorBackupFolder): MonitorBackupFolder
 
     /**
      * Bind mega node util wrapper

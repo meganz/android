@@ -29,6 +29,7 @@ import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -258,4 +260,10 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideRestoreSecondaryTimestamps() = mock<RestoreSecondaryTimestamps>()
+
+    @Provides
+    fun provideMonitorCameraUploadPauseState() = mock<MonitorCameraUploadPauseState>()
+
+    @Provides
+    fun provideBroadcastUploadPauseState() = mock<BroadcastUploadPauseState>()
 }

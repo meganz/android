@@ -65,7 +65,7 @@ interface MediaPlayerGateway {
      *
      * @return current position of playing item
      */
-    fun getCurrentPosition(): Long
+    fun getCurrentPlayingPosition(): Long
 
     /**
      * Set play when ready for player

@@ -240,7 +240,7 @@ class TransfersViewModel @Inject constructor(
             transfer.tag == tag
         }
         if (index != INVALID_POSITION) {
-            megaApiGateway.getTransfersByTag(index)?.let { transfer ->
+            megaApiGateway.getTransfersByTag(tag)?.let { transfer ->
                 Timber.d("The transfer with index : $index has been paused/resumed, left: ${activeTransfers.size}")
                 _activeState.update {
                     ActiveTransfersState.TransferChangeStatusUpdated(index, transfer)
