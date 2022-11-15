@@ -6,15 +6,25 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * TypedFilesRepository
+ *
+ * @param context : App Context
+ * @param megaApi : [MegaApiAndroid]
+ * @param sortOrderIntMapper: [SortOrderIntMapper]
+ */
 class TypedFilesRepository @Inject constructor(
     @ApplicationContext val context: Context,
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) {
     /** Live Data to notify the query result*/
     var fileNodeItems: LiveData<List<NodeItem>> = MutableLiveData()
@@ -30,14 +40,22 @@ class TypedFilesRepository @Inject constructor(
      *
      * @param cancelToken   MegaCancelToken to cancel the fetch at any time.
      * @param type          Type of nodes.
-     * @param order         Order to get nodes.
+     * @param order         SortOrder to get nodes.
      */
-    suspend fun getFiles(cancelToken: MegaCancelToken, type: Int, order: Int) {
+    suspend fun getFiles(
+        cancelToken: MegaCancelToken,
+        type: Int,
+        order: SortOrder,
+    ) {
         preserveSelectedItems()
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = TypedNodesFetcher(context, megaApi, type, order, selectedNodesMap)
+        nodesFetcher = TypedNodesFetcher(context,
+            megaApi,
+            type,
+            sortOrderIntMapper(order),
+            selectedNodesMap)
         fileNodeItems = nodesFetcher.result
 
         withContext(Dispatchers.IO) {
