@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -77,6 +78,7 @@ fun AlbumsView(
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
     onDialogPositiveButtonClicked: (name: String) -> Unit,
+    setDialogInputPlaceholder: () -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -166,7 +168,10 @@ fun AlbumsView(
         ) {
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
-                onClick = { openDialog.value = true },
+                onClick = {
+                    openDialog.value = true
+                    setDialogInputPlaceholder()
+                },
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -184,7 +189,9 @@ fun AlbumsView(
             CreateNewAlbumDialog(
                 onDismissRequest = { openDialog.value = false },
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
-            )
+            ) {
+                albumsViewState.createAlbumPlaceholderTitle
+            }
         }
     }
 
@@ -195,6 +202,7 @@ fun AlbumsView(
 fun CreateNewAlbumDialog(
     onDismissRequest: () -> Unit = {},
     onDialogPositiveButtonClicked: (name: String) -> Unit,
+    inputPlaceHolderText: () -> String = { "" },
 ) {
     var textState by rememberSaveable { mutableStateOf("") }
     val isEnabled by remember { mutableStateOf(true) }
@@ -264,7 +272,7 @@ fun CreateNewAlbumDialog(
                             innerTextField = innerTextField,
                             placeholder = {
                                 Text(
-                                    text = stringResource(id = R.string.photos_album_creation_dialog_input_placeholder),
+                                    text = inputPlaceHolderText(),
                                     color = grey_300,
                                     fontSize = 16.sp,
                                 )

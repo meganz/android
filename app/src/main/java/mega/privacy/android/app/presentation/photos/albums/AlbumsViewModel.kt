@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.photos.albums
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -25,8 +28,8 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -41,6 +44,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMap: GetDefaultAlbumsMap,
     private val getUserAlbums: GetUserAlbums,
@@ -171,7 +175,10 @@ class AlbumsViewModel @Inject constructor(
      */
     fun createNewAlbum(name: String) = viewModelScope.launch {
         try {
-            val album = createAlbum(name)
+            val finalName = name.ifEmpty {
+                _state.value.createAlbumPlaceholderTitle
+            }
+            val album = createAlbum(finalName)
             _state.update {
                 it.copy(currentAlbum = album)
             }
@@ -185,6 +192,31 @@ class AlbumsViewModel @Inject constructor(
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
         albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
 
+    /**
+     * Get the default album title
+     */
+    fun setPlaceholderAlbumTitle() {
+        val allUserAlbumsTitle: List<String> = _state.value.albums.filter {
+            it.id is Album.UserAlbum
+        }.map { album ->
+            album.title(context)
+        }
+
+        var i = 0
+        var currentDefaultTitle =
+            context.getString(R.string.photos_album_creation_dialog_input_placeholder)
+
+        while (currentDefaultTitle in allUserAlbumsTitle) {
+            currentDefaultTitle =
+                context.getString(
+                    R.string.photos_album_creation_dialog_input_placeholder_more_than_one
+                ).replace("%d", (++i).toString())
+        }
+
+        _state.update {
+            it.copy(createAlbumPlaceholderTitle = currentDefaultTitle)
+        }
+    }
 
     private fun shouldAddAlbum(
         it: List<Photo>,

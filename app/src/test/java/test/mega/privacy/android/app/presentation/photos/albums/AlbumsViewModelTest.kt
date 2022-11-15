@@ -58,6 +58,7 @@ class AlbumsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
 
         underTest = AlbumsViewModel(
+            context = mock(),
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
             getDefaultAlbumsMap = getDefaultAlbumsMap,
             getUserAlbums = getUserAlbums,
@@ -234,6 +235,21 @@ class AlbumsViewModelTest {
             assertNull(awaitItem().currentAlbum)
         }
     }
+
+    @Test
+    fun `test that setDefaultAlbumTitle set the right text`() =
+        runTest {
+            val expectedName = "New album"
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf()))
+            whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
+
+            underTest.setPlaceholderAlbumTitle()
+
+            underTest.state.drop(1).test {
+                val actualName = awaitItem().createAlbumPlaceholderTitle
+                assertEquals(expectedName, actualName)
+            }
+        }
 
     private fun createImage(
         id: Long = 2L,
