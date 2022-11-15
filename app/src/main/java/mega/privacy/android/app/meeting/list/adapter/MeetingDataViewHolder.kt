@@ -9,13 +9,13 @@ import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ScalingUtils
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.ItemMeetingBinding
+import mega.privacy.android.app.databinding.ItemMeetingPastBinding
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.setImageRequestFromUri
 
-class MeetingsViewHolder(
-    private val binding: ItemMeetingBinding,
+class MeetingDataViewHolder(
+    private val binding: ItemMeetingPastBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val selectAnimation by lazy {

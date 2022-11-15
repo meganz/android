@@ -5,7 +5,7 @@
 
     <include
         android:id="@+id/header"
-        layout="@layout/item_meeting"
+        layout="@layout/item_meeting_scheduled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
