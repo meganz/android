@@ -147,7 +147,6 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.requestP
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
@@ -352,7 +351,6 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
-import mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
@@ -426,7 +424,6 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
-import mega.privacy.android.domain.usecase.BroadcastUploadPauseState;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -6023,6 +6020,13 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             updateHomepageFabPosition();
         }
+    }
+
+    /**
+     * Exit the Inbox Screen
+     */
+    public void exitInboxScreen() {
+        backToDrawerItem(bottomNavigationCurrentItem);
     }
 
     public void backToDrawerItem(int item) {
