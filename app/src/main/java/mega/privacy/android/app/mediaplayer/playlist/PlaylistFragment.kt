@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -61,6 +63,15 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
 
     private lateinit var itemDecoration: PlaylistItemDecoration
 
+    private val positionUpdateHandler = Handler(Looper.getMainLooper())
+    private val positionUpdateRunnable = object : Runnable {
+        override fun run() {
+            // Up the frequency of refresh, keeping in sync with Exoplayer.
+            positionUpdateHandler.postDelayed(this, UPDATE_INTERVAL_PLAYING_POSITION)
+            adapter?.setCurrentPlayingPosition(serviceGateway?.getCurrentPlayingPosition())
+        }
+    }
+
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             serviceGateway = null
@@ -85,6 +96,9 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                         if (items.isNotEmpty()) {
                             adapter?.submitList(items)
                         }
+                    }
+                    if (!isPaused()) {
+                        positionUpdateHandler.post(positionUpdateRunnable)
                     }
                     tryObservePlaylist()
                     scrollToPlayingPosition()
@@ -139,6 +153,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     override fun onDestroyView() {
         super.onDestroyView()
         playlistObserved = false
+        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
     }
 
     override fun onDestroy() {
@@ -285,6 +300,17 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     }
                     this@PlaylistFragment.isActionMode = isActionMode
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                mediaPlaybackUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { paused ->
+                    if (paused) {
+                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
+                    } else {
+                        positionUpdateHandler.post(positionUpdateRunnable)
+                    }
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
             }
         }
     }
@@ -348,5 +374,12 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
         if (!isActionMode) {
             itemTouchHelper?.startDrag(holder)
         }
+    }
+
+    companion object {
+        /**
+         * The update interval for playing position
+         */
+        const val UPDATE_INTERVAL_PLAYING_POSITION: Long = 500
     }
 }

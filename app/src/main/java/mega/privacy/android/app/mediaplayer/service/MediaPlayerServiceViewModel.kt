@@ -939,9 +939,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
         playlist.postValue(Pair(items, scrollPosition))
     }
 
-    override fun setCurrentPosition(currentPosition: Long) =
-        postPlaylistItems(currentPosition, false)
-
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
         if (items.isEmpty()) return
 

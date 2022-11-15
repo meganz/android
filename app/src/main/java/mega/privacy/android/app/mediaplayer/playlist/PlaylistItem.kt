@@ -84,8 +84,8 @@ data class PlaylistItem(
      * Format current position and duration
      * @return strings of time
      */
-    fun formatCurrentPositionAndDuration() =
-        "${formatMillisecondsToString(milliseconds = currentPosition)} / ${
+    fun formatCurrentPositionAndDuration(currentPlayingPosition: Long) =
+        "${formatMillisecondsToString(milliseconds = currentPlayingPosition)} / ${
             formatSecondsToString(seconds = duration)
         }"
 
@@ -127,8 +127,19 @@ data class PlaylistItem(
     fun formatDuration() = formatSecondsToString(seconds = this.duration)
 
     companion object {
+        /**
+         * The previous type of media item
+         */
         const val TYPE_PREVIOUS = 1
+
+        /**
+         * The playing type playing media item
+         */
         const val TYPE_PLAYING = 2
+
+        /**
+         * The next type next media item
+         */
         const val TYPE_NEXT = 3
 
         /**

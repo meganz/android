@@ -76,11 +76,6 @@ class MediaPlayerFacade @Inject constructor(
                             isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED)
                     }
 
-                    override fun onIsPlayingChanged(isPlaying: Boolean) {
-                        super.onIsPlayingChanged(isPlaying)
-                        mediaPlayerCallback.onIsPlayingChangedCallback(isPlaying)
-                    }
-
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                         mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleModeEnabled)
                     }
@@ -209,7 +204,7 @@ class MediaPlayerFacade @Inject constructor(
         exoPlayer.setShuffleOrder(newShuffleOrder)
     }
 
-    override fun getCurrentPosition(): Long = exoPlayer.currentPosition
+    override fun getCurrentPlayingPosition(): Long = exoPlayer.currentPosition
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
         player.playWhenReady = playWhenReady
