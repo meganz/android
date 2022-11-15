@@ -520,7 +520,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun monitorUploadPauseStatus() {
         coroutineScope?.launch {
             monitorCameraUploadPauseState().collect {
-                delay(1000)
                 updateProgressNotification()
             }
         }
