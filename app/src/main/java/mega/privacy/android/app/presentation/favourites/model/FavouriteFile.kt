@@ -3,13 +3,14 @@ package mega.privacy.android.app.presentation.favourites.model
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
 
 /**
  * The favourite file entity
  */
 data class FavouriteFile(
-    override val handle: Long,
+    override val nodeId: NodeId,
     @DrawableRes override val icon: Int,
     override val name: String,
     @ColorRes override val labelColour: Int,

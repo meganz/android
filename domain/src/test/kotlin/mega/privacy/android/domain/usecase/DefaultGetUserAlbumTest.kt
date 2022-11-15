@@ -16,15 +16,15 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetUserAlbumsTest {
-    private lateinit var underTest: GetUserAlbums
+class DefaultGetUserAlbumTest {
+    private lateinit var underTest: GetUserAlbum
 
     private val albumRepository = mock<AlbumRepository>()
     private val photosRepository = mock<PhotosRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetUserAlbums(
+        underTest = DefaultGetUserAlbum(
             albumRepository = albumRepository,
             photosRepository = photosRepository,
             defaultDispatcher = UnconfinedTestDispatcher(),
@@ -32,19 +32,16 @@ class DefaultGetUserAlbumsTest {
     }
 
     @Test
-    fun `test that user albums collect is working`() = runTest {
-        val userSets = (1..3).map { createUserSet(id = it.toLong()) }
-        whenever(albumRepository.getAllUserSets()).thenReturn(userSets)
+    fun `test that get album collect behaves properly`() = runTest {
+        val albumId = AlbumId(1L)
+        val userSet = createUserSet(id = 1L)
+
+        whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf())
 
-        underTest().test {
-            val actualUserAlbums = awaitItem()
-
-            assertThat(actualUserAlbums.size).isEqualTo(3)
-            assertThat(actualUserAlbums[0].id).isEqualTo(AlbumId(1L))
-            assertThat(actualUserAlbums[1].id).isEqualTo(AlbumId(2L))
-            assertThat(actualUserAlbums[2].id).isEqualTo(AlbumId(3L))
-
+        underTest(albumId).test {
+            val actualUserAlbum = awaitItem()
+            assertThat(actualUserAlbum?.id).isEqualTo(albumId)
             awaitComplete()
         }
     }

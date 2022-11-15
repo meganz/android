@@ -133,7 +133,6 @@ class ManagerViewModelTest {
             val initial = awaitItem()
             assertThat(initial.browserParentHandle).isEqualTo(-1L)
             assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
-            assertThat(initial.inboxParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
@@ -166,19 +165,6 @@ class ManagerViewModelTest {
                 val newValue = 123456789L
                 assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setRubbishBinParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-    @Test
-    fun `test that inbox parent handle is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.inboxParentHandle }.distinctUntilChanged()
-            .test {
-                val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setInboxParentHandle(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }

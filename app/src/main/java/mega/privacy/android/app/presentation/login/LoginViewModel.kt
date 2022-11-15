@@ -9,12 +9,16 @@ import javax.inject.Inject
 
 /**
  * View Model for [LoginFragment]
+ *
+ * @property intentAction Stores intent action for avoiding lose it in some situations.
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
     private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
+
+    var intentAction: String? = null
 
     /**
      * Get latest value of [StorageState]
