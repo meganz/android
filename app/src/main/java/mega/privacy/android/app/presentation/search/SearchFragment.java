@@ -90,6 +90,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
@@ -112,6 +113,7 @@ public class SearchFragment extends RotatableFragment {
     private ManagerViewModel managerViewModel;
     private IncomingSharesViewModel incomingSharesViewModel;
     private OutgoingSharesViewModel outgoingSharesViewModel;
+    private InboxViewModel inboxViewModel;
     private LinksViewModel linksViewModel;
     private SearchViewModel viewModel;
 
@@ -522,6 +524,7 @@ public class SearchFragment extends RotatableFragment {
         managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
         outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
+        inboxViewModel = new ViewModelProvider(requireActivity()).get(InboxViewModel.class);
         linksViewModel = new ViewModelProvider(requireActivity()).get(LinksViewModel.class);
         viewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         viewModel.getUpdateNodes().observe(getViewLifecycleOwner(),
@@ -657,7 +660,7 @@ public class SearchFragment extends RotatableFragment {
         viewModel.performSearch(
                 managerViewModel.getState().getValue().getBrowserParentHandle(),
                 managerViewModel.getState().getValue().getRubbishBinParentHandle(),
-                managerViewModel.getState().getValue().getInboxParentHandle(),
+                inboxViewModel.getState().getValue().getInboxHandle(),
                 incomingSharesViewModel.getState().getValue().getIncomingHandle(),
                 outgoingSharesViewModel.getState().getValue().getOutgoingHandle(),
                 linksViewModel.getState().getValue().getLinksHandle(),
