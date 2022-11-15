@@ -110,7 +110,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.MonitorBatteryLevelState
+import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -490,7 +490,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Monitor battery level
      */
     @Inject
-    lateinit var monitorBatteryLevelState: MonitorBatteryLevelState
+    lateinit var monitorBatteryInfo: MonitorBatteryInfo
 
     /**
      * Coroutine Scope for camera upload work
@@ -533,8 +533,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
-            monitorBatteryLevelState().collect {
-                batteryLevel = it
+            monitorBatteryInfo().collect {
+                batteryLevel = it.level
                 if (isDeviceLowOnBattery()) {
                     coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
                     for (transfer in cuTransfers) {

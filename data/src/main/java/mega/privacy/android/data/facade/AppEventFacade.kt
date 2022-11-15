@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.extensions.registerReceiverAsFlow
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -30,7 +31,11 @@ internal class AppEventFacade @Inject constructor(
 
     override val monitorBatteryInfo =
         context.registerReceiverAsFlow(Intent.ACTION_BATTERY_CHANGED).map {
-            return@map it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val status: Int = it.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val isCharging =
+                status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
+            return@map BatteryInfo(level = level, isCharging = isCharging)
         }.toSharedFlow(appScope)
 
     override suspend fun broadcastUploadPauseState() =

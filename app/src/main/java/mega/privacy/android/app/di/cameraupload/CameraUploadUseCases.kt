@@ -96,7 +96,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
-import mega.privacy.android.domain.usecase.MonitorBatteryLevelState
+import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -367,11 +367,11 @@ abstract class CameraUploadUseCases {
             BroadcastUploadPauseState(cameraUploadRepository::broadcastUploadPauseState)
 
         /**
-         * Provide the [MonitorBatteryLevelState] implementation
+         * Provide the [MonitorBatteryInfo] implementation
          */
         @Provides
-        fun provideMonitorBatteryLevelState(cameraUploadRepository: CameraUploadRepository): MonitorBatteryLevelState =
-            MonitorBatteryLevelState(cameraUploadRepository::monitorBatteryInfo)
+        fun provideMonitorBatteryInfo(cameraUploadRepository: CameraUploadRepository): MonitorBatteryInfo =
+            MonitorBatteryInfo(cameraUploadRepository::monitorBatteryInfo)
     }
 
     /**
