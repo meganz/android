@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.set.UserSet
@@ -38,4 +39,18 @@ interface AlbumRepository {
      * @param photoIDs the photos' node handles
      */
     suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
+
+    /**
+     * Monitor user sets update
+     *
+     * @return a flow of all new user sets update
+     */
+    fun monitorUserSetsUpdate(): Flow<List<UserSet>>
+
+    /**
+     * Monitor user set's element ids update
+     *
+     * @return a flow of all new element ids update
+     */
+    fun monitorAlbumElementIds(): Flow<List<NodeId>>
 }
