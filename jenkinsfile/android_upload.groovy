@@ -319,7 +319,9 @@ pipeline {
                         withEnv([
                                 "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
-                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}"
+                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}",
+                                "SDK_COMMIT=${getSdkGitHash()}",
+                                "CHAT_COMMIT=${getMegaChatSdkGitHash()}"
                         ]) {
                             sh """
                                 cd ${WORKSPACE}
@@ -709,7 +711,6 @@ private String publishSdkSuccessMessage(String lineBreak) {
 private boolean triggerByPush() {
     return env.gitlabActionType == "PUSH"
 }
-
 
 /**
  * Check if this build is triggered by a deliver_qa command
