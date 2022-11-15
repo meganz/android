@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,7 +24,8 @@ class AppEventFacadeTest {
     fun setUp() {
         coroutineScope = TestScope(UnconfinedTestDispatcher())
         underTest = AppEventFacade(
-            appScope = coroutineScope
+            appScope = coroutineScope,
+            context = mock()
         )
     }
 
