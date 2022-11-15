@@ -30,11 +30,9 @@ class PlaylistAdapter(
     val isAudio: Boolean,
     private val dragStartListener: DragStartListener
 ) : ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
-    companion object {
-        const val ANIMATION_DURATION = 250L
-    }
 
-    private var playingPosition: Int = 0
+    private var playingItemIndex: Int = 0
+    private var currentPlayingPosition: Long = 0
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
@@ -60,14 +58,14 @@ class PlaylistAdapter(
                 false
             }
         val playlistItem = getItem(holder.absoluteAdapterPosition)
-        val currentPosition = holder.absoluteAdapterPosition
+        val playingItemIndex = holder.absoluteAdapterPosition
 
         with(holder.itemView.findViewById<TextView>(R.id.duration)) {
             isVisible = playlistItem.duration > 0L
 
             if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
-                playingPosition = holder.absoluteAdapterPosition
-                text = playlistItem.formatCurrentPositionAndDuration()
+                this@PlaylistAdapter.playingItemIndex = holder.absoluteAdapterPosition
+                text = playlistItem.formatCurrentPositionAndDuration(currentPlayingPosition)
             } else {
                 text = playlistItem.formatDuration()
             }
@@ -76,9 +74,9 @@ class PlaylistAdapter(
         holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =
             playlistItem.headerIsVisible
         holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
-            currentPosition != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
+            playingItemIndex != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
 
-        holder.bind(paused, playlistItem, itemOperation, holder, isAudio, currentPosition)
+        holder.bind(paused, playlistItem, itemOperation, holder, isAudio, playingItemIndex)
     }
 
     /**
@@ -108,5 +106,21 @@ class PlaylistAdapter(
      * Get the position of playing item
      * @return the position of playing item
      */
-    fun getPlayingPosition() = playingPosition
+    fun getPlayingPosition() = playingItemIndex
+
+    /**
+     * Set the current playing position
+     * @param currentPosition current playing position
+     */
+    fun setCurrentPlayingPosition(currentPosition: Long?) {
+        currentPlayingPosition = currentPosition ?: 0
+        notifyItemChanged(playingItemIndex)
+    }
+
+    companion object {
+        /**
+         * Animation duration
+         */
+        const val ANIMATION_DURATION = 250L
+    }
 }

@@ -15,13 +15,6 @@ interface MediaPlayerCallback {
     fun onMediaItemTransitionCallback(handle: String?, isUpdateName: Boolean)
 
     /**
-     * Callback from onIsPlayingChanged
-     *
-     * @param isPlaying true is playing, otherwise is false
-     */
-    fun onIsPlayingChangedCallback(isPlaying: Boolean)
-
-    /**
      * Callback from onShuffleModeEnabledChanged
      *
      * @param shuffleModeEnabled true is shuffle mode enable, otherwise is false
