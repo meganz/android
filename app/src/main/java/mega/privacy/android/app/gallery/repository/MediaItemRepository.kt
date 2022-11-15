@@ -13,17 +13,28 @@ import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.gallery.extension.previewPath
 import mega.privacy.android.app.gallery.repository.fetcher.MediaFetcher
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * MediaItemRepository
+ * 
+ * @param context            : App Context
+ * @param megaApi            : [MegaApiAndroid]
+ * @param cacheFolderGateway : [CacheFolderGateway]
+ * @param sortOrderIntMapper : [SortOrderIntMapper]
+ */
 @Singleton
 class MediaItemRepository @Inject constructor(
     @ApplicationContext val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     cacheFolderGateway: CacheFolderGateway,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) {
 
     /** Live Data to notify the query result*/
@@ -40,13 +51,12 @@ class MediaItemRepository @Inject constructor(
     /**
      * Gets the image items.
      *
-     * @param cancelToken   MegaCancelToken to cancel the search at any time.
-     * @param order         Order to get the items.
+     * @param order         SortOrder to get the items.
      * @param zoom          Zoom value.
-     * @param handle
+     * @param handle        Long
      */
     suspend fun getFiles(
-        order: Int,
+        order: SortOrder,
         zoom: Int,
         handle: Long
     ) {
@@ -54,7 +64,12 @@ class MediaItemRepository @Inject constructor(
 
         // Create a node fetcher for the new request, and link fileNodeItems to its result.
         // Then the result of any previous NodesFetcher will be ignored
-        nodesFetcher = MediaFetcher(context, megaApi, selectedNodesMap, order, zoom, handle)
+        nodesFetcher = MediaFetcher(context,
+            megaApi,
+            selectedNodesMap,
+            sortOrderIntMapper(order),
+            zoom,
+            handle)
         @Suppress("UNCHECKED_CAST")
         galleryItems = nodesFetcher.result as MutableLiveData<List<GalleryItem>>
 
