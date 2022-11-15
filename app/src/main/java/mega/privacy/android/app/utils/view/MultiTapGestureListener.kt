@@ -27,6 +27,7 @@ class MultiTapGestureListener constructor(
     private val doubleTapImagePoint = PointF()
     private var doubleTapScale = 1.0f
     private var doubleTapScroll = false
+    private var doubleTapMaxScaleDivider = 4
     private var durationMs = 300L
 
     /**
@@ -69,17 +70,17 @@ class MultiTapGestureListener constructor(
         val ip = zc.mapViewToImage(vp)
         val maxScale: Float
         when (event.actionMasked) {
-            0 -> {
+            MotionEvent.ACTION_DOWN -> {
                 this.doubleTapViewPoint.set(vp)
                 this.doubleTapImagePoint.set(ip)
                 this.doubleTapScale = zc.scaleFactor
             }
-            1 -> {
+            MotionEvent.ACTION_UP -> {
                 if (this.doubleTapScroll) {
                     maxScale = this.calcScale(vp)
                     zc.zoomToPoint(maxScale, this.doubleTapImagePoint, this.doubleTapViewPoint)
                 } else {
-                    maxScale = zc.maxScaleFactor / 4
+                    maxScale = zc.maxScaleFactor / doubleTapMaxScaleDivider
                     val minScale = zc.minScaleFactor
                     if (zc.scaleFactor < (maxScale + minScale) / 2.0f) {
                         zc.zoomToPoint(maxScale,
@@ -99,7 +100,7 @@ class MultiTapGestureListener constructor(
                 }
                 this.doubleTapScroll = false
             }
-            2 -> {
+            MotionEvent.ACTION_MOVE -> {
                 this.doubleTapScroll = this.doubleTapScroll || this.shouldStartDoubleTapScroll(vp)
                 if (this.doubleTapScroll) {
                     maxScale = this.calcScale(vp)
