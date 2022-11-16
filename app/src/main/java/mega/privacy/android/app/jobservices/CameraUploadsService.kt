@@ -508,7 +508,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var notificationManager: NotificationManager? = null
     private var builder: NotificationCompat.Builder? = null
     private var intent: Intent? = null
-    private var batteryLevel: Int? = null
+    private var isBatteryLow: Boolean? = null
     private var pendingIntent: PendingIntent? = null
     private var tempRoot: String? = null
     private var isOverQuota = false
@@ -534,7 +534,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
             monitorBatteryInfo().collect {
-                batteryLevel = it.level
+                isBatteryLow = (it.level <= LOW_BATTERY_LEVEL && it.isCharging)
                 if (isDeviceLowOnBattery()) {
                     coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
                     for (transfer in cuTransfers) {
@@ -2011,9 +2011,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private fun isDeviceLowOnBattery(): Boolean {
-        batteryLevel?.let {
-            Timber.d("Device battery level is %s", it)
-            return it <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
-        } ?: return false
+        return isBatteryLow ?: false
     }
 }
