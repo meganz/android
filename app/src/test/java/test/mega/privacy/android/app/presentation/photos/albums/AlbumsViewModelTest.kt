@@ -241,7 +241,7 @@ class AlbumsViewModelTest {
             val expectedName = "New album"
             whenever(getUserAlbums()).thenReturn(flowOf(listOf()))
 
-            underTest.setPlaceholderAlbumTitle(expectedName)
+            underTest.setPlaceholderAlbumTitle("New album")
 
             underTest.state.test {
                 val actualName = awaitItem().createAlbumPlaceholderTitle
@@ -257,9 +257,8 @@ class AlbumsViewModelTest {
                 createUserAlbum(title = "New album")
             )))
 
-            underTest.setPlaceholderAlbumTitle(expectedName)
-
             underTest.state.test {
+                underTest.setPlaceholderAlbumTitle("New album")
                 val actualName = awaitItem().createAlbumPlaceholderTitle
                 assertEquals(expectedName, actualName)
             }
@@ -274,7 +273,7 @@ class AlbumsViewModelTest {
                 createUserAlbum(title = "New album(1)")
             )))
 
-            underTest.setPlaceholderAlbumTitle(expectedName)
+            underTest.setPlaceholderAlbumTitle("New album")
 
             underTest.state.test {
                 val actualName = awaitItem().createAlbumPlaceholderTitle
