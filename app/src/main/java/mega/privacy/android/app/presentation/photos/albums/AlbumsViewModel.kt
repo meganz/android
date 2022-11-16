@@ -195,22 +195,18 @@ class AlbumsViewModel @Inject constructor(
     /**
      * Get the default album title
      */
-    fun setPlaceholderAlbumTitle() {
+    fun setPlaceholderAlbumTitle(placeholderTitle: String) {
         val allUserAlbumsTitle: List<String> = _state.value.albums.filter {
             it.id is Album.UserAlbum
-        }.map { album ->
-            album.title(context)
+        }.map { (id) ->
+            val userAlbum = id as Album.UserAlbum
+            userAlbum.title
         }
-
         var i = 0
-        var currentDefaultTitle =
-            context.getString(R.string.photos_album_creation_dialog_input_placeholder)
+        var currentDefaultTitle = placeholderTitle
 
         while (currentDefaultTitle in allUserAlbumsTitle) {
-            currentDefaultTitle =
-                context.getString(
-                    R.string.photos_album_creation_dialog_input_placeholder_more_than_one
-                ).replace("%d", (++i).toString())
+            currentDefaultTitle = placeholderTitle + "(${++i})"
         }
 
         _state.update {

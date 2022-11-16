@@ -237,15 +237,14 @@ class AlbumsViewModelTest {
     }
 
     @Test
-    fun `test that setDefaultAlbumTitle set the right text`() =
+    fun `test that setPlaceholderAlbumTitle set the right text`() =
         runTest {
             val expectedName = "New album"
             whenever(getUserAlbums()).thenReturn(flowOf(listOf()))
-            whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
-            underTest.setPlaceholderAlbumTitle()
+            underTest.setPlaceholderAlbumTitle(expectedName)
 
-            underTest.state.drop(1).test {
+            underTest.state.test {
                 val actualName = awaitItem().createAlbumPlaceholderTitle
                 assertEquals(expectedName, actualName)
             }

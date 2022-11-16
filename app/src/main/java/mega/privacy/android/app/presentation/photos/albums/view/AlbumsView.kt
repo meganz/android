@@ -71,6 +71,7 @@ import mega.privacy.android.presentation.theme.subtitle2
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
+import timber.log.Timber
 
 @Composable
 fun AlbumsView(
@@ -78,7 +79,7 @@ fun AlbumsView(
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
     onDialogPositiveButtonClicked: (name: String) -> Unit,
-    setDialogInputPlaceholder: () -> Unit = {},
+    setDialogInputPlaceholder: (String) -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -166,11 +167,14 @@ fun AlbumsView(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
         ) {
+            val placeholderText =
+                stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
                 onClick = {
+                    Timber.d("It's clicked")
                     openDialog.value = true
-                    setDialogInputPlaceholder()
+                    setDialogInputPlaceholder(placeholderText)
                 },
             ) {
                 Icon(

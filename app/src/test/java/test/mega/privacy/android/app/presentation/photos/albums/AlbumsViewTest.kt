@@ -49,7 +49,8 @@ class AlbumsViewTest {
 
     @Test
     fun `test that clicking the fab will provide the input placeholder text`() {
-        val setDialogInputPlaceholder = mock<() -> Unit>()
+        val setDialogInputPlaceholder = mock<(String) -> Unit>()
+        val defaultText = "abc"
         composeRule.setContent {
             AlbumsView(
                 albumsViewState = AlbumsViewState(),
@@ -63,7 +64,7 @@ class AlbumsViewTest {
 
         composeRule.onNodeWithContentDescription("Create new album").performClick()
 
-        verify(setDialogInputPlaceholder).invoke()
+        verify(setDialogInputPlaceholder).invoke(defaultText)
     }
 
     @Test
