@@ -236,10 +236,43 @@ class AlbumsViewModelTest {
     }
 
     @Test
-    fun `test that setPlaceholderAlbumTitle set the right text`() =
+    fun `test that setPlaceholderAlbumTitle set the right text if no album with default name exists`() =
         runTest {
             val expectedName = "New album"
             whenever(getUserAlbums()).thenReturn(flowOf(listOf()))
+
+            underTest.setPlaceholderAlbumTitle(expectedName)
+
+            underTest.state.test {
+                val actualName = awaitItem().createAlbumPlaceholderTitle
+                assertEquals(expectedName, actualName)
+            }
+        }
+
+    @Test
+    fun `test that setPlaceholderAlbumTitle set the right text if an album with default name already exists`() =
+        runTest {
+            val expectedName = "New album(1)"
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf(
+                createUserAlbum(title = "New album")
+            )))
+
+            underTest.setPlaceholderAlbumTitle(expectedName)
+
+            underTest.state.test {
+                val actualName = awaitItem().createAlbumPlaceholderTitle
+                assertEquals(expectedName, actualName)
+            }
+        }
+
+    @Test
+    fun `test that setPlaceholderAlbumTitle set the right text if two albums with default name already exist`() =
+        runTest {
+            val expectedName = "New album(2)"
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf(
+                createUserAlbum(title = "New album"),
+                createUserAlbum(title = "New album(1)")
+            )))
 
             underTest.setPlaceholderAlbumTitle(expectedName)
 
