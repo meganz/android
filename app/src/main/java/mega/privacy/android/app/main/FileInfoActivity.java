@@ -144,7 +144,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.LegacyDatabaseHandler;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -544,7 +543,7 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             }
 
             MenuItem changePermissionsMenuItem = menu.findItem(R.id.action_file_contact_list_permissions);
-            if (node != null && megaApi.isInInbox(node)) {
+            if (isNodeInInbox(node)) {
                 // If the node came from Backups, hide the Change Permissions option from the Action Bar
                 changePermissionsMenuItem.setVisible(false);
                 changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -757,8 +756,12 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             if (nodeController == null) {
                 nodeController = new NodeController(this);
             }
-
-            if (megaApi.hasVersions(node)) {
+            // If the Node belongs to Backups or has no versions, then hide
+            // the Versions layout
+            if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
+                versionsLayout.setVisibility(View.GONE);
+                separatorVersions.setVisibility(View.GONE);
+            } else {
                 versionsLayout.setVisibility(View.VISIBLE);
 
                 String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
@@ -767,9 +770,6 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 separatorVersions.setVisibility(View.VISIBLE);
 
                 nodeVersions = megaApi.getVersions(node);
-            } else {
-                versionsLayout.setVisibility(View.GONE);
-                separatorVersions.setVisibility(View.GONE);
             }
         } else {
             Timber.w("Extras is NULL");
@@ -969,8 +969,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             } else {
                 setDefaultOptionsToolbar();
             }
-            // Check if read-only properties should be applied
-            checkIfShouldApplyReadOnlyState(parent);
+            // Check if read-only properties should be applied on MenuItems
+            shouldApplyMenuItemReadOnlyState(parent);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -982,8 +982,8 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
      *
      * @param node The Mega Node
      */
-    private void checkIfShouldApplyReadOnlyState(MegaNode node) {
-        if (node != null && megaApi.isInInbox(node)) {
+    private void shouldApplyMenuItemReadOnlyState(MegaNode node) {
+        if (isNodeInInbox(node)) {
             renameMenuItem.setVisible(false);
             moveMenuItem.setVisible(false);
             rubbishMenuItem.setVisible(false);
@@ -1099,6 +1099,17 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
 
         drawableChat.setColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN);
         sendToChatMenuItem.setIcon(drawableChat);
+    }
+
+    /**
+     * Checks whether the provided Node exists in the Inbox or not
+     *
+     * @param node The Provided Node
+     *
+     * @return true if the provided Node exists in the Inbox, and false if otherwise
+     */
+    private boolean isNodeInInbox(MegaNode node) {
+        return node != null && megaApi.isInInbox(node);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -1338,18 +1349,18 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                     }
                 }
             }
-
-            if (megaApi.hasVersions(node)) {
+            // If the Node belongs to Backups or has no versions, then hide
+            // the Versions layout
+            if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
+                versionsLayout.setVisibility(View.GONE);
+                separatorVersions.setVisibility(View.GONE);
+            } else {
                 versionsLayout.setVisibility(View.VISIBLE);
                 String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
                 versionsButton.setText(text);
                 versionsButton.setOnClickListener(this);
                 separatorVersions.setVisibility(View.VISIBLE);
-
                 nodeVersions = megaApi.getVersions(node);
-            } else {
-                versionsLayout.setVisibility(View.GONE);
-                separatorVersions.setVisibility(View.GONE);
             }
         } else { //Folder
 
@@ -1779,10 +1790,20 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
+
+            // If the Folder belongs to Backups, hide all Folder Version layouts
+            if (isNodeInInbox(node)) {
+                folderVersionsLayout.setVisibility(View.GONE);
+                folderCurrentVersionsLayout.setVisibility(View.GONE);
+                folderPreviousVersionsLayout.setVisibility(View.GONE);
+                return;
+            }
+
             if (e.getErrorCode() == MegaError.API_OK) {
                 MegaFolderInfo info = request.getMegaFolderInfo();
                 int numVersions = info.getNumVersions();
                 Timber.d("Num versions: %s", numVersions);
+
                 if (numVersions > 0) {
                     folderVersionsLayout.setVisibility(View.VISIBLE);
                     String text = getQuantityString(R.plurals.number_of_versions_inside_folder, numVersions, numVersions);
@@ -2324,15 +2345,17 @@ public class FileInfoActivity extends PasscodeActivity implements OnClickListene
             modifiedTextView.setText("");
         }
 
-        if (megaApi.hasVersions(node)) {
+        // If the Node belongs to Backups or has no versions, then hide
+        // the Versions layout
+        if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
+            versionsLayout.setVisibility(View.GONE);
+            separatorVersions.setVisibility(View.GONE);
+        } else {
             versionsLayout.setVisibility(View.VISIBLE);
             String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
             versionsButton.setText(text);
             versionsButton.setOnClickListener(this);
             separatorVersions.setVisibility(View.VISIBLE);
-        } else {
-            versionsLayout.setVisibility(View.GONE);
-            separatorVersions.setVisibility(View.GONE);
         }
 
         refresh();
