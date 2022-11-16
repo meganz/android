@@ -355,7 +355,7 @@
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">資料夾名稱</string>
     <!-- status dialog when performing the action -->
-    <string name="context_creating_folder">建立資料夾中</string>
+    <string name="context_creating_folder">正在建立資料夾</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">清空垃圾筒</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
@@ -662,7 +662,7 @@
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">MEGA相機上傳資料夾</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">本機次要資料夾</string>
+    <string name="settings_local_secondary_folder">本地次要資料夾</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">MEGA次要資料夾</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -1255,7 +1255,7 @@
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">傳輸配額不足</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
-    <string name="current_text_depleted_transfer_overquota">您的排程下載已超出您IP位址目前可用的傳輸配額，因此傳輸已經中斷。請升級您的帳戶或等待%s再繼續。</string>
+    <string name="current_text_depleted_transfer_overquota">您的佇列下載已超出您IP位址目前可用的傳輸配額，因此傳輸已經中斷。請升級您的帳戶或等待%s再繼續。</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">此IP位址的傳輸配額已超過。請升級您的帳戶或等待%s才能繼續下載。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
@@ -1267,13 +1267,13 @@
         <item quantity="other">%1$d個檔案</item>
     </plurals>
     <!-- Menu option -->
-    <string name="general_view">檢視檔案</string>
+    <string name="general_view">查看檔案</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">匯入</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">新增至雲端硬碟</string>
     <!-- Menu option -->
-    <string name="general_view_contacts">檢視聯絡人</string>
+    <string name="general_view_contacts">查看聯絡人</string>
     <!-- Menu option -->
     <string name="import_success_error">發生錯誤，無法新增至雲端硬碟</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -2780,7 +2780,7 @@
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">總是儲存在此位置？</string>
     <!-- Action to show any file in its location -->
-    <string name="view_in_folder_label">在資料夾中檢視</string>
+    <string name="view_in_folder_label">在資料夾中查看</string>
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
@@ -3307,8 +3307,6 @@
     <string name="change_meeting_name">更改會議名稱</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">會議連結</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">通話時間</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">以訪客身份加入</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3468,7 +3466,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">因為這是一個備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本機資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本地資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">因為這些是備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -3487,8 +3485,6 @@
     <string name="payment_methods">付款方式</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">繼續</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">感謝您訂閱%1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite月方案</string>
     <!-- Pro Lite yearly subscription -->
@@ -3929,4 +3925,20 @@
     <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的相簿</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]續訂日期：[/A][B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">輸入相簿名稱</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">新相簿</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
 </resources>

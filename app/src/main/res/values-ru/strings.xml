@@ -244,9 +244,9 @@
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Ссылки</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="title_incoming_shares_explorer">Входящие общие элементы</string>
+    <string name="title_incoming_shares_explorer">Входящие элементы</string>
     <!-- Title of the share with file explorer -->
-    <string name="title_incoming_shares_with_explorer">Открытый доступ от</string>
+    <string name="title_incoming_shares_with_explorer">Входящие элементы от</string>
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">В облачном диске нет файлов</string>
     <!-- Text that indicates that a folder is currently empty -->
@@ -1778,7 +1778,7 @@
     <!-- Password strong -->
     <string name="pass_strong">Надёжный</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
-    <string name="title_notification_call_in_progress">Идёт вызов</string>
+    <string name="title_notification_call_in_progress">Идёт звонок</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Вернуться к звонку</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2233,7 +2233,7 @@
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Подписки</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
-    <string name="button_custom_almost_full_warning">Пользовательский план</string>
+    <string name="button_custom_almost_full_warning">Индивидуальный план</string>
     <!-- Button of the dialog shown when the storage is almost full to get bonus -->
     <string name="button_bonus_almost_full_warning">Бонусы</string>
     <!-- Mail title to upgrade to a custom plan -->
@@ -2439,7 +2439,7 @@
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">При условии вашего участия в программе достижений.</string>
     <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">Вид оплаты</string>
+    <string name="payment_method">Способ оплаты</string>
     <!-- title of billing period -->
     <string name="billing_period_title">Расчётный период</string>
     <!-- Option of monthly billing period. Placeholder: purchase price -->
@@ -2576,9 +2576,9 @@
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Вложение уже отправлено</string>
     <!-- Message shown when a group call ends. -->
-    <string name="group_call_ended_message">[A]Групповой вызов завершен[/A][C]. Длительность: [/C]</string>
+    <string name="group_call_ended_message">[A]Групповой звонок завершён[/A][C]. Длительность: [/C]</string>
     <!-- Message to indicate a call has ended and indicate the call duration. -->
-    <string name="call_ended_message">[A]Вызов завершён[/A][C]. Продолжительность: [/C]</string>
+    <string name="call_ended_message">[A]Звонок завершён[/A][C]. Продолжительность: [/C]</string>
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
         <item quantity="one">[B]%1$s час[/B]</item>
@@ -2639,7 +2639,7 @@
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">Отправить это местоположение</string>
     <!-- Title of the dialog shown when the location is disabled -->
-    <string name="gps_disabled">GPS отключен</string>
+    <string name="gps_disabled">GPS отключён</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
     <string name="open_location_settings">Открыть настройки местоположения?</string>
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
@@ -3050,7 +3050,7 @@
         <item quantity="other">%d дня</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_hours">%d ч</string>
+    <string name="label_time_in_hours">%d&#160;ч</string>
     <!-- Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_minutes">%d&#160;мин</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -3402,9 +3402,9 @@
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил квоту на хранение.</string>
+    <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил лимит хранения данных.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил квоту на хранение.</string>
+    <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил лимит хранения данных.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
         <item quantity="one">1 файл уже скачан. 1 файл в ожидании.</item>
@@ -3480,13 +3480,13 @@
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
-    <string name="used_storage_transfer_percentage">%1$s&#160;%%</string>
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;ПБ</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_exa_byte">%1$s&#160;ЭБ</string>
     <!-- Title of Add phone number option in My account section -->
-    <string name="add_phone_label">Добавить номер телефона</string>
+    <string name="add_phone_label">Добавьте номер телефона</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Вы помните свой пароль?\nMEGA не сможет сбросить пароль, если вы его забудете.</string>
     <!-- Action to change name -->
@@ -3586,11 +3586,11 @@
     <!-- Label for end meeting-->
     <string name="meeting_end">Закончить</string>
     <!-- Invite contacts as participants of the meeting-->
-    <string name="invite_participants">Приглашение участников</string>
+    <string name="invite_participants">Пригласить участников</string>
     <!-- The number of participants in the meeting-->
     <string name="participants_number">Участники (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
-    <string name="pin_to_speaker">Показать в главном окне</string>
+    <string name="pin_to_speaker">Отображать в основном представлении</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Сделать организатором</string>
     <!-- assign moderator option when the moderator leave meeting-->
@@ -3598,11 +3598,9 @@
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Пожалуйста, назначьте одного или нескольких новых организаторов.</string>
     <!-- The title of dialog for changing meeting name-->
-    <string name="change_meeting_name">Название встречи</string>
+    <string name="change_meeting_name">Изменение названия встречи</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Ссылка на встречу</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Продолжительность</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Присоединиться к встрече как гость</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3646,13 +3644,13 @@
     <!-- the title of join without account on left meeting page-->
     <string name="left_meeting_join_title">Ваша конфиденциальность имеет значение</string>
     <!-- the content of join without account on left meeting page-->
-    <string name="left_meeting_join_content">Присоединяйтесь к самой крупной в мире безопасной облачной платформе хранения и совместной работы.</string>
+    <string name="left_meeting_join_content">Присоединяйтесь к самой большой в мире безопасной облачной платформе хранения данных и совместной работы.</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="left_meeting_bonus_title">Получите 20&#160;ГБ бесплатно</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Зарегистрируйтесь сейчас и наслаждайтесь расширенными функциями совместной работы бесплатно.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">Идёт ещё один звонок. Пожалуйста, завершите первый звонок, прежде чем сделать следующий.</string>
+    <string name="ongoing_call_content">Идёт ещё один звонок. Пожалуйста, завершите первый звонок, прежде чем начать следующий.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">Новое название встречи</string>
     <!-- The content of dialog when failed for creating meeting-->
@@ -3660,7 +3658,7 @@
     <!-- Word next to own user’s name on participant list -->
     <string name="meeting_me_text_bracket">%1s [A](я)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
-    <string name="main_view">Общий вид</string>
+    <string name="main_view">Основное представление</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Выход из системы удалит локальный контент.</string>
     <!-- Settings category which contains all preferences related to user interface. -->
@@ -3740,7 +3738,7 @@
     <!-- title for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_title">Использовать мобильные данные для превью изображений с высоким разрешением</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">Разрешить использование мобильных данных для загрузки изображений с высоким разрешением при предварительном просмотре. Если этот параметр отключён, исходное изображение будет загружено только при увеличении масштаба.</string>
+    <string name="settings_mobile_data_resoluton_summary">Разрешить использование мобильных данных для загрузки изображений с высоким разрешением при предпросмотре. Если этот параметр отключён, исходное изображение будет загружено только при увеличении масштаба.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Вы удаляете папку с резервными копиями. Это удалит все созданные вами резервные копии. Вы уверены, что хотите это сделать?</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -3776,13 +3774,11 @@
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Загрузить папку</string>
     <!-- Title of the Payments screen -->
-    <string name="payment">Платёж</string>
+    <string name="payment">Оплата</string>
     <!-- Label indicating payment methods -->
     <string name="payment_methods">Способы оплаты</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Продолжить</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Спасибо за вашу подписку %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">ежемесячный Pro&#160;Lite</string>
     <!-- Pro Lite yearly subscription -->
@@ -3854,11 +3850,11 @@
     <!-- Next audios to be played in the audio playlist -->
     <string name="media_player_audio_playlist_next">Далее</string>
     <!-- Previous audios have been already played in the audio playlist -->
-    <string name="media_player_audio_playlist_previous">Назад</string>
+    <string name="media_player_audio_playlist_previous">Предыдущие</string>
     <!-- Next videos to be played in the video playlist -->
     <string name="media_player_video_playlist_next">Далее</string>
     <!-- Previous videos have been already played in the video playlist -->
-    <string name="media_player_video_playlist_previous">Назад</string>
+    <string name="media_player_video_playlist_previous">Предыдущие</string>
     <!-- Setting option available to choose for the preferred start screen. -->
     <string name="settings_start_screen_photos_option">Фотографии</string>
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
@@ -3976,7 +3972,7 @@
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Объединить существующую папку с копируемой.</string>
     <!-- Copy and merge action button for a name collision. -->
-    <string name="copy_and_merge">Скопировать и объединить</string>
+    <string name="copy_and_merge">Копировать и объединить</string>
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
     <string name="warning_move_and_merge">Объединить существующую папку с перемещаемой.</string>
     <!-- Move and merge action button for a name collision. -->
@@ -4014,7 +4010,7 @@
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">Здесь только вы</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
-    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Вы все еще разговариваете</string>
+    <string name="calls_chat_screen_dialog_title_only_you_in_the_call">Вы всё ещё разговариваете</string>
     <!-- Description of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen -->
     <string name="calls_call_screen_dialog_description_only_you_in_the_call">Звонок автоматически завершится через 2 минуты, если вы не захотите остаться в нём.</string>
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to hang up the call -->
@@ -4022,11 +4018,11 @@
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
     <string name="calls_call_screen_button_to_stay_alone_in_call">Продолжить звонок</string>
     <!-- Report issue setting name-->
-    <string name="settings_help_report_issue">Сообщение о проблеме</string>
+    <string name="settings_help_report_issue">Сообщить об ошибке</string>
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">Ваши отзывы помогают нам улучшать MEGA. Пожалуйста, чётко опишите ошибку, с которой вы столкнулись. Чем больше подробностей вы предоставите, тем легче нам будет её решить.</string>
     <!-- Hint text for the description field on the report issue screen-->
-    <string name="settings_help_report_issue_description_label">Опишите проблему</string>
+    <string name="settings_help_report_issue_description_label">Опишите ошибку</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">Отправить лог-файл</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
@@ -4241,4 +4237,20 @@
     <string name="media_player_video_snackbar_screenshot_saved">Изображение сохранено в галерею устройства</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Дата продления:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Введите название альбома</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">Новый альбом</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Поделиться ссылкой на встречу</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Показать больше</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Покинуть группу</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
 </resources>

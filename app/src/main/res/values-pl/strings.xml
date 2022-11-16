@@ -244,9 +244,9 @@
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Linki</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="title_incoming_shares_explorer">Udostępnienia</string>
+    <string name="title_incoming_shares_explorer">Udostępnienia przychodzące</string>
     <!-- Title of the share with file explorer -->
-    <string name="title_incoming_shares_with_explorer">Udostępnione z</string>
+    <string name="title_incoming_shares_with_explorer">Udostępnienia przychodzące z</string>
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">Brak plików na dysku</string>
     <!-- Text that indicates that a folder is currently empty -->
@@ -3601,8 +3601,6 @@
     <string name="change_meeting_name">Zmień nazwę spotkania</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link do spotkania</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Czas trwania</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Dołącz do spotkania jako gość</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3781,8 +3779,6 @@
     <string name="payment_methods">Metody płatności</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Kontynuuj</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Dziękujemy za Twoją subskrypcję %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite miesięcznie</string>
     <!-- Pro Lite yearly subscription -->
@@ -4241,4 +4237,20 @@
     <string name="media_player_video_snackbar_screenshot_saved">Zapisanie zdjęcia w galerii urządzenia</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Data odnowienia:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
 </resources>

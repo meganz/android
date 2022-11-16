@@ -3307,8 +3307,6 @@
     <string name="change_meeting_name">ミーティング名の変更</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">ミーティングリンク</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">時間</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">ゲストとしてミーティングに参加</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3487,8 +3485,6 @@
     <string name="payment_methods">お支払い方法</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">進む</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">%1$sをご契約いただきありがとうございます</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite 月間</string>
     <!-- Pro Lite yearly subscription -->
@@ -3929,4 +3925,20 @@
     <string name="media_player_video_snackbar_screenshot_saved">画像を端末のギャラリーに保存しました</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]更新日：[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">アルバム名を入力</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">新規アルバム</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">ミーティングリンクを共有</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">もっと見る</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">グループから退出</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">この名前のアルバムはすでに存在します。別の名前を入力してください。</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新しいアルバム（%d）</string>
 </resources>
