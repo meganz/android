@@ -62,7 +62,7 @@ public class MimeTypeList {
         resources.put(R.drawable.ic_podcast_list, new String[]{"pcast",});
         resources.put(R.drawable.ic_powerpoint_list, new String[]{"pot", "potm", "potx", "ppam", "ppc", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", });
         resources.put(R.drawable.ic_premiere_list, new String[]{"plb", "ppj", "prproj", "prtpset",});
-        resources.put(R.drawable.ic_raw_list, new String[]{"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf",});
+        resources.put(R.drawable.ic_raw_list, new String[]{"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf", "iiq", "k25", "kdc", "mos", "raw", "sr2","x3f",});
         resources.put(R.drawable.ic_real_audio_list, new String[]{"ra", "ram", "rm",});
         resources.put(R.drawable.ic_source_list, new String[]{"c", "cc", "cgi", "cpp", "cxx", "dll", "h", "hpp", "pl", "py", "sh",});
         resources.put(R.drawable.ic_spreadsheet_list, new String[]{"123", "gsheet", "nb", "ods", "ots", "sxc", "xlr",});
@@ -128,12 +128,51 @@ public class MimeTypeList {
                 case "webp":
                     detectedType = "image/webp";
                     break;
+                case "3fr":
+                    detectedType = "image/3fr";
+                    break;
+                case "iiq":
+                    detectedType = "image/iiq";
+                    break;
+                case "k25":
+                    detectedType = "image/k25";
+                    break;
+                case "kdc":
+                    detectedType = "image/kdc";
+                    break;
+                case "mef":
+                    detectedType = "image/mef";
+                    break;
+                case "mos":
+                    detectedType = "image/mos";
+                    break;
+                case "mrw":
+                    detectedType = "image/mrw";
+                    break;
+                case "raw":
+                    detectedType = "image/raw";
+                    break;
+                case "rwl":
+                    detectedType = "image/rwl";
+                    break;
+                case "sr2":
+                    detectedType = "image/sr2";
+                    break;
+                case "srf":
+                    detectedType = "image/srf";
+                    break;
+                case "x3f":
+                    detectedType = "image/x3f";
+                    break;
                 default:
                     detectedType = "application/octet-stream";
                     break;
             }
         }
 
+        if (extension.equals("dcr")) {
+            detectedType = "image/dcr";
+        }
         return new MimeTypeList(detectedType, extension);
     }
 
