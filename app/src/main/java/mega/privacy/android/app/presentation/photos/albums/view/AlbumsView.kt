@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -71,7 +70,6 @@ import mega.privacy.android.presentation.theme.subtitle2
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
-import timber.log.Timber
 
 @Composable
 fun AlbumsView(
@@ -172,7 +170,6 @@ fun AlbumsView(
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
                 onClick = {
-                    Timber.d("It's clicked")
                     openDialog.value = true
                     setDialogInputPlaceholder(placeholderText)
                 },
