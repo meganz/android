@@ -50,7 +50,7 @@ class AlbumsViewTest {
     @Test
     fun `test that clicking the fab will provide the input placeholder text`() {
         val setDialogInputPlaceholder = mock<(String) -> Unit>()
-        val defaultText = "abc"
+        val defaultText = fromId(R.string.photos_album_creation_dialog_input_placeholder)
         composeRule.setContent {
             AlbumsView(
                 albumsViewState = AlbumsViewState(),

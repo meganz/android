@@ -58,7 +58,6 @@ class AlbumsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
 
         underTest = AlbumsViewModel(
-            context = mock(),
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
             getDefaultAlbumsMap = getDefaultAlbumsMap,
             getUserAlbums = getUserAlbums,
