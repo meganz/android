@@ -20,6 +20,9 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property highlight          Check if message should be highlighted
  * @property timeStamp          Last timestamp of the chat
  * @property formattedTimestamp Last timestamp of the chat formatted
+ * @property startTimestamp     Schedule meeting start time
+ * @property endTimestamp       Schedule meeting start time
+ * @property isRecurring        Check if is recurring meeting
  */
 data class MeetingItem constructor(
     val chatId: Long,
@@ -35,7 +38,16 @@ data class MeetingItem constructor(
     val highlight: Boolean,
     val timeStamp: Long,
     val formattedTimestamp: String,
+    val startTimestamp: Long?,
+    val endTimestamp: Long?,
+    val isRecurring: Boolean,
 ) {
+
+    /**
+     * Check if is a Scheduled Meeting
+     */
+    fun isScheduled(): Boolean =
+        startTimestamp != null || endTimestamp != null
 
     /**
      * Check if meeting contains only 1 user and myself

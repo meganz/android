@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlin.random.Random
 
 /**
  * Get meeting list use case
@@ -276,7 +277,11 @@ class GetMeetingListUseCase @Inject constructor(
             unreadCount = unreadCount,
             highlight = highlight,
             timeStamp = chatListItem.lastTimestamp,
-            formattedTimestamp = formattedDate)
+            formattedTimestamp = formattedDate,
+            if (Random.nextBoolean()) System.currentTimeMillis().plus(Random.nextLong()) else null,
+            null,
+            Random.nextBoolean()
+        )
     }
 
     /**

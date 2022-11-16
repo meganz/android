@@ -8,6 +8,6 @@ class MeetingItemDetailsLookup(private val recyclerView: RecyclerView) : ItemDet
 
     override fun getItemDetails(event: MotionEvent): ItemDetails<Long>? =
         recyclerView.findChildViewUnder(event.x, event.y)?.let { view ->
-            (recyclerView.getChildViewHolder(view) as? MeetingDataViewHolder?)?.getItemDetails()
+            (recyclerView.getChildViewHolder(view) as? MeetingPastViewHolder?)?.getItemDetails()
         }
 }
