@@ -66,6 +66,12 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
+    override suspend fun getUserSet(albumId: AlbumId): UserSet? = withContext(ioDispatcher) {
+        megaApiGateway.getSet(sid = albumId.id)?.let { set ->
+            userSetMapper(set.id(), set.name(), set.cover(), set.ts())
+        }
+    }
+
     override fun monitorUserSetsUpdate(): Flow<List<UserSet>> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
         .mapNotNull { (sets) ->

@@ -224,8 +224,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             )
                         )
                     if (requireActivity() is ManagerActivity) {
-                        (requireActivity() as ManagerActivity).refreshCloudOrder(sortOrderIntMapper(
-                            order))
+                        (requireActivity() as ManagerActivity).refreshCloudOrder()
                     } else if (requireActivity() is FileExplorerActivity) {
                         updateFileExplorerOrder(sortOrderIntMapper(order))
                     }

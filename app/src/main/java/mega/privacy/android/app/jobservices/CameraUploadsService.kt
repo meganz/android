@@ -12,7 +12,6 @@ import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
 import android.os.BatteryManager
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.StatFs
@@ -112,6 +111,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -481,6 +481,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var ioDispatcher: CoroutineDispatcher
 
     /**
+     * Monitor camera upload pause state
+     */
+    @Inject
+    lateinit var monitorCameraUploadPauseState: MonitorCameraUploadPauseState
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -511,10 +517,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var createFolderListener: CreateFolderListener? = null
     private val cuTransfers: MutableList<MegaTransfer> = mutableListOf()
 
-    private val pauseReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            @Suppress("DEPRECATION")
-            Handler().postDelayed({ updateProgressNotification() }, 1000)
+    private fun monitorUploadPauseStatus() {
+        coroutineScope?.launch {
+            monitorCameraUploadPauseState().collect {
+                updateProgressNotification()
+            }
         }
     }
 
@@ -552,10 +559,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         startForegroundNotification()
         registerReceiver(chargingStopReceiver, IntentFilter(Intent.ACTION_POWER_DISCONNECTED))
         registerReceiver(batteryInfoReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        registerReceiver(
-            pauseReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION)
-        )
+        monitorUploadPauseStatus()
         getAttrUserListener = GetCameraUploadAttributeListener(this)
         setAttrUserListener = SetAttrUserListener(this)
         createFolderListener = CreateFolderListener(this, ExtraAction.INIT_CAMERA_UPLOAD)
@@ -571,7 +575,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         receiver?.let { unregisterReceiver(it) }
         unregisterReceiver(chargingStopReceiver)
         unregisterReceiver(batteryInfoReceiver)
-        unregisterReceiver(pauseReceiver)
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
@@ -580,6 +583,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             it.removeTransferListener(this)
         }
         stopActiveHeartbeat()
+        coroutineScope?.cancel()
     }
 
     /**

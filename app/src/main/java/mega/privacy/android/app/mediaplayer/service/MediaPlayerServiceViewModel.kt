@@ -180,7 +180,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun setPaused(paused: Boolean, currentPosition: Long?) {
         this.paused = paused
-        postPlaylistItems(currentPosition = currentPosition, isScroll = false)
         mediaPlayback.value = paused
     }
 
@@ -514,8 +513,8 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
         typedNodes.mapIndexed { currentIndex, typedNode ->
             if (typedNode is TypedFileNode) {
-                mediaPlayerRepository.getLocalFilePath(typedNode)?.let { localPath ->
-                    if (isLocalFile(typedNode, localPath)) {
+                mediaPlayerRepository.getLocalFilePath(typedNode).let { localPath ->
+                    if (localPath != null && isLocalFile(typedNode, localPath)) {
                         mediaItemFromFile(File(localPath), typedNode.id.id.toString())
                     } else {
                         val url = if (isMegaApiFolder(type)) {
@@ -938,9 +937,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
         }
         playlist.postValue(Pair(items, scrollPosition))
     }
-
-    override fun setCurrentPosition(currentPosition: Long) =
-        postPlaylistItems(currentPosition, false)
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
         if (items.isEmpty()) return
