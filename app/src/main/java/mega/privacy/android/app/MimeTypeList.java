@@ -174,6 +174,7 @@ public class MimeTypeList {
                     break;
             }
         }
+
         return new MimeTypeList(detectedType, extension);
     }
 
