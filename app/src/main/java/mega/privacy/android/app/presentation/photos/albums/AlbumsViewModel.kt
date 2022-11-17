@@ -25,8 +25,8 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -171,7 +171,10 @@ class AlbumsViewModel @Inject constructor(
      */
     fun createNewAlbum(name: String) = viewModelScope.launch {
         try {
-            val album = createAlbum(name)
+            val finalName = name.ifEmpty {
+                _state.value.createAlbumPlaceholderTitle
+            }
+            val album = createAlbum(finalName)
             _state.update {
                 it.copy(currentAlbum = album)
             }
@@ -185,6 +188,27 @@ class AlbumsViewModel @Inject constructor(
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
         albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
 
+    /**
+     * Get the default album title
+     */
+    fun setPlaceholderAlbumTitle(placeholderTitle: String) {
+        val allUserAlbumsTitle: List<String> = _state.value.albums.filter {
+            it.id is Album.UserAlbum
+        }.map { (id) ->
+            val userAlbum = id as Album.UserAlbum
+            userAlbum.title
+        }
+        var i = 0
+        var currentDefaultTitle = placeholderTitle
+
+        while (currentDefaultTitle in allUserAlbumsTitle) {
+            currentDefaultTitle = placeholderTitle + "(${++i})"
+        }
+
+        _state.update {
+            it.copy(createAlbumPlaceholderTitle = currentDefaultTitle)
+        }
+    }
 
     private fun shouldAddAlbum(
         it: List<Photo>,

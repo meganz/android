@@ -235,6 +235,57 @@ class AlbumsViewModelTest {
         }
     }
 
+    @Test
+    fun `test that setPlaceholderAlbumTitle set the right text if no album with default name exists`() =
+        runTest {
+            val expectedName = "New album"
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf()))
+
+            underTest.setPlaceholderAlbumTitle("New album")
+
+            underTest.state.test {
+                val actualName = awaitItem().createAlbumPlaceholderTitle
+                assertEquals(expectedName, actualName)
+            }
+        }
+
+    @Test
+    fun `test that setPlaceholderAlbumTitle set the right text if an album with default name already exists`() =
+        runTest {
+            val expectedName = "New album(1)"
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf(
+                createUserAlbum(title = "New album")
+            )))
+            whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
+
+
+            underTest.state.drop(1).test {
+                awaitItem()
+                underTest.setPlaceholderAlbumTitle("New album")
+                val actualName = awaitItem().createAlbumPlaceholderTitle
+                assertEquals(expectedName, actualName)
+            }
+        }
+
+    @Test
+    fun `test that setPlaceholderAlbumTitle set the right text if two albums with default name already exist`() =
+        runTest {
+            val expectedName = "New album(2)"
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf(
+                createUserAlbum(id = AlbumId(1L), title = "New album", modificationTime = 1L),
+                createUserAlbum(id = AlbumId(2L), title = "New album(1)", modificationTime = 2L),
+            )))
+            whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
+
+
+            underTest.state.drop(2).test {
+                awaitItem()
+                underTest.setPlaceholderAlbumTitle("New album")
+                val actualName = awaitItem().createAlbumPlaceholderTitle
+                assertEquals(expectedName, actualName)
+            }
+        }
+
     private fun createImage(
         id: Long = 2L,
         parentId: Long = 0L,

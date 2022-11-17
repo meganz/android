@@ -31,7 +31,7 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val ALBUM_ID: String = "album_id"
+        internal const val ALBUM_ID: String = "album_id"
 
         const val MESSAGE: String = "message"
 
