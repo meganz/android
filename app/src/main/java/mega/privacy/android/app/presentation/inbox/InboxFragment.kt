@@ -238,7 +238,7 @@ class InboxFragment : RotatableFragment() {
             }
 
             gridLayoutManager?.let {
-                adapter?.getSpanSizeLookup(it.spanCount)
+                it.spanSizeLookup = adapter?.getSpanSizeLookup(it.spanCount)
             }
             recyclerView?.adapter = adapter
             observeUiState()

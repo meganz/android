@@ -56,7 +56,7 @@ import mega.privacy.android.app.middlelayer.iab.BillingManager
 import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.app.middlelayer.iab.MegaSku
+import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.psa.Psa

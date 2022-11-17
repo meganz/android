@@ -522,6 +522,7 @@ pipeline {
                 }
 
                 gitlabCommitStatus(name: 'Lint Check') {
+                    sh "mv custom_lint.xml lint.xml"
                     sh "./gradlew lint"
 
                     script {
