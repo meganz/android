@@ -23,17 +23,23 @@ class MeetingPastViewHolder(
     }
 
     fun bind(item: MeetingItem, isSelected: Boolean) {
-        val lastMessageColor = if (item.highlight) {
-            ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
-        } else {
-            getThemeColor(itemView.context, android.R.attr.textColorSecondary)
+        val lastMessageColor = when {
+            item.isScheduled() -> ContextCompat.getColor(itemView.context, R.color.red_600_red_300)
+            item.highlight -> ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
+            else -> getThemeColor(itemView.context, android.R.attr.textColorSecondary)
         }
 
         binding.txtTitle.text = item.title
-        binding.txtTimestamp.text = item.formattedTimestamp
-        binding.txtLastMessage.text = item.lastMessage
+        if (item.isScheduled()) {
+            binding.txtLastMessage.text = item.formattedScheduledTimestamp
+            binding.txtLastMessage.isVisible = !item.formattedScheduledTimestamp.isNullOrBlank()
+            binding.txtTimestamp.text = if (item.isRecurring) "Recurring meeting" else "Upcoming meeting"
+        } else {
+            binding.txtLastMessage.text = item.lastMessage
+            binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
+            binding.txtTimestamp.text = item.formattedTimestamp
+        }
         binding.txtLastMessage.setTextColor(lastMessageColor)
-        binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
         if (item.lastMessageIcon != null) {
             binding.imgLastMessage.setImageResource(item.lastMessageIcon)
         } else {

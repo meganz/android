@@ -1,8 +1,10 @@
 package mega.privacy.android.app.meeting.list
 
+import android.text.format.DateFormat
+import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
-import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
+import java.util.Calendar
 
 /**
  * Meeting item
@@ -20,6 +22,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupUser
  * @property highlight          Check if message should be highlighted
  * @property timeStamp          Last timestamp of the chat
  * @property formattedTimestamp Last timestamp of the chat formatted
+ * @property formattedScheduledTimestamp Timestamp of the scheduled chat formatted
  * @property startTimestamp     Schedule meeting start time
  * @property endTimestamp       Schedule meeting start time
  * @property isRecurring        Check if is recurring meeting
@@ -38,6 +41,7 @@ data class MeetingItem constructor(
     val highlight: Boolean,
     val timeStamp: Long,
     val formattedTimestamp: String,
+    val formattedScheduledTimestamp: String?,
     val startTimestamp: Long?,
     val endTimestamp: Long?,
     val isRecurring: Boolean,
@@ -57,11 +61,13 @@ data class MeetingItem constructor(
     fun isSingleMeeting(): Boolean =
         lastUser == null
 
-    class DiffCallback : DiffUtil.ItemCallback<MeetingItem>() {
-        override fun areItemsTheSame(oldItem: MeetingItem, newItem: MeetingItem): Boolean =
-            oldItem.chatId == newItem.chatId
+    fun getStartDay(): String {
+        if (startTimestamp == null) return ""
 
-        override fun areContentsTheSame(oldItem: MeetingItem, newItem: MeetingItem): Boolean =
-            oldItem == newItem
+        return DateUtils.getRelativeTimeSpanString(
+            startTimestamp,
+            System.currentTimeMillis(),
+            DateUtils.DAY_IN_MILLIS
+        ).toString()
     }
 }

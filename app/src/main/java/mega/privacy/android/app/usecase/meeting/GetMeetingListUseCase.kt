@@ -1,6 +1,7 @@
 package mega.privacy.android.app.usecase.meeting
 
 import android.content.Context
+import android.icu.text.SimpleDateFormat
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
@@ -40,6 +41,10 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
+import java.util.Calendar.DAY_OF_YEAR
+import java.util.Calendar.HOUR_OF_DAY
+import java.util.Calendar.MINUTE
+import java.util.Calendar.getInstance
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -59,6 +64,8 @@ class GetMeetingListUseCase @Inject constructor(
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val getLastMessageUseCase: GetLastMessageUseCase,
 ) {
+
+    private val hourFormat by lazy { SimpleDateFormat("hh:mm") }
 
     /**
      * Get a list of updated MeetingItems
@@ -255,13 +262,32 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
+        val isScheduled = Random.nextBoolean()
+        val isRecurring = Random.nextBoolean()
         val lastMessageIcon = when {
+            isScheduled ->
+                null
             chatListItem.lastMessageType == MegaChatMessage.TYPE_VOICE_CLIP ->
                 R.drawable.ic_mic_on_small
             chatListItem.isGeolocationMetaType() ->
                 R.drawable.ic_location_small
             else ->
                 null
+        }
+        val startTime = getInstance().apply {
+            set(DAY_OF_YEAR, get(DAY_OF_YEAR) + Random.nextInt(7))
+            set(HOUR_OF_DAY, Random.nextInt(20))
+            set(MINUTE, Random.nextInt(60))
+        }
+        val endTime = getInstance().apply {
+            timeInMillis = startTime.timeInMillis
+            set(HOUR_OF_DAY, get(HOUR_OF_DAY) + Random.nextInt(1, 4))
+        }
+        val scheduleText = "${hourFormat.format(startTime.time)} - ${hourFormat.format(endTime.time)}"
+        val formattedScheduledTimestamp = if (isRecurring) {
+            "$scheduleText Weekly"
+        } else {
+            scheduleText
         }
 
         return MeetingItem(
@@ -278,9 +304,10 @@ class GetMeetingListUseCase @Inject constructor(
             highlight = highlight,
             timeStamp = chatListItem.lastTimestamp,
             formattedTimestamp = formattedDate,
-            if (Random.nextBoolean()) System.currentTimeMillis().plus(Random.nextLong()) else null,
-            null,
-            Random.nextBoolean()
+            formattedScheduledTimestamp = if (isScheduled) formattedScheduledTimestamp else null,
+            startTimestamp = if (isScheduled) startTime.timeInMillis else null,
+            endTimestamp = if (isScheduled) endTime.timeInMillis else null,
+            isRecurring
         )
     }
 

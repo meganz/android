@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.list.adapter
 
+import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.selection.SelectionTracker
@@ -9,14 +10,15 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemMeetingDataBinding
 import mega.privacy.android.app.databinding.ItemMeetingHeaderBinding
 import mega.privacy.android.app.meeting.list.MeetingItem
+import mega.privacy.android.app.meeting.list.MeetingItemDiffCallback
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 import mega.privacy.android.app.utils.TimeUtils
-import kotlin.random.Random
+import java.util.Calendar
 
 class MeetingsAdapter constructor(
     private val itemCallback: (Long) -> Unit,
     private val itemMoreCallback: (Long) -> Unit,
-) : ListAdapter<MeetingItem, RecyclerView.ViewHolder>(MeetingItem.DiffCallback()), SectionTitleProvider {
+) : ListAdapter<MeetingItem, RecyclerView.ViewHolder>(MeetingItemDiffCallback()), SectionTitleProvider {
 
     companion object {
         private const val TYPE_HEADER = 0
@@ -28,6 +30,7 @@ class MeetingsAdapter constructor(
         setHasStableIds(true)
     }
 
+    private val headerItems = mutableMapOf<Int, String>()
     private var enableScheduleMeetings: Boolean = false
     var tracker: SelectionTracker<Long>? = null
 
@@ -64,7 +67,7 @@ class MeetingsAdapter constructor(
                 (holder as MeetingPastViewHolder).bind(item, isItemSelected)
             }
             else -> {
-                (holder as MeetingHeaderViewHolder).bind(if (Random.nextBoolean()) "Today" else "Past meetings")
+                (holder as MeetingHeaderViewHolder).bind(headerItems[position]!!)
             }
         }
     }
@@ -77,13 +80,55 @@ class MeetingsAdapter constructor(
 
     override fun getItemViewType(position: Int): Int {
         if (!enableScheduleMeetings) return TYPE_MEETING_PAST
-        val currentItem = getItem(position)
-        val currentTime = System.currentTimeMillis()
+//        val currentItem = getItem(position)
+//        val currentTime = System.currentTimeMillis()
         return when {
-            position == 0 || position == 3 -> TYPE_HEADER
-            (currentItem.startTimestamp ?: 0) > currentTime -> TYPE_MEETING_SCHEDULED
+            headerItems.containsKey(position) -> TYPE_HEADER
+//            (currentItem.startTimestamp ?: 0) > currentTime -> TYPE_MEETING_SCHEDULED
             else -> TYPE_MEETING_PAST
         }
+    }
+
+    override fun submitList(list: List<MeetingItem>?) {
+        val sortedList = list?.sortedByDescending { it.isScheduled() }
+        list.addHeadersIfRequired()
+        super.submitList(sortedList)
+    }
+
+    override fun submitList(list: List<MeetingItem>?, commitCallback: Runnable?) {
+        val sortedList = list?.sortedByDescending { it.isScheduled() }
+        list.addHeadersIfRequired()
+        super.submitList(sortedList, commitCallback)
+    }
+
+    private fun List<MeetingItem>?.addHeadersIfRequired() {
+        if (enableScheduleMeetings) {
+            this?.forEachIndexed { index, item ->
+                val previousItem = getOrNull(index - 1)
+                val nextItem = getOrNull(index + 1)
+                when {
+                    item.isScheduled() && isSameDay(previousItem?.startTimestamp, item.startTimestamp) -> {
+                        headerItems[index] = item.getStartDay()
+                    }
+                    item.isScheduled() && nextItem != null && !nextItem.isScheduled() -> {
+                        headerItems[index] = "Past meetings"
+                    }
+                }
+            }
+        }
+    }
+
+    private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean {
+        if (timeStampA == null || timeStampB == null) return false
+
+        val dateFormat = SimpleDateFormat("ddMMyyyy")
+        val calendarA = Calendar.getInstance().apply {
+            timeInMillis = timeStampA
+        }
+        val calendarB = Calendar.getInstance().apply {
+            timeInMillis = timeStampB
+        }
+        return dateFormat.format(calendarA.time) == dateFormat.format(calendarB.time)
     }
 
     fun setScheduleMeetingsEnabled(enable: Boolean) {
