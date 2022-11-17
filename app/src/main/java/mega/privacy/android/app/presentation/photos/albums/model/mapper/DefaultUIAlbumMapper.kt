@@ -9,16 +9,9 @@ import mega.privacy.android.domain.entity.photos.Photo
 import javax.inject.Inject
 
 /**
- * UIAlbumMapper
- */
-interface UIAlbumMapper {
-    operator fun invoke(photos: List<Photo>, album: Album): UIAlbum
-}
-
-/**
  * Mapper to convert list of Photos to UIAlbum
  */
-class ToUIAlbum @Inject constructor(@ApplicationContext private val context: Context) :
+class DefaultUIAlbumMapper @Inject constructor(@ApplicationContext private val context: Context) :
     UIAlbumMapper {
 
     override fun invoke(photos: List<Photo>, album: Album): UIAlbum {

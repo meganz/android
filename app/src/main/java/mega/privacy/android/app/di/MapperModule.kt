@@ -17,8 +17,6 @@ import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMappe
 import mega.privacy.android.app.presentation.achievements.toUIMegaAchievement
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.ToUIAlbum
 import mega.privacy.android.data.mapper.SkuMapper
 
 /**
@@ -63,12 +61,6 @@ class MapperModule {
      */
     @Provides
     fun provideSkuMapper(): SkuMapper = ::toSkuMapper
-
-    /**
-     * Provide UIAlbum mapper
-     */
-    @Provides
-    fun provideUIAlbumMapper(): UIAlbumMapper = ::ToUIAlbum
 
     /**
      * Provide UIMegaAchievementMapper
