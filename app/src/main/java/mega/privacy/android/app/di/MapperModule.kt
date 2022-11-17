@@ -3,6 +3,7 @@ package mega.privacy.android.app.di
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
@@ -25,7 +26,7 @@ import mega.privacy.android.data.mapper.SkuMapper
  * Module for providing mapper dependencies
  */
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 class MapperModule {
 
     /**

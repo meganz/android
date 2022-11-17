@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.achievements
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,6 +17,7 @@ import javax.inject.Inject
  * @param getAccountAchievements : [GetAccountAchievements] use case
  * @param uiMegaAchievementMapper : UIMegaAchievementMapper
  */
+@HiltViewModel
 class AchievementsViewModel @Inject constructor(
     private val getAccountAchievements: GetAccountAchievements,
     private val uiMegaAchievementMapper: UIMegaAchievementMapper,
