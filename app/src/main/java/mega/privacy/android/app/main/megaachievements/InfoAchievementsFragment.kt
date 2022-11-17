@@ -71,8 +71,9 @@ class InfoAchievementsFragment : Fragment(), GetAchievementsListener.DataCallbac
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         getAchievementsListener.setDataCallback(this)
         getAchievementsTitleAndType(achievementType = achievementType).run {
             achievementsViewModel.setToolbarTitle(this.first)
