@@ -52,7 +52,11 @@ fun DiscardReportDialog(
                     )
                 )
             }
-        }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        ),
     )
 }
 
