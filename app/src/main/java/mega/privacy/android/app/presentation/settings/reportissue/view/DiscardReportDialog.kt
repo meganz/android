@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
+import mega.privacy.android.presentation.controls.MegaDialog
 import mega.privacy.android.presentation.theme.AndroidTheme
 
 @Composable
@@ -21,27 +22,16 @@ fun DiscardReportDialog(
     onDiscardCancelled: () -> Unit,
     onDiscard: () -> Unit,
 ) {
-    AlertDialog(
+    MegaDialog(
         onDismissRequest = onDiscardCancelled,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        ),
-        title = {
-            Text(
-                text = stringResource(id = R.string.settings_help_report_issue_discard_dialog_title),
-                color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.white_alpha_054) else Color(
-                    0x8A000000
-                )
-            )
-        },
+        titleStringID = R.string.settings_help_report_issue_discard_dialog_title,
         confirmButton = {
             TextButton(
                 onClick = onDiscard,
                 modifier = Modifier
             ) {
                 Text(
-                    text = stringResource(id = R.string.settings_help_report_issue_discard_button).uppercase(),
+                    text = stringResource(id = R.string.settings_help_report_issue_discard_button),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -55,7 +45,7 @@ fun DiscardReportDialog(
                 modifier = Modifier
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel).uppercase(),
+                    text = stringResource(id = R.string.general_cancel),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -63,7 +53,10 @@ fun DiscardReportDialog(
                 )
             }
         },
-        backgroundColor = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.dark_grey) else MaterialTheme.colors.surface
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        ),
     )
 }
 
