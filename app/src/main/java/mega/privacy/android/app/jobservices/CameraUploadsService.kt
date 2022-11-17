@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
-import android.os.BatteryManager
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -111,6 +110,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -487,6 +487,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var monitorCameraUploadPauseState: MonitorCameraUploadPauseState
 
     /**
+     * Monitor battery level
+     */
+    @Inject
+    lateinit var monitorBatteryInfo: MonitorBatteryInfo
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -502,7 +508,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var notificationManager: NotificationManager? = null
     private var builder: NotificationCompat.Builder? = null
     private var intent: Intent? = null
-    private var batteryIntent: Intent? = null
+    private var isDeviceLowOnBattery: Boolean = false
     private var pendingIntent: PendingIntent? = null
     private var tempRoot: String? = null
     private var isOverQuota = false
@@ -525,6 +531,22 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
+    private fun monitorBatteryLevelStatus() {
+        coroutineScope?.launch {
+            monitorBatteryInfo().collect {
+                isDeviceLowOnBattery = (it.level <= LOW_BATTERY_LEVEL && it.isCharging)
+                if (isDeviceLowOnBattery) {
+                    coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
+                    for (transfer in cuTransfers) {
+                        megaApi?.cancelTransfer(transfer)
+                    }
+                    sendTransfersInterruptedInfoToBackupCenter()
+                    endService()
+                }
+            }
+        }
+    }
+
     private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             coroutineScope?.launch {
@@ -532,20 +554,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     Timber.d("Detected device stops charging.")
                     videoCompressor?.stop()
                 }
-            }
-        }
-    }
-
-    private val batteryInfoReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            batteryIntent = intent
-            if (isDeviceLowOnBattery(batteryIntent)) {
-                coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
-                for (transfer in cuTransfers) {
-                    megaApi?.cancelTransfer(transfer)
-                }
-                sendTransfersInterruptedInfoToBackupCenter()
-                endService()
             }
         }
     }
@@ -558,7 +566,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         coroutineScope = CoroutineScope(ioDispatcher)
         startForegroundNotification()
         registerReceiver(chargingStopReceiver, IntentFilter(Intent.ACTION_POWER_DISCONNECTED))
-        registerReceiver(batteryInfoReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
         getAttrUserListener = GetCameraUploadAttributeListener(this)
         setAttrUserListener = SetAttrUserListener(this)
@@ -574,7 +582,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         isServiceRunning = false
         receiver?.let { unregisterReceiver(it) }
         unregisterReceiver(chargingStopReceiver)
-        unregisterReceiver(batteryInfoReceiver)
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
@@ -745,7 +752,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 endService()
                 return
             }
-            if (isDeviceLowOnBattery(batteryIntent)) {
+            if (isDeviceLowOnBattery) {
                 endService()
                 return
             }
@@ -2001,14 +2008,5 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 ex.printStackTrace()
             }
         }
-    }
-
-    private fun isDeviceLowOnBattery(intent: Intent?): Boolean {
-        if (intent == null) {
-            return false
-        }
-        val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-        Timber.d("Device battery level is %s", level)
-        return level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
     }
 }
