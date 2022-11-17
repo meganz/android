@@ -521,7 +521,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var notificationManager: NotificationManager? = null
     private var builder: NotificationCompat.Builder? = null
     private var intent: Intent? = null
-    private var isDeviceLowOnBattery: Boolean = false
+    private var deviceAboveMinimumBatteryLevel: Boolean = true
     private var pendingIntent: PendingIntent? = null
     private var tempRoot: String? = null
     private var isOverQuota = false
@@ -547,8 +547,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
             monitorBatteryInfo().collect {
-                isDeviceLowOnBattery = (it.level <= LOW_BATTERY_LEVEL && it.isCharging)
-                if (isDeviceLowOnBattery) {
+                deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
+                if (!deviceAboveMinimumBatteryLevel) {
                     coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
                     for (transfer in cuTransfers) {
                         megaApi?.cancelTransfer(transfer)
@@ -559,6 +559,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         }
     }
+
+    // above battery level -> level > LOW_BATTERY_LEVEL || Util.isCharging
+    // below battery level -> level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
 
     private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -776,7 +779,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * 1. The Preferences exist - [preferencesExist],
      * 2. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
      * 3. The User is online - [isUserOnline],
-     * 4. The Device battery level is above the minimum threshold - [isDeviceLowOnBattery],
+     * 4. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
      * 5. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
      * 6. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
      * 7. The local Primary Folder exists - [hasLocalPrimaryFolder],
@@ -796,7 +799,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             !preferencesExist() -> StartCameraUploadsState.MISSING_PREFERENCES
             !cameraUploadsSyncEnabled() -> StartCameraUploadsState.DISABLED_SYNC
             !isUserOnline() -> StartCameraUploadsState.OFFLINE_USER
-            isDeviceLowOnBattery -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
+            !deviceAboveMinimumBatteryLevel -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
             !hasCameraUploadsLocalPath() -> StartCameraUploadsState.MISSING_LOCAL_PATH
             !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
             !hasLocalPrimaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
