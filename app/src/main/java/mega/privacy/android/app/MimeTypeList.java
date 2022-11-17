@@ -111,8 +111,13 @@ public class MimeTypeList {
             extension = fixedName.substring(index + 1);
         }
 
-        String detectedType = MimeTypeMap.getSingleton()
-                .getMimeTypeFromExtension(extension);
+        String detectedType;
+        if (extension.equals("dcr")) {
+            detectedType = "image/dcr";
+        } else {
+            detectedType = MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(extension);
+        }
 
         if (detectedType == null) {
             switch (extension) {
@@ -168,10 +173,6 @@ public class MimeTypeList {
                     detectedType = "application/octet-stream";
                     break;
             }
-        }
-
-        if (extension.equals("dcr")) {
-            detectedType = "image/dcr";
         }
         return new MimeTypeList(detectedType, extension);
     }
