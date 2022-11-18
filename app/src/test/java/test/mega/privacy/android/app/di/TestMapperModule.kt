@@ -9,6 +9,7 @@ import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 
 import mega.privacy.android.app.di.MapperModule
+import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
@@ -41,5 +42,9 @@ object TestMapperModule {
     fun provideUIAlbumMapper(): UIAlbumMapper = mock()
 
     @Provides
+    fun providePlaylistItemMapper(): PlaylistItemMapper = mock()
+
+    @Provides
     fun provideAchievementsMapper(): UIMegaAchievementMapper = mock()
+
 }

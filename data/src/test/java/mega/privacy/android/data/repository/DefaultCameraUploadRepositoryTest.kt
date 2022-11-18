@@ -65,7 +65,8 @@ class DefaultCameraUploadRepositoryTest {
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             ioDispatcher = UnconfinedTestDispatcher(),
-            appEventGateway = mock()
+            appEventGateway = mock(),
+            broadcastReceiverGateway = mock(),
         )
     }
 
