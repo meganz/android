@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -242,4 +243,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideMonitorBatteryInfo() = mock<MonitorBatteryInfo>()
+
+    @Provides
+    fun provideMonitorChargingStoppedState() = mock<MonitorChargingStoppedState>()
 }
