@@ -7,7 +7,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.MegaRecentActionBucketProvider
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaApiJava
@@ -30,6 +32,13 @@ class DefaultRecentActionsRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
 
+    private val recentActionsMapper: RecentActionsMapper =
+        { list: MegaRecentActionBucketList?, bucketProvider: MegaRecentActionBucketProvider ->
+            list?.let { actions ->
+                (0 until actions.size()).map { bucketProvider(mock()) }
+            } ?: emptyList()
+        }
+
     private val recentActionBucketMapper = mock<RecentActionBucketMapper>()
 
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
@@ -40,6 +49,7 @@ class DefaultRecentActionsRepositoryTest {
     fun setUp() {
         underTest = DefaultRecentActionsRepository(
             megaApiGateway = megaApiGateway,
+            recentActionsMapper = recentActionsMapper,
             recentActionBucketMapper = recentActionBucketMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             cacheFolderGateway = cacheFolderGateway,
@@ -50,21 +60,10 @@ class DefaultRecentActionsRepositoryTest {
     @Test
     fun `test that get recent actions returns the result of api recentActions`() = runTest {
         val megaApiJava = mock<MegaApiJava>()
-        val megaRecentActionBucket = mock<MegaRecentActionBucket>() {
-            on { timestamp }.thenReturn(0L)
-            on { userEmail }.thenReturn("1")
-            on { parentHandle }.thenReturn(1L)
-            on { isUpdate }.thenReturn(true)
-            on { isMedia }.thenReturn(true)
-            on { nodes }.thenReturn(mock())
-        }
-        val bucketList = mock<MegaRecentActionBucketList> {
-            on { size() }.thenReturn(4)
-            on { get(any()) }.thenReturn(megaRecentActionBucket)
-        }
+        val bucketList = mock<MegaRecentActionBucketList> { on { size() }.thenReturn(4) }
         val request = mock<MegaRequest> { on { recentActions }.thenReturn(bucketList) }
         val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
-
+        val list = (1..4).map { mock<MegaRecentActionBucket>() }
         val recentActionBucket = RecentActionBucketUnTyped(
             isMedia = true,
             isUpdate = true,
@@ -74,6 +73,7 @@ class DefaultRecentActionsRepositoryTest {
             nodes = emptyList(),
         )
         val expected = (1..4).map { recentActionBucket }
+
         whenever(megaApiGateway.getRecentActionsAsync(any(), any(), any())).thenAnswer {
             (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
                 megaApiJava,
@@ -81,8 +81,9 @@ class DefaultRecentActionsRepositoryTest {
                 error
             )
         }
+        whenever(recentActionsMapper(bucketList, mock())).thenReturn(list)
         whenever(recentActionBucketMapper.invoke(
-            megaRecentActionBucket,
+            mock(),
             mock(),
             mock(),
             mock(),
@@ -91,6 +92,7 @@ class DefaultRecentActionsRepositoryTest {
             mock(),
             mock(),
         )).thenReturn(recentActionBucket)
+
         assertThat(underTest.getRecentActions().size).isEqualTo(expected.size)
     }
 }

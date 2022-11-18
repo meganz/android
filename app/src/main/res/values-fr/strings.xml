@@ -3503,8 +3503,6 @@
     <string name="change_meeting_name">Changer le nom de la réunion</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Lien de la réunion</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Durée</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Me joindre à une réunion en tant qu’invité</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3683,8 +3681,6 @@
     <string name="payment_methods">Modes de paiement</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Procéder au paiement</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Nous vous remercions pour votre abonnement %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">mensuel Pro&#160;Lite</string>
     <!-- Pro Lite yearly subscription -->
@@ -4137,4 +4133,28 @@
     <string name="media_player_video_snackbar_screenshot_saved">L’image a été enregistrée dans la galerie de votre appareil</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Date de renouvellement&#160;:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Saisir le nom de l’album</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">Nouvel album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Partager le lien de la réunion</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Afficher davantage</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Quitter le groupe</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">Un album du même nom existe déjà. Saisissez un nom différent.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nouvel album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>
