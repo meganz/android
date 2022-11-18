@@ -7,7 +7,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 
 /**
@@ -33,5 +35,9 @@ abstract class SharedUseCaseModule {
         @Provides
         fun provideCheckAccessErrorExtended(repository: FilesRepository) =
             CheckAccessErrorExtended(repository::checkAccessErrorExtended)
+
+        @Provides
+        fun provideGetSpecificAccountDetail(repository: AccountRepository) =
+            GetSpecificAccountDetail(repository::getSpecificAccountDetail)
     }
 }
