@@ -1046,7 +1046,7 @@
     <!-- Label for the option of the sliding panel to start a one to one chat -->
     <string name="group_chat_start_conversation_label">開始對話</string>
     <!-- Label for the option of the sliding panel to edit the profile -->
-    <string name="group_chat_edit_profile_label">編輯檔案</string>
+    <string name="group_chat_edit_profile_label">編輯個人資料</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
     <string name="title_properties_chat_leave_chat">離開群組</string>
     <!-- Label for participants of a group chat -->
@@ -3941,4 +3941,10 @@
     <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="other"></item>
+    </plurals>
 </resources>

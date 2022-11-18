@@ -4045,4 +4045,11 @@
     <string name="photos_create_album_error_message_duplicate">Een album met deze naam bestaat al. Voer een andere naam in.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nieuw album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>

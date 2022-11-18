@@ -4250,7 +4250,16 @@
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album"></string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <string name="photos_create_album_error_message_duplicate">Альбом с таким названием уже существует. Введите другое название.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Новый альбом (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>

@@ -3941,4 +3941,10 @@
     <string name="photos_create_album_error_message_duplicate">มีอัลบั้มที่ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">อัลบั้มใหม่ (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="other"></item>
+    </plurals>
 </resources>

@@ -3940,7 +3940,7 @@
     <!-- Button text for discard dialog option-->
     <string name="settings_help_report_issue_discard_button">Descartar</string>
     <!-- Text shown when editing a chatroom message -->
-    <string name="edit_chat_message">Modificar mensaje</string>
+    <string name="edit_chat_message">Editar mensaje</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Llamada</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -4138,15 +4138,23 @@
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">Nuevo álbum</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Compartir enlace de la reunión</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Mostrar más</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Abandonar grupo</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album"></string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <string name="photos_create_album_error_message_duplicate">Ya existe un álbum con este nombre. Introduce un nombre diferente.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nuevo álbum (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>
