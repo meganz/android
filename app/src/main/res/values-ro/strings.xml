@@ -2846,7 +2846,7 @@
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Cont dezactivat</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure. You won’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure. You won’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3503,8 +3503,6 @@
     <string name="change_meeting_name">Modifică numele întâlnirii</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link al întâlnirii</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Durată</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Alătură-te întâlnirii ca invitat</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3683,8 +3681,6 @@
     <string name="payment_methods">Metode de plată</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Continuă</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Îți mulțumim pentru abonamentul %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">lunar Pro&#160;Lite</string>
     <!-- Pro Lite yearly subscription -->
@@ -4137,4 +4133,28 @@
     <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria dispozitivului</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Data reînnoirii:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title"></string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one"></item>
+        <item quantity="few"></item>
+        <item quantity="other"></item>
+    </plurals>
 </resources>
