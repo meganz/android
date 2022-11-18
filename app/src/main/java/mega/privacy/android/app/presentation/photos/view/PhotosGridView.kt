@@ -108,6 +108,7 @@ internal fun PhotosGridView(
                     PhotoViewContainer(
                         photo = item.photo,
                         isSelected = isSelected,
+                        currentZoomLevel = currentZoomLevel,
                         modifier = Modifier
                             .isSelected(isSelected)
                             .combinedClickable(
@@ -138,11 +139,22 @@ internal fun PhotosGridView(
 internal fun PhotoViewContainer(
     photo: Photo,
     isSelected: Boolean,
+    currentZoomLevel: ZoomLevel,
     modifier: Modifier = Modifier,
     photoView: @Composable () -> Unit,
 ) {
     Box(
-        modifier = modifier
+        modifier = when (currentZoomLevel) {
+            ZoomLevel.Grid_1 -> modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)
+            ZoomLevel.Grid_3 -> modifier
+                .fillMaxSize()
+                .padding(all = 1.5.dp)
+            ZoomLevel.Grid_5 -> modifier
+                .fillMaxSize()
+                .padding(all = 1.dp)
+        }
     ) {
 
         photoView()

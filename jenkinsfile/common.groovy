@@ -93,19 +93,12 @@ void sendToMR(String message) {
 }
 
 /**
- * Get the short commit ID of SDK
- * @return short git commit ID
+ * download jenkins build console log and save to file.
  */
-String getSdkGitHash() {
-    return sh(script: "cd $WORKSPACE/sdk/src/main/jni/mega/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
-}
-
-/**
- * Get the short commit ID of mega chat SDK
- * @return short git commit ID
- */
-String getMegaChatSdkGitHash() {
-    return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
+void downloadJenkinsConsoleLog(String downloaded) {
+    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
+        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
+    }
 }
 
 return this

@@ -9,12 +9,6 @@ internal interface AppEventGateway {
      */
     val monitorCameraUploadPauseState: Flow<Boolean>
 
-
-    /**
-     * monitor battery info
-     */
-    val monitorBatteryInfo: Flow<Int>
-
     /**
      * monitor charging state
      */

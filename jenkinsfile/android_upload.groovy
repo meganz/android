@@ -21,6 +21,9 @@ MEGACHAT_TAG = ""
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
 
+// The log file of publishing pre-built SDK to Artifatory
+ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
+
 /**
  * common.groovy file with common methods
  */
@@ -68,9 +71,27 @@ pipeline {
         failure {
             script {
 
-                downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                common = load('jenkinsfile/common.groovy')
+                common.helloWorld()
 
-                if (common.hasGitLabMergeRequest()) {
+                common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+
+                if (triggerByDeliverQaCmd() || triggerByDeliverQaCmd()) {
+                    if (common.hasGitLabMergeRequest()) {
+                        // upload Jenkins console log
+                        String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
+
+                        String message = firebaseUploadFailureMessage("<br/>") +
+                                "<br/>Build Log:\t${jsonJenkinsLog}" +
+                                sdkBuildMessage
+
+                        common.sendToMR(message)
+                    } else {
+                        // if build is triggered by PUSH, send result only to Slack
+                        slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
+                        slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
+                    }
+                } else if (triggerByPublishSdkCmd()) {
                     // upload Jenkins console log
                     String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
@@ -78,28 +99,38 @@ pipeline {
                     String sdkBuildMessage = ""
                     if (BUILD_STEP == "Build SDK For Publish") {
                         def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
-                        sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog}"
+                        sdkBuildMessage = "<br/>SDK BuildLog:\t${jsonSdkLog}"
                     }
 
-                    String message = failureMessage("<br/>") +
+                    String message = publishSdkFailureMessage("<br/>") +
                             "<br/>Build Log:\t${jsonJenkinsLog}" +
                             sdkBuildMessage
 
                     common.sendToMR(message)
-                } else {
-                    // if build is triggered by PUSH, send result only to Slack
-                    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-                        slackSend color: 'danger', message: failureMessage("\n")
-                        slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
-                    }
+
+                    slackSend color: 'danger', message: publishSdkFailureMessage("\n")
+                    slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                 }
             }
         }
         success {
             script {
-                slackSend color: "good", message: successMessage("\n")
-                common.sendToMR(successMessage("<br/>"))
+                common = load('jenkinsfile/common.groovy')
+                common.helloWorld()
+
+                if (triggerByDeliverQaCmd() || triggerByPush()) {
+                    slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
+                    common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
+                } else if (triggerByPublishSdkCmd()) {
+                    slackSend color: "good", message: publishSdkSuccessMessage("\n")
+                    common.sendToMR(publishSdkSuccessMessage("<br/>"))
+                }
             }
+        }
+        cleanup {
+            // delete whole workspace after each successful build, to save Jenkins storage
+            // We do not clean workspace if build fails, for a chance to investigate the crime scene.
+            cleanWs(cleanWhenFailure: false)
         }
     }
     stages {
@@ -110,7 +141,6 @@ pipeline {
 
                     common = load('jenkinsfile/common.groovy')
                     common.helloWorld()
-                    common.sendToMR("Hello! Load Common Script")
                 }
             }
         }
@@ -289,11 +319,13 @@ pipeline {
                         withEnv([
                                 "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
-                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}"
+                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}",
+                                "SDK_COMMIT=${getSdkGitHash()}",
+                                "CHAT_COMMIT=${getMegaChatSdkGitHash()}"
                         ]) {
                             sh """
                                 cd ${WORKSPACE}
-                                ./gradlew sdk:artifactoryPublish
+                                ./gradlew sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
                             """
                         }
                     }
@@ -520,8 +552,15 @@ pipeline {
     }
 }
 
-private String failureMessage(String lineBreak) {
-    String message = ":x: Android Firebase Upload Build Failed!" +
+/**
+ * Create the build report of failed Firebase Upload
+ *
+ * @param lineBreak the line break used between the lines. For GitLab and Slack, different line break
+ * can be provided. GitLab accepts HTML "<BR/>", and Slack accepts "\n"
+ * @return failure message
+ */
+private String firebaseUploadFailureMessage(String lineBreak) {
+    String message = ":x: Android Firebase Upload Build Failed!(BuildNumber: ${env.BUILD_NUMBER})" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
@@ -531,6 +570,20 @@ private String failureMessage(String lineBreak) {
     } else if (env.gitlabActionType == "NOTE") {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
     }
+    return message
+}
+
+/**
+ * Create the build report of failed prebuilt SDK build
+ *
+ * @param lineBreak the line break used between the lines. For GitLab and Slack, different line break
+ * can be provided. GitLab accepts HTML "<BR/>", and Slack accepts "\n"
+ * @return failure message
+ */
+private String publishSdkFailureMessage(String lineBreak) {
+    String message = ":x: Prebuilt SDK Creation Failed!(BuildNumber: ${env.BUILD_NUMBER})" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}"
     return message
 }
 
@@ -624,8 +677,8 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
  * while GitLab MR uses "<br/>".
  * @return The success message to be sent
  */
-private String successMessage(String lineBreak) {
-    return ":rocket: Android APK Build uploaded successfully to Firebase AppDistribution!" +
+private String firebaseUploadSuccessMessage(String lineBreak) {
+    return ":rocket: Android APK Build uploaded successfully to Firebase AppDistribution!(${env.BUILD_NUMBER})" +
             "${lineBreak}Version:\t${readAppVersion()}${APK_VERSION_NAME_FOR_CD}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
@@ -636,13 +689,28 @@ private String successMessage(String lineBreak) {
 }
 
 /**
+ * compose the success message, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+private String publishSdkSuccessMessage(String lineBreak) {
+    common = load('jenkinsfile/common.groovy')
+    return ":rocket: Prebuilt SDK is published to Artifactory Successfully!(${env.BUILD_NUMBER})" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}SDK Commit:\t${getSdkGitHash()}" +
+            "${lineBreak}Chat SDK Commit:\t${getMegaChatSdkGitHash()}" +
+            "${lineBreak}Version:\tnz.mega.sdk:sdk:${getSdkVersionText()}" +
+            "${lineBreak}AAR Artifactory Page: ${getSdkAarArtifactoryPage()}"
+}
+
+/**
  * Check this build is triggered by PUSH to a branch
  * @return
  */
 private boolean triggerByPush() {
     return env.gitlabActionType == "PUSH"
 }
-
 
 /**
  * Check if this build is triggered by a deliver_qa command
@@ -715,7 +783,7 @@ def parseCommandParameter() {
     println("[DEBUG] parsing command parameters. \nuser input: $fullCommand")
 
     String command
-    if (triggerByDeliverQaCmd()){
+    if (triggerByDeliverQaCmd()) {
         command = DELIVER_QA_CMD
     } else if (triggerByPublishSdkCmd()) {
         command = PUBLISH_SDK_CMD
@@ -830,15 +898,6 @@ private String lastCommitMessage() {
 }
 
 /**
- * download jenkins build console log and save to file.
- */
-private void downloadJenkinsConsoleLog(String downloaded) {
-    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
-    }
-}
-
-/**
  * upload file to GitLab and return the GitLab link
  * @param fileName the local file to be uploaded
  * @return file link on GitLab
@@ -866,4 +925,54 @@ private String getSdkPublishType() {
     }
 }
 
+/**
+ * Parse log file of publishing SDK to Artifactory maven repo
+ * and return the new pre-built SDK version. For example:
+ * "20221109.084452-rel"
+ *
+ * The version info is extracted from below line in the log:
+ * "[pool-4-thread-1] Deploying artifact: https://artifactory.developers.mega.co.nz/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/20221109.084452-rel/sdk-20221109.084452-rel.aar"
+ *
+ * @return the version text of the SDK that has just been published to Artifactory
+ */
+private String getSdkVersionText() {
+    println("Entering getSdkVersionText()")
 
+    String content = sh(script: "grep 'Deploying artifact' ${ARTIFACTORY_PUBLISH_LOG}", returnStdout: true).trim()
+    String[] lines = content.split("\n")
+    for (line in lines) {
+        println("parsing line = $line")
+        if (line.endsWith("aar")) {
+            String version = line.substring(line.lastIndexOf("/sdk-") + 5, line.lastIndexOf("."))
+            println("SDK version = $version")
+            return version
+        }
+    }
+    return "Invalid Sdk Version"
+}
+
+/**
+ * Get Sdk AAR download link
+ *
+ * @return download link
+ */
+private String getSdkAarArtifactoryPage() {
+    String version = getSdkVersionText()
+    return "https://artifactory.developers.mega.co.nz/ui/repos/tree/Properties/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
+}
+
+/**
+ * Get the short commit ID of SDK
+ * @return short git commit ID
+ */
+String getSdkGitHash() {
+    return sh(script: "cd $WORKSPACE/sdk/src/main/jni/mega/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
+}
+
+/**
+ * Get the short commit ID of mega chat SDK
+ * @return short git commit ID
+ */
+String getMegaChatSdkGitHash() {
+    return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
+}

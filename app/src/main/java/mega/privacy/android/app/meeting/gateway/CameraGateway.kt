@@ -13,10 +13,10 @@ interface CameraGateway {
     /**
      * Get front camera
      */
-    fun getFrontCamera(): String
+    fun getFrontCamera(): String?
 
     /**
      * Get back camera
      */
-    fun getBackCamera(): String
+    fun getBackCamera(): String?
 }

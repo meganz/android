@@ -133,7 +133,7 @@ class FavouritesViewHolder(
                                 if (file.exists()) {
                                     itemThumbnail.setImageURI(Uri.fromFile(file))
                                 } else {
-                                    getThumbnail(info.handle) { thumbnail ->
+                                    getThumbnail(info.nodeId.id) { thumbnail ->
                                         thumbnail?.let { fileByGetThumbnail ->
                                             itemThumbnail.setImageURI(
                                                 Uri.fromFile(
@@ -206,7 +206,7 @@ class FavouritesViewHolder(
  */
 object FavouritesDiffCallback : DiffUtil.ItemCallback<FavouriteItem>() {
     override fun areItemsTheSame(oldInfo: FavouriteItem, newInfo: FavouriteItem): Boolean {
-        return oldInfo.favourite?.handle == newInfo.favourite?.handle
+        return oldInfo.favourite?.nodeId == newInfo.favourite?.nodeId
     }
 
     override fun areContentsTheSame(oldInfo: FavouriteItem, newInfo: FavouriteItem): Boolean {

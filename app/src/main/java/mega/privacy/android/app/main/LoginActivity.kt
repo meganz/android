@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +26,7 @@ import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util
@@ -46,6 +48,8 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
+
+    private val viewModel by viewModels<LoginViewModel>()
 
     private lateinit var binding: ActivityLoginBinding
 
@@ -169,6 +173,15 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE).apply {
                 addAction(BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE)
             })
+
+        registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (viewModel.intentAction == ACTION_FORCE_RELOAD_ACCOUNT) {
+                    MegaApplication.isLoggingIn = false
+                    finish()
+                }
+            }
+        }, IntentFilter(ACTION_FETCH_NODES_FINISHED))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -545,5 +558,15 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
          */
         @JvmField
         var isBackFromLoginPage = false
+
+        /**
+         * Intent action for showing the login fetching nodes.
+         */
+        const val ACTION_FORCE_RELOAD_ACCOUNT = "FORCE_RELOAD"
+
+        /**
+         * Intent action for notifying fetchNodes finished.
+         */
+        const val ACTION_FETCH_NODES_FINISHED = "FETCH_NODES_FINISHED"
     }
 }

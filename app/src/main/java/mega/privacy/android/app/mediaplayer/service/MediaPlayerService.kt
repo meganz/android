@@ -98,16 +98,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
         }
 
-    private val positionUpdateHandler = Handler()
-    private val positionUpdateRunnable = object : Runnable {
-        override fun run() {
-            val currentPosition = mediaPlayerGateway.getCurrentPosition()
-            // Up the frequency of refresh, keeping in sync with Exoplayer.
-            positionUpdateHandler.postDelayed(this, 500)
-            viewModelGateway.setCurrentPosition(currentPosition)
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
 
@@ -149,14 +139,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                     }
                 }
 
-                override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
-                    if (isPlaying) {
-                        positionUpdateHandler.post(positionUpdateRunnable)
-                    } else {
-                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-                    }
-                }
-
                 override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
                     setShuffleEnabled(shuffleModeEnabled)
 
@@ -174,23 +156,22 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 }
 
                 override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
-                    setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
+                    setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPlayingPosition())
                 }
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
                     when {
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
-                            setPaused(true, mediaPlayerGateway.getCurrentPosition())
+                            setPaused(true, mediaPlayerGateway.getCurrentPlayingPosition())
                         }
                         state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
-                            setPaused(false, mediaPlayerGateway.getCurrentPosition())
+                            setPaused(false, mediaPlayerGateway.getCurrentPlayingPosition())
                         }
                     }
                 }
 
                 override fun onPlayerErrorCallback() {
                     onPlayerError()
-                    positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                 }
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
@@ -345,7 +326,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         super.onDestroy()
         viewModelGateway.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
-        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
 
         if (audioManager != null) {
             abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
@@ -437,6 +417,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     }
 
     override fun getCurrentMediaItem() = mediaPlayerGateway.getCurrentMediaItem()
+
+    override fun getCurrentPlayingPosition() = mediaPlayerGateway.getCurrentPlayingPosition()
 
     override fun getPlaybackState() = mediaPlayerGateway.getPlaybackState()
 

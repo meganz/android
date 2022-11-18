@@ -108,7 +108,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.MonitorBatteryLevelState
+import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
@@ -489,7 +489,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * Monitor battery level
      */
     @Inject
-    lateinit var monitorBatteryLevelState: MonitorBatteryLevelState
+    lateinit var monitorBatteryInfo: MonitorBatteryInfo
 
     /**
      * Monitor charging stop status
@@ -513,7 +513,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var notificationManager: NotificationManager? = null
     private var builder: NotificationCompat.Builder? = null
     private var intent: Intent? = null
-    private var batteryLevel: Int? = null
+    private var isDeviceLowOnBattery: Boolean = false
     private var pendingIntent: PendingIntent? = null
     private var tempRoot: String? = null
     private var isOverQuota = false
@@ -531,7 +531,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun monitorUploadPauseStatus() {
         coroutineScope?.launch {
             monitorCameraUploadPauseState().collect {
-                delay(1000)
                 updateProgressNotification()
             }
         }
@@ -539,9 +538,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
-            monitorBatteryLevelState().collect {
-                batteryLevel = it
-                if (isDeviceLowOnBattery()) {
+            monitorBatteryInfo().collect {
+                isDeviceLowOnBattery = (it.level <= LOW_BATTERY_LEVEL && it.isCharging)
+                if (isDeviceLowOnBattery) {
                     coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
                     for (transfer in cuTransfers) {
                         megaApi?.cancelTransfer(transfer)
@@ -757,7 +756,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 endService()
                 return
             }
-            if (isDeviceLowOnBattery()) {
+            if (isDeviceLowOnBattery) {
                 endService()
                 return
             }
@@ -2013,12 +2012,5 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 ex.printStackTrace()
             }
         }
-    }
-
-    private fun isDeviceLowOnBattery(): Boolean {
-        batteryLevel?.let {
-            Timber.d("Device battery level is %s", it)
-            return it <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
-        } ?: return false
     }
 }
