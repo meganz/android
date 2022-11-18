@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 
 data class AlbumPhotosSelectionState(
     val album: Album.UserAlbum? = null,
+    val albumPhotos: List<Photo> = listOf(),
     val photos: List<Photo> = listOf(),
     val uiPhotos: List<UIPhoto> = listOf(),
     val selectedPhotoIds: Set<Long> = setOf(),
