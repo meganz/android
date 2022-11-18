@@ -19,7 +19,7 @@ data class PlaylistItem(
     val nodeHandle: Long,
     val nodeName: String,
     val thumbnail: File?,
-    var index: Int,
+    val index: Int,
     val type: Int,
     val size: Long,
     val isSelected: Boolean = false,
