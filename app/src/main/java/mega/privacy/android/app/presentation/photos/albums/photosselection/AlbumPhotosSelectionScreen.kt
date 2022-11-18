@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -20,15 +23,18 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,11 +42,16 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.app.presentation.photos.model.UIPhoto
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
+import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
@@ -50,8 +61,10 @@ import mega.privacy.android.presentation.theme.white
 fun AlbumPhotosSelectionScreen(
     viewModel: AlbumPhotosSelectionViewModel = viewModel(),
     onBackClicked: () -> Unit,
+    onCompletion: (message: String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val lazyGridState = rememberLazyGridState()
 
     var showSelectLocationDialog by rememberSaveable { mutableStateOf(false) }
     var showMoreMenu by rememberSaveable { mutableStateOf(false) }
@@ -61,9 +74,18 @@ fun AlbumPhotosSelectionScreen(
         selectedLocation = state.selectedLocation,
         onLocationSelected = { location ->
             showSelectLocationDialog = false
+
             viewModel.updateLocation(location)
+            viewModel.filterPhotos()
         },
         onDialogDismissed = { showSelectLocationDialog = false },
+    )
+
+    handleCompletion(
+        album = state.album,
+        selectedPhotoIds = state.selectedPhotoIds,
+        isSelectionCompleted = state.isSelectionCompleted,
+        onCompletion = onCompletion,
     )
 
     Scaffold(
@@ -74,7 +96,13 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
-                onBackClicked = onBackClicked,
+                onBackClicked = {
+                    if (state.selectedPhotoIds.isEmpty()) {
+                        onBackClicked()
+                    } else {
+                        viewModel.clearSelection()
+                    }
+                },
                 onFilterClicked = { showSelectLocationDialog = true },
                 onMoreClicked = { showMoreMenu = true },
                 onMoreDismissed = { showMoreMenu = false },
@@ -88,8 +116,40 @@ fun AlbumPhotosSelectionScreen(
                 },
             )
         },
-        floatingActionButton = { TODO() },
-        content = { TODO() },
+        floatingActionButton = {
+            state.album?.let { album ->
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.addPhotos(
+                            album = album,
+                            selectedPhotoIds = state.selectedPhotoIds,
+                        )
+                    },
+                    backgroundColor = teal_300,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_check),
+                        contentDescription = null,
+                        tint = white,
+                    )
+                }
+            }
+        },
+        content = {
+            AlbumPhotosSelectionContent(
+                lazyGridState = lazyGridState,
+                uiPhotos = state.uiPhotos,
+                selectedPhotoIds = state.selectedPhotoIds,
+                onPhotoDownload = viewModel::downloadPhoto,
+                onPhotoSelection = { photo ->
+                    if (photo.id in state.selectedPhotoIds) {
+                        viewModel.unselectPhoto(photo)
+                    } else {
+                        viewModel.selectPhoto(photo)
+                    }
+                },
+            )
+        },
     )
 }
 
@@ -121,7 +181,10 @@ private fun AlbumPhotosSelectionHeader(
                     )
                 } else {
                     Text(
-                        text = album?.title.orEmpty(),
+                        text = stringResource(
+                            id = R.string.photos_album_selection_title,
+                            album?.title.orEmpty(),
+                        ),
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.subtitle1,
                     )
@@ -181,6 +244,41 @@ private fun AlbumPhotosSelectionHeader(
 }
 
 @Composable
+private fun AlbumPhotosSelectionContent(
+    lazyGridState: LazyGridState,
+    uiPhotos: List<UIPhoto>,
+    selectedPhotoIds: Set<Long>,
+    onPhotoDownload: PhotoDownload,
+    onPhotoSelection: (Photo) -> Unit,
+) {
+    PhotosGridView(
+        currentZoomLevel = ZoomLevel.Grid_3,
+        photoDownland = onPhotoDownload,
+        lazyGridState = lazyGridState,
+        onClick = onPhotoSelection,
+        onLongPress = onPhotoSelection,
+        selectedPhotoIds = selectedPhotoIds,
+        uiPhotoList = uiPhotos,
+    )
+}
+
+@Composable
+private fun handleSelectLocationDialog(
+    showSelectLocationDialog: Boolean,
+    selectedLocation: TimelinePhotosSource,
+    onLocationSelected: (TimelinePhotosSource) -> Unit,
+    onDialogDismissed: () -> Unit,
+) {
+    if (showSelectLocationDialog) {
+        SelectLocationDialog(
+            selectedLocation = selectedLocation,
+            onLocationSelected = onLocationSelected,
+            onDialogDismissed = onDialogDismissed,
+        )
+    }
+}
+
+@Composable
 private fun SelectLocationDialog(
     selectedLocation: TimelinePhotosSource,
     onLocationSelected: (TimelinePhotosSource) -> Unit,
@@ -227,19 +325,27 @@ private fun SelectLocationDialog(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun handleSelectLocationDialog(
-    showSelectLocationDialog: Boolean,
-    selectedLocation: TimelinePhotosSource,
-    onLocationSelected: (TimelinePhotosSource) -> Unit,
-    onDialogDismissed: () -> Unit,
+private fun handleCompletion(
+    album: Album.UserAlbum?,
+    selectedPhotoIds: Set<Long>,
+    isSelectionCompleted: Boolean,
+    onCompletion: (message: String) -> Unit,
 ) {
-    if (showSelectLocationDialog) {
-        SelectLocationDialog(
-            selectedLocation = selectedLocation,
-            onLocationSelected = onLocationSelected,
-            onDialogDismissed = onDialogDismissed,
-        )
+    if (isSelectionCompleted) {
+        val message = "".takeIf { selectedPhotoIds.isEmpty() } ?: album?.title?.let { albumName ->
+            pluralStringResource(
+                id = R.plurals.photos_album_selection_added,
+                count = selectedPhotoIds.size,
+                selectedPhotoIds.size,
+                albumName
+            )
+        }.orEmpty()
+
+        LaunchedEffect(Unit) {
+            onCompletion(message)
+        }
     }
 }
 
