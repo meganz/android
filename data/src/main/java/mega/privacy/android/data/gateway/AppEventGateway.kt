@@ -10,11 +10,6 @@ internal interface AppEventGateway {
     val monitorCameraUploadPauseState: Flow<Boolean>
 
     /**
-     * monitor charging state
-     */
-    val monitorChargingStoppedState: Flow<Boolean>
-
-    /**
      * Broadcast upload pause state
      */
     suspend fun broadcastUploadPauseState()

@@ -28,6 +28,11 @@ internal class BroadcastReceiverFacade @Inject constructor(
                 status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
             return@map BatteryInfo(level = level, isCharging = isCharging)
         }.toSharedFlow(appScope)
+
+    override val monitorChargingStoppedState =
+        context.registerReceiverAsFlow(Intent.ACTION_POWER_DISCONNECTED).map {
+            true
+        }.toSharedFlow(appScope)
 }
 
 private fun <T> Flow<T>.toSharedFlow(
