@@ -8,12 +8,13 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.RecentActionsRepository
-import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRecentActionBucket
+import nz.mega.sdk.MegaRecentActionBucketList
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,6 +26,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultRecentActionsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val cacheFolderGateway: CacheFolderGateway,
+    private val recentActionsMapper: RecentActionsMapper,
     private val recentActionBucketMapper: RecentActionBucketMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -32,10 +34,13 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     override suspend fun getRecentActions() = withContext(ioDispatcher) {
         runCatching {
-            val megaRecentActions = getMegaRecentAction()
-            val list = (0 until megaRecentActions.size()).map {
+            val megaRecentActions = recentActionsMapper(
+                getMegaRecentAction(),
+                ::copyRecentActionBucket)
+
+            val list = (megaRecentActions.indices).map {
                 recentActionBucketMapper.invoke(
-                    copyRecentActionBucket(megaRecentActions.get(it)),
+                    megaRecentActions[it],
                     cacheFolderGateway::getThumbnailCacheFilePath,
                     megaApiGateway::hasVersion,
                     megaApiGateway::getNumChildFolders,
@@ -52,13 +57,13 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         return@withContext emptyList<RecentActionBucketUnTyped>()
     }
 
-    private suspend fun getMegaRecentAction() =
+    private suspend fun getMegaRecentAction(): MegaRecentActionBucketList? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { request: MegaRequest, error: MegaError ->
-                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                            if (error.errorCode == MegaError.API_OK) {
                                 continuation.resumeWith(Result.success(request.recentActions))
                             } else {
                                 continuation.failWithError(error)
