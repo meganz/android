@@ -31,6 +31,8 @@ import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGatewa
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
+import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result
@@ -457,7 +459,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 nodeName = firstPlayNodeName,
                 thumbnailFile = thumbnail,
                 index = 0,
-                type = PlaylistItem.TYPE_PLAYING,
+                type = TYPE_PLAYING,
                 size = node?.size ?: INVALID_SIZE,
                 duration = node?.duration ?: 0)
 
@@ -546,7 +548,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     nodeName = typedNode.name,
                     thumbnailFile = thumbnail,
                     index = currentIndex,
-                    type = PlaylistItem.TYPE_NEXT,
+                    type = TYPE_NEXT,
                     size = typedNode.size,
                     duration = typedNode.duration)
 
@@ -593,7 +595,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 nodeName = megaOffline.name,
                 thumbnailFile = offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
                 index = currentIndex,
-                type = PlaylistItem.TYPE_NEXT,
+                type = TYPE_NEXT,
                 size = megaOffline.getSize(context),
                 duration = 0
             )
@@ -623,7 +625,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 nodeName = file.name,
                 thumbnailFile = null,
                 index = currentIndex,
-                type = PlaylistItem.TYPE_NEXT,
+                type = TYPE_NEXT,
                 size = file.length(),
                 duration = 0
             )
@@ -843,11 +845,10 @@ class MediaPlayerServiceViewModel @Inject constructor(
      * Get playlist from playlistItems
      * @param isScroll whether scroll to the specific position
      */
-    private fun postPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
+    private fun postPlaylistItems(isScroll: Boolean = true) {
         Timber.d("postPlaylistItems")
         compositeDisposable.add(Completable.fromCallable {
-            doPostPlaylistItems(currentPosition,
-                isScroll)
+            doPostPlaylistItems(isScroll)
         }
             .subscribeOn(Schedulers.single())
             .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel postPlaylistItems")))
@@ -857,25 +858,23 @@ class MediaPlayerServiceViewModel @Inject constructor(
      * Get playlist from playlistItems
      * @param isScroll whether scroll to the specific position
      */
-    private fun doPostPlaylistItems(currentPosition: Long? = null, isScroll: Boolean = true) {
+    private fun doPostPlaylistItems(isScroll: Boolean = true) {
         Timber.d("doPostPlaylistItems ${playlistItems.size} items")
         if (playlistItems.isEmpty()) {
             return
         }
-        var playingIndex = 0
-        for ((index, item) in playlistItems.withIndex()) {
-            if (item.nodeHandle == playingHandle) {
-                playingIndex = index
-                playingPosition = playingIndex
-                break
-            }
-        }
+        var playingIndex = playlistItems.indexOfFirst { (nodeHandle) ->
+            nodeHandle == playingHandle
+        }.takeIf { index ->
+            index in playlistItems.indices
+        } ?: 0
+
+        playingPosition = playingIndex
+
         val order = shuffleOrder
 
-        val items: ArrayList<PlaylistItem>
+        val items = mutableListOf<PlaylistItem>()
         if (shuffleEnabled && order.length == playlistItems.size) {
-            items = ArrayList()
-
             items.add(playlistItems[playingIndex])
 
             var newPlayingIndex = 0
@@ -894,7 +893,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
             playingIndex = newPlayingIndex
         } else {
-            items = ArrayList(playlistItems)
+            items.addAll(playlistItems)
         }
 
         val searchQuery = playlistSearchQuery
@@ -904,9 +903,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
         }
         for ((index, item) in items.withIndex()) {
             val type = when {
-                index < playingIndex -> PlaylistItem.TYPE_PREVIOUS
-                playingIndex == index -> PlaylistItem.TYPE_PLAYING
-                else -> PlaylistItem.TYPE_NEXT
+                index < playingIndex -> TYPE_PREVIOUS
+                playingIndex == index -> TYPE_PLAYING
+                else -> TYPE_NEXT
             }
             items[index] =
                 item.finalizeItem(
@@ -914,11 +913,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     type = type,
                     isSelected = item.isSelected,
                     duration = item.duration,
-                    currentPosition = if (playingIndex == index) {
-                        currentPosition ?: item.currentPosition
-                    } else {
-                        item.currentPosition
-                    }
                 )
         }
 
@@ -927,10 +921,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
         var scrollPosition = playingIndex
 
         if (hasPrevious) {
-            items[0].headerIsVisible = true
+            items[0] = items[0].copy(headerIsVisible = true)
         }
-
-        items[playingIndex].headerIsVisible = true
+        items[playingIndex] = items[playingIndex].copy(headerIsVisible = true)
         Timber.d("doPostPlaylistItems post ${items.size} items")
         if (!isScroll) {
             scrollPosition = -1
@@ -946,7 +939,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (item.nodeName.contains(filter, true)) {
                 // Filter only affects displayed playlist, it doesn't affect what
                 // ExoPlayer is playing, so we still need use the index before filter.
-                filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))
+                filteredItems.add(item.finalizeItem(index, TYPE_PREVIOUS))
             }
         }
 
@@ -1010,8 +1003,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     private fun removeSingleItem(handle: Long) {
-        mediaItemToRemove.value = playlistItems.indexOfFirst { (nodeHandle) ->
+        playlistItems.indexOfFirst { (nodeHandle) ->
             nodeHandle == handle
+        }.takeIf { index ->
+            index in playlistItems.indices
+        }?.let {
+            mediaItemToRemove.value = it
         }
         playlistItems.removeIf { (nodeHandle) ->
             nodeHandle == handle
@@ -1040,11 +1037,16 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     override fun itemSelected(handle: Long) {
-        playlistItems.forEach {
-            if (it.nodeHandle == handle) {
-                it.isSelected = !it.isSelected
-                if (it.isSelected) {
-                    itemsSelectedMap[handle] = it
+        playlistItems.indexOfFirst { (nodeHandle) ->
+            nodeHandle == handle
+        }.takeIf { index ->
+            index in playlistItems.indices
+        }?.let { selectedIndex ->
+            playlistItems[selectedIndex].let { item ->
+                val isSelected = !item.isSelected
+                playlistItems[selectedIndex] = item.copy(isSelected = isSelected)
+                if (playlistItems[selectedIndex].isSelected) {
+                    itemsSelectedMap[handle] = item
                 } else {
                     itemsSelectedMap.remove(handle)
                 }
@@ -1056,12 +1058,17 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     override fun clearSelections() {
-        playlistItems.forEach {
-            it.isSelected = false
-            itemsSelectedMap.clear()
-            actionMode.value = false
-            postPlaylistItems()
+        mutableListOf<PlaylistItem>().let { items ->
+            items.addAll(playlistItems.map { item ->
+                item.copy(isSelected = false)
+            }).apply {
+                playlistItems.clear()
+                playlistItems.addAll(items)
+            }
         }
+        itemsSelectedMap.clear()
+        actionMode.value = false
+        postPlaylistItems()
     }
 
     override fun setActionMode(isActionMode: Boolean) {
@@ -1176,9 +1183,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
         Collections.swap(playSourceChanged, current, target)
     }
 
-    override fun getIndexFromPlaylistItems(item: PlaylistItem): Int {
+    override fun getIndexFromPlaylistItems(item: PlaylistItem): Int? {
         return playlistItems.indexOfFirst {
             it.nodeName == item.nodeName
+        }.takeIf { index ->
+            index in playlistItems.indices
         }
     }
 
@@ -1273,6 +1282,21 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     companion object {
         private const val MAX_RETRY = 6
+
+        /**
+         * The previous type of media item
+         */
+        const val TYPE_PREVIOUS = 1
+
+        /**
+         * The playing type playing media item
+         */
+        const val TYPE_PLAYING = 2
+
+        /**
+         * The next type next media item
+         */
+        const val TYPE_NEXT = 3
 
         /**
          * Clear saved audio player settings.

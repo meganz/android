@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemPlaylistBinding
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.TYPE_PLAYING
 
 /**
  * RecyclerView adapter for playlist screen.
@@ -62,7 +63,7 @@ class PlaylistAdapter(
         with(holder.itemView.findViewById<TextView>(R.id.duration)) {
             isVisible = playlistItem.duration > 0L
 
-            if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
+            if (playlistItem.type == TYPE_PLAYING) {
                 playingItemIndex = holder.absoluteAdapterPosition
                 text = playlistItem.formatCurrentPositionAndDuration(currentPlayingPosition)
             } else {
@@ -73,7 +74,7 @@ class PlaylistAdapter(
         holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =
             playlistItem.headerIsVisible
         holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
-            currentItemIndex != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
+            currentItemIndex != itemCount - 1 && playlistItem.type == TYPE_PLAYING
 
         holder.bind(isPaused, playlistItem, itemOperation, holder, isAudio, currentItemIndex)
     }
