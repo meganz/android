@@ -79,8 +79,13 @@ class AlbumsViewModel @Inject constructor(
                     includedSystemAlbums.values.toList()
                 ).mapLatest { photos ->
                     includedSystemAlbums.mapNotNull { (key, value) ->
-                        photos.filter { value(it) }.takeIf { shouldAddAlbum(it, key) }
-                            ?.let { uiAlbumMapper(it, key) }
+                        photos.filter {
+                            value(it)
+                        }.takeIf {
+                            shouldAddAlbum(it, key)
+                        }?.let {
+                            uiAlbumMapper(it, key)
+                        }
                     }
                 }.collectLatest { systemAlbums ->
                     _state.update { state ->

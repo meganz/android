@@ -104,12 +104,6 @@ abstract class PhotosUseCases {
     @Binds
     abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
 
-    /**
-     * Binds UIAlbum mapper
-     */
-    @Binds
-    abstract fun bindUIAlbumMapper(implementation: DefaultUIAlbumMapper): UIAlbumMapper
-
     companion object {
         @Provides
         fun providesIsCameraSyncPreferenceEnabled(settingsRepository: SettingsRepository): IsCameraSyncPreferenceEnabled =
