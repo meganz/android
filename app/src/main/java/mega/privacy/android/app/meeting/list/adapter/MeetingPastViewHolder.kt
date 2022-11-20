@@ -22,7 +22,7 @@ class MeetingPastViewHolder(
         AnimationUtils.loadAnimation(itemView.context, R.anim.multiselect_flip)
     }
 
-    fun bind(item: MeetingItem, isSelected: Boolean) {
+    fun bind(item: MeetingItem.Data, isSelected: Boolean) {
         val lastMessageColor = when {
             item.isScheduled() -> ContextCompat.getColor(itemView.context, R.color.red_600_red_300)
             item.highlight -> ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)

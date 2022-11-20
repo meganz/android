@@ -72,10 +72,10 @@ class GetMeetingListUseCase @Inject constructor(
      *
      * @return  Flowable
      */
-    fun get(): Flowable<List<MeetingItem>> =
+    fun get(): Flowable<List<MeetingItem.Data>> =
         Flowable.create({ emitter ->
             val changesSubscription = CompositeDisposable()
-            val meetings = mutableListOf<MeetingItem>()
+            val meetings = mutableListOf<MeetingItem.Data>()
 
             val userAttrsListener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -146,7 +146,7 @@ class GetMeetingListUseCase @Inject constructor(
                                 }
                             }
 
-                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         }
                     } else {
                         Timber.w(error.toMegaException())
@@ -163,7 +163,7 @@ class GetMeetingListUseCase @Inject constructor(
                 if (index != Constants.INVALID_POSITION) {
                     val oldItem = meetings[index]
                     meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
-                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                 }
             }
 
@@ -174,7 +174,7 @@ class GetMeetingListUseCase @Inject constructor(
                 if (index != Constants.INVALID_POSITION) {
                     val chatRoom = megaChatApi.getChatRoom(updatedChatId)
                     meetings[index] = chatRoom.toMeetingItem(userAttrsListener)
-                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                 }
             }
 
@@ -184,7 +184,7 @@ class GetMeetingListUseCase @Inject constructor(
                     meetings.add(chatRoom.toMeetingItem(userAttrsListener))
                 }
 
-            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
 
             getChatChangesUseCase.get()
                 .filter { it is Result.OnChatListItemUpdate && it.item != null }
@@ -203,10 +203,10 @@ class GetMeetingListUseCase @Inject constructor(
                             } else {
                                 meetings[index] = updatedChatRoom.toMeetingItem(userAttrsListener)
                             }
-                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         } else if (updatedChatRoom.isMeeting && updatedChatRoom.isActive && !updatedChatRoom.isArchived) {
                             meetings.add(updatedChatRoom.toMeetingItem(userAttrsListener))
-                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         }
                     },
                     onError = Timber::e
@@ -228,7 +228,7 @@ class GetMeetingListUseCase @Inject constructor(
      * @param listener Listener to deliver user attributes
      * @return                  MeetingItem
      */
-    private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
+    private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem.Data {
         val chatListItem = megaChatApi.getChatListItem(chatId)
 
         val title = ChatUtil.getTitleChat(this)
@@ -290,7 +290,7 @@ class GetMeetingListUseCase @Inject constructor(
             scheduleText
         }
 
-        return MeetingItem(
+        return MeetingItem.Data(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
@@ -367,4 +367,3 @@ class GetMeetingListUseCase @Inject constructor(
                 && megaChatApi.getMessage(chatId, lastMessageId)
             ?.containsMeta?.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
 }
-
