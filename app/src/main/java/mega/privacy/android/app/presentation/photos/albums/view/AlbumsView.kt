@@ -144,7 +144,7 @@ fun AlbumsView(
                     )
                     MiddleEllipsisText(
                         modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                        text = album.title(LocalContext.current),
+                        text = album.title,
                         style = subtitle2,
                         color = if (MaterialTheme.colors.isLight) black else white,
                         fontWeight = FontWeight.Medium
