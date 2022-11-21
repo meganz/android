@@ -24,6 +24,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment

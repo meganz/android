@@ -13,10 +13,14 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -28,6 +32,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -65,9 +71,18 @@ class GetMeetingListUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val getLastMessageUseCase: GetLastMessageUseCase,
+    private val getFeatureFlag: GetFeatureFlagValue,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
 
     private val hourFormat by lazy { SimpleDateFormat("hh:mm") }
+    private var enableScheduleMeetings = false
+
+    init {
+        CoroutineScope(defaultDispatcher).launch {
+            enableScheduleMeetings = getFeatureFlag(AppFeatures.ScheduleMeeting)
+        }
+    }
 
     /**
      * Get a list of updated MeetingItems
@@ -264,7 +279,7 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
-        val isScheduled = Random.nextBoolean()
+        val isScheduled = enableScheduleMeetings && Random.nextBoolean()
         var isRecurring = false
         val lastMessageIcon = when {
             isScheduled ->
