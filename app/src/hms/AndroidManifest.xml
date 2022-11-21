@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:installLocation="internalOnly"
-          tools:node="merge">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:installLocation="internalOnly"
+    tools:node="merge">
 
     <application tools:node="merge">
 
@@ -14,7 +14,13 @@
             </intent-filter>
         </service>
 
+        <provider
+            android:name="com.huawei.agconnect.core.provider.AGConnectInitializeProvider"
+            android:authorities="${applicationId}.AGCInitializeProvider"
+            android:exported="false"
+            android:initOrder="100" />
     </application>
+
     <uses-permission android:name="com.huawei.appmarket.service.commondata.permission.GET_COMMON_DATA" />
     <uses-permission android:name="com.huawei.permission.SECURITY_DIAGNOSE" />
 
