@@ -4070,4 +4070,6 @@
         <item quantity="one">Your Pro membership plan expired 1 day ago.</item>
         <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
     </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]EMPTY[/B] [A]ALBUM[/A]</string>
 </resources>
