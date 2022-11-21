@@ -28,6 +28,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MOD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
@@ -114,6 +115,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val sortOrderIntMapper: SortOrderIntMapper,
+    private val playlistItemMapper: PlaylistItemMapper,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -647,18 +649,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
         size: Long = 0,
         duration: Int = 0,
     ) {
-        PlaylistItem(
-            nodeHandle = nodeHandle,
-            nodeName = nodeName,
-            thumbnail = thumbnailFile,
-            index = index,
-            type = type,
-            size = size,
-            duration = duration
-        ).let { playlistItem ->
-            playlistItems.add(playlistItem)
-            playlistItemsMap[nodeHandle.toString()] = playlistItem
-        }
+        playlistItemMapper(nodeHandle, nodeName, thumbnailFile, index, type, size, duration)
+            .let { playlistItem ->
+                playlistItems.add(playlistItem)
+                playlistItemsMap[nodeHandle.toString()] = playlistItem
+            }
     }
 
     private suspend fun updateMediaItems(
@@ -1171,13 +1166,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
         type == FOLDER_LINK_ADAPTER && mediaPlayerRepository.credentialsIsNull()
 
     override fun swapItems(current: Int, target: Int) {
-        playlistItems.run {
-            Collections.swap(this, current, target)
-            // Keep the index for swap items to keep the play order is correct
-            val index = this[current].index
-            this[current].index = this[target].index
-            this[target].index = index
-        }
+        Collections.swap(playlistItems, current, target)
+        // Keep the index for swap items to keep the play order is correct
+        val index = playlistItems[current].index
+        playlistItems[current] = playlistItems[current].copy(index = playlistItems[target].index)
+        playlistItems[target] = playlistItems[target].copy(index = index)
+
         initPlayerSourceChanged()
         // Swap the items of play source
         Collections.swap(playSourceChanged, current, target)
