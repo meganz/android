@@ -84,7 +84,7 @@ fun AlbumsView(
     albumsViewState: AlbumsViewState,
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
-    onDialogPositiveButtonClicked: (name: String) -> Unit,
+    onDialogPositiveButtonClicked: (name: String, proscribedStrings: List<String>) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit = {},
     setInputValidity: (Boolean) -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
@@ -217,7 +217,7 @@ fun AlbumsView(
 @Composable
 fun CreateNewAlbumDialog(
     onDismissRequest: () -> Unit = {},
-    onDialogPositiveButtonClicked: (name: String) -> Unit,
+    onDialogPositiveButtonClicked: (name: String, proscribedString: List<String>) -> Unit,
     onDialogInputChange: (Boolean) -> Unit = {},
     inputPlaceHolderText: () -> String = { "" },
     errorMessage: Int? = null,
@@ -227,6 +227,10 @@ fun CreateNewAlbumDialog(
     val isEnabled by remember { mutableStateOf(true) }
     val isError by remember { mutableStateOf(false) }
     val singleLine = true
+    val proscribedString = listOf(
+        stringResource(id = R.string.photos_album_subsection_my_albums),
+        stringResource(id = R.string.photos_album_subsection_shared_albums),
+    )
 
     val inputColor = if (isInputValid()) {
         if (MaterialTheme.colors.isLight) {
@@ -329,7 +333,9 @@ fun CreateNewAlbumDialog(
                     ) {
                         errorMessage?.let {
                             Text(
-                                modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp),
                                 text = if (it == R.string.invalid_characters_defined) {
                                     stringResource(id = it).replace("%1\$s", INVALID_CHARACTERS)
                                 } else {
@@ -366,7 +372,7 @@ fun CreateNewAlbumDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onDialogPositiveButtonClicked(textState)
+                    onDialogPositiveButtonClicked(textState, proscribedString)
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,

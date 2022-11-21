@@ -205,9 +205,9 @@ class AlbumsViewModel @Inject constructor(
      *
      * @param title the name of the album
      */
-    fun createNewAlbum(title: String) = viewModelScope.launch {
+    fun createNewAlbum(title: String, proscribedStrings: List<String>) = viewModelScope.launch {
         try {
-            if (checkTitleValidity(title)) {
+            if (checkTitleValidity(title, proscribedStrings)) {
                 val finalName = title.ifEmpty {
                     _state.value.createAlbumPlaceholderTitle
                 }
@@ -251,11 +251,11 @@ class AlbumsViewModel @Inject constructor(
         it.id !is Album.UserAlbum
     }.map { it.title }
 
-    private fun checkTitleValidity(title: String): Boolean {
+    private fun checkTitleValidity(title: String, proscribedStrings: List<String>): Boolean {
         var errorMessage: Int? = null
         var isTitleValid = true
 
-        if (title in getAllSystemAlbumsNames()) {
+        if (title in (getAllSystemAlbumsNames() + proscribedStrings)) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_systems_album
         } else if (title in getAllUserAlbumsNames()) {

@@ -14,6 +14,8 @@ import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDi
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.fromId
@@ -21,6 +23,7 @@ import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class AlbumsViewTest {
+    private val proscribedStrings = listOf("My albums", "Shared albums")
 
     @get:Rule
     var composeRule = createComposeRule()
@@ -29,12 +32,13 @@ class AlbumsViewTest {
 
     @Test
     fun `test that clicking create album fab opens the dialog`() {
+        val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
         composeRule.setContent {
             AlbumsView(
                 albumsViewState = AlbumsViewState(),
                 openAlbum = {},
                 downloadPhoto = mock(),
-                onDialogPositiveButtonClicked = {},
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 isUserAlbumsEnabled = isUserAlbumsEnabled,
             )
         }
@@ -51,12 +55,14 @@ class AlbumsViewTest {
     fun `test that clicking the fab will provide the input placeholder text`() {
         val setDialogInputPlaceholder = mock<(String) -> Unit>()
         val defaultText = fromId(R.string.photos_album_creation_dialog_input_placeholder)
+        val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
+
         composeRule.setContent {
             AlbumsView(
                 albumsViewState = AlbumsViewState(),
                 openAlbum = {},
                 downloadPhoto = mock(),
-                onDialogPositiveButtonClicked = {},
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 setDialogInputPlaceholder = setDialogInputPlaceholder,
                 isUserAlbumsEnabled = isUserAlbumsEnabled,
             )
@@ -70,10 +76,11 @@ class AlbumsViewTest {
     @Test
     fun `test that clicking negative button on dialog calls the correct function`() {
         val onDismissRequest = mock<() -> Unit>()
+        val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
         composeRule.setContent {
             CreateNewAlbumDialog(
                 onDismissRequest = onDismissRequest,
-                onDialogPositiveButtonClicked = {}
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked
             )
         }
 
@@ -84,7 +91,7 @@ class AlbumsViewTest {
 
     @Test
     fun `test that without input clicking the positive dialog button calls the correct function`() {
-        val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
+        val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
         val onDismissRequest = mock<() -> Unit>()
 
         composeRule.setContent {
@@ -96,14 +103,14 @@ class AlbumsViewTest {
 
         composeRule.onNodeWithText(R.string.general_create).performClick()
 
-        verify(onDialogPositiveButtonClicked).invoke("")
+        verify(onDialogPositiveButtonClicked).invoke("", proscribedStrings)
     }
 
     @Test
     fun `test that with input clicking the positive dialog button calls the correct function`() {
         val expectedAlbumName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         val inputPlaceholderText = R.string.photos_album_creation_dialog_input_placeholder
-        val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
+        val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
         val onDismissRequest = mock<() -> Unit>()
         composeRule.setContent {
             CreateNewAlbumDialog(
@@ -117,6 +124,6 @@ class AlbumsViewTest {
             .performTextInput(expectedAlbumName)
         composeRule.onNodeWithText(R.string.general_create).performClick()
 
-        verify(onDialogPositiveButtonClicked).invoke(expectedAlbumName)
+        verify(onDialogPositiveButtonClicked).invoke(expectedAlbumName, proscribedStrings)
     }
 }

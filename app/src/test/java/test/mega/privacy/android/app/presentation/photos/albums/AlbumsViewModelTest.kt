@@ -63,6 +63,7 @@ class AlbumsViewModelTest {
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
+    private val proscribedStrings = listOf("My albums", "Shared albums")
 
     @Before
     fun setUp() {
@@ -360,7 +361,7 @@ class AlbumsViewModelTest {
             createUserAlbum(title = expectedAlbumName)
         )
 
-        underTest.createNewAlbum(expectedAlbumName)
+        underTest.createNewAlbum(expectedAlbumName, proscribedStrings)
 
         underTest.state.drop(1).test {
             val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
@@ -372,7 +373,7 @@ class AlbumsViewModelTest {
     fun `test that an error in creating an album would keep current album as null`() = runTest {
         whenever(createAlbum(any())).thenAnswer { throw Exception() }
 
-        underTest.createNewAlbum("ABD")
+        underTest.createNewAlbum("ABD", proscribedStrings)
 
         underTest.state.test {
             assertNull(awaitItem().currentAlbum)
@@ -489,7 +490,7 @@ class AlbumsViewModelTest {
 
             underTest.state.drop(1).test {
                 awaitItem()
-                underTest.createNewAlbum("Favourite")
+                underTest.createNewAlbum("Favourite", proscribedStrings)
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -522,7 +523,7 @@ class AlbumsViewModelTest {
 
             underTest.state.drop(1).test {
                 awaitItem()
-                underTest.createNewAlbum(testAlbumName)
+                underTest.createNewAlbum(testAlbumName, proscribedStrings)
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -540,7 +541,7 @@ class AlbumsViewModelTest {
 
             underTest.state.test {
                 awaitItem()
-                underTest.createNewAlbum(testAlbumName)
+                underTest.createNewAlbum(testAlbumName, proscribedStrings)
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
