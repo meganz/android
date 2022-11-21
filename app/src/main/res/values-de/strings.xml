@@ -4030,26 +4030,26 @@
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Verlängerungsdatum:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
-    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <string name="photos_album_creation_dialog_title">Albumnamen eingeben</string>
     <!-- Album creation input name placeholder -->
-    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <string name="photos_album_creation_dialog_input_placeholder">Neues Album</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Meetinglink teilen</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Mehr sehen</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Gruppe verlassen</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album"></string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <string name="photos_create_album_error_message_duplicate">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Neues Album (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title"></string>
+    <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
     </plurals>
 </resources>
