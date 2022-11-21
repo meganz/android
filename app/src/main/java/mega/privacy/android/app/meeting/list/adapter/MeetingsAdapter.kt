@@ -21,8 +21,8 @@ class MeetingsAdapter constructor(
 ) : ListAdapter<MeetingItem, RecyclerView.ViewHolder>(MeetingItemDiffCallback()), SectionTitleProvider {
 
     companion object {
-        private const val TYPE_HEADER = 0
-        private const val TYPE_DATA = 1
+        const val TYPE_HEADER = 100
+        const val TYPE_DATA = 101
     }
 
     init {
@@ -73,13 +73,13 @@ class MeetingsAdapter constructor(
     override fun getItemId(position: Int): Long =
         getItem(position).id
 
-    override fun getSectionTitle(position: Int): String {
+    override fun getSectionTitle(position: Int): String? {
         val item = getItem(position)
-        return when (getItemViewType(position)) {
-            TYPE_DATA ->
-                TimeUtils.formatDate((item as MeetingItem.Data).timeStamp, TimeUtils.DATE_SHORT_SHORT_FORMAT)
-            else ->
-                (item as MeetingItem.Header).title
+        return if (item is MeetingItem.Data && item.startTimestamp != null) {
+            val timeStamp = item.startTimestamp
+            TimeUtils.formatDate(timeStamp, TimeUtils.DATE_SHORT_SHORT_FORMAT)
+        } else {
+            null
         }
     }
 
@@ -105,6 +105,7 @@ class MeetingsAdapter constructor(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun addSectionHeaders(list: List<MeetingItem>): List<MeetingItem> {
         val itemsWithHeader = mutableListOf<MeetingItem>()
         val sortedItems = (list as List<MeetingItem.Data>).sortedWith(

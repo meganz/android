@@ -1,12 +1,9 @@
 package mega.privacy.android.app.meeting.list
 
-import android.icu.text.SimpleDateFormat
-import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
-import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
-import mega.privacy.android.app.utils.StringResourcesUtils
-import java.util.Calendar
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.TimeUtils.formatDate
 
 sealed class MeetingItem(val id: Long) {
 
@@ -76,13 +73,6 @@ sealed class MeetingItem(val id: Long) {
          * Get Meeting start day formatted
          */
         fun getStartDay(): String =
-            when {
-                startTimestamp == null -> ""
-                DateUtils.isToday(startTimestamp) -> StringResourcesUtils.getString(R.string.label_today)
-                else -> {
-                    val calendar = Calendar.getInstance().apply { timeInMillis = startTimestamp }
-                    SimpleDateFormat("EEEE, d MMM").format(calendar.time)
-                }
-            }
+            startTimestamp?.let { formatDate(it, TimeUtils.DATE_WEEK_DAY_FORMAT) } ?: ""
     }
 }

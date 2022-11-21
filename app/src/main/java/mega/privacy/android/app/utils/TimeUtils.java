@@ -42,6 +42,7 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
+    public static final int DATE_WEEK_DAY_FORMAT = 5;
     private static final int TIME_OF_CHANGE = 8;
     private static final int INITIAL_PERIOD_TIME = 0;
 
@@ -189,6 +190,9 @@ public class TimeUtils implements Comparator<Calendar> {
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
                 df = new SimpleDateFormat("MMM d, yyyy", locale);
+                break;
+            case DATE_WEEK_DAY_FORMAT:
+                df = new SimpleDateFormat("EEEE, d MMM", locale);
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
                 df = new SimpleDateFormat(getBestDateTimePattern(locale, "yyyy-MM-dd HH:mm"), locale);
