@@ -12,5 +12,5 @@ fun interface GetAlbumPhotos {
      * Get album photos from album id.
      * @return a flow list of photos.
      */
-    suspend operator fun invoke(albumId: AlbumId): Flow<List<Photo>>
+    operator fun invoke(albumId: AlbumId): Flow<List<Photo>>
 }

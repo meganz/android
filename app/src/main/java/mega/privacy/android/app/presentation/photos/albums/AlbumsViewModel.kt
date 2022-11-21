@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -57,6 +58,8 @@ class AlbumsViewModel @Inject constructor(
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
 
+    private val albumJobs: MutableMap<AlbumId, Job> = mutableMapOf()
+
     private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
         return if (getFeatureFlag(AppFeatures.DynamicAlbum)) {
@@ -79,8 +82,13 @@ class AlbumsViewModel @Inject constructor(
                     includedSystemAlbums.values.toList()
                 ).mapLatest { photos ->
                     includedSystemAlbums.mapNotNull { (key, value) ->
-                        photos.filter { value(it) }.takeIf { shouldAddAlbum(it, key) }
-                            ?.let { uiAlbumMapper(it, key) }
+                        photos.filter {
+                            value(it)
+                        }.takeIf {
+                            shouldAddAlbum(it, key)
+                        }?.let {
+                            uiAlbumMapper(it, key)
+                        }
                     }
                 }.collectLatest { systemAlbums ->
                     _state.update { state ->
@@ -101,33 +109,67 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    private fun loadUserAlbums() {
-        viewModelScope.launch {
-            if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
+    /**
+     * User albums with real-time updates
+     */
+    private fun loadUserAlbums() = viewModelScope.launch {
+        if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
 
-            getUserAlbums()
-                .catch { exception ->
-                    Timber.e(exception)
-                }.collectLatest { albums ->
-                    albums.forEach(::fetchAlbumPhotos)
-                }
-        }
+        getUserAlbums()
+            .catch { exception -> Timber.e(exception) }
+            .collectLatest(::handleUserAlbums)
     }
 
-    private fun fetchAlbumPhotos(album: Album.UserAlbum) {
-        viewModelScope.launch {
-            getAlbumPhotos(album.id)
-                .catch { exception ->
-                    Timber.e(exception)
-                }.collectLatest { photos ->
-                    processUserAlbum(album, photos)
-                }
-        }
-    }
-
-    private suspend fun processUserAlbum(album: Album.UserAlbum, photos: List<Photo>) {
+    private suspend fun handleUserAlbums(userAlbums: List<Album.UserAlbum>) {
         _state.update { state ->
-            val albums = updateUIAlbums(state.albums, album, photos)
+            val albums = updateUserAlbums(state.albums, userAlbums)
+            val currentAlbumId = checkCurrentAlbumExists(albums = albums)
+
+            state.copy(
+                albums = albums,
+                currentAlbum = currentAlbumId,
+            )
+        }
+
+        for (album in userAlbums) {
+            val job = albumJobs[album.id] ?: loadAlbumPhotos(album)
+            albumJobs[album.id] = job
+        }
+
+        val activeAlbumIds = userAlbums.map { it.id }
+        for (albumId in albumJobs.keys - activeAlbumIds) {
+            albumJobs[albumId]?.cancel()
+            albumJobs.remove(albumId)
+        }
+    }
+
+    private suspend fun updateUserAlbums(
+        uiAlbums: List<UIAlbum>,
+        userAlbums: List<Album.UserAlbum>,
+    ): List<UIAlbum> = withContext(defaultDispatcher) {
+        val (systemUIAlbums, userUIAlbums) = uiAlbums.partition {
+            it.id !is Album.UserAlbum
+        }
+
+        val updatedUserUIAlbums = userAlbums.map { userAlbum ->
+            val uiAlbum = userUIAlbums.firstOrNull { uiAlbum ->
+                (uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id
+            }
+            uiAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum)
+        }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
+
+        systemUIAlbums + updatedUserUIAlbums
+    }
+
+    private fun loadAlbumPhotos(album: Album.UserAlbum): Job = viewModelScope.launch {
+        getAlbumPhotos(album.id)
+            .catch { exception -> Timber.e(exception) }
+            .collectLatest { photos -> handleAlbumPhotos(album, photos) }
+    }
+
+    private suspend fun handleAlbumPhotos(album: Album.UserAlbum, photos: List<Photo>) {
+        _state.update { state ->
+            val albums = updateAlbumPhotos(state.albums, album, photos)
             val currentAlbumId = checkCurrentAlbumExists(albums = albums)
 
             state.copy(
@@ -137,31 +179,24 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateUIAlbums(
-        albums: List<UIAlbum>,
+    private suspend fun updateAlbumPhotos(
+        uiAlbums: List<UIAlbum>,
         userAlbum: Album.UserAlbum,
         photos: List<Photo>,
     ): List<UIAlbum> = withContext(defaultDispatcher) {
-        val (systemAlbums, userAlbums) = albums.partition {
+        val (systemUIAlbums, userUIAlbums) = uiAlbums.partition {
             it.id !is Album.UserAlbum
         }
-        val isReplaceAlbum = userAlbums.any {
-            (it.id as? Album.UserAlbum)?.id == userAlbum.id
-        }
 
-        val updatedUserAlbums = if (isReplaceAlbum) {
-            userAlbums.map {
-                if ((it.id as? Album.UserAlbum)?.id == userAlbum.id) {
-                    uiAlbumMapper(photos, userAlbum)
-                } else {
-                    it
-                }
+        val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
+            if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
+                uiAlbumMapper(photos, uiAlbum.id)
+            } else {
+                uiAlbum
             }
-        } else {
-            userAlbums + uiAlbumMapper(photos, userAlbum)
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
 
-        systemAlbums + updatedUserAlbums
+        systemUIAlbums + updatedUserUIAlbums
     }
 
     /**

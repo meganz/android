@@ -4,6 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.DefaultUIAlbumMapper
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.usecase.AddPhotosToAlbum
 import mega.privacy.android.domain.usecase.DefaultAddPhotosToAlbum
 import mega.privacy.android.domain.usecase.DefaultGetAlbumPhotos
@@ -27,4 +29,10 @@ abstract class AlbumUseCases {
 
     @Binds
     abstract fun bindAddPhotosToAlbum(useCase: DefaultAddPhotosToAlbum): AddPhotosToAlbum
+
+    /**
+     * Binds UIAlbum mapper
+     */
+    @Binds
+    abstract fun bindUIAlbumMapper(useCase: DefaultUIAlbumMapper): UIAlbumMapper
 }
