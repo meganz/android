@@ -3,10 +3,6 @@ BUILD_STEP = ""
 // Below values will be read from MR description and are used to decide SDK versions
 SDK_BRANCH = "develop"
 MEGACHAT_BRANCH = "develop"
-SDK_COMMIT = ""
-MEGACHAT_COMMIT = ""
-SDK_TAG = ""
-MEGACHAT_TAG = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
 HMS_APK_BUILD_LOG = "hms_build.log"
@@ -59,60 +55,6 @@ def shouldSkipBuild() {
 }
 
 /**
- * Detect if there is SDK_BRANCH specified in MR Description.
- * If yes, parse and assign the value to SDK_BRANCH, so later we
- * can checkout wanted branch for SDK.
- * If no, set SDK_BRANCH to "develop".
- */
-def getSDKBranch() {
-    def description = env.GITLAB_OA_DESCRIPTION
-    if (description != null) {
-        String[] lines = description.split("\n")
-        String KEY = "SDK_BRANCH="
-        for (String line : lines) {
-            line = line.trim()
-            if (line.startsWith(KEY)) {
-                print("SDK_BRANCH line found!!! --> " + line)
-                String value = line.substring(KEY.length())
-                if (!value.isEmpty()) {
-                    print("Setting SDK_BRANCH value --> " + value)
-                    SDK_BRANCH = value
-                    return
-                }
-            }
-        }
-    }
-    SDK_BRANCH = 'develop'
-}
-
-/**
- * Detect if there is MEGACHAT_BRANCH specified in MR Description.
- * If yes, parse and assign the value to MEGACHAT_BRANCH, so later we
- * can checkout wanted branch for MEGAChat SDK.
- * If no, set MEGACHAT_BRANCH to "develop".
- */
-def getMEGAChatBranch() {
-    def description = env.GITLAB_OA_DESCRIPTION
-    if (description != null) {
-        String[] lines = description.split("\n")
-        String KEY = "MEGACHAT_BRANCH="
-        for (String line : lines) {
-            line = line.trim()
-            if (line.startsWith(KEY)) {
-                print("MEGACHAT_BRANCH line found!!! --> " + line)
-                String value = line.substring(KEY.length())
-                if (!value.isEmpty()) {
-                    MEGACHAT_BRANCH = value
-                    print("Setting MEGACHAT_BRANCH value --> " + value)
-                    return
-                }
-            }
-        }
-    }
-    MEGACHAT_BRANCH = 'develop'
-}
-
-/**
  * Fetch the message of the last commit from environment variable.
  *
  * @return The commit message text if GitLab plugin has sent a valid commit message, which is
@@ -160,18 +102,13 @@ pipeline {
         GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
-        // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
-        BUILD_ARCHS = "arm64-v8a"
-
-        // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
-        SDK_LOG_FILE_NAME = "sdk_build_log.txt"
-        LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
     }
     post {
         failure {
             script {
-                if (hasGitLabMergeRequest()) {
+                common = load('jenkinsfile/common.groovy')
+
+                if (common.hasGitLabMergeRequest()) {
 
                     // download Jenkins console log
                     downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
@@ -204,23 +141,13 @@ pipeline {
                         unitTestResult += "<br>Data Unit Test: ${dataUnitTestSummary}"
                     }
 
-                    // upload SDK build log if SDK build fails
-                    String sdkBuildMessage = ""
-                    if (BUILD_STEP == "Build SDK") {
-//                            final String respSdkLog = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${SDK_LOG_FILE_NAME} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
-//                            def jsonSdkLog = new groovy.json.JsonSlurperClassic().parseText(respSdkLog)
-                        def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
-                        sdkBuildMessage = "<br/>SDK Build failed. Log:${jsonSdkLog}"
-                    }
-
                     def failureMessage = ":x: Build Failed" +
                             "<br/>Failure Stage: ${BUILD_STEP}" +
                             "<br/>Last Commit Message: ${getLastCommitMessage()}" +
                             "Last Commit ID: ${env.GIT_COMMIT}" +
                             "<br/>Build Log: ${jsonJenkinsLog}" +
-                            sdkBuildMessage +
                             unitTestResult
-                    sendToMR(failureMessage)
+                    common.sendToMR(failureMessage)
                 } else {
                     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
                         def comment = ":x: Android Build failed for branch: ${env.GIT_BRANCH}"
@@ -236,13 +163,15 @@ pipeline {
         }
         success {
             script {
-                if (hasGitLabMergeRequest()) {
+                common = load('jenkinsfile/common.groovy')
+
+                if (common.hasGitLabMergeRequest()) {
                     // If CI build is skipped due to Draft status, send a comment to MR
                     if (shouldSkipBuild()) {
                         def skipMessage = ":raising_hand: Android CI Pipeline Build Skipped! <BR/> " +
                                 "Newly triggered builds will resume after you have removed <b>Draft:</b> or " +
                                 "<b>WIP:</b> from the beginning of MR title."
-                        sendToMR(skipMessage)
+                        common.sendToMR(skipMessage)
                     } else {
                         // String containing the Lint Results
                         String jsonLintReportLink = uploadFileToGitLab(LINT_REPORT_ARCHIVE)
@@ -255,7 +184,7 @@ pipeline {
                                 buildTestResults()
 
                         // Send mergeRequestMessage to MR
-                        sendToMR(mergeRequestMessage)
+                        common.sendToMR(mergeRequestMessage)
 
                         def successSlackMessage = "Android Line Code Coverage:" +
                                 "\nCommit:\t${env.GIT_COMMIT}" +
@@ -281,7 +210,6 @@ pipeline {
                     BUILD_STEP = 'Preparation'
 
                     common = load('jenkinsfile/common.groovy')
-                    common.helloWorld()
                 }
             }
         }
@@ -292,61 +220,13 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Preparation"
-                    checkSDKVersion()
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     script {
-                        getSDKBranch()
-                        sh("echo SDK_BRANCH = ${SDK_BRANCH}")
-
-                        getMEGAChatBranch()
-                        sh("echo MEGACHAT_BRANCH = ${MEGACHAT_BRANCH}")
 
                         sh("rm -fv ${CONSOLE_LOG_FILE}")
                         sh("set")
                         sh("rm -fv unit_test_result*.zip")
-                    }
-                }
-            }
-        }
-
-        stage('Fetch SDK Submodules') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Fetch SDK Submodules"
-
-                    common.fetchSdkSubmodules()
-                }
-            }
-        }
-
-        stage('Select SDK Version') {
-            steps {
-                script {
-                    BUILD_STEP = 'Select SDK Version'
-                }
-                gitlabCommitStatus(name: 'Select SDK Version') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            if (isDefined(SDK_COMMIT)) {
-                                checkoutSdkByCommit(SDK_COMMIT)
-                            } else if (isDefined(SDK_TAG)) {
-                                checkoutSdkByTag(SDK_TAG)
-                            } else {
-                                checkoutSdkByBranch(SDK_BRANCH)
-                            }
-
-                            if (isDefined(MEGACHAT_COMMIT)) {
-                                checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
-                            } else if (isDefined(MEGACHAT_TAG)) {
-                                checkoutMegaChatSdkByTag(MEGACHAT_TAG)
-                            } else {
-                                checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
-                            }
-                        }
                     }
                 }
             }
@@ -361,16 +241,18 @@ pipeline {
                     BUILD_STEP = "Download Dependency Lib for SDK"
                 }
                 gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-                    sh """
 
+                    sh """
+                        # we still have to download webrtc file for lint check. :( 
                         cd "${WORKSPACE}/jenkinsfile/"
                         bash download_webrtc.sh
 
                         mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
                         cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        pwd
+
+                        pwd 
                         ls -lh
-                
+
                         ## check default Google API
                         if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
                             echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
@@ -393,24 +275,6 @@ pipeline {
                         rm -fr app/src/release/res/values/google_maps_api.xml
                         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
                 
-                    """
-                }
-            }
-        }
-        stage('Build SDK') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Build SDK"
-                }
-                gitlabCommitStatus(name: 'Build SDK') {
-                    sh """
-                    rm -f ${LOG_FILE}
-                    cd ${WORKSPACE}/sdk/src/main/jni
-                    echo "=== START SDK BUILD===="
-                    bash build.sh all
                     """
                 }
             }
@@ -501,10 +365,11 @@ pipeline {
                         sh "rm -frv ${WORKSPACE}/app/src/testDebug"
 
                         // run coverage for app module
-                        sh "./gradlew clean app:createUnitTestCoverageReport"
+                        sh "./gradlew app:createUnitTestCoverageReport"
 
                         // restore failed test cases
                         sh "git checkout -- app/src/testDebug"
+
                         APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                         println("APP_COVERAGE = ${APP_COVERAGE}")
                     }
@@ -584,16 +449,6 @@ String buildTestResults() {
             "$appTestResultsRow\n" +
             "$domainTestResultsRow\n" +
             "$dataTestResultsRow\n"
-}
-
-def cleanUp() {
-    sh """
-        cd ${WORKSPACE}
-        ./gradlew clean
-
-        cd ${WORKSPACE}/sdk/src/main/jni
-        bash build.sh clean
-    """
 }
 
 /**
@@ -690,7 +545,7 @@ def archiveLintReports() {
 }
 
 /**
- * archive all HTML coverage reports into one zip file
+ * Archive all HTML coverage reports into one zip file
  */
 def archiveCoverageReport() {
     sh """
@@ -739,16 +594,10 @@ def archiveUnitTestReport(String reportPath, String targetFileName) {
  * @param archiveTargetName file name of the test report zip file
  */
 def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, String archiveTargetName) {
-//    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-    // upload unit test report if unit test fails
 
     String unitTestResult
     if (archiveUnitTestReport(reportPath, archiveTargetName)) {
         unitTestFileLink = uploadFileToGitLab(archiveTargetName)
-//            final String unitTestUploadResponse = sh(
-//                    script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${archiveTargetName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads",
-//                    returnStdout: true).trim()
-//            def unitTestFileLink = new groovy.json.JsonSlurperClassic().parseText(unitTestUploadResponse).markdown
 
         String unitTestSummary = unitTestSummary("${WORKSPACE}/${testResultPath}")
         unitTestResult = "<br/>${unitTestSummary} <br/>${unitTestFileLink}"
@@ -756,7 +605,6 @@ def unitTestSummaryWithArchiveLink(String testResultPath, String reportPath, Str
         unitTestResult = "<br>Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return unitTestResult
-//    }
 }
 
 /**
@@ -789,31 +637,6 @@ String getTestCoverageSummary(String csvReportPath) {
     return summary
 }
 
-
-/**
- * Check if this build is triggered by a GitLab Merge Request.
- * @return true if this build is triggerd by a GitLab MR. False if this build is triggerd
- * by a plain git push.
- */
-private boolean hasGitLabMergeRequest() {
-    return env.BRANCH_NAME != null && env.BRANCH_NAME.startsWith('MR-')
-}
-
-/**
- * send message to GitLab MR comment
- * @param message message to send
- */
-private void sendToMR(String message) {
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.BRANCH_NAME.replace('MR-', '')
-        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh "curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}"
-        }
-    }
-}
-
 /**
  * download jenkins build console log and save to file.
  */
@@ -839,134 +662,10 @@ private String uploadFileToGitLab(String fileName) {
 }
 
 /**
- * Get the value from GitLab MR description by key
- * @param key the key to check and read
- * @return actual value of key if key is specified. null otherwise.
- */
-String getValueInMRDescriptionBy(String key) {
-    if (key == null || key.isEmpty()) return null
-    String description = env.GITLAB_OA_DESCRIPTION
-    if (description == null) return null
-    String[] lines = description.split('\n')
-    for (String line : lines) {
-        line = line.trim()
-        if (line.startsWith(key)) {
-            String value = line.substring(key.length() + 1)
-            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
-            return value
-        }
-    }
-    return null
-}
-
-/**
- * Read SDK versions from MR description and assign the values into environment.
- */
-private void checkSDKVersion() {
-    SDK_COMMIT = getValueInMRDescriptionBy("SDK_COMMIT")
-    MEGACHAT_COMMIT = getValueInMRDescriptionBy("MEGACHAT_COMMIT")
-
-    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
-    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
-
-    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
-    if (!isDefined(SDK_BRANCH)) {
-        SDK_BRANCH = "develop"
-    }
-
-    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
-    if (!isDefined(MEGACHAT_BRANCH)) {
-        MEGACHAT_BRANCH = "develop"
-    }
-}
-
-/**
  * check if a certain value is defined by checking the tag value
  * @param value value of tag
  * @return true if tag has a value. false if tag is null or zero length
  */
 static boolean isDefined(String value) {
     return value != null && !value.isEmpty()
-}
-
-/**
- * checkout SDK by commit ID
- * @param sdkCommitId the commit ID to checkout
- */
-private void checkoutSdkByCommit(String sdkCommitId) {
-    sh """
-    echo checkoutSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout $sdkCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout SDK by git tag
- * @param sdkTag the tag to checkout
- */
-private void checkoutSdkByTag(String sdkTag) {
-    sh """
-    echo checkoutSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout tags/$sdkTag
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout SDK by branch
- * @param sdkBranch the branch to checkout
- */
-private void checkoutSdkByBranch(String sdkBranch) {
-    sh "echo checkoutSdkByBranch"
-    sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
-    sh 'git submodule sync'
-    sh 'git submodule update --init --recursive --remote'
-}
-
-/**
- * checkout MEGAchat SDK by commit ID
- * @param megaChatCommitId the commit ID to checkout
- */
-private void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
-    sh """
-    echo checkoutMegaChatSdkByCommit
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout $megaChatCommitId
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by git tag
- * @param megaChatTag the tag to checkout
- */
-private void checkoutMegaChatSdkByTag(String megaChatTag) {
-    sh """
-    echo checkoutMegaChatSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout tags/$megaChatTag
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by branch
- * @param megaChatBranch the branch to checkout
- */
-private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
-    sh "echo checkoutMegaChatSdkByBranch"
-    sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
-    sh 'git submodule sync'
-    sh 'git submodule update --init --recursive --remote'
 }
