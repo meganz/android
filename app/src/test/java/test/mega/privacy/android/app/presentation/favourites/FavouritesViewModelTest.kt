@@ -121,10 +121,9 @@ class FavouritesViewModelTest {
         whenever(getAllFavorites()).thenReturn(flowOf(nodes))
         whenever(getSortOrder()).thenReturn(FavouriteSortOrder.ModifiedDate(false))
         whenever(favouriteMapper(any(), any(), any(), any(), any())).thenAnswer {
-            val time = (it.arguments[1] as TypedFileNode).modificationTime
+            val typedFileNode = it.arguments[1] as TypedFileNode
             mock<Favourite> {
-                on { modificationTime }.thenReturn(time)
-                on { getComparableField(any()) }.thenReturn(time)
+                on { typedNode }.thenReturn(typedFileNode)
             }
         }
         whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
@@ -134,7 +133,7 @@ class FavouritesViewModelTest {
             val items = awaitItem()
             assertThat(items).isInstanceOf(FavouriteLoadState.Success::class.java)
             assertThat((items as FavouriteLoadState.Success).favourites.drop(1)
-                .map { it.favourite?.modificationTime }).containsExactlyElementsIn(
+                .map { (it.favourite?.typedNode as TypedFileNode).modificationTime }).containsExactlyElementsIn(
                 timeDescending.reversed()).inOrder()
         }
 
@@ -151,10 +150,9 @@ class FavouritesViewModelTest {
         val sortOrder = FavouriteSortOrder.ModifiedDate(false)
         whenever(getSortOrder()).thenReturn(sortOrder)
         whenever(favouriteMapper(any(), any(), any(), any(), any())).thenAnswer {
-            val time = (it.arguments[1] as TypedFileNode).modificationTime
+            val typedFileNode = it.arguments[1] as TypedFileNode
             mock<Favourite> {
-                on { modificationTime }.thenReturn(time)
-                on { getComparableField(any()) }.thenReturn(time)
+                on { typedNode }.thenReturn(typedFileNode)
             }
         }
         whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
@@ -166,13 +164,13 @@ class FavouritesViewModelTest {
             val items = awaitItem()
             assertThat(items).isInstanceOf(FavouriteLoadState.Success::class.java)
             assertThat((items as FavouriteLoadState.Success).favourites.drop(1)
-                .map { it.favourite?.modificationTime }).containsExactlyElementsIn(
+                .map { (it.favourite?.typedNode as TypedFileNode).modificationTime }).containsExactlyElementsIn(
                 timeDescending.reversed()).inOrder()
             underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
             scheduler.advanceUntilIdle()
             val sortedItems = awaitItem()
             assertThat((sortedItems as FavouriteLoadState.Success).favourites.drop(1)
-                .map { it.favourite?.modificationTime }).containsExactlyElementsIn(
+                .map { (it.favourite?.typedNode as TypedFileNode).modificationTime }).containsExactlyElementsIn(
                 timeDescending).inOrder()
         }
     }

@@ -71,19 +71,13 @@ private fun TypedFolderNode.createFolder(
     folderInfo: String,
     isAvailableOffline: Boolean,
 ) = FavouriteFolder(
-    nodeId = id,
     icon = getFolderIcon(this),
-    name = name,
-    label = label,
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
     showLabel = label != MegaNode.NODE_LBL_UNKNOWN,
     node = node,
-    hasVersion = hasVersion,
     info = folderInfo,
-    isFavourite = isFavourite,
-    isExported = isExported,
-    isTakenDown = isTakenDown,
-    isAvailableOffline = isAvailableOffline
+    isAvailableOffline = isAvailableOffline,
+    typedNode = this,
 )
 
 /**
@@ -100,22 +94,14 @@ private fun TypedFileNode.createFile(
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
 ) = FavouriteFile(
-    nodeId = id,
     icon = getFileIcon(name),
-    name = name,
-    label = label,
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
     showLabel = label != MegaNode.NODE_LBL_UNKNOWN,
     node = node,
-    hasVersion = hasVersion,
     info = fileInfo,
-    size = size,
-    modificationTime = modificationTime,
-    isFavourite = isFavourite,
-    isExported = isExported,
-    isTakenDown = isTakenDown,
     isAvailableOffline = isAvailableOffline,
-    thumbnailPath = thumbnailPath?.takeIf { type.hasThumbnail() }
+    thumbnailPath = thumbnailPath?.takeIf { type.hasThumbnail() },
+    typedNode = this,
 )
 
 private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
