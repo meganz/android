@@ -5,12 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemMeetingDataBinding
 import mega.privacy.android.app.databinding.ItemMeetingHeaderBinding
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.meeting.list.MeetingItemDiffCallback
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 
 class MeetingsAdapter constructor(
@@ -117,7 +119,7 @@ class MeetingsAdapter constructor(
                 item.isScheduled() && !isSameDay(item.startTimestamp, previousItem?.startTimestamp) ->
                     itemsWithHeader.add(MeetingItem.Header(item.getStartDay()))
                 !item.isScheduled() && previousItem?.isScheduled() == true ->
-                    itemsWithHeader.add(MeetingItem.Header("Past meetings"))
+                    itemsWithHeader.add(MeetingItem.Header(StringResourcesUtils.getString(R.string.meetings_list_past_header)))
             }
             itemsWithHeader.add(item)
         }

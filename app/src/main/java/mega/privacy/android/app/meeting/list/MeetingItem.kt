@@ -10,10 +10,15 @@ import java.util.Calendar
 
 sealed class MeetingItem(val id: Long) {
 
+    /**
+     * Meeting item header
+     *
+     * @property title  Header title
+     */
     data class Header constructor(val title: String) : MeetingItem(title.hashCode().toLong())
 
     /**
-     * Meeting item
+     * Meeting item data class
      *
      * @property chatId             Chat identifier
      * @property title              Chat title
@@ -67,6 +72,9 @@ sealed class MeetingItem(val id: Long) {
         fun isSingleMeeting(): Boolean =
             lastUser == null
 
+        /**
+         * Get Meeting start day formatted
+         */
         fun getStartDay(): String =
             when {
                 startTimestamp == null -> ""

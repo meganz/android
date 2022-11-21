@@ -4046,10 +4046,18 @@
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s“</string>
+    <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
     </plurals>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Past meetings</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s Weekly</string>
 </resources>

@@ -33,7 +33,11 @@ class MeetingDataViewHolder(
         if (item.isScheduled()) {
             binding.txtLastMessage.text = item.formattedScheduledTimestamp
             binding.txtLastMessage.isVisible = !item.formattedScheduledTimestamp.isNullOrBlank()
-            binding.txtTimestamp.text = if (item.isRecurring) "Recurring meeting" else "Upcoming meeting"
+            binding.txtTimestamp.setText(if (item.isRecurring) {
+                R.string.meetings_list_recurring_meeting_label
+            } else {
+                R.string.meetings_list_upcoming_meeting_label
+            })
         } else {
             binding.txtLastMessage.text = item.lastMessage
             binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()

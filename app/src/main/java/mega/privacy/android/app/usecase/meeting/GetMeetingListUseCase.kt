@@ -25,6 +25,7 @@ import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
@@ -291,7 +292,7 @@ class GetMeetingListUseCase @Inject constructor(
             }
             val scheduleText = "${hourFormat.format(startTime.time)} - ${hourFormat.format(endTime.time)}"
             formattedScheduledTimestamp = if (isRecurring) {
-                "$scheduleText Weekly"
+                StringResourcesUtils.getString(R.string.meetings_list_scheduled_meeting_weekly_label, scheduleText)
             } else {
                 scheduleText
             }
