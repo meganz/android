@@ -207,11 +207,11 @@ class AlbumsViewModel @Inject constructor(
      */
     fun createNewAlbum(title: String, proscribedStrings: List<String>) = viewModelScope.launch {
         try {
-            if (checkTitleValidity(title, proscribedStrings)) {
-                val finalName = title.ifEmpty {
-                    _state.value.createAlbumPlaceholderTitle
-                }
-                val album = createAlbum(finalName)
+            val finalTitle = title.ifEmpty {
+                _state.value.createAlbumPlaceholderTitle
+            }.trim()
+            if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                val album = createAlbum(finalTitle)
                 _state.update {
                     it.copy(currentAlbum = album)
                 }
