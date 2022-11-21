@@ -88,6 +88,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -463,7 +464,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 index = 0,
                 type = TYPE_PLAYING,
                 size = node?.size ?: INVALID_SIZE,
-                duration = node?.duration ?: 0)
+                duration = node?.type?.getDuration() ?: 0)
 
             postPlaylistItems()
 
@@ -552,7 +553,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     index = currentIndex,
                     type = TYPE_NEXT,
                     size = typedNode.size,
-                    duration = typedNode.duration)
+                    duration = typedNode.type.getDuration())
 
                 if (thumbnail != null && !thumbnail.exists()) {
                     nodesWithoutThumbnail.add(Pair(typedNode.id.id, thumbnail))

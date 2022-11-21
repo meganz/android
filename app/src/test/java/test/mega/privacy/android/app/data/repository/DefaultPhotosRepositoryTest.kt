@@ -152,7 +152,7 @@ class DefaultPhotosRepositoryTest {
         thumbnailFilePath: String?,
         previewFilePath: String?,
         fileTypeInfo: FileTypeInfo,
-    ): Photo = Photo.Image(
+    ): Photo.Image = Photo.Image(
         id,
         parentId,
         name,
@@ -173,9 +173,8 @@ class DefaultPhotosRepositoryTest {
         modificationTime: LocalDateTime,
         thumbnailFilePath: String?,
         previewFilePath: String?,
-        duration: Int,
         fileTypeInfo: FileTypeInfo,
-    ): Photo = Photo.Video(
+    ): Photo.Video = Photo.Video(
         id,
         parentId,
         name,
@@ -184,7 +183,6 @@ class DefaultPhotosRepositoryTest {
         modificationTime,
         thumbnailFilePath,
         previewFilePath,
-        duration,
         fileTypeInfo,
     )
 
@@ -197,7 +195,7 @@ class DefaultPhotosRepositoryTest {
         } else if (name.contains("raw")) {
             return RawFileTypeInfo(type = "", extension = "raw")
         } else if (name.contains("video")) {
-            return VideoFileTypeInfo(type = "", extension = "video")
+            return VideoFileTypeInfo(type = "", extension = "video", duration = 120)
         } else {
             return UnknownFileTypeInfo(type = "", extension = "")
         }

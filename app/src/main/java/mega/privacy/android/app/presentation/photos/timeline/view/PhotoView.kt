@@ -38,6 +38,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.photos.Photo
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -167,7 +168,7 @@ fun PhotoCoverView(
                 )
 
                 Text(
-                    text = TimeUtils.getVideoDuration(photo.duration),
+                    text = TimeUtils.getVideoDuration(photo.fileTypeInfo.getDuration()),
                     color = colorResource(id = R.color.white),
                     modifier = Modifier
                         .wrapContentSize()
@@ -221,6 +222,3 @@ fun PhotoImageView(
             .aspectRatio(1f)
     )
 }
-
-
-

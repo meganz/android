@@ -26,7 +26,8 @@ internal fun getFileTypeInfo(node: MegaNode, mimeTypeMapper: MimeTypeMapper): Fi
     with(getFileExtension(node)) {
         getFileTypeInfoForExtension(
             mimeType = mimeTypeMapper(this),
-            extension = this
+            extension = this,
+            duration = node.duration
         )
     }
 
@@ -36,6 +37,7 @@ private fun getFileExtension(node: MegaNode) =
 private fun getFileTypeInfoForExtension(
     mimeType: String,
     extension: String,
+    duration: Int,
 ) = when {
     mimeType.startsWith(PdfFileTypeInfo.type) -> {
         PdfFileTypeInfo
@@ -71,6 +73,7 @@ private fun getFileTypeInfoForExtension(
         AudioFileTypeInfo(
             type = mimeType,
             extension = extension,
+            duration = duration
         )
     }
     mimeType.isTextMimeType(extension) -> {
@@ -83,6 +86,7 @@ private fun getFileTypeInfoForExtension(
         VideoFileTypeInfo(
             type = mimeType,
             extension = extension,
+            duration = duration
         )
     }
     mimeType.isUnMappedMimeType(extension) -> {
