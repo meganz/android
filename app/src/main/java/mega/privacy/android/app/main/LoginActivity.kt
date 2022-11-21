@@ -389,12 +389,12 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     public override fun showConfirmationEnableLogsKarere() {
         loginFragment?.numberOfClicksKarere = 0
-        showConfirmationEnableLogsKarere()
+        super.showConfirmationEnableLogsKarere()
     }
 
     public override fun showConfirmationEnableLogsSDK() {
         loginFragment?.numberOfClicksSDK = 0
-        showConfirmationEnableLogsSDK()
+        super.showConfirmationEnableLogsSDK()
     }
 
     /**

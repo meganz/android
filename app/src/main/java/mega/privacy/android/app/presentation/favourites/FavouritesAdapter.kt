@@ -127,13 +127,13 @@ class FavouritesViewHolder(
         with(binding) {
             when (this) {
                 is ItemFavouriteBinding -> {
-                    item.favourite?.let { info: Favourite ->
-                        info.thumbnailPath?.let { thumbnailPath ->
+                    item.favourite?.let { favourite: Favourite ->
+                        favourite.thumbnailPath?.let { thumbnailPath ->
                             File(thumbnailPath).let { file ->
                                 if (file.exists()) {
                                     itemThumbnail.setImageURI(Uri.fromFile(file))
                                 } else {
-                                    getThumbnail(info.nodeId.id) { thumbnail ->
+                                    getThumbnail(favourite.typedNode.id.id) { thumbnail ->
                                         thumbnail?.let { fileByGetThumbnail ->
                                             itemThumbnail.setImageURI(
                                                 Uri.fromFile(
@@ -142,11 +142,11 @@ class FavouritesViewHolder(
                                             )
                                         }
                                     }
-                                    itemThumbnail.setImageResource(info.icon)
+                                    itemThumbnail.setImageResource(favourite.icon)
                                 }
                             }
-                        } ?: itemThumbnail.setImageResource(info.icon)
-                        itemFilename.text = info.name
+                        } ?: itemThumbnail.setImageResource(favourite.icon)
+                        itemFilename.text = favourite.typedNode.name
                         itemImgLabel.setImageDrawable(
                             ResourcesCompat.getDrawable(
                                 context.resources,
@@ -157,34 +157,34 @@ class FavouritesViewHolder(
                                     setTint(
                                         ResourcesCompat.getColor(
                                             context.resources,
-                                            info.labelColour,
+                                            favourite.labelColour,
                                             null
                                         )
                                     )
                                 }
                         )
-                        itemThumbnail.isVisible = !info.isSelected
-                        imageSelected.visibility = if (info.isSelected) {
+                        itemThumbnail.isVisible = !favourite.isSelected
+                        imageSelected.visibility = if (favourite.isSelected) {
                             View.VISIBLE
                         } else {
                             View.INVISIBLE
                         }
-                        itemImgLabel.isVisible = info.showLabel
-                        fileListSavedOffline.isVisible = info.isAvailableOffline
-                        itemImgFavourite.isVisible = info.isFavourite
-                        itemPublicLink.isVisible = info.isExported
-                        itemTakenDown.isVisible = info.isTakenDown
-                        itemVersionsIcon.isVisible = info.hasVersion
-                        itemFileInfo.text = info.info
+                        itemImgLabel.isVisible = favourite.showLabel
+                        fileListSavedOffline.isVisible = favourite.isAvailableOffline
+                        itemImgFavourite.isVisible = favourite.typedNode.isFavourite
+                        itemPublicLink.isVisible = favourite.typedNode.isExported
+                        itemTakenDown.isVisible = favourite.typedNode.isTakenDown
+                        itemVersionsIcon.isVisible = favourite.typedNode.hasVersion
+                        itemFileInfo.text = favourite.info
                         itemFavouriteLayout.setOnClickListener {
-                            onItemClicked(info, imageSelected, position)
+                            onItemClicked(favourite, imageSelected, position)
                         }
                         itemThreeDots.setOnClickListener {
-                            onThreeDotsClicked(info)
+                            onThreeDotsClicked(favourite)
                         }
 
                         itemFavouriteLayout.setOnLongClickListener {
-                            onLongClicked(info, imageSelected, position)
+                            onLongClicked(favourite, imageSelected, position)
                         }
                     }
                 }
@@ -206,7 +206,7 @@ class FavouritesViewHolder(
  */
 object FavouritesDiffCallback : DiffUtil.ItemCallback<FavouriteItem>() {
     override fun areItemsTheSame(oldInfo: FavouriteItem, newInfo: FavouriteItem): Boolean {
-        return oldInfo.favourite?.nodeId == newInfo.favourite?.nodeId
+        return oldInfo.favourite?.typedNode?.id == newInfo.favourite?.typedNode?.id
     }
 
     override fun areContentsTheSame(oldInfo: FavouriteItem, newInfo: FavouriteItem): Boolean {

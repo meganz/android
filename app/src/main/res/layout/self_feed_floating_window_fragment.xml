@@ -11,13 +11,6 @@
     android:layout_marginBottom="13dp"
     android:background="@drawable/self_feed_floating_window_background">
 
-    <SurfaceView
-        android:id="@+id/video"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:visibility="gone" />
-
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar"
         android:layout_width="60dp"
@@ -31,6 +24,23 @@
         rounded:border_color="@color/white_alpha_030"
         rounded:border_width="2.73dp"
         rounded:corner_radius="60dp" />
+
+    <TextureView
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/micro_off_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="6dp"
+        android:src="@drawable/ic_mic_off_contact"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/on_hold_icon"

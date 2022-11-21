@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -43,6 +44,8 @@ class DefaultGetAlbumPhotosTest {
         val expectedVideo = createVideo()
 
         whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(nodeIds)
+        whenever(albumRepository.monitorAlbumElementIds(albumId)).thenReturn(flowOf())
+
         whenever(photosRepository.getPhotoFromNodeID(nodeIds[0])).thenReturn(expectedImage)
         whenever(photosRepository.getPhotoFromNodeID(nodeIds[1])).thenReturn(expectedVideo)
 

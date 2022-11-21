@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -16,6 +17,8 @@ import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
@@ -59,42 +62,34 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     override suspend fun getAllUserSets(): List<UserSet> = withContext(ioDispatcher) {
         val setList = megaApiGateway.getSets()
-        (0 until setList.size()).map {
-            with(setList.get(it)) {
-                userSetMapper(id(), name(), cover(), ts())
-            }
+        (0 until setList.size()).map { index ->
+            setList.get(index).toUserSet()
         }
     }
 
     override suspend fun getUserSet(albumId: AlbumId): UserSet? = withContext(ioDispatcher) {
-        megaApiGateway.getSet(sid = albumId.id)?.let { set ->
-            userSetMapper(set.id(), set.name(), set.cover(), set.ts())
-        }
+        megaApiGateway.getSet(sid = albumId.id)?.toUserSet()
     }
 
     override fun monitorUserSetsUpdate(): Flow<List<UserSet>> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
-        .mapNotNull { (sets) ->
-            sets?.map { set ->
-                userSetMapper(set.id(), set.name(), set.cover(), set.ts())
-            }
-        }
+        .mapNotNull { it.sets }
+        .map { sets -> sets.map { it.toUserSet() } }
 
     override suspend fun getAlbumElementIDs(albumId: AlbumId): List<NodeId> =
         withContext(ioDispatcher) {
             val elementList = megaApiGateway.getSetElements(sid = albumId.id)
-            (0 until elementList.size()).map {
-                NodeId(elementList.get(it).node())
+            (0 until elementList.size()).map { index ->
+                elementList.get(index).toNodeId()
             }
         }
 
-    override fun monitorAlbumElementIds(): Flow<List<NodeId>> = megaApiGateway.globalUpdates
-        .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
-        .mapNotNull { (elements) ->
-            elements?.map { element ->
-                NodeId(id = element.node())
-            }
-        }
+    override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<NodeId>> =
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
+            .mapNotNull { it.elements }
+            .map { elements -> elements.filter { it.setId() == albumId.id } }
+            .map { elements -> elements.map { it.toNodeId() } }
 
     override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
@@ -102,4 +97,8 @@ internal class DefaultAlbumRepository @Inject constructor(
                 megaApiGateway.createSetElement(albumID.id, photoID.id)
             }
         }
+
+    private fun MegaSet.toUserSet(): UserSet = userSetMapper(id(), name(), cover(), ts())
+
+    private fun MegaSetElement.toNodeId(): NodeId = NodeId(id = node())
 }

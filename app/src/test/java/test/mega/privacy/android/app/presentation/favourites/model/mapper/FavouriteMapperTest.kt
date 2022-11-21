@@ -42,7 +42,7 @@ class FavouriteMapperTest {
             on { isInShare }.thenReturn(expectedIsShared)
         }
 
-        val favouriteInfo = mock<TypedFolderNode> {
+        val typedFolderNode = mock<TypedFolderNode> {
             on { id }.thenReturn(expectedNodeId)
             on { name }.thenReturn(expectedName)
             on { label }.thenReturn(expectedLabel)
@@ -68,29 +68,18 @@ class FavouriteMapperTest {
             }.thenReturn(expectedInfo)
         }
 
-        val actual = toFavourite(testNode, favouriteInfo, false, stringUtil)
+        val actual = toFavourite(testNode, typedFolderNode, false, stringUtil)
 
-        assertWithMessage("Name not mapped correctly").that(actual.name).isEqualTo(expectedName)
-        assertWithMessage("Label not mapped correctly").that(actual.label).isEqualTo(expectedLabel)
-        assertWithMessage("HasVersion not mapped correctly").that(actual.hasVersion)
-            .isEqualTo(expectedHasVersion)
         assertWithMessage("ShowLabel not mapped correctly").that(actual.showLabel)
             .isEqualTo(expectedShowLabel)
         assertWithMessage("Info not mapped correctly").that(actual.info).isEqualTo(expectedInfo)
         assertWithMessage("IsAvailableOffline not mapped correctly").that(actual.isAvailableOffline)
             .isEqualTo(expectedIsAvailableOffline)
-        assertWithMessage("IsExported not mapped correctly").that(actual.isExported)
-            .isEqualTo(expectedIsExported)
-        assertWithMessage("IsFavourite not mapped correctly").that(actual.isFavourite)
-            .isEqualTo(expectedIsFavourite)
-        assertWithMessage("IsTakenDown not mapped correctly").that(actual.isTakenDown)
-            .isEqualTo(expectedIsTakenDown)
         assertWithMessage("LabelColour not mapped correctly").that(actual.labelColour)
             .isEqualTo(expectedLabelColour)
         assertWithMessage("Icon not mapped correctly").that(actual.icon).isEqualTo(expectedIcon)
-        assertWithMessage("Node not mapped correctly").that(actual.node).isSameInstanceAs(testNode)
-        assertWithMessage("Handle not mapped correctly").that(actual.nodeId)
-            .isEqualTo(expectedNodeId)
+
+        assertThat(actual.typedNode).isSameInstanceAs(typedFolderNode)
     }
 
     @Test
@@ -126,7 +115,7 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = mock<TypedFileNode> {
+        val typedFileNode = mock<TypedFileNode> {
             on { id }.thenReturn(expectedNodeId)
             on { name }.thenReturn(expectedName)
             on { size }.thenReturn(expectedSize)
@@ -150,21 +139,14 @@ class FavouriteMapperTest {
         val getFileIcon: (String) -> Int = mock()
         whenever(getFileIcon(expectedName)).thenReturn(expectedIcon)
 
-        val actual = toFavourite(testNode, favouriteInfo, false, stringUtil, getFileIcon)
+        val actual = toFavourite(testNode, typedFileNode, false, stringUtil, getFileIcon)
 
-        assertThat(actual.nodeId).isEqualTo(expectedNodeId)
-        assertThat(actual.name).isEqualTo(expectedName)
-        assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
         assertThat(actual.showLabel).isEqualTo(expectedShowLabel)
         assertThat(actual.info).isEqualTo(expectedInfo)
         assertThat(actual.isAvailableOffline).isEqualTo(expectedIsAvailableOffline)
-        assertThat(actual.isExported).isEqualTo(expectedIsExported)
-        assertThat(actual.isFavourite).isEqualTo(expectedIsFavourite)
-        assertThat(actual.isTakenDown).isEqualTo(expectedIsTakenDown)
         assertThat(actual.labelColour).isEqualTo(expectedLabelColour)
         assertThat(actual.icon).isEqualTo(expectedIcon)
-        assertThat(actual.size).isEqualTo(expectedSize)
-        assertThat(actual.modificationTime).isEqualTo(expectedModificationTime)
+        assertThat(actual.typedNode).isSameInstanceAs(typedFileNode)
         assertThat(actual.node).isSameInstanceAs(testNode)
     }
 

@@ -347,7 +347,7 @@ class AlbumsViewModelTest {
         )
 
         underTest.state.drop(1).test {
-            val actualUserAlbums = (1..3).map { awaitItem() }.last().albums.map { it.id }
+            val actualUserAlbums = awaitItem().albums.map { it.id }
             assertThat(expectedUserAlbums).isEqualTo(actualUserAlbums)
         }
     }
@@ -457,7 +457,7 @@ class AlbumsViewModelTest {
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
 
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 awaitItem()
                 underTest.setPlaceholderAlbumTitle("New album")
                 val actualName = awaitItem().createAlbumPlaceholderTitle

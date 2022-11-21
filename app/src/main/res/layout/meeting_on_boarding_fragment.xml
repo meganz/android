@@ -32,8 +32,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <SurfaceView
-            android:id="@+id/localSurfaceView"
+        <TextureView
+            android:id="@+id/localTextureView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone"

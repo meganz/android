@@ -4150,11 +4150,10 @@
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Novo álbum (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title"></string>
+    <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
     </plurals>
 </resources>
