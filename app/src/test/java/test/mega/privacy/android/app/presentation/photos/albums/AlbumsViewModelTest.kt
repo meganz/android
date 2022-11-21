@@ -337,10 +337,9 @@ class AlbumsViewModelTest {
             createUserAlbum(id = AlbumId(1L), title = "Album 1", modificationTime = 100L),
         )
 
-        underTest.state.test {
-            val actualUserAlbums = (1..3).map { awaitItem() }.last().albums.map { it.id }
+        underTest.state.drop(1).test {
+            val actualUserAlbums = awaitItem().albums.map { it.id }
             assertThat(expectedUserAlbums).isEqualTo(actualUserAlbums)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
