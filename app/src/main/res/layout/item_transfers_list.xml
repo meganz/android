@@ -9,20 +9,34 @@
 	android:descendantFocusability="blocksDescendants"
 	tools:ignore="RtlSymmetry">
 
-    <ImageView
-        android:id="@+id/transfers_list_thumbnail"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_centerVertical="true"
-        android:scaleType="fitCenter" />
+	<RelativeLayout
+		android:id="@+id/layout_thumbnail"
+		android:layout_width="48dp"
+		android:layout_height="48dp"
+		android:layout_centerVertical="true"
+		android:layout_marginStart="13dp">
 
-    <ImageView
-        android:id="@+id/transfers_list_small_icon"
-        android:layout_width="21dp"
-        android:layout_height="21dp"
-        android:layout_alignTop="@id/transfers_list_thumbnail"
-        android:layout_alignEnd="@id/transfers_list_thumbnail"
-        android:src="@drawable/ic_download_transfers" />
+		<ImageView
+			android:id="@+id/transfers_list_default_icon"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:scaleType="centerCrop" />
+
+		<ImageView
+			android:id="@+id/transfers_list_thumbnail"
+			android:layout_width="36dp"
+			android:layout_height="36dp"
+			android:layout_centerInParent="true"
+			android:scaleType="centerCrop" />
+
+		<ImageView
+			android:id="@+id/transfers_list_small_icon"
+			android:layout_width="21dp"
+			android:layout_height="21dp"
+			android:layout_alignParentEnd="true"
+			android:src="@drawable/ic_download_transfers" />
+
+	</RelativeLayout>
 
     <TextView
         android:id="@+id/transfers_list_filename"
@@ -31,7 +45,7 @@
         android:layout_marginStart="13dp"
         android:layout_marginTop="16dp"
         android:layout_toStartOf="@+id/transfers_list_option_pause"
-        android:layout_toEndOf="@id/transfers_list_thumbnail"
+        android:layout_toEndOf="@id/layout_thumbnail"
         android:ellipsize="middle"
         android:singleLine="true"
         style="@style/textAppearanceSubtitle1" />
@@ -43,7 +57,7 @@
         android:layout_below="@id/transfers_list_filename"
         android:layout_alignStart="@id/transfers_list_filename"
         android:layout_marginBottom="14dp"
-        android:layout_toEndOf="@id/transfers_list_thumbnail" />
+        android:layout_toEndOf="@id/layout_thumbnail" />
 
     <TextView
         android:id="@+id/transfers_list_completed_text"
@@ -84,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/transfers_list_filename"
         android:layout_marginStart="13dp"
-        android:layout_toEndOf="@id/transfers_list_thumbnail"
+        android:layout_toEndOf="@id/layout_thumbnail"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
     <TextView

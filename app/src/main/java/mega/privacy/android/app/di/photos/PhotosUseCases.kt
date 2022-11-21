@@ -7,7 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.DefaultUIAlbumMapper
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.DefaultCreateAlbum

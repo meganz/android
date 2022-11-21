@@ -28,12 +28,17 @@ import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
+import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
+import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
@@ -49,9 +54,14 @@ import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.MonitorBatteryInfo
+import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -214,6 +224,12 @@ object TestCameraUploadUseCases {
     fun provideSetSecondarySyncHandle() = mock<SetSecondarySyncHandle>()
 
     @Provides
+    fun provideIsNodeInRubbish() = mock<IsNodeInRubbish>()
+
+    @Provides
+    fun provideClearCacheDirectory() = mock<ClearCacheDirectory>()
+
+    @Provides
     fun provideGetPrimarySyncHandle() = mock<GetPrimarySyncHandle>()
 
     @Provides
@@ -226,8 +242,32 @@ object TestCameraUploadUseCases {
     fun provideGetUploadFolderHandle() = mock<GetUploadFolderHandle>()
 
     @Provides
+    fun provideResetCameraUploadTimeStamps() = mock<ResetCameraUploadTimeStamps>()
+
+    @Provides
+    fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
+
+    @Provides
+    fun provideDisableCameraUploadSettings() = mock<DisableCameraUploadSettings>()
+
+    @Provides
+    fun provideDisableMediaUploadSettings() = mock<DisableMediaUploadSettings>()
+
+    @Provides
+    fun provideBackupTimeStampsAndFolderHandle() = mock<BackupTimeStampsAndFolderHandle>()
+
+    @Provides
     fun provideRestorePrimaryTimestamps() = mock<RestorePrimaryTimestamps>()
 
     @Provides
     fun provideRestoreSecondaryTimestamps() = mock<RestoreSecondaryTimestamps>()
+
+    @Provides
+    fun provideMonitorCameraUploadPauseState() = mock<MonitorCameraUploadPauseState>()
+
+    @Provides
+    fun provideBroadcastUploadPauseState() = mock<BroadcastUploadPauseState>()
+
+    @Provides
+    fun provideMonitorBatteryInfo() = mock<MonitorBatteryInfo>()
 }

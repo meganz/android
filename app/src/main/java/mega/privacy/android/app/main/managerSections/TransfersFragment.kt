@@ -24,6 +24,7 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
+import mega.privacy.android.app.main.adapters.SelectModeInterface
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -32,18 +33,28 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * The Fragment is used for displaying the transfer list.
  */
 @AndroidEntryPoint
-class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectModeInterface,
+class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback, MoveTransferInterface {
+
+    /**
+     * MegaApiAndroid injection
+     */
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
 
     private var adapter: MegaTransfersAdapter? = null
 
@@ -75,13 +86,14 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         viewModel.setActiveTransfers((requireActivity() as ManagerActivity).transfersInProgress)
 
         binding.transfersListView.let { recyclerView ->
-            adapter = MegaTransfersAdapter(requireActivity(),
-                viewModel.getActiveTransfers(),
-                recyclerView,
-                this,
-                viewModel)
+            adapter = MegaTransfersAdapter(context = requireActivity(),
+                transfers = viewModel.getActiveTransfers(),
+                listView = recyclerView,
+                selectModeInterface = this,
+                transfersViewModel = viewModel,
+                megaApi = megaApi)
 
-            adapter?.isMultipleSelect = false
+            adapter?.setMultipleSelect(false)
             recyclerView.adapter = adapter
             recyclerView.itemAnimator = noChangeRecyclerViewItemAnimator()
         }
@@ -140,7 +152,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
      */
     fun checkSelectModeAfterChangeTabOrDrawerItem() {
         adapter?.run {
-            if (isMultipleSelect) {
+            if (isMultipleSelect()) {
                 destroyActionMode()
             }
         }
@@ -157,7 +169,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
     override fun cancelTransfers() {
         adapter?.run {
             (requireActivity() as ManagerActivity).showConfirmationCancelSelectedTransfers(
-                selectedTransfers)
+                getSelectedTransfers())
         }
     }
 
@@ -169,10 +181,10 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         adapter?.clearSelections()
     }
 
-    override fun getSelectedTransfers() = adapter?.selectedItemsCount ?: 0
+    override fun getSelectedTransfers() = adapter?.getSelectedItemsCount() ?: 0
 
     override fun areAllTransfersSelected() = adapter?.run {
-        selectedItemsCount == itemCount
+        getSelectedItemsCount() == itemCount
     } == true
 
     override fun hideTabs(hide: Boolean) =
@@ -197,8 +209,8 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
 
     override fun activateActionMode() {
         adapter?.let {
-            if (!it.isMultipleSelect) {
-                it.isMultipleSelect = true
+            if (!it.isMultipleSelect()) {
+                it.setMultipleSelect(true)
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
                     TransfersActionBarCallBack(this))
                 updateActionModeTitle()
@@ -213,7 +225,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
 
     override fun updateActionModeTitle() {
         if (actionMode != null && activity != null && adapter != null) {
-            val count = adapter?.selectedItemsCount
+            val count = adapter?.getSelectedItemsCount()
             val title: String = if (count == 0) {
                 getString(R.string.title_select_transfers)
             } else {
@@ -230,7 +242,7 @@ class TransfersFragment : TransfersBaseFragment(), MegaTransfersAdapter.SelectMo
         if (bindingIsInitialized()) {
             (requireActivity() as ManagerActivity).changeAppBarElevation(
                 binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION) ||
-                        adapter?.isMultipleSelect == true)
+                        adapter?.isMultipleSelect() == true)
         }
     }
 

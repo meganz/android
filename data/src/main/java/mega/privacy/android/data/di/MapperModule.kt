@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
@@ -27,8 +28,8 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
-import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.PricingMapper
+import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
@@ -37,6 +38,7 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
@@ -53,6 +55,7 @@ import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
+import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toContactData
@@ -76,6 +79,7 @@ import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionPlan
 import mega.privacy.android.data.mapper.toSubscriptionPlanList
+import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toSyncRecordType
 import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
@@ -354,10 +358,22 @@ internal class MapperModule {
      */
     @Provides
     fun provideUserSetMapper(): UserSetMapper = ::toUserSet
+
     /**
      * Provide [RecentActionBucketMapper] mapper
      */
     @Provides
     fun provideRecentActionBucketMapper(): RecentActionBucketMapper = ::toRecentActionBucket
 
+    /**
+     * Provide [SubscriptionStatusMapper] mapper
+     */
+    @Provides
+    fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
+
+    /**
+     * Provide [AccountDetailMapper] mapper
+     */
+    @Provides
+    fun provideAccountDetailMapper(): AccountDetailMapper = ::toAccountDetail
 }

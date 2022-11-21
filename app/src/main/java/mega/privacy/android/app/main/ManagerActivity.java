@@ -147,7 +147,6 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.requestP
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
 
@@ -1495,7 +1494,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 mediaDiscoveryFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.MEDIA_DISCOVERY.getTag());
             }
             isInAlbumContent = savedInstanceState.getBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, false);
-            if (isInAlbumContent){
+            if (isInAlbumContent) {
                 albumContentFragment = getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.ALBUM_CONTENT.getTag());
             }
             isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false);
@@ -2618,7 +2617,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     setToolbarTitle();
                     supportInvalidateOptionsMenu();
                 }
-                viewModel.nodeUpdateHandled();  
+                viewModel.nodeUpdateHandled();
             }
             return Unit.INSTANCE;
         });
@@ -9383,8 +9382,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
             Timber.d("MegaRequest.TYPE_PAUSE_TRANSFERS");
             //force update the pause notification to prevent missed onTransferUpdate
-            sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
-
+            viewModel.broadcastUploadPauseStatus();
             if (e.getErrorCode() == MegaError.API_OK) {
                 updateTransfersWidgetState();
 

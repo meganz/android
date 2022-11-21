@@ -104,7 +104,8 @@ class ManagerViewModelTest {
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
-            monitorConnectivity = monitorConnectivity
+            monitorConnectivity = monitorConnectivity,
+            broadcastUploadPauseState = mock()
         )
     }
 

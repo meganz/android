@@ -77,6 +77,7 @@ fun AlbumsView(
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
     onDialogPositiveButtonClicked: (name: String) -> Unit,
+    setDialogInputPlaceholder: (String) -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -143,7 +144,7 @@ fun AlbumsView(
                     )
                     MiddleEllipsisText(
                         modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                        text = album.title(LocalContext.current),
+                        text = album.title,
                         style = subtitle2,
                         color = if (MaterialTheme.colors.isLight) black else white,
                         fontWeight = FontWeight.Medium
@@ -164,9 +165,14 @@ fun AlbumsView(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
         ) {
+            val placeholderText =
+                stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
-                onClick = { openDialog.value = true },
+                onClick = {
+                    openDialog.value = true
+                    setDialogInputPlaceholder(placeholderText)
+                },
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -184,7 +190,9 @@ fun AlbumsView(
             CreateNewAlbumDialog(
                 onDismissRequest = { openDialog.value = false },
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
-            )
+            ) {
+                albumsViewState.createAlbumPlaceholderTitle
+            }
         }
     }
 
@@ -195,6 +203,7 @@ fun AlbumsView(
 fun CreateNewAlbumDialog(
     onDismissRequest: () -> Unit = {},
     onDialogPositiveButtonClicked: (name: String) -> Unit,
+    inputPlaceHolderText: () -> String = { "" },
 ) {
     var textState by rememberSaveable { mutableStateOf("") }
     val isEnabled by remember { mutableStateOf(true) }
@@ -264,7 +273,7 @@ fun CreateNewAlbumDialog(
                             innerTextField = innerTextField,
                             placeholder = {
                                 Text(
-                                    text = stringResource(id = R.string.photos_album_creation_dialog_input_placeholder),
+                                    text = inputPlaceHolderText(),
                                     color = grey_300,
                                     fontSize = 16.sp,
                                 )

@@ -14,27 +14,25 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemPlaylistBinding
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.TYPE_PLAYING
 
 /**
  * RecyclerView adapter for playlist screen.
  * @param context Context
  * @param itemOperation PlaylistItemOperation
- * @param paused Whether is paused
  * @param isAudio whether is audio
  * @param dragStartListener DragStartListener
  */
 class PlaylistAdapter(
     private val context: Context,
     private val itemOperation: PlaylistItemOperation,
-    var paused: Boolean = false,
     val isAudio: Boolean,
     private val dragStartListener: DragStartListener
 ) : ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
-    companion object {
-        const val ANIMATION_DURATION = 250L
-    }
 
-    private var playingPosition: Int = 0
+    private var isPaused = false
+    private var playingItemIndex: Int = 0
+    private var currentPlayingPosition: Long = 0
 
     override fun getItemViewType(position: Int): Int {
         return getItem(position).type
@@ -60,14 +58,14 @@ class PlaylistAdapter(
                 false
             }
         val playlistItem = getItem(holder.absoluteAdapterPosition)
-        val currentPosition = holder.absoluteAdapterPosition
+        val currentItemIndex = holder.absoluteAdapterPosition
 
         with(holder.itemView.findViewById<TextView>(R.id.duration)) {
             isVisible = playlistItem.duration > 0L
 
-            if (playlistItem.type == PlaylistItem.TYPE_PLAYING) {
-                playingPosition = holder.absoluteAdapterPosition
-                text = playlistItem.formatCurrentPositionAndDuration()
+            if (playlistItem.type == TYPE_PLAYING) {
+                playingItemIndex = holder.absoluteAdapterPosition
+                text = playlistItem.formatCurrentPositionAndDuration(currentPlayingPosition)
             } else {
                 text = playlistItem.formatDuration()
             }
@@ -76,9 +74,9 @@ class PlaylistAdapter(
         holder.itemView.findViewById<FrameLayout>(R.id.header_layout).isVisible =
             playlistItem.headerIsVisible
         holder.itemView.findViewById<FrameLayout>(R.id.next_layout).isVisible =
-            currentPosition != itemCount - 1 && playlistItem.type == PlaylistItem.TYPE_PLAYING
+            currentItemIndex != itemCount - 1 && playlistItem.type == TYPE_PLAYING
 
-        holder.bind(paused, playlistItem, itemOperation, holder, isAudio, currentPosition)
+        holder.bind(isPaused, playlistItem, itemOperation, holder, isAudio, currentItemIndex)
     }
 
     /**
@@ -108,5 +106,40 @@ class PlaylistAdapter(
      * Get the position of playing item
      * @return the position of playing item
      */
-    fun getPlayingPosition() = playingPosition
+    fun getPlayingPosition() = playingItemIndex
+
+    /**
+     * Set the current playing position
+     * @param currentPosition current playing position
+     */
+    fun setCurrentPlayingPosition(currentPosition: Long?) {
+        currentPlayingPosition = currentPosition ?: 0
+        notifyItemChanged(playingItemIndex)
+    }
+
+    /**
+     * Refresh UI when the paused state is changed
+     *
+     * @param paused true is paused, otherwise is false.
+     */
+    fun refreshPausedState(paused: Boolean) {
+        isPaused = paused
+        notifyItemChanged(playingItemIndex)
+    }
+
+    /**
+     * Set paused state
+     *
+     * @param paused true is paused, otherwise is false.
+     */
+    fun setPaused(paused: Boolean) {
+        isPaused = paused
+    }
+
+    companion object {
+        /**
+         * Animation duration
+         */
+        const val ANIMATION_DURATION = 250L
+    }
 }

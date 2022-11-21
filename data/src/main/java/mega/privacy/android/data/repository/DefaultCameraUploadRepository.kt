@@ -2,6 +2,8 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -43,6 +45,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
+    private val appEventGateway: AppEventGateway,
+    private val broadcastReceiverGateway: BroadcastReceiverGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CameraUploadRepository {
 
@@ -341,4 +345,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun deleteAllSecondarySyncRecords() = withContext(ioDispatcher) {
         localStorageGateway.deleteAllSecondarySyncRecords()
     }
+
+    override fun monitorCameraUploadPauseState() = appEventGateway.monitorCameraUploadPauseState
+
+    override suspend fun broadcastUploadPauseState() = appEventGateway.broadcastUploadPauseState()
+
+    override fun monitorBatteryInfo() = broadcastReceiverGateway.monitorBatteryInfo
 }

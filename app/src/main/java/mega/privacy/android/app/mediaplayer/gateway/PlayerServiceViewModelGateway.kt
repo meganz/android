@@ -180,9 +180,9 @@ interface PlayerServiceViewModelGateway {
     /**
      * Get the index from playlistItems to keep the play order is correct after reordered
      * @param item clicked item
-     * @return the index of clicked item in playlistItems
+     * @return the index of clicked item in playlistItems or null
      */
-    fun getIndexFromPlaylistItems(item: PlaylistItem): Int
+    fun getIndexFromPlaylistItems(item: PlaylistItem): Int?
 
     /**
      * Get the position of playing item
@@ -209,12 +209,6 @@ interface PlayerServiceViewModelGateway {
      * @return true is paused, otherwise is false
      */
     fun isPaused(): Boolean
-
-    /**
-     * Set the duration for playing item
-     * @param currentPosition the current position of audio
-     */
-    fun setCurrentPosition(currentPosition: Long)
 
     /**
      * Judge the shuffle if is enabled
