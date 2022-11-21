@@ -17,18 +17,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import javax.inject.Inject
 
@@ -112,7 +113,7 @@ class FavouriteFolderViewModel @Inject constructor(
     private suspend fun getData(
         name: String,
         children: List<TypedNode>,
-        folderInfo: FavouriteFolderInfo
+        folderInfo: FavouriteFolderInfo,
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
@@ -154,8 +155,8 @@ class FavouriteFolderViewModel @Inject constructor(
      * @param favourite Favourite
      */
     fun openFile(favourite: Favourite) {
-        if (favourite.isFolder) {
-            getChildrenNodes(favourite.nodeId.id)
+        if (favourite is FavouriteFolder) {
+            getChildrenNodes(favourite.typedNode.id.id)
         } else {
             viewModelScope.launch {
                 _favouritesEventState.emit(FavouritesEventState.OpenFile(favourite as FavouriteFile))

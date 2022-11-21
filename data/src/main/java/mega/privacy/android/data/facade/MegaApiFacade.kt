@@ -478,8 +478,13 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getAccountDetails(listener)
     }
 
-    override fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean) {
-        megaApi.getSpecificAccountDetails(storage, transfer, pro)
+    override fun getSpecificAccountDetails(
+        storage: Boolean,
+        transfer: Boolean,
+        pro: Boolean,
+        listener: MegaRequestListenerInterface
+    ) {
+        megaApi.getSpecificAccountDetails(storage, transfer, pro, listener)
     }
 
     override fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?) {
@@ -533,4 +538,8 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getSet(sid: Long): MegaSet? = megaApi.getSet(sid)
 
     override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
+
+    override fun removeRequestListener(listener: MegaRequestListenerInterface) {
+        megaApi.removeRequestListener(listener)
+    }
 }

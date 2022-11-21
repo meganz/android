@@ -33,6 +33,8 @@ import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAllFavorites
@@ -169,8 +171,8 @@ class FavouritesViewModel @Inject constructor(
     fun openFile(favourite: Favourite) {
         viewModelScope.launch {
             _favouritesEventState.emit(
-                if (favourite.isFolder) {
-                    FavouritesEventState.OpenFolder(favourite.nodeId.id)
+                if (favourite is FavouriteFolder) {
+                    FavouritesEventState.OpenFolder(favourite.typedNode.id.id)
                 } else {
                     FavouritesEventState.OpenFile(favourite as FavouriteFile)
                 }
@@ -224,11 +226,11 @@ class FavouritesViewModel @Inject constructor(
      */
     fun itemSelected(item: Favourite) {
         val items = favouriteList.map { favourite ->
-            if (favourite.nodeId == item.nodeId) {
+            if (favourite.typedNode.id == item.typedNode.id) {
                 if (favourite.isSelected) {
-                    itemsSelected.remove(favourite.nodeId.id)
+                    itemsSelected.remove(favourite.typedNode.id.id)
                 } else {
-                    itemsSelected[favourite.nodeId.id] = favourite
+                    itemsSelected[favourite.typedNode.id.id] = favourite
                 }
                 (favourite as? FavouriteFile)?.copy(isSelected = !favourite.isSelected)
                     ?: (favourite as FavouriteFolder).copy(
@@ -253,7 +255,7 @@ class FavouritesViewModel @Inject constructor(
         }
         itemsSelected.putAll(
             items.map {
-                Pair(it.nodeId.id, it)
+                Pair(it.typedNode.id.id, it)
             }
         )
         updateFavouritesStateUnderActionMode(items)
@@ -362,11 +364,11 @@ class FavouritesViewModel @Inject constructor(
         } else {
             // If the number of favourite folders cannot be divisible by 2,
             // add placeholder view to make sure folder is not displayed with file in same row.
-            if (favouriteList.filter { it.isFolder }.size % 2 != 0) {
+            if (favouriteList.filterIsInstance<FavouriteFolder>().size % 2 != 0) {
                 favouriteItemList.add(
                     // Get the index of last folder and add placeholder in next position of last folder
                     // The position of last folder is index + 1, so that the next position is index + 2
-                    index = favouriteList.indexOfLast { it.isFolder } + 2,
+                    index = favouriteList.indexOfLast { it is FavouriteFolder } + 2,
                     element = FavouritePlaceholderItem())
             }
         }
@@ -497,41 +499,14 @@ class FavouritesViewModel @Inject constructor(
         mutableListOf<Favourite>().apply {
             addAll(list)
             sortWith { item1, item2 ->
-                sortOrderByType(
-                    sortByType = {
-                        when {
-                            order is FavouriteSortOrder.Name && !order.sortDescending -> {
-                                item1.name.compareTo(item2.name)
-                            }
-                            order is FavouriteSortOrder.Name && order.sortDescending -> {
-                                item2.name.compareTo(item1.name)
-                            }
-                            order is FavouriteSortOrder.Size && order.sortDescending -> {
-                                item2.size.compareTo(item1.size)
-                            }
-                            order is FavouriteSortOrder.Size && !order.sortDescending -> {
-                                item1.size.compareTo(item2.size)
-                            }
-                            order is FavouriteSortOrder.ModifiedDate && order.sortDescending -> {
-                                item2.modificationTime.compareTo(item1.modificationTime)
-                            }
-                            order is FavouriteSortOrder.ModifiedDate && !order.sortDescending -> {
-                                item1.modificationTime.compareTo(item2.modificationTime)
-                            }
-                            else -> {
-                                if (item1.label != 0 && item2.label != 0) {
-                                    item1.label.compareTo(item2.label)
-                                } else {
-                                    item2.label.compareTo(item1.label)
-                                }
-                            }
-                        }
-                    },
-                    item1 = item1,
-                    item2 = item2
-                )
+                if (order.sortDescending) {
+                    item2.typedNode.compareTo(item1.typedNode, order)
+                } else {
+                    item1.typedNode.compareTo(item2.typedNode, order)
+                }
             }
         }
+
 
     /**
      * Sort order for Favourite list
@@ -547,7 +522,7 @@ class FavouritesViewModel @Inject constructor(
             if (query.isNotEmpty()) {
                 addAll(
                     list.filter { info ->
-                        info.name.contains(query, true)
+                        info.typedNode.name.contains(query, true)
                     }
                 )
             } else {
@@ -555,23 +530,40 @@ class FavouritesViewModel @Inject constructor(
             }
         }
 
-    /**
-     * Sort order for Favourite list by type and place the folders at the top
-     * @param sortByType the function for sorting by type
-     * @param item1 the first Favourite item for comparing
-     * @param item2 the second Favourite item for comparing
-     */
-    private fun sortOrderByType(
-        sortByType: () -> Int,
-        item1: Favourite,
-        item2: Favourite,
-    ): Int {
-        return if (item1.isFolder != item2.isFolder) {
-            item2.isFolder.compareTo(item1.isFolder)
-        } else {
-            sortByType()
+
+    private fun TypedNode.compareTo(other: TypedNode, order: FavouriteSortOrder): Int {
+        return when (this) {
+            is TypedFileNode -> this.compareToFile(other, order)
+            is TypedFolderNode -> this.compareToFolder(other, order)
         }
     }
+
+
+    private fun TypedFileNode.compareToFile(
+        other: TypedNode,
+        order: FavouriteSortOrder,
+    ): Int {
+        val otherFile = other as? TypedFileNode ?: return compareFileToFolder(order)
+        return when (order) {
+            FavouriteSortOrder.Label -> label.compareTo(otherFile.label)
+            is FavouriteSortOrder.ModifiedDate -> modificationTime.compareTo(otherFile.modificationTime)
+            is FavouriteSortOrder.Name -> name.compareTo(otherFile.name)
+            is FavouriteSortOrder.Size -> size.compareTo(otherFile.size)
+        }
+    }
+
+    private fun compareFileToFolder(order: FavouriteSortOrder) = if (order.sortDescending) -1 else 1
+
+    private fun TypedFolderNode.compareToFolder(
+        other: TypedNode,
+        order: FavouriteSortOrder,
+    ): Int {
+        val otherFolder = other as? TypedFolderNode ?: return compareFolderToFile(order)
+        return if (order is FavouriteSortOrder.Label) label.compareTo(otherFolder.label) else name.compareTo(
+            otherFolder.name)
+    }
+
+    private fun compareFolderToFile(order: FavouriteSortOrder) = if (order.sortDescending) 1 else -1
 
     /**
      * On order change

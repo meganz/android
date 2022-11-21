@@ -357,7 +357,9 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     return
                 }
                 if (!CallUtil.participatingInACall()) {
-                    serviceGateway?.seekTo(getIndexFromPlaylistItems(item))
+                    getIndexFromPlaylistItems(item)?.let { index ->
+                        serviceGateway?.seekTo(index)
+                    }
                 }
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 

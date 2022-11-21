@@ -27,9 +27,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.util.DisplayMetrics;
-import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback;
-import android.view.SurfaceView;
 import android.view.TextureView;
 
 import java.util.ArrayList;
@@ -37,19 +34,18 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTextureListener {
+public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
 
     private Paint paint;
-    private PorterDuffXfermode modesrcover;
-    private PorterDuffXfermode modesrcin;
-    private int surfaceWidth = 0;
-    private int surfaceHeight = 0;
+    private final PorterDuffXfermode modesrcover;
+    private final PorterDuffXfermode modesrcin;
+    private int surfaceWidth;
+    private int surfaceHeight;
     private static final int CORNER_RADIUS = 8;
     private static final int VISIBLE = 255;
 
     // the bitmap used for drawing.
-    private Bitmap bitmap = null;
-    private SurfaceHolder surfaceHolder;
+    private Bitmap bitmap;
     // Rect of the source bitmap to draw
     private final Rect srcRect = new Rect();
     // Rect of the destination canvas to draw to
@@ -59,7 +55,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     private DisplayMetrics outMetrics;
     private long peerId = MEGACHAT_INVALID_HANDLE;
     private long clientId = MEGACHAT_INVALID_HANDLE;
-    private TextureView myTexture = null;
+    private final TextureView myTexture;
     protected List<MegaSurfaceRendererListener> listeners;
 
     private int alpha = VISIBLE;
@@ -68,23 +64,26 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         this.alpha = alpha;
     }
 
-    public MegaSurfaceRenderer(SurfaceView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
-        surfaceHolder = view.getHolder();
-        if (surfaceHolder == null)
-            return;
-
-        surfaceHolder.addCallback(this);
+    public MegaSurfaceRenderer(TextureView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
+        this.myTexture = view;
+        myTexture.setSurfaceTextureListener(this);
+        bitmap = myTexture.getBitmap();
+        surfaceHeight = myTexture.getHeight();
+        surfaceWidth = myTexture.getWidth();
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         this.isSmallCamera = isSmallCamera;
         this.outMetrics = outMetrics;
+        listeners = new ArrayList<>();
     }
 
     public MegaSurfaceRenderer(TextureView view, long peerId, long clientId) {
         this.myTexture = view;
         myTexture.setSurfaceTextureListener(this);
         bitmap = myTexture.getBitmap();
+        surfaceHeight = myTexture.getHeight();
+        surfaceWidth = myTexture.getWidth();
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
@@ -107,7 +106,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     }
 
     private void adjustAspectRatio() {
-        if (bitmap != null && dstRect.height() != 0) {
+        if (bitmap != null) {
             dstRect.top = 0;
             dstRect.left = 0;
             dstRect.right = surfaceWidth;
@@ -151,29 +150,6 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         }
     }
 
-    public void surfaceCreated(SurfaceHolder holder) {
-        Canvas canvas = surfaceHolder.lockCanvas();
-        if (canvas == null) return;
-        Rect dst = surfaceHolder.getSurfaceFrame();
-        if (dst != null) {
-            changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
-        }
-
-        Timber.d("Surface created");
-        surfaceHolder.unlockCanvasAndPost(canvas);
-    }
-
-    public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        changeDestRect(in_width, in_height);
-    }
-
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Timber.d("Surface destroyed");
-        bitmap = null;
-        surfaceWidth = 0;
-        surfaceHeight = 0;
-    }
-
     public Bitmap createBitmap(int width, int height) {
         if (bitmap == null) {
             try {
@@ -197,11 +173,11 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
      *
      * @param isLocal Indicates if the frames are from the local camera.
      */
-    public void drawBitmap(boolean isLocal, boolean isGroup) {
-        if (bitmap == null || (isGroup && myTexture == null) || (!isGroup && surfaceHolder == null))
+    public void drawBitmap(boolean isLocal) {
+        if (bitmap == null || myTexture == null)
             return;
 
-        Canvas canvas = isGroup ? myTexture.lockCanvas() : surfaceHolder.lockCanvas();
+        Canvas canvas = myTexture.lockCanvas();
 
         if (canvas == null) return;
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
@@ -222,14 +198,11 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         }
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
 
-        if (isGroup) {
-            myTexture.unlockCanvasAndPost(canvas);
-        } else {
-            surfaceHolder.unlockCanvasAndPost(canvas);
-        }
+        myTexture.unlockCanvasAndPost(canvas);
     }
 
     private void notifyStateToAll() {
+        if (listeners == null) return;
         for (MegaSurfaceRendererListener listener : listeners) {
             notifyState(listener);
         }
@@ -276,23 +249,5 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
 
     public interface MegaSurfaceRendererListener {
         void resetSize(long peerId, long clientId);
-    }
-
-    /**
-     * Get the width of the surface view
-     *
-     * @return the width
-     */
-    public int getSurfaceWidth() {
-        return surfaceWidth;
-    }
-
-    /**
-     * Get the height of the surface view
-     *
-     * @return the height
-     */
-    public int getSurfaceHeight() {
-        return surfaceHeight;
     }
 }

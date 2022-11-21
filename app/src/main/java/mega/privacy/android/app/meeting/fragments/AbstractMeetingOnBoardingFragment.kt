@@ -455,7 +455,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Method for activating the video.
      */
     private fun activateVideo() {
-        if (binding.localSurfaceView.visibility == View.VISIBLE) {
+        if (binding.localTextureView.visibility == View.VISIBLE) {
             Timber.e("Error activating video")
             setViewEnable(binding.onOffFab.fabCam, true)
             return
@@ -463,11 +463,10 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
         if (videoListener == null) {
             videoListener = IndividualCallVideoListener(
-                binding.localSurfaceView,
+                binding.localTextureView,
                 resources.displayMetrics,
                 MEGACHAT_INVALID_HANDLE,
-                isFloatingWindow = false,
-                isOneToOneCall = true
+                isFloatingWindow = false
             )
 
             sharedModel.addLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)
@@ -478,7 +477,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             }
         }
 
-        binding.localSurfaceView.visibility = View.VISIBLE
+        binding.localTextureView.visibility = View.VISIBLE
         setViewEnable(binding.onOffFab.fabCam, true, bSync = false)
     }
 
@@ -515,14 +514,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Method for deactivating the video.
      */
     private fun deactivateVideo() {
-        if (videoListener == null || binding.localSurfaceView.visibility == View.GONE) {
+        if (videoListener == null || binding.localTextureView.visibility == View.GONE) {
             Timber.e("Error deactivating video")
             setViewEnable(binding.onOffFab.fabCam, true)
             return
         }
 
-        Timber.d("Removing surface view")
-        binding.localSurfaceView.visibility = View.GONE
+        Timber.d("Removing texture view")
+        binding.localTextureView.visibility = View.GONE
         removeChatVideoListener()
         setViewEnable(binding.onOffFab.fabCam, true)
     }

@@ -788,7 +788,12 @@ interface MegaApiGateway {
      * @param transfer
      * @param pro
      */
-    fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean)
+    fun getSpecificAccountDetails(
+        storage: Boolean,
+        transfer: Boolean,
+        pro: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Get the credit card subscriptions of the account
@@ -939,4 +944,9 @@ interface MegaApiGateway {
      * @return all Elements in that Set, or null if not found or none added
      */
     suspend fun getSetElements(sid: Long): MegaSetElementList
+
+    /**
+     * Remove request listener
+     */
+    fun removeRequestListener(listener: MegaRequestListenerInterface)
 }

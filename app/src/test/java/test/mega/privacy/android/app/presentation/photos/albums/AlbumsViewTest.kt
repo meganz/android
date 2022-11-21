@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.fromId
 import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
@@ -44,6 +45,26 @@ class AlbumsViewTest {
             .onParent()
             .onParent()
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clicking the fab will provide the input placeholder text`() {
+        val setDialogInputPlaceholder = mock<(String) -> Unit>()
+        val defaultText = fromId(R.string.photos_album_creation_dialog_input_placeholder)
+        composeRule.setContent {
+            AlbumsView(
+                albumsViewState = AlbumsViewState(),
+                openAlbum = {},
+                downloadPhoto = mock(),
+                onDialogPositiveButtonClicked = {},
+                setDialogInputPlaceholder = setDialogInputPlaceholder,
+                isUserAlbumsEnabled = isUserAlbumsEnabled,
+            )
+        }
+
+        composeRule.onNodeWithContentDescription("Create new album").performClick()
+
+        verify(setDialogInputPlaceholder).invoke(defaultText)
     }
 
     @Test
@@ -82,16 +103,18 @@ class AlbumsViewTest {
     @Test
     fun `test that with input clicking the positive dialog button calls the correct function`() {
         val expectedAlbumName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val inputPlaceholderText = R.string.photos_album_creation_dialog_input_placeholder
         val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
         val onDismissRequest = mock<() -> Unit>()
         composeRule.setContent {
             CreateNewAlbumDialog(
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDismissRequest = onDismissRequest,
+                inputPlaceHolderText = { fromId(inputPlaceholderText) }
             )
         }
 
-        composeRule.onNodeWithText(R.string.photos_album_creation_dialog_input_placeholder)
+        composeRule.onNodeWithText(inputPlaceholderText)
             .performTextInput(expectedAlbumName)
         composeRule.onNodeWithText(R.string.general_create).performClick()
 

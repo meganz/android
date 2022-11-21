@@ -96,6 +96,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -117,49 +118,49 @@ abstract class CameraUploadUseCases {
 
     companion object {
         /**
-         * Provide the HasCredentials implementation
+         * Provide the [HasCredentials] implementation
          */
         @Provides
         fun provideHasCredentials(cameraUploadRepository: CameraUploadRepository): HasCredentials =
             HasCredentials(cameraUploadRepository::doCredentialsExist)
 
         /**
-         * Provide the HasPreferences implementation
+         * Provide the [HasPreferences] implementation
          */
         @Provides
         fun provideHasPreferences(cameraUploadRepository: CameraUploadRepository): HasPreferences =
             HasPreferences(cameraUploadRepository::doPreferencesExist)
 
         /**
-         * Provide the IsCameraUploadSyncEnabled implementation
+         * Provide the [IsCameraUploadSyncEnabled] implementation
          */
         @Provides
         fun provideIsCameraUploadSyncEnabled(cameraUploadRepository: CameraUploadRepository): IsCameraUploadSyncEnabled =
             IsCameraUploadSyncEnabled(cameraUploadRepository::isSyncEnabled)
 
         /**
-         * Provide the IsCameraUploadByWifi implementation
+         * Provide the [IsCameraUploadByWifi] implementation
          */
         @Provides
         fun provideIsCameraUploadByWifi(cameraUploadRepository: CameraUploadRepository): IsCameraUploadByWifi =
             IsCameraUploadByWifi(cameraUploadRepository::isSyncByWifi)
 
         /**
-         * Provide the GetChargingOnSizeString implementation
+         * Provide the [GetChargingOnSizeString] implementation
          */
         @Provides
         fun provideGetChargingOnSizeString(cameraUploadRepository: CameraUploadRepository): GetChargingOnSizeString =
             GetChargingOnSizeString(cameraUploadRepository::getChargingOnSizeString)
 
         /**
-         * Provide the GetPendingSyncRecords implementation
+         * Provide the [GetPendingSyncRecords] implementation
          */
         @Provides
         fun provideGetPendingSyncRecords(cameraUploadRepository: CameraUploadRepository): GetPendingSyncRecords =
             GetPendingSyncRecords(cameraUploadRepository::getPendingSyncRecords)
 
         /**
-         * Provide the MediaLocalPathExists implementation
+         * Provide the [MediaLocalPathExists] implementation
          */
         @Provides
         fun provideMediaLocalPathExists(cameraUploadRepository: CameraUploadRepository): MediaLocalPathExists =
@@ -172,56 +173,56 @@ abstract class CameraUploadUseCases {
             }
 
         /**
-         * Provide the IsSecondaryFolderEnabled implementation
+         * Provide the [IsSecondaryFolderEnabled] implementation
          */
         @Provides
         fun provideIsSecondaryFolderEnabled(cameraUploadRepository: CameraUploadRepository): IsSecondaryFolderEnabled =
             IsSecondaryFolderEnabled(cameraUploadRepository::isSecondaryMediaFolderEnabled)
 
         /**
-         * Provide the DeleteSyncRecord implementation
+         * Provide the [DeleteSyncRecord] implementation
          */
         @Provides
         fun provideDeleteSyncRecord(cameraUploadRepository: CameraUploadRepository): DeleteSyncRecord =
             DeleteSyncRecord(cameraUploadRepository::deleteSyncRecord)
 
         /**
-         * Provide the DeleteSyncRecordByLocalPath implementation
+         * Provide the [DeleteSyncRecordByLocalPath] implementation
          */
         @Provides
         fun provideDeleteSyncRecordByLocalPath(cameraUploadRepository: CameraUploadRepository): DeleteSyncRecordByLocalPath =
             DeleteSyncRecordByLocalPath(cameraUploadRepository::deleteSyncRecordByLocalPath)
 
         /**
-         * Provide the DeleteSyncRecordByFingerprint implementation
+         * Provide the [DeleteSyncRecordByFingerprint] implementation
          */
         @Provides
         fun provideDeleteSyncRecordByFingerprint(cameraUploadRepository: CameraUploadRepository): DeleteSyncRecordByFingerprint =
             DeleteSyncRecordByFingerprint(cameraUploadRepository::deleteSyncRecordByFingerprint)
 
         /**
-         * Provide the SetSecondaryFolderPath implementation
+         * Provide the [SetSecondaryFolderPath] implementation
          */
         @Provides
         fun provideSetSecondaryFolderPath(cameraUploadRepository: CameraUploadRepository): SetSecondaryFolderPath =
             SetSecondaryFolderPath(cameraUploadRepository::setSecondaryFolderPath)
 
         /**
-         * Provide the SetSyncLocalPath implementation
+         * Provide the [SetSyncLocalPath] implementation
          */
         @Provides
         fun provideSetSyncLocalPath(cameraUploadRepository: CameraUploadRepository): SetSyncLocalPath =
             SetSyncLocalPath(cameraUploadRepository::setSyncLocalPath)
 
         /**
-         * Provide the GetRemoveGps implementation
+         * Provide the [GetRemoveGps] implementation
          */
         @Provides
         fun provideGetRemoveGps(cameraUploadRepository: CameraUploadRepository): GetRemoveGps =
             GetRemoveGps(cameraUploadRepository::getRemoveGpsDefault)
 
         /**
-         * Provide the FileNameExists implementation
+         * Provide the [FileNameExists] implementation
          */
         @Provides
         fun provideFileNameExists(cameraUploadRepository: CameraUploadRepository): FileNameExists =
@@ -234,28 +235,28 @@ abstract class CameraUploadUseCases {
             }
 
         /**
-         * Provide the KeepFileNames implementation
+         * Provide the [KeepFileNames] implementation
          */
         @Provides
         fun provideKeepFileNames(cameraUploadRepository: CameraUploadRepository): KeepFileNames =
             KeepFileNames(cameraUploadRepository::getKeepFileNames)
 
         /**
-         * Provide the GetSyncRecordByFingerprint implementation
+         * Provide the [GetSyncRecordByFingerprint] implementation
          */
         @Provides
         fun provideGetSyncRecordByFingerprint(cameraUploadRepository: CameraUploadRepository): GetSyncRecordByFingerprint =
             GetSyncRecordByFingerprint(cameraUploadRepository::getSyncRecordByFingerprint)
 
         /**
-         * Provide the SaveSyncRecord implementation
+         * Provide the [SaveSyncRecord] implementation
          */
         @Provides
         fun provideSaveSyncRecord(cameraUploadRepository: CameraUploadRepository): SaveSyncRecord =
             SaveSyncRecord(cameraUploadRepository::saveSyncRecord)
 
         /**
-         * Provide the SetSyncRecordPendingByPath implementation
+         * Provide the [SetSyncRecordPendingByPath] implementation
          */
         @Provides
         fun provideSetSyncRecordPendingByPath(cameraUploadRepository: CameraUploadRepository): SetSyncRecordPendingByPath =
@@ -268,84 +269,84 @@ abstract class CameraUploadUseCases {
             }
 
         /**
-         * Provide the GetVideoSyncRecordsByStatus implementation
+         * Provide the [GetVideoSyncRecordsByStatus] implementation
          */
         @Provides
         fun provideGetVideoSyncRecordsByStatus(cameraUploadRepository: CameraUploadRepository): GetVideoSyncRecordsByStatus =
             GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it.value) }
 
         /**
-         * Provide the GetVideoQuality implementation
+         * Provide the [GetVideoQuality] implementation
          */
         @Provides
         fun provideGetVideoQuality(cameraUploadRepository: CameraUploadRepository): GetVideoQuality =
             GetVideoQuality { cameraUploadRepository.getVideoQuality().toInt() }
 
         /**
-         * Provide the GetFingerprint implementation
+         * Provide the [GetFingerprint] implementation
          */
         @Provides
         fun provideGetFingerPrint(filesRepository: FilesRepository): GetFingerprint =
             GetFingerprint(filesRepository::getFingerprint)
 
         /**
-         * Provide the GetNodesByOriginalFingerprint implementation
+         * Provide the [GetNodesByOriginalFingerprint] implementation
          */
         @Provides
         fun provideGetNodesByOriginalFingerprint(filesRepository: FilesRepository): GetNodesByOriginalFingerprint =
             GetNodesByOriginalFingerprint(filesRepository::getNodesByOriginalFingerprint)
 
         /**
-         * Provide the GetNodeByFingerprintAndParentNode implementation
+         * Provide the [GetNodeByFingerprintAndParentNode] implementation
          */
         @Provides
         fun provideGetNodeByFingerprintAndParentNode(filesRepository: FilesRepository): GetNodeByFingerprintAndParentNode =
             GetNodeByFingerprintAndParentNode(filesRepository::getNodeByFingerprintAndParentNode)
 
         /**
-         * Provide the GetNodeByFingerprint implementation
+         * Provide the [GetNodeByFingerprint] implementation
          */
         @Provides
         fun provideGetNodeByFingerprint(filesRepository: FilesRepository): GetNodeByFingerprint =
             GetNodeByFingerprint(filesRepository::getNodeByFingerprint)
 
         /**
-         * Provide the GetParentMegaNode implementation
+         * Provide the [GetParentMegaNode] implementation
          */
         @Provides
         fun provideGetParentMegaNode(filesRepository: FilesRepository): GetParentMegaNode =
             GetParentMegaNode(filesRepository::getParentNode)
 
         /**
-         * Provide the GetChildMegaNode implementation
+         * Provide the [GetChildMegaNode] implementation
          */
         @Provides
         fun provideGetChildMegaNode(filesRepository: FilesRepository): GetChildMegaNode =
             GetChildMegaNode(filesRepository::getChildNode)
 
         /**
-         * Provide the SetPrimarySyncHandle implementation
+         * Provide the [SetPrimarySyncHandle] implementation
          */
         @Provides
         fun provideSetPrimarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetPrimarySyncHandle =
             SetPrimarySyncHandle(cameraUploadRepository::setPrimarySyncHandle)
 
         /**
-         * Provide the SetSecondarySyncHandle implementation
+         * Provide the [SetSecondarySyncHandle] implementation
          */
         @Provides
         fun provideSetSecondarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetSecondarySyncHandle =
             SetSecondarySyncHandle(cameraUploadRepository::setSecondarySyncHandle)
 
         /**
-         * Provide the IsNodeInRubbish implementation
+         * Provide the [IsNodeInRubbish] implementation
          */
         @Provides
         fun provideIsNodeInRubbish(fileRepository: FileRepository): IsNodeInRubbish =
             IsNodeInRubbish(fileRepository::isNodeInRubbish)
 
         /**
-         * Provide the ClearCacheDirectory implementation
+         * Provide the [ClearCacheDirectory] implementation
          */
         @Provides
         fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
@@ -364,6 +365,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideBroadcastUploadPauseState(cameraUploadRepository: CameraUploadRepository): BroadcastUploadPauseState =
             BroadcastUploadPauseState(cameraUploadRepository::broadcastUploadPauseState)
+
+        /**
+         * Provide the [MonitorBatteryInfo] implementation
+         */
+        @Provides
+        fun provideMonitorBatteryInfo(cameraUploadRepository: CameraUploadRepository): MonitorBatteryInfo =
+            MonitorBatteryInfo(cameraUploadRepository::monitorBatteryInfo)
     }
 
     /**
@@ -373,169 +381,169 @@ abstract class CameraUploadUseCases {
     abstract fun bindCheckEnableCameraUploadsStatus(useCase: DefaultCheckEnableCameraUploadsStatus): CheckEnableCameraUploadsStatus
 
     /**
-     * Provide the GetNodeFromCloud implementation
+     * Provide the [GetNodeFromCloud] implementation
      */
     @Binds
     abstract fun bindGetNodeFromCloud(getNodeFromCloud: DefaultGetNodeFromCloud): GetNodeFromCloud
 
     /**
-     * Provide the GetDefaultNodeHandle implementation
+     * Provide the [GetDefaultNodeHandle] implementation
      */
     @Binds
     abstract fun bindGetDefaultNodeHandle(getDefaultNodeHandle: DefaultGetDefaultNodeHandle): GetDefaultNodeHandle
 
     /**
-     * Provide the GetPrimarySyncHandle implementation
+     * Provide the [GetPrimarySyncHandle] implementation
      */
     @Binds
     abstract fun bindGetPrimarySyncHandle(getPrimarySyncHandle: DefaultGetPrimarySyncHandle): GetPrimarySyncHandle
 
     /**
-     * Provide the GetSecondarySyncHandle implementation
+     * Provide the [GetSecondarySyncHandle] implementation
      */
     @Binds
     abstract fun bindGetSecondarySyncHandle(getSecondarySyncHandle: DefaultGetSecondarySyncHandle): GetSecondarySyncHandle
 
     /**
-     * Provide the UpdateTimeStamp implementation
+     * Provide the [UpdateCameraUploadTimeStamp] implementation
      */
     @Binds
     abstract fun bindUpdateTimeStamp(updateTimeStamp: DefaultUpdateCameraUploadTimeStamp): UpdateCameraUploadTimeStamp
 
     /**
-     * Provide the GetCameraUploadLocalPath implementation
+     * Provide the [GetCameraUploadLocalPath] implementation
      */
     @Binds
     abstract fun bindGetCameraUploadLocalPath(getLocalPath: DefaultGetCameraUploadLocalPath): GetCameraUploadLocalPath
 
     /**
-     * Provide the GetCameraUploadLocalPathSecondary implementation
+     * Provide the [GetCameraUploadLocalPathSecondary] implementation
      */
     @Binds
     abstract fun bindGetCameraUploadLocalPathSecondary(getLocalPathSecondary: DefaultGetCameraUploadLocalPathSecondary): GetCameraUploadLocalPathSecondary
 
     /**
-     * Provide the GetCameraUploadSelectionQuery implementation
+     * Provide the [GetCameraUploadSelectionQuery] implementation
      */
     @Binds
     abstract fun bindGetCameraUploadSelectionQuery(getSelectionQuery: DefaultGetCameraUploadSelectionQuery): GetCameraUploadSelectionQuery
 
     /**
-     * Provide the IsLocalPrimaryFolderSet implementation
+     * Provide the [IsLocalPrimaryFolderSet] implementation
      */
     @Binds
     abstract fun bindIsLocalPrimaryFolderSet(isLocalPrimaryFolderSet: DefaultIsLocalPrimaryFolderSet): IsLocalPrimaryFolderSet
 
     /**
-     * Provide the IsLocalSecondaryFolderSet implementation
+     * Provide the [IsLocalSecondaryFolderSet] implementation
      */
     @Binds
     abstract fun bindIsLocalSecondaryFolderSet(isLocalSecondaryFolderSet: DefaultIsLocalSecondaryFolderSet): IsLocalSecondaryFolderSet
 
     /**
-     * Provide the IsWifiNotSatisfied implementation
+     * Provide the [IsWifiNotSatisfied] implementation
      */
     @Binds
     abstract fun bindIsWifiNotSatisfied(isWifiNotSatisfied: DefaultIsWifiNotSatisfied): IsWifiNotSatisfied
 
     /**
-     * Provide the GetSyncFileUploadUris implementation
+     * Provide the [GetSyncFileUploadUris] implementation
      */
     @Binds
     abstract fun bindGetSyncFileUploadUris(getSyncFileUploadUris: DefaultGetSyncFileUploadUris): GetSyncFileUploadUris
 
     /**
-     * Provide the ShouldCompressVideo implementation
+     * Provide the [ShouldCompressVideo] implementation
      */
     @Binds
     abstract fun bindShouldCompressVideo(shouldCompressVideo: DefaultShouldCompressVideo): ShouldCompressVideo
 
     /**
-     * Provide the GetSyncRecordByPath implementation
+     * Provide the [GetSyncRecordByPath] implementation
      */
     @Binds
     abstract fun bindGetSyncRecordByPath(getSyncRecordByPath: DefaultGetSyncRecordByPath): GetSyncRecordByPath
 
     /**
-     * Provide the ClearSyncRecords implementation
+     * Provide the [ClearSyncRecords] implementation
      */
     @Binds
     abstract fun bindClearSyncRecords(clearSyncRecords: DefaultClearSyncRecords): ClearSyncRecords
 
     /**
-     * Provide the CompressedVideoPending implementation
+     * Provide the [CompressedVideoPending] implementation
      */
     @Binds
     abstract fun bindCompressedVideoPending(compressedVideoPending: DefaultCompressedVideoPending): CompressedVideoPending
 
     /**
-     * Provide the GetGPSCoordinates implementation
+     * Provide the [GetGPSCoordinates] implementation
      */
     @Binds
     abstract fun bindGetGPSCoordinates(getGPSCoordinates: DefaultGetGPSCoordinates): GetGPSCoordinates
 
     /**
-     * Provide the IsChargingRequired implementation
+     * Provide the [IsChargingRequired] implementation
      */
     @Binds
     abstract fun bindIsChargingRequired(isChargingRequired: DefaultIsChargingRequired): IsChargingRequired
 
     /**
-     * Provide the SaveSyncRecordsToDB implementation
+     * Provide the [SaveSyncRecordsToDB] implementation
      */
     @Binds
     abstract fun bindSaveSyncRecordsToDB(saveSyncRecordsToDB: DefaultSaveSyncRecordsToDB): SaveSyncRecordsToDB
 
     /**
-     * Provide the GetPendingUploadList implementation
+     * Provide the [GetPendingUploadList] implementation
      */
     @Binds
     abstract fun bindGetPendingUploadList(getPendingUploadList: DefaultGetPendingUploadList): GetPendingUploadList
 
     /**
-     * Provide the ProcessMediaForUpload implementation
+     * Provide the [ProcessMediaForUpload] implementation
      */
     @Binds
     abstract fun bindProcessMediaForUpload(processMediaForUpload: DefaultProcessMediaForUpload): ProcessMediaForUpload
 
     /**
-     * Provide the GetUploadFolderHandle implementation
+     * Provide the [GetUploadFolderHandle] implementation
      */
     @Binds
     abstract fun bindGetUploadFolderHandle(getUploadFolderHandle: DefaultGetUploadFolderHandle): GetUploadFolderHandle
 
     /**
-     * Provide the ResetCameraUploadTimeStamps implementation
+     * Provide the [ResetCameraUploadTimeStamps] implementation
      */
     @Binds
     abstract fun bindResetCameraUploadTimeStamps(resetCameraUploadTimeStamps: DefaultResetCameraUploadTimeStamps): ResetCameraUploadTimeStamps
 
     /**
-     * Provide the ResetMediaUploadTimeStamps implementation
+     * Provide the [ResetMediaUploadTimeStamps] implementation
      */
     @Binds
     abstract fun bindResetMediaUploadTimeStamps(resetMediaUploadTimeStamps: DefaultResetMediaUploadTimeStamps): ResetMediaUploadTimeStamps
 
     /**
-     * Provide the DisableCameraUploadSettings implementation
+     * Provide the [DisableCameraUploadSettings] implementation
      */
     @Binds
     abstract fun bindDisableCameraUploadSettings(disableCameraUploadSettings: DefaultDisableCameraUploadSettings): DisableCameraUploadSettings
 
     /**
-     * Provide the DisableMediaUploadSettings implementation
+     * Provide the [DisableMediaUploadSettings] implementation
      */
     @Binds
     abstract fun bindDisableMediaUploadSettings(disableMediaUploadSettings: DefaultDisableMediaUploadSettings): DisableMediaUploadSettings
 
     /**
-     * Provide the CheckCameraUpload implementation
+     * Provide the [CheckCameraUpload] implementation
      */
     @Binds
     abstract fun bindCheckCameraUpload(defaultCheckCameraUpload: DefaultCheckCameraUpload): CheckCameraUpload
 
     /**
-     * Provide the BackupTimeStampsAndFolderHandle implementation
+     * Provide the [BackupTimeStampsAndFolderHandle] implementation
      */
     @Binds
     abstract fun bindBackupTimeStampsAndFolderHandle(defaultBackupTimeStampsAndFolderHandle: DefaultBackupTimeStampsAndFolderHandle): BackupTimeStampsAndFolderHandle
