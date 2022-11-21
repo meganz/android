@@ -10,6 +10,7 @@ import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -43,6 +44,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
@@ -326,4 +328,59 @@ class DefaultAccountRepositoryTest {
             underTest.retryPendingConnections(false)
         }
 
+    @Test
+    fun `test that getSpecificAccountDetail returns success when MegaApi returns ERROR_OK`() =
+        runTest {
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+            }
+
+            whenever(megaApiGateway.getSpecificAccountDetails(
+                storage = any(),
+                transfer = any(),
+                pro = any(),
+                listener = any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+
+            underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+            verify(accountInfoWrapper).handleAccountDetail(megaRequest)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that getSpecificAccountDetail finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
+        runTest {
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_NOENT)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+            }
+
+            whenever(megaApiGateway.getSpecificAccountDetails(
+                storage = any(),
+                transfer = any(),
+                pro = any(),
+                listener = any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+        }
 }

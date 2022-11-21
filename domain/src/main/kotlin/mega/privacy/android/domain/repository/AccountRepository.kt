@@ -123,4 +123,13 @@ interface AccountRepository {
      * @return the latest account detail time stamp
      */
     suspend fun getAccountDetailsTimeStampInSeconds(): String?
+
+    /**
+     * Get specific account detail
+     *
+     * @param storage
+     * @param transfer
+     * @param pro
+     */
+    suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
 }
