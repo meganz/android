@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.list.adapter
 
-import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.selection.SelectionTracker
@@ -13,7 +12,6 @@ import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.meeting.list.MeetingItemDiffCallback
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 import mega.privacy.android.app.utils.TimeUtils
-import java.util.Calendar
 
 class MeetingsAdapter constructor(
     private val itemCallback: (Long) -> Unit,
@@ -126,14 +124,12 @@ class MeetingsAdapter constructor(
         return itemsWithHeader
     }
 
-    private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean {
-        if (timeStampA == null || timeStampB == null) return false
-
-        val dateFormat = SimpleDateFormat("ddMMyyyy")
-        val calendarA = Calendar.getInstance().apply { timeInMillis = timeStampA }
-        val calendarB = Calendar.getInstance().apply { timeInMillis = timeStampB }
-        return dateFormat.format(calendarA.time) == dateFormat.format(calendarB.time)
-    }
+    private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean =
+        if (timeStampA == null || timeStampB == null) {
+            false
+        } else {
+            TimeUtils.isSameDate(timeStampA, timeStampB)
+        }
 
     fun setScheduleMeetingsEnabled(enable: Boolean) {
         enableScheduleMeetings = enable

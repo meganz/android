@@ -16,6 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -622,5 +625,26 @@ public class TimeUtils implements Comparator<Calendar> {
      */
     public static void createAndShowCountDownTimer(int stringResource, View v, TextView textView) {
         createAndShowCountDownTimer(stringResource, null, v, textView);
+    }
+
+    /**
+     * Check if two timestamps are the same date
+     * 
+     * @param oneMillis     First timestamp in millis to copmare
+     * @param twoMillis     Second timestamp in millis to compare
+     * @return              True if it's the same date, false otherwise
+     */
+    public static boolean isSameDate(long oneMillis, long twoMillis) {
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        Instant oneInstant = Instant.ofEpochMilli(oneMillis);
+        LocalDateTime oneLocalDateTime = LocalDateTime.ofInstant(oneInstant, zoneId);
+
+        Instant twoInstant = Instant.ofEpochMilli(twoMillis);
+        LocalDateTime twoLocalDateTime = LocalDateTime.ofInstant(twoInstant, zoneId);
+
+        return (oneLocalDateTime.getYear() == twoLocalDateTime.getYear())
+                && (oneLocalDateTime.getMonthValue() == twoLocalDateTime.getMonthValue())
+                && (oneLocalDateTime.getDayOfMonth() == twoLocalDateTime.getDayOfMonth());
     }
 }

@@ -1,8 +1,12 @@
 package mega.privacy.android.app.meeting.list
 
+import android.icu.text.SimpleDateFormat
 import android.text.format.DateUtils
 import androidx.annotation.DrawableRes
+import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
+import mega.privacy.android.app.utils.StringResourcesUtils
+import java.util.Calendar
 
 sealed class MeetingItem(val id: Long) {
 
@@ -63,14 +67,14 @@ sealed class MeetingItem(val id: Long) {
         fun isSingleMeeting(): Boolean =
             lastUser == null
 
-        fun getStartDay(): String {
-            if (startTimestamp == null) return ""
-
-            return DateUtils.getRelativeTimeSpanString(
-                startTimestamp,
-                System.currentTimeMillis(),
-                DateUtils.DAY_IN_MILLIS
-            ).toString()
-        }
+        fun getStartDay(): String =
+            when {
+                startTimestamp == null -> ""
+                DateUtils.isToday(startTimestamp) -> StringResourcesUtils.getString(R.string.label_today)
+                else -> {
+                    val calendar = Calendar.getInstance().apply { timeInMillis = startTimestamp }
+                    SimpleDateFormat("EEEE, d MMM").format(calendar.time)
+                }
+            }
     }
 }
