@@ -33,6 +33,7 @@ class MeetingDataViewHolder(
         if (item.isScheduled()) {
             binding.txtLastMessage.text = item.formattedScheduledTimestamp
             binding.txtLastMessage.isVisible = !item.formattedScheduledTimestamp.isNullOrBlank()
+            binding.imgRecurring.isVisible = item.isRecurring
             binding.txtTimestamp.setText(if (item.isRecurring) {
                 R.string.meetings_list_recurring_meeting_label
             } else {

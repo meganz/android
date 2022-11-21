@@ -113,6 +113,20 @@
         tools:visibility="visible" />
 
     <ImageView
+        android:id="@+id/img_recurring"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="4dp"
+        android:background="@null"
+        android:src="@drawable/ic_rotate_cw"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/img_mute"
+        app:layout_constraintStart_toEndOf="@id/img_mute"
+        app:layout_constraintTop_toTopOf="@id/img_mute"
+        app:tint="?android:attr/textColorPrimary"
+        tools:visibility="visible" />
+
+    <ImageView
         android:id="@+id/img_last_message"
         android:layout_width="16dp"
         android:layout_height="16dp"
