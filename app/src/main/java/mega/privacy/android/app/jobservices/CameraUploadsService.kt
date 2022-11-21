@@ -76,7 +76,6 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.stopA
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderBackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderBackupState
 import mega.privacy.android.app.utils.CameraUploadUtil
-import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
@@ -95,6 +94,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
@@ -485,6 +485,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var monitorCameraUploadPauseState: MonitorCameraUploadPauseState
+
+    /**
+     * Complete Fast Login
+     */
+    @Inject
+    lateinit var completeFastLogin: CompleteFastLogin
 
     /**
      * Coroutine Scope for camera upload work
@@ -1029,10 +1035,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             Timber.w("RootNode = null")
             running = true
             MegaApplication.isLoggingIn = true
-            // TODO Remove DbHandler and Refactor in MegaApi dependency removal with use cases:
-            // GetSession, FastLogin, InitMegaChat (already provided)
-            megaApi?.fastLogin(tempDbHandler.credentials?.session, this)
-            ChatUtil.initMegaChatApi(tempDbHandler.credentials?.session)
+            val result = runCatching { completeFastLogin() }
+            MegaApplication.isLoggingIn = false
+
+            if (result.isSuccess) {
+                Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
+                MegaApplication.getInstance().checkEnabledCookies()
+                Timber.d("Start CameraUploadsService")
+                startWorker()
+            } else {
+                Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}")
+                endService()
+            }
             return LOGIN_IN
         }
 
@@ -1283,63 +1297,43 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun requestFinished(request: MegaRequest, e: MegaError) {
-        if (request.type == MegaRequest.TYPE_LOGIN) {
-            if (e.errorCode == MegaError.API_OK) {
-                Timber.d("Logged in. Setting account auth token for folder links.")
-                megaApiFolder?.accountAuth = megaApi?.accountAuth
-                Timber.d("Fast login OK, Calling fetchNodes from CameraSyncService")
-                megaApi?.fetchNodes(this)
-
-                // Get cookies settings after login.
-                MegaApplication.getInstance().checkEnabledCookies()
-            } else {
-                Timber.d("ERROR: %s", e.errorString)
-                MegaApplication.isLoggingIn = false
-                endService()
-            }
-        } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
-            if (e.errorCode == MegaError.API_OK) {
-                Timber.d("fetch nodes ok")
-                MegaApplication.isLoggingIn = false
-                Timber.d("Start service here MegaRequest.TYPE_FETCH_NODES")
-                startWorker()
-            } else {
-                Timber.d("ERROR: %s", e.errorString)
-                MegaApplication.isLoggingIn = false
-                endService()
-            }
-        } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
-            Timber.d("Cancel transfer received")
-            if (e.errorCode == MegaError.API_OK) {
-                delay(200)
-                megaApi?.let {
-                    @Suppress("DEPRECATION")
-                    if (it.numPendingUploads <= 0) {
-                        it.resetTotalUploads()
+        when (request.type) {
+            MegaRequest.TYPE_CANCEL_TRANSFER -> {
+                Timber.d("Cancel transfer received")
+                if (e.errorCode == MegaError.API_OK) {
+                    delay(200)
+                    megaApi?.let {
+                        @Suppress("DEPRECATION")
+                        if (it.numPendingUploads <= 0) {
+                            it.resetTotalUploads()
+                        }
                     }
+                } else {
+                    endService()
                 }
-            } else {
-                endService()
             }
-        } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
-            @Suppress("DEPRECATION")
-            if (e.errorCode == MegaError.API_OK && (megaApi?.numPendingUploads ?: 1) <= 0) {
-                megaApi?.resetTotalUploads()
+            MegaRequest.TYPE_CANCEL_TRANSFERS -> {
+                @Suppress("DEPRECATION")
+                if (e.errorCode == MegaError.API_OK && (megaApi?.numPendingUploads ?: 1) <= 0) {
+                    megaApi?.resetTotalUploads()
+                }
             }
-        } else if (request.type == MegaRequest.TYPE_PAUSE_TRANSFERS) {
-            Timber.d("PauseTransfer false received")
-            if (e.errorCode == MegaError.API_OK) {
-                endService()
+            MegaRequest.TYPE_PAUSE_TRANSFERS -> {
+                Timber.d("PauseTransfer false received")
+                if (e.errorCode == MegaError.API_OK) {
+                    endService()
+                }
             }
-        } else if (request.type == MegaRequest.TYPE_COPY) {
-            if (e.errorCode == MegaError.API_OK) {
-                val node = getNodeByHandle(request.nodeHandle)
-                val fingerPrint = node?.fingerprint
-                val isSecondary = node?.parentHandle == getSecondarySyncHandle()
-                fingerPrint?.let { deleteSyncRecordByFingerprint(it, fingerPrint, isSecondary) }
-                node?.let { onUploadSuccess(it, isSecondary) }
+            MegaRequest.TYPE_COPY -> {
+                if (e.errorCode == MegaError.API_OK) {
+                    val node = getNodeByHandle(request.nodeHandle)
+                    val fingerPrint = node?.fingerprint
+                    val isSecondary = node?.parentHandle == getSecondarySyncHandle()
+                    fingerPrint?.let { deleteSyncRecordByFingerprint(it, fingerPrint, isSecondary) }
+                    node?.let { onUploadSuccess(it, isSecondary) }
+                }
+                updateUpload()
             }
-            updateUpload()
         }
     }
 
