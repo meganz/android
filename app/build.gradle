@@ -94,10 +94,8 @@ String readTesterGroupList() {
  * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
  */
 boolean shouldUsePrebuiltSdk() {
-    return false
-    //FIXME uncomment this method once prebuilt sdk feature is ready
-    /*String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
-    return usePrebuiltSdk == null || usePrebuiltSdk != "false"*/
+    String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
+    return usePrebuiltSdk == null || usePrebuiltSdk != "false"
 }
 
 configurations {
@@ -299,7 +297,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "$rootProject.projectDir/sdk/src/main/jni/ExoPlayer/", include: ['*.aar'])
+
     implementation project(':domain')
     implementation project(':presentation')
     implementation project(':data')
@@ -344,7 +342,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
     implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
-
 
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
@@ -404,12 +401,23 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation files('../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar')
+
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     implementation "androidx.biometric:biometric:$biometricVersion"
     implementation "com.anggrayudi:storage:$simpleStorageVersion"
+
+    if (shouldUsePrebuiltSdk()) {
+        // These 2 ExoPlayer libs are created by SDK build. If upgrading ExoPlayer version,
+        // remember to upload these 2 files.
+        implementation files('src/main/libs/exoplayer-extension-ffmpeg-2.18.1.aar')
+        implementation files('src/main/libs/exoplayer-extension-flac-2.18.1.aar')
+    } else {
+        implementation fileTree(dir: "$rootProject.projectDir/sdk/src/main/jni/ExoPlayer/", include: ['*.aar'])
+
+        implementation files('../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar')
+    }
 
     // Java
     implementation "androidx.work:work-runtime:$workVersion"
