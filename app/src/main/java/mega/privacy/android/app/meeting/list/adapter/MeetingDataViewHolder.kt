@@ -14,7 +14,7 @@ import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.setImageRequestFromUri
 
-class MeetingPastViewHolder(
+class MeetingDataViewHolder(
     private val binding: ItemMeetingDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 

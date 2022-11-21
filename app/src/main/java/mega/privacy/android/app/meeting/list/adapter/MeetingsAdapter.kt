@@ -37,7 +37,7 @@ class MeetingsAdapter constructor(
         return when (viewType) {
             TYPE_DATA -> {
                 val binding = ItemMeetingDataBinding.inflate(layoutInflater, parent, false)
-                MeetingPastViewHolder(binding).apply {
+                MeetingDataViewHolder(binding).apply {
                     binding.root.setOnClickListener {
                         if (isValidPosition(bindingAdapterPosition)) {
                             itemCallback.invoke(getItem(bindingAdapterPosition).id)
@@ -62,7 +62,7 @@ class MeetingsAdapter constructor(
         when (getItemViewType(position)) {
             TYPE_DATA -> {
                 val isItemSelected = tracker?.isSelected(item.id) ?: false
-                (holder as MeetingPastViewHolder).bind(item as MeetingItem.Data, isItemSelected)
+                (holder as MeetingDataViewHolder).bind(item as MeetingItem.Data, isItemSelected)
             }
             else -> {
                 (holder as MeetingHeaderViewHolder).bind(item as MeetingItem.Header)
@@ -91,9 +91,7 @@ class MeetingsAdapter constructor(
 
     override fun submitList(list: List<MeetingItem>?) {
         if (enableScheduleMeetings && !list.isNullOrEmpty()) {
-            val sortedList: MutableList<MeetingItem> = list.sortedByDescending { (it as MeetingItem.Data).isScheduled() }.toMutableList()
-            sortedList.addSectionHeaders()
-            super.submitList(sortedList)
+            super.submitList(addSectionHeaders(list))
         } else {
             super.submitList(list)
         }
@@ -101,30 +99,31 @@ class MeetingsAdapter constructor(
 
     override fun submitList(list: List<MeetingItem>?, commitCallback: Runnable?) {
         if (enableScheduleMeetings && !list.isNullOrEmpty()) {
-            val sortedList: MutableList<MeetingItem> = list.sortedByDescending { (it as MeetingItem.Data).isScheduled() }.toMutableList()
-            sortedList.addSectionHeaders()
-            super.submitList(sortedList, commitCallback)
+            super.submitList(addSectionHeaders(list), commitCallback)
         } else {
             super.submitList(list, commitCallback)
         }
     }
 
-    private fun MutableList<MeetingItem>.addSectionHeaders() {
-        val headerItems = mutableMapOf<Int, MeetingItem.Header>()
-        forEachIndexed { index, item ->
-            if (item !is MeetingItem.Data) return
-            val previousItem = getOrNull(index - 1) as? MeetingItem.Data?
-            val nextItem = getOrNull(index + 1) as? MeetingItem.Data?
+    private fun addSectionHeaders(list: List<MeetingItem>): List<MeetingItem> {
+        val itemsWithHeader = mutableListOf<MeetingItem>()
+        val sortedItems = (list as List<MeetingItem.Data>).sortedWith(
+            compareByDescending<MeetingItem.Data> { it.isScheduled() }
+                .thenBy { it.startTimestamp }
+                .thenByDescending { it.timeStamp }
+        )
+
+        sortedItems.forEachIndexed { index, item ->
+            val previousItem = sortedItems.getOrNull(index - 1)
             when {
-                item.isScheduled() && !isSameDay(previousItem?.startTimestamp, item.startTimestamp) -> {
-                    headerItems[index] = MeetingItem.Header(item.getStartDay())
-                }
-                item.isScheduled() && nextItem != null && !nextItem.isScheduled() -> {
-                    headerItems[index] = MeetingItem.Header("Past meetings")
-                }
+                item.isScheduled() && !isSameDay(item.startTimestamp, previousItem?.startTimestamp) ->
+                    itemsWithHeader.add(MeetingItem.Header(item.getStartDay()))
+                !item.isScheduled() && previousItem?.isScheduled() == true ->
+                    itemsWithHeader.add(MeetingItem.Header("Past meetings"))
             }
+            itemsWithHeader.add(item)
         }
-        headerItems.forEach { (index, item) -> add(index, item) }
+        return itemsWithHeader
     }
 
     private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean {

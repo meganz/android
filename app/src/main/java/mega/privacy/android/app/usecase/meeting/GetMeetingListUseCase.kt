@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
+import java.util.Calendar
 import java.util.Calendar.DAY_OF_YEAR
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -263,7 +264,7 @@ class GetMeetingListUseCase @Inject constructor(
             onError = Timber::w
         )
         val isScheduled = Random.nextBoolean()
-        val isRecurring = Random.nextBoolean()
+        var isRecurring = false
         val lastMessageIcon = when {
             isScheduled ->
                 null
@@ -274,20 +275,26 @@ class GetMeetingListUseCase @Inject constructor(
             else ->
                 null
         }
-        val startTime = getInstance().apply {
-            set(DAY_OF_YEAR, get(DAY_OF_YEAR) + Random.nextInt(7))
-            set(HOUR_OF_DAY, Random.nextInt(20))
-            set(MINUTE, Random.nextInt(60))
-        }
-        val endTime = getInstance().apply {
-            timeInMillis = startTime.timeInMillis
-            set(HOUR_OF_DAY, get(HOUR_OF_DAY) + Random.nextInt(1, 4))
-        }
-        val scheduleText = "${hourFormat.format(startTime.time)} - ${hourFormat.format(endTime.time)}"
-        val formattedScheduledTimestamp = if (isRecurring) {
-            "$scheduleText Weekly"
-        } else {
-            scheduleText
+        var startTime: Calendar? = null
+        var endTime: Calendar? = null
+        var formattedScheduledTimestamp: String? = null
+        if (isScheduled) {
+            isRecurring = Random.nextBoolean()
+            startTime = getInstance().apply {
+                set(DAY_OF_YEAR, get(DAY_OF_YEAR) + Random.nextInt(7))
+                set(HOUR_OF_DAY, Random.nextInt(20))
+                set(MINUTE, Random.nextInt(60))
+            }
+            endTime = getInstance().apply {
+                timeInMillis = startTime.timeInMillis
+                set(HOUR_OF_DAY, get(HOUR_OF_DAY) + Random.nextInt(1, 4))
+            }
+            val scheduleText = "${hourFormat.format(startTime.time)} - ${hourFormat.format(endTime.time)}"
+            formattedScheduledTimestamp = if (isRecurring) {
+                "$scheduleText Weekly"
+            } else {
+                scheduleText
+            }
         }
 
         return MeetingItem.Data(
@@ -304,9 +311,9 @@ class GetMeetingListUseCase @Inject constructor(
             highlight = highlight,
             timeStamp = chatListItem.lastTimestamp,
             formattedTimestamp = formattedDate,
-            formattedScheduledTimestamp = if (isScheduled) formattedScheduledTimestamp else null,
-            startTimestamp = if (isScheduled) startTime.timeInMillis else null,
-            endTimestamp = if (isScheduled) endTime.timeInMillis else null,
+            formattedScheduledTimestamp = formattedScheduledTimestamp,
+            startTimestamp = startTime?.timeInMillis,
+            endTimestamp = endTime?.timeInMillis,
             isRecurring
         )
     }
