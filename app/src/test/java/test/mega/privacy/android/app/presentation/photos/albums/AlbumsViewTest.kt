@@ -14,8 +14,6 @@ import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDi
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.fromId
