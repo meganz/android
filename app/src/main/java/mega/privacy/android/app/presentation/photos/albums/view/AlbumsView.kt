@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -25,7 +28,6 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
@@ -39,34 +41,40 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.presentation.controls.MegaDialog
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.caption
 import mega.privacy.android.presentation.theme.grey_300
 import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.h6
+import mega.privacy.android.presentation.theme.red_400
+import mega.privacy.android.presentation.theme.red_900
 import mega.privacy.android.presentation.theme.subtitle2
+import mega.privacy.android.presentation.theme.teal_200
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
@@ -78,6 +86,7 @@ fun AlbumsView(
     downloadPhoto: PhotoDownload,
     onDialogPositiveButtonClicked: (name: String) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit = {},
+    setInputValidity: (Boolean) -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -188,64 +197,91 @@ fun AlbumsView(
 
         if (openDialog.value) {
             CreateNewAlbumDialog(
-                onDismissRequest = { openDialog.value = false },
+                onDismissRequest = {
+                    openDialog.value = false
+                    setInputValidity(true)
+                },
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDialogInputChange = setInputValidity,
+                inputPlaceHolderText = { albumsViewState.createAlbumPlaceholderTitle },
+                errorMessage = albumsViewState.createDialogErrorMessage,
             ) {
-                albumsViewState.createAlbumPlaceholderTitle
+                albumsViewState.isInputNameValid
             }
         }
     }
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateNewAlbumDialog(
     onDismissRequest: () -> Unit = {},
     onDialogPositiveButtonClicked: (name: String) -> Unit,
+    onDialogInputChange: (Boolean) -> Unit = {},
     inputPlaceHolderText: () -> String = { "" },
+    errorMessage: Int? = null,
+    isInputValid: () -> Boolean = { true },
 ) {
     var textState by rememberSaveable { mutableStateOf("") }
     val isEnabled by remember { mutableStateOf(true) }
     val isError by remember { mutableStateOf(false) }
-
     val singleLine = true
-    Dialog(
+
+    val inputColor = if (isInputValid()) {
+        if (MaterialTheme.colors.isLight) {
+            teal_300
+        } else {
+            teal_200
+        }
+    } else {
+        if (MaterialTheme.colors.isLight) {
+            red_900
+        } else {
+            red_400
+        }
+    }
+
+    val textFieldColors = TextFieldDefaults.textFieldColors(
+        backgroundColor = Color.Transparent,
+        cursorColor = inputColor,
+        focusedIndicatorColor = inputColor,
+        unfocusedIndicatorColor = inputColor,
+    )
+
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val textColor = if (isInputValid()) {
+        if (MaterialTheme.colors.isLight) {
+            black
+        } else {
+            white
+        }
+    } else {
+        if (MaterialTheme.colors.isLight) {
+            red_900
+        } else {
+            red_400
+        }
+    }
+    val mergedTextStyle = LocalTextStyle.current.merge(
+        TextStyle(
+            color = textColor,
+            fontSize = 16.sp,
+        )
+    )
+
+    MegaDialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        modifier = Modifier.padding(horizontal = 40.dp),
         onDismissRequest = onDismissRequest,
-    ) {
-        Surface(
-            elevation = 24.dp,
-        ) {
-            Column {
-                // Dialog title
-                Text(
-                    text = stringResource(id = R.string.photos_album_creation_dialog_title),
-                    style = h6,
-                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
-                )
-
-                val textFieldColors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
-                    cursorColor = teal_300,
-                    focusedIndicatorColor = teal_300,
-                    unfocusedIndicatorColor = teal_300,
-                )
-
-                val interactionSource = remember { MutableInteractionSource() }
-
-                val textColor = LocalTextStyle.current.color.takeOrElse {
-                    textFieldColors.textColor(isEnabled).value
-                }
-                val mergedTextStyle = LocalTextStyle.current.merge(
-                    TextStyle(
-                        color = textColor,
-                        fontSize = 16.sp,
-                    )
-                )
-
+        titleStringID = R.string.photos_album_creation_dialog_title,
+        body = {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 BasicTextField(
                     value = textState,
                     onValueChange = {
+                        onDialogInputChange(true)
                         textState = it
                     },
                     modifier = Modifier
@@ -283,58 +319,94 @@ fun CreateNewAlbumDialog(
                         )
                     }
                 )
+                if (!isInputValid()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth()
+                            .padding(horizontal = 24.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        errorMessage?.let {
+                            Text(
+                                modifier = Modifier.weight(1f).padding(end = 8.dp),
+                                text = if (it == R.string.invalid_characters_defined) {
+                                    stringResource(id = it).replace("%1\$s", INVALID_CHARACTERS)
+                                } else {
+                                    stringResource(id = it)
+                                },
+                                color = if (MaterialTheme.colors.isLight) {
+                                    red_900
+                                } else {
+                                    red_400
+                                },
+                                style = caption
+                            )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 32.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Button(
-                        onClick = onDismissRequest,
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent,
-                        ),
-                        modifier = Modifier.padding(all = 0.dp),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 0.dp,
-                            pressedElevation = 0.dp,
-                            disabledElevation = 0.dp,
-                            hoveredElevation = 0.dp,
-                            focusedElevation = 0.dp
-                        ),
-                    ) {
-                        Text(
-                            stringResource(id = R.string.general_cancel),
-                            color = teal_300
-                        )
-                    }
-                    Button(
-                        onClick = {
-                            onDismissRequest()
-                            onDialogPositiveButtonClicked(textState)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent,
-                        ),
-                        modifier = Modifier.padding(all = 0.dp),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 0.dp,
-                            pressedElevation = 0.dp,
-                            disabledElevation = 0.dp,
-                            hoveredElevation = 0.dp,
-                            focusedElevation = 0.dp
-                        ),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.general_create),
-                            color = teal_300
-                        )
+                            Icon(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .fillMaxHeight(),
+                                painter = painterResource(
+                                    id = R.drawable.ic_sent_error_warning
+                                ),
+                                contentDescription = "Input error icon",
+                                tint = if (MaterialTheme.colors.isLight) {
+                                    red_900
+                                } else {
+                                    red_400
+                                }
+                            )
+
+                        }
                     }
                 }
-
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onDialogPositiveButtonClicked(textState)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Transparent,
+                ),
+                modifier = Modifier.padding(all = 0.dp),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp
+                ),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.general_create),
+                    color = teal_300
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismissRequest,
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Transparent,
+                ),
+                modifier = Modifier.padding(all = 0.dp),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp
+                ),
+            ) {
+                Text(
+                    stringResource(id = R.string.general_cancel),
+                    color = teal_300
+                )
             }
         }
-    }
+    )
 }
 
