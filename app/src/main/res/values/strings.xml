@@ -722,7 +722,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK Version</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGA chat SDK Version</string>
+    <string name="settings_about_karere_version">MEGA Chat SDK Version</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">View source code</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -1896,7 +1896,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Enable rich URL previews</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Enhance the MEGA chat experience. URL content will be retrieved without end-to-end encryption.</string>
+    <string name="text_enable_rich_links">Enhance the MEGA Chat experience. URL content will be retrieved without end-to-end encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Please enter a stronger password</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -4072,4 +4072,8 @@
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[B]EMPTY[/B] [A]ALBUM[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
 </resources>

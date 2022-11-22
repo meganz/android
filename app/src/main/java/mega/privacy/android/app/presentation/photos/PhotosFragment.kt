@@ -336,7 +336,8 @@ class PhotosFragment : Fragment() {
             openAlbum = this::openAlbum,
             downloadPhoto = photosViewModel::downloadPhoto,
             onDialogPositiveButtonClicked = albumsViewModel::createNewAlbum,
-            setDialogInputPlaceholder = albumsViewModel::setPlaceholderAlbumTitle
+            setDialogInputPlaceholder = albumsViewModel::setPlaceholderAlbumTitle,
+            setInputValidity = albumsViewModel::setNewAlbumNameValidity,
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
