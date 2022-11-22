@@ -7,27 +7,7 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'jacoco'
 
-// Get the MEGA SDK commit hash using Git
-def getSdkGitHash = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        workingDir '../sdk/src/main/jni/mega/sdk'
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
-// Get the MEGAchat (Karere) commit hash using Git
-def getKarereGitHash = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        workingDir '../sdk/src/main/jni/megachat/sdk'
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
+apply from: "$project.rootDir/tools/util.gradle"
 
 /**
  * For Continuous Delivery with Firebase AppDistribution <p/>
@@ -133,8 +113,8 @@ android {
 
         buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
         resValue("string", "app_version", "\"${versionName}\"")
-        resValue("string", "sdk_version", "\"${getSdkGitHash()}\"")
-        resValue("string", "karere_version", "\"${getKarereGitHash()}\"")
+        resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion)}\"")
+        resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
 
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
     }

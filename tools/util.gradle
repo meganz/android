@@ -1,0 +1,100 @@
+import groovy.json.JsonSlurperClassic
+
+/**
+ * This file contains the commit gradle functions that may be used by multiple files.
+ */
+
+/**
+ * Check whether we should use prebuilt SDK or local sdk module
+ *
+ * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
+ */
+boolean shouldUsePrebuiltSdk() {
+    String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
+    return usePrebuiltSdk == null || usePrebuiltSdk != "false"
+}
+
+/**
+ *
+ * @param property the property to query. possible value: 'sdk-commit', 'chat-commit'
+ * @param version version of the pre-built SDK. It can be read at the value of megaSdkVersion in
+ * project build.gradle file.
+ * @return property value
+ */
+def queryPrebuiltSdkProperty(String property, String version) {
+    def commit = "N/A"
+    def stdout = new ByteArrayOutputStream()
+    def url = "https://artifactory.developers.mega.co.nz/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
+    exec {
+        workingDir '.'
+        commandLine 'curl', url
+        standardOutput = stdout
+    }
+    def response = stdout.toString().trim()
+
+    def properties = new JsonSlurperClassic().parseText(response).properties
+    if (properties != null) {
+        commit = properties[property][0]
+    }
+    return commit
+}
+
+/**
+ * Get the Git hash for SDK.
+ * If build uses prebuilt SDK, fetch the value from Artifactory.
+ * Else, read the value from local SDK folder
+ *
+ * @param version version of the pre-built SDK.
+ * @return commit ID of SDK
+ */
+def getSdkGitHash(String version) {
+    def commit = "N/A"
+    if (shouldUsePrebuiltSdk()) {
+        commit = queryPrebuiltSdkProperty('sdk-commit', version)
+    } else {
+        // Read commit ID from local SDK folder
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            workingDir '../sdk/src/main/jni/mega/sdk'
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = stdout
+        }
+        commit = stdout.toString().trim()
+    }
+
+    println("sdk_commit = $commit")
+    return commit
+}
+
+/**
+ * Get the Git hash for MEGAchat SDK.
+ * If build uses prebuilt SDK, fetch the value from Artifactory.
+ * Else, read the value from local MEGAchat SDK folder
+ *
+ * @param version version of the pre-built SDK.
+ * @return commit ID of MEGAchat SDK
+ */
+def getChatGitHash(String prebuiltSdkVersion) {
+    def commit = "N/A"
+    if (shouldUsePrebuiltSdk()) {
+        commit = queryPrebuiltSdkProperty('chat-commit', prebuiltSdkVersion)
+    } else {
+        // Read commit ID from local SDK folder
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            workingDir '../sdk/src/main/jni/megachat/sdk'
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = stdout
+        }
+        commit = stdout.toString().trim()
+    }
+
+    println("chat_commit = $commit")
+    return commit
+}
+
+ext {
+    shouldUsePrebuiltSdk = this.&shouldUsePrebuiltSdk
+    getSdkGitHash = this.&getSdkGitHash
+    getChatGitHash = this.&getChatGitHash
+}
