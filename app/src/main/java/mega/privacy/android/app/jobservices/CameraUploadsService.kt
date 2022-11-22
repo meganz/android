@@ -58,6 +58,7 @@ import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.BackupState
@@ -109,8 +110,8 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
-import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -509,6 +510,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var monitorChargingStoppedState: MonitorChargingStoppedState
+
+    /**
+     * initiate mega api connection based on IP
+     */
+    @Inject
+    lateinit var cameraServiceIpChangeHandler: CameraServiceIpChangeHandler
 
     /**
      * Coroutine Scope for camera upload work
@@ -1417,19 +1424,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             return
         }
 
-        val previousIP = app?.localIpAddress
-        // the new logic implemented in NetworkStateReceiver
-        val currentIP = Util.getLocalIpAddress(applicationContext)
-        app?.localIpAddress = currentIP
-        if (currentIP != null && currentIP.isNotEmpty() && currentIP.compareTo("127.0.0.1") != 0) {
-            if (previousIP == null || currentIP.compareTo(previousIP) != 0) {
-                Timber.d("Reconnecting...")
-                megaApi?.reconnect()
-            } else {
-                Timber.d("Retrying pending connections...")
-                megaApi?.retryPendingConnections()
-            }
-        }
+        cameraServiceIpChangeHandler.start()
         // end new logic
         intent = Intent(this, ManagerActivity::class.java)
         intent?.action = Constants.ACTION_CANCEL_CAM_SYNC
