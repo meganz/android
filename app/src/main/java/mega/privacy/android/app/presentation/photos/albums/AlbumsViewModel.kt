@@ -349,4 +349,10 @@ class AlbumsViewModel @Inject constructor(
             it.copy(currentSort = sort)
         }
     }
+
+    fun setSnackBarMessage(snackBarMessage: String) {
+        _state.update {
+            it.copy(snackBarMessage = snackBarMessage)
+        }
+    }
 }
