@@ -20,7 +20,6 @@ import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
 import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
 import static mega.privacy.android.app.utils.ChatUtil.getStatusBitmap;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
-import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
 import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PICTURE;
 import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PROFILE_PICTURE;
@@ -201,12 +200,6 @@ public class CallUtil {
             meetingIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
 
-        if (context instanceof ChatActivity) {
-            meetingIntent.putExtra(ACTION_CHAT_OPEN, true);
-        } else {
-            meetingIntent.putExtra(ACTION_CHAT_OPEN, false);
-        }
-
         context.startActivity(meetingIntent);
     }
 
@@ -229,12 +222,6 @@ public class CallUtil {
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_AUDIO_ENABLE, isAudioEnable);
         meetingIntent.putExtra(MEETING_VIDEO_ENABLE, isVideoEnable);
-
-        if (context instanceof ChatActivity) {
-            meetingIntent.putExtra(ACTION_CHAT_OPEN, true);
-        } else {
-            meetingIntent.putExtra(ACTION_CHAT_OPEN, false);
-        }
         context.startActivity(meetingIntent);
     }
 
@@ -252,7 +239,6 @@ public class CallUtil {
         passcodeManagement.setShowPasscodeScreen(true);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         chatRequestHandler.setIsLoggingRunning(true);
-
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {
