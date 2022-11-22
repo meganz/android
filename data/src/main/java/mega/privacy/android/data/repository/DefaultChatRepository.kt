@@ -4,13 +4,20 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.mapper.ChatRoomMapper
+import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
@@ -31,6 +38,7 @@ internal class DefaultChatRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatRequestMapper: ChatRequestMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val chatRoomMapper: ChatRoomMapper,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> {
@@ -113,4 +121,15 @@ internal class DefaultChatRepository @Inject constructor(
 
     override suspend fun getChatFilesFolderId(): NodeId? =
         localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
+
+    override fun monitorChatRoomUpdates(chatId: Long) = chatGateway.getChatRoomUpdates(chatId)
+        .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
+        .mapNotNull { it.chat }
+        .map { chatRoomMapper(it) }
+        .flowOn(ioDispatcher)
+
+    override fun getChatRoom(chatId: Long): ChatRoom? =
+        chatGateway.getChatRoom(chatId)?.let {
+            chatRoomMapper(it)
+        }
 }
