@@ -266,11 +266,11 @@ class DefaultAlbumRepositoryTest {
         override val modificationTime: Long = modificationTime
 
         override fun equals(other: Any?): Boolean {
-            val other = other as? UserSet ?: return false
-            return id == other.id
-                    && name == other.name
-                    && cover == other.cover
-                    && modificationTime == other.modificationTime
+            val otherSet = other as? UserSet ?: return false
+            return id == otherSet.id
+                    && name == otherSet.name
+                    && cover == otherSet.cover
+                    && modificationTime == otherSet.modificationTime
         }
     }
 }

@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.photos.Album
  * @property createAlbumPlaceholderTitle
  * @property isInputNameValid
  * @property createDialogErrorMessage
+ * @property isAlbumCreatedSuccessfully
  */
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
@@ -20,4 +21,5 @@ data class AlbumsViewState(
     val createAlbumPlaceholderTitle: String = "",
     val isInputNameValid: Boolean = true,
     val createDialogErrorMessage: Int? = null,
+    val isAlbumCreatedSuccessfully: Boolean = false,
 )

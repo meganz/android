@@ -140,8 +140,7 @@ class DefaultGetDefaultAlbumPhotosTest {
             modificationTime = modificationTime,
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
-            duration = 123,
-            fileTypeInfo = VideoFileTypeInfo("", "")
+            fileTypeInfo = VideoFileTypeInfo("", "", duration = 123)
         )
     }
 }

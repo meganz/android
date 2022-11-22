@@ -30,9 +30,4 @@ interface FileNode : UnTypedNode {
      * Fingerprint
      */
     val fingerprint: String?
-
-    /**
-     * Duration
-     */
-    val duration: Int
 }

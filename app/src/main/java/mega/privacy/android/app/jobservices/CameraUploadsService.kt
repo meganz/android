@@ -4,8 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
@@ -60,6 +58,7 @@ import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.BackupState
@@ -111,6 +110,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
@@ -506,6 +506,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var isNodeInRubbish: IsNodeInRubbish
 
     /**
+     * Monitor charging stop status
+     */
+    @Inject
+    lateinit var monitorChargingStoppedState: MonitorChargingStoppedState
+
+    /**
+     * initiate mega api connection based on IP
+     */
+    @Inject
+    lateinit var cameraServiceIpChangeHandler: CameraServiceIpChangeHandler
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -544,6 +556,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
+    // above battery level -> level > LOW_BATTERY_LEVEL || Util.isCharging
+    // below battery level -> level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
             monitorBatteryInfo().collect {
@@ -560,12 +574,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    // above battery level -> level > LOW_BATTERY_LEVEL || Util.isCharging
-    // below battery level -> level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
-
-    private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            coroutineScope?.launch {
+    private fun monitorChargingStoppedStatus() {
+        coroutineScope?.launch {
+            monitorChargingStoppedState().collect {
                 if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
                     Timber.d("Detected device stops charging.")
                     videoCompressor?.stop()
@@ -581,7 +592,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         super.onCreate()
         coroutineScope = CoroutineScope(ioDispatcher)
         startForegroundNotification()
-        registerReceiver(chargingStopReceiver, IntentFilter(Intent.ACTION_POWER_DISCONNECTED))
+        monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
         getAttrUserListener = GetCameraUploadAttributeListener(this)
@@ -597,7 +608,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         super.onDestroy()
         isServiceRunning = false
         receiver?.let { unregisterReceiver(it) }
-        unregisterReceiver(chargingStopReceiver)
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
@@ -1414,19 +1424,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             return
         }
 
-        val previousIP = app?.localIpAddress
-        // the new logic implemented in NetworkStateReceiver
-        val currentIP = Util.getLocalIpAddress(applicationContext)
-        app?.localIpAddress = currentIP
-        if (currentIP != null && currentIP.isNotEmpty() && currentIP.compareTo("127.0.0.1") != 0) {
-            if (previousIP == null || currentIP.compareTo(previousIP) != 0) {
-                Timber.d("Reconnecting...")
-                megaApi?.reconnect()
-            } else {
-                Timber.d("Retrying pending connections...")
-                megaApi?.retryPendingConnections()
-            }
-        }
+        cameraServiceIpChangeHandler.start()
         // end new logic
         intent = Intent(this, ManagerActivity::class.java)
         intent?.action = Constants.ACTION_CANCEL_CAM_SYNC

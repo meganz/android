@@ -419,4 +419,9 @@ interface CameraUploadRepository {
      * monitor battery info
      */
     fun monitorBatteryInfo(): Flow<BatteryInfo>
+
+    /**
+     * monitor charging stopped info
+     */
+    fun monitorChargingStoppedInfo(): Flow<Boolean>
 }

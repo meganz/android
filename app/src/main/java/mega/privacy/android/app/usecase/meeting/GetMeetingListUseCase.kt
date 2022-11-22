@@ -196,7 +196,7 @@ class GetMeetingListUseCase @Inject constructor(
             }
 
             megaChatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
-                .filter { it.isActive && !it.isArchived }
+                .filter { !it.isArchived }
                 .forEach { chatRoom ->
                     meetings.add(chatRoom.toMeetingItem(userAttrsListener))
                 }
@@ -215,13 +215,13 @@ class GetMeetingListUseCase @Inject constructor(
 
                         val index = meetings.indexOfFirst { it.chatId == updatedChatId }
                         if (index != Constants.INVALID_POSITION) {
-                            if (updatedChatRoom.isArchived || !updatedChatRoom.isActive) {
+                            if (updatedChatRoom.isArchived) {
                                 meetings.removeAt(index)
                             } else {
                                 meetings[index] = updatedChatRoom.toMeetingItem(userAttrsListener)
                             }
                             emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
-                        } else if (updatedChatRoom.isMeeting && updatedChatRoom.isActive && !updatedChatRoom.isArchived) {
+                        } else if (updatedChatRoom.isMeeting && !updatedChatRoom.isArchived) {
                             meetings.add(updatedChatRoom.toMeetingItem(userAttrsListener))
                             emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         }

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -9,6 +10,7 @@ import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class AccountDetailMapperTest {
     private val expectedUsedStorage: Long = 1003L
     private val expectedSubscriptionMethodId: Int = 100
