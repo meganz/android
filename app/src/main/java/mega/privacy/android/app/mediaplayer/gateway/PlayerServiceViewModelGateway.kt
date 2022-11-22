@@ -145,7 +145,7 @@ interface PlayerServiceViewModelGateway {
     /**
      * Remove the selected items
      */
-    fun removeItems()
+    fun removeAllSelectedItems()
 
     /**
      * Clear the all selections

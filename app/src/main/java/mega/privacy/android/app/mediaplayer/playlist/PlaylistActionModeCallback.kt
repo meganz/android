@@ -27,7 +27,7 @@ class PlaylistActionModeCallback(private val playerServiceViewModelGateway: Play
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         if (item?.itemId == R.id.remove) {
-            playerServiceViewModelGateway.removeItems()
+            playerServiceViewModelGateway.removeAllSelectedItems()
         }
         return true
     }
