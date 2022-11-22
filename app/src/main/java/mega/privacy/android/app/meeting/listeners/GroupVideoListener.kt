@@ -48,11 +48,10 @@ class GroupVideoListener(
             }
         }
 
-        if (bitmap == null) return
-        bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
+        (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
 
         if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
-            localRenderer!!.drawBitmap(isLocal, true)
+            localRenderer!!.drawBitmap(isLocal)
         }
     }
 

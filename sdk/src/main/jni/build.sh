@@ -144,6 +144,7 @@ PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
 PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
+#  When using pre-built SDK, upgrading ExoPlayer must upgrade the ExoPlayer AARs under app/src/main/libs
 EXOPLAYER=ExoPlayer
 EXOPLAYER_VERSION=2.18.1
 EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip

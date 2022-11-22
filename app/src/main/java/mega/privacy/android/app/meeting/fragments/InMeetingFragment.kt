@@ -2102,6 +2102,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bottomFloatingPanelViewHolder.updateMicIcon(isMicOn)
         updateParticipantsBottomPanel()
         showMuteBanner()
+        inMeetingViewModel.getCall()?.hasLocalAudio()
+            ?.let { floatingWindowFragment?.showLocalFloatingViewMicroMutedIcon(!it) }
     }
 
     /**

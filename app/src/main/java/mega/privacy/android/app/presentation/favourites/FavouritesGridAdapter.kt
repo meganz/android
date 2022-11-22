@@ -21,10 +21,13 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.setNodeGridThumbnail
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.HEADER_VIEW_TYPE
+import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
+import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
 import mega.privacy.android.app.utils.TimeUtils
 import java.io.File
 
@@ -41,7 +44,7 @@ class FavouritesGridAdapter(
     private val onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
     private val onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean = { _, _, _ -> false },
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
-    private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit
+    private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesGridViewHolder>(FavouritesDiffCallback) {
 
     override fun getItemViewType(position: Int): Int = getItem(position).type
@@ -50,7 +53,8 @@ class FavouritesGridAdapter(
         return FavouritesGridViewHolder(
             when (viewType) {
                 ITEM_PLACEHOLDER_TYPE,
-                ITEM_VIEW_TYPE -> {
+                ITEM_VIEW_TYPE,
+                -> {
                     ItemFavouriteGridBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
@@ -118,7 +122,7 @@ class FavouritesGridAdapter(
  * The view holder regarding favourites
  */
 class FavouritesGridViewHolder(
-    private val binding: ViewBinding
+    private val binding: ViewBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     /**
@@ -137,7 +141,7 @@ class FavouritesGridViewHolder(
         onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean,
-        getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit
+        getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
     ) {
         with(binding) {
             when (this) {
@@ -148,15 +152,15 @@ class FavouritesGridViewHolder(
                         } else {
                             R.drawable.background_item_grid
                         }
-                        itemGridFolder.isVisible = info.isFolder
-                        itemGridFile.isVisible = !info.isFolder
-                        if (info.isFolder) {
+                        itemGridFolder.isVisible = info is FavouriteFolder
+                        itemGridFile.isVisible = info !is FavouriteFolder
+                        if (info is FavouriteFolder) {
                             itemGridFolder.setBackgroundResource(backgroundColor)
                             with(folderGridIcon) {
                                 setImageResource(info.icon)
                                 isVisible = !info.isSelected
                             }
-                            folderGridTakenDown.isVisible = info.isTakenDown
+                            folderGridTakenDown.isVisible = info.typedNode.isTakenDown
                             textViewSettings(folderGridFilename, info)
                             folderIcSelected.isVisible = info.isSelected
                             folderGridThreeDots.setOnClickListener {
@@ -165,12 +169,12 @@ class FavouritesGridViewHolder(
                         } else {
                             itemGridFile.setBackgroundResource(backgroundColor)
                             info.thumbnailPath?.let { thumbnailPath ->
-                                if (item is FavouriteListItem && isThumbnailAvailable(info.name)) {
+                                if (item is FavouriteListItem && isThumbnailAvailable(info.typedNode.name)) {
                                     File(thumbnailPath).let { file ->
                                         if (file.exists()) {
                                             setNodeGridThumbnail(itemThumbnail, file, info.icon)
                                         } else {
-                                            getThumbnail(info.nodeId.id) { thumbnail ->
+                                            getThumbnail(info.typedNode.id.id) { thumbnail ->
                                                 thumbnail?.let { fileByGetThumbnail ->
                                                     setNodeGridThumbnail(
                                                         itemThumbnail,
@@ -192,14 +196,14 @@ class FavouritesGridViewHolder(
                             } else {
                                 View.INVISIBLE
                             }
-                            if (MimeTypeList.typeForName(info.name).isVideo) {
+                            if (MimeTypeList.typeForName(info.typedNode.name).isVideo) {
                                 videoInfo.isVisible = true
                                 videoDuration.text =
                                     TimeUtils.getVideoDuration((info.node.duration))
                             } else {
                                 videoInfo.isVisible = false
                             }
-                            takenDown.isVisible = info.isTakenDown
+                            takenDown.isVisible = info.typedNode.isTakenDown
                             textViewSettings(filename, info)
                             filenameContainer.setOnClickListener {
                                 onThreeDotsClicked(info)
@@ -236,9 +240,9 @@ class FavouritesGridViewHolder(
      */
     private fun textViewSettings(textView: TextView, info: Favourite) {
         with(textView) {
-            text = info.name
+            text = info.typedNode.name
             setTextColor(
-                if (info.isTakenDown) {
+                if (info.typedNode.isTakenDown) {
                     context.getColor(R.color.red_600_red_300)
                 } else {
                     context.getColor(R.color.grey_087_white_087)

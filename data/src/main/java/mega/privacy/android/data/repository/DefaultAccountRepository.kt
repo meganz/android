@@ -243,4 +243,27 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             dbHandler.attributes?.accountDetailsTimeStamp
         }
+
+    override suspend fun getSpecificAccountDetail(
+        storage: Boolean,
+        transfer: Boolean,
+        pro: Boolean,
+    ) = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
+            megaApiGateway.getSpecificAccountDetails(storage, transfer, pro, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        myAccountInfoFacade.handleAccountDetail(request)
+    }
 }

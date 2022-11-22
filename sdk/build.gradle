@@ -50,6 +50,7 @@ android {
 dependencies {
 
     implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
+    implementation files('src/main/jni/megachat/webrtc/libwebrtc.jar')
 
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"

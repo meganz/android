@@ -157,7 +157,7 @@ class FavouriteFolderFragment : Fragment() {
      * @param favourite FavouriteFile
      */
     private fun openNode(favourite: FavouriteFile) {
-        MimeTypeList.typeForName(favourite.name).apply {
+        MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
                 isImage ||
                         (isVideoReproducible || isAudio) ||
@@ -175,7 +175,7 @@ class FavouriteFolderFragment : Fragment() {
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
                 }
-                isOpenableTextFile(favourite.size) -> {
+                isOpenableTextFile(favourite.typedNode.size) -> {
                     MegaNodeUtil.manageTextFileIntent(
                         requireContext(),
                         favourite.node,

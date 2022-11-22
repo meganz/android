@@ -1,5 +1,7 @@
 package mega.privacy.android.data.facade
 
+import nz.mega.sdk.MegaRequest
+
 /**
  * Account info wrapper to create an interface to Account information functionality
  *
@@ -36,4 +38,11 @@ interface AccountInfoWrapper {
      *
      */
     fun requestAccountDetails()
+
+    /**
+     * Handle account detail
+     *
+     * @param request
+     */
+    suspend fun handleAccountDetail(request: MegaRequest)
 }

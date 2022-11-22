@@ -11,5 +11,5 @@ fun interface GetUserAlbums {
      * Get user albums.
      * @return a flow list of user albums.
      */
-    suspend operator fun invoke(): Flow<List<Album.UserAlbum>>
+    operator fun invoke(): Flow<List<Album.UserAlbum>>
 }
