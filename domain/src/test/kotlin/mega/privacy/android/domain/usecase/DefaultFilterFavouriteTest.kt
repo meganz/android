@@ -102,8 +102,7 @@ class DefaultFilterFavouriteTest {
             modificationTime = modificationTime,
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
-            duration = 123,
-            fileTypeInfo = VideoFileTypeInfo("","")
+            fileTypeInfo = VideoFileTypeInfo("", "", duration = 123)
         )
     }
 
@@ -123,7 +122,7 @@ class DefaultFilterFavouriteTest {
             modificationTime = modificationTime,
             thumbnailFilePath = "thumbnailFilePath",
             previewFilePath = "previewFilePath",
-            fileTypeInfo = StaticImageFileTypeInfo("","")
+            fileTypeInfo = StaticImageFileTypeInfo("", "")
         )
     }
 

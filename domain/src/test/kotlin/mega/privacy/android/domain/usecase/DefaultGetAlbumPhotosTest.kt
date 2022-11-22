@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -92,7 +93,9 @@ class DefaultGetAlbumPhotosTest {
         thumbnailFilePath: String? = null,
         previewFilePath: String? = null,
         duration: Int = 0,
-        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(type = "", extension = ""),
+        fileTypeInfo: FileTypeInfo = VideoFileTypeInfo(type = "",
+            extension = "",
+            duration = duration),
     ): Photo = Photo.Video(
         id,
         parentId,
@@ -102,7 +105,6 @@ class DefaultGetAlbumPhotosTest {
         modificationTime,
         thumbnailFilePath,
         previewFilePath,
-        duration,
         fileTypeInfo,
     )
 }

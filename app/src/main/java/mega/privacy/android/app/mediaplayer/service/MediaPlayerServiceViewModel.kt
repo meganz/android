@@ -86,6 +86,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -155,6 +156,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private var mediaPlayback = MutableLiveData<Boolean>()
 
     private val playlistItems = mutableListOf<PlaylistItem>()
+
     private val itemsSelectedMap = mutableMapOf<Long, PlaylistItem>()
 
     private var playlistSearchQuery: String? = null
@@ -461,7 +463,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 0,
                 TYPE_PLAYING,
                 node?.size ?: INVALID_SIZE,
-                node?.duration ?: 0)
+                node?.type?.getDuration() ?: 0)
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)
                 }
@@ -592,7 +594,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     currentIndex,
                     TYPE_NEXT,
                     typedNode.size,
-                    typedNode.duration)
+                    typedNode.type.getDuration())
                     .let { playlistItem ->
                         playlistItems.add(playlistItem)
                     }

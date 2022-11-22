@@ -72,6 +72,5 @@ internal suspend fun toNode(
         isTakenDown = megaNode.isTakenDown,
         isIncomingShare = megaNode.isInShare,
         fingerprint = megaNode.fingerprint,
-        duration = megaNode.duration
     )
 }
