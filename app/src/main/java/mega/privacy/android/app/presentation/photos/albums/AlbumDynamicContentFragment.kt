@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -7,15 +8,31 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -25,6 +42,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -33,12 +51,14 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
@@ -155,29 +175,92 @@ class AlbumDynamicContentFragment : Fragment() {
             } ?: emptyList()
         }
 
-        if (photos.isNotEmpty()) {
-            DynamicView(
-                photos = photos,
-                smallWidth = smallWidth,
-                photoDownload = photosViewModel::downloadPhoto,
-                onClick = this::onClick,
-                onLongPress = this::onLongPress,
-                selectedPhotoIds = uiState.selectedPhotoIds
-            )
-        } else {
-            when (uiState.currentAlbum) {
-                Album.FavouriteAlbum -> EmptyView(
-                    imageResId = R.drawable.ic_photos_favourite_album,
-                    textResId = R.string.empty_hint_favourite_album
+        Box {
+            if (photos.isNotEmpty()) {
+                DynamicView(
+                    photos = photos,
+                    smallWidth = smallWidth,
+                    photoDownload = photosViewModel::downloadPhoto,
+                    onClick = this@AlbumDynamicContentFragment::onClick,
+                    onLongPress = this@AlbumDynamicContentFragment::onLongPress,
+                    selectedPhotoIds = uiState.selectedPhotoIds
                 )
-                Album.GifAlbum -> Back()
-                Album.RawAlbum -> Back()
-                is Album.UserAlbum -> EmptyView(
-                    imageResId = R.drawable.ic_photos_user_album_empty,
-                    textResId = R.string.photos_user_album_empty_album
-                )
-                null -> Back()
+            } else {
+                when (uiState.currentAlbum) {
+                    Album.FavouriteAlbum -> EmptyView(
+                        imageResId = R.drawable.ic_photos_favourite_album,
+                        textResId = R.string.empty_hint_favourite_album
+                    )
+                    Album.GifAlbum -> Back()
+                    Album.RawAlbum -> Back()
+                    is Album.UserAlbum -> EmptyView(
+                        imageResId = R.drawable.ic_photos_user_album_empty,
+                        textResId = R.string.photos_user_album_empty_album
+                    )
+                    null -> Back()
+                }
             }
+
+            if (uiState.snackBarMessage.isNotEmpty()) {
+                SnackBar(
+                    message = uiState.snackBarMessage,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(8.dp, 80.dp)
+                )
+            }
+
+            if (uiState.currentAlbum is Album.UserAlbum) {
+                AddFabButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun AddFabButton(
+        modifier: Modifier,
+    ) {
+        FloatingActionButton(
+            onClick = this::onFabClick,
+            modifier = modifier
+                .size(56.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = if (MaterialTheme.colors.isLight) {
+                    R.drawable.ic_add_white
+                } else {
+                    R.drawable.ic_add
+                }),
+                contentDescription = "",
+                tint = if (!MaterialTheme.colors.isLight) {
+                    Color.Black
+                } else {
+                    Color.White
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun SnackBar(
+        message: String,
+        modifier: Modifier,
+    ) {
+        Snackbar(
+            modifier = modifier.padding(8.dp)
+        ) {
+            Text(
+                text = message
+            )
+        }
+
+        LaunchedEffect(true) {
+            delay(3000L)
+            albumsViewModel.setSnackBarMessage("")
         }
     }
 
@@ -206,6 +289,32 @@ class AlbumDynamicContentFragment : Fragment() {
             startActivity(intent)
             managerActivity.overridePendingTransition(0, 0)
         }
+    }
+
+    private fun onFabClick() {
+        if (albumsViewModel.state.value.currentAlbum is Album.UserAlbum) {
+            val userAlbum = albumsViewModel.state.value.currentAlbum as Album.UserAlbum
+            openAlbumPhotosSelection(albumId = userAlbum.id)
+        }
+    }
+
+    private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAlbumPhotosSelectionResult,
+        )
+
+    private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
+        val message =
+            result.data?.getStringExtra(AlbumPhotosSelectionActivity.MESSAGE) // Added 5 items to "Color ️‍🌈"
+        albumsViewModel.setSnackBarMessage(snackBarMessage = message ?: "")
+    }
+
+    private fun openAlbumPhotosSelection(albumId: AlbumId) {
+        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId)
+        albumPhotosSelectionLauncher.launch(intent)
+        managerActivity.overridePendingTransition(0, 0)
+
     }
 
     fun onClick(photo: Photo) {
@@ -257,6 +366,11 @@ class AlbumDynamicContentFragment : Fragment() {
         albumsViewModel.state.value.currentAlbum?.let { album ->
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
+            menu.findItem(R.id.action_menu_filter)?.isVisible = photos.isNotEmpty()
+            if (album is Album.UserAlbum) {
+                menu.findItem(R.id.action_menu_rename)?.isVisible = true
+                menu.findItem(R.id.action_menu_delete)?.isVisible = true
+            }
         }
     }
 
@@ -270,6 +384,18 @@ class AlbumDynamicContentFragment : Fragment() {
                         albumsViewModel.setCurrentSort(Sort.values()[i])
                     },
                 )
+            }
+            R.id.action_menu_filter -> {
+                //TODO
+                Toast.makeText(activity, "Filter is developing...", Toast.LENGTH_SHORT).show()
+            }
+            R.id.action_menu_delete -> {
+                //TODO
+                Toast.makeText(activity, "Delete is developing...", Toast.LENGTH_SHORT).show()
+            }
+            R.id.action_menu_rename -> {
+                //TODO
+                Toast.makeText(activity, "Rename is developing...", Toast.LENGTH_SHORT).show()
             }
         }
         return super.onOptionsItemSelected(item)
