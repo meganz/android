@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -202,18 +203,20 @@ class AlbumsViewModel @Inject constructor(
     /**
      * Create a new album
      *
-     * @param name the name of the album
+     * @param title the name of the album
      */
-    fun createNewAlbum(name: String) = viewModelScope.launch {
+    fun createNewAlbum(title: String, proscribedStrings: List<String>) = viewModelScope.launch {
         try {
-            val finalName = name.ifEmpty {
+            val finalTitle = title.ifEmpty {
                 _state.value.createAlbumPlaceholderTitle
+            }.trim()
+            if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                val album = createAlbum(finalTitle)
+                _state.update {
+                    it.copy(currentAlbum = album)
+                }
+                Timber.d("Current album: ${album.title}")
             }
-            val album = createAlbum(finalName)
-            _state.update {
-                it.copy(currentAlbum = album)
-            }
-            Timber.d("Current album: ${album.title}")
         } catch (exception: Exception) {
             Timber.e(exception)
         }
@@ -227,12 +230,7 @@ class AlbumsViewModel @Inject constructor(
      * Get the default album title
      */
     fun setPlaceholderAlbumTitle(placeholderTitle: String) {
-        val allUserAlbumsTitle: List<String> = _state.value.albums.filter {
-            it.id is Album.UserAlbum
-        }.map { (id) ->
-            val userAlbum = id as Album.UserAlbum
-            userAlbum.title
-        }
+        val allUserAlbumsTitle: List<String> = getAllUserAlbumsNames()
         var i = 0
         var currentDefaultTitle = placeholderTitle
 
@@ -243,6 +241,43 @@ class AlbumsViewModel @Inject constructor(
         _state.update {
             it.copy(createAlbumPlaceholderTitle = currentDefaultTitle)
         }
+    }
+
+    private fun getAllUserAlbumsNames() = _state.value.albums.filter {
+        it.id is Album.UserAlbum
+    }.map { it.title }
+
+    private fun getAllSystemAlbumsNames() = _state.value.albums.filter {
+        it.id !is Album.UserAlbum
+    }.map { it.title }
+
+    private fun checkTitleValidity(title: String, proscribedStrings: List<String>): Boolean {
+        var errorMessage: Int? = null
+        var isTitleValid = true
+
+        if (title in (getAllSystemAlbumsNames() + proscribedStrings)) {
+            isTitleValid = false
+            errorMessage = R.string.photos_create_album_error_message_systems_album
+        } else if (title in getAllUserAlbumsNames()) {
+            isTitleValid = false
+            errorMessage = R.string.photos_create_album_error_message_duplicate
+        } else if ("[*/:<>?\"|]".toRegex().containsMatchIn(title)) {
+            isTitleValid = false
+            errorMessage = R.string.invalid_characters_defined
+        }
+
+        _state.update {
+            it.copy(
+                isInputNameValid = isTitleValid,
+                createDialogErrorMessage = errorMessage,
+            )
+        }
+
+        return isTitleValid
+    }
+
+    fun setNewAlbumNameValidity(valid: Boolean) = _state.update {
+        it.copy(isInputNameValid = valid)
     }
 
     private fun shouldAddAlbum(

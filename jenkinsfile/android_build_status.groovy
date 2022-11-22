@@ -12,7 +12,7 @@ MODULE_LIST = ['app', 'domain', 'sdk', 'data']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
-LINT_REPORT_SUMMARY = ""
+LINT_REPORT_SUMMARY_MAP = [:]
 
 APP_UNIT_TEST_SUMMARY = ""
 DOMAIN_UNIT_TEST_SUMMARY = ""
@@ -35,7 +35,6 @@ COVERAGE_FOLDER = "coverage"
  */
 def common
 
-HTML_INDENT = "-- "
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
  * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
@@ -180,7 +179,7 @@ pipeline {
                         String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
-                                "**Lint Summary:** (${jsonLintReportLink}):<br/>" + "${LINT_REPORT_SUMMARY}" + "\n\n" +
+                                buildLintSummaryTable(jsonLintReportLink) + "\n\n" +
                                 buildTestResults()
 
                         // Send mergeRequestMessage to MR
@@ -324,6 +323,7 @@ pipeline {
                     sh "./gradlew testGmsDebugUnitTest"
                     sh "./gradlew domain:test"
                     sh "./gradlew :data:testGmsDebugUnitTest"
+                    sh "./gradlew lint:test"
 
                     script {
                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
@@ -391,17 +391,52 @@ pipeline {
                     sh "./gradlew lint"
 
                     script {
-                        MODULE_LIST.eachWithIndex { module, index ->
-                            LINT_REPORT_SUMMARY += "${HTML_INDENT}<b>${module}</b>: ${lintSummary(module)}<br/>"
+                        MODULE_LIST.each { module ->
+                            LINT_REPORT_SUMMARY_MAP.put(module, lintSummary(module))
                         }
-                        print("LINT_REPORT_SUMMARY = ${LINT_REPORT_SUMMARY}")
-
                         archiveLintReports()
                     }
                 }
             }
         }
     }
+}
+
+/**
+ * Returns a Markdown table-formatted String that holds all the Lint Results for available modules
+ *
+ * @param jsonLintReportLink A String that contains a link to all Lint Results
+ *
+ * @return a Markdown table-formatted String
+ */
+String buildLintSummaryTable(String jsonLintReportLink) {
+
+    // Declare a JsonSlurperClassic object
+    def jsonSlurperClassic = new groovy.json.JsonSlurperClassic()
+
+    // Declare the initial value for the String
+    String tableStr = "**Lint Summary:** (${jsonLintReportLink}):" + "\n\n" +
+            "| Module | Fatal | Error | Warning | Information | Error Message |\n" +
+            "| :---: | :---: | :---: | :---: | :---: | :---: |\n"
+
+    // Iterate through all the values in LINT_REPORT_SUMMARY_MAP and add a row per module
+    // The standard method of iterating a map returns an error when used with a Jenkins pipeline,
+    // which is why the map iteration is set up in this manner
+    for (def key in LINT_REPORT_SUMMARY_MAP.keySet()) {
+        // Parse the JSON String received from lint_report.py into a Map
+        def jsonObject = jsonSlurperClassic.parseText(LINT_REPORT_SUMMARY_MAP[key])
+
+        // Add a new row to the table
+        tableStr += "| **$key** " +
+                "| $jsonObject.fatalCount " +
+                "| $jsonObject.errorCount " +
+                "| $jsonObject.warningCount " +
+                "| $jsonObject.informationCount " +
+                "| $jsonObject.errorMessage |\n"
+    }
+
+    // Return the final result after iterating through all modules
+    tableStr
 }
 
 /**
@@ -444,6 +479,7 @@ String buildTestResults() {
             "${dataSummaryArray[4]} | " +
             "${DATA_UNIT_TEST_RESULT} |"
 
+    "**Code Coverage:**" + "\n\n" +
     "| Module | Coverage | Total Cases | Skipped | Errors | Failure | Duration (s) | Test Report |\n" +
             "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n" +
             "$appTestResultsRow\n" +
@@ -508,17 +544,19 @@ String unitTestSummary(String testReportPath) {
 }
 
 /**
- * Parse lint analysis report and create summary
+ * Executes lint_report.py in order to parse the Lint Results and create a Lint Summary
  *
- * @param module module of the code. Possible values can be app, domain or sdk.
- * @return lint summary report of the given module. Example return value:
- *{'Error': 248, 'Fatal': 17, 'Warning': 4781, 'Information': 1}
+ * @param module The name of the module (e.g. app, domain, sdk)
+ * @return The Lint Summary Report of the given module from lint_report.py. Here's a sample return value:
+ *
+ * {"fatalCount": 10, "errorCount": 20, "warningCount": 30, "informationCount": 40, "errorMessage": ""}
  */
 String lintSummary(String module) {
     summary = sh(
             script: "python3 ${WORKSPACE}/jenkinsfile/lint_report.py $WORKSPACE/${module}/build/reports/lint-results.xml",
             returnStdout: true).trim()
-    if (!summary) summary = 'Warning(0) Error(0) Information(0) Fatal(0)'
+    // If summary is empty, return a String with 0 counts and a "No lint results found" error message
+    if (!summary) summary = '{"fatalCount": "0", "errorCount": "0", "warningCount": "0", "informationCount": "0", "errorMessage": "No lint results found"}'
     print("lintSummary($module) = $summary")
     return summary
 }
