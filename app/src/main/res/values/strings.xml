@@ -4076,4 +4076,12 @@
     <string name="photos_album_subsection_my_albums">My albums</string>
     <!-- Albums sub-section for all shared albums -->
     <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Past meetings</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s Weekly</string>
 </resources>

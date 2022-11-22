@@ -12,7 +12,7 @@
         android:clipToPadding="false"
         android:paddingBottom="72dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_meeting" />
+        tools:listitem="@layout/item_meeting_scheduled" />
 
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/list_scroller"

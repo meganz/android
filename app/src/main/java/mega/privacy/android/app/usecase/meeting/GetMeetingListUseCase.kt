@@ -1,6 +1,7 @@
 package mega.privacy.android.app.usecase.meeting
 
 import android.content.Context
+import android.icu.text.SimpleDateFormat
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
@@ -12,10 +13,14 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -24,8 +29,11 @@ import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -40,7 +48,13 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
+import java.util.Calendar
+import java.util.Calendar.DAY_OF_YEAR
+import java.util.Calendar.HOUR_OF_DAY
+import java.util.Calendar.MINUTE
+import java.util.Calendar.getInstance
 import javax.inject.Inject
+import kotlin.random.Random
 
 /**
  * Get meeting list use case
@@ -57,17 +71,28 @@ class GetMeetingListUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val getLastMessageUseCase: GetLastMessageUseCase,
+    private val getFeatureFlag: GetFeatureFlagValue,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
+
+    private val hourFormat by lazy { SimpleDateFormat("hh:mm") }
+    private var enableScheduleMeetings = false
+
+    init {
+        CoroutineScope(defaultDispatcher).launch {
+            enableScheduleMeetings = getFeatureFlag(AppFeatures.ScheduleMeeting)
+        }
+    }
 
     /**
      * Get a list of updated MeetingItems
      *
      * @return  Flowable
      */
-    fun get(): Flowable<List<MeetingItem>> =
+    fun get(): Flowable<List<MeetingItem.Data>> =
         Flowable.create({ emitter ->
             val changesSubscription = CompositeDisposable()
-            val meetings = mutableListOf<MeetingItem>()
+            val meetings = mutableListOf<MeetingItem.Data>()
 
             val userAttrsListener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -138,7 +163,7 @@ class GetMeetingListUseCase @Inject constructor(
                                 }
                             }
 
-                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         }
                     } else {
                         Timber.w(error.toMegaException())
@@ -155,7 +180,7 @@ class GetMeetingListUseCase @Inject constructor(
                 if (index != Constants.INVALID_POSITION) {
                     val oldItem = meetings[index]
                     meetings[index] = oldItem.copy(isMuted = !oldItem.isMuted)
-                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                 }
             }
 
@@ -166,7 +191,7 @@ class GetMeetingListUseCase @Inject constructor(
                 if (index != Constants.INVALID_POSITION) {
                     val chatRoom = megaChatApi.getChatRoom(updatedChatId)
                     meetings[index] = chatRoom.toMeetingItem(userAttrsListener)
-                    emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                    emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                 }
             }
 
@@ -176,7 +201,7 @@ class GetMeetingListUseCase @Inject constructor(
                     meetings.add(chatRoom.toMeetingItem(userAttrsListener))
                 }
 
-            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
 
             getChatChangesUseCase.get()
                 .filter { it is Result.OnChatListItemUpdate && it.item != null }
@@ -195,10 +220,10 @@ class GetMeetingListUseCase @Inject constructor(
                             } else {
                                 meetings[index] = updatedChatRoom.toMeetingItem(userAttrsListener)
                             }
-                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         } else if (updatedChatRoom.isMeeting && !updatedChatRoom.isArchived) {
                             meetings.add(updatedChatRoom.toMeetingItem(userAttrsListener))
-                            emitter.onNext(meetings.sortedByDescending(MeetingItem::timeStamp))
+                            emitter.onNext(meetings.sortedByDescending(MeetingItem.Data::timeStamp))
                         }
                     },
                     onError = Timber::e
@@ -220,7 +245,7 @@ class GetMeetingListUseCase @Inject constructor(
      * @param listener Listener to deliver user attributes
      * @return                  MeetingItem
      */
-    private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem {
+    private fun MegaChatRoom.toMeetingItem(listener: OptionalMegaRequestListenerInterface): MeetingItem.Data {
         val chatListItem = megaChatApi.getChatListItem(chatId)
 
         val title = ChatUtil.getTitleChat(this)
@@ -254,7 +279,11 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
+        val isScheduled = enableScheduleMeetings && Random.nextBoolean()
+        var isRecurring = false
         val lastMessageIcon = when {
+            isScheduled ->
+                null
             chatListItem.lastMessageType == MegaChatMessage.TYPE_VOICE_CLIP ->
                 R.drawable.ic_mic_on_small
             chatListItem.isGeolocationMetaType() ->
@@ -262,8 +291,29 @@ class GetMeetingListUseCase @Inject constructor(
             else ->
                 null
         }
+        var startTime: Calendar? = null
+        var endTime: Calendar? = null
+        var formattedScheduledTimestamp: String? = null
+        if (isScheduled) {
+            isRecurring = Random.nextBoolean()
+            startTime = getInstance().apply {
+                set(DAY_OF_YEAR, get(DAY_OF_YEAR) + Random.nextInt(7))
+                set(HOUR_OF_DAY, Random.nextInt(20))
+                set(MINUTE, Random.nextInt(60))
+            }
+            endTime = getInstance().apply {
+                timeInMillis = startTime.timeInMillis
+                set(HOUR_OF_DAY, get(HOUR_OF_DAY) + Random.nextInt(1, 4))
+            }
+            val scheduleText = "${hourFormat.format(startTime.time)} - ${hourFormat.format(endTime.time)}"
+            formattedScheduledTimestamp = if (isRecurring) {
+                StringResourcesUtils.getString(R.string.meetings_list_scheduled_meeting_weekly_label, scheduleText)
+            } else {
+                scheduleText
+            }
+        }
 
-        return MeetingItem(
+        return MeetingItem.Data(
             chatId = chatId,
             title = title,
             lastMessage = lastMessageFormatted,
@@ -276,7 +326,12 @@ class GetMeetingListUseCase @Inject constructor(
             unreadCount = unreadCount,
             highlight = highlight,
             timeStamp = chatListItem.lastTimestamp,
-            formattedTimestamp = formattedDate)
+            formattedTimestamp = formattedDate,
+            formattedScheduledTimestamp = formattedScheduledTimestamp,
+            startTimestamp = startTime?.timeInMillis,
+            endTimestamp = endTime?.timeInMillis,
+            isRecurring
+        )
     }
 
     /**
@@ -335,4 +390,3 @@ class GetMeetingListUseCase @Inject constructor(
                 && megaChatApi.getMessage(chatId, lastMessageId)
             ?.containsMeta?.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
 }
-

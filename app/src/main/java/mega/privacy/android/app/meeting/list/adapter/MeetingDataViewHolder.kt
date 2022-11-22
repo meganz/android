@@ -9,31 +9,42 @@ import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ScalingUtils
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.ItemMeetingBinding
+import mega.privacy.android.app.databinding.ItemMeetingDataBinding
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.setImageRequestFromUri
 
-class MeetingsViewHolder(
-    private val binding: ItemMeetingBinding,
+class MeetingDataViewHolder(
+    private val binding: ItemMeetingDataBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val selectAnimation by lazy {
         AnimationUtils.loadAnimation(itemView.context, R.anim.multiselect_flip)
     }
 
-    fun bind(item: MeetingItem, isSelected: Boolean) {
-        val lastMessageColor = if (item.highlight) {
-            ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
-        } else {
-            getThemeColor(itemView.context, android.R.attr.textColorSecondary)
+    fun bind(item: MeetingItem.Data, isSelected: Boolean) {
+        val lastMessageColor = when {
+            item.isScheduled() -> ContextCompat.getColor(itemView.context, R.color.red_600_red_300)
+            item.highlight -> ContextCompat.getColor(itemView.context, R.color.teal_300_teal_200)
+            else -> getThemeColor(itemView.context, android.R.attr.textColorSecondary)
         }
 
         binding.txtTitle.text = item.title
-        binding.txtTimestamp.text = item.formattedTimestamp
-        binding.txtLastMessage.text = item.lastMessage
+        if (item.isScheduled()) {
+            binding.txtLastMessage.text = item.formattedScheduledTimestamp
+            binding.txtLastMessage.isVisible = !item.formattedScheduledTimestamp.isNullOrBlank()
+            binding.imgRecurring.isVisible = item.isRecurring
+            binding.txtTimestamp.setText(if (item.isRecurring) {
+                R.string.meetings_list_recurring_meeting_label
+            } else {
+                R.string.meetings_list_upcoming_meeting_label
+            })
+        } else {
+            binding.txtLastMessage.text = item.lastMessage
+            binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
+            binding.txtTimestamp.text = item.formattedTimestamp
+        }
         binding.txtLastMessage.setTextColor(lastMessageColor)
-        binding.txtLastMessage.isVisible = !item.lastMessage.isNullOrBlank()
         if (item.lastMessageIcon != null) {
             binding.imgLastMessage.setImageResource(item.lastMessageIcon)
         } else {
