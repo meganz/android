@@ -4,8 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
@@ -112,6 +110,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -506,6 +505,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var isNodeInRubbish: IsNodeInRubbish
 
     /**
+     * Monitor charging stop status
+     */
+    @Inject
+    lateinit var monitorChargingStoppedState: MonitorChargingStoppedState
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -544,6 +549,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
+    // above battery level -> level > LOW_BATTERY_LEVEL || Util.isCharging
+    // below battery level -> level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
             monitorBatteryInfo().collect {
@@ -560,12 +567,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    // above battery level -> level > LOW_BATTERY_LEVEL || Util.isCharging
-    // below battery level -> level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
-
-    private val chargingStopReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            coroutineScope?.launch {
+    private fun monitorChargingStoppedStatus() {
+        coroutineScope?.launch {
+            monitorChargingStoppedState().collect {
                 if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
                     Timber.d("Detected device stops charging.")
                     videoCompressor?.stop()
@@ -581,7 +585,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         super.onCreate()
         coroutineScope = CoroutineScope(ioDispatcher)
         startForegroundNotification()
-        registerReceiver(chargingStopReceiver, IntentFilter(Intent.ACTION_POWER_DISCONNECTED))
+        monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
         getAttrUserListener = GetCameraUploadAttributeListener(this)
@@ -597,7 +601,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         super.onDestroy()
         isServiceRunning = false
         receiver?.let { unregisterReceiver(it) }
-        unregisterReceiver(chargingStopReceiver)
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null

@@ -9,4 +9,9 @@ internal interface BroadcastReceiverGateway {
      * monitor battery info
      */
     val monitorBatteryInfo: Flow<BatteryInfo>
+
+    /**
+     * monitor charging state
+     */
+    val monitorChargingStoppedState: Flow<Boolean>
 }
