@@ -108,7 +108,6 @@ public class ChatManagement {
      */
     public boolean openChatRoom(long chatId) {
         closeChatRoom(chatId);
-        Timber.d("**************** ChatManagement:: openChatRoom ChatID: "+chatId);
         return app.getMegaChatApi().openChatRoom(chatId, chatRoomListener);
     }
 
@@ -118,8 +117,6 @@ public class ChatManagement {
      * @param chatId The chat ID.
      */
     private void closeChatRoom(long chatId) {
-        Timber.d("**************** ChatManagement:: closeChatRoom ChatID: "+chatId);
-
         app.getMegaChatApi().closeChatRoom(chatId, chatRoomListener);
     }
 
