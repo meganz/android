@@ -2,6 +2,7 @@ package mega.privacy.android.app.components
 
 import android.content.Context
 import android.graphics.Canvas
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
@@ -9,50 +10,54 @@ import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 
 class ChatDividerItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
 
+    companion object {
+        private const val VIEWTYPE_DEFAULT = 0
+    }
+
     private val divider = ContextCompat.getDrawable(context, R.drawable.line_divider)
         ?: error("Divider doesn't exist")
 
-    private val fullMarginLeft =
+    private val marginStart =
         context.resources.getDimensionPixelSize(R.dimen.bottom_sheet_item_divider_margin_start)
 
-    private val shortMarginLeft =
+    private val shortMarginStart =
         context.resources.getDimensionPixelSize(R.dimen.bottom_sheet_item_divider_short_margin_start)
 
     override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        val right = parent.width - parent.paddingRight
-        val childCount = parent.childCount
-        for (i in 0 until childCount) {
+        for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
             val position = parent.getChildAdapterPosition(child)
-            when (parent.adapter?.getItemViewType(position)) {
+            if (position == RecyclerView.NO_POSITION) return
+
+            val adapter = parent.adapter ?: return
+            when (adapter.getItemViewType(position)) {
+                VIEWTYPE_DEFAULT -> {
+                    canvas.drawDivider(child, marginStart)
+                }
                 MeetingsAdapter.TYPE_DATA -> {
-                    if (position + 1 < (parent.adapter?.itemCount ?: 0)
-                        && parent.adapter?.getItemViewType(position + 1) == MeetingsAdapter.TYPE_HEADER
+                    val nextItem = position + 1
+                    if (nextItem < adapter.itemCount
+                        && adapter.getItemViewType(nextItem) == MeetingsAdapter.TYPE_HEADER
                     ) {
-                        val params = child.layoutParams as RecyclerView.LayoutParams
-                        val top = child.bottom + params.bottomMargin
-                        val bottom = top + divider.intrinsicHeight
-                        divider.setBounds(shortMarginLeft, top, right, bottom)
-                        divider.draw(canvas)
+                        canvas.drawDivider(child, shortMarginStart)
                     } else {
-                        val params = child.layoutParams as RecyclerView.LayoutParams
-                        val top = child.bottom + params.bottomMargin
-                        val bottom = top + divider.intrinsicHeight
-                        divider.setBounds(fullMarginLeft, top, right, bottom)
-                        divider.draw(canvas)
+                        canvas.drawDivider(child, marginStart)
                     }
                 }
-                MeetingsAdapter.TYPE_HEADER -> {
-                    // do nothing
-                }
                 else -> {
-                    val params = child.layoutParams as RecyclerView.LayoutParams
-                    val top = child.bottom + params.bottomMargin
-                    val bottom = top + divider.intrinsicHeight
-                    divider.setBounds(fullMarginLeft, top, right, bottom)
-                    divider.draw(canvas)
+                    // no divider required
                 }
             }
         }
+    }
+
+    private fun Canvas.drawDivider(view: View, shortMarginLeft: Int) {
+        val params = view.layoutParams as RecyclerView.LayoutParams
+        val parentView = view.parent as RecyclerView
+        val right = parentView.width - parentView.paddingRight
+        val top = view.bottom + params.bottomMargin
+        val bottom = top + divider.intrinsicHeight
+        divider.setBounds(shortMarginLeft, top, right, bottom)
+        divider.draw(this)
     }
 }
