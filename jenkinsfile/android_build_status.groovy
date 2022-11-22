@@ -324,6 +324,7 @@ pipeline {
                     sh "./gradlew testGmsDebugUnitTest"
                     sh "./gradlew domain:test"
                     sh "./gradlew :data:testGmsDebugUnitTest"
+                    sh "./gradlew lint:test"
 
                     script {
                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
