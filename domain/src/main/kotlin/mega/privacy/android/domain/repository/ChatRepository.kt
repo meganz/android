@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -58,4 +59,20 @@ interface ChatRepository {
      * Get chat files folder id if it exists
      */
     suspend fun getChatFilesFolderId(): NodeId?
+
+    /**
+     * Monitor updates on chat room item update
+     *
+     * @param chatId    Chat Id.
+     * @return          A flow of [ChatRoom]
+     */
+    fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
+
+    /**
+     * Gets chat room if it exists
+     *
+     * @param chatId      Chat Id
+     * @return [ChatRoom] containing the updated data.
+     */
+    fun getChatRoom(chatId: Long): ChatRoom?
 }
