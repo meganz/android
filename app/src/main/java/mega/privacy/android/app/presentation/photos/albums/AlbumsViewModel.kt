@@ -213,12 +213,15 @@ class AlbumsViewModel @Inject constructor(
             if (checkTitleValidity(finalTitle, proscribedStrings)) {
                 val album = createAlbum(finalTitle)
                 _state.update {
-                    it.copy(currentAlbum = album)
+                    it.copy(currentAlbum = album, isAlbumCreatedSuccessfully = true)
                 }
                 Timber.d("Current album: ${album.title}")
             }
         } catch (exception: Exception) {
             Timber.e(exception)
+            _state.update {
+                it.copy(isAlbumCreatedSuccessfully = false)
+            }
         }
     }
 
@@ -278,6 +281,10 @@ class AlbumsViewModel @Inject constructor(
 
     fun setNewAlbumNameValidity(valid: Boolean) = _state.update {
         it.copy(isInputNameValid = valid)
+    }
+
+    fun setIsAlbumCreatedSuccessfully(success: Boolean) = _state.update {
+        it.copy(isAlbumCreatedSuccessfully = success)
     }
 
     private fun shouldAddAlbum(
