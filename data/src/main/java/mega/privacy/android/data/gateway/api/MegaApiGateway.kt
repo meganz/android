@@ -112,6 +112,11 @@ interface MegaApiGateway {
     val accountAuth: String
 
     /**
+     * Fingerprint of the signing key of the current account
+     */
+    val myCredentials: String?
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean
@@ -949,4 +954,28 @@ interface MegaApiGateway {
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
+
+    /**
+     * Gets the credentials of a given user.
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun getUserCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Resets credentials of a given user
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun resetCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Verifies credentials of a given user.
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
 }
