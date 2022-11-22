@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -64,11 +63,12 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.data.model.chat.NonContactInfo;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.chat.NonContactInfo;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -459,12 +459,7 @@ public class ChatController {
                     } catch (Exception e) {
                         Timber.e(e);
                     }
-                    Spanned result;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     builder.append(result);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
@@ -616,7 +611,7 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
                     builder.append(fullNameTitle).append(": ");
                     String textToShow = "";
-                    switch(message.getTermCode()){
+                    switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         case MegaChatMessage.END_CALL_REASON_ENDED:
                             textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration()).toString();

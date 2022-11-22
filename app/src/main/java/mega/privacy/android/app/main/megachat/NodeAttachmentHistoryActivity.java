@@ -37,7 +37,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -265,12 +264,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
         }
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(result);
 
         linearLayoutList = (LinearLayout) findViewById(R.id.linear_layout_recycler_list);
@@ -546,7 +540,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     Timber.d("FileProviderOption");
                                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                     if (mediaFileUri == null) {
@@ -634,7 +628,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                             String localPath = getLocalFile(node);
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     Timber.d("File Provider Option");
                                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                     if (mediaFileUri == null) {

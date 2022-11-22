@@ -6,7 +6,6 @@ import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
@@ -1163,9 +1162,7 @@ public class ChatActivity extends PasscodeActivity
         if (intent.resolveActivity(getPackageManager()) != null) {
             File photoFile = createImageFile();
             if (photoFile != null) {
-                Uri photoURI = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
-                        FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, photoFile) :
-                        Uri.fromFile(photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, photoFile);
 
                 mOutputFilePath = photoFile.getAbsolutePath();
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -4948,7 +4945,7 @@ public class ChatActivity extends PasscodeActivity
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
-            if (viewModel.getStorageState()== StorageState.PayWall) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning();
                 return false;
             }
@@ -5624,7 +5621,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (localPath != null) {
                 File mediaFile = new File(localPath);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                     if (mediaFileUri == null) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
@@ -5693,7 +5690,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (localPath != null) {
                 File mediaFile = new File(localPath);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                     if (mediaFileUri == null) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
@@ -6252,12 +6249,7 @@ public class ChatActivity extends PasscodeActivity
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(userTyping);
-                }
+                Spanned result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
 
                 userTypingText.setText(result);
                 break;
@@ -6268,12 +6260,7 @@ public class ChatActivity extends PasscodeActivity
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(userTyping);
-                }
+                Spanned result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
 
                 userTypingText.setText(result);
                 break;
@@ -6285,12 +6272,7 @@ public class ChatActivity extends PasscodeActivity
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(userTyping);
-                }
+                Spanned result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
 
                 userTypingText.setText(result);
                 break;

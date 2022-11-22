@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -56,7 +55,6 @@ import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.zippreview.domain.FileType
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
 import mega.privacy.android.domain.entity.SortOrder
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
 import java.util.zip.ZipException
@@ -334,7 +332,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         getExternalFilesDir(null)?.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && file.absolutePath.contains(path)) {
+            if (file.absolutePath.contains(path)) {
                 mediaIntent.setDataAndType(
                     FileProvider.getUriForFile(
                         this@ZipBrowserActivity,
@@ -358,17 +356,13 @@ class ZipBrowserActivity : PasscodeActivity() {
                 showSnackBar(resources.getString(R.string.intent_not_available))
 
                 val intentShare = Intent(Intent.ACTION_SEND)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intentShare.setDataAndType(
-                        FileProvider.getUriForFile(
-                            this@ZipBrowserActivity,
-                            URI_FILE_PROVIDER,
-                            file
-                        ), type
-                    )
-                } else {
-                    intentShare.setDataAndType(Uri.fromFile(file), type)
-                }
+                intentShare.setDataAndType(
+                    FileProvider.getUriForFile(
+                        this@ZipBrowserActivity,
+                        URI_FILE_PROVIDER,
+                        file
+                    ), type
+                )
                 intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 if (MegaApiUtils.isIntentAvailable(this@ZipBrowserActivity, intentShare)) {
                     Timber.d("Call to startActivity(intentShare)")
@@ -402,17 +396,13 @@ class ZipBrowserActivity : PasscodeActivity() {
             zipAdapter
         )
         getExternalFilesDir(null)?.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && file.absolutePath.contains(path)) {
-                pdfIntent.setDataAndType(
-                    FileProvider.getUriForFile(
-                        this@ZipBrowserActivity,
-                        URI_FILE_PROVIDER,
-                        file
-                    ), type
-                )
-            } else {
-                pdfIntent.setDataAndType(Uri.fromFile(file), type)
-            }
+            pdfIntent.setDataAndType(
+                FileProvider.getUriForFile(
+                    this@ZipBrowserActivity,
+                    URI_FILE_PROVIDER,
+                    file
+                ), type
+            )
             pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivity(pdfIntent)
             overridePendingTransition(0, 0)
@@ -426,33 +416,25 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun MimeTypeList.otherFileOpen(file: File) {
         Timber.d("NOT Image, video, audio or pdf")
         val viewIntent = Intent(Intent.ACTION_VIEW)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            viewIntent.setDataAndType(
+        viewIntent.setDataAndType(
+            FileProvider.getUriForFile(
+                this@ZipBrowserActivity,
+                URI_FILE_PROVIDER,
+                file
+            ), type
+        )
+        viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        if (MegaApiUtils.isIntentAvailable(this@ZipBrowserActivity, viewIntent)) {
+            startActivity(viewIntent)
+        } else {
+            val intentShare = Intent(Intent.ACTION_SEND)
+            intentShare.setDataAndType(
                 FileProvider.getUriForFile(
                     this@ZipBrowserActivity,
                     URI_FILE_PROVIDER,
                     file
                 ), type
             )
-        } else {
-            viewIntent.setDataAndType(Uri.fromFile(file), type)
-        }
-        viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        if (MegaApiUtils.isIntentAvailable(this@ZipBrowserActivity, viewIntent)) {
-            startActivity(viewIntent)
-        } else {
-            val intentShare = Intent(Intent.ACTION_SEND)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                intentShare.setDataAndType(
-                    FileProvider.getUriForFile(
-                        this@ZipBrowserActivity,
-                        URI_FILE_PROVIDER,
-                        file
-                    ), type
-                )
-            } else {
-                intentShare.setDataAndType(Uri.fromFile(file), type)
-            }
             intentShare.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             if (MegaApiUtils.isIntentAvailable(this@ZipBrowserActivity, intentShare)) {
                 Timber.d("Call to startActivity(intentShare)")

@@ -8,7 +8,6 @@ import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View.*
@@ -28,9 +27,9 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import timber.log.Timber
@@ -99,7 +98,7 @@ class WebViewActivity : BaseActivity() {
                 override fun onShowFileChooser(
                     webView: WebView,
                     filePathCallback: ValueCallback<Array<Uri>>,
-                    fileChooserParams: FileChooserParams
+                    fileChooserParams: FileChooserParams,
                 ): Boolean {
                     mFilePathCallback = filePathCallback
                     mFileChooserParams = fileChooserParams
@@ -133,7 +132,7 @@ class WebViewActivity : BaseActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -268,16 +267,17 @@ class WebViewActivity : BaseActivity() {
         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, chooserArray)
 
-        val chooserLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.data == null) {
-                mFilePathCallback?.onReceiveValue(null)
-            } else if (mFilePathCallback != null) {
-                manageResult(result.data)
-            }
+        val chooserLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.data == null) {
+                    mFilePathCallback?.onReceiveValue(null)
+                } else if (mFilePathCallback != null) {
+                    manageResult(result.data)
+                }
 
-            pickedImage = null
-            pickedVideo = null
-        }
+                pickedImage = null
+                pickedVideo = null
+            }
 
         chooserLauncher.launch(chooserIntent)
 
@@ -346,7 +346,8 @@ class WebViewActivity : BaseActivity() {
                 @SuppressLint("SimpleDateFormat")
                 val fileName = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
-                file = CacheFolderManager.buildTempFile(this, fileName + getContentExtension(contentType))
+                file = CacheFolderManager.buildTempFile(this,
+                    fileName + getContentExtension(contentType))
             } catch (e: IOException) {
                 Timber.e(e, "Error creating temp file.")
             }
@@ -357,13 +358,11 @@ class WebViewActivity : BaseActivity() {
                 contentIntent.apply {
                     putExtra(
                         MediaStore.EXTRA_OUTPUT,
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            FileProvider.getUriForFile(
-                                this@WebViewActivity,
-                                AUTHORITY_STRING_FILE_PROVIDER,
-                                file
-                            )
-                        } else Uri.fromFile(file)
+                        FileProvider.getUriForFile(
+                            this@WebViewActivity,
+                            AUTHORITY_STRING_FILE_PROVIDER,
+                            file
+                        )
                     )
 
                     flags = FLAG_GRANT_WRITE_URI_PERMISSION and FLAG_GRANT_READ_URI_PERMISSION

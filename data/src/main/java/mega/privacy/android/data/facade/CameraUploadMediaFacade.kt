@@ -36,11 +36,7 @@ internal class CameraUploadMediaFacade @Inject constructor(
             Timber.d("Extract 0 Media - Cursor is NULL")
         }
 
-    private fun getPageSize(isVideo: Boolean): Int = if (isVideo) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 50 else 10
-    } else {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) 1000 else 400
-    }
+    private fun getPageSize(isVideo: Boolean): Int = if (isVideo) 50 else 1000
 
     private fun createMediaCursor(
         parentPath: String?,

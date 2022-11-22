@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.util.DisplayMetrics;
@@ -354,14 +353,10 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
                 share.setType("image/*");
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Timber.d("Use provider to share");
-                    Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", qrCodeFile);
-                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                } else {
-                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + qrCodeFile));
-                }
+                Timber.d("Use provider to share");
+                Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", qrCodeFile);
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             } else {
                 showSnackbar(rootLevelLayout, getString(R.string.error_share_qr));
@@ -431,7 +426,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
             if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
                 scanCodeFragment.myEmail = request.getEmail();
                 if (e.getErrorCode() == MegaError.API_OK) {
-Timber.d("OK INVITE CONTACT: %s",  request.getEmail());
+                    Timber.d("OK INVITE CONTACT: %s", request.getEmail());
                     scanCodeFragment.dialogTitleContent = R.string.invite_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, false);

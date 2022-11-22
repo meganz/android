@@ -465,12 +465,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
                         ).replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
 
                 } else {
@@ -492,12 +487,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
                         ).replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 }
             } else {
