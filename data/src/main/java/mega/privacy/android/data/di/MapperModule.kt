@@ -9,6 +9,7 @@ import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
@@ -24,6 +25,7 @@ import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
+import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
@@ -58,6 +60,7 @@ import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
+import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
@@ -68,6 +71,7 @@ import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
+import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
@@ -376,4 +380,16 @@ internal class MapperModule {
      */
     @Provides
     fun provideAccountDetailMapper(): AccountDetailMapper = ::toAccountDetail
+
+    /**
+     * Provide [MyAccountCredentialsMapper] mapper
+     */
+    @Provides
+    fun provideMyAccountCredentialsMapper(): MyAccountCredentialsMapper = ::toMyAccountCredentials
+
+    /**
+     * Provide [ContactCredentialsMapper] mapper
+     */
+    @Provides
+    fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
 }
