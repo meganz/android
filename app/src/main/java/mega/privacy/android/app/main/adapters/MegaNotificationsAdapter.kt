@@ -30,7 +30,10 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
+import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
+import kotlin.math.absoluteValue
 
 class MegaNotificationsAdapter(
     private val context: Context,
@@ -887,14 +890,17 @@ class MegaNotificationsAdapter(
                     ViewGroup.LayoutParams.WRAP_CONTENT)
                 holder.itemLayout.layoutParams = params
                 holder.itemLayout.visibility = View.VISIBLE
-                section = alert.heading.uppercase(Locale.getDefault())
+                section = StringResourcesUtils.getString(R.string.notifications_payment_title)
+                    .uppercase(Locale.getDefault())
                 holder.sectionIcon.visibility = View.GONE
                 holder.titleIcon.visibility = View.GONE
                 holder.sectionText.setTextColor(ContextCompat.getColor(context,
                     R.color.red_600_red_300))
                 holder.titleText.visibility = View.VISIBLE
                 holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14f)
-                holder.titleText.text = alert.title
+                holder.titleText.text =
+                    StringResourcesUtils.getString(R.string.notifications_pro_payment_received,
+                        alert.getString(0))
                 holder.descriptionText.visibility = View.GONE
 
                 //Description not shown, adjust title
@@ -923,14 +929,17 @@ class MegaNotificationsAdapter(
                     ViewGroup.LayoutParams.WRAP_CONTENT)
                 holder.itemLayout.layoutParams = params
                 holder.itemLayout.visibility = View.VISIBLE
-                section = alert.heading.uppercase(Locale.getDefault())
+                section = StringResourcesUtils.getString(R.string.notifications_payment_title)
+                    .uppercase(Locale.getDefault())
                 holder.sectionIcon.visibility = View.GONE
                 holder.titleIcon.visibility = View.GONE
                 holder.sectionText.setTextColor(ContextCompat.getColor(context,
                     R.color.red_600_red_300))
                 holder.titleText.visibility = View.VISIBLE
                 holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14f)
-                holder.titleText.text = alert.title
+                holder.titleText.text =
+                    StringResourcesUtils.getString(R.string.notifications_pro_payment_failed,
+                        alert.getString(0))
                 holder.descriptionText.visibility = View.GONE
 
                 //Description not shown, adjust title
@@ -959,14 +968,22 @@ class MegaNotificationsAdapter(
                     ViewGroup.LayoutParams.WRAP_CONTENT)
                 holder.itemLayout.layoutParams = params
                 holder.itemLayout.visibility = View.VISIBLE
-                section = alert.heading
+                section = StringResourcesUtils.getString(R.string.notifications_pro_expiring_title)
                 holder.sectionIcon.visibility = View.GONE
                 holder.titleIcon.visibility = View.GONE
                 holder.sectionText.setTextColor(ContextCompat.getColor(context,
                     R.color.red_600_red_300))
                 holder.titleText.visibility = View.VISIBLE
                 holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14f)
-                holder.titleText.text = alert.title
+                val days =
+                    TimeUnit.SECONDS.toDays(alert.getTimestamp(1) - TimeUnit.MILLISECONDS.toSeconds(
+                        Date().time)).toInt()
+                val stringId =
+                    if (days >= 0) R.plurals.notifications_expiring_pro_plan_text else R.plurals.notifications_expired_pro_plan_text
+                holder.titleText.text =
+                    StringResourcesUtils.getQuantityString(stringId,
+                        days.absoluteValue,
+                        days.absoluteValue)
                 holder.descriptionText.visibility = View.GONE
 
                 //Description not shown, adjust title

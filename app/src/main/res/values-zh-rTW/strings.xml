@@ -3930,21 +3930,22 @@
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">新相簿</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">分享會議連結</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">查看更多</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">離開群組</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album"></string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新相簿（%d）</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title"></string>
+    <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="other"></item>
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
     </plurals>
 </resources>

@@ -10,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
@@ -126,6 +125,8 @@ class SortByHeaderViewModel @Inject constructor(
         _orderChangeEvent.value = Event(it)
     }
 
+    private val _oldOrder = MutableStateFlow<SortOrder?>(null)
+
     init {
         // Use "sticky" to observe the value set in ManagerActivity onCreate()
         @Suppress("UNCHECKED_CAST")
@@ -145,7 +146,6 @@ class SortByHeaderViewModel @Inject constructor(
         }
     }
 
-    private val _oldOrder = MutableStateFlow<SortOrder?>(null)
 
     /**
      * Previously Selected Order

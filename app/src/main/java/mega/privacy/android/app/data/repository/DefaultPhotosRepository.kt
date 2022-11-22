@@ -22,19 +22,18 @@ import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -238,7 +237,6 @@ class DefaultPhotosRepository @Inject constructor(
             dateUtilFacade.fromEpoch(megaNode.modificationTime),
             getThumbnailCacheFilePath(megaNode),
             getPreviewCacheFilePath(megaNode),
-            megaNode.duration,
             fileTypeInfoMapper(megaNode),
         )
 

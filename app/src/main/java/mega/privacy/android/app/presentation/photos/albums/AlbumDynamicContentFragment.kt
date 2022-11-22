@@ -166,10 +166,16 @@ class AlbumDynamicContentFragment : Fragment() {
             )
         } else {
             when (uiState.currentAlbum) {
-                Album.FavouriteAlbum -> EmptyView()
+                Album.FavouriteAlbum -> EmptyView(
+                    imageResId = R.drawable.ic_photos_favourite_album,
+                    textResId = R.string.empty_hint_favourite_album
+                )
                 Album.GifAlbum -> Back()
                 Album.RawAlbum -> Back()
-                is Album.UserAlbum -> Back()
+                is Album.UserAlbum -> EmptyView(
+                    imageResId = R.drawable.ic_photos_user_album_empty,
+                    textResId = R.string.photos_user_album_empty_album
+                )
                 null -> Back()
             }
         }

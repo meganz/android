@@ -4,7 +4,14 @@ package mega.privacy.android.domain.entity
  * File type info
  */
 sealed interface FileTypeInfo {
+    /**
+     * type of file
+     */
     val type: String
+
+    /**
+     * file extension
+     */
     val extension: String
 }
 
@@ -82,6 +89,10 @@ data class StaticImageFileTypeInfo(
 data class AudioFileTypeInfo(
     override val type: String,
     override val extension: String,
+    /**
+     * Duration
+     */
+    val duration: Int,
 ) : FileTypeInfo
 
 /**
@@ -139,4 +150,18 @@ data class UnMappedFileTypeInfo(
 data class VideoFileTypeInfo(
     override val type: String,
     override val extension: String,
+    /**
+     * Duration
+     */
+    val duration: Int,
 ) : FileTypeInfo
+
+
+/**
+ *
+ */
+fun FileTypeInfo.getDuration() = when (this) {
+    is AudioFileTypeInfo -> this.duration
+    is VideoFileTypeInfo -> this.duration
+    else -> 0
+}

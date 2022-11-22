@@ -21,7 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
-import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import nz.mega.sdk.MegaApiJava
@@ -132,16 +132,17 @@ class FavouritesFragmentTest {
 
     private fun initData() {
         val node = mock<MegaNode>()
-        whenever(node.isFolder).thenReturn(true)
+        val typedNode = mock<TypedFolderNode>()
+        whenever(node.isFolder).thenReturn(false)
         whenever(node.isInShare).thenReturn(true)
-        whenever(node.name).thenReturn("testName.txt")
+        whenever(typedNode.name).thenReturn("testName")
+        whenever(node.name).thenReturn("testName")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mock<TypedFolderNode>()
-        val favourite = mock<Favourite>()
+        val favourite = mock<FavouriteFolder>()
         whenever(favourite.labelColour).thenReturn(R.color.salmon_400_salmon_300)
-        whenever(favourite.isFolder).thenReturn(true)
-        val list = listOf(favouriteInfo)
+        whenever(favourite.typedNode).thenReturn(typedNode)
+        val list = listOf(typedNode)
         runBlocking {
             whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(TestMapperModule.sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(

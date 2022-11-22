@@ -21,18 +21,20 @@ import mega.privacy.android.presentation.theme.h6
  */
 @Composable
 fun MegaDialog(
+    modifier: Modifier = Modifier,
+    properties: DialogProperties = DialogProperties(),
     onDismissRequest: () -> Unit,
     titleStringID: Int? = null,
     body: @Composable (() -> Unit) = {},
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable () -> Unit,
-    properties: DialogProperties = DialogProperties()
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = properties,
     ) {
         Surface(
+            modifier = modifier,
             elevation = 24.dp,
             shape = RoundedCornerShape(4.dp)
         ) {

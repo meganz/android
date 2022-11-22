@@ -1504,38 +1504,43 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun requestFinished(request: MegaRequest, e: MegaError) {
-        if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
-            Timber.d("Cancel transfer received")
-            if (e.errorCode == MegaError.API_OK) {
-                delay(200)
-                megaApi?.let {
-                    @Suppress("DEPRECATION")
-                    if (it.numPendingUploads <= 0) {
-                        it.resetTotalUploads()
+        when (request.type) {
+            MegaRequest.TYPE_CANCEL_TRANSFER -> {
+                Timber.d("Cancel transfer received")
+                if (e.errorCode == MegaError.API_OK) {
+                    delay(200)
+                    megaApi?.let {
+                        @Suppress("DEPRECATION")
+                        if (it.numPendingUploads <= 0) {
+                            it.resetTotalUploads()
+                        }
                     }
+                } else {
+                    endService()
                 }
-            } else {
-                endService()
             }
-        } else if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
-            @Suppress("DEPRECATION")
-            if (e.errorCode == MegaError.API_OK && (megaApi?.numPendingUploads ?: 1) <= 0) {
-                megaApi?.resetTotalUploads()
+            MegaRequest.TYPE_CANCEL_TRANSFERS -> {
+                @Suppress("DEPRECATION")
+                if (e.errorCode == MegaError.API_OK && (megaApi?.numPendingUploads ?: 1) <= 0) {
+                    megaApi?.resetTotalUploads()
+                }
             }
-        } else if (request.type == MegaRequest.TYPE_PAUSE_TRANSFERS) {
-            Timber.d("PauseTransfer false received")
-            if (e.errorCode == MegaError.API_OK) {
-                endService()
+            MegaRequest.TYPE_PAUSE_TRANSFERS -> {
+                Timber.d("PauseTransfer false received")
+                if (e.errorCode == MegaError.API_OK) {
+                    endService()
+                }
             }
-        } else if (request.type == MegaRequest.TYPE_COPY) {
-            if (e.errorCode == MegaError.API_OK) {
-                val node = getNodeByHandle(request.nodeHandle)
-                val fingerPrint = node?.fingerprint
-                val isSecondary = node?.parentHandle == getSecondarySyncHandle()
-                fingerPrint?.let { deleteSyncRecordByFingerprint(it, fingerPrint, isSecondary) }
-                node?.let { onUploadSuccess(it, isSecondary) }
+            MegaRequest.TYPE_COPY -> {
+                if (e.errorCode == MegaError.API_OK) {
+                    val node = getNodeByHandle(request.nodeHandle)
+                    val fingerPrint = node?.fingerprint
+                    val isSecondary = node?.parentHandle == getSecondarySyncHandle()
+                    fingerPrint?.let { deleteSyncRecordByFingerprint(it, fingerPrint, isSecondary) }
+                    node?.let { onUploadSuccess(it, isSecondary) }
+                }
+                updateUpload()
             }
-            updateUpload()
         }
     }
 

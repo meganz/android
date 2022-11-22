@@ -1,15 +1,12 @@
+/**
+ * This file is a common module that hosts methods that are called by different CI/CD scripts.
+ */
 
-
-
-void helloWorld() {
-    println("####### Entering common.helloWorld() #######")
-    sh """
-        echo hello from common.groovy
-    """
-    println("workspace = ${env.WORKSPACE}")
-    println("path = ${env.PATH}")
-}
-
+/**
+ * Check out mega chat SDK by commit ID
+ *
+ * @param megaChatCommitId commit ID
+ */
 void checkoutMegaChatSdkByCommit(String megaChatCommitId) {
     println("####### Entering common.checkoutMegaChatSdkByCommit() #######")
     sh """
@@ -69,11 +66,37 @@ void fetchSdkSubmodules() {
 
 /**
  * Check if this build is triggered by a GitLab Merge Request.
- * @return true if this build is triggerd by a GitLab MR. False if this build is triggerd
+ * @return true if this build is triggered by a GitLab MR. False if this build is triggerd
  * by a plain git push.
+ * This method can be used for both CI and CD pipeline.
  */
 private boolean hasGitLabMergeRequest() {
-    return env.gitlabMergeRequestIid != null && !env.gitlabMergeRequestIid.isEmpty()
+    def hasMergeRequestInCD = env.gitlabMergeRequestIid != null && !env.gitlabMergeRequestIid.isEmpty()
+    def hasMergeRequestInCI = env.BRANCH_NAME != null && env.BRANCH_NAME.startsWith('MR-')
+
+    return hasMergeRequestInCD || hasMergeRequestInCI
+}
+
+/**
+ * Get the MergeRequest ID for CI
+ * @return MR number if job is triggered in CI. Otherwise return null.
+ */
+def getMrNumberInCI() {
+    def branchName = env.BRANCH_NAME
+    if (branchName != null && branchName.startsWith('MR-')) {
+        return branchName.replace('MR-', '')
+    } else {
+        return null
+    }
+}
+
+/**
+ * Get MergeRequest ID for CD
+ *
+ * @return MR Number if job is triggered in CD. Otherwise return null.
+ */
+def getMrNumberInCD() {
+    return env.gitlabMergeRequestIid
 }
 
 /**
@@ -82,8 +105,13 @@ private boolean hasGitLabMergeRequest() {
  */
 void sendToMR(String message) {
     println("####### Entering common.sendToMR() #######")
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.gitlabMergeRequestIid
+
+    def mrNumber = getMrNumberInCD()
+    if (mrNumber == null) {
+        mrNumber = getMrNumberInCI()
+    }
+
+    if (mrNumber != null && !mrNumber.isEmpty()) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
             env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"

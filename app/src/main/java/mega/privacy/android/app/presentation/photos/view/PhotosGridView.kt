@@ -49,6 +49,7 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.grey_alpha_032
 import mega.privacy.android.presentation.theme.white
@@ -187,7 +188,7 @@ internal fun PhotoViewContainer(
             )
 
             Text(
-                text = TimeUtils.getVideoDuration(photo.duration),
+                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.getDuration()),
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()
@@ -289,4 +290,3 @@ private fun dateText(
         )
     )
 }
-

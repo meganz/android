@@ -4,7 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Pair
 import android.view.LayoutInflater
-import android.view.SurfaceView
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -49,9 +49,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     // Views
     private lateinit var rootLayout: ConstraintLayout
-    private lateinit var videoSurfaceView: SurfaceView
+    private lateinit var videoTextureView: TextureView
     private lateinit var avatarImageView: RoundedImageView
     private lateinit var onHoldImageView: ImageView
+    private var microOffImageView: ImageView? = null
 
     private lateinit var inMeetingFragment: InMeetingFragment
 
@@ -207,17 +208,20 @@ class IndividualCallFragment : MeetingBaseFragment() {
         // The cast is essential here not repeated code.
         if (binding is SelfFeedFloatingWindowFragmentBinding) {
             rootLayout = binding.root
-            videoSurfaceView = binding.video
+            videoTextureView = binding.video
             avatarImageView = binding.avatar
             onHoldImageView = binding.onHoldIcon
+            microOffImageView = binding.microOffIcon
         }
 
         if (binding is IndividualCallFragmentBinding) {
             rootLayout = binding.root
-            videoSurfaceView = binding.video
+            videoTextureView = binding.video
             avatarImageView = binding.avatar
             onHoldImageView = binding.onHoldIcon
         }
+
+        videoTextureView.isOpaque = false
 
         return binding.root
     }
@@ -242,6 +246,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     videoListener?.setAlpha(videoAlphaFloating)
                 }
             }
+
+            inMeetingViewModel.getCall()?.hasLocalAudio()
+                ?.let { showLocalFloatingViewMicroMutedIcon(!it) }
         } else {
             videoListener?.setAlpha(videoAlpha)
         }
@@ -257,11 +264,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun addListener(clientId: Long) {
         if (videoListener == null) {
             videoListener = IndividualCallVideoListener(
-                videoSurfaceView,
+                videoTextureView,
                 resources.displayMetrics,
                 clientId,
-                isFloatingWindow = false,
-                isOneToOneCall = true
+                isFloatingWindow = false
             )
             Timber.d("Participant $clientId video listener created")
         }
@@ -355,6 +361,15 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     /**
+     * Method to show or hide the local micro muted icon of the floating view
+     *
+     * @param show Indicates if the call has local audio or not
+     */
+    fun showLocalFloatingViewMicroMutedIcon(show: Boolean) {
+        microOffImageView?.isVisible = show
+    }
+
+    /**
      * Method to close Video
      *
      * @param peerId User handle of a participant
@@ -364,7 +379,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (isInvalid(peerId, clientId)) return
 
         Timber.d("Close video of $clientId")
-        videoSurfaceView.isVisible = false
+        videoTextureView.isVisible = false
 
         if (isFloatingWindow) {
             rootLayout.background = ContextCompat.getDrawable(
@@ -466,17 +481,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 videoListener!!.width = 0
             }
             inMeetingViewModel.isMe(peerId) -> {
-                var isOneToOneChat = true
-                if (isFloatingWindow && !inMeetingViewModel.isOneToOneCall()) {
-                    isOneToOneChat = false
-                }
-
                 videoListener = IndividualCallVideoListener(
-                    videoSurfaceView,
+                    videoTextureView,
                     resources.displayMetrics,
                     MEGACHAT_INVALID_HANDLE,
-                    isFloatingWindow,
-                    isOneToOneChat
+                    isFloatingWindow
                 )
                 // Check bottom panel's expanding state, if it's expanded, video should invisible.
                 videoListener?.setAlpha(videoAlphaFloating)
@@ -486,11 +495,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
             else -> {
                 Timber.d("Video listener is null")
                 videoListener = IndividualCallVideoListener(
-                    videoSurfaceView,
+                    videoTextureView,
                     resources.displayMetrics,
                     clientId,
-                    isFloatingWindow = false,
-                    isOneToOneCall = true
+                    isFloatingWindow = false
                 )
                 Timber.d("Participant $clientId video listener created")
 
@@ -510,7 +518,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
         rootLayout.isVisible = true
-        videoSurfaceView.isVisible = true
+        videoTextureView.isVisible = true
         rootLayout.background = null
     }
 

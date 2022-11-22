@@ -19,6 +19,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -79,20 +80,19 @@ import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
-import mega.privacy.android.app.utils.RxUtil.IGNORE
-import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
-import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
@@ -116,6 +116,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val playlistItemMapper: PlaylistItemMapper,
+    private val monitorConnectivity: MonitorConnectivity,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -134,7 +135,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     private val playerSource = MutableLiveData<MediaPlaySources>()
 
-    private val mediaItemToRemove = MutableLiveData<Int>()
+    private val mediaItemToRemove = MutableSharedFlow<Int>()
 
     private val nodeNameUpdate = MutableLiveData<String>()
 
@@ -155,7 +156,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private var mediaPlayback = MutableLiveData<Boolean>()
 
     private val playlistItems = mutableListOf<PlaylistItem>()
-    private val playlistItemsMap = mutableMapOf<String, PlaylistItem>()
+
     private val itemsSelectedMap = mutableMapOf<Long, PlaylistItem>()
 
     private var playlistSearchQuery: String? = null
@@ -273,7 +274,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 when (type) {
                     OFFLINE_ADAPTER -> {
                         playlistTitle.postValue(getOfflineFolderName(context, firstPlayHandle))
-                        buildPlaylistFromOfflineNodes(type, intent, firstPlayHandle)
+                        buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                     }
                     AUDIO_BROWSE_ADAPTER -> {
                         playlistTitle.postValue(getString(R.string.upload_to_audio))
@@ -422,8 +423,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 playlistTitle.postValue(File(zipPath).parentFile?.name
                                     ?: "")
                                 File(zipPath).parentFile?.listFiles()?.let { files ->
-                                    buildPlaySourcesByFiles(type = type,
-                                        files = files.asList(),
+                                    buildPlaySourcesByFiles(files = files.asList(),
                                         firstPlayHandle = firstPlayHandle)
                                 }
                             }
@@ -440,7 +440,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 postPlayingThumbnail()
             }
         } else {
-            playlistClear()
+            playlistItems.clear()
 
             val node: TypedFileNode? =
                 mediaPlayerRepository.getTypedNodeByHandle(firstPlayHandle) as? TypedFileNode
@@ -457,15 +457,18 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 }
             }
 
-            convertToPlaylistItem(nodeHandle = firstPlayHandle,
-                nodeName = firstPlayNodeName,
-                thumbnailFile = thumbnail,
-                index = 0,
-                type = TYPE_PLAYING,
-                size = node?.size ?: INVALID_SIZE,
-                duration = node?.duration ?: 0)
+            playlistItemMapper(firstPlayHandle,
+                firstPlayNodeName,
+                thumbnail,
+                0,
+                TYPE_PLAYING,
+                node?.size ?: INVALID_SIZE,
+                node?.type?.getDuration() ?: 0)
+                .let { playlistItem ->
+                    playlistItems.add(playlistItem)
+                }
 
-            postPlaylistItems()
+            recreateAndUpdatePlaylistItems()
 
             if (thumbnail != null && !thumbnail.exists() && node != null) {
                 mediaPlayerRepository.getThumbnail(isAudioPlayer,
@@ -484,8 +487,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
         return true
     }
 
-    private suspend fun buildPlaylistFromOfflineNodes(
-        type: Int,
+    /**
+     * Build play sources by node OfflineNodes
+     *
+     * @param intent Intent
+     * @param firstPlayHandle the index of first playing item
+     */
+    private fun buildPlaylistFromOfflineNodes(
         intent: Intent,
         firstPlayHandle: Long,
     ) {
@@ -496,19 +504,53 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 @Suppress("DEPRECATION")
                 getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
             }
-        }?.let { nodes ->
-            buildPlaySourcesByMegaOffline(type = type,
-                offlineFiles = nodes,
-                firstPlayHandle = firstPlayHandle)
+        }?.let { offlineFiles ->
+            playlistItems.clear()
+
+            val mediaItems = mutableListOf<MediaItem>()
+            var firstPlayIndex = 0
+
+            offlineFiles.filter {
+                getOfflineFile(context, it).let { file ->
+                    isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
+                }
+            }.mapIndexed { currentIndex, megaOffline ->
+                mediaItems.add(
+                    mediaItemFromFile(getOfflineFile(context, megaOffline), megaOffline.handle)
+                )
+                if (megaOffline.handle.toLong() == firstPlayHandle) {
+                    firstPlayIndex = currentIndex
+                }
+
+                playlistItemMapper(megaOffline.handle.toLong(),
+                    megaOffline.name,
+                    offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
+                    currentIndex,
+                    TYPE_NEXT,
+                    megaOffline.getSize(context),
+                    0)
+                    .let { playlistItem ->
+                        playlistItems.add(playlistItem)
+                    }
+            }
+
+            updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
         }
     }
 
+    /**
+     * Build play sources by node TypedNodes
+     *
+     * @param type adapter type
+     * @param typedNodes [TypedNode] list
+     * @param firstPlayHandle the index of first playing item
+     */
     private suspend fun buildPlaySourcesByTypedNodes(
         type: Int,
         typedNodes: List<TypedNode>,
         firstPlayHandle: Long,
     ) {
-        playlistClear()
+        playlistItems.clear()
 
         val mediaItems = ArrayList<MediaItem>()
         var firstPlayIndex = 0
@@ -546,128 +588,24 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     File(path)
                 }
 
-                convertToPlaylistItem(nodeHandle = typedNode.id.id,
-                    nodeName = typedNode.name,
-                    thumbnailFile = thumbnail,
-                    index = currentIndex,
-                    type = TYPE_NEXT,
-                    size = typedNode.size,
-                    duration = typedNode.duration)
+                playlistItemMapper(typedNode.id.id,
+                    typedNode.name,
+                    thumbnail,
+                    currentIndex,
+                    TYPE_NEXT,
+                    typedNode.size,
+                    typedNode.type.getDuration())
+                    .let { playlistItem ->
+                        playlistItems.add(playlistItem)
+                    }
 
                 if (thumbnail != null && !thumbnail.exists()) {
                     nodesWithoutThumbnail.add(Pair(typedNode.id.id, thumbnail))
                 }
             }
         }
-        updateMediaItems(mediaItems, firstPlayIndex, nodesWithoutThumbnail, type)
-    }
 
-    private suspend fun buildPlaylistFromHandles(
-        type: Int,
-        handles: List<Long>,
-        firstPlayHandle: Long,
-    ) {
-        buildPlaySourcesByTypedNodes(type = type,
-            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles),
-            firstPlayHandle = firstPlayHandle)
-    }
-
-    private suspend fun buildPlaySourcesByMegaOffline(
-        type: Int,
-        offlineFiles: List<MegaOffline>,
-        firstPlayHandle: Long,
-    ) {
-        playlistClear()
-
-        val mediaItems = ArrayList<MediaItem>()
-        var firstPlayIndex = 0
-
-        offlineFiles.filter {
-            getOfflineFile(context, it).let { file ->
-                isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
-            }
-        }.mapIndexed { currentIndex, megaOffline ->
-            mediaItems.add(
-                mediaItemFromFile(getOfflineFile(context, megaOffline), megaOffline.handle)
-            )
-            if (megaOffline.handle.toLong() == firstPlayHandle) {
-                firstPlayIndex = currentIndex
-            }
-            convertToPlaylistItem(nodeHandle = megaOffline.handle.toLong(),
-                nodeName = megaOffline.name,
-                thumbnailFile = offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
-                index = currentIndex,
-                type = TYPE_NEXT,
-                size = megaOffline.getSize(context),
-                duration = 0
-            )
-        }
-        updateMediaItems(mediaItems = mediaItems, firstPlayIndex = firstPlayIndex, type = type)
-    }
-
-    private suspend fun buildPlaySourcesByFiles(
-        type: Int,
-        files: List<File>,
-        firstPlayHandle: Long,
-    ) {
-        playlistClear()
-
-        val mediaItems = ArrayList<MediaItem>()
-        var firstPlayIndex = 0
-
-        files.filter {
-            it.isFile && filterByNodeName(it.name)
-        }.mapIndexed { currentIndex, file ->
-            mediaItems.add(mediaItemFromFile(file, file.name.hashCode().toString()))
-
-            if (file.name.hashCode().toLong() == firstPlayHandle) {
-                firstPlayIndex = currentIndex
-            }
-            convertToPlaylistItem(nodeHandle = file.name.hashCode().toLong(),
-                nodeName = file.name,
-                thumbnailFile = null,
-                index = currentIndex,
-                type = TYPE_NEXT,
-                size = file.length(),
-                duration = 0
-            )
-        }
-        updateMediaItems(mediaItems = mediaItems, firstPlayIndex = firstPlayIndex, type = type)
-    }
-
-    private fun playlistClear() {
-        playlistItems.clear()
-        playlistItemsMap.clear()
-    }
-
-    private fun convertToPlaylistItem(
-        nodeHandle: Long,
-        nodeName: String,
-        thumbnailFile: File?,
-        index: Int,
-        type: Int,
-        size: Long = 0,
-        duration: Int = 0,
-    ) {
-        playlistItemMapper(nodeHandle, nodeName, thumbnailFile, index, type, size, duration)
-            .let { playlistItem ->
-                playlistItems.add(playlistItem)
-                playlistItemsMap[nodeHandle.toString()] = playlistItem
-            }
-    }
-
-    private suspend fun updateMediaItems(
-        mediaItems: ArrayList<MediaItem>,
-        firstPlayIndex: Int,
-        nodesWithoutThumbnail: ArrayList<Pair<Long, File>>? = null,
-        type: Int,
-    ) {
-        if (mediaItems.isNotEmpty()) {
-            playerSource.postValue(MediaPlaySources(mediaItems, firstPlayIndex, null))
-            postPlaylistItems()
-        }
-
-        if (nodesWithoutThumbnail != null && nodesWithoutThumbnail.isNotEmpty() && isOnline(context)) {
+        if (nodesWithoutThumbnail.isNotEmpty() && monitorConnectivity().value) {
             sharingScope.launch(ioDispatcher) {
                 nodesWithoutThumbnail.map {
                     mediaPlayerRepository.getThumbnail(
@@ -681,6 +619,80 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     }
                 }
             }
+        }
+        updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
+    }
+
+    /**
+     * Build play sources by node handles
+     *
+     * @param type adapter type
+     * @param handles node handles
+     * @param firstPlayHandle the index of first playing item
+     */
+    private suspend fun buildPlaylistFromHandles(
+        type: Int,
+        handles: List<Long>,
+        firstPlayHandle: Long,
+    ) {
+        buildPlaySourcesByTypedNodes(type = type,
+            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles),
+            firstPlayHandle = firstPlayHandle)
+    }
+
+    /**
+     * Build play sources by files
+     *
+     * @param files media files
+     * @param firstPlayHandle the index of first playing item
+     */
+    private fun buildPlaySourcesByFiles(
+        files: List<File>,
+        firstPlayHandle: Long,
+    ) {
+        playlistItems.clear()
+
+        val mediaItems = ArrayList<MediaItem>()
+        var firstPlayIndex = 0
+
+        files.filter {
+            it.isFile && filterByNodeName(it.name)
+        }.mapIndexed { currentIndex, file ->
+            mediaItems.add(mediaItemFromFile(file, file.name.hashCode().toString()))
+
+            if (file.name.hashCode().toLong() == firstPlayHandle) {
+                firstPlayIndex = currentIndex
+            }
+
+            playlistItemMapper(file.name.hashCode().toLong(),
+                file.name,
+                null,
+                currentIndex,
+                TYPE_NEXT,
+                file.length(),
+                0)
+                .let { playlistItem ->
+                    playlistItems.add(playlistItem)
+                }
+        }
+        updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
+    }
+
+    /**
+     * Update play sources for media player and playlist
+     *
+     * @param mediaItems media items
+     * @param items playlist items
+     * @param firstPlayIndex the index of first playing item
+     */
+    private fun updatePlaySources(
+        mediaItems: List<MediaItem>,
+        items: List<PlaylistItem>,
+        firstPlayIndex: Int,
+    ) {
+        if (mediaItems.isNotEmpty() && items.isNotEmpty()) {
+            playerSource.postValue(MediaPlaySources(mediaItems, firstPlayIndex, null))
+            recreateAndUpdatePlaylistItems(items = items)
         }
     }
 
@@ -831,99 +843,95 @@ class MediaPlayerServiceViewModel @Inject constructor(
             .build()
 
 
-    private fun postPlayingThumbnail() {
-        val thumbnail = playlistItemsMap[playingHandle.toString()]?.thumbnail ?: return
-        playingThumbnail.postValue(thumbnail)
-    }
-
-    /**
-     * Get playlist from playlistItems
-     * @param isScroll whether scroll to the specific position
-     */
-    private fun postPlaylistItems(isScroll: Boolean = true) {
-        Timber.d("postPlaylistItems")
-        compositeDisposable.add(Completable.fromCallable {
-            doPostPlaylistItems(isScroll)
-        }
-            .subscribeOn(Schedulers.single())
-            .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel postPlaylistItems")))
-    }
-
-    /**
-     * Get playlist from playlistItems
-     * @param isScroll whether scroll to the specific position
-     */
-    private fun doPostPlaylistItems(isScroll: Boolean = true) {
-        Timber.d("doPostPlaylistItems ${playlistItems.size} items")
-        if (playlistItems.isEmpty()) {
-            return
-        }
-        var playingIndex = playlistItems.indexOfFirst { (nodeHandle) ->
+    private fun postPlayingThumbnail() =
+        playlistItems.firstOrNull { (nodeHandle) ->
             nodeHandle == playingHandle
-        }.takeIf { index ->
-            index in playlistItems.indices
-        } ?: 0
+        }?.thumbnail?.let {
+            playingThumbnail.postValue(it)
+        }
 
-        playingPosition = playingIndex
-
-        val order = shuffleOrder
-
-        val items = mutableListOf<PlaylistItem>()
-        if (shuffleEnabled && order.length == playlistItems.size) {
-            items.add(playlistItems[playingIndex])
-
-            var newPlayingIndex = 0
-            var index = order.getPreviousIndex(playingIndex)
-            while (index != C.INDEX_UNSET) {
-                items.add(0, playlistItems[index])
-                index = order.getPreviousIndex(index)
-                newPlayingIndex++
+    /**
+     * Recreate and update playlist items
+     *
+     * @param items playlist items
+     * @param isScroll true is scroll to target position, otherwise is false.
+     * @param isBuildPlaySources true is building play sources, otherwise is false.
+     */
+    private fun recreateAndUpdatePlaylistItems(
+        items: List<PlaylistItem> = playlistItems,
+        isScroll: Boolean = true,
+        isBuildPlaySources: Boolean = true,
+    ) {
+        sharingScope.launch(ioDispatcher) {
+            Timber.d("recreateAndUpdatePlaylistItems ${items.size} items")
+            if (items.isEmpty()) {
+                return@launch
             }
 
-            index = order.getNextIndex(playingIndex)
-            while (index != C.INDEX_UNSET) {
-                items.add(playlistItems[index])
-                index = order.getNextIndex(index)
+            playingPosition = items.indexOfFirst { (nodeHandle) ->
+                nodeHandle == playingHandle
+            }.takeIf { index ->
+                index in items.indices
+            } ?: 0
+
+            val recreatedItems = mutableListOf<PlaylistItem>()
+            // Adjust whether need to build play sources again to avoid playlist is reordered everytime playlist items updated
+            if (isBuildPlaySources && shuffleEnabled && shuffleOrder.length == items.size) {
+                recreatedItems.add(items[playingPosition])
+
+                var newPlayingIndex = 0
+
+                var index = shuffleOrder.getPreviousIndex(playingPosition)
+                while (index != C.INDEX_UNSET) {
+                    recreatedItems.add(0, items[index])
+                    index = shuffleOrder.getPreviousIndex(index)
+                    newPlayingIndex++
+                }
+
+                index = shuffleOrder.getNextIndex(playingPosition)
+                while (index != C.INDEX_UNSET) {
+                    recreatedItems.add(items[index])
+                    index = shuffleOrder.getNextIndex(index)
+                }
+
+                playingPosition = newPlayingIndex
+            } else {
+                recreatedItems.addAll(items)
             }
 
-            playingIndex = newPlayingIndex
-        } else {
-            items.addAll(playlistItems)
-        }
-
-        val searchQuery = playlistSearchQuery
-        if (!TextUtil.isTextEmpty(searchQuery)) {
-            filterPlaylistItems(items, searchQuery ?: return)
-            return
-        }
-        for ((index, item) in items.withIndex()) {
-            val type = when {
-                index < playingIndex -> TYPE_PREVIOUS
-                playingIndex == index -> TYPE_PLAYING
-                else -> TYPE_NEXT
+            val searchQuery = playlistSearchQuery
+            if (!TextUtil.isTextEmpty(searchQuery)) {
+                filterPlaylistItems(recreatedItems, searchQuery ?: return@launch)
+                return@launch
             }
-            items[index] =
-                item.finalizeItem(
-                    index = index,
-                    type = type,
-                    isSelected = item.isSelected,
-                    duration = item.duration,
-                )
-        }
+            for ((index, item) in recreatedItems.withIndex()) {
+                val type = when {
+                    index < playingPosition -> TYPE_PREVIOUS
+                    playingPosition == index -> TYPE_PLAYING
+                    else -> TYPE_NEXT
+                }
+                recreatedItems[index] =
+                    item.finalizeItem(
+                        index = index,
+                        type = type,
+                        isSelected = item.isSelected,
+                        duration = item.duration,
+                    )
+            }
+            val hasPrevious = playingPosition > 0
+            var scrollPosition = playingPosition
+            if (hasPrevious) {
+                recreatedItems[0] = recreatedItems[0].copy(headerIsVisible = true)
+            }
+            recreatedItems[playingPosition] =
+                recreatedItems[playingPosition].copy(headerIsVisible = true)
 
-        val hasPrevious = playingIndex > 0
-
-        var scrollPosition = playingIndex
-
-        if (hasPrevious) {
-            items[0] = items[0].copy(headerIsVisible = true)
+            Timber.d("recreateAndUpdatePlaylistItems post ${recreatedItems.size} items")
+            if (!isScroll) {
+                scrollPosition = -1
+            }
+            playlist.postValue(Pair(recreatedItems, scrollPosition))
         }
-        items[playingIndex] = items[playingIndex].copy(headerIsVisible = true)
-        Timber.d("doPostPlaylistItems post ${items.size} items")
-        if (!isScroll) {
-            scrollPosition = -1
-        }
-        playlist.postValue(Pair(items, scrollPosition))
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
@@ -943,7 +951,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun searchQueryUpdate(newText: String?) {
         playlistSearchQuery = newText
-        postPlaylistItems()
+        playlist.value?.first?.let {
+            recreateAndUpdatePlaylistItems(items = it, isBuildPlaySources = false)
+        }
     }
 
     override fun getCurrentIntent() = currentIntent
@@ -952,22 +962,29 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun setCurrentPlayingHandle(handle: Long) {
         playingHandle = handle
-        postPlaylistItems()
+        playlist.value?.first?.let { items ->
+            playingPosition = items.indexOfFirst { (nodeHandle) ->
+                nodeHandle == handle
+            }.takeIf { index ->
+                index in items.indices
+            } ?: 0
+            recreateAndUpdatePlaylistItems(items = items, isBuildPlaySources = false)
+        }
         postPlayingThumbnail()
     }
 
-    override fun getPlaylistItem(handle: String?): PlaylistItem? {
-        if (handle == null) {
-            return null
+    override fun getPlaylistItem(handle: String?): PlaylistItem? =
+        handle?.let {
+            playlistItems.firstOrNull { (nodeHandle) ->
+                nodeHandle == handle.toLong()
+            }
         }
-        return playlistItemsMap[handle]
-    }
 
     override fun getPlayingThumbnail() = playingThumbnail
 
     override fun playerSourceUpdate() = playerSource.asFlow()
 
-    override fun mediaItemToRemoveUpdate() = mediaItemToRemove.asFlow()
+    override fun mediaItemToRemoveUpdate() = mediaItemToRemove
 
     override fun nodeNameUpdate() = nodeNameUpdate.asFlow()
 
@@ -987,45 +1004,48 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun removeItem(handle: Long) {
         initPlayerSourceChanged()
-        removeSingleItem(handle)
-        if (playlistItems.isEmpty()) {
-            playlist.value = Pair(emptyList(), 0)
-            error.value = MegaError.API_ENOENT
-        } else {
+        val newItems = removeSingleItem(handle)
+        newItems?.let {
             resetRetryState()
-            postPlaylistItems()
+            recreateAndUpdatePlaylistItems(items = it)
+        } ?: let {
+            playlist.value = Pair(emptyList(), 0)
+            error.postValue(MegaError.API_ENOENT)
         }
     }
 
-    private fun removeSingleItem(handle: Long) {
-        playlistItems.indexOfFirst { (nodeHandle) ->
-            nodeHandle == handle
-        }.takeIf { index ->
-            index in playlistItems.indices
-        }?.let {
-            mediaItemToRemove.value = it
+    private fun removeSingleItem(handle: Long): List<PlaylistItem>? =
+        playlist.value?.first?.let { items ->
+            val newItems = items.toMutableList()
+            items.indexOfFirst { (nodeHandle) ->
+                nodeHandle == handle
+            }.takeIf { index ->
+                index in playlistItems.indices
+            }?.let { index ->
+                sharingScope.launch {
+                    mediaItemToRemove.emit(index)
+                }
+                newItems.removeIf { (nodeHandle) ->
+                    nodeHandle == handle
+                }
+                playlistItems.removeIf { (nodeHandle) ->
+                    nodeHandle == handle
+                }
+                playSourceChanged.removeIf { mediaItem ->
+                    mediaItem.mediaId.toLong() == handle
+                }
+            }
+            newItems
         }
-        playlistItems.removeIf { (nodeHandle) ->
-            nodeHandle == handle
-        }
-        playSourceChanged.removeIf { mediaItem ->
-            mediaItem.mediaId.toLong() == handle
-        }
-    }
 
-    override fun removeItems() {
+    override fun removeAllSelectedItems() {
         if (itemsSelectedMap.isNotEmpty()) {
-            initPlayerSourceChanged()
             itemsSelectedMap.forEach {
-                removeSingleItem(it.value.nodeHandle)
+                removeSingleItem(it.value.nodeHandle)?.let { newItems ->
+                    playlist.value = Pair(newItems, playingPosition)
+                }
             }
             itemsSelectedMap.clear()
-            if (playlistItems.isNotEmpty()) {
-                postPlaylistItems()
-            } else {
-                playlist.value = Pair(emptyList(), 0)
-                error.value = MegaError.API_ENOENT
-            }
             itemsSelectedCount.value = itemsSelectedMap.size
             actionMode.value = false
         }
@@ -1047,7 +1067,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 }
                 itemsSelectedCount.value = itemsSelectedMap.size
                 // Refresh the playlist
-                postPlaylistItems(isScroll = false)
+                recreateAndUpdatePlaylistItems(isScroll = false)
             }
         }
     }
@@ -1063,13 +1083,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
         }
         itemsSelectedMap.clear()
         actionMode.value = false
-        postPlaylistItems()
+        recreateAndUpdatePlaylistItems()
     }
 
     override fun setActionMode(isActionMode: Boolean) {
         actionMode.value = isActionMode
         if (isActionMode) {
-            postPlaylistItems(isScroll = false)
+            recreateAndUpdatePlaylistItems(isScroll = false)
         }
     }
 
@@ -1083,8 +1103,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (item.nodeHandle == handle) {
                 val newItem = playlistItems[index].updateNodeName(newName)
                 playlistItems[index] = newItem
-                playlistItemsMap[handle.toString()] = newItem
-                postPlaylistItems()
+                recreateAndUpdatePlaylistItems()
                 if (handle == playingHandle) {
                     nodeNameUpdate.postValue(newName)
                 }
@@ -1121,8 +1140,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
         preferences.edit()
             .putBoolean(KEY_AUDIO_SHUFFLE_ENABLED, shuffleEnabled)
             .apply()
-
-        postPlaylistItems()
+        if (!enabled) {
+            recreateAndUpdatePlaylistItems()
+        }
     }
 
     override fun newShuffleOrder(): ShuffleOrder {
@@ -1177,13 +1197,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
         Collections.swap(playSourceChanged, current, target)
     }
 
-    override fun getIndexFromPlaylistItems(item: PlaylistItem): Int? {
-        return playlistItems.indexOfFirst {
-            it.nodeName == item.nodeName
-        }.takeIf { index ->
-            index in playlistItems.indices
+    override fun getIndexFromPlaylistItems(item: PlaylistItem): Int? =
+        playlist.value?.first?.let { items ->
+            items.indexOfFirst {
+                it.nodeName == item.nodeName
+            }.takeIf { index ->
+                index in items.indices
+            }
         }
-    }
 
     override fun updatePlaySource() {
         val newPlayerSource = mutableListOf<MediaItem>()
@@ -1199,7 +1220,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun getPlayingPosition(): Int = playingPosition
 
-    override fun scrollToPlayingPosition() = postPlaylistItems(isScroll = true)
+    override fun scrollToPlayingPosition() {
+        playlist.value?.first?.let {
+            recreateAndUpdatePlaylistItems(items = it, isBuildPlaySources = false)
+        }
+    }
 
     override fun isActionMode() = actionMode.value
 
@@ -1214,6 +1239,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun onShuffleChanged(newShuffle: ShuffleOrder) {
         shuffleOrder = newShuffle
+        if (shuffleOrder.length != 0 && shuffleOrder.length == playlistItems.size) {
+            recreateAndUpdatePlaylistItems()
+        }
     }
 
     private fun onTransferTemporaryError(transfer: MegaTransfer, e: MegaError): Completable =

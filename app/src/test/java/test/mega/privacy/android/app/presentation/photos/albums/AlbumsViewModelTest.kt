@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.photos.albums
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.app.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
@@ -35,10 +36,18 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+
+private fun createUserAlbum(
+    id: AlbumId = AlbumId(0L),
+    title: String = "",
+    cover: Photo? = null,
+    modificationTime: Long = 0L,
+): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
 
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
@@ -54,6 +63,7 @@ class AlbumsViewModelTest {
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
+    private val proscribedStrings = listOf("My albums", "Shared albums")
 
     @Before
     fun setUp() {
@@ -337,10 +347,9 @@ class AlbumsViewModelTest {
             createUserAlbum(id = AlbumId(1L), title = "Album 1", modificationTime = 100L),
         )
 
-        underTest.state.test {
-            val actualUserAlbums = (1..3).map { awaitItem() }.last().albums.map { it.id }
+        underTest.state.drop(1).test {
+            val actualUserAlbums = awaitItem().albums.map { it.id }
             assertThat(expectedUserAlbums).isEqualTo(actualUserAlbums)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -352,7 +361,7 @@ class AlbumsViewModelTest {
             createUserAlbum(title = expectedAlbumName)
         )
 
-        underTest.createNewAlbum(expectedAlbumName)
+        underTest.createNewAlbum(expectedAlbumName, proscribedStrings)
 
         underTest.state.drop(1).test {
             val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
@@ -364,7 +373,7 @@ class AlbumsViewModelTest {
     fun `test that an error in creating an album would keep current album as null`() = runTest {
         whenever(createAlbum(any())).thenAnswer { throw Exception() }
 
-        underTest.createNewAlbum("ABD")
+        underTest.createNewAlbum("ABD", proscribedStrings)
 
         underTest.state.test {
             assertNull(awaitItem().currentAlbum)
@@ -457,30 +466,108 @@ class AlbumsViewModelTest {
             }
         }
 
+    @Test
+    fun `test that creating an album with an system album title will not create the album`() =
+        runTest {
+            val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+                Album.FavouriteAlbum to { true },
+                Album.GifAlbum to { false },
+                Album.RawAlbum to { false },
+            )
+
+            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+                UIAlbum(
+                    title = "Favourite",
+                    count = 0,
+                    coverPhoto = null,
+                    photos = emptyList(),
+                    id = Album.FavouriteAlbum
+                )
+            )
+
+            whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+            whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
+
+            underTest.state.drop(1).test {
+                awaitItem()
+                underTest.createNewAlbum("Favourite", proscribedStrings)
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    item.createDialogErrorMessage,
+                    R.string.photos_create_album_error_message_systems_album
+                )
+            }
+            verifyNoInteractions(createAlbum)
+
+        }
+
+    @Test
+    fun `test that creating an album with an existing title will not create the album`() =
+        runTest {
+            val testAlbumName = "Album 1"
+            val newAlbum1 = createUserAlbum(title = testAlbumName)
+
+            whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
+                UIAlbum(
+                    title = newAlbum1.title,
+                    count = 0,
+                    coverPhoto = newAlbum1.cover,
+                    photos = emptyList(),
+                    id = newAlbum1,
+                )
+            )
+
+            whenever(getUserAlbums()).thenReturn(flowOf(listOf(newAlbum1)))
+            whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
+
+            underTest.state.drop(1).test {
+                awaitItem()
+                underTest.createNewAlbum(testAlbumName, proscribedStrings)
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    item.createDialogErrorMessage,
+                    R.string.photos_create_album_error_message_duplicate
+                )
+            }
+            verifyNoInteractions(createAlbum)
+        }
+
+    @Test
+    fun `test that creating an album with an invalid character will not create the album`() =
+        runTest {
+            val testAlbumName = "*"
+
+            underTest.state.test {
+                awaitItem()
+                underTest.createNewAlbum(testAlbumName, proscribedStrings)
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    item.createDialogErrorMessage,
+                    R.string.invalid_characters_defined
+                )
+            }
+
+            verifyNoInteractions(createAlbum)
+        }
+
     private fun createImage(
         id: Long = 2L,
         parentId: Long = 0L,
         isFavourite: Boolean = false,
         modificationTime: LocalDateTime = LocalDateTime.now(),
         fileTypeInfo: FileTypeInfo = StaticImageFileTypeInfo("", ""),
-    ): Photo {
-        return Photo.Image(
-            id = id,
-            parentId = parentId,
-            name = "",
-            isFavourite = isFavourite,
-            creationTime = LocalDateTime.now(),
-            modificationTime = modificationTime,
-            thumbnailFilePath = "thumbnailFilePath",
-            previewFilePath = "previewFilePath",
-            fileTypeInfo = fileTypeInfo
-        )
-    }
-
-    private fun createUserAlbum(
-        id: AlbumId = AlbumId(0L),
-        title: String = "",
-        cover: Photo? = null,
-        modificationTime: Long = 0L,
-    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
+    ): Photo = Photo.Image(
+        id = id,
+        parentId = parentId,
+        name = "",
+        isFavourite = isFavourite,
+        creationTime = LocalDateTime.now(),
+        modificationTime = modificationTime,
+        thumbnailFilePath = "thumbnailFilePath",
+        previewFilePath = "previewFilePath",
+        fileTypeInfo = fileTypeInfo
+    )
 }

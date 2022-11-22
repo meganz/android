@@ -36,6 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.grey_alpha_032
 import mega.privacy.android.presentation.theme.white
@@ -306,7 +307,7 @@ private fun AlbumPhotoContainer(
             )
 
             Text(
-                text = TimeUtils.getVideoDuration(photo.duration),
+                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.getDuration()),
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()
@@ -363,4 +364,3 @@ private fun AlbumPhotoView(
             .aspectRatio(1f)
     )
 }
-

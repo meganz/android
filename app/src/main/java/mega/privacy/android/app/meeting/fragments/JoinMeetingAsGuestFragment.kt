@@ -106,7 +106,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         val constraintSet = ConstraintSet()
         constraintSet.clone(binding.createMeeting)
         constraintSet.connect(
-            R.id.localSurfaceView,
+            R.id.localTextureView,
             ConstraintSet.BOTTOM,
             R.id.edit_first_name,
             ConstraintSet.TOP,
