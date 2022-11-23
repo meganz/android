@@ -474,6 +474,19 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getRecentActionsAsync(days, maxNodes, listener)
 
+    override fun copyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        if (listener != null) {
+            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, listener)
+        } else {
+            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+        }
+    }
+
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
         megaApi.copyBucket(bucket)
 

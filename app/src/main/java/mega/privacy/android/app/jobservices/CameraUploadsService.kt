@@ -34,6 +34,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
+import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
@@ -489,6 +490,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var hasPendingUploads: HasPendingUploads
+
+    /**
+     * Copy Node
+     */
+    @Inject
+    lateinit var copyNode: CopyNode
 
     /**
      * Coroutine Scope for camera upload work
@@ -1161,13 +1168,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (file.isCopyOnly) {
                 Timber.d("Copy from node, file timestamp is: %s", file.timestamp)
                 totalToUpload++
-                file.nodeHandle?.let {
-                    megaApi.copyNode(
-                        getNodeByHandle(it),
-                        parent,
-                        file.fileName,
-                        this
-                    )
+                file.nodeHandle?.let { nodeHandle ->
+                    getNodeByHandle(nodeHandle)?.let { nodeToCopy ->
+                        handleCopyNode(
+                            nodeToCopy = nodeToCopy,
+                            newNodeParent = parent,
+                            newNodeName = file.fileName.orEmpty(),
+                        )
+                    }
                 }
             } else {
                 val toUpload = path?.let { File(it) }
@@ -1208,6 +1216,49 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 onQueueComplete()
             }
         }
+    }
+
+    /**
+     * Perform a copy operation through [CopyNode]
+     *
+     * @param nodeToCopy The [MegaNode] to be copied
+     * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     */
+    private suspend fun handleCopyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+    ) {
+        runCatching {
+            copyNode(
+                nodeToCopy = nodeToCopy,
+                newNodeParent = newNodeParent,
+                newNodeName = newNodeName,
+            )
+        }.onSuccess { nodeId ->
+            Timber.d("Copy node successful")
+            getNodeByHandle(nodeId.id)?.let { retrievedNode ->
+                val fingerprint = retrievedNode.fingerprint
+                val isSecondary = retrievedNode.parentHandle == getSecondarySyncHandle()
+                // Delete the Camera Upload sync record by fingerprint
+                deleteSyncRecordByFingerprint(
+                    originalPrint = fingerprint,
+                    newPrint = fingerprint,
+                    isSecondary = isSecondary,
+                )
+                // Update information when the file is copied to the target node
+                onUploadSuccess(
+                    node = retrievedNode,
+                    isSecondary = isSecondary,
+                )
+            }
+            updateUpload()
+        }.onFailure { error ->
+            Timber.e("Copy node error: $error")
+            updateUpload()
+        }
+
     }
 
     private suspend fun checkExistBySize(parent: MegaNode, size: Long): MegaNode? {
@@ -1467,32 +1518,20 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s", request.requestString)
         try {
-            coroutineScope?.launch {
-                requestFinished(request, e)
-            }
+            requestFinished(request, e)
         } catch (th: Throwable) {
             Timber.e(th)
             th.printStackTrace()
         }
     }
 
-    private suspend fun requestFinished(request: MegaRequest, e: MegaError) {
+    private fun requestFinished(request: MegaRequest, e: MegaError) {
         when (request.type) {
             MegaRequest.TYPE_PAUSE_TRANSFERS -> {
                 Timber.d("PauseTransfer false received")
                 if (e.errorCode == MegaError.API_OK) {
                     endService()
                 }
-            }
-            MegaRequest.TYPE_COPY -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    val node = getNodeByHandle(request.nodeHandle)
-                    val fingerPrint = node?.fingerprint
-                    val isSecondary = node?.parentHandle == getSecondarySyncHandle()
-                    fingerPrint?.let { deleteSyncRecordByFingerprint(it, fingerPrint, isSecondary) }
-                    node?.let { onUploadSuccess(it, isSecondary) }
-                }
-                updateUpload()
             }
         }
     }

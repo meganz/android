@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -19,15 +20,32 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 abstract class GetNodeModule {
 
     companion object {
+
         /**
-         * Provide the GetChildrenNode implementation
+         * Provides the [CopyNode] implementation
+         *
+         * @param filesRepository [FilesRepository]
+         * @return [CopyNode]
+         */
+        @Provides
+        fun provideCopyNode(filesRepository: FilesRepository): CopyNode =
+            CopyNode(filesRepository::copyNode)
+
+        /**
+         * Provides the [GetChildrenNode] implementation
+         *
+         * @param filesRepository [FilesRepository]
+         * @return [GetChildrenNode]
          */
         @Provides
         fun provideGetChildrenNode(filesRepository: FilesRepository): GetChildrenNode =
             GetChildrenNode(filesRepository::getChildrenNode)
 
         /**
-         * Provide the GetNodeByHandle implementation
+         * Provides the [GetNodeByHandle] implementation
+         *
+         * @param filesRepository [FilesRepository]
+         * @return [GetNodeByHandle]
          */
         @Provides
         fun provideGetNodeByHandle(filesRepository: FilesRepository): GetNodeByHandle =
