@@ -401,11 +401,12 @@ interface MegaApiGateway {
     fun base64ToHandle(base64Handle: String): Long
 
     /**
-     * Cancel transfer
+     * Cancels a [MegaTransfer]
      *
-     * @param transfer to be cancelled
+     * @param transfer the [MegaTransfer] to cancel
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
      */
-    fun cancelTransfer(transfer: MegaTransfer)
+    fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
      * Gets the number of unread user alerts for the logged in user.
@@ -597,7 +598,7 @@ interface MegaApiGateway {
      * @param order order for the returned list
      * @return children nodes list
      */
-    suspend fun getChildren(parent: MegaNode, order: Int, ): List<MegaNode>
+    suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode>
 
     /**
      * Get a list with all public links

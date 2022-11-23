@@ -31,6 +31,7 @@ import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -106,6 +107,12 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
+
+    /**
+     * Bind transfers repository
+     */
+    @Binds
+    abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
 
     /**
      * Bind domain transfers repository
