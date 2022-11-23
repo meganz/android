@@ -132,4 +132,11 @@ interface AccountRepository {
      * @param pro
      */
     suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
+
+    /**
+     * Gets the credentials of the currently open account.
+     *
+     * @return Fingerprint of the signing key of the current account.
+     */
+    suspend fun getMyCredentials(): String?
 }
