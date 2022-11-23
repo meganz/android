@@ -457,8 +457,10 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun hideToolbar(animate: Boolean = true) {
-        toolbarVisible = false
-        (requireActivity() as MediaPlayerActivity).hideToolbar(animate)
+        activity?.let {
+            toolbarVisible = false
+            (it as? MediaPlayerActivity)?.hideToolbar(animate)
+        }
     }
 
     private fun showToolbar() {
