@@ -605,8 +605,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
                 for (transfer in cuTransfers) {
-                    handleCancelTransfer(transfer = transfer, shouldResetTotalUploads = true)
+                    handleCancelTransfer(transfer)
                 }
+                // Reset the total upload count once all upload transfers have been cancelled
+                handleResetTotalUploads()
                 coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
                 sendTransfersInterruptedInfoToBackupCenter()
                 endService()
@@ -615,26 +617,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Handle the transfer cancellation here. This includes a listener for callback events
+     * Cancel the transfer through [CancelTransfer] and log the result
      *
      * @param transfer the [MegaTransfer] to be cancelled
-     * @param shouldResetTotalUploads if true, will reset the total upload count
      */
-    private suspend fun handleCancelTransfer(
-        transfer: MegaTransfer,
-        shouldResetTotalUploads: Boolean = false,
-    ) {
+    private suspend fun handleCancelTransfer(transfer: MegaTransfer) {
         runCatching { cancelTransfer(transfer) }
-            .onSuccess {
-                Timber.d("Transfer cancellation successful")
-                if (shouldResetTotalUploads) {
-                    // Reset the pending uploads overall count
-                    handleResetTotalUploads()
-                }
-            }
-            .onFailure { error ->
-                Timber.e("Transfer cancellation error: $error")
-            }
+            .onSuccess { Timber.d("Transfer cancellation successful") }
+            .onFailure { error -> Timber.e("Transfer cancellation error: $error") }
     }
 
     /**
@@ -655,11 +645,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     Timber.d("Stop all Camera Uploads Transfers")
                     coroutineScope?.launch {
                         for (transfer in cuTransfers) {
-                            handleCancelTransfer(
-                                transfer = transfer,
-                                shouldResetTotalUploads = true,
-                            )
+                            handleCancelTransfer(transfer)
                         }
+                        // Reset the total upload count once all upload transfers have been cancelled
+                        handleResetTotalUploads()
                         sendTransfersInterruptedInfoToBackupCenter()
                     }
                 }
