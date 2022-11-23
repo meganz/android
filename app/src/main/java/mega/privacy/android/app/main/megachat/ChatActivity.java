@@ -1056,7 +1056,7 @@ public class ChatActivity extends PasscodeActivity
             }
 
             Timber.d("Show new chat room UI");
-            initAndShowChat(null);
+            initEmptyScreen(null);
             supportInvalidateOptionsMenu();
         } else {
             String text;
@@ -1480,7 +1480,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -2172,7 +2171,7 @@ public class ChatActivity extends PasscodeActivity
                             text = getString(R.string.chat_link_copied_clipboard);
                         }
                     }
-                    initAndShowChat(text);
+                    initEmptyScreen(text);
                 }
             }
         } else {
@@ -2305,34 +2304,12 @@ public class ChatActivity extends PasscodeActivity
     }
 
     /**
-     * Opens a new chat conversation.
-     * If it went well, shows the chat with the empty state and requests messages.
+     * Shows the chat with the empty state and requests messages.
      *
      * @param textSnackbar if there is a chat link involved in the action, it it indicates the "Copy chat link" dialog has to be shown.
      *                     If not, a simple Snackbar has to be shown with this text.
      */
-    private void initAndShowChat(String textSnackbar) {
-        boolean resultInit = initChat();
-        if (!resultInit) {
-            return;
-        }
-
-        initializeInputText();
-        checkIfIsAlreadyJoiningOrLeaving();
-
-        int chatConnection = megaChatApi.getChatConnectionState(idChat);
-        Timber.d("Chat connection (%d) is: %d", idChat, chatConnection);
-
-        //Create always a new adapter to avoid showing messages of a previous conversation.
-        createAdapter();
-
-        setPreviewersView();
-        titleToolbar.setText(getTitleChat(chatRoom));
-        setChatSubtitle();
-        privateIconToolbar.setVisibility((!chatRoom.isGroup() || chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
-        muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
-        isOpeningChat = true;
-
+    private void initEmptyScreen(String textSnackbar){
         String textToShowB = getString(R.string.chat_loading_messages);
 
         try {
@@ -2359,6 +2336,33 @@ public class ChatActivity extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, textSnackbar, MEGACHAT_INVALID_HANDLE);
             }
         }
+    }
+
+    /**
+     * Opens a new chat conversation.
+     * If it went well, requests messages.
+     */
+    private void initAndShowChat() {
+        boolean resultInit = initChat();
+        if (!resultInit) {
+            return;
+        }
+
+        initializeInputText();
+        checkIfIsAlreadyJoiningOrLeaving();
+
+        int chatConnection = megaChatApi.getChatConnectionState(idChat);
+        Timber.d("Chat connection (%d) is: %d", idChat, chatConnection);
+
+        //Create always a new adapter to avoid showing messages of a previous conversation.
+        createAdapter();
+
+        setPreviewersView();
+        titleToolbar.setText(getTitleChat(chatRoom));
+        setChatSubtitle();
+        privateIconToolbar.setVisibility((!chatRoom.isGroup() || chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
+        muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
+        isOpeningChat = true;
 
         loadHistory();
         Timber.d("On create: stateHistory: %s", stateHistory);
@@ -8378,6 +8382,13 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initAndShowChat();
+    }
+
     @Override
     protected void onDestroy() {
         destroySpeakerAudioManger();
@@ -8476,6 +8487,7 @@ public class ChatActivity extends PasscodeActivity
 
         saveInputText();
         shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
+
         megaChatApi.closeChatRoom(idChat, this);
         if (chatRoom.isPreview()) {
             megaChatApi.closeChatPreview(idChat);
@@ -8561,7 +8573,6 @@ public class ChatActivity extends PasscodeActivity
 
                     closeChat(false);
                     MegaApplication.setOpenChatId(-1);
-
                     initAfterIntent(intent, null);
                 }
 
@@ -8984,6 +8995,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onPause() {
         super.onPause();
+
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
 
