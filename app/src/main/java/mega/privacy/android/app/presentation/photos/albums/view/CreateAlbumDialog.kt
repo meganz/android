@@ -72,6 +72,7 @@ fun CreateNewAlbumDialog(
         stringResource(id = R.string.photos_album_title_gif),
         stringResource(id = R.string.photos_album_title_raw),
     )
+    val maxCharacter = 250
 
     val inputColor = if (isInputValid()) {
         if (MaterialTheme.colors.isLight) {
@@ -127,7 +128,9 @@ fun CreateNewAlbumDialog(
                     value = textState,
                     onValueChange = {
                         onDialogInputChange(true)
-                        textState = it
+                        if (it.length <= maxCharacter) {
+                            textState = it
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
