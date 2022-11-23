@@ -258,7 +258,7 @@ class AlbumsViewModel @Inject constructor(
         var errorMessage: Int? = null
         var isTitleValid = true
 
-        if (title in (getAllSystemAlbumsNames() + proscribedStrings)) {
+        if (title.lowercase() in (getAllSystemAlbumsNames().map { it.lowercase() } + proscribedStrings.map { it.lowercase() })) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_systems_album
         } else if (title in getAllUserAlbumsNames()) {

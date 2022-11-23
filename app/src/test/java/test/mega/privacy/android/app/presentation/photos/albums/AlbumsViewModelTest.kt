@@ -161,7 +161,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
             UIAlbum(
-                title = "Favourite",
+                title = "Favourites",
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -198,7 +198,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
             UIAlbum(
-                title = "Favourite",
+                title = "Favourites",
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -226,7 +226,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
             UIAlbum(
-                title = "Favourite",
+                title = "Favourites",
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -280,7 +280,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(testPhotosList, Album.FavouriteAlbum)).thenReturn(
             UIAlbum(
-                title = "Favourite",
+                title = "Favourites",
                 count = testPhotosList.size,
                 coverPhoto = createImage(id = 1L, modificationTime = LocalDateTime.MAX),
                 photos = testPhotosList,
@@ -477,7 +477,7 @@ class AlbumsViewModelTest {
 
             whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
                 UIAlbum(
-                    title = "Favourite",
+                    title = "Favourites",
                     count = 0,
                     coverPhoto = null,
                     photos = emptyList(),
@@ -490,7 +490,7 @@ class AlbumsViewModelTest {
 
             underTest.state.drop(1).test {
                 awaitItem()
-                underTest.createNewAlbum("Favourite", proscribedStrings)
+                underTest.createNewAlbum("favourites", proscribedStrings)
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
