@@ -153,7 +153,14 @@ class FileFacade @Inject constructor(
         return null
     }
 
+    override suspend fun getOfflineFilesRootPath() =
+        context.filesDir.absolutePath + File.separator + OFFLINE_DIR
+
+    override suspend fun getOfflineFilesInboxRootPath() =
+        context.filesDir.absolutePath + File.separator + OFFLINE_DIR + File.separator + "in"
+
     companion object {
         private const val DOWNLOAD_DIR = "MEGA Downloads"
+        private const val OFFLINE_DIR = "MEGA Offline"
     }
 }
