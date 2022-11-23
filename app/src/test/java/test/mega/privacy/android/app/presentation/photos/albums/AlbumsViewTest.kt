@@ -21,7 +21,8 @@ import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class AlbumsViewTest {
-    private val proscribedStrings = listOf("My albums", "Shared albums")
+    private val proscribedStrings =
+        listOf("My albums", "Shared albums", "Favourites", "GIFs", "RAW")
 
     @get:Rule
     var composeRule = createComposeRule()
