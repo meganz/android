@@ -531,11 +531,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             monitorBatteryInfo().collect {
                 deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
                 if (!deviceAboveMinimumBatteryLevel) {
-                    coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
-                    for (transfer in cuTransfers) {
-                        handleCancelTransfer(transfer)
-                    }
+                    cancelAllPendingTransfers()
                     sendTransfersInterruptedInfoToBackupCenter()
+                    coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
                     endService()
                 }
             }
@@ -604,27 +602,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             stopByNetworkStateChange =
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
-                for (transfer in cuTransfers) {
-                    handleCancelTransfer(transfer)
-                }
-                // Reset the total upload count once all upload transfers have been cancelled
-                handleResetTotalUploads()
-                coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
+                cancelAllPendingTransfers()
                 sendTransfersInterruptedInfoToBackupCenter()
+                coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
                 endService()
             }
         }
-    }
-
-    /**
-     * Cancel the transfer through [CancelTransfer] and log the result
-     *
-     * @param transfer the [MegaTransfer] to be cancelled
-     */
-    private suspend fun handleCancelTransfer(transfer: MegaTransfer) {
-        runCatching { cancelTransfer(transfer) }
-            .onSuccess { Timber.d("Transfer cancellation successful") }
-            .onFailure { error -> Timber.e("Transfer cancellation error: $error") }
     }
 
     /**
@@ -644,18 +627,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 ACTION_STOP -> {
                     Timber.d("Stop all Camera Uploads Transfers")
                     coroutineScope?.launch {
-                        for (transfer in cuTransfers) {
-                            handleCancelTransfer(transfer)
-                        }
-                        // Reset the total upload count once all upload transfers have been cancelled
-                        handleResetTotalUploads()
+                        cancelAllPendingTransfers()
                         sendTransfersInterruptedInfoToBackupCenter()
                     }
                 }
                 ACTION_CANCEL_ALL -> {
                     Timber.d("Cancel all Camera Uploads Transfers")
-                    handleCancelAllUploadTransfers()
-                    sendTransfersCancelledInfoToBackupCenter()
+                    coroutineScope?.launch {
+                        cancelAllPendingTransfers()
+                        sendTransfersCancelledInfoToBackupCenter()
+                    }
                 }
                 else -> Unit
             }
@@ -676,29 +657,42 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Handle the cancellation of all upload transfers here
+     * Cancels a pending [MegaTransfer] through [CancelTransfer],
+     * and call [resetTotalUploads] afterwards
+     *
+     * @param transfer the [MegaTransfer] to be cancelled
      */
-    private fun handleCancelAllUploadTransfers() {
-        coroutineScope?.launch {
-            runCatching { cancelAllUploadTransfers() }
-                .onSuccess {
-                    Timber.d("Cancel all transfers successful")
-                    handleResetTotalUploads()
-                }
-                .onFailure { error ->
-                    Timber.e("Cancel all transfers error: $error")
-                }
-        }
+    private suspend fun cancelPendingTransfer(transfer: MegaTransfer) {
+        runCatching { cancelTransfer(transfer) }
+            .onSuccess {
+                Timber.d("Transfer cancellation successful")
+                resetTotalUploads()
+            }
+            .onFailure { error -> Timber.e("Transfer cancellation error: $error") }
     }
 
     /**
-     * Resets the overall upload count if there are no pending upload transfers
-     *
-     * The function is marked with the DEPRECATION annotation as resetTotalUploads() is deprecated
+     * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfers],
+     * and call [resetTotalUploads] afterwards
      */
-    @Suppress("DEPRECATION")
-    private suspend fun handleResetTotalUploads() {
-        if (!hasPendingUploads()) megaApi.resetTotalUploads()
+    private suspend fun cancelAllPendingTransfers() {
+        runCatching { cancelAllUploadTransfers() }
+            .onSuccess {
+                Timber.d("Cancel all transfers successful")
+                resetTotalUploads()
+            }
+            .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
+    }
+
+    /**
+     * Checks [HasPendingUploads] and resets the overall upload count
+     * if there are no pending transfers
+     */
+    private suspend fun resetTotalUploads() {
+        if (!hasPendingUploads()) {
+            @Suppress("DEPRECATION")
+            megaApi.resetTotalUploads()
+        }
     }
 
     /**
@@ -1233,7 +1227,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private fun onQueueComplete() {
         Timber.d("Stopping foreground!")
-        coroutineScope?.launch { handleResetTotalUploads() }
+        coroutineScope?.launch { resetTotalUploads() }
         totalUploaded = 0
         totalToUpload = 0
         reportUploadFinish()
@@ -1581,7 +1575,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun transferUpdated(transfer: MegaTransfer) {
         if (canceled) {
             Timber.d("Transfer cancel: %s", transfer.nodeHandle)
-            coroutineScope?.launch { handleCancelTransfer(transfer) }
+            coroutineScope?.launch { cancelPendingTransfer(transfer) }
             endService()
             return
         }
@@ -1757,7 +1751,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private suspend fun startVideoCompression() {
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         @Suppress("DEPRECATION")
-        handleResetTotalUploads()
+        resetTotalUploads()
         totalUploaded = 0
         totalToUpload = 0
 
