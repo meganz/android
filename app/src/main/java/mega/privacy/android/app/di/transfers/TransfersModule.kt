@@ -7,14 +7,17 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
+import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.AreTransfersPaused
+import mega.privacy.android.domain.usecase.DefaultHasPendingUploads
 import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
+import mega.privacy.android.domain.usecase.HasPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 
@@ -31,6 +34,13 @@ class TransfersModule {
     @Provides
     fun provideCancelTransfer(transfersRepository: TransfersRepository): CancelTransfer =
         CancelTransfer(transfersRepository::cancelTransfer)
+
+    /**
+     * Provides the [CancelAllUploadTransfers] implementation
+     */
+    @Provides
+    fun provideCancelAllUploadTransfers(transfersRepository: TransferRepository): CancelAllUploadTransfers =
+        CancelAllUploadTransfers(transfersRepository::cancelAllUploadTransfers)
 
     /**
      * Provides the [AreTransfersPaused] implementation
@@ -60,6 +70,15 @@ class TransfersModule {
     @Provides
     fun provideGetNumPendingTransfers(transfersRepository: TransferRepository): GetNumPendingTransfers =
         GetNumPendingTransfers(transfersRepository::getNumPendingTransfers)
+
+    /**
+     * Provides the [HasPendingUploads] implementation
+     */
+    @Provides
+    fun provideHasPendingUploads(getNumPendingUploads: GetNumPendingUploads): HasPendingUploads =
+        DefaultHasPendingUploads(
+            getNumPendingUploads = getNumPendingUploads,
+        )
 
     /**
      * Provides the [IsCompletedTransfersEmpty] implementation

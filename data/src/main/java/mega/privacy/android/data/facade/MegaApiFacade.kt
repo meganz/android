@@ -309,6 +309,10 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.cancelTransfer(transfer, listener)
     }
 
+    override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
+        megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
+    }
+
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
 
     override suspend fun getInboxNode(): MegaNode? = megaApi.inboxNode
