@@ -1496,10 +1496,6 @@ public class CallUtil {
      */
     public static boolean areNotificationsSettingsEnabled() {
         NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return notificationManager.areNotificationsEnabled();
-        }
-
-        return true;
+        return notificationManager.areNotificationsEnabled();
     }
 }

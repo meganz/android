@@ -11,7 +11,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
-import static mega.privacy.android.app.utils.Util.isAndroidNougatOrUpper;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
@@ -56,7 +55,6 @@ import java.util.List;
 import java.util.Stack;
 
 import mega.privacy.android.app.FileDocument;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -65,6 +63,7 @@ import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.model.MegaPreferences;
 import timber.log.Timber;
 
 public class FileStorageActivity extends PasscodeActivity implements Scrollable {
@@ -512,8 +511,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
             if (isFileAvailable(f)) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Uri uri = isAndroidNougatOrUpper() ? FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, f)
-                        : Uri.fromFile(f);
+                Uri uri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, f);
 
                 if (uri != null) {
                     intent.setDataAndType(uri, MimeTypeList.typeForName(f.getName()).getType());

@@ -16,6 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -39,6 +42,7 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
+    public static final int DATE_WEEK_DAY_FORMAT = 5;
     private static final int TIME_OF_CHANGE = 8;
     private static final int INITIAL_PERIOD_TIME = 0;
 
@@ -186,6 +190,9 @@ public class TimeUtils implements Comparator<Calendar> {
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
                 df = new SimpleDateFormat("MMM d, yyyy", locale);
+                break;
+            case DATE_WEEK_DAY_FORMAT:
+                df = new SimpleDateFormat("EEEE, d MMM", locale);
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
                 df = new SimpleDateFormat(getBestDateTimePattern(locale, "yyyy-MM-dd HH:mm"), locale);
@@ -622,5 +629,26 @@ public class TimeUtils implements Comparator<Calendar> {
      */
     public static void createAndShowCountDownTimer(int stringResource, View v, TextView textView) {
         createAndShowCountDownTimer(stringResource, null, v, textView);
+    }
+
+    /**
+     * Check if two timestamps are the same date
+     * 
+     * @param oneMillis     First timestamp in millis to copmare
+     * @param twoMillis     Second timestamp in millis to compare
+     * @return              True if it's the same date, false otherwise
+     */
+    public static boolean isSameDate(long oneMillis, long twoMillis) {
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        Instant oneInstant = Instant.ofEpochMilli(oneMillis);
+        LocalDateTime oneLocalDateTime = LocalDateTime.ofInstant(oneInstant, zoneId);
+
+        Instant twoInstant = Instant.ofEpochMilli(twoMillis);
+        LocalDateTime twoLocalDateTime = LocalDateTime.ofInstant(twoInstant, zoneId);
+
+        return (oneLocalDateTime.getYear() == twoLocalDateTime.getYear())
+                && (oneLocalDateTime.getMonthValue() == twoLocalDateTime.getMonthValue())
+                && (oneLocalDateTime.getDayOfMonth() == twoLocalDateTime.getDayOfMonth());
     }
 }

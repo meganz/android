@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -30,7 +29,6 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
@@ -54,6 +52,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -358,11 +357,9 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
 
                         val mediaFile = File(localPath)
                         setDataAndType(
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                FileProvider.getUriForFile(requireContext(),
-                                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                    mediaFile)
-                            } else Uri.fromFile(mediaFile),
+                            FileProvider.getUriForFile(requireContext(),
+                                Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                                mediaFile),
                             MimeTypeList.typeForName(node.name).type
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -426,11 +423,9 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     if (localPath != null) {
                         val mediaFile = File(localPath)
                         setDataAndType(
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                FileProvider.getUriForFile(requireContext(),
-                                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                    mediaFile)
-                            } else Uri.fromFile(mediaFile),
+                            FileProvider.getUriForFile(requireContext(),
+                                Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                                mediaFile),
                             mimeTypeType
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

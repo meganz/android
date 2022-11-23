@@ -87,7 +87,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         viewModel.getMeeting(chatId).observe(viewLifecycleOwner, ::showMeeting)
     }
 
-    private fun showMeeting(meeting: MeetingItem?) {
+    private fun showMeeting(meeting: MeetingItem.Data?) {
         requireNotNull(meeting) { "Meeting not found" }
 
         binding.header.txtTitle.text = meeting.title

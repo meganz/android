@@ -12,16 +12,19 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment
@@ -33,6 +36,8 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MeetingListFragment : Fragment() {
@@ -44,6 +49,9 @@ class MeetingListFragment : Fragment() {
         fun newInstance(): MeetingListFragment =
             MeetingListFragment()
     }
+
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     private lateinit var binding: FragmentMeetingListBinding
     private var actionMode: ActionMode? = null
@@ -84,6 +92,10 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun setupView() {
+        lifecycleScope.launch {
+            meetingsAdapter.setScheduleMeetingsEnabled(getFeatureFlag(AppFeatures.ScheduleMeeting))
+        }
+
         binding.list.apply {
             adapter = meetingsAdapter
             setHasFixedSize(true)
@@ -136,9 +148,9 @@ class MeetingListFragment : Fragment() {
 
     private fun setupObservers(savedInstanceState: Bundle?) {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            val currentFirstChat = meetingsAdapter.currentList.firstOrNull()?.chatId
+            val currentFirstChat = meetingsAdapter.currentList.firstOrNull()?.id
             meetingsAdapter.submitList(items) {
-                if (currentFirstChat != items.firstOrNull()?.chatId) {
+                if (currentFirstChat != items.firstOrNull()?.id) {
                     binding.list.smoothScrollToPosition(0)
                 }
 
@@ -204,7 +216,7 @@ class MeetingListFragment : Fragment() {
                 }
 
                 val selectedItems = meetingsAdapter.tracker?.selection
-                    ?.map { id -> meetingsAdapter.currentList.first { it.chatId == id } }
+                    ?.map { id -> meetingsAdapter.currentList.first { it.id == id } }
                     ?: return true
 
                 if (selectedItems.size == meetingsAdapter.currentList.size) {
@@ -212,11 +224,11 @@ class MeetingListFragment : Fragment() {
                 }
 
                 when {
-                    selectedItems.all { it.isMuted } -> {
+                    selectedItems.all { it is MeetingItem.Data && it.isMuted } -> {
                         menu.findItem(R.id.cab_menu_unmute).isVisible = true
                         menu.findItem(R.id.cab_menu_mute).isVisible = false
                     }
-                    selectedItems.all { !it.isMuted } -> {
+                    selectedItems.all { it is MeetingItem.Data && !it.isMuted } -> {
                         menu.findItem(R.id.cab_menu_mute).isVisible = true
                         menu.findItem(R.id.cab_menu_unmute).isVisible = false
                     }
@@ -231,7 +243,7 @@ class MeetingListFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
                 return when (item.itemId) {
                     R.id.cab_menu_select_all -> {
-                        val allItems = meetingsAdapter.currentList.map { it.chatId }
+                        val allItems = meetingsAdapter.currentList.map { it.id }
                         meetingsAdapter.tracker?.setItemsSelected(allItems, true)
                         true
                     }
@@ -246,12 +258,12 @@ class MeetingListFragment : Fragment() {
                         true
                     }
                     R.id.cab_menu_unmute -> {
-                        meetingsAdapter.tracker?.selection?.forEach { chatId ->
+                        meetingsAdapter.tracker?.selection?.forEach { id ->
                             MegaApplication.getPushNotificationSettingManagement()
                                 .controlMuteNotificationsOfAChat(
                                     requireContext(),
                                     Constants.NOTIFICATIONS_ENABLED,
-                                    chatId)
+                                    id)
                         }
                         clearSelections()
                         true

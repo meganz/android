@@ -1,13 +1,11 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment as NewMediaDiscoveryFragment
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -51,10 +49,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -67,6 +63,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -697,7 +694,7 @@ class FileBrowserFragment : RotatableFragment() {
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().path)) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
                     Timber.d("itemClick:FileProviderOption")
                     val mediaFileUri = FileProvider.getUriForFile(
                         requireContext(),
@@ -794,7 +791,7 @@ class FileBrowserFragment : RotatableFragment() {
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().path)) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
                     pdfIntent.setDataAndType(FileProvider.getUriForFile(
                         requireContext(),
                         "mega.privacy.android.app.providers.fileprovider",
@@ -982,11 +979,7 @@ class FileBrowserFragment : RotatableFragment() {
                 } catch (e: Exception) {
                     Timber.e(e)
                 }
-                val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                } else {
-                    Html.fromHtml(textToShow)
-                }
+                val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
                 emptyTextViewFirst?.text = result
             }
         } else {
@@ -1160,11 +1153,7 @@ class FileBrowserFragment : RotatableFragment() {
                     } catch (e: Exception) {
                         Timber.e(e)
                     }
-                    val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        Html.fromHtml(textToShow)
-                    }
+                    val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
                     emptyTextViewFirst?.text = result
                 } else {
                     if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -1186,11 +1175,7 @@ class FileBrowserFragment : RotatableFragment() {
                     } catch (e: Exception) {
                         Timber.e(e)
                     }
-                    val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        Html.fromHtml(textToShow)
-                    }
+                    val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
                     emptyTextViewFirst?.text = result
                 }
             } else {
@@ -1341,14 +1326,8 @@ class FileBrowserFragment : RotatableFragment() {
 
     fun showMediaDiscovery() {
         activity?.lifecycleScope?.launch {
-            val newMediaDiscoveryEnable = getFeatureFlag(AppFeatures.NewMediaDiscovery)
-
-            val f = if (newMediaDiscoveryEnable) {
-                NewMediaDiscoveryFragment.getNewInstance(mediaHandle)
-            } else {
-                MediaDiscoveryFragment.getInstance(mediaHandle)
-            }
-            (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(f, mediaHandle)
+            (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(
+                MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle)
         }
     }
 

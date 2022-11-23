@@ -55,7 +55,7 @@ import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.GroupChatParticipant
-import mega.privacy.android.app.meeting.list.adapter.ScheduledMeetingItem
+import mega.privacy.android.app.meeting.list.ScheduledMeetingItem
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon

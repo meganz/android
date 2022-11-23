@@ -4,9 +4,9 @@ import com.android.tools.lint.checks.infrastructure.LintDetectorTest.kotlin
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
 
-class CallIsSystemInDarkThemeIssueTest {
+class CallIsSystemInDarkThemeDetectorTest {
     @Test
-    fun `test_when_no_preview_annotation_and_pass_reference_of_isSystemInDarkTheme_as_parameter_then_show_error`() {
+    fun test_when_no_preview_annotation_and_pass_reference_of_isSystemInDarkTheme_as_parameter_then_show_error() {
         lint().files(
             *Stubs.stubs,
             kotlin(
@@ -26,11 +26,11 @@ class CallIsSystemInDarkThemeIssueTest {
                         }
                     """
             ).indented()
-        ).issues(CallIsSystemInDarkThemeIssue.ISSUE)
+        ).issues(CallIsSystemInDarkThemeDetector.ISSUE)
             .run()
             .expect(
                 """
-                        src/mega/privacy/android/presentation/controls/test.kt:10: Warning: isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase [isSystemInDarkTheme]
+                        src/mega/privacy/android/presentation/controls/test.kt:10: Warning: isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase [IsSystemInDarkTheme]
                             AndroidTheme(isDark = isDark) {
                             ~~~~~~~~~~~~
                         0 errors, 1 warnings
@@ -39,7 +39,7 @@ class CallIsSystemInDarkThemeIssueTest {
     }
 
     @Test
-    fun `test_when_no_preview_annotation_and_pass_isSystemInDarkTheme_as_parameter_then_show_error`() {
+    fun test_when_no_preview_annotation_and_pass_isSystemInDarkTheme_as_parameter_then_show_error() {
         lint().files(
             *Stubs.stubs,
             kotlin(
@@ -58,11 +58,11 @@ class CallIsSystemInDarkThemeIssueTest {
                         }
                     """
             ).indented()
-        ).issues(CallIsSystemInDarkThemeIssue.ISSUE)
+        ).issues(CallIsSystemInDarkThemeDetector.ISSUE)
             .run()
             .expect(
                 """
-                        src/mega/privacy/android/presentation/controls/test.kt:9: Warning: isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase [isSystemInDarkTheme]
+                        src/mega/privacy/android/presentation/controls/test.kt:9: Warning: isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase [IsSystemInDarkTheme]
                             AndroidTheme(isDark = isSystemInDarkTheme()) {
                             ~~~~~~~~~~~~
                         0 errors, 1 warnings
@@ -93,7 +93,7 @@ class CallIsSystemInDarkThemeIssueTest {
                         }
                     """
             ).indented()
-        ).issues(CallIsSystemInDarkThemeIssue.ISSUE)
+        ).issues(CallIsSystemInDarkThemeDetector.ISSUE)
             .run()
             .expect(
                 """

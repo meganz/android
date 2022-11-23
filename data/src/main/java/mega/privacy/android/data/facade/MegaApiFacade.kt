@@ -92,6 +92,8 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.isEphemeralPlusPlus
     override val accountAuth: String
         get() = megaApi.accountAuth
+    override val myCredentials: String?
+        get() = megaApi.myCredentials
 
     override suspend fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
@@ -305,8 +307,8 @@ internal class MegaApiFacade @Inject constructor(
     override fun base64ToHandle(base64Handle: String): Long =
         MegaApiAndroid.base64ToHandle(base64Handle)
 
-    override fun cancelTransfer(transfer: MegaTransfer) {
-        megaApi.cancelTransfer(transfer)
+    override fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?) {
+        megaApi.cancelTransfer(transfer, listener)
     }
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
@@ -539,7 +541,15 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
 
-    override fun removeRequestListener(listener: MegaRequestListenerInterface) {
+    override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApi.removeRequestListener(listener)
-    }
+
+    override fun getUserCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
+        megaApi.getUserCredentials(user, listener)
+
+    override fun resetCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
+        megaApi.resetCredentials(user, listener)
+
+    override fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
+        megaApi.verifyCredentials(user, listener)
 }

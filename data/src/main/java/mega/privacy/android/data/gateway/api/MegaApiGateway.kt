@@ -112,6 +112,11 @@ interface MegaApiGateway {
     val accountAuth: String
 
     /**
+     * Fingerprint of the signing key of the current account
+     */
+    val myCredentials: String?
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean
@@ -401,11 +406,12 @@ interface MegaApiGateway {
     fun base64ToHandle(base64Handle: String): Long
 
     /**
-     * Cancel transfer
+     * Cancels a [MegaTransfer]
      *
-     * @param transfer to be cancelled
+     * @param transfer the [MegaTransfer] to cancel
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
      */
-    fun cancelTransfer(transfer: MegaTransfer)
+    fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
      * Gets the number of unread user alerts for the logged in user.
@@ -597,7 +603,7 @@ interface MegaApiGateway {
      * @param order order for the returned list
      * @return children nodes list
      */
-    suspend fun getChildren(parent: MegaNode, order: Int, ): List<MegaNode>
+    suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode>
 
     /**
      * Get a list with all public links
@@ -949,4 +955,28 @@ interface MegaApiGateway {
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
+
+    /**
+     * Gets the credentials of a given user.
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun getUserCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Resets credentials of a given user
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun resetCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Verifies credentials of a given user.
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
 }

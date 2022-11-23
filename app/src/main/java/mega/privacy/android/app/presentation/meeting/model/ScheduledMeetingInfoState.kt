@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.model
 
-import mega.privacy.android.app.meeting.list.adapter.ScheduledMeetingItem
+import mega.privacy.android.app.meeting.list.ScheduledMeetingItem
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.domain.entity.contacts.ContactItem
 

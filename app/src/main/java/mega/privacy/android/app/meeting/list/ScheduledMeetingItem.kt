@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting.list.adapter
+package mega.privacy.android.app.meeting.list
 
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.contacts.group.data.GroupChatParticipant

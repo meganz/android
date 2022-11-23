@@ -2213,12 +2213,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             }
 
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
+            Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
@@ -2381,12 +2376,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             } //END participant removed
 
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
+            Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
 
         }
@@ -3807,12 +3797,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
                 } else {
                     ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(context.getString(R.string.text_deleted_message));
@@ -5871,12 +5856,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } catch (Exception e) {
             }
 
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
+            Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
@@ -5947,12 +5927,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } catch (Exception e) {
             }
 
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
+            Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
 
             ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
         }
@@ -6044,12 +6019,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         }
 
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
 
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);

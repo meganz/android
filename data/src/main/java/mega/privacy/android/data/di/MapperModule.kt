@@ -9,6 +9,7 @@ import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
@@ -60,6 +61,7 @@ import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
+import mega.privacy.android.data.mapper.toChatRoom
 import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
@@ -380,6 +382,12 @@ internal class MapperModule {
      */
     @Provides
     fun provideAccountDetailMapper(): AccountDetailMapper = ::toAccountDetail
+
+    /**
+     * Provide chat room mapper
+     */
+    @Provides
+    fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
 
     /**
      * Provide [MyAccountCredentialsMapper] mapper

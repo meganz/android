@@ -33,10 +33,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -109,18 +109,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-            String manufacturer = "xiaomi";
-            if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                Timber.d("POST Android N");
-                newIncomingContactRequest(finalIcr);
-            } else {
-                Timber.d("XIAOMI POST Android N");
-                generateIncomingNotificationPreN(finalIcr);
-            }
+        String manufacturer = "xiaomi";
+        if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
+            Timber.d("POST Android N");
+            newIncomingContactRequest(finalIcr);
         } else {
-            Timber.d("PRE Android N");
+            Timber.d("XIAOMI POST Android N");
             generateIncomingNotificationPreN(finalIcr);
         }
     }
@@ -154,18 +148,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public void newAcceptanceContactRequest() {
         Timber.d("newAcceptanceContactRequest");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-            String manufacturer = "xiaomi";
-            if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                Timber.d("POST Android N");
-                sendBundledNotificationAPC();
-            } else {
-                Timber.d("XIAOMI POST Android N");
-                showSimpleNotificationAPC();
-            }
+        String manufacturer = "xiaomi";
+        if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
+            Timber.d("POST Android N");
+            sendBundledNotificationAPC();
         } else {
-            Timber.d("PRE Android N");
+            Timber.d("XIAOMI POST Android N");
             showSimpleNotificationAPC();
         }
     }
@@ -207,13 +195,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
         notificationBuilder.setStyle(inboxStyle);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-        } else {
-            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-            notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        }
+        notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
         for (int i = 0; i < icr.size(); i++) {
             MegaContactRequest contactRequest = icr.get(i);
@@ -594,13 +576,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                 mBuilderCompat.setLargeIcon(largeIcon);
             }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                mBuilderCompat.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            } else {
-                // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                mBuilderCompat.setPriority(NotificationCompat.PRIORITY_HIGH);
-            }
+            mBuilderCompat.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             notificationManager.notify(NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
         }

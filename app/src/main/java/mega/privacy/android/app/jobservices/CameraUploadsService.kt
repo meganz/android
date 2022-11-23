@@ -13,7 +13,6 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -33,22 +32,17 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
+import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
-import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
-import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
-import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
-import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
@@ -58,6 +52,7 @@ import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.BackupState
@@ -109,13 +104,11 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
-import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -210,28 +203,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * UpdateCameraUploadTimeStamp
-     */
-    @Inject
-    lateinit var updateTimeStamp: UpdateCameraUploadTimeStamp
-
-    /**
      * GetCameraUploadLocalPath
      */
     @Inject
     lateinit var localPath: GetCameraUploadLocalPath
-
-    /**
-     * GetCameraUploadLocalPathSecondary
-     */
-    @Inject
-    lateinit var localPathSecondary: GetCameraUploadLocalPathSecondary
-
-    /**
-     * GetCameraUploadSelectionQuery
-     */
-    @Inject
-    lateinit var selectionQuery: GetCameraUploadSelectionQuery
 
     /**
      * IsLocalPrimaryFolderSet
@@ -298,12 +273,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var setSyncLocalPath: SetSyncLocalPath
-
-    /**
-     * GetSyncFileUploadUris
-     */
-    @Inject
-    lateinit var getSyncFileUploadUris: GetSyncFileUploadUris
 
     /**
      * ShouldCompressVideo
@@ -384,28 +353,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getNodeByHandle: GetNodeByHandle
 
     /**
-     * GetFingerprint
-     */
-    @Inject
-    lateinit var getFingerprint: GetFingerprint
-
-    /**
      * GetChildrenNode
      */
     @Inject
     lateinit var getChildrenNode: GetChildrenNode
-
-    /**
-     * SaveSyncRecordsToDB
-     */
-    @Inject
-    lateinit var saveSyncRecordsToDB: SaveSyncRecordsToDB
-
-    /**
-     * GetPendingUploadList
-     */
-    @Inject
-    lateinit var getPendingUploadList: GetPendingUploadList
 
     /**
      * ProcessMediaForUpload
@@ -493,12 +444,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getSession: GetSession
 
     /**
-     * Root Node Exists
-     */
-    @Inject
-    lateinit var rootNodeExists: RootNodeExists
-
-    /**
      * Is Node In Rubbish
      */
     @Inject
@@ -509,6 +454,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var monitorChargingStoppedState: MonitorChargingStoppedState
+
+    /**
+     * initiate mega api connection based on IP
+     */
+    @Inject
+    lateinit var cameraServiceIpChangeHandler: CameraServiceIpChangeHandler
+
+    /**
+     * Cancel Transfer
+     */
+    @Inject
+    lateinit var cancelTransfer: CancelTransfer
 
     /**
      * Coroutine Scope for camera upload work
@@ -549,8 +506,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    // above battery level -> level > LOW_BATTERY_LEVEL || Util.isCharging
-    // below battery level -> level <= LOW_BATTERY_LEVEL && !Util.isCharging(this@CameraUploadsService)
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
             monitorBatteryInfo().collect {
@@ -630,11 +585,32 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
                 for (transfer in cuTransfers) {
-                    megaApi?.cancelTransfer(transfer, this@CameraUploadsService)
+                    runCatching { cancelTransfer(transfer) }
+                        .onSuccess {
+                            handleSuccessfullyCancelledTransfer()
+                        }
+                        .onFailure { error ->
+                            Timber.e("Transfer cancellation error: $error")
+                        }
                 }
                 coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
                 sendTransfersInterruptedInfoToBackupCenter()
                 endService()
+            }
+        }
+    }
+
+    /**
+     * When a Transfer is successfully cancelled, reset the overall number of
+     * pending uploads after a short delay
+     */
+    private suspend fun handleSuccessfullyCancelledTransfer() {
+        Timber.d("Transfer cancellation successful")
+        delay(200)
+        megaApi?.let {
+            @Suppress("DEPRECATION")
+            if (it.numPendingUploads <= 0) {
+                it.resetTotalUploads()
             }
         }
     }
@@ -1417,19 +1393,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             return
         }
 
-        val previousIP = app?.localIpAddress
-        // the new logic implemented in NetworkStateReceiver
-        val currentIP = Util.getLocalIpAddress(applicationContext)
-        app?.localIpAddress = currentIP
-        if (currentIP != null && currentIP.isNotEmpty() && currentIP.compareTo("127.0.0.1") != 0) {
-            if (previousIP == null || currentIP.compareTo(previousIP) != 0) {
-                Timber.d("Reconnecting...")
-                megaApi?.reconnect()
-            } else {
-                Timber.d("Retrying pending connections...")
-                megaApi?.retryPendingConnections()
-            }
-        }
+        cameraServiceIpChangeHandler.start()
         // end new logic
         intent = Intent(this, ManagerActivity::class.java)
         intent?.action = Constants.ACTION_CANCEL_CAM_SYNC
@@ -1459,12 +1423,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         cuTransfers.clear()
         canceled = true
         running = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
     }
@@ -1505,20 +1464,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private suspend fun requestFinished(request: MegaRequest, e: MegaError) {
         when (request.type) {
-            MegaRequest.TYPE_CANCEL_TRANSFER -> {
-                Timber.d("Cancel transfer received")
-                if (e.errorCode == MegaError.API_OK) {
-                    delay(200)
-                    megaApi?.let {
-                        @Suppress("DEPRECATION")
-                        if (it.numPendingUploads <= 0) {
-                            it.resetTotalUploads()
-                        }
-                    }
-                } else {
-                    endService()
-                }
-            }
             MegaRequest.TYPE_CANCEL_TRANSFERS -> {
                 @Suppress("DEPRECATION")
                 if (e.errorCode == MegaError.API_OK && (megaApi?.numPendingUploads ?: 1) <= 0) {
@@ -2088,11 +2033,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
             builder?.setSubText(subText)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder?.setSubText(subText)
         } else {
-            builder?.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                ?.setContentInfo(subText)
+            builder?.setSubText(subText)
         }
         notification = builder?.build()
         notificationManager?.notify(notificationId, notification)
@@ -2129,11 +2071,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
             builder.setContentText(contentText)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder.setContentText(contentText)
         } else {
-            builder.setContentInfo(contentText).color =
-                ContextCompat.getColor(this, R.color.red_600_red_300)
+            builder.setContentText(contentText)
         }
         notificationManager?.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
     }
