@@ -68,16 +68,6 @@ String readTesterGroupList() {
     return groups
 }
 
-/**
- * Check whether we should use prebuilt SDK or local sdk module
- *
- * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
- */
-boolean shouldUsePrebuiltSdk() {
-    String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
-    return usePrebuiltSdk == null || usePrebuiltSdk != "false"
-}
-
 configurations {
     jacocoAnt
 }
