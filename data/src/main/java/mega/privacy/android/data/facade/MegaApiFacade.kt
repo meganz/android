@@ -552,4 +552,38 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
         megaApi.verifyCredentials(user, listener)
+
+    override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
+        megaApi.getCountryCallingCodes(listener)
+
+    override fun isAchievementsEnabled() =
+        megaApi.isAchievementsEnabled
+
+    override fun logout(listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.logout()
+        } else {
+            megaApi.logout(listener)
+        }
+    }
+
+    override fun sendSMSVerificationCode(
+        phoneNumber: String,
+        reVerifyingWhitelisted: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        if (reVerifyingWhitelisted) {
+            megaApi.sendSMSVerificationCode(phoneNumber, listener, true)
+        } else {
+            megaApi.sendSMSVerificationCode(phoneNumber, listener)
+        }
+    }
+
+    override fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.resetSmsVerifiedPhoneNumber()
+        } else {
+            megaApi.resetSmsVerifiedPhoneNumber(listener)
+        }
+    }
 }
