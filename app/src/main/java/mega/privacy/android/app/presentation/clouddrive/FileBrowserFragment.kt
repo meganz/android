@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment as NewMediaDiscoveryFragment
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
@@ -50,10 +49,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -66,6 +63,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -1328,14 +1326,8 @@ class FileBrowserFragment : RotatableFragment() {
 
     fun showMediaDiscovery() {
         activity?.lifecycleScope?.launch {
-            val newMediaDiscoveryEnable = getFeatureFlag(AppFeatures.NewMediaDiscovery)
-
-            val f = if (newMediaDiscoveryEnable) {
-                NewMediaDiscoveryFragment.getNewInstance(mediaHandle)
-            } else {
-                MediaDiscoveryFragment.getInstance(mediaHandle)
-            }
-            (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(f, mediaHandle)
+            (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(
+                MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle)
         }
     }
 
