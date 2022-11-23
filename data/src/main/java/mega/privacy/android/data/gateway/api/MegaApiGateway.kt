@@ -1026,4 +1026,19 @@ interface MegaApiGateway {
      */
     fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?)
 
+
+    /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     * @param listener
+     */
+    fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
 }

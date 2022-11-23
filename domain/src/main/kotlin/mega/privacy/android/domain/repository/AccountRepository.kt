@@ -132,4 +132,17 @@ interface AccountRepository {
      * @param pro
      */
     suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
+
+    /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     */
+    suspend fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+    )
 }
