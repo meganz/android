@@ -622,8 +622,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             .onSuccess {
                 Timber.d("Transfer cancellation successful")
                 if (shouldResetTotalUploads) {
-                    // Reset the pending uploads overall count after a short delay
-                    delay(200)
+                    // Reset the pending uploads overall count
                     handleResetTotalUploads()
                 }
             }
