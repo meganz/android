@@ -284,9 +284,11 @@ class MediaPlayerFragment : Fragment() {
                 }
                 with(viewHolder) {
                     // we need setup control buttons again, because reset player would reset PlayerControlView
-                    setupPlaylistButton(playerServiceViewModelGateway?.getPlaylistItems()) {
-                        (requireActivity() as MediaPlayerActivity).setDraggable(false)
-                        findNavController().navigate(R.id.action_player_to_playlist)
+                    playerServiceViewModelGateway?.run {
+                        setupPlaylistButton(getPlaylistItems()) {
+                            (requireActivity() as MediaPlayerActivity).setDraggable(false)
+                            findNavController().navigate(R.id.action_player_to_playlist)
+                        }
                     }
                     setupLockUI(viewModel.isLockUpdate.value) { isLock ->
                         viewModel.updateLockStatus(isLock)

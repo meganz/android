@@ -141,7 +141,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      */
     fun setupPlaylistButton(
         context: Context,
-        playlistItems: List<PlaylistItem>?,
+        playlistItems: List<PlaylistItem>,
         openPlaylist: () -> Unit,
     ) {
         togglePlaylistEnabled(context, playlistItems)
@@ -157,10 +157,8 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      * @param context Context
      * @param playlistItems the new playlist
      */
-    fun togglePlaylistEnabled(context: Context, playlistItems: List<PlaylistItem>?) {
-        playlist.isEnabled = playlistItems?.run {
-            size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
-        } ?: false
+    fun togglePlaylistEnabled(context: Context, playlistItems: List<PlaylistItem>) {
+        playlist.isEnabled = playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
         playlist.setColorFilter(context.getColor(
             if (playlist.isEnabled) {
                 R.color.dark_grey_white
