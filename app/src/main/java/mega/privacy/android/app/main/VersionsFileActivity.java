@@ -32,7 +32,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -529,8 +528,8 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-Timber.d("onRequestFinish: %s",  request.getType());
-Timber.d("onRequestFinish: %s",  request.getRequestString());
+        Timber.d("onRequestFinish: %s", request.getType());
+        Timber.d("onRequestFinish: %s", request.getRequestString());
         if (adapter != null && adapter.isMultipleSelect()) {
             adapter.clearSelections();
             hideMultipleSelect();
@@ -616,7 +615,7 @@ Timber.d("onRequestFinish: %s",  request.getRequestString());
 
             if (localPath != null) {
                 File mediaFile = new File(localPath);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                     Uri mediaFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
                     if (mediaFileUri == null) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
@@ -674,7 +673,7 @@ Timber.d("onRequestFinish: %s",  request.getRequestString());
 
             if (localPath != null) {
                 File mediaFile = new File(localPath);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                     pdfIntent.setDataAndType(FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(vNode.getName()).getType());
                 } else {
                     pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(vNode.getName()).getType());
@@ -832,7 +831,7 @@ Timber.d("onRequestFinish: %s",  request.getRequestString());
                 } else {
                     node = n;
                 }
-Timber.d("Node name: %s",  node.getName());
+                Timber.d("Node name: %s", node.getName());
                 if (megaApi.hasVersions(node)) {
                     nodeVersions = megaApi.getVersions(node);
                 } else {
@@ -880,7 +879,7 @@ Timber.d("Node name: %s",  node.getName());
         if (nodeVersions == null || nodeVersions.size() == 1) {
             finish();
         } else {
-Timber.d("After update - nodeVersions size: %s",  nodeVersions.size());
+            Timber.d("After update - nodeVersions size: %s", nodeVersions.size());
 
             if (adapter != null) {
                 adapter.setNodes(nodeVersions);

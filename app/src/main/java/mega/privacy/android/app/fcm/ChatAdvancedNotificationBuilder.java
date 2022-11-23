@@ -64,7 +64,6 @@ import android.os.Build;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -75,18 +74,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.app.meeting.CallNotificationIntentService;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.domain.entity.ChatRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -164,7 +163,6 @@ public final class ChatAdvancedNotificationBuilder {
         chatC = new ChatController(context);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, List<Long> unreadHandleList) {
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
@@ -281,13 +279,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setStyle(inboxStyle);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-        } else {
-            // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-            notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        }
+        notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
         for (int i = 0; i < chats.size(); i++) {
             if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
@@ -418,7 +410,6 @@ public final class ChatAdvancedNotificationBuilder {
         return message.getContent();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, ArrayList<MegaChatMessage> unreadMessageList) {
         Intent intent = new Intent(context, ManagerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1136,13 +1127,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-            } else {
-                // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-            }
+            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
 
@@ -1166,8 +1151,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             newGenerateChatNotification(request);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
+        } else {
             String manufacturer = "xiaomi";
             if (!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
                 Timber.d("POST Android N");
@@ -1176,13 +1160,9 @@ public final class ChatAdvancedNotificationBuilder {
                 Timber.d("XIAOMI POST Android N");
                 generateChatNotificationPreN(request);
             }
-        } else {
-            Timber.d("PRE Android N");
-            generateChatNotificationPreN(request);
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void newGenerateChatNotification(ChatRequest request) {
         Timber.d("newGenerateChatNotification");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1264,7 +1244,6 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void checkShowChatNotifications(long lastChatId, boolean beep, ChatRequest request, ArrayList<MegaChatListItem> chats) {
         if (MegaApplication.getOpenChatId() != lastChatId) {
             Timber.d("Generate chat notification for: %d chats", chats.size());
@@ -1360,7 +1339,6 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private boolean showChatNotification(long chatid, List<Long> handleListUnread, boolean beep) {
         Timber.d("Beep: %s", beep);
         if (beep) {
@@ -1375,7 +1353,6 @@ public final class ChatAdvancedNotificationBuilder {
         return true;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void checkNotificationsSound(long chatid, List<Long> handleListUnread, boolean beep) {
         Timber.d("Chat ID: %d, Beep: %s", chatid, beep);
 

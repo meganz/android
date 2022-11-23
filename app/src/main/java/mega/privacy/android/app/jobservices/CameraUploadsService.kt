@@ -13,7 +13,6 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -1454,12 +1453,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         cuTransfers.clear()
         canceled = true
         running = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
     }
@@ -2083,11 +2077,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
             builder?.setSubText(subText)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder?.setSubText(subText)
         } else {
-            builder?.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                ?.setContentInfo(subText)
+            builder?.setSubText(subText)
         }
         notification = builder?.build()
         notificationManager?.notify(notificationId, notification)
@@ -2124,11 +2115,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
             builder.setContentText(contentText)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder.setContentText(contentText)
         } else {
-            builder.setContentInfo(contentText).color =
-                ContextCompat.getColor(this, R.color.red_600_red_300)
+            builder.setContentText(contentText)
         }
         notificationManager?.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
     }

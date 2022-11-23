@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -373,12 +372,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                     ).replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
             }
 
@@ -459,12 +453,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                         ).replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextView.setText(result);
                 }
             } else {
@@ -534,7 +523,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                     String localPath = getLocalFile(file);
                     if (localPath != null) {
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         } else {
                             mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -590,7 +579,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                     String localPath = getLocalFile(file);
                     if (localPath != null) {
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         } else {
                             pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -690,12 +679,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                 ).replace("[/B]", "</font>");
             } catch (Exception e) {
             }
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
+            Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             emptyTextView.setText(result);
 
 

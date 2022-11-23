@@ -565,8 +565,7 @@ public class AppRTCAudioManager {
 
         if (typeAudioManager != AUDIO_MANAGER_PLAY_VOICE_CLIP &&
                 typeAudioManager != AUDIO_MANAGER_CALL_RINGING &&
-                (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
-                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Timber.d("Mode communication");
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         } else {

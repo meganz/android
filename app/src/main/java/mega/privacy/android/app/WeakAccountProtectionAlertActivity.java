@@ -25,11 +25,11 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.main.LoginActivity;
 import mega.privacy.android.app.main.controllers.AccountController;
+import mega.privacy.android.domain.qualifier.ApplicationScope;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -70,12 +70,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
         } catch (Exception e) {
         }
 
-        Spanned result;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(text);
-        }
+        Spanned result = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
         verifyEmailText.setText(result);
 
         whyAmISeeingThisLayout = findViewById(R.id.why_am_i_seeing_this_layout);
