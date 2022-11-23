@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di.transfers
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,87 +27,117 @@ import mega.privacy.android.domain.usecase.MonitorTransfersSize
  */
 @Module
 @InstallIn(ViewModelComponent::class, ServiceComponent::class)
-class TransfersModule {
+abstract class TransfersModule {
 
     /**
-     * Provides the [CancelTransfer] implementation
+     * Binds the Use Case [HasPendingUploads] to its default implementation [DefaultHasPendingUploads]
+     *
+     * @param useCase [DefaultHasPendingUploads]
+     * @return [HasPendingUploads]
      */
-    @Provides
-    fun provideCancelTransfer(transfersRepository: TransfersRepository): CancelTransfer =
-        CancelTransfer(transfersRepository::cancelTransfer)
+    @Binds
+    abstract fun bindHasPendingUploads(useCase: DefaultHasPendingUploads): HasPendingUploads
 
     /**
-     * Provides the [CancelAllUploadTransfers] implementation
+     * Binds the Use Case [MonitorTransfersSize] to its default implementation [DefaultMonitorTransfersSize]
+     *
+     * @param useCase [DefaultMonitorTransfersSize]
+     * @return [MonitorTransfersSize]
      */
-    @Provides
-    fun provideCancelAllUploadTransfers(transfersRepository: TransferRepository): CancelAllUploadTransfers =
-        CancelAllUploadTransfers(transfersRepository::cancelAllUploadTransfers)
+    @Binds
+    abstract fun bindMonitorTransfersSize(useCase: DefaultMonitorTransfersSize): MonitorTransfersSize
 
-    /**
-     * Provides the [AreTransfersPaused] implementation
-     */
-    @Provides
-    fun provideAreTransfersPaused(transfersRepository: TransferRepository):
-            AreTransfersPaused = AreTransfersPaused(transfersRepository::areTransfersPaused)
+    companion object {
 
-    /**
-     * Provides the [GetNumPendingDownloadsNonBackground] implementation
-     */
-    @Provides
-    fun provideGetNumPendingDownloadsNonBackground(transfersRepository: TransferRepository):
-            GetNumPendingDownloadsNonBackground =
-        GetNumPendingDownloadsNonBackground(transfersRepository::getNumPendingDownloadsNonBackground)
+        /**
+         * Provides the [CancelTransfer] implementation
+         *
+         * @param transfersRepository [TransfersRepository]
+         * @return [CancelTransfer]
+         */
+        @Provides
+        fun provideCancelTransfer(transfersRepository: TransfersRepository): CancelTransfer =
+            CancelTransfer(transfersRepository::cancelTransfer)
 
-    /**
-     * Provides the [GetNumPendingUploads] implementation
-     */
-    @Provides
-    fun provideGetNumPendingUploads(transfersRepository: TransferRepository): GetNumPendingUploads =
-        GetNumPendingUploads(transfersRepository::getNumPendingUploads)
+        /**
+         * Provides the [CancelAllUploadTransfers] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [CancelAllUploadTransfers]
+         */
+        @Provides
+        fun provideCancelAllUploadTransfers(transfersRepository: TransferRepository): CancelAllUploadTransfers =
+            CancelAllUploadTransfers(transfersRepository::cancelAllUploadTransfers)
 
-    /**
-     * Provides the [GetNumPendingTransfers] implementation
-     */
-    @Provides
-    fun provideGetNumPendingTransfers(transfersRepository: TransferRepository): GetNumPendingTransfers =
-        GetNumPendingTransfers(transfersRepository::getNumPendingTransfers)
+        /**
+         * Provides the [AreTransfersPaused] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [AreTransfersPaused]
+         */
+        @Provides
+        fun provideAreTransfersPaused(transfersRepository: TransferRepository):
+                AreTransfersPaused = AreTransfersPaused(transfersRepository::areTransfersPaused)
 
-    /**
-     * Provides the [HasPendingUploads] implementation
-     */
-    @Provides
-    fun provideHasPendingUploads(getNumPendingUploads: GetNumPendingUploads): HasPendingUploads =
-        DefaultHasPendingUploads(
-            getNumPendingUploads = getNumPendingUploads,
-        )
+        /**
+         * Provides the [GetNumPendingDownloadsNonBackground] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [GetNumPendingDownloadsNonBackground]
+         */
+        @Provides
+        fun provideGetNumPendingDownloadsNonBackground(transfersRepository: TransferRepository):
+                GetNumPendingDownloadsNonBackground =
+            GetNumPendingDownloadsNonBackground(transfersRepository::getNumPendingDownloadsNonBackground)
 
-    /**
-     * Provides the [IsCompletedTransfersEmpty] implementation
-     */
-    @Provides
-    fun provideIsCompletedTransfersEmpty(transfersRepository: TransferRepository): IsCompletedTransfersEmpty =
-        IsCompletedTransfersEmpty(transfersRepository::isCompletedTransfersEmpty)
+        /**
+         * Provides the [GetNumPendingUploads] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [GetNumPendingUploads]
+         */
+        @Provides
+        fun provideGetNumPendingUploads(transfersRepository: TransferRepository): GetNumPendingUploads =
+            GetNumPendingUploads(transfersRepository::getNumPendingUploads)
 
-    /**
-     * Provides the [AreAllTransfersPaused] implementation
-     */
-    @Provides
-    fun provideAreAllTransfersPaused(transfersRepository: TransferRepository): AreAllTransfersPaused =
-        AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
+        /**
+         * Provides the [GetNumPendingTransfers] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [GetNumPendingTransfers]
+         */
+        @Provides
+        fun provideGetNumPendingTransfers(transfersRepository: TransferRepository): GetNumPendingTransfers =
+            GetNumPendingTransfers(transfersRepository::getNumPendingTransfers)
 
-    /**
-     * Provides the [AreAllUploadTransfersPaused] implementation
-     */
-    @Provides
-    fun provideAreAllUploadTransfersPaused(transfersRepository: TransferRepository): AreAllUploadTransfersPaused =
-        AreAllUploadTransfersPaused(transfersRepository::areAllUploadTransfersPaused)
+        /**
+         * Provides the [IsCompletedTransfersEmpty] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [IsCompletedTransfersEmpty]
+         */
+        @Provides
+        fun provideIsCompletedTransfersEmpty(transfersRepository: TransferRepository): IsCompletedTransfersEmpty =
+            IsCompletedTransfersEmpty(transfersRepository::isCompletedTransfersEmpty)
 
-    /**
-     * Provides the [MonitorTransfersSize] implementation
-     */
-    @Provides
-    fun provideMonitorTransfersSize(
-        transfersRepository: TransferRepository,
-    ): MonitorTransfersSize =
-        DefaultMonitorTransfersSize(transfersRepository)
+        /**
+         * Provides the [AreAllTransfersPaused] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [AreAllTransfersPaused]
+         */
+        @Provides
+        fun provideAreAllTransfersPaused(transfersRepository: TransferRepository): AreAllTransfersPaused =
+            AreAllTransfersPaused(transfersRepository::areAllTransfersPaused)
+
+        /**
+         * Provides the [AreAllUploadTransfersPaused] implementation
+         *
+         * @param transfersRepository [TransferRepository]
+         * @return [AreAllUploadTransfersPaused]
+         */
+        @Provides
+        fun provideAreAllUploadTransfersPaused(transfersRepository: TransferRepository): AreAllUploadTransfersPaused =
+            AreAllUploadTransfersPaused(transfersRepository::areAllUploadTransfersPaused)
+    }
 }
