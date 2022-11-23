@@ -282,9 +282,7 @@ class GlobalListener @Inject constructor(
                     .setContentIntent(pendingIntent)
                     .setColor(ContextCompat.getColor(appContext, R.color.red_600_red_300))
                     .setLargeIcon((d as BitmapDrawable).bitmap)
-                    .setPriority(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                    ) NotificationManager.IMPORTANCE_HIGH // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                    else NotificationCompat.PRIORITY_HIGH)
+                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
             notificationManager.notify(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE,
                 notificationBuilder.build())
         } catch (e: Exception) {

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.recentactions
 
 import android.content.Context
-import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -283,11 +282,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
             Timber.e(e, "Exception formatting string")
             ""
         }
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            @Suppress("DEPRECATION")
-            Html.fromHtml(formattedUserAction)
-        } else
-            Html.fromHtml(formattedUserAction, Html.FROM_HTML_MODE_LEGACY)
+        return Html.fromHtml(formattedUserAction, Html.FROM_HTML_MODE_LEGACY)
     }
 
     /**

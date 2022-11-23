@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.Spanned
@@ -559,9 +558,7 @@ class InboxFragment : RotatableFragment() {
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
-                    localPath.contains(Environment.getExternalStorageDirectory().path)
-                ) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
                     mediaIntent.setDataAndType(FileProvider.getUriForFile(
                         requireActivity(),
                         "mega.privacy.android.app.providers.fileprovider",
@@ -618,7 +615,7 @@ class InboxFragment : RotatableFragment() {
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().path)) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
                     pdfIntent.setDataAndType(FileProvider.getUriForFile(
                         requireActivity(),
                         "mega.privacy.android.app.providers.fileprovider",

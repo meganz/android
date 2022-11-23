@@ -20,6 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -141,7 +143,8 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     private val playingThumbnail = MutableLiveData<File>()
 
-    private val playlist = MutableLiveData<Pair<List<PlaylistItem>, Int>>()
+    private val playlistItemsFlow =
+        MutableStateFlow<Pair<List<PlaylistItem>, Int>>(Pair(emptyList(), 0))
 
     private val playlistTitle = MutableLiveData<String>()
 
@@ -174,6 +177,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private var needStopStreamingServer = false
 
     private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
+    private var playlistItemsChanged: MutableList<PlaylistItem> = mutableListOf()
     private var playingPosition = 0
 
     private var cancelToken: MegaCancelToken? = null
@@ -930,7 +934,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (!isScroll) {
                 scrollPosition = -1
             }
-            playlist.postValue(Pair(recreatedItems, scrollPosition))
+            playlistItemsFlow.update {
+                it.copy(recreatedItems, scrollPosition)
+            }
         }
     }
 
@@ -946,14 +952,15 @@ class MediaPlayerServiceViewModel @Inject constructor(
             }
         }
 
-        playlist.postValue(Pair(filteredItems, 0))
+        playlistItemsFlow.update {
+            it.copy(filteredItems, 0)
+        }
     }
 
     override fun searchQueryUpdate(newText: String?) {
         playlistSearchQuery = newText
-        playlist.value?.first?.let {
-            recreateAndUpdatePlaylistItems(items = it, isBuildPlaySources = false)
-        }
+        recreateAndUpdatePlaylistItems(items = playlistItemsFlow.value.first,
+            isBuildPlaySources = false)
     }
 
     override fun getCurrentIntent() = currentIntent
@@ -962,13 +969,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun setCurrentPlayingHandle(handle: Long) {
         playingHandle = handle
-        playlist.value?.first?.let { items ->
-            playingPosition = items.indexOfFirst { (nodeHandle) ->
+        playlistItemsFlow.value.first.let { playlistItems ->
+            playingPosition = playlistItems.indexOfFirst { (nodeHandle) ->
                 nodeHandle == handle
-            }.takeIf { index ->
-                index in items.indices
-            } ?: 0
-            recreateAndUpdatePlaylistItems(items = items, isBuildPlaySources = false)
+            }.takeIf { index -> index in playlistItems.indices } ?: 0
+            recreateAndUpdatePlaylistItems(items = playlistItemsFlow.value.first,
+                isBuildPlaySources = false)
         }
         postPlayingThumbnail()
     }
@@ -990,7 +996,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun retryUpdate() = retry.asFlow()
 
-    override fun playlistUpdate() = playlist.asFlow()
+    override fun playlistUpdate() = playlistItemsFlow
 
     override fun mediaPlaybackUpdate() = mediaPlayback.asFlow()
 
@@ -1005,17 +1011,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
     override fun removeItem(handle: Long) {
         initPlayerSourceChanged()
         val newItems = removeSingleItem(handle)
-        newItems?.let {
+        if (newItems.isNotEmpty()) {
             resetRetryState()
-            recreateAndUpdatePlaylistItems(items = it)
-        } ?: let {
-            playlist.value = Pair(emptyList(), 0)
+            recreateAndUpdatePlaylistItems(items = newItems)
+        } else {
+            playlistItemsFlow.update {
+                it.copy(emptyList(), 0)
+            }
             error.postValue(MegaError.API_ENOENT)
         }
     }
 
-    private fun removeSingleItem(handle: Long): List<PlaylistItem>? =
-        playlist.value?.first?.let { items ->
+    private fun removeSingleItem(handle: Long): List<PlaylistItem> =
+        playlistItemsFlow.value.first.let { items ->
             val newItems = items.toMutableList()
             items.indexOfFirst { (nodeHandle) ->
                 nodeHandle == handle
@@ -1041,8 +1049,10 @@ class MediaPlayerServiceViewModel @Inject constructor(
     override fun removeAllSelectedItems() {
         if (itemsSelectedMap.isNotEmpty()) {
             itemsSelectedMap.forEach {
-                removeSingleItem(it.value.nodeHandle)?.let { newItems ->
-                    playlist.value = Pair(newItems, playingPosition)
+                removeSingleItem(it.value.nodeHandle).let { newItems ->
+                    playlistItemsFlow.update { flow ->
+                        flow.copy(newItems, playingPosition)
+                    }
                 }
             }
             itemsSelectedMap.clear()
@@ -1052,44 +1062,52 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     override fun itemSelected(handle: Long) {
-        playlistItems.indexOfFirst { (nodeHandle) ->
-            nodeHandle == handle
-        }.takeIf { index ->
-            index in playlistItems.indices
-        }?.let { selectedIndex ->
-            playlistItems[selectedIndex].let { item ->
-                val isSelected = !item.isSelected
-                playlistItems[selectedIndex] = item.copy(isSelected = isSelected)
-                if (playlistItems[selectedIndex].isSelected) {
-                    itemsSelectedMap[handle] = item
-                } else {
-                    itemsSelectedMap.remove(handle)
+        playlistItemsFlow.update {
+            it.copy(
+                it.first.toMutableList().let { playlistItems ->
+                    playlistItems.indexOfFirst { (nodeHandle) ->
+                        nodeHandle == handle
+                    }.takeIf { index ->
+                        index in playlistItems.indices
+                    }?.let { selectedIndex ->
+                        playlistItems[selectedIndex].let { item ->
+                            val isSelected = !item.isSelected
+                            playlistItems[selectedIndex] = item.copy(isSelected = isSelected)
+                            if (playlistItems[selectedIndex].isSelected) {
+                                itemsSelectedMap[handle] = item
+                            } else {
+                                itemsSelectedMap.remove(handle)
+                            }
+                            itemsSelectedCount.value = itemsSelectedMap.size
+                        }
+                    }
+                    playlistItems
                 }
-                itemsSelectedCount.value = itemsSelectedMap.size
-                // Refresh the playlist
-                recreateAndUpdatePlaylistItems(isScroll = false)
-            }
+            )
         }
     }
 
     override fun clearSelections() {
-        mutableListOf<PlaylistItem>().let { items ->
-            items.addAll(playlistItems.map { item ->
-                item.copy(isSelected = false)
-            }).apply {
-                playlistItems.clear()
-                playlistItems.addAll(items)
-            }
+        playlistItemsFlow.update {
+            it.copy(
+                it.first.toMutableList().let { playlistItems ->
+                    playlistItems.map { item ->
+                        item.copy(isSelected = false)
+                    }
+                }
+            )
         }
         itemsSelectedMap.clear()
         actionMode.value = false
-        recreateAndUpdatePlaylistItems()
+
     }
 
     override fun setActionMode(isActionMode: Boolean) {
         actionMode.value = isActionMode
         if (isActionMode) {
-            recreateAndUpdatePlaylistItems(isScroll = false)
+            recreateAndUpdatePlaylistItems(items = playlistItemsFlow.value.first,
+                isScroll = false,
+                isBuildPlaySources = false)
         }
     }
 
@@ -1098,21 +1116,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
         retry.value = true
     }
 
-    override fun updateItemName(handle: Long, newName: String) {
-        for ((index, item) in playlistItems.withIndex()) {
-            if (item.nodeHandle == handle) {
-                val newItem = playlistItems[index].updateNodeName(newName)
-                playlistItems[index] = newItem
-                recreateAndUpdatePlaylistItems()
-                if (handle == playingHandle) {
-                    nodeNameUpdate.postValue(newName)
+    override fun updateItemName(handle: Long, newName: String) =
+        playlistItemsFlow.update {
+            it.copy(
+                it.first.map { item ->
+                    if (item.nodeHandle == handle) {
+                        nodeNameUpdate.postValue(newName)
+                        item.updateNodeName(newName)
+                    } else item
                 }
-                return
-            }
+            )
         }
-    }
 
-    override fun getPlaylistItems() = playlist.value?.first
+    override fun getPlaylistItems() = playlistItemsFlow.value.first
 
     override fun isAudioPlayer() = isAudioPlayer
 
@@ -1140,13 +1156,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
         preferences.edit()
             .putBoolean(KEY_AUDIO_SHUFFLE_ENABLED, shuffleEnabled)
             .apply()
-        if (!enabled) {
-            recreateAndUpdatePlaylistItems()
-        }
+        recreateAndUpdatePlaylistItems(if (enabled) playlistItemsFlow.value.first else playlistItems)
     }
 
     override fun newShuffleOrder(): ShuffleOrder {
-        shuffleOrder = ExposedShuffleOrder(playlistItems.size, this)
+        shuffleOrder = ExposedShuffleOrder(playlistItemsFlow.value.first.size, this)
         return shuffleOrder
     }
 
@@ -1186,11 +1200,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
         type == FOLDER_LINK_ADAPTER && mediaPlayerRepository.credentialsIsNull()
 
     override fun swapItems(current: Int, target: Int) {
-        Collections.swap(playlistItems, current, target)
-        // Keep the index for swap items to keep the play order is correct
-        val index = playlistItems[current].index
-        playlistItems[current] = playlistItems[current].copy(index = playlistItems[target].index)
-        playlistItems[target] = playlistItems[target].copy(index = index)
+        playlistItemsChanged.addAll(playlistItemsFlow.value.first)
+        Collections.swap(playlistItemsChanged, current, target)
+        val index = playlistItemsChanged[current].index
+        playlistItemsChanged[current] =
+            playlistItemsChanged[current].copy(index = playlistItemsChanged[target].index)
+        playlistItemsChanged[target] = playlistItemsChanged[target].copy(index = index)
 
         initPlayerSourceChanged()
         // Swap the items of play source
@@ -1198,33 +1213,34 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     override fun getIndexFromPlaylistItems(item: PlaylistItem): Int? =
-        playlist.value?.first?.let { items ->
-            items.indexOfFirst {
-                it.nodeName == item.nodeName
-            }.takeIf { index ->
-                index in items.indices
-            }
+        /* The media items of ExoPlayer are still the original order even the shuffleEnable is true,
+         so the index of media item should be got from original playlist items */
+        playlistItems.indexOfFirst {
+            it.nodeHandle == item.nodeHandle
+        }.takeIf { index ->
+            index in playlistItemsFlow.value.first.indices
         }
 
     override fun updatePlaySource() {
-        val newPlayerSource = mutableListOf<MediaItem>()
-        newPlayerSource.addAll(playSourceChanged)
+        playlistItemsFlow.update {
+            it.copy(playlistItemsChanged.toList())
+        }
         playerSource.value?.run {
             playerSource.value =
-                copy(mediaItems = newPlayerSource, newIndexForCurrentItem = playingPosition)
-            playSourceChanged.clear()
+                copy(mediaItems = playSourceChanged.toList(),
+                    newIndexForCurrentItem = playingPosition)
         }
+        playSourceChanged.clear()
+        playlistItemsChanged.clear()
     }
 
     override fun isPaused() = paused
 
     override fun getPlayingPosition(): Int = playingPosition
 
-    override fun scrollToPlayingPosition() {
-        playlist.value?.first?.let {
-            recreateAndUpdatePlaylistItems(items = it, isBuildPlaySources = false)
-        }
-    }
+    override fun scrollToPlayingPosition() =
+        recreateAndUpdatePlaylistItems(items = playlistItemsFlow.value.first,
+            isBuildPlaySources = false)
 
     override fun isActionMode() = actionMode.value
 
@@ -1239,7 +1255,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun onShuffleChanged(newShuffle: ShuffleOrder) {
         shuffleOrder = newShuffle
-        if (shuffleOrder.length != 0 && shuffleOrder.length == playlistItems.size) {
+        if (shuffleEnabled && shuffleOrder.length != 0 && shuffleOrder.length == playlistItems.size) {
             recreateAndUpdatePlaylistItems()
         }
     }

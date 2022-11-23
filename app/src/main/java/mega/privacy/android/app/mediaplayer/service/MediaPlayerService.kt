@@ -267,7 +267,9 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     private fun observeData() {
         lifecycleScope.launch {
             viewModelGateway.playerSourceUpdate().collect { mediaPlaySources ->
-                playSource(mediaPlaySources)
+                if (mediaPlaySources.mediaItems.isNotEmpty()) {
+                    playSource(mediaPlaySources)
+                }
             }
         }
 

@@ -32,7 +32,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -83,7 +82,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.LegacyDatabaseHandler;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ContactInfoListDialog;
@@ -529,12 +527,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             Timber.e(e);
         }
 
-        Spanned result;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(result);
     }
 

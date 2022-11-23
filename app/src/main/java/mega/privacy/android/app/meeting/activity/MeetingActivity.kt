@@ -222,8 +222,6 @@ class MeetingActivity : BaseActivity() {
                 }
             }
 
-            meetingViewModel.isChatOpen = it.getBooleanExtra(Constants.ACTION_CHAT_OPEN, false)
-
             meetingViewModel.updateChatRoomId(it.getLongExtra(MEETING_CHAT_ID,
                 MEGACHAT_INVALID_HANDLE))
 

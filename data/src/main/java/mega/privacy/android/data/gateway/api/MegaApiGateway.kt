@@ -112,6 +112,11 @@ interface MegaApiGateway {
     val accountAuth: String
 
     /**
+     * Fingerprint of the signing key of the current account
+     */
+    val myCredentials: String?
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean
@@ -401,11 +406,12 @@ interface MegaApiGateway {
     fun base64ToHandle(base64Handle: String): Long
 
     /**
-     * Cancel transfer
+     * Cancels a [MegaTransfer]
      *
-     * @param transfer to be cancelled
+     * @param transfer the [MegaTransfer] to cancel
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
      */
-    fun cancelTransfer(transfer: MegaTransfer)
+    fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
      * Gets the number of unread user alerts for the logged in user.
@@ -597,7 +603,7 @@ interface MegaApiGateway {
      * @param order order for the returned list
      * @return children nodes list
      */
-    suspend fun getChildren(parent: MegaNode, order: Int, ): List<MegaNode>
+    suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode>
 
     /**
      * Get a list with all public links
@@ -949,4 +955,75 @@ interface MegaApiGateway {
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
+
+    /**
+     * Gets the credentials of a given user.
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun getUserCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Resets credentials of a given user
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun resetCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Verifies credentials of a given user.
+     *
+     * @param user     MegaUser of a contact.
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Requests the currently available country calling codes
+     *
+     * @param listener [MegaRequestListenerInterface] to track this request
+     */
+    fun getCountryCallingCodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Returns whether MEGA Achievements are enabled for the open account
+     *
+     * @return True if enabled, false otherwise.
+     */
+
+    fun isAchievementsEnabled(): Boolean
+
+    /**
+     * Logout of the MEGA account invalidating the session
+     *
+     * @param listener [MegaRequestListenerInterface] to track this request
+     */
+    fun logout(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Provide a phone number to get verification code.
+     *
+     * @param phoneNumber the phone number to receive the txt with verification code.
+     * @param reVerifyingWhitelisted to check whether to re verify whitelisted
+     * @param listener [MegaRequestListenerInterface]    callback of this request.
+     */
+    fun sendSMSVerificationCode(
+        phoneNumber: String,
+        reVerifyingWhitelisted: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Reset the verified phone number for the account logged in.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_RESET_SMS_VERIFIED_NUMBER
+     * If there's no verified phone number associated for the account logged in, the error code
+     * provided in onRequestFinish is MegaError::API_ENOENT.
+     *
+     * @param listener [MegaRequestListenerInterface] to track this request
+     */
+    fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?)
+
 }

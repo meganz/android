@@ -22,7 +22,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
@@ -234,13 +233,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                     callManager { manager ->
                         manager.refreshCUNodes()
-
-                        if (manager.isInMDPage) {
-                            val f = manager.mdFragment
-                            if (f is MediaDiscoveryFragment) {
-                                f.loadPhotos()
-                            }
-                        }
 
                         if (manager.isInAlbumContentPage) {
                             val f = manager.albumContentFragment

@@ -2,7 +2,6 @@ package mega.privacy.android.app.smsVerification
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.telephony.PhoneNumberUtils
@@ -28,7 +27,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.CountryCodePickerActivity
-import mega.privacy.android.app.main.LoginFragment
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColor
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
@@ -140,12 +138,7 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
                     "<font color=\' " + getThemeColorHexString(this,
                         R.attr.colorSecondary) + "\'><u>")
                 .replace("[/A]", "</u></font>")
-            val result: Spanned = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                @Suppress("DEPRECATION")
-                Html.fromHtml(textToShow)
-            } else {
-                Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-            }
+            val result: Spanned = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
             textLogout = findViewById(R.id.sms_logout)
             textLogout.text = result
             textLogout.visibility = View.VISIBLE

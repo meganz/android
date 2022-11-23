@@ -76,7 +76,7 @@ interface PlayerServiceViewModelGateway {
      *
      * @return List<PlaylistItem>
      */
-    fun getPlaylistItems(): List<PlaylistItem>?
+    fun getPlaylistItems(): List<PlaylistItem>
 
     /**
      * Is the audio player

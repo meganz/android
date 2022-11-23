@@ -6,7 +6,6 @@ import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
@@ -1057,7 +1056,7 @@ public class ChatActivity extends PasscodeActivity
             }
 
             Timber.d("Show new chat room UI");
-            initAndShowChat(null);
+            initEmptyScreen(null);
             supportInvalidateOptionsMenu();
         } else {
             String text;
@@ -1163,9 +1162,7 @@ public class ChatActivity extends PasscodeActivity
         if (intent.resolveActivity(getPackageManager()) != null) {
             File photoFile = createImageFile();
             if (photoFile != null) {
-                Uri photoURI = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
-                        FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, photoFile) :
-                        Uri.fromFile(photoFile);
+                Uri photoURI = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, photoFile);
 
                 mOutputFilePath = photoFile.getAbsolutePath();
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -1483,7 +1480,6 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -2175,7 +2171,7 @@ public class ChatActivity extends PasscodeActivity
                             text = getString(R.string.chat_link_copied_clipboard);
                         }
                     }
-                    initAndShowChat(text);
+                    initEmptyScreen(text);
                 }
             }
         } else {
@@ -2308,34 +2304,12 @@ public class ChatActivity extends PasscodeActivity
     }
 
     /**
-     * Opens a new chat conversation.
-     * If it went well, shows the chat with the empty state and requests messages.
+     * Shows the chat with the empty state and requests messages.
      *
      * @param textSnackbar if there is a chat link involved in the action, it it indicates the "Copy chat link" dialog has to be shown.
      *                     If not, a simple Snackbar has to be shown with this text.
      */
-    private void initAndShowChat(String textSnackbar) {
-        boolean resultInit = initChat();
-        if (!resultInit) {
-            return;
-        }
-
-        initializeInputText();
-        checkIfIsAlreadyJoiningOrLeaving();
-
-        int chatConnection = megaChatApi.getChatConnectionState(idChat);
-        Timber.d("Chat connection (%d) is: %d", idChat, chatConnection);
-
-        //Create always a new adapter to avoid showing messages of a previous conversation.
-        createAdapter();
-
-        setPreviewersView();
-        titleToolbar.setText(getTitleChat(chatRoom));
-        setChatSubtitle();
-        privateIconToolbar.setVisibility((!chatRoom.isGroup() || chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
-        muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
-        isOpeningChat = true;
-
+    private void initEmptyScreen(String textSnackbar){
         String textToShowB = getString(R.string.chat_loading_messages);
 
         try {
@@ -2362,6 +2336,33 @@ public class ChatActivity extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, textSnackbar, MEGACHAT_INVALID_HANDLE);
             }
         }
+    }
+
+    /**
+     * Opens a new chat conversation.
+     * If it went well, requests messages.
+     */
+    private void initAndShowChat() {
+        boolean resultInit = initChat();
+        if (!resultInit) {
+            return;
+        }
+
+        initializeInputText();
+        checkIfIsAlreadyJoiningOrLeaving();
+
+        int chatConnection = megaChatApi.getChatConnectionState(idChat);
+        Timber.d("Chat connection (%d) is: %d", idChat, chatConnection);
+
+        //Create always a new adapter to avoid showing messages of a previous conversation.
+        createAdapter();
+
+        setPreviewersView();
+        titleToolbar.setText(getTitleChat(chatRoom));
+        setChatSubtitle();
+        privateIconToolbar.setVisibility((!chatRoom.isGroup() || chatRoom.isPublic()) ? View.GONE : View.VISIBLE);
+        muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
+        isOpeningChat = true;
 
         loadHistory();
         Timber.d("On create: stateHistory: %s", stateHistory);
@@ -4948,7 +4949,7 @@ public class ChatActivity extends PasscodeActivity
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
-            if (viewModel.getStorageState()== StorageState.PayWall) {
+            if (viewModel.getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning();
                 return false;
             }
@@ -5624,7 +5625,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (localPath != null) {
                 File mediaFile = new File(localPath);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                     if (mediaFileUri == null) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
@@ -5693,7 +5694,7 @@ public class ChatActivity extends PasscodeActivity
 
             if (localPath != null) {
                 File mediaFile = new File(localPath);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                     Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                     if (mediaFileUri == null) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
@@ -6252,12 +6253,7 @@ public class ChatActivity extends PasscodeActivity
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(userTyping);
-                }
+                Spanned result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
 
                 userTypingText.setText(result);
                 break;
@@ -6268,12 +6264,7 @@ public class ChatActivity extends PasscodeActivity
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(userTyping);
-                }
+                Spanned result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
 
                 userTypingText.setText(result);
                 break;
@@ -6285,12 +6276,7 @@ public class ChatActivity extends PasscodeActivity
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(userTyping);
-                }
+                Spanned result = Html.fromHtml(userTyping, Html.FROM_HTML_MODE_LEGACY);
 
                 userTypingText.setText(result);
                 break;
@@ -8396,6 +8382,13 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initAndShowChat();
+    }
+
     @Override
     protected void onDestroy() {
         destroySpeakerAudioManger();
@@ -8494,6 +8487,7 @@ public class ChatActivity extends PasscodeActivity
 
         saveInputText();
         shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
+
         megaChatApi.closeChatRoom(idChat, this);
         if (chatRoom.isPreview()) {
             megaChatApi.closeChatPreview(idChat);
@@ -8579,7 +8573,6 @@ public class ChatActivity extends PasscodeActivity
 
                     closeChat(false);
                     MegaApplication.setOpenChatId(-1);
-
                     initAfterIntent(intent, null);
                 }
 
@@ -9002,6 +8995,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onPause() {
         super.onPause();
+
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
 

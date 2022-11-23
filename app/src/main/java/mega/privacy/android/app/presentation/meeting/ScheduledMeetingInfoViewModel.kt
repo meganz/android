@@ -6,17 +6,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.extensions.findItemByHandle
-import mega.privacy.android.app.data.extensions.replaceIfExists
-import mega.privacy.android.app.data.extensions.sortList
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
@@ -74,93 +69,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     val isConnected: Boolean
         get() = monitorConnectivity().value
 
-    init {
-        getContacts()
-        observeContactUpdates()
-        observeLastGreenUpdates()
-        observeOnlineStatusUpdates()
-        observeNewContacts()
-    }
-
-    private fun getContacts() {
-        viewModelScope.launch {
-            val contactList = getVisibleContacts()
-            _state.update {
-                it.copy(
-                    participantItemList = contactList
-                )
-            }
-            getContactsData(contactList)
-        }
-    }
-
-    private suspend fun getContactsData(contactList: List<ContactItem>) {
-        contactList.forEach { contactItem ->
-            val contactData = getContactData(contactItem)
-            _state.value.participantItemList.apply {
-                findItemByHandle(contactItem.handle)?.apply {
-                    toMutableList().apply {
-                        replaceIfExists(copy(contactData = contactData))
-                        _state.update { it.copy(participantItemList = this.sortList()) }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun observeContactUpdates() {
-        viewModelScope.launch {
-            monitorContactUpdates().collectLatest { userUpdates ->
-                val contactList = applyContactUpdates(_state.value.participantItemList, userUpdates)
-                _state.update { it.copy(participantItemList = contactList) }
-            }
-        }
-    }
-
-    private fun observeLastGreenUpdates() {
-        viewModelScope.launch {
-            monitorLastGreenUpdates().collectLatest { (handle, lastGreen) ->
-                _state.value.participantItemList.apply {
-                    findItemByHandle(handle)?.apply {
-                        toMutableList().apply {
-                            replaceIfExists(copy(lastSeen = lastGreen))
-                            _state.update { it.copy(participantItemList = this.sortList()) }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun observeOnlineStatusUpdates() {
-        viewModelScope.launch {
-            monitorOnlineStatusUpdates().collectLatest { (userHandle, status) ->
-                if (status != UserStatus.Online) {
-                    requestLastGreen(userHandle)
-                }
-
-                _state.value.participantItemList.apply {
-                    findItemByHandle(userHandle)?.apply {
-                        toMutableList().apply {
-                            replaceIfExists(copy(status = status))
-                            _state.update { it.copy(participantItemList = this.sortList()) }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun observeNewContacts() {
-        viewModelScope.launch {
-            monitorContactRequestUpdates().collectLatest { newContacts ->
-                val contactList = addNewContacts(_state.value.participantItemList, newContacts)
-                _state.update { it.copy(participantItemList = contactList.sortList()) }
-            }
-        }
-    }
-
-
     /**
      * Edit scheduled meeting if there is internet connection, shows an error if not.
      */
@@ -182,6 +90,21 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Leave group chat.
      */
     fun onLeaveGroupTap() {
+    }
+
+    /**
+     * Tap in a button action
+     */
+    fun onActionTap(action: ScheduledMeetingInfoAction) {
+        when (action) {
+            ScheduledMeetingInfoAction.MeetingLink -> onMeetingLinkTap()
+            ScheduledMeetingInfoAction.ShareMeetingLink -> onShareMeetingLinkTap()
+            ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> onAllowAddParticipantsTap()
+            ScheduledMeetingInfoAction.ShareFiles -> onSharedFilesTap()
+            ScheduledMeetingInfoAction.ManageChatHistory -> onManageChatHistoryTap()
+            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> onEnableEncryptedKeyRotationTap()
+        }
     }
 
     /**

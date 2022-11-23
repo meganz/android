@@ -118,9 +118,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
@@ -128,6 +126,8 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1368,9 +1368,7 @@ public class Util {
         }
 
         //This method is in the v4 support library, so can be applied to all devices
-        Uri outputFileUri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                ? FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile)
-                : Uri.fromFile(newFile);
+        Uri outputFileUri = FileProvider.getUriForFile(activity, AUTHORITY_STRING_FILE_PROVIDER, newFile);
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -1423,10 +1421,6 @@ public class Util {
 
     public static boolean isAndroidOreoOrUpper() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-    }
-
-    public static boolean isAndroidNougatOrUpper() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
     }
 
     public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus) {

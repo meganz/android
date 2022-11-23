@@ -30,7 +30,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.StatFs;
 
 import androidx.core.content.FileProvider;
@@ -848,11 +847,7 @@ public class OfflineUtils {
         String type = MimeTypeList.typeForName(node.getName()).getType();
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file), type);
-        } else {
-            mediaIntent.setDataAndType(Uri.fromFile(file), type);
-        }
+        mediaIntent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file), type);
         mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         if (isIntentAvailable(context, mediaIntent)) {
