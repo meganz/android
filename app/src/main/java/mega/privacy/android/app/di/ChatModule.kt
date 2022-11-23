@@ -21,22 +21,37 @@ import mega.privacy.android.domain.usecase.StartChatCall
 @InstallIn(SingletonComponent::class, ViewModelComponent::class)
 class ChatModule {
 
+    /**
+     * Provides the Use Case [SetOpenInvite]
+     */
     @Provides
     fun provideSetOpenInvite(chatRepository: ChatRepository): SetOpenInvite =
         SetOpenInvite(chatRepository::setOpenInvite)
 
+    /**
+     * Provides the Use Case [StartChatCall]
+     */
     @Provides
     fun provideStartChatCall(chatRepository: ChatRepository): StartChatCall =
         StartChatCall(chatRepository::startChatCall)
 
+    /**
+     * Provides the Use Case [AnswerChatCall]
+     */
     @Provides
     fun provideAnswerChatCall(chatRepository: ChatRepository): AnswerChatCall =
         AnswerChatCall(chatRepository::answerChatCall)
 
+    /**
+     * Provides the Use Case [GetChatRoom]
+     */
     @Provides
     fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
         GetChatRoom(chatRepository::getChatRoom)
 
+    /**
+     * Provides the Use Case [MonitorChatRoomUpdates]
+     */
     @Provides
     fun provideMonitorChatRoomUpdates(chatRepository: ChatRepository): MonitorChatRoomUpdates =
         MonitorChatRoomUpdates(chatRepository::monitorChatRoomUpdates)
