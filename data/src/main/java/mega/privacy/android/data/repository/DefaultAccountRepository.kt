@@ -290,4 +290,8 @@ internal class DefaultAccountRepository @Inject constructor(
         }
         myAccountInfoFacade.handleAccountDetail(request)
     }
+
+    override suspend fun getMyCredentials() = withContext(ioDispatcher) {
+        megaApiGateway.myCredentials
+    }
 }

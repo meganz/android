@@ -145,4 +145,11 @@ interface AccountRepository {
         purchases: Boolean,
         transactions: Boolean,
     )
+
+    /**
+     * Gets the credentials of the currently open account.
+     *
+     * @return Fingerprint of the signing key of the current account.
+     */
+    suspend fun getMyCredentials(): String?
 }

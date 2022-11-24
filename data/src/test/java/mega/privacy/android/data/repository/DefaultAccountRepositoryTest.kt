@@ -383,4 +383,20 @@ class DefaultAccountRepositoryTest {
 
             underTest.getSpecificAccountDetail(storage = true, transfer = false, pro = false)
         }
+
+    @Test
+    fun `test that getMyCredentials returns valid credentials if api returns valid credentials`() =
+        runTest {
+            val validCredentials = "KJ9hFK67vhj3cNCIUHAi8ccwciojiot4hVE5yab3"
+
+            whenever(megaApiGateway.myCredentials).thenReturn(validCredentials)
+            assertThat(underTest.getMyCredentials()).isEqualTo(validCredentials)
+        }
+
+    @Test
+    fun `test that getMyCredentials returns null if api returns null`() =
+        runTest {
+            whenever(megaApiGateway.myCredentials).thenReturn(null)
+            assertThat(underTest.getMyCredentials()).isNull()
+        }
 }
