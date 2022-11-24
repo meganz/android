@@ -358,6 +358,7 @@ class AlbumsViewModelTest {
         underTest.createNewAlbum(expectedAlbumName, proscribedStrings)
 
         underTest.state.drop(1).test {
+            awaitItem()
             val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
             assertEquals(expectedAlbumName, actualAlbum.title)
         }
@@ -485,6 +486,7 @@ class AlbumsViewModelTest {
             underTest.state.drop(1).test {
                 awaitItem()
                 underTest.createNewAlbum("favourites", proscribedStrings)
+                awaitItem()
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -521,6 +523,7 @@ class AlbumsViewModelTest {
             underTest.state.drop(1).test {
                 awaitItem()
                 underTest.createNewAlbum("raw", proscribedStrings)
+                awaitItem()
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -554,6 +557,7 @@ class AlbumsViewModelTest {
             underTest.state.drop(1).test {
                 awaitItem()
                 underTest.createNewAlbum(testAlbumName, proscribedStrings)
+                awaitItem()
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -572,6 +576,7 @@ class AlbumsViewModelTest {
             underTest.state.test {
                 awaitItem()
                 underTest.createNewAlbum(testAlbumName, proscribedStrings)
+                awaitItem()
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(

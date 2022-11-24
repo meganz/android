@@ -178,6 +178,28 @@ class AlbumsViewTest {
         verify(onDialogPositiveButtonClicked).invoke(expectedAlbumName, proscribedStrings)
     }
 
+    @Test
+    fun `test that with input clicking the positive dialog button while album creation is in process will not trigger album creation function`() {
+        val expectedAlbumName = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val inputPlaceholderText = R.string.photos_album_creation_dialog_input_placeholder
+        val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
+        val onDismissRequest = mock<() -> Unit>()
+        composeRule.setContent {
+            CreateNewAlbumDialog(
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDismissRequest = onDismissRequest,
+                inputPlaceHolderText = { fromId(inputPlaceholderText) },
+                isAlbumCreationInProgress = { true }
+            )
+        }
+
+        composeRule.onNodeWithText(inputPlaceholderText)
+            .performTextInput(expectedAlbumName)
+        composeRule.onNodeWithText(R.string.general_create).performClick()
+
+        verifyNoInteractions(onDialogPositiveButtonClicked)
+    }
+
     private fun createUserAlbum(
         id: AlbumId = AlbumId(0L),
         title: String = "",
