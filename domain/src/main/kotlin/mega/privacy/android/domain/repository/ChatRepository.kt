@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -93,4 +94,12 @@ interface ChatRepository {
      * @return The scheduled meeting.
      */
     fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @return The list of scheduled meetings occurrences.
+     */
+    suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>?
 }

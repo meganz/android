@@ -230,4 +230,16 @@ interface MegaChatApiGateway {
      * @return The scheduled meeting.
      */
     fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>?
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param listener MegaChatRequestListener to track this request
+     * @return The list of scheduled meetings occurrences.
+     */
+    fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
 }

@@ -11,6 +11,7 @@ import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
@@ -64,6 +65,7 @@ import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
 import mega.privacy.android.data.mapper.toChatScheduledMeeting
+import mega.privacy.android.data.mapper.toChatScheduledMeetingOccur
 import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
@@ -408,4 +410,11 @@ internal class MapperModule {
      */
     @Provides
     fun provideChatScheduledMeetingMapper(): ChatScheduledMeetingMapper = ::toChatScheduledMeeting
+
+    /**
+     * Provide chat scheduled meeting occurr mapper
+     */
+    @Provides
+    fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
+        ::toChatScheduledMeetingOccur
 }
