@@ -414,6 +414,13 @@ interface MegaApiGateway {
     fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
+     * Cancels all [MegaTransfer] uploads
+     *
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?)
+
+    /**
      * Gets the number of unread user alerts for the logged in user.
      *
      * @return Number of unread user alerts.
@@ -979,4 +986,66 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request.
      */
     fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Requests the currently available country calling codes
+     *
+     * @param listener [MegaRequestListenerInterface] to track this request
+     */
+    fun getCountryCallingCodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Returns whether MEGA Achievements are enabled for the open account
+     *
+     * @return True if enabled, false otherwise.
+     */
+
+    fun isAchievementsEnabled(): Boolean
+
+    /**
+     * Logout of the MEGA account invalidating the session
+     *
+     * @param listener [MegaRequestListenerInterface] to track this request
+     */
+    fun logout(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Provide a phone number to get verification code.
+     *
+     * @param phoneNumber the phone number to receive the txt with verification code.
+     * @param reVerifyingWhitelisted to check whether to re verify whitelisted
+     * @param listener [MegaRequestListenerInterface]    callback of this request.
+     */
+    fun sendSMSVerificationCode(
+        phoneNumber: String,
+        reVerifyingWhitelisted: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Reset the verified phone number for the account logged in.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_RESET_SMS_VERIFIED_NUMBER
+     * If there's no verified phone number associated for the account logged in, the error code
+     * provided in onRequestFinish is MegaError::API_ENOENT.
+     *
+     * @param listener [MegaRequestListenerInterface] to track this request
+     */
+    fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?)
+
+
+    /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     * @param listener
+     */
+    fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
 }

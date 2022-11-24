@@ -308,7 +308,19 @@ internal class MegaApiFacade @Inject constructor(
         MegaApiAndroid.base64ToHandle(base64Handle)
 
     override fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?) {
-        megaApi.cancelTransfer(transfer, listener)
+        if (listener != null) {
+            megaApi.cancelTransfer(transfer, listener)
+        } else {
+            megaApi.cancelTransfer(transfer)
+        }
+    }
+
+    override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
+        if (listener != null) {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
+        } else {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+        }
     }
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
@@ -484,7 +496,7 @@ internal class MegaApiFacade @Inject constructor(
         storage: Boolean,
         transfer: Boolean,
         pro: Boolean,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         megaApi.getSpecificAccountDetails(storage, transfer, pro, listener)
     }
@@ -552,4 +564,47 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
         megaApi.verifyCredentials(user, listener)
+
+    override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
+        megaApi.getCountryCallingCodes(listener)
+
+    override fun isAchievementsEnabled() =
+        megaApi.isAchievementsEnabled
+
+    override fun logout(listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.logout()
+        } else {
+            megaApi.logout(listener)
+        }
+    }
+
+    override fun sendSMSVerificationCode(
+        phoneNumber: String,
+        reVerifyingWhitelisted: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        if (reVerifyingWhitelisted) {
+            megaApi.sendSMSVerificationCode(phoneNumber, listener, true)
+        } else {
+            megaApi.sendSMSVerificationCode(phoneNumber, listener)
+        }
+    }
+
+    override fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.resetSmsVerifiedPhoneNumber()
+        } else {
+            megaApi.resetSmsVerifiedPhoneNumber(listener)
+        }
+    }
+
+    override fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
+    }
 }

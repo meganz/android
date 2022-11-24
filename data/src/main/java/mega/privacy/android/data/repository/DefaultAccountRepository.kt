@@ -179,7 +179,8 @@ internal class DefaultAccountRepository @Inject constructor(
                         onRequestFinish = { request, error ->
                             if (request.type == MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS) {
                                 when (error.errorCode) {
-                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(Unit))
+                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(
+                                        Unit))
                                     MegaChatError.ERROR_ACCESS -> continuation.resumeWith(Result.failure(
                                         ChatNotInitializedException()))
                                     else -> continuation.failWithError(error)
@@ -260,6 +261,29 @@ internal class DefaultAccountRepository @Inject constructor(
                 },
             )
             megaApiGateway.getSpecificAccountDetails(storage, transfer, pro, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        myAccountInfoFacade.handleAccountDetail(request)
+    }
+
+    override suspend fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+    ) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
+            megaApiGateway.getExtendedAccountDetails(sessions, purchases, transactions, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
             }

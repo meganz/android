@@ -134,6 +134,19 @@ interface AccountRepository {
     suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
 
     /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     */
+    suspend fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+    )
+
+    /**
      * Gets the credentials of the currently open account.
      *
      * @return Fingerprint of the signing key of the current account.
