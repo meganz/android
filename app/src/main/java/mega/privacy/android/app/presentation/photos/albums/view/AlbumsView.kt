@@ -181,8 +181,9 @@ fun AlbumsView(
                     onDialogInputChange = setInputValidity,
                     inputPlaceHolderText = { albumsViewState.createAlbumPlaceholderTitle },
                     errorMessage = albumsViewState.createDialogErrorMessage,
+                    isInputValid = { albumsViewState.isInputNameValid },
                 ) {
-                    albumsViewState.isInputNameValid
+                    albumsViewState.isAlbumCreationInProgress
                 }
             }
         } else {

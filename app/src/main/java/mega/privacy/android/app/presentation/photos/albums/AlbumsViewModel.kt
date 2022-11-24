@@ -206,6 +206,9 @@ class AlbumsViewModel @Inject constructor(
      * @param title the name of the album
      */
     fun createNewAlbum(title: String, proscribedStrings: List<String>) = viewModelScope.launch {
+        _state.update {
+            it.copy(isAlbumCreationInProgress = true)
+        }
         try {
             val finalTitle = title.ifEmpty {
                 _state.value.createAlbumPlaceholderTitle
@@ -213,14 +216,18 @@ class AlbumsViewModel @Inject constructor(
             if (checkTitleValidity(finalTitle, proscribedStrings)) {
                 val album = createAlbum(finalTitle)
                 _state.update {
-                    it.copy(currentAlbum = album, isAlbumCreatedSuccessfully = true)
+                    it.copy(
+                        currentAlbum = album,
+                        isAlbumCreatedSuccessfully = true,
+                        isAlbumCreationInProgress = false,
+                    )
                 }
                 Timber.d("Current album: ${album.title}")
             }
         } catch (exception: Exception) {
             Timber.e(exception)
             _state.update {
-                it.copy(isAlbumCreatedSuccessfully = false)
+                it.copy(isAlbumCreatedSuccessfully = false, isAlbumCreationInProgress = false)
             }
         }
     }

@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.photos.Album
  * @property createDialogErrorMessage
  * @property isAlbumCreatedSuccessfully
  * @property snackBarMessage
+ * @property isAlbumCreationInProgress
  */
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
@@ -23,5 +24,6 @@ data class AlbumsViewState(
     val isInputNameValid: Boolean = true,
     val createDialogErrorMessage: Int? = null,
     val isAlbumCreatedSuccessfully: Boolean = false,
-    val snackBarMessage: String = ""
+    val snackBarMessage: String = "",
+    val isAlbumCreationInProgress: Boolean = false,
 )
