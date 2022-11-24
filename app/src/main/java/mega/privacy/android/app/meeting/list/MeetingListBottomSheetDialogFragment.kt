@@ -123,6 +123,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val intent = if (scheduleMeetingEnabled) {
                     Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
                         putExtra(Constants.HANDLE, chatId)
+                        putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
                     }
                 } else {
                     Intent(context, GroupChatInfoActivity::class.java).apply {

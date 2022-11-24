@@ -5,7 +5,6 @@ import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewMod
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -16,7 +15,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
  *
  * @property buttons                                    List of available action buttons.
- * @property chatRoom                                   The corresponding [ChatRoom].
+ * @property chatId                                     Chat id.
+ * @property chatTitle                                  Chat title.
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
@@ -32,16 +32,18 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  */
 data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
-    val chatRoom: ChatRoom? = null,
+    val chatId: Long = -1,
+    val chatTitle: String = "",
     val scheduledMeeting: ScheduledMeetingItem? = null,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
+    val inviteParticipantAction: InviteParticipantsAction? = null,
     val participantItemList: List<ChatParticipant> = emptyList(),
     val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
     val enabledChatNotificationsOption: Boolean = true,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
-    val error: Int? = null,
+    val snackBar: Int? = null,
     val result: Long? = null,
     val firstParticipant: ChatParticipant? = ChatParticipant(
         participantId = -1,
