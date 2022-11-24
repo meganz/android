@@ -3,11 +3,13 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.ScheduleMeetingUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
  * Mega chat api gateway
@@ -211,5 +213,39 @@ interface MegaChatApiGateway {
     fun setChatVideoInDevice(
         device: String,
         listener: MegaChatRequestListenerInterface?,
+    )
+
+    /**
+     * Scheduled meetings updates.
+     */
+    val scheduledMeetingUpdates: Flow<ScheduleMeetingUpdate>
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeeting(chatId: Long, schedId: Long): MegaChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>?
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param listener MegaChatRequestListener to track this request
+     * @return The list of scheduled meetings occurrences.
+     */
+    fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
     )
 }
