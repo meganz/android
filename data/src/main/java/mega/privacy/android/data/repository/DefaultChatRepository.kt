@@ -19,7 +19,7 @@ import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
-import mega.privacy.android.data.model.ScheduleMeetingUpdate
+import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -152,22 +152,24 @@ internal class DefaultChatRepository @Inject constructor(
 
     override fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting> =
         megaChatApiGateway.scheduledMeetingUpdates
-            .filterIsInstance<ScheduleMeetingUpdate.OnChatSchedMeetingUpdate>()
+            .filterIsInstance<ScheduledMeetingUpdate.OnChatSchedMeetingUpdate>()
             .mapNotNull { it.item }
             .map(chatScheduledMeetingMapper)
             .flowOn(ioDispatcher)
 
     override fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long> =
         megaChatApiGateway.scheduledMeetingUpdates
-            .filterIsInstance<ScheduleMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
+            .filterIsInstance<ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
             .mapNotNull { it.chatId }
             .flowOn(ioDispatcher)
 
     override fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting? =
         megaChatApiGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
 
-    override fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
-        megaChatApiGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
+    override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
+        }
 
     override suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>? =
         withContext(ioDispatcher) {

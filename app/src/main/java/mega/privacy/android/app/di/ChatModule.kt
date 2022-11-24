@@ -8,8 +8,10 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.StartChatCall
 
@@ -63,4 +65,18 @@ class ChatModule {
     @Provides
     fun provideInviteToChat(chatRepository: ChatRepository): InviteToChat =
         InviteToChat(chatRepository::inviteToChat)
+
+    /**
+     * Provides the Use Case [MonitorScheduledMeetingUpdates]
+     */
+    @Provides
+    fun provideMonitorScheduledMeetingUpdates(chatRepository: ChatRepository): MonitorScheduledMeetingUpdates =
+        MonitorScheduledMeetingUpdates(chatRepository::monitorScheduledMeetingsUpdates)
+
+    /**
+     * Provides the Use Case [GetScheduledMeetingByChat]
+     */
+    @Provides
+    fun provideGetScheduledMeetingByChat(chatRepository: ChatRepository): GetScheduledMeetingByChat =
+        GetScheduledMeetingByChat(chatRepository::getScheduledMeetingsByChat)
 }

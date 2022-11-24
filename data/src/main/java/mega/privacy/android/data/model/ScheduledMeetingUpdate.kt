@@ -1,11 +1,12 @@
 package mega.privacy.android.data.model
 
 import nz.mega.sdk.MegaChatScheduledMeeting
+import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
 
 /**
  * Chat update events corresponding to [MegaChatScheduledMeetingListenerInterface] callbacks.
  */
-sealed class ScheduleMeetingUpdate {
+sealed class ScheduledMeetingUpdate {
 
     /**
      * On chat scheduled meeting item update.
@@ -14,12 +15,12 @@ sealed class ScheduleMeetingUpdate {
      */
     data class OnChatSchedMeetingUpdate(
         val item: MegaChatScheduledMeeting?,
-    ) : ScheduleMeetingUpdate()
+    ) : ScheduledMeetingUpdate()
 
     /**
      * On chat scheduled meeting occurrences item update.
      *
      * @property chatId
      */
-    data class OnSchedMeetingOccurrencesUpdate(val chatId: Long) : ScheduleMeetingUpdate()
+    data class OnSchedMeetingOccurrencesUpdate(val chatId: Long) : ScheduledMeetingUpdate()
 }
