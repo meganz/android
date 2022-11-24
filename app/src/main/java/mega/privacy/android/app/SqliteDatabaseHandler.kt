@@ -40,6 +40,7 @@ import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
+import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
@@ -530,7 +531,9 @@ class SqliteDatabaseHandler(
         }
         if (oldVersion <= 46) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_STORAGE_STATE INTEGER;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${encrypt(storageStateIntMapper(StorageState.Unknown).toString())}';")
+            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${
+                encrypt(storageStateIntMapper(StorageState.Unknown).toString())
+            }';")
         }
         if (oldVersion <= 47) {
             db.execSQL(CREATE_MEGA_CONTACTS_TABLE)
@@ -937,7 +940,11 @@ class SqliteDatabaseHandler(
         db.execSQL(sql)
     }
 
-    override fun updateSyncRecordStatusByLocalPath(status: Int, localPath: String?, isSecondary: Boolean) {
+    override fun updateSyncRecordStatusByLocalPath(
+        status: Int,
+        localPath: String?,
+        isSecondary: Boolean,
+    ) {
         val sql = "UPDATE $TABLE_SYNC_RECORDS SET $KEY_SYNC_STATE = $status  " +
                 "WHERE $KEY_SYNC_FILEPATH_ORI = '${encrypt(localPath)}' " +
                 "AND $KEY_SYNC_SECONDARY ='${encrypt(isSecondary.toString())}'"
@@ -2536,10 +2543,20 @@ class SqliteDatabaseHandler(
         return false
     }
 
+    @Deprecated(
+        message = "MegaOffline has been deprecated in favour of OfflineInformation",
+        replaceWith = ReplaceWith("getOfflineInformation(handle)"),
+        level = DeprecationLevel.WARNING
+    )
     override fun findByHandle(handle: Long): MegaOffline? {
         return findByHandle(handle.toString())
     }
 
+    @Deprecated(
+        message = "MegaOffline has been deprecated in favour of OfflineInformation",
+        replaceWith = ReplaceWith("getOfflineInformation(handle)"),
+        level = DeprecationLevel.WARNING
+    )
     override fun findByHandle(handle: String?): MegaOffline? {
         //Get the foreign key of the node
         val selectQuery =
@@ -4087,7 +4104,11 @@ class SqliteDatabaseHandler(
      * @param nodeHandle Handle of the node already uploaded.
      * @param state      State of the pending message.
      */
-    override fun updatePendingMessageOnTransferFinish(idMessage: Long, nodeHandle: String?, state: Int) {
+    override fun updatePendingMessageOnTransferFinish(
+        idMessage: Long,
+        nodeHandle: String?,
+        state: Int,
+    ) {
         updatePendingMessage(idMessage, Constants.INVALID_ID, nodeHandle, state)
     }
 
@@ -4099,7 +4120,12 @@ class SqliteDatabaseHandler(
      * @param nodeHandle  Handle of the node already uploaded.
      * @param state       State of the pending message.
      */
-    override fun updatePendingMessage(idMessage: Long, transferTag: Int, nodeHandle: String?, state: Int) {
+    override fun updatePendingMessage(
+        idMessage: Long,
+        transferTag: Int,
+        nodeHandle: String?,
+        state: Int,
+    ) {
         val values = ContentValues()
         if (transferTag != Constants.INVALID_ID) {
             values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag)
@@ -4470,6 +4496,38 @@ class SqliteDatabaseHandler(
     override val isCompletedTransfersEmpty: Boolean
         get() = completedTransfers.isEmpty()
 
+    override suspend fun getOfflineInformation(handle: Long): OfflineInformation? {
+        val selectQuery =
+            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_HANDLE = '${encrypt(handle.toString())}'"
+        try {
+            db.rawQuery(selectQuery, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val id = cursor.getString(0).toInt()
+                    val nodeHandle = decrypt(cursor.getString(1))
+                    val path = decrypt(cursor.getString(2))
+                    val name = decrypt(cursor.getString(3))
+                    val parent = cursor.getInt(4)
+                    val type = decrypt(cursor.getString(5))
+                    val incoming = cursor.getInt(6)
+                    val handleIncoming = decrypt(cursor.getString(7))
+                    return OfflineInformation(
+                        id = id,
+                        handle = nodeHandle.toString(),
+                        path = path.toString(),
+                        name = name.toString(),
+                        parentId = parent,
+                        type = type,
+                        origin = incoming,
+                        handleIncoming = handleIncoming.toString(),
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Exception opening or managing DB cursor")
+        }
+        return null
+    }
+
     /**
      * Get the index of a column in a cursor.
      * Avoid to access column with hardcode index.
@@ -4584,7 +4642,7 @@ class SqliteDatabaseHandler(
         private const val KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera"
         private const val KEY_URI_EXTERNAL_SD_CARD = "uriexternalsdcard"
         private const val KEY_URI_MEDIA_EXTERNAL_SD_CARD = "urimediaexternalsdcard"
-        private const  val KEY_SD_CARD_URI = "sdcarduri"
+        private const val KEY_SD_CARD_URI = "sdcarduri"
         private const val KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = "camerafolderexternalsdcard"
         private const val KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = "mediafolderexternalsdcard"
         private const val KEY_CONTACT_HANDLE = "handle"
