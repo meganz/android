@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.StartChatCall
@@ -55,4 +56,11 @@ class ChatModule {
     @Provides
     fun provideMonitorChatRoomUpdates(chatRepository: ChatRepository): MonitorChatRoomUpdates =
         MonitorChatRoomUpdates(chatRepository::monitorChatRoomUpdates)
+
+    /**
+     * Provides the Use Case [InviteToChat]
+     */
+    @Provides
+    fun provideInviteToChat(chatRepository: ChatRepository): InviteToChat =
+        InviteToChat(chatRepository::inviteToChat)
 }
