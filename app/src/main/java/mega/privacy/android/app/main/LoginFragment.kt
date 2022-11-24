@@ -1632,6 +1632,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             isFetchingNodes = false
             isLoggingIn = false
             if (error.errorCode == MegaError.API_OK) {
+                if (!isAdded) return
+
                 receivedIntent = (requireActivity() as LoginActivity).intent
                 if (receivedIntent != null) {
                     @Suppress("UNCHECKED_CAST")
