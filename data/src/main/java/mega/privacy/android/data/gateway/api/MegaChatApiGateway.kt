@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.ScheduleMeetingUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
@@ -213,6 +214,11 @@ interface MegaChatApiGateway {
         device: String,
         listener: MegaChatRequestListenerInterface?,
     )
+
+    /**
+     * Scheduled meetings updates.
+     */
+    val scheduledMeetingUpdates: Flow<ScheduleMeetingUpdate>
 
     /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id

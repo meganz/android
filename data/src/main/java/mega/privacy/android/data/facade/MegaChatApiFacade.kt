@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.ScheduleMeetingUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -20,9 +22,9 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoomListenerInterface
 import nz.mega.sdk.MegaChatScheduledMeeting
+import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
 import javax.inject.Inject
 
 /**
@@ -213,6 +215,25 @@ internal class MegaChatApiFacade @Inject constructor(
         device: String,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.setChatVideoInDevice(device, listener)
+
+    override val scheduledMeetingUpdates: Flow<ScheduleMeetingUpdate>
+        get() = callbackFlow {
+            val listener = object : MegaChatScheduledMeetingListenerInterface {
+                override fun onChatSchedMeetingUpdate(
+                    api: MegaChatApiJava?,
+                    scheduledMeeting: MegaChatScheduledMeeting?,
+                ) {
+                    trySend(ScheduleMeetingUpdate.OnChatSchedMeetingUpdate(scheduledMeeting))
+                }
+
+                override fun onSchedMeetingOccurrencesUpdate(api: MegaChatApiJava?, chatId: Long) {
+                    trySend(ScheduleMeetingUpdate.OnSchedMeetingOccurrencesUpdate(chatId))
+                }
+            }
+
+            chatApi.addSchedMeetingListener(listener)
+            awaitClose { chatApi.removeSchedMeetingListener(listener) }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override fun getScheduledMeeting(
         chatId: Long,

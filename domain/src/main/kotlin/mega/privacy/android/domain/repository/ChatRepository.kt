@@ -79,6 +79,20 @@ interface ChatRepository {
     fun getChatRoom(chatId: Long): ChatRoom?
 
     /**
+     * Monitor updates on scheduled meetings
+     *
+     * @return          A flow of [ChatScheduledMeeting]
+     */
+    fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
+
+    /**
+     * Monitor updates on scheduled meeting occurrences
+     *
+     * @return          A flow of schedIds
+     */
+    fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
+
+    /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
      *
      * @param chatId  MegaChatHandle that identifies a chat room

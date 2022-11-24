@@ -18,6 +18,7 @@ import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
+import mega.privacy.android.data.model.ScheduleMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -136,6 +137,19 @@ internal class DefaultChatRepository @Inject constructor(
 
     override fun getChatRoom(chatId: Long): ChatRoom? =
         chatGateway.getChatRoom(chatId)?.let(chatRoomMapper)
+
+    override fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting> =
+        chatGateway.scheduledMeetingUpdates
+            .filterIsInstance<ScheduleMeetingUpdate.OnChatSchedMeetingUpdate>()
+            .mapNotNull { it.item }
+            .map(chatScheduledMeetingMapper)
+            .flowOn(ioDispatcher)
+
+    override fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long> =
+        chatGateway.scheduledMeetingUpdates
+            .filterIsInstance<ScheduleMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
+            .mapNotNull { it.chatId }
+            .flowOn(ioDispatcher)
 
     override fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting? =
         chatGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
