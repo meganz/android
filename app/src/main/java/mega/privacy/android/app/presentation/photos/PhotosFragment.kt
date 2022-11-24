@@ -346,6 +346,7 @@ class PhotosFragment : Fragment() {
             setInputValidity = albumsViewModel::setNewAlbumNameValidity,
             openPhotosSelectionActivity = this::openAlbumPhotosSelection,
             setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
+            allPhotos = timelineViewModel.state.value.photos
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
