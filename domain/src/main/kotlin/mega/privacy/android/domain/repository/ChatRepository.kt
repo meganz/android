@@ -107,7 +107,7 @@ interface ChatRepository {
      * @param chatId MegaChatHandle that identifies a chat room
      * @return The scheduled meeting.
      */
-    fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
+    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
 
     /**
      * Get a list of all scheduled meeting occurrences for a chatroom
