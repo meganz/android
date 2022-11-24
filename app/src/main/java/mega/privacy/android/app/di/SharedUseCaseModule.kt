@@ -9,6 +9,7 @@ import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 
@@ -39,5 +40,9 @@ abstract class SharedUseCaseModule {
         @Provides
         fun provideGetSpecificAccountDetail(repository: AccountRepository) =
             GetSpecificAccountDetail(repository::getSpecificAccountDetail)
+
+        @Provides
+        fun provideGetExtendedAccountDetail(repository: AccountRepository) =
+            GetExtendedAccountDetail(repository::getExtendedAccountDetails)
     }
 }

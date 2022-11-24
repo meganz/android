@@ -496,7 +496,7 @@ internal class MegaApiFacade @Inject constructor(
         storage: Boolean,
         transfer: Boolean,
         pro: Boolean,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         megaApi.getSpecificAccountDetails(storage, transfer, pro, listener)
     }
@@ -597,5 +597,14 @@ internal class MegaApiFacade @Inject constructor(
         } else {
             megaApi.resetSmsVerifiedPhoneNumber(listener)
         }
+    }
+
+    override fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
 }
