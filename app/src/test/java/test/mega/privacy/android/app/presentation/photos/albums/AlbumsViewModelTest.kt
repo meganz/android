@@ -42,13 +42,6 @@ import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-private fun createUserAlbum(
-    id: AlbumId = AlbumId(0L),
-    title: String = "",
-    cover: Photo? = null,
-    modificationTime: Long = 0L,
-): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
-
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
@@ -63,7 +56,8 @@ class AlbumsViewModelTest {
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
-    private val proscribedStrings = listOf("My albums", "Shared albums")
+    private val proscribedStrings =
+        listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
 
     @Before
     fun setUp() {
@@ -494,8 +488,44 @@ class AlbumsViewModelTest {
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
-                    item.createDialogErrorMessage,
-                    R.string.photos_create_album_error_message_systems_album
+                    R.string.photos_create_album_error_message_systems_album,
+                    item.createDialogErrorMessage
+                )
+            }
+            verifyNoInteractions(createAlbum)
+
+        }
+
+    @Test
+    fun `test that creating an album with an empty system album title will not create the album`() =
+        runTest {
+            val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
+                Album.FavouriteAlbum to { true },
+                Album.GifAlbum to { false },
+                Album.RawAlbum to { false },
+            )
+
+            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+                UIAlbum(
+                    title = "Favourites",
+                    count = 0,
+                    coverPhoto = null,
+                    photos = emptyList(),
+                    id = Album.FavouriteAlbum
+                )
+            )
+
+            whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+            whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
+
+            underTest.state.drop(1).test {
+                awaitItem()
+                underTest.createNewAlbum("raw", proscribedStrings)
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    R.string.photos_create_album_error_message_systems_album,
+                    item.createDialogErrorMessage
                 )
             }
             verifyNoInteractions(createAlbum)
@@ -552,6 +582,13 @@ class AlbumsViewModelTest {
 
             verifyNoInteractions(createAlbum)
         }
+
+    private fun createUserAlbum(
+        id: AlbumId = AlbumId(0L),
+        title: String = "",
+        cover: Photo? = null,
+        modificationTime: Long = 0L,
+    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
 
     private fun createImage(
         id: Long = 2L,
