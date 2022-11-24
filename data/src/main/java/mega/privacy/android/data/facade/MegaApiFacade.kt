@@ -308,7 +308,19 @@ internal class MegaApiFacade @Inject constructor(
         MegaApiAndroid.base64ToHandle(base64Handle)
 
     override fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?) {
-        megaApi.cancelTransfer(transfer, listener)
+        if (listener != null) {
+            megaApi.cancelTransfer(transfer, listener)
+        } else {
+            megaApi.cancelTransfer(transfer)
+        }
+    }
+
+    override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
+        if (listener != null) {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
+        } else {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+        }
     }
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
