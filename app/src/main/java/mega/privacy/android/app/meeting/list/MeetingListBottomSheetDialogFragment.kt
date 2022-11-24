@@ -127,7 +127,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     }
                 } else {
                     Intent(context, GroupChatInfoActivity::class.java).apply {
-                        putExtra(CHAT_ID, chatId)
+                        putExtra(Constants.HANDLE, chatId)
                         putExtra(Constants.ACTION_CHAT_OPEN, true)
                     }
                 }
