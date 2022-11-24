@@ -768,7 +768,7 @@
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">รหัสผ่านของคุณจะปลดล็อกคีย์การกู้คืน</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">ข้อมูลของคุณสามารถอ่านได้เฉพาะผ่านทางกระบวนการถอดรหัสลับ ที่เริ่มต้นด้วยคีย์การเข้ารหัสลับหลักของคุณ ซึ่งเราเก็บรหัสผ่านไว้ด้วยรหัสผ่านของคุณอีกชั้น ซึ่งหมายความว่าหากคุณทำรหัสผ่านสูญหาย คีย์หลักของคุณจะไม่สามารถถอดรหัสและคุณจะไม่สามารถถอดรหัสข้อมูลของคุณได้อีกต่อไป</string>
+    <string name="backup_first_paragraph">ข้อมูลของคุณสามารถอ่านได้ด้วยชุดการดำเนินการถอดรหัสที่เริ่มต้นด้วยคีย์การเข้ารหัสหลักเท่านั้น คีย์การกู้คืนถูกเข้ารหัสด้วยรหัสผ่านของคุณและบันทึกไว้ ซึ่งหมายความว่าหากคุณทำรหัสผ่านหาย คุณจะไม่สามารถถอดรหัสคีย์หลักของคุณได้ และจะไม่สามารถถอดรหัสข้อมูลของคุณได้</string>
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">การส่งออกคีย์การกู้คืนและเก็บไว้ในที่ปลอดภัย จะช่วยให้คุณสามารถตั้งรหัสผ่านใหม่โดยไม่สูญเสียข้อมูล</string>
     <!-- Third paragraph of the screen to backup the master key -->
@@ -3307,8 +3307,6 @@
     <string name="change_meeting_name">เปลี่ยนชื่อการประชุม</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">ลิงก์ประชุม</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">ระยะเวลา</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">เข้าร่วมประชุมในฐานะแขกรับเชิญ</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3487,8 +3485,6 @@
     <string name="payment_methods">วิธีการชำระเงิน</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">ดำเนินการต่อ</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">ขอบคุณสำหรับการสมัครใช้งาน %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite แบบรายเดือน</string>
     <!-- Pro Lite yearly subscription -->
@@ -3929,4 +3925,27 @@
     <string name="media_player_video_snackbar_screenshot_saved">บันทึกภาพไว้ในแกลเลอรี่อุปกรณ์ของคุณแล้ว</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]วันที่ต่ออายุ:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">กรอกชื่ออัลบั้ม</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">อัลบั้มใหม่</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">แชร์ลิงก์การประชุม</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">ดูเพิ่มเติม</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">ออกจากกลุ่ม</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">มีอัลบั้มที่ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">อัลบั้มใหม่ (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>

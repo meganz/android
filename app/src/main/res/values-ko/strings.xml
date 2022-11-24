@@ -3307,8 +3307,6 @@
     <string name="change_meeting_name">회의 이름 변경</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">회의 링크</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">시간</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">손님으로 회의에 참석</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3487,8 +3485,6 @@
     <string name="payment_methods">결제 수단</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">진행</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for your %1$s subscription</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
@@ -3929,4 +3925,27 @@
     <string name="media_player_video_snackbar_screenshot_saved">기기 갤러리에 이미지 저장됨</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]갱신일:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">앨범 이름 입력</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">새 앨범</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">회의 링크 공유</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">더 보기</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">그룹 떠나기</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">새 앨범(%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>

@@ -687,6 +687,16 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 
+        <activity
+            android:name="mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
     </application>
 
 </manifest>

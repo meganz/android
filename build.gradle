@@ -1,6 +1,9 @@
+import java.text.SimpleDateFormat
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.gradleVersion = '7.2.2'
+    ext.lintVersion = '30.2.2' // = gradleVersion + 23.0.0
     ext.kotlinVersion = '1.7.20'
     ext.navigationVersion = '2.4.2'
     ext.googleServicesVersion = '4.3.10'
@@ -11,10 +14,12 @@ buildscript {
     ext.firebaseAppDistribution = "3.0.1"
     ext.jacocoVersion = '0.8.8'
     ext.paparazziVersion = "1.0.0"
+    ext.jfrogArtifactoryVersion = '4.29.2'
     repositories {
         google()
-        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'https://developer.huawei.com/repo/' }
+        jcenter()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
@@ -29,6 +34,8 @@ buildscript {
         //Jacoco Plugin for code coverage
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
         classpath "app.cash.paparazzi:paparazzi-gradle-plugin:$paparazziVersion"
+        // jfrog artifactory publish&resolve
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:$jfrogArtifactoryVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -45,7 +52,12 @@ allprojects {
         maven {
             url 'https://developer.huawei.com/repo/'
         }
+        maven {
+            url "https://artifactory.developers.mega.co.nz/artifactory/mega-gradle/mega-sdk-android"
+        }
     }
+    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'maven-publish'
 }
 
 task clean(type: Delete) {
@@ -55,14 +67,17 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "6.21"
-    versionCode = 481
+    appVersion = "6.22"
+    versionCode = 484
 
     // Sdk and tools
     compileSdkVersion = 33
     minSdkVersion = 23
     targetSdkVersion = 33
     buildToolsVerion = '31.0.0'
+
+    // Prebuilt MEGA SDK version
+    megaSdkVersion = '20221106.213008-rel'
 
     // App dependencies
     accompanistLayoutVersion = '0.24.13-rc'
@@ -123,3 +138,5 @@ ext {
     workVersion = '2.7.1'
     exifinterfaceVersion = '1.3.0'
 }
+
+apply from: "$project.rootDir/tools/prebuilt-sdk.gradle"

@@ -11,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.util.Base64
 import android.util.TypedValue
@@ -32,7 +34,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +51,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
+import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.main.controllers.AccountController.Companion.localLogoutApp
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginViewModel
@@ -63,6 +66,7 @@ import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
+import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
@@ -139,7 +143,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     var emailTemp: String? = null
     var passwdTemp: String? = null
 
-    private val viewModel by viewModels<LoginViewModel>()
+    private val viewModel: LoginViewModel by activityViewModels()
 
     private lateinit var binding: FragmentLoginBinding
 
@@ -158,6 +162,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private var resumeSession = false
     private var confirmLink: String? = null
 
+    private var isFetchingNodes = false
     private var firstTime = true
     private var backWhileLogin = false
     private var loginClicked = false
@@ -492,12 +497,12 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
             action?.let { action ->
                 Timber.d("action is: %s", action)
-                when {
-                    Constants.ACTION_CONFIRM == action -> {
+                when (action) {
+                    Constants.ACTION_CONFIRM -> {
                         handleConfirmationIntent(intent)
                         return
                     }
-                    action == Constants.ACTION_RESET_PASS -> {
+                    Constants.ACTION_RESET_PASS -> {
                         val link = intent.dataString
                         if (link != null) {
                             Timber.d("Link to resetPass: %s", link)
@@ -505,7 +510,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             return
                         }
                     }
-                    action == Constants.ACTION_PASS_CHANGED -> {
+                    Constants.ACTION_PASS_CHANGED -> {
                         when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
                             MegaError.API_OK -> (requireActivity() as LoginActivity).showSnackbar(
                                 requireContext().getFormattedStringOrDefault(
@@ -519,15 +524,21 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         }
                         return
                     }
-                    action == Constants.ACTION_CANCEL_DOWNLOAD -> {
+                    Constants.ACTION_CANCEL_DOWNLOAD -> {
                         (requireActivity() as LoginActivity).showConfirmationCancelAllTransfers()
                     }
-                    action == Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
+                    Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
                         val accountBlockedString =
                             intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
                         if (!TextUtil.isTextEmpty(accountBlockedString)) {
                             Util.showErrorAlertDialog(accountBlockedString, false, activity)
                         }
+                    }
+                    ACTION_FORCE_RELOAD_ACCOUNT -> {
+                        viewModel.intentAction = ACTION_FORCE_RELOAD_ACCOUNT
+                        isLoggingIn = true
+                        showFetchingNodesScreen()
+                        return
                     }
                 }
             } ?: Timber.w("ACTION NULL")
@@ -644,9 +655,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    (requireActivity() as LoginActivity).startCameraUploadService(
-                                        false,
-                                        5 * 60 * 1000)
+                                    startCameraUploadService(false, 5 * 60 * 1000)
                                 }
 
                                 startActivity(newIntent)
@@ -661,7 +670,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 }
             }
 
-            if (megaApi.rootNode != null && !LoginActivity.isFetchingNodes && !isIsHeartBeatAlive) {
+            if (megaApi.rootNode != null && !isFetchingNodes && !isIsHeartBeatAlive) {
                 Timber.d("rootNode != null")
 
                 var intent = Intent(requireContext(), ManagerActivity::class.java)
@@ -707,9 +716,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 dbH.preferences?.let { preferences ->
                     preferences.camSyncEnabled?.let { enabled ->
                         if (enabled.toBoolean() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                            (requireActivity() as LoginActivity).startCameraUploadService(
-                                false,
-                                30 * 1000)
+                            startCameraUploadService(false, 30 * 1000)
                         }
                     }
                 }
@@ -750,6 +757,20 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 }
             }
         }
+    }
+
+    /**
+     * Shows fetching nodes screen.
+     */
+    private fun showFetchingNodesScreen() = with(binding) {
+        loginLayout.isVisible = false
+        loginLoggingInLayout.isVisible = true
+        loginProgressBar.isVisible = true
+        loginFetchingNodesBar.isVisible = false
+        loginLoggingInText.isVisible = true
+        loginFetchNodesText.isVisible = true
+        loginPrepareNodesText.isVisible = false
+        loginServersBusyText.isVisible = false
     }
 
     /**
@@ -923,7 +944,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         lastPassword = passwdTemp
         loginEmailText.hideKeyboard()
 
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             loginLoggingInLayout.isVisible = false
             loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
@@ -966,7 +987,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun performLogin() = with(binding) {
         loginEmailText.hideKeyboard()
 
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             loginLoggingInLayout.isVisible = false
             loginLayout.isVisible = true
             confirmLogoutDialog?.dismiss()
@@ -1013,7 +1034,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         if (confirmLink == null) {
             onKeysGeneratedLogin(email, password)
         } else {
-            if (!Util.isOnline(requireActivity())) {
+            if (viewModel.isConnected.not()) {
                 (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
                     R.string.error_server_connection_problem))
                 return
@@ -1077,7 +1098,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun onKeysGeneratedLogin(email: String?, password: String?) {
         Timber.d("onKeysGeneratedLogin")
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             with(binding) {
                 loginLoggingInLayout.isVisible = false
                 loginLayout.isVisible = true
@@ -1212,7 +1233,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * @param link Link to check.
      */
     private fun updateConfirmEmail(link: String?) {
-        if (!Util.isOnline(requireActivity())) {
+        if (viewModel.isConnected.not()) {
             (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
                 R.string.error_server_connection_problem))
             return
@@ -1261,9 +1282,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 firstRequestUpdate = false
             }
             binding.loginFetchingNodesBar.apply {
-                isVisible = true
                 layoutParams.width = Util.dp2px(250 * scaleW)
+
                 if (request.totalBytes > 0) {
+                    isVisible = true
                     var progressValue = 100.0 * request.transferredBytes / request.totalBytes
                     if (progressValue > 99 || progressValue < 0) {
                         progressValue = 100.0
@@ -1271,6 +1293,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         binding.loginProgressBar.isVisible = true
                     }
                     progress = progressValue.toInt()
+                } else {
+                    isVisible = false
                 }
             }
         }
@@ -1351,12 +1375,12 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             if (prefs.camSyncEnabled != null) {
                                 if (java.lang.Boolean.parseBoolean(prefs.camSyncEnabled)) {
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        loginActivity.startCameraUploadService(false, 30 * 1000)
+                                        startCameraUploadService(false, 30 * 1000)
                                     }
                                 }
                             } else {
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    loginActivity.startCameraUploadService(true, 30 * 1000)
+                                    startCameraUploadService(true, 30 * 1000)
                                 }
                                 initialCam = true
                             }
@@ -1456,12 +1480,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             disableLoginButton()
         }
         if (request.type == MegaRequest.TYPE_FETCH_NODES) {
-            binding.loginFetchingNodesBar.apply {
-                isVisible = true
-                layoutParams.width = Util.dp2px(250 * scaleW)
-                progress = 0
-            }
-            LoginActivity.isFetchingNodes = true
+            isFetchingNodes = true
             disableLoginButton()
         }
     }
@@ -1563,14 +1582,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         login2fa.isVisible = false
                         (requireActivity() as LoginActivity).hideAB()
                     }
-                    loginLayout.isVisible = false
-                    loginLoggingInLayout.isVisible = true
-                    loginProgressBar.isVisible = true
-                    loginFetchingNodesBar.isVisible = false
-                    loginLoggingInText.isVisible = true
-                    loginFetchNodesText.isVisible = true
-                    loginPrepareNodesText.isVisible = false
-                    loginServersBusyText.isVisible = false
+
+                    showFetchingNodesScreen()
                 }
 
                 saveCredentials()
@@ -1616,10 +1629,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 Timber.d("Terminate login process when fetch nodes")
                 return
             }
-            LoginActivity.isFetchingNodes = false
+            isFetchingNodes = false
             isLoggingIn = false
             if (error.errorCode == MegaError.API_OK) {
-                receivedIntent = (requireActivity() as LoginActivity).getIntentReceived()
+                receivedIntent = (requireActivity() as LoginActivity).intent
                 if (receivedIntent != null) {
                     @Suppress("UNCHECKED_CAST")
                     shareInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -1630,37 +1643,41 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         intentReceived?.getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS)
                     } as ArrayList<ShareInfo>?
 
-                    if (shareInfos?.isNotEmpty() == true) {
-                        val permissions = arrayOf(
-                            getImagePermissionByVersion(),
-                            getAudioPermissionByVersion(),
-                            getVideoPermissionByVersion(),
-                            getReadExternalStoragePermission()
-                        )
-                        if (hasPermissions(requireContext(), *permissions)) {
-                            toSharePage()
-                        } else {
-                            requestMediaPermission.launch(permissions)
+                    when {
+                        shareInfos?.isNotEmpty() == true -> {
+                            val permissions = arrayOf(
+                                getImagePermissionByVersion(),
+                                getAudioPermissionByVersion(),
+                                getVideoPermissionByVersion(),
+                                getReadExternalStoragePermission()
+                            )
+                            if (hasPermissions(requireContext(), *permissions)) {
+                                toSharePage()
+                            } else {
+                                requestMediaPermission.launch(permissions)
+                            }
+                            return
                         }
-                        return
-                    } else if (Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == receivedIntent?.type) {
-                        startActivity(Intent(requireContext(), FileExplorerActivity::class.java)
-                            .putExtra(Intent.EXTRA_TEXT,
-                                receivedIntent?.getStringExtra(Intent.EXTRA_TEXT))
-                            .putExtra(Intent.EXTRA_SUBJECT,
-                                receivedIntent?.getStringExtra(Intent.EXTRA_SUBJECT))
-                            .putExtra(Intent.EXTRA_EMAIL,
-                                receivedIntent?.getStringExtra(Intent.EXTRA_EMAIL))
-                            .setAction(Intent.ACTION_SEND)
-                            .setType(Constants.TYPE_TEXT_PLAIN))
-                        requireActivity().finish()
-                        return
-                    } else if (Constants.ACTION_REFRESH == action && activity != null) {
-                        requireActivity().apply {
-                            setResult(Activity.RESULT_OK)
-                            finish()
+                        Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == receivedIntent?.type -> {
+                            startActivity(Intent(requireContext(), FileExplorerActivity::class.java)
+                                .putExtra(Intent.EXTRA_TEXT,
+                                    receivedIntent?.getStringExtra(Intent.EXTRA_TEXT))
+                                .putExtra(Intent.EXTRA_SUBJECT,
+                                    receivedIntent?.getStringExtra(Intent.EXTRA_SUBJECT))
+                                .putExtra(Intent.EXTRA_EMAIL,
+                                    receivedIntent?.getStringExtra(Intent.EXTRA_EMAIL))
+                                .setAction(Intent.ACTION_SEND)
+                                .setType(Constants.TYPE_TEXT_PLAIN))
+                            requireActivity().finish()
+                            return
                         }
-                        return
+                        Constants.ACTION_REFRESH == action && activity != null -> {
+                            requireActivity().apply {
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                            return
+                        }
                     }
                 }
                 readyToManager()
@@ -1685,9 +1702,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
                 if (error.errorCode == MegaError.API_EACCESS) {
                     Timber.e("Error API_EACCESS")
-                    if ((requireActivity() as LoginActivity).accountBlocked != null) {
-                        Timber.e("Account blocked")
-                    } else if (!backWhileLogin) {
+                    if (!backWhileLogin) {
                         (requireActivity() as LoginActivity).showSnackbar(error.errorString)
                     }
                 } else if (error.errorCode != MegaError.API_EBLOCKED) {
@@ -1963,7 +1978,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         backToLoginForm()
                         backWhileLogin = true
                         isLoggingIn = false
-                        LoginActivity.isFetchingNodes = false
+                        isFetchingNodes = false
                         loginClicked = false
                         firstTime = true
                         megaChatApi.logout(ChatLogoutListener(requireActivity(), loggingSettings))
@@ -1994,7 +2009,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         //login is in process
         val onLoginPage = binding.loginLayout.isVisible
         val on2faPage = binding.login2fa.isVisible
-        return if ((isLoggingIn || LoginActivity.isFetchingNodes) && !onLoginPage && !on2faPage) {
+        return if ((isLoggingIn || isFetchingNodes) && !onLoginPage && !on2faPage) {
             showConfirmLogoutDialog()
             2
         } else {
@@ -2120,6 +2135,35 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         setNegativeButton(R.string.general_cancel, null)
         setCancelable(false)
         show()
+    }
+
+    /**
+     * Starts CU service.
+     *
+     * @param firstTimeCam
+     * @param time
+     */
+    private fun startCameraUploadService(firstTimeCam: Boolean, time: Int) {
+        Timber.d("firstTimeCam: $firstTimeCam: $time")
+
+        with(requireActivity()) {
+            if (firstTimeCam) {
+                setStartScreenTimeStamp(this)
+
+                startActivity(Intent(this,
+                    ManagerActivity::class.java).apply {
+                    putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                })
+
+                finish()
+            } else {
+                Timber.d("Start the Camera Uploads service")
+                Handler(Looper.getMainLooper()).postDelayed({
+                    Timber.d("Now I start the service")
+                    JobUtil.scheduleCameraUploadJob(this)
+                }, time.toLong())
+            }
+        }
     }
 
     companion object {

@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.set.UserSet
@@ -16,6 +17,14 @@ interface AlbumRepository {
     suspend fun getAllUserSets(): List<UserSet>
 
     /**
+     * Get a user set
+     *
+     * @param albumId is the album's id to get the user set
+     * @return the user set if exist
+     */
+    suspend fun getUserSet(albumId: AlbumId): UserSet?
+
+    /**
      * Get album element ids
      *
      * @param albumId the id of the album which elements we want to get
@@ -29,7 +38,7 @@ interface AlbumRepository {
      *
      * @param name the name of the album
      */
-    suspend fun createAlbum(name: String)
+    suspend fun createAlbum(name: String): UserSet
 
     /**
      * Add photos to an album
@@ -38,4 +47,18 @@ interface AlbumRepository {
      * @param photoIDs the photos' node handles
      */
     suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
+
+    /**
+     * Monitor user sets update
+     *
+     * @return a flow of all new user sets update
+     */
+    fun monitorUserSetsUpdate(): Flow<List<UserSet>>
+
+    /**
+     * Monitor user set's element ids update
+     *
+     * @return a flow of all new element ids update
+     */
+    fun monitorAlbumElementIds(): Flow<List<NodeId>>
 }

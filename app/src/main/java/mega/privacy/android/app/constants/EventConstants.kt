@@ -7,7 +7,6 @@ object EventConstants {
     const val EVENT_USER_NAME_UPDATED = "EVENT_USER_NAME_UPDATED"
     const val EVENT_USER_EMAIL_UPDATED = "EVENT_USER_EMAIL_UPDATED"
 
-    const val EVENT_NETWORK_CHANGE = "network_change"
     const val EVENT_CHAT_TITLE_CHANGE = "chat_title_change"
     const val EVENT_CONTACT_NAME_CHANGE = "contact_name_change"
     const val EVENT_MEETING_AVATAR_CHANGE = "meeting_avatar_change"

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="ImpliedQuantity">
+        <ignore path="res/values-fr/strings.xml" />
+        <ignore path="res/values-ru/strings.xml" />
+    </issue>
+    <issue id="NewApi" severity="error" />
+    <!-- We can define which issue will ignore when run lint in CI/CD here />-->
+    <!--    <issue id="QueryPermissionsNeeded" severity="ignore" />-->
+</lint>

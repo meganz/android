@@ -97,7 +97,7 @@
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Thumbnail view</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Back up Recovery Key</string>
+    <string name="action_export_master_key">Back up Recovery key</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Cancel subscription</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -204,7 +204,7 @@
         <item quantity="other">The selected transfers will be cancelled.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Cloud Drive</string>
+    <string name="section_cloud_drive">Cloud drive</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recents</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -242,7 +242,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Incoming shares with</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">No files in your Cloud Drive</string>
+    <string name="file_browser_empty_cloud_drive">No files in your Cloud drive</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Empty Folder</string>
     <!-- Title of the fragment Choose Account -->
@@ -776,21 +776,21 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro&#160;Lite account</string>
     <!--  -->
-    <string name="backup_title">Back up your Recovery Key</string>
+    <string name="backup_title">Back up your Recovery key</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Your password unlocks your Recovery Key</string>
+    <string name="backup_subtitle">Your password unlocks your Recovery key</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your Recovery Key can no longer be decrypted, and you can no longer decrypt your data.</string>
+    <string name="backup_first_paragraph">Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your Recovery key can no longer be decrypted, and you can no longer decrypt your data.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
+    <string name="backup_second_paragraph">Exporting the Recovery key and keeping it in a secure location enables you to set a new password without data loss.</string>
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your email.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copy the Recovery Key to the clipboard or save it as text file.</string>
+    <string name="backup_action">Copy the Recovery key to the clipboard or save it as text file.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Save</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation">The Recovery key has been successfully copied</string>
     <!-- Button to change the password -->
     <string name="change_pass">Change</string>
     <!-- Positive button to perform a general action -->
@@ -800,7 +800,7 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Forgot your password?</string>
     <!-- Hint of the text when the user can write his master key -->
-    <string name="edit_text_insert_mk">Your Recovery Key goes here</string>
+    <string name="edit_text_insert_mk">Your Recovery key goes here</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">password goes here</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
@@ -828,7 +828,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Password reset</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Please enter your Recovery Key below</string>
+    <string name="text_dialog_insert_MK">Please enter your Recovery key below</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Your password has been changed.</string>
     <!-- Title of the dialog to park an account -->
@@ -842,7 +842,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">This recovery link has expired, please try again.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Your Recovery Key will be used to reset your password. Please enter your new password.</string>
+    <string name="text_reset_pass_logged_in">Your Recovery key will be used to reset your password. Please enter your new password.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Upgrade</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
@@ -866,9 +866,9 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Delete picture</string>
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.</string>
+    <string name="incorrect_MK">The key you supplied does not match this account. Please make sure you use the correct Recovery key and try again.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Invalid Recovery Key</string>
+    <string name="incorrect_MK_title">Invalid Recovery key</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Getting info&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1302,11 +1302,11 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Import</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Add to Cloud Drive</string>
+    <string name="add_to_cloud_node_chat">Add to Cloud drive</string>
     <!-- Menu option -->
     <string name="general_view_contacts">View contacts</string>
     <!-- Menu option -->
-    <string name="import_success_error">Error. Not added to Cloud Drive</string>
+    <string name="import_success_error">Error. Not added to Cloud drive</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Connecting&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1377,7 +1377,7 @@
     <!--  -->
     <string name="no_files_selected_warning">No files selected</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
+    <string name="attachment_upload_panel_from_cloud">From Cloud drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1566,7 +1566,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">User account</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Save to my \nCloud Drive</string>
+    <string name="save_to_mega">Save to my \nCloud drive</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">The chat already exists</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1594,7 +1594,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Delete QR code</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">To Cloud Drive</string>
+    <string name="save_cloud_drive">To Cloud drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">To file system</string>
     <!-- Title of QR code section -->
@@ -1656,7 +1656,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud Drive[/A]</string>
+    <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -1836,13 +1836,13 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Password accepted</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Wrong password.\nBack up your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong">Wrong password.\nBack up your Recovery key as soon as possible!</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copy to clipboard</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Proceed to log out</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Recovery Key</string>
+    <string name="recovery_key_bottom_sheet">Recovery key</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Save on File System</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
@@ -1864,9 +1864,9 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Security</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Back up Recovery Key</string>
+    <string name="settings_recovery_key_title">Back up Recovery key</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
+    <string name="settings_recovery_key_summary">Exporting the Recovery key and keeping it in a secure location enables you to set a new password without data loss.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">Unable to reach MEGA. Please check your connectivity or try again later.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -1882,7 +1882,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Print</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">The Recovery Key has been successfully saved</string>
+    <string name="save_MK_confirmation">The Recovery key has been successfully saved</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Pending)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1925,7 +1925,7 @@
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">Why do you need two-factor authentication?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">Two-factor authentication is a second layer of security for your account. Which means that even if someone knows your password they cannot access it, without also having access to the six digit code only you have access to.</string>
+    <string name="two_factor_authentication_explain">Two-factor authentication is a second layer of security for your account. Which means that even if someone knows your password they cannot access it, without also having access to the 6-digit code only you have access to.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Begin Setup</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -1945,7 +1945,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Please save your <b>Recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Invalid code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1975,7 +1975,7 @@
     <!-- Text button -->
     <string name="general_close">Close</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Export your Recovery Key to finish</string>
+    <string name="backup_rk_2fa_end">Export your Recovery key to finish</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Two-factor authentication app</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2121,17 +2121,17 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Invalid code</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Cloud Drive is almost full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning">Cloud drive is almost full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Cloud Drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning_pro_account">Cloud drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Cloud Drive is full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning">Cloud drive is full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Cloud Drive is full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning_pro_account">Cloud drive is full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Cloud Drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">See plans</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2250,7 +2250,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Saving %s in Cloud Drive&#8230;</string>
+    <string name="save_qr_cloud_drive">Saving %s in Cloud drive&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Files</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2600,7 +2600,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Encrypted chat</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
+    <string name="content_tour_two">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud drive.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Create your network</string>
     <!-- Content of third tour screen -->
@@ -2700,7 +2700,7 @@
         <item quantity="other">%d files pending.</item>
     </plurals>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">Log into MEGA</string>
+    <string name="login_to_mega">Log in to MEGA</string>
     <!-- Title of the create account screen -->
     <string name="create_account_title">Create your MEGA account</string>
     <!-- Label to reference a recents section -->
@@ -2773,7 +2773,7 @@
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Account deactivated</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure. You won’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure. You won’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2817,7 +2817,7 @@
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
     <string name="locked_accounts_text_1">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_2">Your password leaked and is now being used by bad actors to log into your accounts, including, but not limited to, your MEGA account.</string>
+    <string name="locked_accounts_text_2">Your password leaked and is now being used by bad actors to log in to your accounts, including, but not limited to, your MEGA account.</string>
     <!-- Button to add a nickname for a user -->
     <string name="add_nickname">Set Nickname</string>
     <!-- Button to update a nickname for a user -->
@@ -2874,7 +2874,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">The folder does not exist.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Storage Full</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3205,7 +3205,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Playing in the background</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
+    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">All</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3405,8 +3405,6 @@
     <string name="change_meeting_name">Change the meeting name</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meeting link</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Duration</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Join meeting as guest</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3585,8 +3583,6 @@
     <string name="payment_methods">Payment methods</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for your %1$s subscription</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
@@ -3982,7 +3978,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]No items in [/B][A]backups[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">This is where your backed up files and folders are stored. Your backed up items are “read-only” to protect them from being accidentally modified in your cloud drive.\nYou can back up items from your computer to MEGA using our desktop app.</string>
+    <string name="backups_empty_state_body">This is where your backed up files and folders are stored. Your backed up items are “read-only” to protect them from being accidentally modified in your Cloud drive.\nYou can back up items from your computer to MEGA using our desktop app.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4037,4 +4033,23 @@
     <string name="photos_album_creation_dialog_title">Enter album name</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>

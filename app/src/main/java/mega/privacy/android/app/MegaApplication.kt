@@ -2,8 +2,6 @@ package mega.privacy.android.app
 
 import android.app.Activity
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
@@ -18,6 +16,7 @@ import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
@@ -39,7 +38,7 @@ import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.theme.ThemeModeState
-import mega.privacy.android.app.receivers.NetworkStateReceiver
+import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase
 import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.ChangeApiServerUtil
@@ -49,6 +48,7 @@ import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -86,6 +86,8 @@ import javax.inject.Inject
  * @property localIpAddress
  * @property isEsid
  * @property monitorStorageStateEvent
+ * @property isDatabaseEntryStale
+ * @property globalNetworkStateHandler
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
@@ -160,6 +162,12 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     @Inject
     lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
 
+    @Inject
+    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
+
+    @Inject
+    lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -216,10 +224,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         megaApi.useHttpsOnly(useHttpsOnly)
         myAccountInfo.resetDefaults()
         dbH.resetExtendedAccountDetailsTimestamp()
-
-        @Suppress("DEPRECATION")
-        registerReceiver(NetworkStateReceiver(),
-            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
 
         // clear the cache files stored in the external cache folder.
         clearPublicCache(this)
@@ -348,7 +352,8 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      */
     fun refreshAccountInfo() {
         //Check if the call is recently
-        if (dbH.callToAccountDetails() || myAccountInfo.usedFormatted.trim().isEmpty()) {
+        if (runBlocking { isDatabaseEntryStale() }
+            || myAccountInfo.usedFormatted.trim().isEmpty()) {
             Timber.d("megaApi.getAccountDetails SEND")
             askForAccountDetails()
         }

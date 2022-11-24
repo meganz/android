@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import androidx.compose.foundation.background
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -32,9 +32,9 @@ import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -53,6 +53,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -61,7 +62,11 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.presentation.theme.black
+import mega.privacy.android.presentation.theme.caption
+import mega.privacy.android.presentation.theme.grey_300
 import mega.privacy.android.presentation.theme.grey_alpha_054
+import mega.privacy.android.presentation.theme.h6
+import mega.privacy.android.presentation.theme.subtitle2
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
@@ -71,6 +76,7 @@ fun AlbumsView(
     albumsViewState: AlbumsViewState,
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -94,7 +100,6 @@ fun AlbumsView(
         ) { album ->
             Box(
                 modifier = Modifier
-                    .padding(10.dp)
                     .clickable {
                         openAlbum(album)
                     }
@@ -136,16 +141,17 @@ fun AlbumsView(
                             .clip(RoundedCornerShape(10.dp))
                             .aspectRatio(1f)
                     )
-                    Text(
+                    MiddleEllipsisText(
                         modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
                         text = album.title(LocalContext.current),
-                        style = MaterialTheme.typography.subtitle2,
+                        style = subtitle2,
                         color = if (MaterialTheme.colors.isLight) black else white,
                         fontWeight = FontWeight.Medium
                     )
+
                     Text(
                         text = album.count.toString(),
-                        style = MaterialTheme.typography.caption,
+                        style = caption,
                         color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
                     )
                 }
@@ -160,7 +166,7 @@ fun AlbumsView(
         ) {
             FloatingActionButton(
                 modifier = Modifier.padding(all = 16.dp),
-                onClick = { openDialog.value = true }
+                onClick = { openDialog.value = true },
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -176,7 +182,8 @@ fun AlbumsView(
 
         if (openDialog.value) {
             CreateNewAlbumDialog(
-                onDismissRequest = { openDialog.value = false }
+                onDismissRequest = { openDialog.value = false },
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
             )
         }
     }
@@ -187,125 +194,136 @@ fun AlbumsView(
 @Composable
 fun CreateNewAlbumDialog(
     onDismissRequest: () -> Unit = {},
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
 ) {
     var textState by rememberSaveable { mutableStateOf("") }
     val isEnabled by remember { mutableStateOf(true) }
     val isError by remember { mutableStateOf(false) }
 
     val singleLine = true
-    MaterialTheme {
-        Dialog(onDismissRequest = onDismissRequest) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colors.surface,
-            ) {
-                Column {
-                    // Dialog title
-                    Text(
-                        text = stringResource(id = R.string.photos_album_creation_dialog_title),
-                        style = MaterialTheme.typography.subtitle1,
-                        modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Surface(
+            elevation = 24.dp,
+        ) {
+            Column {
+                // Dialog title
+                Text(
+                    text = stringResource(id = R.string.photos_album_creation_dialog_title),
+                    style = h6,
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
+                )
+
+                val textFieldColors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    cursorColor = teal_300,
+                    focusedIndicatorColor = teal_300,
+                    unfocusedIndicatorColor = teal_300,
+                )
+
+                val interactionSource = remember { MutableInteractionSource() }
+
+                val textColor = LocalTextStyle.current.color.takeOrElse {
+                    textFieldColors.textColor(isEnabled).value
+                }
+                val mergedTextStyle = LocalTextStyle.current.merge(
+                    TextStyle(
+                        color = textColor,
+                        fontSize = 16.sp,
                     )
+                )
 
-                    val textFieldColors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent,
-                        cursorColor = teal_300,
-                        focusedIndicatorColor = teal_300,
-                        unfocusedIndicatorColor = teal_300,
-                    )
-
-                    val interactionSource = remember { MutableInteractionSource() }
-
-                    val textColor = LocalTextStyle.current.color.takeOrElse {
-                        textFieldColors.textColor(isEnabled).value
+                BasicTextField(
+                    value = textState,
+                    onValueChange = {
+                        textState = it
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp, top = 16.dp)
+                        .background(color = Color.Transparent)
+                        .indicatorLine(
+                            enabled = isEnabled,
+                            isError = isError,
+                            interactionSource = interactionSource,
+                            colors = textFieldColors
+                        ),
+                    cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
+                    textStyle = mergedTextStyle,
+                    maxLines = 1,
+                    singleLine = singleLine,
+                    decorationBox = @Composable { innerTextField ->
+                        // places leading icon, text field with label and placeholder, trailing icon
+                        TextFieldDefaults.TextFieldDecorationBox(
+                            enabled = isEnabled,
+                            interactionSource = interactionSource,
+                            singleLine = singleLine,
+                            visualTransformation = VisualTransformation.None,
+                            value = textState,
+                            innerTextField = innerTextField,
+                            placeholder = {
+                                Text(
+                                    text = stringResource(id = R.string.photos_album_creation_dialog_input_placeholder),
+                                    color = grey_300,
+                                    fontSize = 16.sp,
+                                )
+                            },
+                            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 0.dp),
+                            colors = textFieldColors,
+                        )
                     }
-                    val mergedTextStyle = LocalTextStyle.current.merge(TextStyle(color = textColor))
+                )
 
-                    BasicTextField(
-                        value = textState,
-                        onValueChange = {
-                            textState = it
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 24.dp, end = 24.dp, top = 16.dp)
-                            .background(color = Color.Transparent)
-                            .indicatorLine(
-                                enabled = isEnabled,
-                                isError = isError,
-                                interactionSource = interactionSource,
-                                colors = textFieldColors
-                            ),
-                        cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
-                        textStyle = mergedTextStyle,
-                        maxLines = 1,
-                        singleLine = singleLine,
-                        decorationBox = @Composable { innerTextField ->
-                            // places leading icon, text field with label and placeholder, trailing icon
-                            TextFieldDefaults.TextFieldDecorationBox(
-                                enabled = isEnabled,
-                                interactionSource = interactionSource,
-                                singleLine = singleLine,
-                                visualTransformation = VisualTransformation.None,
-                                value = textState,
-                                innerTextField = innerTextField,
-                                placeholder = {
-                                    Text(text = stringResource(
-                                        id = R.string.photos_album_creation_dialog_input_placeholder
-                                    ))
-                                },
-                                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 0.dp),
-                                colors = textFieldColors,
-                            )
-                        }
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp, bottom = 8.dp),
-                        horizontalArrangement = Arrangement.End
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        onClick = onDismissRequest,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.Transparent,
+                        ),
+                        modifier = Modifier.padding(all = 0.dp),
+                        elevation = ButtonDefaults.elevation(
+                            defaultElevation = 0.dp,
+                            pressedElevation = 0.dp,
+                            disabledElevation = 0.dp,
+                            hoveredElevation = 0.dp,
+                            focusedElevation = 0.dp
+                        ),
                     ) {
-                        Button(
-                            onClick = { onDismissRequest() },
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent,
-                            ),
-                            modifier = Modifier.padding(all = 0.dp),
-                            elevation = ButtonDefaults.elevation(
-                                defaultElevation = 0.dp,
-                                pressedElevation = 0.dp,
-                                disabledElevation = 0.dp,
-                                hoveredElevation = 0.dp,
-                                focusedElevation = 0.dp
-                            ),
-                        ) {
-                            Text(
-                                stringResource(id = R.string.general_cancel),
-                                color = teal_300
-                            )
-                        }
-                        Button(
-                            onClick = { onDismissRequest() },
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent,
-                            ),
-                            modifier = Modifier.padding(all = 0.dp),
-                            elevation = ButtonDefaults.elevation(
-                                defaultElevation = 0.dp,
-                                pressedElevation = 0.dp,
-                                disabledElevation = 0.dp,
-                                hoveredElevation = 0.dp,
-                                focusedElevation = 0.dp
-                            ),
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.general_create),
-                                color = teal_300
-                            )
-                        }
+                        Text(
+                            stringResource(id = R.string.general_cancel),
+                            color = teal_300
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            onDismissRequest()
+                            onDialogPositiveButtonClicked(textState)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.Transparent,
+                        ),
+                        modifier = Modifier.padding(all = 0.dp),
+                        elevation = ButtonDefaults.elevation(
+                            defaultElevation = 0.dp,
+                            pressedElevation = 0.dp,
+                            disabledElevation = 0.dp,
+                            hoveredElevation = 0.dp,
+                            focusedElevation = 0.dp
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.general_create),
+                            color = teal_300
+                        )
                     }
                 }
+
             }
         }
     }

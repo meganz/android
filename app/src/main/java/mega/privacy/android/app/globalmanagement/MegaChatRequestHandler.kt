@@ -124,10 +124,8 @@ class MegaChatRequestHandler @Inject constructor(
                         }
                         action = Constants.ACTION_CONFIRM
                         MegaApplication.urlConfirmationLink = null
-                    } else if (activityLifecycleHandler.isActivityVisible) {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     } else {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
                 }
                 application.startActivity(loginIntent)

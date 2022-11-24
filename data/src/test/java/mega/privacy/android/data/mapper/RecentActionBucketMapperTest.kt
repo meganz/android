@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
@@ -50,7 +50,7 @@ class RecentActionBucketMapperTest {
             fileTypeInfoMapper = { PdfFileTypeInfo },
             isPendingShare = { false },
         )
-        assertThat(actual).isInstanceOf(RecentActionBucket::class.java)
+        assertThat(actual).isInstanceOf(RecentActionBucketUnTyped::class.java)
         assertThat(actual.timestamp).isEqualTo(recentActionBucket.timestamp)
         assertThat(actual.userEmail).isEqualTo(recentActionBucket.userEmail)
         assertThat(actual.parentHandle).isEqualTo(recentActionBucket.parentHandle)

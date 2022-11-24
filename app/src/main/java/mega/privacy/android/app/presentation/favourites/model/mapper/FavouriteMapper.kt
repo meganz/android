@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.favourites.model.mapper
 
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
@@ -72,9 +71,8 @@ private fun TypedFolderNode.createFolder(
     folderInfo: String,
     isAvailableOffline: Boolean,
 ) = FavouriteFolder(
-    handle = id.id,
-    icon = MegaNodeUtil.getFolderIcon(node,
-        DrawerItem.HOMEPAGE),
+    nodeId = id,
+    icon = getFolderIcon(this),
     name = name,
     label = label,
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
@@ -102,7 +100,7 @@ private fun TypedFileNode.createFile(
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
 ) = FavouriteFile(
-    handle = id.id,
+    nodeId = id,
     icon = getFileIcon(name),
     name = name,
     label = label,

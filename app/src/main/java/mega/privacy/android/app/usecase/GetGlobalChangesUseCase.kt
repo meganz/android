@@ -8,6 +8,8 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
@@ -29,6 +31,8 @@ class GetGlobalChangesUseCase @Inject constructor(
         data class OnNodesUpdate(val nodes: List<MegaNode>?) : Result()
         data class OnContactRequestsUpdate(val contactRequests: List<MegaContactRequest>?) : Result()
         data class OnEvent(val event: MegaEvent) : Result()
+        data class OnSetsUpdate(val sets: List<MegaSet>?) : Result()
+        data class OnSetElementsUpdate(val elements: List<MegaSetElement>?) : Result()
         object OnReloadNeeded : Result()
         object OnAccountUpdate : Result()
     }
@@ -69,6 +73,16 @@ class GetGlobalChangesUseCase @Inject constructor(
                 onEvent = { event ->
                     if (!emitter.isCancelled) {
                         emitter.onNext(Result.OnEvent(event))
+                    }
+                },
+                onSetsUpdate = { sets ->
+                    if (!emitter.isCancelled) {
+                        emitter.onNext((Result.OnSetsUpdate(sets)))
+                    }
+                },
+                onSetElementsUpdate = { elements ->
+                    if (!emitter.isCancelled) {
+                        emitter.onNext((Result.OnSetElementsUpdate(elements)))
                     }
                 }
             )

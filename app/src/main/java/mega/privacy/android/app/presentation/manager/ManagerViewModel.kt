@@ -38,10 +38,12 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -93,6 +95,8 @@ class ManagerViewModel @Inject constructor(
     private val getSecondarySyncHandle: GetSecondarySyncHandle,
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val monitorConnectivity: MonitorConnectivity,
+    private val broadcastUploadPauseState: BroadcastUploadPauseState,
 ) : ViewModel() {
 
     /**
@@ -111,6 +115,18 @@ class ManagerViewModel @Inject constructor(
      * private Inbox Node
      */
     private var inboxNode: MegaNode? = null
+
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
+
+    /**
+     * Is network connected
+     */
+    val isConnected: Boolean
+        get() = monitorConnectivity().value
 
     private val isFirstLogin = savedStateHandle.getStateFlow(
         viewModelScope,
@@ -251,15 +267,6 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Set the current inbox parent handle to the UI state
-     *
-     * @param handle the id of the current inbox parent handle to set
-     */
-    fun setInboxParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(inboxParentHandle = handle) }
-    }
-
-    /**
      * Set a flag to know if the current navigation level is the first one
      *
      * @param isFirstNavigationLevel true if the current navigation level corresponds to the first level
@@ -396,6 +403,15 @@ class ManagerViewModel @Inject constructor(
                     shouldSendCameraBroadcastEvent = result.shouldSendEvent,
                 )
             }
+        }
+    }
+
+    /**
+     * broadcast upload pause status
+     */
+    fun broadcastUploadPauseStatus() {
+        viewModelScope.launch {
+            broadcastUploadPauseState()
         }
     }
 }

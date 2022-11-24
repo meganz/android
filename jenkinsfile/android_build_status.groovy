@@ -34,6 +34,11 @@ DATA_COVERAGE = ""
 COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
 
+/**
+ * common.groovy file with common methods
+ */
+def common
+
 HTML_INDENT = "-- "
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
@@ -270,6 +275,16 @@ pipeline {
         }
     }
     stages {
+        stage('Load Common Script') {
+            steps {
+                script {
+                    BUILD_STEP = 'Preparation'
+
+                    common = load('jenkinsfile/common.groovy')
+                    common.helloWorld()
+                }
+            }
+        }
         stage('Preparation') {
             when {
                 expression { (!shouldSkipBuild()) }
@@ -302,27 +317,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
-                }
 
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            sh '''
-                            cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                            git submodule sync
-                            git submodule update --init --recursive --remote 
-                            cd sdk/src/main/jni/mega/sdk
-                            git fetch
-                            cd ../../megachat/sdk
-                            git fetch
-                            cd ${WORKSPACE}
-                        '''
-                        }
-                    }
+                    common.fetchSdkSubmodules()
                 }
             }
         }
@@ -526,6 +522,7 @@ pipeline {
                 }
 
                 gitlabCommitStatus(name: 'Lint Check') {
+                    sh "mv custom_lint.xml lint.xml"
                     sh "./gradlew lint"
 
                     script {
@@ -611,7 +608,7 @@ String getBuildWarnings() {
         String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("gmsBuildWarnings = $gmsBuildWarnings")
         if (!gmsBuildWarnings.isEmpty()) {
-            result = "<br/><b>:warning: GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(gmsBuildWarnings)
+            result = "<details><summary>:warning: GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(gmsBuildWarnings) + "</details>"
         }
     }
 
@@ -619,7 +616,7 @@ String getBuildWarnings() {
         String hmsBuildWarnings = sh(script: "cat ${HMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("hmsBuildWarnings = $hmsBuildWarnings")
         if (!hmsBuildWarnings.isEmpty()) {
-            result += "<br/><b>:warning: HMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(hmsBuildWarnings)
+            result += "<details><summary>:warning: HMS Build Warnings :warning:</summary>" + wrapBuildWarnings(hmsBuildWarnings) + "</details>"
         }
     }
 
@@ -627,7 +624,7 @@ String getBuildWarnings() {
         String qaBuildWarnings = sh(script: "cat ${QA_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("qaGmsBuildWarnings = $qaBuildWarnings")
         if (!qaBuildWarnings.isEmpty()) {
-            result += "<br/><b>:warning: QA GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(qaBuildWarnings)
+            result += "<details><summary>:warning: QA GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(qaBuildWarnings) + "</details>"
         }
     }
 

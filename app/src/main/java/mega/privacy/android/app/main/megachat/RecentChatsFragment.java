@@ -22,7 +22,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.isDarkMode;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.showAlert;
@@ -554,7 +553,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 }
 
                 if ((chats == null || chats.isEmpty()) && emptyArchivedChats()) {
-                    if (isOnline(context) && initState != MegaChatApi.INIT_OFFLINE_SESSION) {
+                    if (recentChatsViewModel.isConnected() && initState != MegaChatApi.INIT_OFFLINE_SESSION) {
                         showEmptyChatScreen(true, false);
                         showFab();
                     } else {
@@ -670,7 +669,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         switch (v.getId()) {
             case R.id.btn_new_chat: {
-                if (isOnline(context)) {
+                if (recentChatsViewModel.isConnected()) {
                     if (context instanceof ManagerActivity) {
                         Intent in = new Intent(context, AddContactActivity.class);
                         in.putExtra("contactType", CONTACT_TYPE_MEGA);
@@ -743,7 +742,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (megaChatApi != null) {
             builder.append("INIT STATE: " + megaChatApi.getInitState());
             builder.append("\nCONNECT STATE: " + megaChatApi.getConnectionState());
-            if (isOnline(context)) {
+            if (recentChatsViewModel.isConnected()) {
                 builder.append("\nNetwork OK");
             } else {
                 builder.append("\nNo network connection");
@@ -1100,7 +1099,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID: {
-                        if (!isOnline(context)) {
+                        if (!recentChatsViewModel.isConnected()) {
                             setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         } else {
                             if (megaChatApi == null) {
@@ -1119,7 +1118,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                     }
                     default: {
 
-                        if (!isOnline(context) || megaApi == null || megaApi.getRootNode() == null) {
+                        if (!recentChatsViewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
                             setCustomisedActionBarSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         } else {
                             if (megaChatApi == null) {
@@ -1743,7 +1742,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 public void onClick(View v) {
                     if (context != null && context instanceof ManagerActivity
                             && megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
-                            && isOnline(context)) {
+                            && recentChatsViewModel.isConnected()) {
                         ((ManagerActivity) context).showPresenceStatusDialog();
                     }
                 }
@@ -1763,7 +1762,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         }
         if (actionBarSubtitleArrow != null) {
             boolean showArrow = megaChatApi.getConnectionState() == MegaChatApi.CONNECTED
-                    && isOnline(context);
+                    && recentChatsViewModel.isConnected();
             actionBarSubtitleArrow.setVisibility(showArrow ? View.VISIBLE : View.GONE);
         }
     }

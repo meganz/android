@@ -21,6 +21,8 @@ class NodeMapperTest {
     private val expectedParentId = 2L
     private val expectedBase64Id = "1L"
     private val expectedModificationTime = 123L
+    private val expectedFingerprint = "fingerprint"
+    private val expectedDuration = 100
 
     @Test
     fun `test that files are mapped if isFile is true`() = runTest {
@@ -106,6 +108,8 @@ class NodeMapperTest {
         parentId: Long = expectedParentId,
         base64Id: String = expectedBase64Id,
         modificationTime: Long = expectedModificationTime,
+        fingerprint: String = expectedFingerprint,
+        duration: Int = expectedDuration,
         isFile: Boolean,
     ): MegaNode {
         val node = mock<MegaNode> {
@@ -116,6 +120,8 @@ class NodeMapperTest {
             on { this.parentHandle }.thenReturn(parentId)
             on { this.base64Handle }.thenReturn(base64Id)
             on { this.modificationTime }.thenReturn(modificationTime)
+            on { this.fingerprint }.thenReturn(fingerprint)
+            on { this.duration }.thenReturn(duration)
             on { this.isFile }.thenReturn(isFile)
             on { this.isFolder }.thenReturn(!isFile)
         }

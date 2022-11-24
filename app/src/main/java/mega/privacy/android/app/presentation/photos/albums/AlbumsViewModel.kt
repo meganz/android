@@ -3,14 +3,17 @@ package mega.privacy.android.app.presentation.photos.albums
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -21,9 +24,13 @@ import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,17 +43,19 @@ import javax.inject.Inject
 class AlbumsViewModel @Inject constructor(
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
     private val getDefaultAlbumsMap: GetDefaultAlbumsMap,
+    private val getUserAlbums: GetUserAlbums,
+    private val getAlbumPhotos: GetAlbumPhotos,
     private val uiAlbumMapper: UIAlbumMapper,
     private var getFeatureFlag: GetFeatureFlagValue,
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
+    private val createAlbum: CreateAlbum,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AlbumsViewState())
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
-
-    internal val selectedPhotoIds = mutableSetOf<Long>()
 
     private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
@@ -59,6 +68,7 @@ class AlbumsViewModel @Inject constructor(
 
     init {
         loadAlbums()
+        loadUserAlbums()
     }
 
     private fun loadAlbums() {
@@ -72,12 +82,16 @@ class AlbumsViewModel @Inject constructor(
                         photos.filter { value(it) }.takeIf { shouldAddAlbum(it, key) }
                             ?.let { uiAlbumMapper(it, key) }
                     }
-                }.collectLatest { albums ->
-                    val currentAlbumId = checkCurrentAlbumExists(albums = albums)
-                    _state.update {
-                        it.copy(
+                }.collectLatest { systemAlbums ->
+                    _state.update { state ->
+                        val albums = withContext(defaultDispatcher) {
+                            val userAlbums = state.albums.filter { it.id is Album.UserAlbum }
+                            systemAlbums + userAlbums
+                        }
+                        val currentAlbum = checkCurrentAlbumExists(albums = albums)
+                        state.copy(
                             albums = albums,
-                            currentAlbumId = currentAlbumId
+                            currentAlbum = currentAlbum,
                         )
                     }
                 }
@@ -87,8 +101,89 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    private fun loadUserAlbums() {
+        viewModelScope.launch {
+            if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
+
+            getUserAlbums()
+                .catch { exception ->
+                    Timber.e(exception)
+                }.collectLatest { albums ->
+                    albums.forEach(::fetchAlbumPhotos)
+                }
+        }
+    }
+
+    private fun fetchAlbumPhotos(album: Album.UserAlbum) {
+        viewModelScope.launch {
+            getAlbumPhotos(album.id)
+                .catch { exception ->
+                    Timber.e(exception)
+                }.collectLatest { photos ->
+                    processUserAlbum(album, photos)
+                }
+        }
+    }
+
+    private suspend fun processUserAlbum(album: Album.UserAlbum, photos: List<Photo>) {
+        _state.update { state ->
+            val albums = updateUIAlbums(state.albums, album, photos)
+            val currentAlbumId = checkCurrentAlbumExists(albums = albums)
+
+            state.copy(
+                albums = albums,
+                currentAlbum = currentAlbumId,
+            )
+        }
+    }
+
+    private suspend fun updateUIAlbums(
+        albums: List<UIAlbum>,
+        userAlbum: Album.UserAlbum,
+        photos: List<Photo>,
+    ): List<UIAlbum> = withContext(defaultDispatcher) {
+        val (systemAlbums, userAlbums) = albums.partition {
+            it.id !is Album.UserAlbum
+        }
+        val isReplaceAlbum = userAlbums.any {
+            (it.id as? Album.UserAlbum)?.id == userAlbum.id
+        }
+
+        val updatedUserAlbums = if (isReplaceAlbum) {
+            userAlbums.map {
+                if ((it.id as? Album.UserAlbum)?.id == userAlbum.id) {
+                    uiAlbumMapper(photos, userAlbum)
+                } else {
+                    it
+                }
+            }
+        } else {
+            userAlbums + uiAlbumMapper(photos, userAlbum)
+        }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
+
+        systemAlbums + updatedUserAlbums
+    }
+
+    /**
+     * Create a new album
+     *
+     * @param name the name of the album
+     */
+    fun createNewAlbum(name: String) = viewModelScope.launch {
+        try {
+            val album = createAlbum(name)
+            _state.update {
+                it.copy(currentAlbum = album)
+            }
+            Timber.d("Current album: ${album.title}")
+        } catch (exception: Exception) {
+            Timber.e(exception)
+        }
+    }
+
+
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
-        albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbumId }?.id
+        albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
 
 
     private fun shouldAddAlbum(
@@ -99,57 +194,54 @@ class AlbumsViewModel @Inject constructor(
 
     fun setCurrentAlbum(album: Album?) {
         _state.update {
-            it.copy(currentAlbumId = album)
+            it.copy(currentAlbum = album)
         }
     }
 
     fun togglePhotoSelection(id: Long) {
+        val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
         if (id in selectedPhotoIds) {
             selectedPhotoIds.remove(id)
         } else {
             selectedPhotoIds.add(id)
         }
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }
 
     fun clearSelectedPhotos() {
-        selectedPhotoIds.clear()
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            it.copy(selectedPhotoIds = emptySet())
         }
     }
 
     fun selectAllPhotos() {
-        _state.value.currentAlbumId?.let { album ->
+        _state.value.currentAlbum?.let { album ->
             val albumPhotosHandles =
                 _state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
                 }
-            selectedPhotoIds.clear()
-            selectedPhotoIds.addAll(albumPhotosHandles)
             _state.update {
-                it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+                it.copy(selectedPhotoIds = albumPhotosHandles.toMutableSet())
             }
         }
     }
 
     fun getAlbumPhotosCount() =
-        _state.value.albums.find { it.id == _state.value.currentAlbumId }?.count ?: 0
+        _state.value.albums.find { it.id == _state.value.currentAlbum }?.count ?: 0
 
     fun removeFavourites() {
         viewModelScope.launch {
-            removeFavourites(selectedPhotoIds.toList())
+            removeFavourites(_state.value.selectedPhotoIds.toList())
         }
-        selectedPhotoIds.clear()
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds.toMutableSet())
+            it.copy(selectedPhotoIds = emptySet())
         }
     }
 
     suspend fun getSelectedNodes() =
-        getNodeListByIds(selectedPhotoIds.toList())
+        getNodeListByIds(_state.value.selectedPhotoIds.toList())
 
     fun setCurrentSort(sort: Sort) {
         _state.update {

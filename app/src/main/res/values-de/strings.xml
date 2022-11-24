@@ -282,7 +282,7 @@
     <!-- Error message -->
     <string name="error_not_enough_free_space">Nicht genügend Speicherplatz verfügbar</string>
     <!-- Alert Dialog to get link -->
-    <string name="option_decryption_key">Kryptoschlüssel</string>
+    <string name="option_decryption_key">Schlüssel</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Dateien werden vorbereitet</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
@@ -483,7 +483,7 @@
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Kontakt hinzufügen</string>
     <!-- Title of the alert to introduce the decryption key -->
-    <string name="alert_decryption_key">Entschlüsselungs-Code</string>
+    <string name="alert_decryption_key">Schlüssel</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">Bitte geben Sie den Schlüssel für den Link ein</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
@@ -930,7 +930,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">Der Benutzeraccount des Eigentümers wurde wegen wiederholter Verletzung unserer Nutzungsbedingungen gesperrt.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">Der Ordnerschlüssel ist ungültig.</string>
+    <string name="general_error_invalid_decryption_key">Der Schlüssel zur Entschlüsselung des Ordnerlinks ist ungültig.</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -3405,8 +3405,6 @@
     <string name="change_meeting_name">Namen des Meetings ändern</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meetinglink</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Dauer</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Als Gast beitreten</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3585,8 +3583,6 @@
     <string name="payment_methods">Zahlungsmethoden</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Fortfahren</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite (monatliche Abrechnung)</string>
     <!-- Pro Lite yearly subscription -->
@@ -4033,4 +4029,27 @@
     <string name="media_player_video_snackbar_screenshot_saved">Das Bild wurde in der Galerie Ihres Geräts gespeichert</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Verlängerungsdatum:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Albumnamen eingeben</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">Neues Album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Meetinglink teilen</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Mehr sehen</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Gruppe verlassen</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Neues Album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>

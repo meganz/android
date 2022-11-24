@@ -2598,7 +2598,7 @@
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">参与者可通过此链接加入您的群组。</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
-    <string name="enter_group_name">请输入群组名称</string>
+    <string name="enter_group_name">输入群组名称</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
     <string name="alert_enter_group_name">创建聊天链接前请先为群组命名。</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
@@ -3307,8 +3307,6 @@
     <string name="change_meeting_name">更改会议名称</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">会议链接</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">时长</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">以访客身份加入会议</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3487,8 +3485,6 @@
     <string name="payment_methods">付款方式</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">继续</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">感谢您订阅%1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite月度会员方案</string>
     <!-- Pro Lite yearly subscription -->
@@ -3614,7 +3610,7 @@
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_forgot_passcode_button">忘记密码？</string>
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
-    <string name="settings_passcode_enter_password_title">请输入您的密码</string>
+    <string name="settings_passcode_enter_password_title">输入您的密码</string>
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">传输已暂停。恢复以继续下载。</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
@@ -3726,7 +3722,7 @@
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">您的反馈有助于我们改进MEGA。请清楚地描述您遇到的问题。您提供的详细信息越多，我们就越容易解决。</string>
     <!-- Hint text for the description field on the report issue screen-->
-    <string name="settings_help_report_issue_description_label">请描述您的问题</string>
+    <string name="settings_help_report_issue_description_label">描述您的问题</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
     <string name="settings_help_report_issue_attach_logs_label">发送日志文件</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
@@ -3929,4 +3925,27 @@
     <string name="media_player_video_snackbar_screenshot_saved">截屏已保存到您设备的图片库</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]续订日期：[/A][B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">输入相册名称</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">新建相册</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">分享会议链接</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">查看更多</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">离开群组</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">已存在有该名称的相册。请输入不同的名称。</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新建相册（%d）</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>

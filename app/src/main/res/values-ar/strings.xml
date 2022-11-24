@@ -3797,8 +3797,6 @@
     <string name="change_meeting_name">تغيير اسم الاجتماع</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">رابط الاجتماع</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">مدة</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">انضم إلى الاجتماع كضيف</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3977,8 +3975,6 @@
     <string name="payment_methods">طرق الدفع</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">تابع</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">شكرا لاشتراكك في %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">برو لايت Pro&#160;Lite شهرياً</string>
     <!-- Pro Lite yearly subscription -->
@@ -4449,4 +4445,27 @@
     <string name="media_player_video_snackbar_screenshot_saved">تم حفظ الصورة في معرض جهازك</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]تاريخ التجديد:[/A][B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">أدخل اسم الألبوم</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">ألبوم جديد</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">مشاركة رابط الاجتماع</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">شاهد المزيد</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">مغادرة المجموعة</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>

@@ -41,6 +41,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
@@ -49,7 +50,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
@@ -62,7 +62,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
@@ -119,6 +118,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -209,8 +209,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
 
-    private var assignModeratorDialog:AssignModeratorBottomSheetDialogFragment? = null
-    private var endMeetingAsModeratorDialog:EndMeetingAsModeratorBottomSheetDialogFragment? = null
+    private var assignModeratorDialog: AssignModeratorBottomSheetDialogFragment? = null
+    private var endMeetingAsModeratorDialog: EndMeetingAsModeratorBottomSheetDialogFragment? = null
 
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
@@ -674,9 +674,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                         )
 
                                                     camIsEnable =
-                                                        sharedModel.cameraLiveData.value!!
+                                                        (sharedModel.cameraLiveData.value
+                                                            ?: false)
                                                     speakerIsEnable =
-                                                        sharedModel.speakerLiveData.value!! == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+                                                        (sharedModel.speakerLiveData.value
+                                                            ?: false) == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
 
                                                     inMeetingViewModel.joinPublicChat(
                                                         args.chatId,
@@ -1048,7 +1050,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
+        viewLifecycleOwner.collectFlow(sharedModel.monitorConnectivityEvent) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
         }
 
@@ -1073,7 +1075,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 chrono.base =
                                     SystemClock.elapsedRealtime() - it * MILLISECONDS_IN_ONE_SECOND
                                 chrono.start()
-                                chrono.format = " %s"
                                 chrono.isVisible = true
                             }
                         }
@@ -1099,7 +1100,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 StringResourcesUtils.getString(R.string.outgoing_call_starting)
                         }
                         InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
-                            it.text = StringResourcesUtils.getString(R.string.duration_meeting)
+                            it.text = ""
                         }
                     }
                 }
@@ -1233,11 +1234,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         ))
                         text =
                             StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
-
-                        reconnecting()
-                    } else {
-                        inMeetingViewModel.checkBannerInfo()
                     }
+                }
+
+                if (shouldBeShown) {
+                    reconnecting()
+                } else {
+                    checkChildFragments()
                 }
             }
         }
@@ -2629,7 +2632,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
 
-        const val MILLISECONDS_IN_ONE_SECOND:Long = 1000
+        const val MILLISECONDS_IN_ONE_SECOND: Long = 1000
 
         const val INFO_ANIMATION = MILLISECONDS_IN_ONE_SECOND
     }
@@ -2690,8 +2693,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method that updates the microphone and camera values
      */
     private fun updateMicAndCam() {
-        camIsEnable = sharedModel.cameraLiveData.value!!
-        micIsEnable = sharedModel.micLiveData.value!!
+        camIsEnable = sharedModel.cameraLiveData.value ?: false
+        micIsEnable = sharedModel.micLiveData.value ?: false
         bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
         bottomFloatingPanelViewHolder.updateMicIcon(micIsEnable)
         updateParticipantsBottomPanel()

@@ -1,22 +1,18 @@
 package mega.privacy.android.app.presentation.achievements
 
+import mega.privacy.android.domain.entity.achievement.AchievementType
+
 /**
  * UI state for AchievementInfo screen
  *
  * @param toolbarTitle : Toolbar title
  * @param achievementType : Achievement type
- * @param infoAchievementsTitle : Achievement Title
- * @param firstParagraphText : First paragraph text
- * @param checkIconVisible : boolean to decide icon visibility
- * @param sectionTitleVisible : boolean to decide section title visibility
- * @param secondParagraphVisible : boolean to decide second paragraph visibility
+ * @param uiMegaAchievement : [UIMegaAchievement]
+ * @param awardCount : Award count
  */
 data class AchievementInfoUIState(
     val toolbarTitle: String = "",
-    val achievementType: Int = 0,
-    val infoAchievementsTitle: String = "",
-    val firstParagraphText: String = "",
-    val checkIconVisible: Boolean = false,
-    val sectionTitleVisible: Boolean = false,
-    val secondParagraphVisible: Boolean = false,
+    val achievementType: AchievementType = AchievementType.INVALID_ACHIEVEMENT,
+    val uiMegaAchievement: UIMegaAchievement? = null,
+    val awardCount: Long = 0L,
 )

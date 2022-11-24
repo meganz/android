@@ -3,6 +3,7 @@ package mega.privacy.android.app.di
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
@@ -13,6 +14,8 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
+import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
+import mega.privacy.android.app.presentation.achievements.toUIMegaAchievement
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
@@ -23,7 +26,7 @@ import mega.privacy.android.data.mapper.SkuMapper
  * Module for providing mapper dependencies
  */
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 class MapperModule {
 
     /**
@@ -67,4 +70,10 @@ class MapperModule {
      */
     @Provides
     fun provideUIAlbumMapper(): UIAlbumMapper = ::toUIAlbum
+
+    /**
+     * Provide UIMegaAchievementMapper
+     */
+    @Provides
+    fun provideAchievementsMapper(): UIMegaAchievementMapper = ::toUIMegaAchievement
 }

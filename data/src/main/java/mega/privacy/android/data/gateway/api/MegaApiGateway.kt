@@ -11,6 +11,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
@@ -198,7 +199,8 @@ interface MegaApiGateway {
     /**
      * Get the fingerprint of a file by path
      *
-     * @param filePath
+     * @param filePath file path
+     * @return fingerprint
      */
     suspend fun getFingerprint(filePath: String): String?
 
@@ -900,7 +902,7 @@ interface MegaApiGateway {
      * @param name the name of the set
      * @param listener [MegaRequestListenerInterface]
      */
-    suspend fun createSet(name: String, listener: MegaRequestListenerInterface)
+    fun createSet(name: String, listener: MegaRequestListenerInterface)
 
     /**
      * Create a new element for the set
@@ -918,6 +920,16 @@ interface MegaApiGateway {
      * @return list of Sets
      */
     suspend fun getSets(): MegaSetList
+
+    /**
+     * Get the Set with the given id, for current user.
+     * The response value is stored as a MegaSet.
+     * You take the ownership of the returned value
+     *
+     * @param sid the id of the Set to be retrieved
+     * @return the requested Set, or null if not found
+     */
+    suspend fun getSet(sid: Long): MegaSet?
 
     /**
      * Get all Elements in the Set with given id, for current user.

@@ -493,7 +493,7 @@
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
     <string name="unzipping_process">Đang giải nén tệp</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="error_io_problem">File system có vấn đề</string>
+    <string name="error_io_problem">Hệ thống tệp có vấn đề</string>
     <!-- error message while browsing the local filesystem -->
     <string name="general_error">Lỗi phát sinh khi thi hành tác vụ</string>
     <!-- menu item -->
@@ -573,7 +573,7 @@
     <!-- title of the setting to set the default download location -->
     <string name="settings_storage_download_location">Chỗ tải xuống mặc định</string>
     <!-- Whether to always ask the user each time. -->
-    <string name="settings_storage_ask_me_always">Luôn hỏi chỗ để lưu mỗi khi tải về</string>
+    <string name="settings_storage_ask_me_always">Luôn hỏi chỗ để lưu mỗi khi tải xuống</string>
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">Thêm số điện thoại</string>
     <!-- enter verification code page title -->
@@ -620,7 +620,7 @@
     <string name="verify_account_successfully">Số điện thoại đã được xác thực thành công</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
-        <item>Bộ nhớ trong máy</item>
+        <item>Bộ nhớ nội bộ</item>
         <item>Bộ nhớ ngoài</item>
     </string-array>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
@@ -674,7 +674,7 @@
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">Khóa bằng Mã Số</string>
     <!-- Settings option to change Passcode. -->
-    <string name="settings_change_passcode">Đổi mã passcode</string>
+    <string name="settings_change_passcode">Đổi mã số</string>
     <!-- Settings option screen to change Passcode. -->
     <string name="title_change_passcode">Đổi mã số</string>
     <!-- Settings option to set the timer to ask for passcode. -->
@@ -3307,8 +3307,6 @@
     <string name="change_meeting_name">Đổi tên cuộc họp mặt</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Đường liên kết họp mặt</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Thời lượng</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Tham gia họp mặt với tư cách khách</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3487,8 +3485,6 @@
     <string name="payment_methods">Phương thức thanh toán</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Tiến hành</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Cảm ơn quý khách đã mua gói đăng ký dịch vụ %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite hằng tháng</string>
     <!-- Pro Lite yearly subscription -->
@@ -3929,4 +3925,27 @@
     <string name="media_player_video_snackbar_screenshot_saved">Đã lưu lại ảnh vào thư viện của thiết bị</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Ngày gia hạn chu kỳ:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Điền tên album</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">Album mới</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Chia sẻ đường liên kết cuộc họp</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Xem thêm</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Rời khỏi nhóm</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album"></string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
 </resources>
