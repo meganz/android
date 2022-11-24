@@ -360,14 +360,14 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         super.onResume()
         Util.setAppFontSize(this)
 
+        if (intent == null) return
+
         if (intent?.action != null) {
             when (intent.action) {
                 Constants.ACTION_CANCEL_CAM_SYNC -> showCancelCUWarning()
                 Constants.ACTION_CANCEL_DOWNLOAD -> showConfirmationCancelAllTransfers()
                 Constants.ACTION_OVERQUOTA_TRANSFER -> showGeneralTransferOverQuotaWarning()
             }
-
-            intent.action = null
         }
 
         intent = null
