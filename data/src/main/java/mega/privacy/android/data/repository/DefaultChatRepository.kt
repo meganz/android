@@ -15,9 +15,11 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
@@ -39,6 +41,7 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatRequestMapper: ChatRequestMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val chatRoomMapper: ChatRoomMapper,
+    private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> {
@@ -129,7 +132,11 @@ internal class DefaultChatRepository @Inject constructor(
         .flowOn(ioDispatcher)
 
     override fun getChatRoom(chatId: Long): ChatRoom? =
-        chatGateway.getChatRoom(chatId)?.let {
-            chatRoomMapper(it)
-        }
+        chatGateway.getChatRoom(chatId)?.let(chatRoomMapper)
+
+    override fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting? =
+        chatGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
+
+    override fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
+        chatGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -75,4 +76,21 @@ interface ChatRepository {
      * @return [ChatRoom] containing the updated data.
      */
     fun getChatRoom(chatId: Long): ChatRoom?
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
 }

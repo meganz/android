@@ -8,6 +8,7 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
  * Mega chat api gateway
@@ -212,4 +213,21 @@ interface MegaChatApiGateway {
         device: String,
         listener: MegaChatRequestListenerInterface?,
     )
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeeting(chatId: Long, schedId: Long): MegaChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>?
 }

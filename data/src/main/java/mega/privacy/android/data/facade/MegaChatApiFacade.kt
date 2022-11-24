@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoomListenerInterface
+import nz.mega.sdk.MegaChatScheduledMeeting
 import javax.inject.Inject
 
 /**
@@ -191,7 +192,6 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatRoom(chatId: Long): MegaChatRoom? =
         chatApi.getChatRoom(chatId)
 
-
     override fun getChatCall(chatId: Long): MegaChatCall? =
         chatApi.getChatCall(chatId)
 
@@ -213,6 +213,15 @@ internal class MegaChatApiFacade @Inject constructor(
         device: String,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.setChatVideoInDevice(device, listener)
+
+    override fun getScheduledMeeting(
+        chatId: Long,
+        schedId: Long,
+    ): MegaChatScheduledMeeting? =
+        chatApi.getScheduledMeeting(chatId, schedId)
+
+    override fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>? =
+        chatApi.getScheduledMeetingsByChat(chatId)
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
