@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
@@ -119,7 +120,7 @@ fun CreateNewAlbumDialog(
 
     MegaDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.padding(horizontal = 40.dp),
+        modifier = Modifier.padding(horizontal = 40.dp).widthIn(max = 280.dp),
         onDismissRequest = onDismissRequest,
         titleStringID = R.string.photos_album_creation_dialog_title,
         body = {
