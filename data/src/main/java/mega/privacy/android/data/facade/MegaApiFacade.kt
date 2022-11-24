@@ -480,11 +480,9 @@ internal class MegaApiFacade @Inject constructor(
         newNodeName: String,
         listener: MegaRequestListenerInterface?,
     ) {
-        if (listener != null) {
-            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, listener)
-        } else {
-            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
-        }
+        listener?.let {
+            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, it)
+        } ?: megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
     }
 
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
