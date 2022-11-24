@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatRequestMapper
@@ -36,10 +37,16 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [ChatRepository]
  *
- * @property chatGateway
+ * @property megaChatApiGateway     [MegaChatApiGateway]
+ * @property megaApiGateway         [MegaApiGateway]
+ * @property ioDispatcher           [CoroutineDispatcher]
+ * @property chatRequestMapper      [ChatRequestMapper]
+ * @property localStorageGateway    [MegaLocalStorageGateway]
+ * @property chatRoomMapper         [ChatRoomMapper]
  */
 internal class DefaultChatRepository @Inject constructor(
-    private val chatGateway: MegaChatApiGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
+    private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatRequestMapper: ChatRequestMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -60,17 +67,17 @@ internal class DefaultChatRepository @Inject constructor(
                 }
             )
 
-            chatGateway.addChatRequestListener(listener)
+            megaChatApiGateway.addChatRequestListener(listener)
 
-            awaitClose { chatGateway.removeChatRequestListener(listener) }
+            awaitClose { megaChatApiGateway.removeChatRequestListener(listener) }
         }
     }
 
     override suspend fun setOpenInvite(chatId: Long): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                chatGateway.getChatRoom(chatId)?.let { chat ->
-                    chatGateway.setOpenInvite(chatId,
+                megaChatApiGateway.getChatRoom(chatId)?.let { chat ->
+                    megaChatApiGateway.setOpenInvite(chatId,
                         !chat.isOpenInvite,
                         OptionalMegaChatRequestListenerInterface(
                             onRequestFinish = onRequestSetOpenInviteCompleted(continuation)
@@ -92,7 +99,7 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun startChatCall(chatId: Long, enabledVideo: Boolean, enabledAudio: Boolean) =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                chatGateway.startChatCall(chatId,
+                megaChatApiGateway.startChatCall(chatId,
                     enabledVideo,
                     enabledAudio,
                     OptionalMegaChatRequestListenerInterface(
@@ -108,7 +115,7 @@ internal class DefaultChatRepository @Inject constructor(
         enabledSpeaker: Boolean,
     ): ChatRequest = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
-            chatGateway.answerChatCall(chatId,
+            megaChatApiGateway.answerChatCall(chatId,
                 enabledVideo,
                 enabledAudio,
                 OptionalMegaChatRequestListenerInterface(
@@ -129,38 +136,43 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun getChatFilesFolderId(): NodeId? =
         localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
 
-    override fun monitorChatRoomUpdates(chatId: Long) = chatGateway.getChatRoomUpdates(chatId)
-        .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
-        .mapNotNull { it.chat }
-        .map { chatRoomMapper(it) }
-        .flowOn(ioDispatcher)
+    override fun monitorChatRoomUpdates(chatId: Long) =
+        megaChatApiGateway.getChatRoomUpdates(chatId)
+            .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
+            .mapNotNull { it.chat }
+            .map { chatRoomMapper(it) }
+            .flowOn(ioDispatcher)
 
-    override fun getChatRoom(chatId: Long): ChatRoom? =
-        chatGateway.getChatRoom(chatId)?.let(chatRoomMapper)
+    override suspend fun getChatRoom(chatId: Long): ChatRoom? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatRoom(chatId)?.let {
+                chatRoomMapper(it)
+            }
+        }
 
     override fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting> =
-        chatGateway.scheduledMeetingUpdates
+        megaChatApiGateway.scheduledMeetingUpdates
             .filterIsInstance<ScheduleMeetingUpdate.OnChatSchedMeetingUpdate>()
             .mapNotNull { it.item }
             .map(chatScheduledMeetingMapper)
             .flowOn(ioDispatcher)
 
     override fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long> =
-        chatGateway.scheduledMeetingUpdates
+        megaChatApiGateway.scheduledMeetingUpdates
             .filterIsInstance<ScheduleMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
             .mapNotNull { it.chatId }
             .flowOn(ioDispatcher)
 
     override fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting? =
-        chatGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
+        megaChatApiGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
 
     override fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
-        chatGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
+        megaChatApiGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
 
     override suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                chatGateway.fetchScheduledMeetingOccurrencesByChat(
+                megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
                     chatId,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
@@ -177,6 +189,14 @@ internal class DefaultChatRepository @Inject constructor(
                             }
                         }
                     ))
+            }
+        }
+
+    override suspend fun inviteToChat(chatId: Long, contactsData: List<String>) =
+        withContext(ioDispatcher) {
+            contactsData.forEach { email ->
+                val userHandle = megaApiGateway.getContact(email)?.handle ?: -1
+                megaChatApiGateway.inviteToChat(chatId, userHandle, null)
             }
         }
 }

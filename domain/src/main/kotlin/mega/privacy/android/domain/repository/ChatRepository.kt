@@ -76,7 +76,7 @@ interface ChatRepository {
      * @param chatId      Chat Id
      * @return [ChatRoom] containing the updated data.
      */
-    fun getChatRoom(chatId: Long): ChatRoom?
+    suspend fun getChatRoom(chatId: Long): ChatRoom?
 
     /**
      * Monitor updates on scheduled meetings
@@ -116,4 +116,12 @@ interface ChatRepository {
      * @return The list of scheduled meetings occurrences.
      */
     suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>?
+
+    /**
+     * Invite contacts to chat.
+     *
+     * @param chatId            The Chat id.
+     * @param contactsData      List of contacts to add
+     */
+    suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
 }

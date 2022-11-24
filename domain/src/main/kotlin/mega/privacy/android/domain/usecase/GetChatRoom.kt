@@ -13,5 +13,5 @@ fun interface GetChatRoom {
      * @param chatId        Chat id.
      * @return [ChatRoom]   containing the updated data.
      */
-    operator fun invoke(chatId: Long): ChatRoom?
+    suspend operator fun invoke(chatId: Long): ChatRoom?
 }

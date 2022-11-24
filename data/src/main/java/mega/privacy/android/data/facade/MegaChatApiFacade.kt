@@ -249,6 +249,12 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.fetchScheduledMeetingOccurrencesByChat(chatId, listener)
 
+    override fun inviteToChat(
+        chatId: Long,
+        userHandle: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
+
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
     }

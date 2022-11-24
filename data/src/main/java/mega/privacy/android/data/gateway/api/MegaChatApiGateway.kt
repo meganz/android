@@ -248,4 +248,13 @@ interface MegaChatApiGateway {
         chatId: Long,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Invite contact to a chat
+     *
+     * @param chatId        Chat id.
+     * @param userHandle    User handle.
+     * @param listener      Listener.
+     */
+    fun inviteToChat(chatId: Long, userHandle: Long, listener: MegaChatRequestListenerInterface?)
 }
