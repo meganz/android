@@ -83,7 +83,7 @@ internal class DefaultFilesRepository @Inject constructor(
                 newNodeName = newNodeName,
                 listener = OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
-                        if (request.type == MegaRequest.TYPE_COPY && error.errorCode == MegaError.API_OK) {
+                        if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_COPY) {
                             continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
                         } else {
                             continuation.failWithError(error)
