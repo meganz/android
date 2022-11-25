@@ -118,9 +118,10 @@ private fun String.isGifExtension() = this == "gif"
 private fun String.isRawExtension() = this in rawExtensions
 
 private val rawExtensions = listOf(
-    "3fr", "arw", "cr2",
-    "crw", "ciff", "cs1",
-    "dcr", "dng", "erf",
+    "3fr", "arw", "bay",
+    "cr2", "cr3", "crw",
+    "ciff", "cs1", "dcr",
+    "dng", "erf", "fff",
     "iiq", "k25", "kdc",
     "mef", "mos", "mrw",
     "nef", "nrw", "orf",
