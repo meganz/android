@@ -41,6 +41,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -97,6 +98,7 @@ class ManagerViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivity: MonitorConnectivity,
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
+    private val getExtendedAccountDetail: GetExtendedAccountDetail,
 ) : ViewModel() {
 
     /**
@@ -412,6 +414,16 @@ class ManagerViewModel @Inject constructor(
     fun broadcastUploadPauseStatus() {
         viewModelScope.launch {
             broadcastUploadPauseState()
+        }
+    }
+
+    /**
+     * Get extended account detail
+     */
+    fun askForExtendedAccountDetails() {
+        Timber.d("askForExtendedAccountDetails")
+        viewModelScope.launch {
+            getExtendedAccountDetail(sessions = true, purchases = false, transactions = false)
         }
     }
 }

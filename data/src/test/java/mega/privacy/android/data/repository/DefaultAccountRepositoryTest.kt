@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -64,6 +65,7 @@ class DefaultAccountRepositoryTest {
     private val skuMapper = mock<SkuMapper>()
     private val subscriptionPlanListMapper = mock<SubscriptionPlanListMapper>()
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
+    private val dbHandler = mock<DatabaseHandler>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -109,7 +111,7 @@ class DefaultAccountRepositoryTest {
             skuMapper = skuMapper,
             subscriptionPlanListMapper = subscriptionPlanListMapper,
             megaAchievementMapper = megaAchievementMapper,
-            dbHandler = mock()
+            dbHandler = dbHandler,
         )
     }
 
@@ -399,4 +401,124 @@ class DefaultAccountRepositoryTest {
             whenever(megaApiGateway.myCredentials).thenReturn(null)
             assertThat(underTest.getMyCredentials()).isNull()
         }
+
+    @Test
+    fun `test that getExtendedAccountDetails returns success when MegaApi returns ERROR_OK`() =
+        runTest {
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+            }
+
+            whenever(megaApiGateway.getExtendedAccountDetails(
+                sessions = any(),
+                purchases = any(),
+                transactions = any(),
+                listener = any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.getExtendedAccountDetails(
+                sessions = true,
+                purchases = false,
+                transactions = false
+            )
+            verify(accountInfoWrapper).handleAccountDetail(megaRequest)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that getExtendedAccountDetails finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_NOENT)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+            }
+
+            whenever(megaApiGateway.getExtendedAccountDetails(
+                sessions = any(),
+                purchases = any(),
+                transactions = any(),
+                listener = any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.getExtendedAccountDetails(
+                sessions = true,
+                purchases = false,
+                transactions = false
+            )
+        }
+
+
+    @Test
+    fun `test that requestAccount returns success when MegaApi returns ERROR_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+            }
+
+            whenever(megaApiGateway.getAccountDetails(listener = any())).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.requestAccount()
+            verify(accountInfoWrapper).handleAccountDetail(megaRequest)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that requestAccount finishes with general MegaException when MegaChatApi returns errors other than ERROR_ACCESS or ERROR_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_NOENT)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+            }
+
+            whenever(megaApiGateway.getAccountDetails(listener = any())).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.requestAccount()
+        }
+
+    @Test
+    fun `test resetAccountDetailsTimeStamp invoke correct method`() = runTest {
+        underTest.resetAccountDetailsTimeStamp()
+        verify(dbHandler).resetAccountDetailsTimeStamp()
+    }
+
+    @Test
+    fun `test resetExtendedAccountDetailsTimestamp invoke correct method`() = runTest {
+        underTest.resetExtendedAccountDetailsTimestamp()
+        verify(dbHandler).resetExtendedAccountDetailsTimestamp()
+    }
 }

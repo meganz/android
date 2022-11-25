@@ -29,7 +29,7 @@ interface AccountRepository {
      * Request account
      * Sends a request to update account data asynchronously
      */
-    fun requestAccount()
+    suspend fun requestAccount()
 
     /**
      * Set that the user has logged in
@@ -152,4 +152,16 @@ interface AccountRepository {
      * @return Fingerprint of the signing key of the current account.
      */
     suspend fun getMyCredentials(): String?
+
+    /**
+     * Reset account details time stamp
+     *
+     */
+    suspend fun resetAccountDetailsTimeStamp()
+
+    /**
+     * Reset extended account details timestamp
+     *
+     */
+    suspend fun resetExtendedAccountDetailsTimestamp()
 }
