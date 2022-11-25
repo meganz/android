@@ -24,6 +24,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -32,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -64,7 +68,6 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -102,6 +105,7 @@ fun ScheduledMeetingInfoView(
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -174,7 +178,17 @@ fun ScheduledMeetingInfoView(
                 }
             }
         }
+
+        state.snackBar?.let { id ->
+            val msg = stringResource(id = id)
+            LaunchedEffect(scaffoldState.snackbarHostState) {
+                scaffoldState.snackbarHostState.showSnackbar(message = msg,
+                    duration = SnackbarDuration.Long)
+            }
+        }
     }
+
+    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     onScrollChange(!firstItemVisible)
 }
@@ -258,7 +272,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
             Column(modifier = Modifier
                 .padding(start = 16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    state.chatRoom?.let {
+                    state.scheduledMeeting?.let {
                         Text(text = it.title,
                             style = MaterialTheme.typography.subtitle1,
                             color = if (MaterialTheme.colors.isLight) black else white,
@@ -289,9 +303,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
 @Composable
 private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
-        state.chatRoom?.let {
-            DefaultAvatar(title = it.title)
-        }
+        DefaultAvatar(title = state.chatTitle)
     } else if (state.isSingleMeeting()) {
         OneParticipantAvatar(firstUser = state.firstParticipant ?: return)
     } else {
@@ -941,7 +953,7 @@ fun DefaultParticipantAvatar(
 @Composable
 fun PreviewActionButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ActionButton(state = ScheduledMeetingInfoState(chatRoom = ChatRoom(-1),
+        ActionButton(state = ScheduledMeetingInfoState(
             scheduledMeeting = ScheduledMeetingItem(chatId = -1,
                 scheduledMeetingId = -1,
                 date = "date",
@@ -959,7 +971,7 @@ fun PreviewActionButton() {
 @Composable
 fun PreviewAddParticipantsButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        AddParticipantsButton(state = ScheduledMeetingInfoState(chatRoom = ChatRoom(-1),
+        AddParticipantsButton(state = ScheduledMeetingInfoState(
             scheduledMeeting = ScheduledMeetingItem(chatId = -1,
                 scheduledMeetingId = -1,
                 date = "date",
@@ -976,7 +988,7 @@ fun PreviewAddParticipantsButton() {
 fun PreviewScheduledMeetingInfoView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
-            state = ScheduledMeetingInfoState(chatRoom = ChatRoom(-1),
+            state = ScheduledMeetingInfoState(
                 scheduledMeeting = ScheduledMeetingItem(chatId = -1,
                     scheduledMeetingId = -1,
                     date = "date",

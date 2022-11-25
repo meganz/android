@@ -5,7 +5,6 @@ import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewMod
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -16,32 +15,36 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
  *
  * @property buttons                                    List of available action buttons.
- * @property chatRoom                                   The corresponding [ChatRoom].
+ * @property chatId                                     Chat id.
+ * @property chatTitle                                  Chat title.
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
+ * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
  * @property participantItemList                        List of [ContactItem].
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
- * @property error                                      String resource id for showing an error.
+ * @property snackBar                                   String resource id for showing an snackBar.
  * @property result                                     Handle of the new chat conversation.
  * @property firstParticipant                           First participant in the chat room.
  * @property lastParticipant                            Last participant in the chat room.
  */
 data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
-    val chatRoom: ChatRoom? = null,
+    val chatId: Long = -1,
+    val chatTitle: String = "",
     val scheduledMeeting: ScheduledMeetingItem? = null,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
+    val inviteParticipantAction: InviteParticipantsAction? = null,
     val participantItemList: List<ChatParticipant> = emptyList(),
     val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
     val enabledChatNotificationsOption: Boolean = true,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
-    val error: Int? = null,
+    val snackBar: Int? = null,
     val result: Long? = null,
     val firstParticipant: ChatParticipant? = ChatParticipant(
         participantId = -1,
