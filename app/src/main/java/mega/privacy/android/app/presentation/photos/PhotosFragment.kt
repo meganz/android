@@ -83,7 +83,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -488,6 +487,14 @@ class PhotosFragment : Fragment() {
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
         val message =
             result.data?.getStringExtra(AlbumPhotosSelectionActivity.MESSAGE) // Added 5 items to "Color ️‍🌈"
+        message?.let {
+            if (message.isNotEmpty()) {
+                albumsViewModel.setSnackBarMessage(snackBarMessage = message)
+                albumsViewModel.getCurrentUIAlbum()?.let { UIAlbum ->
+                    openAlbum(album = UIAlbum)
+                }
+            }
+        }
     }
 
 
@@ -606,12 +613,15 @@ class PhotosFragment : Fragment() {
         activity?.lifecycleScope?.launch {
             val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
             if (dynamicAlbumEnabled) {
-                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance())
+                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
+                    isAccountHasPhotos()))
             } else {
                 managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }
         }
     }
+
+    private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
 
     /**
      * Register Camera Upload Broadcast

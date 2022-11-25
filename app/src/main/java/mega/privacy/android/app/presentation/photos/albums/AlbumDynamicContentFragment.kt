@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -84,9 +85,19 @@ class AlbumDynamicContentFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun getInstance(): AlbumDynamicContentFragment {
-            return AlbumDynamicContentFragment()
+        fun getInstance(isAccountHasPhotos: Boolean): AlbumDynamicContentFragment {
+            return AlbumDynamicContentFragment().apply {
+                arguments =
+                    bundleOf(INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS to isAccountHasPhotos)
+            }
         }
+
+        internal const val INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS = "IS_ACCOUNT_HAS_PHOTOS"
+    }
+
+    private val isAccountHasPhotos: Boolean by lazy(LazyThreadSafetyMode.NONE) {
+        arguments?.getBoolean(INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS,
+            false) ?: false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -210,7 +221,7 @@ class AlbumDynamicContentFragment : Fragment() {
                 )
             }
 
-            if (uiState.currentAlbum is Album.UserAlbum) {
+            if (uiState.currentAlbum is Album.UserAlbum && isAccountHasPhotos) {
                 AddFabButton(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -405,9 +416,7 @@ class AlbumDynamicContentFragment : Fragment() {
      * Get current page title
      */
     fun getCurrentAlbumTitle(): String {
-        val currentAlbum = albumsViewModel.state.value.currentAlbum
-        val currentUIAlbum =
-            albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+        val currentUIAlbum = albumsViewModel.getCurrentUIAlbum()
         return if (context != null && currentUIAlbum != null) {
             currentUIAlbum.title
         } else {

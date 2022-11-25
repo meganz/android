@@ -229,6 +229,11 @@ class AlbumsViewModel @Inject constructor(
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
         albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
 
+    internal fun getCurrentUIAlbum(): UIAlbum? {
+        val currentAlbum = _state.value.currentAlbum
+        return _state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+    }
+
     /**
      * Get the default album title
      */
