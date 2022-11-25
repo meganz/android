@@ -3532,7 +3532,7 @@
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">연표</string>
     <!-- Title of album tab in photos section. -->
-    <string name="tab_title_album">앨범</string>
+    <string name="tab_title_album">사진첩</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">즐겨찾기</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
@@ -3926,9 +3926,9 @@
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]갱신일:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
-    <string name="photos_album_creation_dialog_title">앨범 이름 입력</string>
+    <string name="photos_album_creation_dialog_title">사진첩 이름 입력</string>
     <!-- Album creation input name placeholder -->
-    <string name="photos_album_creation_dialog_input_placeholder">새 앨범</string>
+    <string name="photos_album_creation_dialog_input_placeholder">새 사진첩</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_share_meeting_link_label">회의 링크 공유</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
@@ -3936,16 +3936,45 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">그룹 떠나기</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <string name="photos_create_album_error_message_systems_album">이 사진첩 이름은 허용되지 않습니다. 다른 이름을 입력하세요.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">새 앨범(%d)</string>
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">새 사진첩 (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">“%s”에 항목 추가</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="other">“%s”에 %d개의 항목 추가함</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">결제 정보</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Pro 회원권 요금제가 곧 만료됩니다</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">%1$s 요금제에 대한 결제가 수신되었습니다.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">%1$s 요금제에 대한 결제가 실패하였습니다.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="other">당신의 Pro 회원권 요금제가 %1$d일 내에 만료됩니다.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="other">당신의 Pro 회원권 요금제가 %1$d일 전에 만료되었습니다.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]빈[/B] [A]사진첩[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">내 사진첩</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">공유된 사진첩</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">지난 회의</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">다가오는 회의</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">반복 회의</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">매주 %s</string>
 </resources>

@@ -4071,7 +4071,7 @@
         <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[B]EMPTY[/B] [A]ALBUM[/A]</string>
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
     <!-- Albums sub-section for all system and user albums -->
     <string name="photos_album_subsection_my_albums">My albums</string>
     <!-- Albums sub-section for all shared albums -->
@@ -4083,5 +4083,5 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s Weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

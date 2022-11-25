@@ -4248,16 +4248,54 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Покинуть группу</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album"></string>
+    <string name="photos_create_album_error_message_systems_album">Недопустимое название альбома. Введите другое название.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Альбом с таким названием уже существует. Введите другое название.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Новый альбом (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">Добавление элементов в «%s»</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="one">%d элемент добавлен в «%s»</item>
+        <item quantity="few">%d элемента добавлено в «%s»</item>
+        <item quantity="many">%d элементов добавлено в «%s»</item>
+        <item quantity="other">%d элемента добавлено в «%s»</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Платёжная информация</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Pro-подписка скоро истекает</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Ваша оплата плана %1$s получена.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Ваша оплата плана %1$s не удалась.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Ваша Pro-подписка истекает через 1 день.</item>
+        <item quantity="few">Ваша Pro-подписка истекает через %1$d дня.</item>
+        <item quantity="many">Ваша Pro-подписка истекает через %1$d дней.</item>
+        <item quantity="other">Ваша Pro-подписка истекает через %1$d дня.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Ваша Pro-подписка истекла 1 день назад.</item>
+        <item quantity="few">Ваша Pro-подписка истекла %1$d дня назад.</item>
+        <item quantity="many">Ваша Pro-подписка истекла %1$d дней назад.</item>
+        <item quantity="other">Ваша Pro-подписка истекла %1$d дня назад.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[A]Альбом[/A][B]пуст[/B]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">Мои альбомы</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Общие альбомы</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Прошедшие встречи</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Предстоящая встреча</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Повторяющаяся встреча</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s еженедельно</string>
 </resources>

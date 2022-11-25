@@ -3936,7 +3936,7 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">ออกจากกลุ่ม</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album"></string>
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">มีอัลบั้มที่ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -3948,4 +3948,34 @@
         <item quantity="one">Added %d item to “%s“</item>
         <item quantity="other">Added %d items to “%s”</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">ข้อมูลการชำระเงิน</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">แผนสมาชิก Pro จะหมดอายุเร็ว ๆ นี้</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">ได้รับการชำระเงินแผน %1$s ของคุณแล้ว</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">การชำระเงินแผน %1$s ของคุณไม่สำเร็จ</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="other">แผนการสมัคร Pro ของคุณจะหมดอายุใน %1$d วัน</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="other">แผนการสมัคร Pro ของคุณหมดอายุเมื่อ %1$d วันก่อน</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">การประชุมที่ผ่านมา</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">การประชุมที่เป็นกิจวัตร</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>
