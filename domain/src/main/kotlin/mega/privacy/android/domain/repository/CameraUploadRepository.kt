@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -413,4 +414,14 @@ interface CameraUploadRepository {
      * Broadcast upload pause state
      */
     suspend fun broadcastUploadPauseState()
+
+    /**
+     * monitor battery info
+     */
+    fun monitorBatteryInfo(): Flow<BatteryInfo>
+
+    /**
+     * monitor charging stopped info
+     */
+    fun monitorChargingStoppedInfo(): Flow<Boolean>
 }

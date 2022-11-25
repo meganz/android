@@ -15,6 +15,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -48,6 +51,7 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFr
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -79,6 +83,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -336,6 +341,11 @@ class PhotosFragment : Fragment() {
             openAlbum = this::openAlbum,
             downloadPhoto = photosViewModel::downloadPhoto,
             onDialogPositiveButtonClicked = albumsViewModel::createNewAlbum,
+            setDialogInputPlaceholder = albumsViewModel::setPlaceholderAlbumTitle,
+            setInputValidity = albumsViewModel::setNewAlbumNameValidity,
+            openPhotosSelectionActivity = this::openAlbumPhotosSelection,
+            setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
+            allPhotos = timelineViewModel.state.value.photos
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
@@ -461,6 +471,33 @@ class PhotosFragment : Fragment() {
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
     }
 
+    private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAlbumPhotosSelectionResult,
+        )
+
+    private fun openAlbumPhotosSelection(albumId: AlbumId) {
+        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId)
+        albumPhotosSelectionLauncher.launch(intent)
+        managerActivity.overridePendingTransition(0, 0)
+
+    }
+
+    private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
+        val message =
+            result.data?.getStringExtra(AlbumPhotosSelectionActivity.MESSAGE) // Added 5 items to "Color ️‍🌈"
+        message?.let {
+            if (message.isNotEmpty()) {
+                albumsViewModel.setSnackBarMessage(snackBarMessage = message)
+                albumsViewModel.getCurrentUIAlbum()?.let { UIAlbum ->
+                    openAlbum(album = UIAlbum)
+                }
+            }
+        }
+    }
+
+
     private fun enterActionMode() {
         actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
             actionModeCallback
@@ -576,12 +613,15 @@ class PhotosFragment : Fragment() {
         activity?.lifecycleScope?.launch {
             val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
             if (dynamicAlbumEnabled) {
-                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance())
+                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
+                    isAccountHasPhotos()))
             } else {
                 managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }
         }
     }
+
+    private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
 
     /**
      * Register Camera Upload Broadcast

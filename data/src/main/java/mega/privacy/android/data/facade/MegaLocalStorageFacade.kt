@@ -6,6 +6,7 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
+import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -317,6 +318,12 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun deleteAllSecondarySyncRecords() = dbHandler.deleteAllSecondarySyncRecords()
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
+
+    override suspend fun isOfflineInformationAvailable(nodeHandle: Long) =
+        dbHandler.exists(nodeHandle)
+
+    override suspend fun getOfflineInformation(nodeHandle: Long) =
+        dbHandler.getOfflineInformation(nodeHandle)
 
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200

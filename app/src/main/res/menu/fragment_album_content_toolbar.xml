@@ -1,11 +1,35 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_menu_rename"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="100"
+        android:title="@string/context_rename"
+        android:visible="false"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_menu_sort_by"
-        android:icon="@drawable/ic_dots_vertical_white"
-        android:orderInCategory="95"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="105"
         android:title="@string/action_sort_by"
-        app:iconTint="?attr/colorControlNormal"
-        android:visible="true"
-        app:showAsAction="ifRoom" />
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_menu_filter"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="110"
+        android:title="@string/photos_action_filter"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_menu_delete"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="115"
+        android:title="@string/context_delete"
+        android:visible="false"
+        app:showAsAction="never" />
 </menu>

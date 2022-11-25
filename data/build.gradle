@@ -7,18 +7,7 @@ plugins {
 
 apply plugin: 'jacoco'
 apply from: "$project.rootDir/tools/jacoco.gradle"
-
-/**
- * Check whether we should use prebuilt SDK or local sdk module
- *
- * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
- */
-boolean shouldUsePrebuiltSdk() {
-    return false
-    //FIXME uncomment this method once prebuilt sdk feature is ready
-    /*String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
-    return usePrebuiltSdk == null || usePrebuiltSdk != "false"*/
-}
+apply from: "$project.rootDir/tools/util.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion

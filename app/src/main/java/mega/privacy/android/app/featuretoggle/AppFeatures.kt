@@ -14,6 +14,11 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
     /**
+     * Indicates if the user is cryptographically secure
+     */
+    Secure("Indicates if user is cryptographically secure", false),
+
+    /**
      * New MediaDiscovery toggle
      */
     NewMediaDiscovery("Enable new mediaDiscovery feature", true),

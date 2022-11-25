@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.utils.Constants
@@ -261,7 +262,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * @param favourite FavouriteFile
      */
     private fun openNode(favourite: FavouriteFile) {
-        MimeTypeList.typeForName(favourite.name).apply {
+        MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
                 isImage ||
                         (isVideoReproducible || isAudio) ||
@@ -279,7 +280,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
                 }
-                isOpenableTextFile(favourite.size) -> {
+                isOpenableTextFile(favourite.typedNode.size) -> {
                     MegaNodeUtil.manageTextFileIntent(
                         requireContext(),
                         favourite.node,
@@ -405,7 +406,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             showAsActionAndVisibility(findItem(R.id.cab_menu_share_link), true)
             showAsActionAndVisibility(
                 findItem(R.id.cab_menu_share_folder), !items.values.any {
-                    !it.isFolder
+                    it !is FavouriteFolder
                 }
             )
             showAsActionAndVisibility(findItem(R.id.cab_menu_share_out), true)

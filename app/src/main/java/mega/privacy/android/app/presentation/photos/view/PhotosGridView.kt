@@ -49,6 +49,7 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.grey_alpha_032
 import mega.privacy.android.presentation.theme.white
@@ -108,6 +109,7 @@ internal fun PhotosGridView(
                     PhotoViewContainer(
                         photo = item.photo,
                         isSelected = isSelected,
+                        currentZoomLevel = currentZoomLevel,
                         modifier = Modifier
                             .isSelected(isSelected)
                             .combinedClickable(
@@ -138,11 +140,22 @@ internal fun PhotosGridView(
 internal fun PhotoViewContainer(
     photo: Photo,
     isSelected: Boolean,
+    currentZoomLevel: ZoomLevel,
     modifier: Modifier = Modifier,
     photoView: @Composable () -> Unit,
 ) {
     Box(
-        modifier = modifier
+        modifier = when (currentZoomLevel) {
+            ZoomLevel.Grid_1 -> modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)
+            ZoomLevel.Grid_3 -> modifier
+                .fillMaxSize()
+                .padding(all = 1.5.dp)
+            ZoomLevel.Grid_5 -> modifier
+                .fillMaxSize()
+                .padding(all = 1.dp)
+        }
     ) {
 
         photoView()
@@ -175,7 +188,7 @@ internal fun PhotoViewContainer(
             )
 
             Text(
-                text = TimeUtils.getVideoDuration(photo.duration),
+                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.getDuration()),
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()
@@ -277,4 +290,3 @@ private fun dateText(
         )
     )
 }
-

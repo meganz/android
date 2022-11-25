@@ -44,14 +44,14 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
+import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.data.model.MegaAttributes;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -286,12 +286,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
         } catch (Exception e) {
         }
 
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
 
         tos.setText(result);
 
@@ -309,12 +304,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
             Timber.e(e, "Exception formatting string");
         }
 
-        Spanned resultTOP;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultTOP = Html.fromHtml(textToShowTOP, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            resultTOP = Html.fromHtml(textToShowTOP);
-        }
+        Spanned resultTOP = Html.fromHtml(textToShowTOP, Html.FROM_HTML_MODE_LEGACY);
 
         top.setText(resultTOP);
         top.setOnClickListener(this);

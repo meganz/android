@@ -16,6 +16,8 @@ import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
@@ -48,6 +50,10 @@ import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
@@ -88,6 +94,10 @@ import javax.inject.Inject
  * @property monitorStorageStateEvent
  * @property isDatabaseEntryStale
  * @property globalNetworkStateHandler
+ * @property getSpecificAccountDetail
+ * @property applicationScope
+ * @property getAccountDetails
+ * @property getExtendedAccountDetail
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
@@ -167,6 +177,19 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
+
+    @Inject
+    lateinit var getSpecificAccountDetail: GetSpecificAccountDetail
+
+    @ApplicationScope
+    @Inject
+    lateinit var applicationScope: CoroutineScope
+
+    @Inject
+    lateinit var getAccountDetails: GetAccountDetails
+
+    @Inject
+    lateinit var getExtendedAccountDetail: GetExtendedAccountDetail
 
     var localIpAddress: String? = ""
 
@@ -293,15 +316,15 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      */
     fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
-        megaApi.run {
-            getPaymentMethods(null)
+        applicationScope.launch {
+            megaApi.getPaymentMethods(null)
             if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
-                getAccountDetails()
+                getAccountDetails(true)
             } else {
-                getSpecificAccountDetails(false, true, true)
+                getSpecificAccountDetail(storage = false, transfer = true, pro = true)
             }
-            getPricing(null)
-            creditCardQuerySubscriptions(null)
+            megaApi.getPricing(null)
+            megaApi.creditCardQuerySubscriptions(null)
         }
     }
 
@@ -324,10 +347,11 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      * Ask for account details
      *
      */
-    fun askForAccountDetails() {
-        Timber.d("askForAccountDetails")
-        dbH.resetAccountDetailsTimeStamp()
-        megaApi.getAccountDetails(null)
+    private fun askForAccountDetails() {
+        applicationScope.launch {
+            Timber.d("askForAccountDetails")
+            getAccountDetails(true)
+        }
     }
 
     /**
@@ -340,10 +364,11 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      * Ask for extended account details
      *
      */
-    fun askForExtendedAccountDetails() {
+    private fun askForExtendedAccountDetails() {
         Timber.d("askForExtendedAccountDetails")
-        dbH.resetExtendedAccountDetailsTimestamp()
-        megaApi.getExtendedAccountDetails(true, false, false, null)
+        applicationScope.launch {
+            getExtendedAccountDetail(sessions = true, purchases = false, transactions = false)
+        }
     }
 
     /**

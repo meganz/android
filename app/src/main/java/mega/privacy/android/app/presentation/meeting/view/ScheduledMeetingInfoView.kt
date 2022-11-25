@@ -24,6 +24,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -32,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -54,8 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
-import mega.privacy.android.app.contacts.group.data.GroupChatParticipant
-import mega.privacy.android.app.meeting.list.adapter.ScheduledMeetingItem
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
@@ -65,6 +67,8 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoA
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.presentation.controls.MarqueeText
@@ -95,12 +99,13 @@ fun ScheduledMeetingInfoView(
     onAddParticipantsClicked: () -> Unit,
     onSeeMoreClicked: () -> Unit,
     onLeaveGroupClicked: () -> Unit,
-    onParticipantClicked: (ContactItem) -> Unit,
+    onParticipantClicked: (ChatParticipant) -> Unit,
     onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -122,9 +127,7 @@ fun ScheduledMeetingInfoView(
 
             state.apply {
                 items(buttons) { button ->
-                    ActionButton(state = state, action = button,
-                        scheduledMeeting = scheduledMeeting,
-                        onButtonClicked = onButtonClicked)
+                    ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
                 }
 
                 item(key = "Participants") { ParticipantsHeader(state = state) }
@@ -136,22 +139,22 @@ fun ScheduledMeetingInfoView(
                 val participantsList = state.participantItemList
 
                 if (state.seeMoreVisible && state.participantItemList.size > 4) {
-                    item(key = participantsList[0].handle) {
+                    item(key = participantsList[0].participantId) {
                         ParticipantItemView(participant = participantsList[0]) {
                             onParticipantClicked(participantsList[0])
                         }
                     }
-                    item(key = participantsList[1].handle) {
+                    item(key = participantsList[1].participantId) {
                         ParticipantItemView(participant = participantsList[1]) {
                             onParticipantClicked(participantsList[1])
                         }
                     }
-                    item(key = participantsList[2].handle) {
+                    item(key = participantsList[2].participantId) {
                         ParticipantItemView(participant = participantsList[2]) {
                             onParticipantClicked(participantsList[2])
                         }
                     }
-                    item(key = participantsList[3].handle) {
+                    item(key = participantsList[3].participantId) {
                         ParticipantItemView(participant = participantsList[3]) {
                             onParticipantClicked(participantsList[3])
                         }
@@ -162,7 +165,7 @@ fun ScheduledMeetingInfoView(
                     }
                 } else {
                     participantsList.forEach { participant ->
-                        item(key = participant.handle) {
+                        item(key = participant.participantId) {
                             ParticipantItemView(participant) {
                                 onParticipantClicked(participant)
                             }
@@ -175,7 +178,17 @@ fun ScheduledMeetingInfoView(
                 }
             }
         }
+
+        state.snackBar?.let { id ->
+            val msg = stringResource(id = id)
+            LaunchedEffect(scaffoldState.snackbarHostState) {
+                scaffoldState.snackbarHostState.showSnackbar(message = msg,
+                    duration = SnackbarDuration.Long)
+            }
+        }
     }
+
+    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     onScrollChange(!firstItemVisible)
 }
@@ -214,7 +227,7 @@ private fun ScheduledMeetingInfoAppBar(
             }
         },
         actions = {
-            if (state.scheduledMeeting.isHost || state.scheduledMeeting.isAllowAddParticipants) {
+            if (state.isHost || state.isOpenInvite) {
                 IconButton(onClick = { onAddParticipantsClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.add_participants),
@@ -224,7 +237,7 @@ private fun ScheduledMeetingInfoAppBar(
                 }
             }
 
-            if (state.scheduledMeeting.isHost) {
+            if (state.isHost) {
                 IconButton(onClick = { onEditClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
@@ -254,23 +267,27 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
             Box(modifier = Modifier
                 .size(40.dp)
                 .background(Color.Transparent)) {
-                MeetingAvatar(scheduledMeetingItem = state.scheduledMeeting)
+                MeetingAvatar(state = state)
             }
             Column(modifier = Modifier
                 .padding(start = 16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = state.scheduledMeeting.title,
-                        style = MaterialTheme.typography.subtitle1,
-                        color = if (MaterialTheme.colors.isLight) black else white,
-                        fontWeight = FontWeight.Bold,
+                    state.scheduledMeeting?.let {
+                        Text(text = it.title,
+                            style = MaterialTheme.typography.subtitle1,
+                            color = if (MaterialTheme.colors.isLight) black else white,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
+                    }
+                }
+                state.scheduledMeeting?.let {
+                    Text(text = it.date,
+                        style = MaterialTheme.typography.subtitle2,
+                        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
-                Text(text = state.scheduledMeeting.date,
-                    style = MaterialTheme.typography.subtitle2,
-                    color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
             }
         }
 
@@ -281,17 +298,17 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
 /**
  * Create meeting avatar view
  *
- * @param scheduledMeetingItem [ScheduledMeetingItem]
+ * @param state [ScheduledMeetingInfoState]
  */
 @Composable
-private fun MeetingAvatar(scheduledMeetingItem: ScheduledMeetingItem) {
-    if (scheduledMeetingItem.isEmptyMeeting()) {
-        DefaultAvatar(title = scheduledMeetingItem.title)
-    } else if (scheduledMeetingItem.isSingleMeeting()) {
-        OneParticipantAvatar(firstUser = scheduledMeetingItem.firstUser ?: return)
+private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
+    if (state.isEmptyMeeting()) {
+        DefaultAvatar(title = state.chatTitle)
+    } else if (state.isSingleMeeting()) {
+        OneParticipantAvatar(firstUser = state.firstParticipant ?: return)
     } else {
-        SeveralParticipantsAvatar(firstUser = scheduledMeetingItem.firstUser ?: return,
-            lastUser = scheduledMeetingItem.lastUser ?: return)
+        SeveralParticipantsAvatar(firstUser = state.lastParticipant ?: return,
+            lastUser = state.lastParticipant)
     }
 }
 
@@ -331,13 +348,13 @@ private fun DefaultAvatar(title: String) {
 /**
  * Meeting avatar with one participant view
  *
- * @param firstUser [GroupChatParticipant]
+ * @param firstUser [ChatParticipant]
  */
 @Composable
-fun OneParticipantAvatar(firstUser: GroupChatParticipant) {
+fun OneParticipantAvatar(firstUser: ChatParticipant) {
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(color = Color(AvatarUtil.getColorAvatar(firstUser.user.handle)),
+            .background(color = Color(AvatarUtil.getColorAvatar(firstUser.participantId)),
                 shape = CircleShape)
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
@@ -350,61 +367,69 @@ fun OneParticipantAvatar(firstUser: GroupChatParticipant) {
                     placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
                 }
             }) {
-        Text(
-            text = AvatarUtil.getFirstLetter(firstUser.user.contactData.fullName),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            style = MaterialTheme.typography.h6
-        )
+        firstUser.contact?.let { contact ->
+            Text(
+                text = AvatarUtil.getFirstLetter(contact.contactData.fullName),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                style = MaterialTheme.typography.h6
+            )
+        }
+
     }
 }
 
 /**
  * Meeting avatar with several participants view
  *
- * @param firstUser [GroupChatParticipant]
- * @param lastUser  [GroupChatParticipant]
+ * @param firstUser [ChatParticipant]
+ * @param lastUser  [ChatParticipant]
  */
 @Composable
 fun SeveralParticipantsAvatar(
-    firstUser: GroupChatParticipant,
-    lastUser: GroupChatParticipant,
+    firstUser: ChatParticipant,
+    lastUser: ChatParticipant,
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Box(contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(28.dp)
-                .border(width = 1.dp, color = Color.White, shape = CircleShape)
-                .clip(CircleShape)
-                .align(Alignment.BottomEnd)
-                .background(color = Color(AvatarUtil.getSpecificAvatarColor(lastUser.user.defaultAvatarColor)),
-                    shape = CircleShape)
-        ) {
-            Text(
-                text = AvatarUtil.getFirstLetter(lastUser.user.contactData.fullName),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
+        lastUser.contact?.let { lastUser ->
+            Box(contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(28.dp)
+                    .border(width = 1.dp, color = Color.White, shape = CircleShape)
+                    .clip(CircleShape)
+                    .align(Alignment.BottomEnd)
+                    .background(color = Color(AvatarUtil.getSpecificAvatarColor(lastUser.defaultAvatarColor)),
+                        shape = CircleShape)
+            ) {
+                Text(
+                    text = AvatarUtil.getFirstLetter(lastUser.contactData.fullName),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1
+                )
+            }
         }
-        Box(contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(28.dp)
-                .border(width = 1.dp, color = Color.White, shape = CircleShape)
-                .clip(CircleShape)
-                .align(Alignment.TopStart)
-                .background(color = Color(AvatarUtil.getSpecificAvatarColor(firstUser.user.defaultAvatarColor)),
-                    shape = CircleShape)
-        ) {
-            Text(
-                text = AvatarUtil.getFirstLetter(firstUser.user.contactData.fullName),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
+
+        firstUser.contact?.let { firstUser ->
+            Box(contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(28.dp)
+                    .border(width = 1.dp, color = Color.White, shape = CircleShape)
+                    .clip(CircleShape)
+                    .align(Alignment.TopStart)
+                    .background(color = Color(AvatarUtil.getSpecificAvatarColor(firstUser.defaultAvatarColor)),
+                        shape = CircleShape)
+            ) {
+                Text(
+                    text = AvatarUtil.getFirstLetter(firstUser.contactData.fullName),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1
+                )
+            }
         }
     }
 }
@@ -414,14 +439,12 @@ fun SeveralParticipantsAvatar(
  *
  * @param state             [ScheduledMeetingInfoState]
  * @param action            [ScheduledMeetingInfoAction]
- * @param scheduledMeeting  [ScheduledMeetingItem]
  * @param onButtonClicked
  */
 @Composable
 private fun ActionButton(
     state: ScheduledMeetingInfoState,
     action: ScheduledMeetingInfoAction,
-    scheduledMeeting: ScheduledMeetingItem,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
     Column(modifier = Modifier
@@ -444,7 +467,7 @@ private fun ActionButton(
                 divider(withStartPadding = true)
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
-                if (scheduledMeeting.isHost) {
+                if (state.isHost) {
                     Text(modifier = Modifier.padding(start = 14.dp,
                         end = 16.dp,
                         top = 18.dp),
@@ -469,7 +492,7 @@ private fun ActionButton(
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants,
             ScheduledMeetingInfoAction.ManageChatHistory,
             -> {
-                if (scheduledMeeting.isHost) {
+                if (state.isHost) {
                     ActionOption(action = action,
                         isEnabled = if (action == ScheduledMeetingInfoAction.MeetingLink) state.enabledMeetingLinkOption else state.enabledAllowNonHostAddParticipantsOption,
                         hasSwitch = action != ScheduledMeetingInfoAction.ManageChatHistory)
@@ -484,7 +507,7 @@ private fun ActionButton(
             }
             ScheduledMeetingInfoAction.ShareFiles -> {
                 ActionOption(action = action, isEnabled = true, hasSwitch = false)
-                divider(withStartPadding = scheduledMeeting.isHost)
+                divider(withStartPadding = state.isHost)
             }
         }
     }
@@ -518,7 +541,7 @@ private fun AddParticipantsButton(
     state: ScheduledMeetingInfoState,
     onAddParticipantsClicked: () -> Unit,
 ) {
-    if (state.scheduledMeeting.isHost || state.scheduledMeeting.isAllowAddParticipants) {
+    if (state.isHost || state.isOpenInvite) {
         Row(modifier = Modifier
             .clickable { onAddParticipantsClicked() }
             .fillMaxWidth()) {
@@ -689,7 +712,7 @@ private fun ActionText(actionText: Int) {
  * @param onClick       Detect when a participant is clicked
  */
 @Composable
-private fun ParticipantItemView(participant: ContactItem, onClick: () -> Unit) {
+private fun ParticipantItemView(participant: ChatParticipant, onClick: () -> Unit) {
     Column {
         Row(modifier = Modifier
             .clickable { onClick() }
@@ -699,38 +722,39 @@ private fun ParticipantItemView(participant: ContactItem, onClick: () -> Unit) {
             Row(modifier = Modifier
                 .weight(1f)) {
                 Box {
-                    ParticipantAvatar(contactItem = participant)
+                    ParticipantAvatar(participant = participant)
                 }
+                participant.contact?.let { contact ->
+                    Column(modifier = Modifier
+                        .align(Alignment.CenterVertically)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val contactName =
+                                contact.contactData.alias ?: contact.contactData.fullName
+                                ?: contact.email
 
-                Column(modifier = Modifier
-                    .align(Alignment.CenterVertically)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        val contactName = with(participant) {
-                            contactData.alias ?: contactData.fullName ?: email
-                        }
+                            Text(text = contactName,
+                                style = MaterialTheme.typography.subtitle1,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis)
 
-                        Text(text = contactName,
-                            style = MaterialTheme.typography.subtitle1,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis)
-
-                        if (participant.status != UserStatus.Invalid) {
-                            ContactStatus(status = participant.status)
-                        }
-                    }
-
-                    if (participant.lastSeen != null || participant.status != UserStatus.Invalid) {
-                        val statusText = stringResource(id = participant.status.text)
-                        val secondLineText =
-                            if (participant.status == UserStatus.Online) {
-                                statusText
-                            } else {
-                                getLastSeenString(participant.lastSeen) ?: statusText
+                            if (contact.status != UserStatus.Invalid) {
+                                ContactStatus(status = contact.status)
                             }
+                        }
 
-                        MarqueeText(text = secondLineText,
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                            style = MaterialTheme.typography.subtitle2)
+                        if (contact.lastSeen != null || contact.status != UserStatus.Invalid) {
+                            val statusText = stringResource(id = contact.status.text)
+                            val secondLineText =
+                                if (contact.status == UserStatus.Online) {
+                                    statusText
+                                } else {
+                                    getLastSeenString(contact.lastSeen) ?: statusText
+                                }
+
+                            MarqueeText(text = secondLineText,
+                                color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                                style = MaterialTheme.typography.subtitle2)
+                        }
                     }
                 }
             }
@@ -851,7 +875,7 @@ private fun ContactStatus(
 /**
  * Participant avatar
  *
- * @param contactItem [ContactItem]
+ * @param participant [ChatParticipant]
  */
 @Composable
 private fun ParticipantAvatar(
@@ -859,16 +883,18 @@ private fun ParticipantAvatar(
         .padding(16.dp)
         .size(40.dp)
         .clip(CircleShape),
-    contactItem: ContactItem,
+    participant: ChatParticipant,
 ) {
-    val avatarUri = contactItem.contactData.avatarUri
+    participant.contact?.let { contact ->
+        val avatarUri = contact.contactData.avatarUri
 
-    if (avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = avatarUri)
-    } else {
-        DefaultParticipantAvatar(modifier = modifier,
-            color = Color(contactItem.defaultAvatarColor.toColorInt()),
-            content = contactItem.getAvatarFirstLetter())
+        if (avatarUri != null) {
+            UriAvatar(modifier = modifier, uri = avatarUri)
+        } else {
+            DefaultParticipantAvatar(modifier = modifier,
+                color = Color(contact.defaultAvatarColor.toColorInt()),
+                content = contact.getAvatarFirstLetter())
+        }
     }
 }
 
@@ -927,9 +953,12 @@ fun DefaultParticipantAvatar(
 @Composable
 fun PreviewActionButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ActionButton(state = ScheduledMeetingInfoState(),
+        ActionButton(state = ScheduledMeetingInfoState(
+            scheduledMeeting = ScheduledMeetingItem(chatId = -1,
+                scheduledMeetingId = -1,
+                date = "date",
+                description = "description")),
             action = ScheduledMeetingInfoAction.MeetingLink,
-            scheduledMeeting = ScheduledMeetingItem(),
             onButtonClicked = {})
     }
 }
@@ -942,7 +971,11 @@ fun PreviewActionButton() {
 @Composable
 fun PreviewAddParticipantsButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        AddParticipantsButton(state = ScheduledMeetingInfoState(), onAddParticipantsClicked = {})
+        AddParticipantsButton(state = ScheduledMeetingInfoState(
+            scheduledMeeting = ScheduledMeetingItem(chatId = -1,
+                scheduledMeetingId = -1,
+                date = "date",
+                description = "description")), onAddParticipantsClicked = {})
     }
 }
 
@@ -955,15 +988,19 @@ fun PreviewAddParticipantsButton() {
 fun PreviewScheduledMeetingInfoView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
-            state = ScheduledMeetingInfoState(),
+            state = ScheduledMeetingInfoState(
+                scheduledMeeting = ScheduledMeetingItem(chatId = -1,
+                    scheduledMeetingId = -1,
+                    date = "date",
+                    description = "description")),
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},
             onSeeMoreClicked = {},
             onLeaveGroupClicked = {},
             onParticipantClicked = {},
-            onBackPressed = {},
             onScrollChange = {},
+            onBackPressed = {},
         )
     }
 }

@@ -8161,7 +8161,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             ((MegaApplication) getApplication()).askForFullAccountInfo();
-            ((MegaApplication) getApplication()).askForExtendedAccountDetails();
+            viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                 viewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));
@@ -10447,12 +10447,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.e(e, "Formatted string: %s", textToShow);
         }
 
-        Spanned result = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         contactsSectionText.setText(result);
     }
 
@@ -10479,12 +10474,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.e(e, "Formatted string: %s", textToShow);
         }
 
-        Spanned result = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         notificationsSectionText.setText(result);
     }
 

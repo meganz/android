@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,18 +21,33 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    private val viewModel: AlbumPhotosSelectionViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                // TODO...
+                AlbumPhotosSelectionScreen(
+                    viewModel,
+                    onBackClicked = ::finish,
+                    onCompletion = ::handleCompletion,
+                )
             }
         }
     }
 
+    private fun handleCompletion(albumId: AlbumId, message: String) {
+        val data = Intent().apply {
+            putExtra(ALBUM_ID, albumId.id)
+            putExtra(MESSAGE, message)
+        }
+        setResult(RESULT_OK, data)
+        finish()
+    }
+
     companion object {
-        private const val ALBUM_ID: String = "album_id"
+        const val ALBUM_ID: String = "album_id"
 
         const val MESSAGE: String = "message"
 

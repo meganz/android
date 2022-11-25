@@ -92,10 +92,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     } else {
                         binding.playerView.isVisible = false
                     }
-                    getPlaylistItems()?.let { items ->
-                        if (items.isNotEmpty()) {
-                            adapter?.submitList(items)
-                        }
+                    if (getPlaylistItems().isNotEmpty()) {
+                        adapter?.submitList(getPlaylistItems())
                     }
                     if (!isPaused()) {
                         positionUpdateHandler.post(positionUpdateRunnable)
@@ -357,7 +355,9 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     return
                 }
                 if (!CallUtil.participatingInACall()) {
-                    serviceGateway?.seekTo(getIndexFromPlaylistItems(item))
+                    getIndexFromPlaylistItems(item)?.let { index ->
+                        serviceGateway?.seekTo(index)
+                    }
                 }
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 

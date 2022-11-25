@@ -92,6 +92,8 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.isEphemeralPlusPlus
     override val accountAuth: String
         get() = megaApi.accountAuth
+    override val myCredentials: String?
+        get() = megaApi.myCredentials
 
     override suspend fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
@@ -305,8 +307,20 @@ internal class MegaApiFacade @Inject constructor(
     override fun base64ToHandle(base64Handle: String): Long =
         MegaApiAndroid.base64ToHandle(base64Handle)
 
-    override fun cancelTransfer(transfer: MegaTransfer) {
-        megaApi.cancelTransfer(transfer)
+    override fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?) {
+        if (listener != null) {
+            megaApi.cancelTransfer(transfer, listener)
+        } else {
+            megaApi.cancelTransfer(transfer)
+        }
+    }
+
+    override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
+        if (listener != null) {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
+        } else {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+        }
     }
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
@@ -460,6 +474,17 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getRecentActionsAsync(days, maxNodes, listener)
 
+    override fun copyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        listener?.let {
+            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, it)
+        } ?: megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+    }
+
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
         megaApi.copyBucket(bucket)
 
@@ -478,8 +503,13 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getAccountDetails(listener)
     }
 
-    override fun getSpecificAccountDetails(storage: Boolean, transfer: Boolean, pro: Boolean) {
-        megaApi.getSpecificAccountDetails(storage, transfer, pro)
+    override fun getSpecificAccountDetails(
+        storage: Boolean,
+        transfer: Boolean,
+        pro: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.getSpecificAccountDetails(storage, transfer, pro, listener)
     }
 
     override fun creditCardQuerySubscriptions(listener: MegaRequestListenerInterface?) {
@@ -533,4 +563,59 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getSet(sid: Long): MegaSet? = megaApi.getSet(sid)
 
     override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
+
+    override fun removeRequestListener(listener: MegaRequestListenerInterface) =
+        megaApi.removeRequestListener(listener)
+
+    override fun getUserCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
+        megaApi.getUserCredentials(user, listener)
+
+    override fun resetCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
+        megaApi.resetCredentials(user, listener)
+
+    override fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
+        megaApi.verifyCredentials(user, listener)
+
+    override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
+        megaApi.getCountryCallingCodes(listener)
+
+    override fun isAchievementsEnabled() =
+        megaApi.isAchievementsEnabled
+
+    override fun logout(listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.logout()
+        } else {
+            megaApi.logout(listener)
+        }
+    }
+
+    override fun sendSMSVerificationCode(
+        phoneNumber: String,
+        reVerifyingWhitelisted: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        if (reVerifyingWhitelisted) {
+            megaApi.sendSMSVerificationCode(phoneNumber, listener, true)
+        } else {
+            megaApi.sendSMSVerificationCode(phoneNumber, listener)
+        }
+    }
+
+    override fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?) {
+        if (listener == null) {
+            megaApi.resetSmsVerifiedPhoneNumber()
+        } else {
+            megaApi.resetSmsVerifiedPhoneNumber(listener)
+        }
+    }
+
+    override fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
+    }
 }

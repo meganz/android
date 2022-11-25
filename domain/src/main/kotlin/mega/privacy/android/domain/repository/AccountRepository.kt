@@ -29,7 +29,7 @@ interface AccountRepository {
      * Request account
      * Sends a request to update account data asynchronously
      */
-    fun requestAccount()
+    suspend fun requestAccount()
 
     /**
      * Set that the user has logged in
@@ -123,4 +123,45 @@ interface AccountRepository {
      * @return the latest account detail time stamp
      */
     suspend fun getAccountDetailsTimeStampInSeconds(): String?
+
+    /**
+     * Get specific account detail
+     *
+     * @param storage
+     * @param transfer
+     * @param pro
+     */
+    suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
+
+    /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     */
+    suspend fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+    )
+
+    /**
+     * Gets the credentials of the currently open account.
+     *
+     * @return Fingerprint of the signing key of the current account.
+     */
+    suspend fun getMyCredentials(): String?
+
+    /**
+     * Reset account details time stamp
+     *
+     */
+    suspend fun resetAccountDetailsTimeStamp()
+
+    /**
+     * Reset extended account details timestamp
+     *
+     */
+    suspend fun resetExtendedAccountDetailsTimestamp()
 }

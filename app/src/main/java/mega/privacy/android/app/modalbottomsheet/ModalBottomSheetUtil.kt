@@ -1,29 +1,27 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
-import nz.mega.sdk.MegaNode
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MimeTypeList
-import android.content.Intent
-import android.app.ActivityManager
 import android.content.Context
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.MegaApiUtils
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 
@@ -71,14 +69,9 @@ object ModalBottomSheetUtil {
         val localPath = FileUtil.getLocalFile(node)
         if (localPath != null) {
             val mediaFile = File(localPath)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mediaIntent.setDataAndType(FileProvider.getUriForFile(app,
-                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                    mediaFile), MimeTypeList.typeForName(node.name).type)
-            } else {
-                mediaIntent.setDataAndType(Uri.fromFile(mediaFile),
-                    MimeTypeList.typeForName(node.name).type)
-            }
+            mediaIntent.setDataAndType(FileProvider.getUriForFile(app,
+                Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                mediaFile), MimeTypeList.typeForName(node.name).type)
             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
             setupStreamingServer(megaApi, context)

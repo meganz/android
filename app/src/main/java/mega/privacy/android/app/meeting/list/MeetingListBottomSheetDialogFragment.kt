@@ -87,7 +87,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         viewModel.getMeeting(chatId).observe(viewLifecycleOwner, ::showMeeting)
     }
 
-    private fun showMeeting(meeting: MeetingItem?) {
+    private fun showMeeting(meeting: MeetingItem.Data?) {
         requireNotNull(meeting) { "Meeting not found" }
 
         binding.header.txtTitle.text = meeting.title
@@ -122,7 +122,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val scheduleMeetingEnabled = getFeatureFlag(AppFeatures.ScheduleMeeting)
                 val intent = if (scheduleMeetingEnabled) {
                     Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
-                        putExtra(Constants.HANDLE, chatId)
+                        putExtra(CHAT_ID, chatId)
+                        putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
                     }
                 } else {
                     Intent(context, GroupChatInfoActivity::class.java).apply {

@@ -16,6 +16,8 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -39,6 +41,8 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -62,6 +66,8 @@ class GlobalListener @Inject constructor(
     @ApplicationContext private val appContext: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val storageStateMapper: StorageStateMapper,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val getAccountDetails: GetAccountDetails,
 ) : MegaGlobalListenerInterface {
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
@@ -140,10 +146,10 @@ class GlobalListener @Inject constructor(
         }
         appContext.sendBroadcast(intent)
         api.getPaymentMethods(null)
-        api.getAccountDetails(null)
         api.getPricing(null)
         api.creditCardQuerySubscriptions(null)
         dbH.resetExtendedAccountDetailsTimestamp()
+        refreshAccountDetail()
     }
 
     override fun onContactRequestsUpdate(
@@ -193,7 +199,7 @@ class GlobalListener @Inject constructor(
                 Timber.d("EVENT_STORAGE: $state")
                 when (state) {
                     StorageState.Change -> {
-                        api.getAccountDetails(null)
+                        refreshAccountDetail()
                     }
                     StorageState.PayWall -> {
                         showOverDiskQuotaPaywallWarning()
@@ -282,9 +288,7 @@ class GlobalListener @Inject constructor(
                     .setContentIntent(pendingIntent)
                     .setColor(ContextCompat.getColor(appContext, R.color.red_600_red_300))
                     .setLargeIcon((d as BitmapDrawable).bitmap)
-                    .setPriority(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N // Use NotificationManager for devices running Android Nougat or above (API >= 24)
-                    ) NotificationManager.IMPORTANCE_HIGH // Otherwise, use NotificationCompat for devices running Android Marshmallow (API 23)
-                    else NotificationCompat.PRIORITY_HIGH)
+                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
             notificationManager.notify(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE,
                 notificationBuilder.build())
         } catch (e: Exception) {
@@ -320,5 +324,11 @@ class GlobalListener @Inject constructor(
             action = ACTION_FORCE_RELOAD_ACCOUNT
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
+    }
+
+    private fun refreshAccountDetail() {
+        applicationScope.launch {
+            getAccountDetails(forceRefresh = true)
+        }
     }
 }

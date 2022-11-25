@@ -25,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultSupportRepository @Inject constructor(
     private val megaApi: MegaApiGateway,
 ) : SupportRepository {
-    override suspend fun logTicket(ticketContent: String) = suspendCoroutine<Unit> { continuation ->
+    override suspend fun logTicket(ticketContent: String) = suspendCoroutine { continuation ->
         megaApi.createSupportTicket(ticketContent,
             OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
@@ -45,7 +45,7 @@ internal class DefaultSupportRepository @Inject constructor(
         megaApi.startUploadForSupport(file.path, callback)
 
         awaitClose {
-            transfer?.let { megaApi.cancelTransfer(it) }
+            transfer?.let { megaApi.cancelTransfer(transfer = it, listener = null) }
         }
     }
 

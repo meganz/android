@@ -206,6 +206,7 @@ class DefaultAlbumRepositoryTest {
 
     @Test
     fun `test that monitorAlbumElementIds emits correct result`() = runTest {
+        val albumId = AlbumId(1L)
         val expectedElementIds = (1..3L).map {
             NodeId(it)
         }
@@ -213,13 +214,14 @@ class DefaultAlbumRepositoryTest {
         val megaSetElements = expectedElementIds.map { node ->
             mock<MegaSetElement> {
                 on { node() }.thenReturn(node.id)
+                on { setId() }.thenReturn(albumId.id)
             }
         }
 
         whenever(megaApiGateway.globalUpdates)
             .thenReturn(flowOf(OnSetElementsUpdate(ArrayList(megaSetElements))))
 
-        underTest.monitorAlbumElementIds().test {
+        underTest.monitorAlbumElementIds(albumId).test {
             val actualElementIds = awaitItem()
             assertThat(expectedElementIds).isEqualTo(actualElementIds)
             awaitComplete()
@@ -264,11 +266,11 @@ class DefaultAlbumRepositoryTest {
         override val modificationTime: Long = modificationTime
 
         override fun equals(other: Any?): Boolean {
-            val other = other as? UserSet ?: return false
-            return id == other.id
-                    && name == other.name
-                    && cover == other.cover
-                    && modificationTime == other.modificationTime
+            val otherSet = other as? UserSet ?: return false
+            return id == otherSet.id
+                    && name == otherSet.name
+                    && cover == otherSet.cover
+                    && modificationTime == otherSet.modificationTime
         }
     }
 }

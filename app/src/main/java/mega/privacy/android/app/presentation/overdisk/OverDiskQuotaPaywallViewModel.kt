@@ -4,9 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
-import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 /**
@@ -16,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OverDiskQuotaPaywallViewModel @Inject constructor(
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
-    @MegaApi private val megaApi: MegaApiAndroid
+    private val getSpecificAccountDetail: GetSpecificAccountDetail,
 ) : ViewModel() {
     /**
      * Request storage details only if is not already requested recently
@@ -24,7 +23,7 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
     fun requestStorageDetailIfNeeded() {
         viewModelScope.launch {
             if (isDatabaseEntryStale()) {
-                megaApi.getSpecificAccountDetails(true, false, false)
+                getSpecificAccountDetail(storage = true, transfer = false, pro = false)
             }
         }
     }

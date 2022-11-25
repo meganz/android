@@ -20,19 +20,9 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import mega.privacy.android.app.globalmanagement.CallChangesObserver
-import mega.privacy.android.app.MegaApplication
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import mega.privacy.android.app.main.controllers.ChatController
-import nz.mega.sdk.MegaChatCall
-import timber.log.Timber
-import mega.privacy.android.app.utils.CallUtil
-import nz.mega.sdk.MegaChatRoom
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
@@ -40,15 +30,25 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOVE_CALL_NOTIFICATION
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.globalmanagement.CallChangesObserver
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatRoom
+import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Service to handle mega calls
@@ -382,12 +382,7 @@ class CallService : Service() {
      * @param newChatIdCall Chat id.
      */
     private fun updateCall(newChatIdCall: Long) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
 
         cancelNotification()
         currentChatId = newChatIdCall
@@ -426,12 +421,7 @@ class CallService : Service() {
      * @param chatId That chat ID of a call.
      */
     private fun stopNotification(chatId: Long) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-        } else {
-            @Suppress("DEPRECATION")
-            stopForeground(true)
-        }
+        stopForeground(STOP_FOREGROUND_REMOVE)
 
         mNotificationManager?.cancel(getCallNotificationId(chatId))
         stopSelf()

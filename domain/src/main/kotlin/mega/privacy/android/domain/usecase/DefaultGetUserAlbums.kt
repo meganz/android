@@ -1,15 +1,15 @@
 package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.PhotosRepository
@@ -18,32 +18,30 @@ import javax.inject.Inject
 /**
  * Default get user albums use case implementation.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetUserAlbums @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val photosRepository: PhotosRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetUserAlbums {
-    override suspend fun invoke(): Flow<List<Album.UserAlbum>> = flow {
-        val userAlbums = albumRepository.getAllUserSets()
-            .map { mapToUserAlbum(it) }
-
-        emit(userAlbums)
-        emitAll(monitorUpdates())
+    override fun invoke(): Flow<List<Album.UserAlbum>> = flow {
+        emit(getUserAlbums())
+        emitAll(monitorUserAlbumsUpdate())
     }.flowOn(defaultDispatcher)
 
-    private fun monitorUpdates(): Flow<List<Album.UserAlbum>> =
-        albumRepository.monitorUserSetsUpdate()
-            .map { sets ->
-                sets.map { mapToUserAlbum(it) }
+    private suspend fun getUserAlbums(): List<Album.UserAlbum> =
+        albumRepository.getAllUserSets()
+            .map { set ->
+                val photo = set.cover?.let { photosRepository.getPhotoFromNodeID(NodeId(it)) }
+                Album.UserAlbum(
+                    id = AlbumId(set.id),
+                    title = set.name,
+                    cover = photo,
+                    modificationTime = set.modificationTime,
+                )
             }
 
-    private suspend fun mapToUserAlbum(set: UserSet): Album.UserAlbum {
-        val photo = set.cover?.let { photosRepository.getPhotoFromNodeID(NodeId(it)) }
-        return Album.UserAlbum(
-            id = AlbumId(set.id),
-            title = set.name,
-            cover = photo,
-            modificationTime = set.modificationTime,
-        )
-    }
+    private fun monitorUserAlbumsUpdate(): Flow<List<Album.UserAlbum>> =
+        albumRepository.monitorUserSetsUpdate()
+            .mapLatest { getUserAlbums() }
 }

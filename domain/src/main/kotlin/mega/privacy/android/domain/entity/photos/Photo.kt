@@ -26,7 +26,6 @@ sealed interface Photo {
         override val modificationTime: LocalDateTime,
         override val thumbnailFilePath: String?,
         override val previewFilePath: String?,
-        val duration: Int,
         override val fileTypeInfo: FileTypeInfo,
     ) : Photo
 
@@ -42,4 +41,3 @@ sealed interface Photo {
         override val fileTypeInfo: FileTypeInfo,
     ) : Photo
 }
-

@@ -37,7 +37,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      * @param playlistItems the playlist
      * @param openPlaylist the callback when playlist button is clicked
      */
-    fun setupPlaylistButton(playlistItems: List<PlaylistItem>?, openPlaylist: () -> Unit) {
+    fun setupPlaylistButton(playlistItems: List<PlaylistItem>, openPlaylist: () -> Unit) {
         togglePlaylistEnabled(playlistItems)
 
         playlist.setOnClickListener {
@@ -112,16 +112,15 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      *
      * @param playlistItems the new playlist
      */
-    fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>?) {
-        if (playlistItems != null && playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE) {
-            playlist.visibility = View.VISIBLE
+    fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
+        binding.playerView.setShowNextButton(
+            playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE)
+        playlist.visibility =
+            if (playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE)
+                View.VISIBLE
+            else
+                View.INVISIBLE
 
-            binding.playerView.setShowNextButton(true)
-        } else {
-            playlist.visibility = View.INVISIBLE
-
-            binding.playerView.setShowNextButton(false)
-        }
     }
 
     /**

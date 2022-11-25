@@ -5,13 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <SurfaceView
-        android:id="@+id/video"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:background="@android:color/transparent" />
-
     <mega.privacy.android.app.components.RoundedImageView
         android:id="@+id/avatar"
         android:layout_width="80dp"
@@ -26,6 +19,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextureView
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true" />
+
     <ImageView
         android:id="@+id/on_hold_icon"
         android:layout_width="wrap_content"
@@ -36,4 +35,5 @@
         app:layout_constraintEnd_toEndOf="@id/avatar"
         app:layout_constraintStart_toStartOf="@id/avatar"
         app:layout_constraintTop_toTopOf="@id/avatar" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

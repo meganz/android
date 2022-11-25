@@ -1976,6 +1976,17 @@ public class ChatUtil {
     /**
      * Method to check if all user's contacts are participants of the chat.
      *
+     * @param chatId     Chat id
+     * @return True if all user's contacts are participants of the chat room or false otherwise.
+     */
+    public static boolean areAllMyContactsChatParticipants(Long chatId) {
+        var chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        return areAllMyContactsChatParticipants(chat);
+    }
+
+    /**
+     * Method to check if all user's contacts are participants of the chat.
+     *
      * @param chatRoom MegaChatRoom to check
      * @return True if all user's contacts are participants of the chat room or false otherwise.
      */

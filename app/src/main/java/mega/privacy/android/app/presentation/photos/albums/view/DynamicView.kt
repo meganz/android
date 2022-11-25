@@ -1,13 +1,14 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -22,7 +24,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
-import mega.privacy.android.app.R
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumPhotoItem
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.domain.entity.photos.Photo
@@ -104,7 +106,10 @@ internal fun DynamicView(
 }
 
 @Composable
-internal fun EmptyView() {
+internal fun EmptyView(
+    imageResId: Int,
+    textResId: Int,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,10 +117,15 @@ internal fun EmptyView() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_homepage_empty_favourite),
+        Icon(
+            imageVector = ImageVector.vectorResource(id = imageResId),
             contentDescription = "Empty",
-            alpha = 40f
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Gray
+            } else {
+                Color.Unspecified
+            }
         )
 
         val placeHolderStart = "[B]"
@@ -124,7 +134,7 @@ internal fun EmptyView() {
         val boldPlaceHolderEnd = "[/A]"
 
         val text: String =
-            stringResource(id = R.string.empty_hint_favourite_album).uppercase()
+            stringResource(id = textResId).uppercase()
 
         Text(
             color = if (MaterialTheme.colors.isLight) grey_600 else grey_300,

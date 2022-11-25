@@ -10,6 +10,8 @@ import java.util.List;
 
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.*;
 
+import mega.privacy.android.domain.entity.account.MegaSku;
+
 /**
  * Defines generic methods to handle with in-app purchase.
  */

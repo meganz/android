@@ -56,7 +56,6 @@ import mega.privacy.android.app.middlelayer.iab.BillingManager
 import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.app.middlelayer.iab.MegaSku
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.psa.Psa
@@ -128,6 +127,8 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
+import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -154,6 +155,8 @@ import javax.inject.Inject
  * @property outMetrics                     [DisplayMetrics]
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
  * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
+ * @property isDatabaseEntryStale
+ * @property getAccountDetails
  */
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -187,6 +190,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @JvmField
     var composite = CompositeDisposable()
+
+    @Inject
+    lateinit var getAccountDetails: GetAccountDetails
 
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
@@ -920,7 +926,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         lifecycleScope.launch {
             if (isDatabaseEntryStale()) {
                 Timber.d("megaApi.getAccountDetails SEND")
-                app?.askForAccountDetails()
+                getAccountDetails(true)
             }
         }
     }

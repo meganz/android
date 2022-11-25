@@ -138,7 +138,7 @@ class DefaultSupportRepositoryTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        verify(megaApiGateway).cancelTransfer(transfer)
+        verify(megaApiGateway).cancelTransfer(transfer = transfer, listener = null)
     }
 
 }
