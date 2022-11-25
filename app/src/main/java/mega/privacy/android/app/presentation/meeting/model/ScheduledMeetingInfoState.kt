@@ -20,12 +20,13 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
+ * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
  * @property participantItemList                        List of [ContactItem].
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
- * @property error                                      String resource id for showing an error.
+ * @property snackBar                                   String resource id for showing an snackBar.
  * @property result                                     Handle of the new chat conversation.
  * @property firstParticipant                           First participant in the chat room.
  * @property lastParticipant                            Last participant in the chat room.
