@@ -3936,16 +3936,45 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">離開群組</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album"></string>
+    <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新相簿（%d）</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">新增項目到「%s」</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="other">已新增%d個項目到「%s」</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">付款資訊</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Pro會員方案即將到期</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">已收到您%1$s方案的付款。</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">您%1$s方案的付款沒有成功。</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="other">您的Pro會員方案將在%1$d內到期。</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="other">您的Pro會員方案已在%1$d天前到期。</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]空[/B][A]相簿[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">我的相簿</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">共享相簿</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">過去的會議</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">即將到來的會議</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">定期會議</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">每周 %s</string>
 </resources>
