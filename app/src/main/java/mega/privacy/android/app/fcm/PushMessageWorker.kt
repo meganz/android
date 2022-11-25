@@ -50,9 +50,15 @@ class PushMessageWorker @AssistedInject constructor(
         withContext(ioDispatcher) {
 
             // legacy support, other places need to know logging in happen
+            if (MegaApplication.isLoggingIn) {
+                Timber.w("Logging already running.")
+                return@withContext Result.failure()
+            }
+
             MegaApplication.isLoggingIn = true
             val result = runCatching { completeFastLogin() }
             MegaApplication.isLoggingIn = false
+
             if (result.isSuccess) {
                 Timber.d("Fast login success.")
                 runCatching { retryPendingConnections(disconnect = false) }
