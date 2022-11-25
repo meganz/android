@@ -61,7 +61,6 @@ fun CreateNewAlbumDialog(
     inputPlaceHolderText: () -> String = { "" },
     errorMessage: Int? = null,
     isInputValid: () -> Boolean = { true },
-    isAlbumCreationInProgress: () -> Boolean = { false },
 ) {
     var textState by rememberSaveable { mutableStateOf("") }
     val isEnabled by remember { mutableStateOf(true) }
@@ -221,9 +220,7 @@ fun CreateNewAlbumDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (!isAlbumCreationInProgress()) {
-                        onDialogPositiveButtonClicked(textState, proscribedString)
-                    }
+                    onDialogPositiveButtonClicked(textState, proscribedString)
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,
