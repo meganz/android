@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -57,6 +58,8 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
     val state: StateFlow<AlbumPhotosSelectionState> = _state
 
+    private var addPhotosJob: Job? = null
+
     init {
         fetchAlbum()
         fetchPhotos()
@@ -65,22 +68,28 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
         .filterNotNull()
         .flatMapLatest { id -> getUserAlbum(albumId = AlbumId(id)) }
-        .filterNotNull()
         .onEach(::updateAlbum)
+        .filterNotNull()
         .flatMapLatest { album -> getAlbumPhotos(album.id) }
         .onEach(::updateAlbumPhotos)
         .catch { exception -> Timber.e(exception) }
         .launchIn(viewModelScope)
 
-    private fun updateAlbum(album: Album.UserAlbum) {
+    private fun updateAlbum(album: Album.UserAlbum?) {
         _state.update {
-            it.copy(album = album)
+            it.copy(
+                album = album,
+                isInvalidAlbum = album == null,
+            )
         }
     }
 
-    private fun updateAlbumPhotos(albumPhotos: List<Photo>) {
+    private suspend fun updateAlbumPhotos(albumPhotos: List<Photo>) {
         _state.update {
-            it.copy(albumPhotos = albumPhotos)
+            val albumPhotoIds = withContext(defaultDispatcher) {
+                albumPhotos.map { photo -> photo.id }.toSet()
+            }
+            it.copy(albumPhotoIds = albumPhotoIds)
         }
     }
 
@@ -113,11 +122,13 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             currentLocation == CAMERA_UPLOAD && numCameraUploadPhotos == 0 -> candidateLocation
             else -> currentLocation
         }
+        val isLocationDetermined = candidateLocation != ALL_PHOTOS || showFilterMenu
 
         _state.update {
             it.copy(
                 photos = photos,
                 selectedLocation = newLocation,
+                isLocationDetermined = isLocationDetermined,
                 showFilterMenu = showFilterMenu,
             )
         }
@@ -162,7 +173,6 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
 
     suspend fun downloadPhoto(
-        isPreview: Boolean,
         photo: Photo,
         callback: (Boolean) -> Unit,
     ) = withContext(defaultDispatcher) {
@@ -202,25 +212,27 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     fun unselectPhoto(photo: Photo) = viewModelScope.launch {
         _state.update {
             val selectedPhotoIds = withContext(defaultDispatcher) {
-                it.selectedPhotoIds.filter { id -> id != photo.id }.toSet()
+                it.selectedPhotoIds - photo.id
             }
             it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }
 
-    fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) = viewModelScope.launch {
-        val albumPhotos = _state.value.albumPhotos
-        val photoIds = selectedPhotoIds.filter { id ->
-            albumPhotos.all { it.id != id }
-        }
+    fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) {
+        addPhotosJob?.cancel()
+        addPhotosJob = viewModelScope.launch {
+            val photoIds = withContext(defaultDispatcher) {
+                val albumPhotoIds = _state.value.albumPhotoIds
+                selectedPhotoIds - albumPhotoIds
+            }
+            addPhotosToAlbum(
+                albumId = album.id,
+                photoIds = photoIds.map { NodeId(it) },
+            )
 
-        addPhotosToAlbum(
-            albumId = album.id,
-            photoIds = photoIds.map { NodeId(it) },
-        )
-
-        _state.update {
-            it.copy(isSelectionCompleted = true)
+            _state.update {
+                it.copy(isSelectionCompleted = true)
+            }
         }
     }
 }

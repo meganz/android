@@ -37,8 +37,9 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleCompletion(message: String) {
+    private fun handleCompletion(albumId: AlbumId, message: String) {
         val data = Intent().apply {
+            putExtra(ALBUM_ID, albumId.id)
             putExtra(MESSAGE, message)
         }
         setResult(RESULT_OK, data)
@@ -46,7 +47,7 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
     }
 
     companion object {
-        internal const val ALBUM_ID: String = "album_id"
+        const val ALBUM_ID: String = "album_id"
 
         const val MESSAGE: String = "message"
 
