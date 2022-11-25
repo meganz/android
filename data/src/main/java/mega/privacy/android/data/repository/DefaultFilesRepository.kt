@@ -71,6 +71,28 @@ internal class DefaultFilesRepository @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FilesRepository, FileRepository {
 
+    override suspend fun copyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+    ): NodeId = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.copyNode(
+                nodeToCopy = nodeToCopy,
+                newNodeParent = newNodeParent,
+                newNodeName = newNodeName,
+                listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_COPY) {
+                            continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
+                        } else {
+                            continuation.failWithError(error)
+                        }
+                    }
+                )
+            )
+        }
+    }
 
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
