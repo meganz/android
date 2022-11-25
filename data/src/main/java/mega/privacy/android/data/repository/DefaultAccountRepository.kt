@@ -93,7 +93,24 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun storageCapacityUsedIsBlank() =
         myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
 
-    override fun requestAccount() = myAccountInfoFacade.requestAccountDetails()
+    override suspend fun requestAccount() = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
+            megaApiGateway.getAccountDetails(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        myAccountInfoFacade.handleAccountDetail(request)
+    }
 
     override suspend fun setUserHasLoggedIn() {
         localStorageGateway.setUserHasLoggedIn()
@@ -293,5 +310,13 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun getMyCredentials() = withContext(ioDispatcher) {
         megaApiGateway.myCredentials
+    }
+
+    override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
+        dbHandler.resetAccountDetailsTimeStamp()
+    }
+
+    override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
+        dbHandler.resetExtendedAccountDetailsTimestamp()
     }
 }

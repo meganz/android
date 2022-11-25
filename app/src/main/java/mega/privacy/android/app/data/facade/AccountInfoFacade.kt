@@ -4,13 +4,12 @@ import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
-import mega.privacy.android.app.LegacyDatabaseHandler
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import nz.mega.sdk.MegaAccountDetails
@@ -31,7 +30,7 @@ class AccountInfoFacade @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
-    private val db: LegacyDatabaseHandler,
+    private val db: DatabaseHandler,
 ) : AccountInfoWrapper {
     private val accountDetail = MutableSharedFlow<MegaAccountDetails>(replay = 1)
 
@@ -41,10 +40,6 @@ class AccountInfoFacade @Inject constructor(
         get() = myAccountInfo.accountType
     override val accountTypeString: String
         get() = getAccountTypeLabel(myAccountInfo.accountType)
-
-    override fun requestAccountDetails() {
-        (context as MegaApplication).askForAccountDetails()
-    }
 
     override suspend fun handleAccountDetail(request: MegaRequest) {
         Timber.d("Account details request")
