@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -179,21 +178,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Tap in a button action
-     */
-    fun onActionTap(action: ScheduledMeetingInfoAction) {
-        when (action) {
-            ScheduledMeetingInfoAction.MeetingLink -> onMeetingLinkTap()
-            ScheduledMeetingInfoAction.ShareMeetingLink -> onShareMeetingLinkTap()
-            ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> onAllowAddParticipantsTap()
-            ScheduledMeetingInfoAction.ShareFiles -> onSharedFilesTap()
-            ScheduledMeetingInfoAction.ManageChatHistory -> onManageChatHistoryTap()
-            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> onEnableEncryptedKeyRotationTap()
-        }
-    }
-
-    /**
      * Add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onInviteParticipantsTap() {
@@ -234,7 +218,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Create or removed meeting link if there is internet connection, shows an error if not.
      */
-    private fun onMeetingLinkTap() {
+    fun onMeetingLinkTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
@@ -245,7 +229,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Share meeting link if there is internet connection, shows an error if not.
      */
-    private fun onShareMeetingLinkTap() {
+    fun onShareMeetingLinkTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
@@ -256,7 +240,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Enable or disable chat notifications if there is internet connection, shows an error if not.
      */
-    private fun onChatNotificationsTap() {
+    fun onChatNotificationsTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
@@ -267,7 +251,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Enable or disable the option Allow non-host add participants to the chat room if there is internet connection, shows an error if not.
      */
-    private fun onAllowAddParticipantsTap() {
+    fun onAllowAddParticipantsTap() {
         if (isConnected) {
             Timber.d("Allow non host add participants to the chat room")
         } else {
@@ -276,16 +260,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Show shared files in the chat room.
-     */
-    private fun onSharedFilesTap() {
-        Timber.d("Show shared files in the chat room")
-    }
-
-    /**
      * Manage chat history if there is internet connection, shows an error if not.
      */
-    private fun onManageChatHistoryTap() {
+    fun onManageChatHistoryTap() {
         if (isConnected) {
             Timber.d("Manage chat history")
         } else {
@@ -296,7 +273,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Enable encrypted key rotation if there is internet connection, shows an error if not.
      */
-    private fun onEnableEncryptedKeyRotationTap() {
+    fun onEnableEncryptedKeyRotationTap() {
         if (isConnected) {
             Timber.d("Enable Encrypted Key Rotation")
         } else {
