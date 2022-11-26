@@ -255,6 +255,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
 
+    override fun setPublicChatToPrivate(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.setPublicChatToPrivate(chatId, listener)
+
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
     }

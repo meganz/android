@@ -201,4 +201,14 @@ internal class DefaultChatRepository @Inject constructor(
                 megaChatApiGateway.inviteToChat(chatId, userHandle, null)
             }
         }
+
+    override suspend fun setPublicChatToPrivate(chatId: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.setPublicChatToPrivate(chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestChatCallCompleted(continuation)
+                    ))
+            }
+        }
 }

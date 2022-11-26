@@ -56,7 +56,6 @@ interface ChatRepository {
         enabledSpeaker: Boolean,
     ): ChatRequest
 
-
     /**
      * Get chat files folder id if it exists
      */
@@ -124,4 +123,14 @@ interface ChatRepository {
      * @param contactsData      List of contacts to add
      */
     suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
+
+    /**
+     * Set public chat to private.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest].
+     */
+    suspend fun setPublicChatToPrivate(
+        chatId: Long,
+    ): ChatRequest
 }
