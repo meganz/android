@@ -18,34 +18,36 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property chatId                                     Chat id.
  * @property chatTitle                                  Chat title.
  * @property scheduledMeeting                           Current scheduled meeting item.
+ * @property finish                                     True, if the activity is to be terminated.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
- * @property participantItemList                        List of [ContactItem].
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
  * @property snackBar                                   String resource id for showing an snackBar.
- * @property result                                     Handle of the new chat conversation.
+ * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
+ * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
  * @property lastParticipant                            Last participant in the chat room.
  */
 data class ScheduledMeetingInfoState(
-    val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val chatId: Long = -1,
     val chatTitle: String = "",
     val scheduledMeeting: ScheduledMeetingItem? = null,
+    val finish: Boolean = false,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val inviteParticipantAction: InviteParticipantsAction? = null,
-    val participantItemList: List<ChatParticipant> = emptyList(),
     val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
     val enabledChatNotificationsOption: Boolean = true,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
     val snackBar: Int? = null,
-    val result: Long? = null,
+    val leaveGroupDialog: Boolean = false,
+    val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
+    val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = ChatParticipant(
         participantId = -1,
         contact = ContactItem(handle = -1,

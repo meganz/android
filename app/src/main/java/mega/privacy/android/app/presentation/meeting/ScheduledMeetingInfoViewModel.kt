@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
@@ -24,9 +25,11 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.InviteToChat
+import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,6 +45,7 @@ import javax.inject.Inject
  * @property monitorConnectivity            [MonitorConnectivity]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
  * @property inviteToChat                   [InviteToChat]
+ * @property leaveChat                      [LeaveChat]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
  */
 @HiltViewModel
@@ -53,6 +57,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val inviteToChat: InviteToChat,
+    private val leaveChat: LeaveChat,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -80,7 +85,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param newScheduledMeetingId     Scheduled meeting id.
      */
     fun setChatId(newChatId: Long, newScheduledMeetingId: Long) {
-        if (newChatId != MEGACHAT_INVALID_HANDLE) {
+        if (newChatId != MEGACHAT_INVALID_HANDLE && newChatId != chatId) {
             chatId = newChatId
             scheduledMeetingId = newScheduledMeetingId
             getChatRoom()
@@ -99,7 +104,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 getChatRoom(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
-                _state.update { it.copy(result = -1L, snackBar = R.string.general_text_error) }
+                _state.update { it.copy(snackBar = R.string.general_text_error) }
             }.onSuccess { chat ->
                 chat?.apply {
                     _state.update {
@@ -124,7 +129,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 getScheduledMeetingByChat(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
-                _state.update { it.copy(result = -1L, snackBar = R.string.general_text_error) }
+                _state.update { it.copy(snackBar = R.string.general_text_error) }
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList?.let { list ->
                     list.forEach { schedMeeting ->
@@ -263,9 +268,54 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Leave group chat.
+     * Leave group chat button clicked
      */
     fun onLeaveGroupTap() {
+        _state.update { state ->
+            state.copy(leaveGroupDialog = !state.leaveGroupDialog)
+        }
+    }
+
+    /**
+     * Dismiss alert dialog
+     */
+    fun dismissDialog() {
+        _state.update { state ->
+            state.copy(leaveGroupDialog = false)
+        }
+    }
+
+    /**
+     * Finish activity
+     */
+    fun finishActivity() {
+        _state.update { state ->
+            state.copy(finish = true)
+        }
+    }
+
+    /**
+     * Leave chat
+     */
+    fun leaveChat() {
+        viewModelScope.launch {
+            runCatching {
+                leaveChat(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                dismissDialog()
+                _state.update { it.copy(snackBar = R.string.general_error) }
+            }.onSuccess { result ->
+                if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
+                    result.chatHandle?.let { chatHandle ->
+                        MegaApplication.getChatManagement().removeLeavingChatId(chatHandle)
+                    }
+                }
+
+                dismissDialog()
+                finishActivity()
+            }
+        }
     }
 
     /**

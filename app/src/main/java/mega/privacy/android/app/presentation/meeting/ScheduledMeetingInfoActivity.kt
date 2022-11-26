@@ -68,7 +68,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (_, chatId, _, _, _, _, inviteParticipantAction) ->
+                viewModel.state.collect { (chatId, _, _, finish, _, _, inviteParticipantAction) ->
+                    if (finish)
+                        finish()
+
                     if (chatRoomId != chatId)
                         chatRoomId = chatId
 
@@ -131,10 +134,12 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                 onEditClicked = { viewModel::onEditTap },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
                 onSeeMoreClicked = { viewModel::onSeeMoreTap },
-                onLeaveGroupClicked = { viewModel::onLeaveGroupTap },
+                onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
                 onParticipantClicked = { viewModel::onParticipantTap },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
-                onBackPressed = { finish() })
+                onBackPressed = { finish() },
+                onDismiss = { viewModel.dismissDialog() },
+                onLeaveGroupDialog = { viewModel.leaveChat() })
         }
     }
 }

@@ -103,7 +103,7 @@ internal class DefaultChatRepository @Inject constructor(
                     enabledVideo,
                     enabledAudio,
                     OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestChatCallCompleted(continuation)
+                        onRequestFinish = onRequestCompleted(continuation)
                     ))
             }
         }
@@ -119,12 +119,23 @@ internal class DefaultChatRepository @Inject constructor(
                 enabledVideo,
                 enabledAudio,
                 OptionalMegaChatRequestListenerInterface(
-                    onRequestFinish = onRequestChatCallCompleted(continuation)
+                    onRequestFinish = onRequestCompleted(continuation)
                 ))
         }
     }
 
-    private fun onRequestChatCallCompleted(continuation: Continuation<ChatRequest>) =
+    override suspend fun leaveChat(chatId: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+
+                megaChatApiGateway.leaveChat(chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
+            }
+        }
+
+    private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
