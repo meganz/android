@@ -31,6 +31,7 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
 import mega.privacy.android.data.mapper.PricingMapper
@@ -79,6 +80,7 @@ import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
+import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
@@ -417,4 +419,8 @@ internal class MapperModule {
     @Provides
     fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
         ::toChatScheduledMeetingOccur
+
+    @Provides
+    fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
+        ::toOfflineNodeInformation
 }
