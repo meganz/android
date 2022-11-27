@@ -17,12 +17,16 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,18 +36,22 @@ import javax.inject.Inject
  * StartConversationFragment view model.
  *
  * @property getVisibleContacts             [GetVisibleContacts]
+ * @property getChatRoom                    [GetChatRoom]
+ * @property getScheduledMeetingByChat      [GetScheduledMeetingByChat]
+ * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
  * @property monitorConnectivity            [MonitorConnectivity]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
- * @property getChatRoom                    [GetChatRoom]
  * @property inviteToChat                   [InviteToChat]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
  */
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getVisibleContacts: GetVisibleContacts,
+    private val getChatRoom: GetChatRoom,
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorConnectivity: MonitorConnectivity,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
-    private val getChatRoom: GetChatRoom,
     private val inviteToChat: InviteToChat,
 ) : ViewModel() {
 
@@ -75,15 +83,17 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (newChatId != MEGACHAT_INVALID_HANDLE) {
             chatId = newChatId
             scheduledMeetingId = newScheduledMeetingId
-            getChatRoomAssociated()
+            getChatRoom()
+            getScheduledMeeting()
             getChatRoomUpdates()
+            getScheduledMeetingUpdates()
         }
     }
 
     /**
      * Get chat room
      */
-    private fun getChatRoomAssociated() {
+    private fun getChatRoom() {
         viewModelScope.launch {
             runCatching {
                 getChatRoom(chatId)
@@ -99,6 +109,34 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             isHost = ownPrivilege == ChatRoomPermission.Moderator,
                             isOpenInvite = chat.isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get scheduled meeting
+     */
+    private fun getScheduledMeeting() {
+        viewModelScope.launch {
+            runCatching {
+                getScheduledMeetingByChat(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                _state.update { it.copy(result = -1L, snackBar = R.string.general_text_error) }
+            }.onSuccess { scheduledMeetingList ->
+                scheduledMeetingList?.let { list ->
+                    list.forEach { schedMeeting ->
+                        if (schedMeeting.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+                            _state.update {
+                                it.copy(scheduledMeeting = ScheduledMeetingItem(chatId = schedMeeting.chatId,
+                                    scheduledMeetingId = schedMeeting.schedId,
+                                    title = schedMeeting.title,
+                                    description = schedMeeting.description))
+                            }
+                            return@forEach
+                        }
                     }
                 }
             }
@@ -134,6 +172,58 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     ChatRoomChanges.Title -> {
                         _state.update {
                             it.copy(chatTitle = chat.title)
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    /**
+     * Get scheduled meeting updates
+     */
+    private fun getScheduledMeetingUpdates() {
+        viewModelScope.launch {
+            monitorScheduledMeetingUpdates().collectLatest { schedMeetReceived ->
+                when (schedMeetReceived.changes) {
+                    ScheduledMeetingChanges.NewScheduledMeeting -> {
+                        if (schedMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+                            _state.update {
+                                it.copy(scheduledMeeting = ScheduledMeetingItem(schedMeetReceived.chatId,
+                                    schedMeetReceived.schedId,
+                                    schedMeetReceived.title,
+                                    schedMeetReceived.description,
+                                    schedMeetReceived.startDateTime))
+                            }
+                        }
+                    }
+                    ScheduledMeetingChanges.Title -> {
+                        _state.value.scheduledMeeting?.let {
+                            if (schedMeetReceived.schedId == it.scheduledMeetingId) {
+                                _state.update { state ->
+                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(title = schedMeetReceived.title))
+                                }
+                            }
+                        }
+                    }
+                    ScheduledMeetingChanges.Description -> {
+                        _state.value.scheduledMeeting?.let {
+                            if (schedMeetReceived.schedId == it.scheduledMeetingId) {
+                                _state.update { state ->
+                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
+                                        description = schedMeetReceived.description))
+                                }
+                            }
+                        }
+                    }
+                    ScheduledMeetingChanges.StartDate -> {
+                        _state.value.scheduledMeeting?.let {
+                            if (schedMeetReceived.schedId == it.scheduledMeetingId) {
+                                _state.update { state ->
+                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(date = schedMeetReceived.startDateTime))
+                                }
+                            }
                         }
                     }
                     else -> {}
