@@ -19,13 +19,11 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.SkuMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.domain.entity.SubscriptionPlan
+import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -56,10 +54,8 @@ import kotlin.coroutines.suspendCoroutine
  * @property localStorageGateway
  * @property userAccountMapper
  * @property accountTypeMapper
- * @property subscriptionPlanMapper
  * @property currencyMapper
- * @property skuMapper
- * @property subscriptionPlanListMapper
+ * @property subscriptionOptionListMapper
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -72,10 +68,8 @@ internal class DefaultAccountRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val userAccountMapper: UserAccountMapper,
     private val accountTypeMapper: AccountTypeMapper,
-    private val subscriptionPlanMapper: SubscriptionPlanMapper,
     private val currencyMapper: CurrencyMapper,
-    private val skuMapper: SkuMapper,
-    private val subscriptionPlanListMapper: SubscriptionPlanListMapper,
+    private val subscriptionOptionListMapper: SubscriptionOptionListMapper,
     private val megaAchievementMapper: MegaAchievementMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
@@ -213,17 +207,16 @@ internal class DefaultAccountRepository @Inject constructor(
         megaApiGateway.isBusinessAccountActive()
     }
 
-    override suspend fun getSubscriptionPlans(): List<SubscriptionPlan> =
+    override suspend fun getSubscriptionOptions(): List<SubscriptionOption> =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 megaApiGateway.getPricing(OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(subscriptionPlanListMapper(
+                            continuation.resumeWith(Result.success(subscriptionOptionListMapper(
                                 request,
-                                subscriptionPlanMapper,
                                 currencyMapper,
-                                skuMapper)))
+                            )))
                         } else {
                             continuation.failWithError(error)
                         }
