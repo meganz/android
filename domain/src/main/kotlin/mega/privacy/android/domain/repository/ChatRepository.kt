@@ -124,4 +124,20 @@ interface ChatRepository {
      * @param contactsData      List of contacts to add
      */
     suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
+
+    /**
+     * Query chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun queryChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Remove chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun removeChatLink(chatId: Long): ChatRequest
 }

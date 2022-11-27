@@ -257,4 +257,20 @@ interface MegaChatApiGateway {
      * @param listener      Listener.
      */
     fun inviteToChat(chatId: Long, userHandle: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Query chat link
+     *
+     * @param chatId        Chat id.
+     * @param listener      Listener.
+     */
+    fun queryChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Remove chat link
+     *
+     * @param chatId        Chat id.
+     * @param listener      Listener.
+     */
+    fun removeChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
 }
