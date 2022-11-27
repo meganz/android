@@ -16,6 +16,7 @@ package mega.privacy.android.domain.entity.chat
  * @property overrides
  * @property flags
  * @property rules
+ * @property changes            Changes [ScheduledMeetingChanges].
  */
 data class ChatScheduledMeeting(
     val chatId: Long,
@@ -31,4 +32,5 @@ data class ChatScheduledMeeting(
     val overrides: String,
     val flags: ChatScheduledFlags?,
     val rules: ChatScheduledRules?,
+    val changes: ScheduledMeetingChanges? = null
 )
