@@ -188,6 +188,26 @@ internal class DefaultFilesRepository @Inject constructor(
             megaApiGateway.getNodeByFingerprint(fingerprint)
         }
 
+    override suspend fun setOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.setOriginalFingerprint(
+                    node = node,
+                    originalFingerprint = originalFingerprint,
+                    listener = OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_SET_ATTR_NODE) {
+                                continuation.resumeWith(Result.success(Unit))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    )
+                )
+            }
+        }
+    }
+
     override suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getIncomingSharesNode(sortOrderIntMapper(order))

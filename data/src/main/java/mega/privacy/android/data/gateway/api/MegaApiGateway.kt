@@ -239,6 +239,19 @@ interface MegaApiGateway {
     suspend fun getNodeByFingerprint(fingerprint: String): MegaNode?
 
     /**
+     * Sets the original fingerprint of a [MegaNode]
+     *
+     * @param node the [MegaNode] to attach the [originalFingerprint] to
+     * @param originalFingerprint the fingerprint of the file before modification
+     * @param listener the [MegaRequestListenerInterface] for callback events. It can be nullable
+     */
+    fun setOriginalFingerprint(
+        node: MegaNode,
+        originalFingerprint: String,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
      * Check the node if has version
      * @param node node that is checked
      * @return true is has version
