@@ -73,14 +73,6 @@ interface ChatRepository {
     suspend fun getChatFilesFolderId(): NodeId?
 
     /**
-     * Monitor updates on chat room item update
-     *
-     * @param chatId    Chat Id.
-     * @return          A flow of [ChatRoom]
-     */
-    fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
-
-    /**
      * Gets chat room if it exists
      *
      * @param chatId      Chat Id
@@ -89,27 +81,13 @@ interface ChatRepository {
     suspend fun getChatRoom(chatId: Long): ChatRoom?
 
     /**
-     * Monitor updates on scheduled meetings
-     *
-     * @return          A flow of [ChatScheduledMeeting]
-     */
-    fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
-
-    /**
-     * Monitor updates on scheduled meeting occurrences
-     *
-     * @return          A flow of schedIds
-     */
-    fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
-
-    /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
      *
      * @param chatId  MegaChatHandle that identifies a chat room
-     * @param schedId MegaChatHandle that identifies a scheduled meeting
+     * @param scheduledMeetingId MegaChatHandle that identifies a scheduled meeting
      * @return The scheduled meeting.
      */
-    fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
+    fun getScheduledMeeting(chatId: Long, scheduledMeetingId: Long): ChatScheduledMeeting?
 
     /**
      * Get a list of all scheduled meeting for a chatroom
@@ -160,6 +138,37 @@ interface ChatRepository {
      * @return          [ChatRequest]
      */
     suspend fun removeChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Create chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun createChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Monitor updates on chat room item update
+     *
+     * @param chatId    Chat Id.
+     * @return          A flow of [ChatRoom]
+     */
+    fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
+
+    /**
+     * Monitor updates on scheduled meetings
+     *
+     * @return          A flow of [ChatScheduledMeeting]
+     */
+    fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
+
+    /**
+     * Monitor updates on scheduled meeting occurrences
+     *
+     * @return          A flow of scheduledMeetingIds
+     */
+    fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
+
 
     /**
      * Monitor updates on chat list item.

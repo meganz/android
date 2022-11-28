@@ -277,6 +277,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.removeChatLink(chatId, listener)
 
+    override fun createChatLink(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.createChatLink(chatId, listener)
+
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
     }

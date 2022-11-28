@@ -151,12 +151,6 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun getChatFilesFolderId(): NodeId? =
         localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
 
-    override fun monitorChatRoomUpdates(chatId: Long) =
-        megaChatApiGateway.getChatRoomUpdates(chatId)
-            .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
-            .mapNotNull { it.chat }
-            .map { chatRoomMapper(it) }
-            .flowOn(ioDispatcher)
 
     override suspend fun getChatRoom(chatId: Long): ChatRoom? =
         withContext(ioDispatcher) {
@@ -165,21 +159,12 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
-    override fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting> =
-        megaChatApiGateway.scheduledMeetingUpdates
-            .filterIsInstance<ScheduledMeetingUpdate.OnChatSchedMeetingUpdate>()
-            .mapNotNull { it.item }
-            .map(chatScheduledMeetingMapper)
-            .flowOn(ioDispatcher)
-
-    override fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long> =
-        megaChatApiGateway.scheduledMeetingUpdates
-            .filterIsInstance<ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
-            .mapNotNull { it.chatId }
-            .flowOn(ioDispatcher)
-
-    override fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting? =
-        megaChatApiGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
+    override fun getScheduledMeeting(
+        chatId: Long,
+        scheduledMeetingId: Long,
+    ): ChatScheduledMeeting? =
+        megaChatApiGateway.getScheduledMeeting(chatId, scheduledMeetingId)
+            ?.let(chatScheduledMeetingMapper)
 
     override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting> =
         withContext(ioDispatcher) {
@@ -253,6 +238,35 @@ internal class DefaultChatRepository @Inject constructor(
                 ))
         }
     }
+
+    override suspend fun createChatLink(chatId: Long): ChatRequest = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaChatApiGateway.createChatLink(chatId,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                ))
+        }
+    }
+
+    override fun monitorChatRoomUpdates(chatId: Long) =
+        megaChatApiGateway.getChatRoomUpdates(chatId)
+            .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
+            .mapNotNull { it.chat }
+            .map { chatRoomMapper(it) }
+            .flowOn(ioDispatcher)
+
+    override fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting> =
+        megaChatApiGateway.scheduledMeetingUpdates
+            .filterIsInstance<ScheduledMeetingUpdate.OnChatSchedMeetingUpdate>()
+            .mapNotNull { it.item }
+            .map(chatScheduledMeetingMapper)
+            .flowOn(ioDispatcher)
+
+    override fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long> =
+        megaChatApiGateway.scheduledMeetingUpdates
+            .filterIsInstance<ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
+            .mapNotNull { it.chatId }
+            .flowOn(ioDispatcher)
 
     override fun monitorChatListItemUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatListItemUpdate>()

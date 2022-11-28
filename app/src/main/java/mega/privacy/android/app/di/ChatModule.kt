@@ -7,6 +7,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -112,6 +113,13 @@ class ChatModule {
     @Provides
     fun provideRemoveChatLink(chatRepository: ChatRepository): RemoveChatLink =
         RemoveChatLink(chatRepository::removeChatLink)
+
+    /**
+     * Provides the Use Case [CreateChatLink]
+     */
+    @Provides
+    fun provideCreateChatLink(chatRepository: ChatRepository): CreateChatLink =
+        CreateChatLink(chatRepository::createChatLink)
 
     /**
      * Provides the Use Case [MonitorChatListItemUpdates]

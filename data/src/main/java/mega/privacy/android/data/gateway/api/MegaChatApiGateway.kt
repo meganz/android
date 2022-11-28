@@ -294,4 +294,12 @@ interface MegaChatApiGateway {
      * @param listener      Listener.
      */
     fun removeChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Create chat link
+     *
+     * @param chatId        Chat id.
+     * @param listener      Listener.
+     */
+    fun createChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
 }

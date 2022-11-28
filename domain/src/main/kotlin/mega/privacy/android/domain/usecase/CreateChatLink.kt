@@ -3,9 +3,9 @@ package mega.privacy.android.domain.usecase
 import mega.privacy.android.domain.entity.ChatRequest
 
 /**
- * Use case for remove chat link
+ * Use case for create chat link
  */
-fun interface RemoveChatLink {
+fun interface CreateChatLink {
 
     /**
      * Invoke.
