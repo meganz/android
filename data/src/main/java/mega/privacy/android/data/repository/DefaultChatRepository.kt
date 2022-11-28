@@ -124,6 +124,17 @@ internal class DefaultChatRepository @Inject constructor(
         }
     }
 
+    override suspend fun leaveChat(chatId: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+
+                megaChatApiGateway.leaveChat(chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
+            }
+        }
+
     private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
@@ -208,6 +219,16 @@ internal class DefaultChatRepository @Inject constructor(
             contactsData.forEach { email ->
                 val userHandle = megaApiGateway.getContact(email)?.handle ?: -1
                 megaChatApiGateway.inviteToChat(chatId, userHandle, null)
+            }
+        }
+
+    override suspend fun setPublicChatToPrivate(chatId: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.setPublicChatToPrivate(chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
             }
         }
 

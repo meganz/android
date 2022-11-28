@@ -64,7 +64,7 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun retryPendingConnections(
         disconnect: Boolean,
-        listener: MegaChatRequestListenerInterface?
+        listener: MegaChatRequestListenerInterface?,
     ) = chatApi.retryPendingConnections(disconnect, listener)
 
     override val chatUpdates: Flow<ChatUpdate>
@@ -158,7 +158,9 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
 
+        chatApi.closeChatRoom(chatId, listener)
         chatApi.openChatRoom(chatId, listener)
+
         awaitClose {
             chatApi.closeChatRoom(chatId, listener)
         }
@@ -172,6 +174,11 @@ internal class MegaChatApiFacade @Inject constructor(
         peers: MegaChatPeerList,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
+
+    override fun leaveChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.leaveChat(chatId, listener)
 
     override fun setOpenInvite(
         chatId: Long,
@@ -254,6 +261,11 @@ internal class MegaChatApiFacade @Inject constructor(
         userHandle: Long,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
+
+    override fun setPublicChatToPrivate(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.setPublicChatToPrivate(chatId, listener)
 
     override fun queryChatLink(
         chatId: Long,

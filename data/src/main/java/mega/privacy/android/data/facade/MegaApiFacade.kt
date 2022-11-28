@@ -226,6 +226,14 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
         megaApi.getNodeByFingerprint(fingerprint)
 
+    override fun setOriginalFingerprint(
+        node: MegaNode,
+        originalFingerprint: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.setOriginalFingerprint(node, originalFingerprint, listener)
+    }
+
     override suspend fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)

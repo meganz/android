@@ -837,6 +837,7 @@ public class ManagerActivity extends TransfersManagementActivity
     int bottomNavigationCurrentItem = -1;
     View chatBadge;
     View callBadge;
+    View pendingActionsBadge;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -1800,6 +1801,13 @@ public class ManagerActivity extends TransfersManagementActivity
         chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
         itemView.addView(chatBadge);
         setChatBadge();
+
+        // Navi button Shared Items
+        BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+        pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
+        sharedItemsView.addView(pendingActionsBadge);
+        pendingActionsBadge.setVisibility(View.GONE);
+        setPendingActionsBadge();
 
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
         itemView.addView(callBadge);
@@ -10494,6 +10502,10 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             chatBadge.setVisibility(View.GONE);
         }
+    }
+
+    public void setPendingActionsBadge() {
+        //// TODO Get pending actions count from SDK api and add a badge on UI
     }
 
     private void setCallBadge() {
