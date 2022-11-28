@@ -416,6 +416,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @return  String with the formatted date
      */
     private fun ChatScheduledMeeting.getFormattedDate(): String =
-        DateTimeFormatter.ofPattern("d MM yyyy '·' HH:mm").format(startDateTime) +
+        DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").format(startDateTime) +
                 " - ${DateTimeFormatter.ofPattern("HH:mm").format(endDateTime)}"
 }
