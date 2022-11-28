@@ -158,7 +158,9 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
 
+        chatApi.closeChatRoom(chatId, listener)
         chatApi.openChatRoom(chatId, listener)
+
         awaitClose {
             chatApi.closeChatRoom(chatId, listener)
         }
@@ -172,6 +174,11 @@ internal class MegaChatApiFacade @Inject constructor(
         peers: MegaChatPeerList,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
+
+    override fun leaveChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.leaveChat(chatId, listener)
 
     override fun setOpenInvite(
         chatId: Long,

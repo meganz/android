@@ -97,12 +97,23 @@ interface MegaChatApiGateway {
      * permissions and if the chat should be a group chat or not.
      *
      * @param isGroup  True if is should create a group chat, false otherwise.
-     * @param peers    MegaChatPeerList] including contacts and their privilege level.
+     * @param peers    [MegaChatPeerList] including contacts and their privilege level.
      * @param listener Listener.
      */
     fun createChat(
         isGroup: Boolean,
         peers: MegaChatPeerList,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     *  Leave a chat room
+     *
+     * @param chatId    Chat id
+     * @param listener  Listener
+     */
+    fun leaveChat(
+        chatId: Long,
         listener: MegaChatRequestListenerInterface,
     )
 

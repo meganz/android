@@ -29,10 +29,10 @@ interface ChatRepository {
     /**
      * Starts call.
      *
-     * @param chatId   The Chat id.
-     * @param enabledVideo True for audio-video call, false for audio call
-     * @param enabledAudio True for starting a call with audio (mute disabled)
-     * @return The chat conversation handle.
+     * @param chatId        The Chat id.
+     * @param enabledVideo  True for audio-video call, false for audio call
+     * @param enabledAudio  True for starting a call with audio (mute disabled)
+     * @return              [ChatRequest]
      */
     suspend fun startChatCall(
         chatId: Long,
@@ -43,17 +43,27 @@ interface ChatRepository {
     /**
      * Answers call.
      *
-     * @param chatId   The Chat id.
-     * @param enabledVideo True for audio-video call, false for audio call
-     * @param enabledAudio True for answering a call with audio (mute disabled)
-     * @param enabledSpeaker True speaker on. False speaker off.
-     * @return The chat conversation handle.
+     * @param chatId            The Chat id.
+     * @param enabledVideo      True for audio-video call, false for audio call
+     * @param enabledAudio      True for answering a call with audio (mute disabled)
+     * @param enabledSpeaker    True speaker on. False speaker off.
+     * @return                  [ChatRequest]
      */
     suspend fun answerChatCall(
         chatId: Long,
         enabledVideo: Boolean,
         enabledAudio: Boolean,
         enabledSpeaker: Boolean,
+    ): ChatRequest
+
+    /**
+     * Leave chat
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun leaveChat(
+        chatId: Long,
     ): ChatRequest
 
     /**
