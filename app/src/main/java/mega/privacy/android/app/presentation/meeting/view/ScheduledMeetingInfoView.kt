@@ -601,13 +601,26 @@ private fun ActionButton(
                 }
             }
             ScheduledMeetingInfoAction.MeetingLink,
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants,
             -> {
+                if (state.isHost && state.isPublic) {
+                    ActionOption(
+                        state = state,
+                        action = action,
+                        isEnabled =
+                        if (action == ScheduledMeetingInfoAction.MeetingLink)
+                            state.enabledMeetingLinkOption
+                        else
+                            state.enabledAllowNonHostAddParticipantsOption,
+                        hasSwitch = true)
+                    divider(withStartPadding = true)
+                }
+            }
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
                 if (state.isHost) {
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = if (action == ScheduledMeetingInfoAction.MeetingLink) state.enabledMeetingLinkOption else state.enabledAllowNonHostAddParticipantsOption,
+                        isEnabled = state.enabledAllowNonHostAddParticipantsOption,
                         hasSwitch = true)
                     divider(withStartPadding = true)
                 }
@@ -627,7 +640,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = state.enabledChatNotificationsOption,
+                    isEnabled = state.chatNotificationsText.isEmpty(),
                     hasSwitch = true)
                 divider(withStartPadding = true)
             }
@@ -799,6 +812,9 @@ private fun ActionOption(
                 ActionText(actionText = action.title)
                 if (action == ScheduledMeetingInfoAction.ManageChatHistory && state.manageChatHistoryText.isNotEmpty()) {
                     ActionSubtitleText(state.manageChatHistoryText)
+                }
+                if (action == ScheduledMeetingInfoAction.ChatNotifications && state.chatNotificationsText.isNotEmpty()) {
+                    ActionSubtitleText(state.chatNotificationsText)
                 }
             }
         }

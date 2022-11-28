@@ -18,18 +18,17 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property chatTitle                                  Chat title.
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property finish                                     True, if the activity is to be terminated.
+ * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
+ * @property chatNotificationsText                      Chat notifications text.
+ * @property manageChatHistoryText                      Manage Chat History text.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
- * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
  * @property isPublic                                   If chat room is public.
- * @property participantItemList                        List of [ContactItem].
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
- * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
  * @property snackBar                                   String resource id for showing an snackBar.
  * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
- *  @property manageChatHistoryText                      Manage Chat History text.
  * @property buttons                                    List of available action buttons.
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
@@ -40,17 +39,17 @@ data class ScheduledMeetingInfoState(
     val chatTitle: String = "",
     val scheduledMeeting: ScheduledMeetingItem? = null,
     val finish: Boolean = false,
+    val inviteParticipantAction: InviteParticipantsAction? = null,
+    val chatNotificationsText: String = " ",
+    val manageChatHistoryText: String = " ",
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
-    val inviteParticipantAction: InviteParticipantsAction? = null,
     val isPublic: Boolean = false,
     val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
-    val enabledChatNotificationsOption: Boolean = true,
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
     val snackBar: Int? = null,
     val leaveGroupDialog: Boolean = false,
-    val manageChatHistoryText: String = " ",
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = ChatParticipant(

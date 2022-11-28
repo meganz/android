@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.meeting
 
 import android.content.Intent
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,7 +15,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
+import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
@@ -21,6 +25,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.transformSecondsInString
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -91,6 +96,32 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         get() = monitorConnectivity().value
 
     /**
+     * Observe changes in Chat notifications
+     */
+    val chatNotificationsObserver = Observer<Any> {
+        _state.update {
+            it.copy(
+                chatNotificationsText = getPushNotificationText(chatId)
+            )
+        }
+    }
+
+    init {
+        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
+            .observeForever(chatNotificationsObserver)
+    }
+
+    /**
+     * onCleared()
+     */
+    override fun onCleared() {
+        super.onCleared()
+
+        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
+            .removeObserver(chatNotificationsObserver)
+    }
+
+    /**
      * Sets chat id and scheduled meeting id
      *
      * @param newChatId                 Chat id.
@@ -128,6 +159,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                             enabledAllowNonHostAddParticipantsOption = isOpenInvite,
                             manageChatHistoryText = getRetentionTimeText(retentionTime),
+                            chatNotificationsText = getPushNotificationText(chatId),
                             isPublic = isPublic
                         )
                     }
@@ -277,6 +309,29 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Get text of Chat notifications
+     *
+     * @param id    Chat id.
+     * @return Text
+     */
+    private fun getPushNotificationText(id: Long): String {
+        var text = ""
+        getPushNotificationSettingManagement().pushNotificationSetting?.let { push ->
+            val isChatDndEnabled = push.isChatDndEnabled(id)
+            if (isChatDndEnabled) {
+                val timestampMute = push.getChatDnd(id)
+                text = if (timestampMute == 0L) {
+                    StringResourcesUtils.getString(R.string.mute_chatroom_notification_option_off)
+                } else {
+                    getCorrectStringDependingOnOptionSelected(timestampMute)
+                }
+            }
+        }
+
+        return text
     }
 
     /**
@@ -433,17 +488,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Share meeting link if there is internet connection, shows an error if not.
      */
     fun onShareMeetingLinkTap() {
-        if (isConnected) {
-            Timber.d("Add participants to the chat room")
-        } else {
-            showError()
-        }
-    }
-
-    /**
-     * Enable or disable chat notifications if there is internet connection, shows an error if not.
-     */
-    fun onChatNotificationsTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {

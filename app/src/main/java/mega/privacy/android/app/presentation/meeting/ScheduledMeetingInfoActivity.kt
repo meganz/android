@@ -19,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -32,6 +33,7 @@ import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAct
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
@@ -52,7 +54,7 @@ import javax.inject.Inject
  *
  * @property passCodeFacade [PasscodeCheck]
  * @property getThemeMode   [GetThemeMode]
- * @property resultLauncher
+ * @property addContactLauncher
  */
 @AndroidEntryPoint
 class ScheduledMeetingInfoActivity : PasscodeActivity() {
@@ -65,8 +67,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
 
     private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
 
-    private lateinit var resultLauncher: ActivityResultLauncher<Intent?>
+    private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
     private var chatRoomId: Long = MEGACHAT_INVALID_HANDLE
+
+    private var enabledChatNotification: Boolean = false
 
     /**
      * Perform Activity initialization
@@ -76,7 +80,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, _, finish, _, _, inviteParticipantAction) ->
+                viewModel.state.collect { (chatId, _, _, finish, inviteParticipantAction, chatNotificationsText) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
@@ -85,12 +89,14 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                     if (chatRoomId != chatId)
                         chatRoomId = chatId
 
+                    enabledChatNotification = chatNotificationsText.isEmpty()
+
                     inviteParticipantAction?.let { action ->
                         viewModel.removeInviteParticipantsAction()
                         when (action) {
                             InviteParticipantsAction.ADD_CONTACTS -> {
                                 Timber.d("Open Invite participants screen")
-                                resultLauncher.launch(Intent(this@ScheduledMeetingInfoActivity,
+                                addContactLauncher.launch(Intent(this@ScheduledMeetingInfoActivity,
                                     AddContactActivity::class.java)
                                     .putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE,
                                         Constants.CONTACT_TYPE_MEGA)
@@ -123,7 +129,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
 
         setContent { ScheduledMeetingInfoView() }
 
-        resultLauncher =
+        addContactLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
@@ -144,6 +150,22 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
             Intent(this@ScheduledMeetingInfoActivity, NodeAttachmentHistoryActivity::class.java)
         intent.putExtra("chatId", chatRoomId)
         startActivity(intent)
+    }
+
+    /**
+     * Enable or disable chat notifications if there is internet connection, shows an error if not.
+     */
+    private fun onChatNotificationsTap() {
+        if (enabledChatNotification) {
+            createMuteNotificationsAlertDialogOfAChat(this@ScheduledMeetingInfoActivity,
+                chatRoomId)
+        } else {
+            MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
+                this@ScheduledMeetingInfoActivity,
+                Constants.NOTIFICATIONS_ENABLED,
+                chatRoomId)
+        }
+
     }
 
     /**
@@ -215,7 +237,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
         when (action) {
             ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
             ScheduledMeetingInfoAction.ShareMeetingLink -> viewModel.onShareMeetingLinkTap()
-            ScheduledMeetingInfoAction.ChatNotifications -> viewModel.onChatNotificationsTap()
+            ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
             ScheduledMeetingInfoAction.ManageChatHistory -> openManageChatHistory()
