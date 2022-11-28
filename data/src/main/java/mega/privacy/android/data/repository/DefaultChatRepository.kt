@@ -14,11 +14,13 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
+import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -43,6 +45,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatRequestMapper      [ChatRequestMapper]
  * @property localStorageGateway    [MegaLocalStorageGateway]
  * @property chatRoomMapper         [ChatRoomMapper]
+ * @property chatListItemMapper     [ChatListItemMapper]
  */
 internal class DefaultChatRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -53,6 +56,7 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatRoomMapper: ChatRoomMapper,
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
+    private val chatListItemMapper: ChatListItemMapper,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> {
@@ -249,4 +253,10 @@ internal class DefaultChatRepository @Inject constructor(
                 ))
         }
     }
+
+    override fun monitorChatListItemUpdates() = megaChatApiGateway.chatUpdates
+        .filterIsInstance<ChatUpdate.OnChatListItemUpdate>()
+        .mapNotNull { it.item }
+        .map { chatListItemMapper(it) }
+        .flowOn(ioDispatcher)
 }

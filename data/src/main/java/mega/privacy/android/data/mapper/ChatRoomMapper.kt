@@ -15,13 +15,18 @@ internal fun toChatRoom(megaChatRoom: MegaChatRoom): ChatRoom =
         megaChatRoom.chatId,
         mapChanges(megaChatRoom.changes),
         megaChatRoom.title,
+        megaChatRoom.hasCustomTitle(),
         mapOwnPrivilege(megaChatRoom.ownPrivilege),
         megaChatRoom.isGroup,
-        megaChatRoom.isMeeting,
         megaChatRoom.isPublic,
         megaChatRoom.isPreview,
         megaChatRoom.isArchived,
-        megaChatRoom.isOpenInvite
+        megaChatRoom.isActive,
+        megaChatRoom.retentionTime,
+        megaChatRoom.isMeeting,
+        megaChatRoom.isWaitingRoom,
+        megaChatRoom.isOpenInvite,
+        megaChatRoom.isSpeakRequest,
     )
 
 private fun mapOwnPrivilege(ownPrivilege: Int): ChatRoomPermission =
