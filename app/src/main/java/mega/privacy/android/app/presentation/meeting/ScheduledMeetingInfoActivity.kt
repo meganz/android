@@ -20,6 +20,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
@@ -76,7 +77,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { (chatId, _, _, finish, _, _, inviteParticipantAction) ->
-                    if (finish){
+                    if (finish) {
                         Timber.d("Finish activity")
                         finish()
                     }
@@ -176,6 +177,17 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
         dialog.show()
     }
 
+    /**
+     * Open manage chat history
+     */
+    private fun openManageChatHistory() {
+        val intentManageChat = Intent(this@ScheduledMeetingInfoActivity,
+            ManageChatHistoryActivity::class.java)
+        intentManageChat.putExtra(CHAT_ID, chatRoomId)
+        intentManageChat.putExtra(Constants.IS_FROM_CONTACTS, true)
+        startActivity(intentManageChat)
+    }
+
     @Composable
     private fun ScheduledMeetingInfoView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
@@ -206,7 +218,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
             ScheduledMeetingInfoAction.ChatNotifications -> viewModel.onChatNotificationsTap()
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
-            ScheduledMeetingInfoAction.ManageChatHistory -> viewModel.onManageChatHistoryTap()
+            ScheduledMeetingInfoAction.ManageChatHistory -> openManageChatHistory()
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
         }

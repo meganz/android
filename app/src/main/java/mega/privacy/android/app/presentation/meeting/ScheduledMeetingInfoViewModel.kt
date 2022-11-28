@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,10 +12,15 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
+import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.ChatUtil.transformSecondsInString
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -121,6 +127,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             isHost = ownPrivilege == ChatRoomPermission.Moderator,
                             isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                             enabledAllowNonHostAddParticipantsOption = isOpenInvite,
+                            manageChatHistoryText = getRetentionTimeText(retentionTime),
                             isPublic = isPublic
                         )
                     }
@@ -198,6 +205,18 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         _state.update {
                             it.copy(isPublic = chat.isPublic)
                         }
+                    ChatRoomChanges.RetentionTime -> {
+                        val intentRetentionTime =
+                            Intent(ACTION_UPDATE_RETENTION_TIME)
+                        intentRetentionTime.putExtra(RETENTION_TIME,
+                            chat.retentionTime)
+                        getInstance().sendBroadcast(intentRetentionTime)
+                        _state.update {
+                            it.copy(
+                                manageChatHistoryText = getRetentionTimeText(chat.retentionTime)
+                            )
+                        }
+                    }
                     else -> {}
                 }
             }
@@ -259,6 +278,24 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Get retention time text
+     *
+     * @param retentionTime     Retention time
+     * @return                  Retention time text
+     */
+    private fun getRetentionTimeText(retentionTime: Long): String {
+        var timeFormatted = transformSecondsInString(retentionTime)
+        if (timeFormatted.isNotEmpty()) {
+            timeFormatted =
+                StringResourcesUtils.getString(R.string.subtitle_properties_manage_chat)
+                    .toString() + " " + timeFormatted
+        }
+
+        return timeFormatted
+    }
+
 
     /**
      * Invite participants to the chat room
@@ -434,17 +471,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     }
                 }
             }
-        } else {
-            showError()
-        }
-    }
-
-    /**
-     * Manage chat history if there is internet connection, shows an error if not.
-     */
-    fun onManageChatHistoryTap() {
-        if (isConnected) {
-            Timber.d("Manage chat history")
         } else {
             showError()
         }
