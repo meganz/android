@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.favourites.facade
+package mega.privacy.android.data.wrapper
 
 import java.time.LocalDateTime
 
