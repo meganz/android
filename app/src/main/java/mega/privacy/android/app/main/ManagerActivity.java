@@ -6296,62 +6296,54 @@ public class ManagerActivity extends TransfersManagementActivity
     public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList) {
         Timber.d("askConfirmationMoveToRubbish");
 
-        if (handleList != null) {
-
-            if (!handleList.isEmpty()) {
-                Long handle = handleList.get(0);
-                MegaNode p = megaApi.getNodeByHandle(handle);
-                while (megaApi.getParentNode(p) != null) {
-                    p = megaApi.getParentNode(p);
-                }
-                if (p.getHandle() != megaApi.getRubbishNode().getHandle()) {
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-                    if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
-                        builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
-                    } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
-                        builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
-                    } else {
-                        builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
-                    }
-
-                    builder.setPositiveButton(R.string.general_move, (dialog, which) ->
-                            moveNodeUseCase.moveToRubbishBin(handleList)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe((result, throwable) -> {
-                                        if (throwable == null) {
-                                            showMovementResult(result, handleList.get(0));
-                                        }
-                                    }));
-
-                    builder.setNegativeButton(R.string.general_cancel, null);
-                    builder.show();
-                } else {
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-                    builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
-
-                    builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete, (dialog, which) ->
-                            removeNodeUseCase.remove(handleList)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe((result, throwable) -> {
-                                        if (throwable == null) {
-                                            boolean notValidView = result.isSingleAction()
-                                                    && result.isSuccess()
-                                                    && viewModel.getState().getValue().getRubbishBinParentHandle() == handleList.get(0);
-
-                                            showRestorationOrRemovalResult(notValidView, result.getResultText());
-                                        }
-                                    }));
-
-                    builder.setNegativeButton(R.string.general_cancel, null);
-                    builder.show();
-                }
-            }
-        } else {
-            Timber.w("handleList NULL");
+        if (handleList == null || handleList.isEmpty()) {
+            Timber.w("handleList NULL or empty");
             return;
         }
+
+        Long handle = handleList.get(0);
+        MegaNode node = megaApi.getNodeByHandle(handle);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+
+        if (!megaApi.isInRubbish(node)) {
+            if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
+                builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
+            } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
+                builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
+            } else {
+                builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+            }
+
+            builder.setPositiveButton(R.string.general_move, (dialog, which) ->
+                    moveNodeUseCase.moveToRubbishBin(handleList)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable == null) {
+                                    showMovementResult(result, handleList.get(0));
+                                }
+                            }));
+
+        } else {
+            builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+            builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete, (dialog, which) ->
+                    removeNodeUseCase.remove(handleList)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable == null) {
+                                    boolean notValidView = result.isSingleAction()
+                                            && result.isSuccess()
+                                            && viewModel.getState().getValue().getRubbishBinParentHandle() == handleList.get(0);
+
+                                    showRestorationOrRemovalResult(notValidView, result.getResultText());
+                                }
+                            }));
+        }
+
+        builder.setNegativeButton(R.string.general_cancel, null);
+        builder.show();
     }
 
     public void showWarningDialogOfShare(final MegaNode p, int nodeType, int actionType) {
