@@ -103,6 +103,7 @@ object SettingsConstants {
     /* User interface settings */
     const val KEY_START_SCREEN = "settings_start_screen"
     const val KEY_HIDE_RECENT_ACTIVITY = "settings_hide_recent_activity"
+    const val KEY_MEDIA_DISCOVERY_VIEW = "settings_media_discovery_view"
 
     /* PassCode Lock settings */
     const val KEY_PASSCODE_ENABLE = "settings_passcode_enable"
