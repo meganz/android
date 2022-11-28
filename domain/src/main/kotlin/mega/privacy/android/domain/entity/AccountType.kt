@@ -11,6 +11,11 @@ enum class AccountType {
     FREE,
 
     /**
+     * PRO_LITE
+     */
+    PRO_LITE,
+
+    /**
      * PRO_I
      */
     PRO_I,
@@ -26,12 +31,17 @@ enum class AccountType {
     PRO_III,
 
     /**
-     * PRO_LITE
+     * PRO_FLEXI
      */
-    PRO_LITE,
+    PRO_FLEXI,
 
     /**
      * BUSINESS
      */
-    BUSINESS
+    BUSINESS,
+
+    /**
+     *
+     */
+    UNKNOWN
 }

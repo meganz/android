@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.SubscriptionPlan
+import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -96,11 +96,11 @@ interface AccountRepository {
     suspend fun isBusinessAccountActive(): Boolean
 
     /**
-     * Get the List of SubscriptionPlans
+     * Get the List of SubscriptionOptions
      *
-     * @return List of SubscriptionPlans
+     * @return List of SubscriptionOptions
      */
-    suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+    suspend fun getSubscriptionOptions(): List<SubscriptionOption>
 
     /**
      * Returns if accounts achievements enabled

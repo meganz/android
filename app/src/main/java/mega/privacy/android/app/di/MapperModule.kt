@@ -20,7 +20,6 @@ import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMappe
 import mega.privacy.android.app.presentation.achievements.toUIMegaAchievement
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
-import mega.privacy.android.data.mapper.SkuMapper
 
 /**
  * Module for providing mapper dependencies
@@ -58,12 +57,6 @@ class MapperModule {
      */
     @Provides
     fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = ::toRepeatModeMapper
-
-    /**
-     * Provide SKU mapper
-     */
-    @Provides
-    fun provideSkuMapper(): SkuMapper = ::toSkuMapper
 
     /**
      * Provide UIMegaAchievementMapper
