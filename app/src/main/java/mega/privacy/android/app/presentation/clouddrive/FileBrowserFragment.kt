@@ -32,13 +32,17 @@ import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -64,6 +68,7 @@ import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -87,7 +92,6 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -150,8 +154,7 @@ class FileBrowserFragment : RotatableFragment() {
     private var backupActionType = 0
     private var fileBackupManager: FileBackupManager? = null
 
-    @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    private var mediaDiscoveryViewSettings = MediaDiscoveryViewSettings.INITIAL.ordinal
 
     override fun activateActionMode() {
         Timber.d("activateActionMode")
@@ -577,6 +580,14 @@ class FileBrowserFragment : RotatableFragment() {
         if ((activity as? ManagerActivity)?.viewInFolderNode != null) {
             animateNode(_nodes)
         }
+
+        fileBrowserViewModel.state.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).onEach {
+            mediaDiscoveryViewSettings = it
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         return v
     }
 
@@ -886,7 +897,9 @@ class FileBrowserFragment : RotatableFragment() {
                 managerViewModel.setBrowserParentHandle(clickedNode.handle)
                 val childNodes: List<MegaNode> = megaApi.getChildren(clickedNode,
                     sortOrderIntMapper(managerViewModel.getOrder()))
-                if (fileBrowserViewModel.shouldEnterMDMode(childNodes)) {
+                if (fileBrowserViewModel.shouldEnterMDMode(childNodes,
+                        mediaDiscoveryViewSettings)
+                ) {
                     showMediaDiscovery()
                 } else {
                     var lastFirstVisiblePosition: Int?

@@ -21,7 +21,9 @@ import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import org.junit.Before
 import org.junit.Test
@@ -51,6 +53,12 @@ class SettingsViewModelTest {
         )
     }
     private val setHideRecentActivity = mock<SetHideRecentActivity>()
+    private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
+        on { invoke() }.thenReturn(
+            emptyFlow()
+        )
+    }
+    private val setMediaDiscoveryView = mock<SetMediaDiscoveryView>()
 
     @Before
     fun setUp() {
@@ -70,6 +78,8 @@ class SettingsViewModelTest {
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
             monitorHideRecentActivity = monitorHideRecentActivity,
             setHideRecentActivity = setHideRecentActivity,
+            monitorMediaDiscoveryView = monitorMediaDiscoveryView,
+            setMediaDiscoveryView = setMediaDiscoveryView,
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
             monitorConnectivity = mock { on { invoke() }.thenReturn(MutableStateFlow(true)) },
             requestAccountDeletion = mock(),
@@ -221,11 +231,42 @@ class SettingsViewModelTest {
         }
 
     @Test
+    fun `test that mediaDiscoveryViewChecked is set with return value of monitorMediaDiscoveryView`() =
+        runTest {
+            whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+            whenever(monitorMediaDiscoveryView()).thenReturn(
+                flow {
+                    emit(0)
+                    emit(1)
+                    emit(2)
+                }
+            )
+
+            underTest.uiState
+                .map { it.mediaDiscoveryViewState }
+                .distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem()).isEqualTo(0)
+                    assertThat(awaitItem()).isEqualTo(1)
+                    assertThat(awaitItem()).isEqualTo(2)
+                }
+        }
+
+    @Test
     fun `test that hideRecentActivity will call setHideRecentActivity use case`() =
         runTest {
             val expected = false
             underTest.hideRecentActivity(expected)
             advanceUntilIdle()
             verify(setHideRecentActivity).invoke(expected)
+        }
+
+    @Test
+    fun `test that mediaDiscoveryView will call setMediaDiscoveryView use case`() =
+        runTest {
+            val expected = 0
+            underTest.mediaDiscoveryView(expected)
+            advanceUntilIdle()
+            verify(setMediaDiscoveryView).invoke(expected)
         }
 }
