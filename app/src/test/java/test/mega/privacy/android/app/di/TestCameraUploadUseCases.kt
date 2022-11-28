@@ -26,6 +26,7 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
@@ -156,6 +157,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprint>()
+
+    @Provides
+    fun provideSetOriginalFingerprint() = mock<SetOriginalFingerprint>()
 
     @Provides
     fun provideGetParentMegaNode() = mock<GetParentMegaNode>()
