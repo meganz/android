@@ -1,4 +1,4 @@
-package mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
@@ -8,12 +8,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
-import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.MegaNodeUtil.getPreviewFileName
-import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
-import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.getPreviewFileName
+import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -23,7 +20,9 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -50,7 +49,7 @@ import javax.inject.Inject
  * @property videoMapper VideoMapper
  * @property nodeUpdateMapper NodeUpdateMapper
  */
-class DefaultPhotosRepository @Inject constructor(
+internal class DefaultPhotosRepository @Inject constructor(
     private val megaApiFacade: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheFolderFacade: CacheFolderGateway,
@@ -167,10 +166,14 @@ class DefaultPhotosRepository @Inject constructor(
      * Map megaNodes to Photos.
      */
     private suspend fun mapMegaNodesToPhotos(megaNodes: List<MegaNode>): List<Photo> {
-        return megaNodes.filter {
-            (it.isImage() || it.isVideo()) && !megaApiFacade.isInRubbish(it)
-        }.map { megaNode ->
-            if (megaNode.isImage()) {
+        return megaNodes.mapNotNull { megaNode ->
+            val fileType = fileTypeInfoMapper(megaNode)
+            val isValid =
+                megaNode.isFile
+                        && (fileType is VideoFileTypeInfo || fileType is ImageFileTypeInfo)
+                        && !megaApiFacade.isInRubbish(megaNode)
+            if (isValid.not()) return@mapNotNull null
+            if (fileType is ImageFileTypeInfo) {
                 mapMegaNodeToImage(megaNode)
             } else {
                 mapMegaNodeToVideo(megaNode)
@@ -243,7 +246,7 @@ class DefaultPhotosRepository @Inject constructor(
     private fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {
         if (thumbnailFolderPath == null) {
             thumbnailFolderPath =
-                cacheFolderFacade.getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER)?.path
+                cacheFolderFacade.getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
         }
         return thumbnailFolderPath?.let {
             "$it${File.separator}${megaNode.getThumbnailFileName()}"
@@ -253,7 +256,7 @@ class DefaultPhotosRepository @Inject constructor(
     private fun getPreviewCacheFilePath(megaNode: MegaNode): String? {
         if (previewFolderPath == null) {
             previewFolderPath =
-                cacheFolderFacade.getCacheFolder(CacheFolderManager.PREVIEW_FOLDER)?.path
+                cacheFolderFacade.getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
         }
         return previewFolderPath?.let {
             "$it${File.separator}${megaNode.getPreviewFileName()}"

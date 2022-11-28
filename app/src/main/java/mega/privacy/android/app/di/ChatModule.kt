@@ -13,7 +13,10 @@ import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
 
 /**
@@ -88,4 +91,24 @@ class ChatModule {
     fun provideLeaveChat(chatRepository: ChatRepository): LeaveChat =
         LeaveChat(chatRepository::leaveChat)
 
+    /**
+     * Provides the Use Case [SetPublicChatToPrivate]
+     */
+    @Provides
+    fun provideSetPublicChatToPrivate(chatRepository: ChatRepository): SetPublicChatToPrivate =
+        SetPublicChatToPrivate(chatRepository::setPublicChatToPrivate)
+
+    /**
+     * Provides the Use Case [QueryChatLink]
+     */
+    @Provides
+    fun provideQueryChatLink(chatRepository: ChatRepository): QueryChatLink =
+        QueryChatLink(chatRepository::queryChatLink)
+
+    /**
+     * Provides the Use Case [RemoveChatLink]
+     */
+    @Provides
+    fun provideRemoveChatLink(chatRepository: ChatRepository): RemoveChatLink =
+        RemoveChatLink(chatRepository::removeChatLink)
 }

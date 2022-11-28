@@ -22,6 +22,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
+ * @property isPublic                                   If chat room is public.
+ * @property participantItemList                        List of [ContactItem].
  * @property seeMoreVisible                             True if see more option is visible, false otherwise.
  * @property enabledMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
  * @property enabledChatNotificationsOption             True if is enabled the chat notifications option, false otherwise.
@@ -40,6 +42,7 @@ data class ScheduledMeetingInfoState(
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val inviteParticipantAction: InviteParticipantsAction? = null,
+    val isPublic: Boolean = false,
     val seeMoreVisible: Boolean = true,
     val enabledMeetingLinkOption: Boolean = true,
     val enabledChatNotificationsOption: Boolean = true,

@@ -221,4 +221,32 @@ internal class DefaultChatRepository @Inject constructor(
                 megaChatApiGateway.inviteToChat(chatId, userHandle, null)
             }
         }
+
+    override suspend fun setPublicChatToPrivate(chatId: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.setPublicChatToPrivate(chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
+            }
+        }
+
+    override suspend fun queryChatLink(chatId: Long): ChatRequest = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaChatApiGateway.queryChatLink(chatId,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                ))
+        }
+    }
+
+    override suspend fun removeChatLink(chatId: Long): ChatRequest = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaChatApiGateway.removeChatLink(chatId,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                ))
+        }
+    }
 }

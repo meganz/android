@@ -15,6 +15,7 @@ package mega.privacy.android.app.presentation.settings.model
  * @property callsEnabled
  * @property startScreen
  * @property hideRecentActivityChecked
+ * @property mediaDiscoveryViewState
  * @property email
  * @property accountType
  */
@@ -31,6 +32,7 @@ data class SettingsState(
     val callsEnabled: Boolean,
     val startScreen: Int,
     val hideRecentActivityChecked: Boolean,
+    val mediaDiscoveryViewState: Int,
     val email: String,
     val accountType: String,
 ) {

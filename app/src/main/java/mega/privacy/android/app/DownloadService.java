@@ -1178,7 +1178,11 @@ public class DownloadService extends Service implements MegaRequestListenerInter
                     isForeground = false;
                 }
             } else {
-                mNotificationManager.notify(NOTIFICATION_DOWNLOAD, notification);
+                try {
+                    mNotificationManager.notify(NOTIFICATION_DOWNLOAD, notification);
+                } catch (Exception e) {
+                    Timber.w("Exception updating notification progress: %s", e.getMessage());
+                }
             }
         }
     }

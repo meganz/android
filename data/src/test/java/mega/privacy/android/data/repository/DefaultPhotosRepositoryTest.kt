@@ -1,11 +1,9 @@
-package test.mega.privacy.android.app.data.repository
+package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.repository.DefaultPhotosRepository
-import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -15,6 +13,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.sortOrderToInt
+import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
@@ -75,7 +74,8 @@ class DefaultPhotosRepositoryTest {
             .thenReturn(megaNode)
 
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
-        assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(StaticImageFileTypeInfo::class.java)
+        assertThat(actualPhoto?.fileTypeInfo)
+            .isInstanceOf(StaticImageFileTypeInfo::class.java)
     }
 
     @Test

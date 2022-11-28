@@ -269,50 +269,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Build HMS APK') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build HMS APK'
-                    sh './gradlew clean app:assembleHmsRelease'
-                }
-            }
-        }
-
-        stage('Sign HMS APK') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Sign HMS APK'
-                }
-                withCredentials([
-                        file(credentialsId: 'ANDROID_PRD_HMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_HMS_APK_PASSWORD_FILE'),
-                        file(credentialsId: 'ANDROID_PRD_HMS_APK_KEYSTORE', variable: 'ANDROID_PRD_HMS_APK_KEYSTORE')
-                ]) {
-                    script {
-                        println("signing HMS APK")
-                        String tempAlignedHmsApk = "unsigned_hms_apk_aligned.apk"
-                        String hmsApkInput = "${WORKSPACE}/app/build/outputs/apk/hms/release/app-hms-release-unsigned.apk"
-                        String hmsApkOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${readAppVersion2()}-hms-release.apk"
-                        println("input = $hmsApkInput \noutput = $hmsApkOutput")
-                        sh """
-                            rm -fv ${tempAlignedHmsApk}
-                            zipalign -p 4 ${hmsApkInput} ${tempAlignedHmsApk}
-                            apksigner sign --ks "${ANDROID_PRD_HMS_APK_KEYSTORE}" --ks-pass file:"${ANDROID_PRD_HMS_APK_PASSWORD_FILE}" --out ${hmsApkOutput} ${tempAlignedHmsApk}
-                            ls -lh ${WORKSPACE}/${ARCHIVE_FOLDER}
-                            rm -fv ${tempAlignedHmsApk}
-                        """
-                        println("Finish signing APK. ($hmsApkOutput) generated!")
-                    }
-                }
-            }
-        }
-
         stage('Build GMS AAB') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -349,46 +305,6 @@ pipeline {
                             sh('jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore ${ANDROID_PRD_GMS_AAB_KEYSTORE} -storepass "${ANDROID_PRD_GMS_AAB_PASSWORD}" -signedjar ${GMS_AAB_OUTPUT} ${GMS_AAB_INPUT} megaandroid-upload')
                         }
                         println("Finish signing GMS AAB. ($gmsAabOutput) generated!")
-                    }
-                }
-            }
-        }
-        stage('Build HMS AAB') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build HMS AAB'
-                    sh './gradlew clean app:bundleHmsRelease'
-                }
-            }
-        }
-        stage('Sign HMS AAB') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Sign HMS AAB'
-                }
-
-                withCredentials([
-                        file(credentialsId: 'ANDROID_PRD_HMS_AAB_KEYSTORE', variable: 'ANDROID_PRD_HMS_AAB_KEYSTORE'),
-                        string(credentialsId: 'ANDROID_PRD_HMS_AAB_PASSWORD', variable: 'ANDROID_PRD_HMS_AAB_PASSWORD'),
-                ]) {
-                    script {
-                        println("signing HMS AAB")
-                        String hmsAabInput = "${WORKSPACE}/app/build/outputs/bundle/hmsRelease/app-hms-release.aab"
-                        String hmsAabOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${readAppVersion2()}-hms-release.aab"
-                        println("input = $hmsAabInput \noutput = $hmsAabOutput")
-                        withEnv([
-                                "HMS_AAB_INPUT=$hmsAabInput",
-                                "HMS_AAB_OUTPUT=${hmsAabOutput}"
-                        ]) {
-                            sh('jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore ${ANDROID_PRD_HMS_AAB_KEYSTORE} -storepass "${ANDROID_PRD_HMS_AAB_PASSWORD}" -signedjar ${HMS_AAB_OUTPUT} ${HMS_AAB_INPUT} megaandroid-upload')
-                        }
-                        println("Finish signing HMS AAB. ($hmsAabOutput) generated!")
                     }
                 }
             }
@@ -506,7 +422,7 @@ pipeline {
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
                             rolloutPercentage: '0',
-                            additionalVersionCodes: '476',
+                            additionalVersionCodes: '476,485',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
                             recentChangeList: getRecentChangeList(release_notes)
                 }
@@ -717,8 +633,6 @@ private String getBuildVersionInfo() {
 
     String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
     String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
-    String hmsAabUrl = "${artifactoryUrl}/${artifactVersion}-hms-release.aab"
-    String hmsApkUrl = "${artifactoryUrl}/${artifactVersion}-hms-release.apk"
 
     String appCommitLink = "https://code.developers.mega.co.nz/mobile/android/android/-/commit/" + appCommitId()
     String sdkCommitLink = "https://code.developers.mega.co.nz/sdk/sdk/-/commit/" + sdkCommitId()
@@ -732,7 +646,6 @@ private String getBuildVersionInfo() {
     Version: ${readAppVersion1()} <br/>
     App Bundles and APKs: <br/>
        - Google (GMS):  [AAB](${gmsAabUrl}) | [APK](${gmsApkUrl}) <br/>
-       - Huawei (HMS): [AAB](${hmsAabUrl}) | [APK](${hmsApkUrl}) <br/>
     Build info: <br/>
        - [Android commit](${appCommitLink}) (`${appBranch}`) <br/>
        - [SDK commit](${sdkCommitLink}) (`${sdkBranch}`) <br/>

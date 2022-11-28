@@ -60,6 +60,20 @@ interface SettingsRepository {
     suspend fun setHideRecentActivity(value: Boolean)
 
     /**
+     * Monitor media discovery view setting
+     *
+     * @return media discovery view option state as a flow
+     */
+    fun monitorMediaDiscoveryView(): Flow<Int?>
+
+    /**
+     * Set media discovery view
+     *
+     * @param value
+     */
+    suspend fun setMediaDiscoveryView(value: Int)
+
+    /**
      * Is camera sync enabled
      *
      * @return
