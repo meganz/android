@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.SetOpenInvite
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -47,6 +48,7 @@ import javax.inject.Inject
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
  * @property inviteToChat                   [InviteToChat]
  * @property leaveChat                      [LeaveChat]
+ * @property setOpenInvite                  [SetOpenInvite]
  * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
  */
@@ -60,6 +62,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val inviteToChat: InviteToChat,
     private val leaveChat: LeaveChat,
+    private val setOpenInvite: SetOpenInvite,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
 ) : ViewModel() {
 
@@ -109,14 +112,16 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 Timber.e(exception)
                 _state.update { it.copy(snackBar = R.string.general_text_error) }
             }.onSuccess { chat ->
+                Timber.d("Chat room obtained")
                 chat?.apply {
                     _state.update {
                         it.copy(
                             chatId = chatId,
                             chatTitle = title,
                             isHost = ownPrivilege == ChatRoomPermission.Moderator,
-                            isPublic = isPublic,
-                            isOpenInvite = chat.isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
+                            isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
+                            enabledAllowNonHostAddParticipantsOption = isOpenInvite,
+                            isPublic = isPublic
                         )
                     }
                 }
@@ -135,6 +140,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 Timber.e(exception)
                 _state.update { it.copy(snackBar = R.string.general_text_error) }
             }.onSuccess { scheduledMeetingList ->
+                Timber.d("Scheduled meeting obtained")
                 scheduledMeetingList?.let { list ->
                     list.forEach { schedMeeting ->
                         if (schedMeeting.parentSchedId == MEGACHAT_INVALID_HANDLE) {
@@ -178,7 +184,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
                     ChatRoomChanges.OpenInvite ->
                         _state.update {
-                            it.copy(isOpenInvite = chat.isOpenInvite)
+                            it.copy(
+                                isOpenInvite = chat.isOpenInvite || chat.ownPrivilege == ChatRoomPermission.Moderator,
+                                enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite)
                         }
 
                     ChatRoomChanges.Title ->
@@ -258,6 +266,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param contacts list of contacts
      */
     fun inviteToChat(contacts: ArrayList<String>) {
+        Timber.d("Invite participants")
         viewModelScope.launch {
             inviteToChat(_state.value.chatId, contacts)
         }
@@ -321,6 +330,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 dismissDialog()
                 _state.update { it.copy(snackBar = R.string.general_error) }
             }.onSuccess { result ->
+                Timber.d("Chat left ")
                 if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
                     result.chatHandle?.let { chatHandle ->
                         MegaApplication.getChatManagement().removeLeavingChatId(chatHandle)
@@ -409,7 +419,21 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun onAllowAddParticipantsTap() {
         if (isConnected) {
-            Timber.d("Allow non host add participants to the chat room")
+            Timber.d("Update option Allow non-host add participants to the chat room")
+            viewModelScope.launch {
+                runCatching {
+                    setOpenInvite(chatId)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    _state.update { it.copy(snackBar = R.string.general_text_error) }
+                }.onSuccess { result ->
+                    _state.update {
+                        it.copy(
+                            isOpenInvite = result || it.isHost,
+                            enabledAllowNonHostAddParticipantsOption = result)
+                    }
+                }
+            }
         } else {
             showError()
         }

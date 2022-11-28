@@ -76,8 +76,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { (chatId, _, _, finish, _, _, inviteParticipantAction) ->
-                    if (finish)
+                    if (finish){
+                        Timber.d("Finish activity")
                         finish()
+                    }
 
                     if (chatRoomId != chatId)
                         chatRoomId = chatId
@@ -86,6 +88,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                         viewModel.removeInviteParticipantsAction()
                         when (action) {
                             InviteParticipantsAction.ADD_CONTACTS -> {
+                                Timber.d("Open Invite participants screen")
                                 resultLauncher.launch(Intent(this@ScheduledMeetingInfoActivity,
                                     AddContactActivity::class.java)
                                     .putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE,
@@ -97,10 +100,12 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                                 )
                             }
                             InviteParticipantsAction.NO_CONTACTS_DIALOG -> {
+                                Timber.d("Show dialog when all contacts are chat participants.")
                                 val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
                                 dialog.show(supportFragmentManager, dialog.tag)
                             }
                             InviteParticipantsAction.NO_MORE_CONTACTS_DIALOG -> {
+                                Timber.d("Show dialog when there are no contacts added.")
                                 val dialog =
                                     AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
                                 dialog.show(supportFragmentManager, dialog.tag)
