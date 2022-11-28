@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 
@@ -130,10 +132,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     list.forEach { schedMeeting ->
                         if (schedMeeting.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
-                                it.copy(scheduledMeeting = ScheduledMeetingItem(chatId = schedMeeting.chatId,
+                                it.copy(scheduledMeeting = ScheduledMeetingItem(
+                                    chatId = schedMeeting.chatId,
                                     scheduledMeetingId = schedMeeting.schedId,
                                     title = schedMeeting.title,
-                                    description = schedMeeting.description))
+                                    description = schedMeeting.description,
+                                    date = schedMeeting.getFormattedDate())
+                                )
                             }
                             return@forEach
                         }
@@ -190,11 +195,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     ScheduledMeetingChanges.NewScheduledMeeting -> {
                         if (schedMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
-                                it.copy(scheduledMeeting = ScheduledMeetingItem(schedMeetReceived.chatId,
+                                it.copy(scheduledMeeting = ScheduledMeetingItem(
+                                    schedMeetReceived.chatId,
                                     schedMeetReceived.schedId,
                                     schedMeetReceived.title,
                                     schedMeetReceived.description,
-                                    schedMeetReceived.startDateTime))
+                                    schedMeetReceived.getFormattedDate())
+                                )
                             }
                         }
                     }
@@ -221,7 +228,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         _state.value.scheduledMeeting?.let {
                             if (schedMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
-                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(date = schedMeetReceived.startDateTime))
+                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
+                                        date = schedMeetReceived.getFormattedDate()
+                                    ))
                                 }
                             }
                         }
@@ -400,4 +409,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun showError() {
         _state.update { it.copy(snackBar = R.string.check_internet_connection_error) }
     }
+
+    /**
+     * Format ZonedDateTime to a readable date
+     *
+     * @return  String with the formatted date
+     */
+    private fun ChatScheduledMeeting.getFormattedDate(): String =
+        DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").format(startDateTime) +
+                " - ${DateTimeFormatter.ofPattern("HH:mm").format(endDateTime)}"
 }
