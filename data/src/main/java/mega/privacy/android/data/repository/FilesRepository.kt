@@ -145,6 +145,18 @@ interface FilesRepository {
      */
     suspend fun getNodeByFingerprint(fingerprint: String): MegaNode?
 
+
+    /**
+     * Sets the original fingerprint of a [MegaNode]
+     *
+     * @param node the [MegaNode] to attach the [originalFingerprint] to
+     * @param originalFingerprint the fingerprint of the file before modification
+     */
+    suspend fun setOriginalFingerprint(
+        node: MegaNode,
+        originalFingerprint: String,
+    )
+
     /**
      * Get a list of all incoming shares
      *

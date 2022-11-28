@@ -13,11 +13,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -28,13 +28,14 @@ import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-
 
 /**
  * StartConversationFragment view model.
@@ -48,6 +49,7 @@ import javax.inject.Inject
  * @property inviteToChat                   [InviteToChat]
  * @property leaveChat                      [LeaveChat]
  * @property setOpenInvite                  [SetOpenInvite]
+ * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
  */
 @HiltViewModel
@@ -61,6 +63,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val inviteToChat: InviteToChat,
     private val leaveChat: LeaveChat,
     private val setOpenInvite: SetOpenInvite,
+    private val getPublicChatToPrivate: SetPublicChatToPrivate,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -117,7 +120,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             chatTitle = title,
                             isHost = ownPrivilege == ChatRoomPermission.Moderator,
                             isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
-                            enabledAllowNonHostAddParticipantsOption = isOpenInvite
+                            enabledAllowNonHostAddParticipantsOption = isOpenInvite,
+                            isPublic = isPublic
                         )
                     }
                 }
@@ -141,10 +145,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     list.forEach { schedMeeting ->
                         if (schedMeeting.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
-                                it.copy(scheduledMeeting = ScheduledMeetingItem(chatId = schedMeeting.chatId,
+                                it.copy(scheduledMeeting = ScheduledMeetingItem(
+                                    chatId = schedMeeting.chatId,
                                     scheduledMeetingId = schedMeeting.schedId,
                                     title = schedMeeting.title,
-                                    description = schedMeeting.description))
+                                    description = schedMeeting.description,
+                                    date = schedMeeting.getFormattedDate())
+                                )
                             }
                             return@forEach
                         }
@@ -170,23 +177,27 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
                 when (chat.changes) {
-                    ChatRoomChanges.OwnPrivilege -> {
+                    ChatRoomChanges.OwnPrivilege ->
                         _state.update {
                             it.copy(isHost = chat.ownPrivilege == ChatRoomPermission.Moderator)
                         }
-                    }
-                    ChatRoomChanges.OpenInvite -> {
+
+                    ChatRoomChanges.OpenInvite ->
                         _state.update {
                             it.copy(
                                 isOpenInvite = chat.isOpenInvite || chat.ownPrivilege == ChatRoomPermission.Moderator,
                                 enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite)
                         }
-                    }
-                    ChatRoomChanges.Title -> {
+
+                    ChatRoomChanges.Title ->
                         _state.update {
                             it.copy(chatTitle = chat.title)
                         }
-                    }
+
+                    ChatRoomChanges.ChatMode ->
+                        _state.update {
+                            it.copy(isPublic = chat.isPublic)
+                        }
                     else -> {}
                 }
             }
@@ -203,11 +214,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     ScheduledMeetingChanges.NewScheduledMeeting -> {
                         if (schedMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
-                                it.copy(scheduledMeeting = ScheduledMeetingItem(schedMeetReceived.chatId,
+                                it.copy(scheduledMeeting = ScheduledMeetingItem(
+                                    schedMeetReceived.chatId,
                                     schedMeetReceived.schedId,
                                     schedMeetReceived.title,
                                     schedMeetReceived.description,
-                                    schedMeetReceived.startDateTime))
+                                    schedMeetReceived.getFormattedDate())
+                                )
                             }
                         }
                     }
@@ -234,7 +247,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         _state.value.scheduledMeeting?.let {
                             if (schedMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
-                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(date = schedMeetReceived.startDateTime))
+                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
+                                        date = schedMeetReceived.getFormattedDate()
+                                    ))
                                 }
                             }
                         }
@@ -329,21 +344,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Tap in a button action
-     */
-    fun onActionTap(action: ScheduledMeetingInfoAction) {
-        when (action) {
-            ScheduledMeetingInfoAction.MeetingLink -> onMeetingLinkTap()
-            ScheduledMeetingInfoAction.ShareMeetingLink -> onShareMeetingLinkTap()
-            ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> onAllowAddParticipantsTap()
-            ScheduledMeetingInfoAction.ShareFiles -> onSharedFilesTap()
-            ScheduledMeetingInfoAction.ManageChatHistory -> onManageChatHistoryTap()
-            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> onEnableEncryptedKeyRotationTap()
-        }
-    }
-
-    /**
      * Add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onInviteParticipantsTap() {
@@ -384,7 +384,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Create or removed meeting link if there is internet connection, shows an error if not.
      */
-    private fun onMeetingLinkTap() {
+    fun onMeetingLinkTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
@@ -395,7 +395,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Share meeting link if there is internet connection, shows an error if not.
      */
-    private fun onShareMeetingLinkTap() {
+    fun onShareMeetingLinkTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
@@ -406,7 +406,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Enable or disable chat notifications if there is internet connection, shows an error if not.
      */
-    private fun onChatNotificationsTap() {
+    fun onChatNotificationsTap() {
         if (isConnected) {
             Timber.d("Add participants to the chat room")
         } else {
@@ -417,7 +417,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Enable or disable the option Allow non-host add participants to the chat room if there is internet connection, shows an error if not.
      */
-    private fun onAllowAddParticipantsTap() {
+    fun onAllowAddParticipantsTap() {
         if (isConnected) {
             Timber.d("Update option Allow non-host add participants to the chat room")
             viewModelScope.launch {
@@ -440,16 +440,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Show shared files in the chat room.
-     */
-    private fun onSharedFilesTap() {
-        Timber.d("Show shared files in the chat room")
-    }
-
-    /**
      * Manage chat history if there is internet connection, shows an error if not.
      */
-    private fun onManageChatHistoryTap() {
+    fun onManageChatHistoryTap() {
         if (isConnected) {
             Timber.d("Manage chat history")
         } else {
@@ -460,11 +453,20 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Enable encrypted key rotation if there is internet connection, shows an error if not.
      */
-    private fun onEnableEncryptedKeyRotationTap() {
-        if (isConnected) {
-            Timber.d("Enable Encrypted Key Rotation")
+    fun enableEncryptedKeyRotation() {
+        if (_state.value.participantItemList.size > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
+            _state.update { it.copy(snackBar = R.string.warning_make_chat_private) }
         } else {
-            showError()
+            viewModelScope.launch {
+                runCatching {
+                    getPublicChatToPrivate(chatId)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    _state.update { it.copy(snackBar = R.string.general_error) }
+                }.onSuccess { _ ->
+                    _state.update { it.copy(isPublic = false) }
+                }
+            }
         }
     }
 
@@ -474,4 +476,19 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun showError() {
         _state.update { it.copy(snackBar = R.string.check_internet_connection_error) }
     }
+
+    companion object {
+        private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
+    }
+
+
+    /**
+     * Format ZonedDateTime to a readable date
+     *
+     * @return  String with the formatted date
+     */
+    private fun ChatScheduledMeeting.getFormattedDate(): String =
+        DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").format(startDateTime) +
+                " - ${DateTimeFormatter.ofPattern("HH:mm").format(endDateTime)}"
+
 }

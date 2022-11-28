@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -8,15 +9,31 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -43,6 +60,8 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
+import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -177,20 +196,25 @@ class MediaDiscoveryFragment : Fragment() {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
         ) {
-            if (uiState.selectedTimeBarTab == TimeBarTab.All) {
-                PhotosGridView(uiState = uiState, lazyGridState = lazyGridState)
-            } else {
-                val dateCards = when (uiState.selectedTimeBarTab) {
-                    TimeBarTab.Years -> uiState.yearsCardList
-                    TimeBarTab.Months -> uiState.monthsCardList
-                    TimeBarTab.Days -> uiState.daysCardList
-                    else -> uiState.daysCardList
+            Column(modifier = Modifier.fillMaxWidth()) {
+                if (uiState.mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal) {
+                    MediaDiscoveryDialog()
                 }
-                CardListView(dateCards = dateCards, lazyGridState = lazyGridState)
-            }
+                if (uiState.selectedTimeBarTab == TimeBarTab.All) {
+                    PhotosGridView(uiState = uiState, lazyGridState = lazyGridState)
+                } else {
+                    val dateCards = when (uiState.selectedTimeBarTab) {
+                        TimeBarTab.Years -> uiState.yearsCardList
+                        TimeBarTab.Months -> uiState.monthsCardList
+                        TimeBarTab.Days -> uiState.daysCardList
+                        else -> uiState.daysCardList
+                    }
+                    CardListView(dateCards = dateCards, lazyGridState = lazyGridState)
+                }
 
-            if (uiState.selectedPhotoIds.isEmpty()) {
-                TimeSwitchBar(uiState = uiState)
+                if (uiState.selectedPhotoIds.isEmpty()) {
+                    TimeSwitchBar(uiState = uiState)
+                }
             }
         }
     }
@@ -223,6 +247,73 @@ class MediaDiscoveryFragment : Fragment() {
         selectedTimeBarTab = uiState.selectedTimeBarTab,
         onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected
     )
+
+    /**
+     * Media discovery view dialog
+     */
+    @Composable
+    fun MediaDiscoveryDialog() {
+        Divider(modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 3.dp)
+            .shadow(elevation = 10.dp,
+                ambientColor = colorResource(id = R.color.black),
+                spotColor = colorResource(id = R.color.black))
+            .zIndex(2f),
+            color = Color.Transparent)
+        Text(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, top = 30.dp, end = 20.dp),
+            text = getString(R.string.cloud_drive_media_discovery_banner_context),
+            color = colorResource(id = R.color.grey_alpha_087_white))
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End) {
+            SettingsButton()
+            OKButton()
+        }
+        Divider(modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+            color = colorResource(id = R.color.grey_012_white_015))
+    }
+
+    /**
+     * Settings button for media discovery view dialog
+     */
+    @Composable
+    fun SettingsButton() {
+        TextButton(modifier = Modifier.padding(end = 10.dp),
+            colors = ButtonDefaults.buttonColors(
+                contentColor = MaterialTheme.colors.secondary,
+                backgroundColor = Color.Transparent
+            ),
+            onClick = {
+                mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
+                    MediaDiscoveryViewSettings.ENABLED.ordinal)
+                requireContext().startActivity(Intent(requireActivity(),
+                    SettingsActivity::class.java))
+            }) {
+            Text(text = getString(R.string.cloud_drive_media_discovery_banner_settings), fontSize = 16.sp)
+        }
+    }
+
+    /**
+     * Ok button for media discovery view dialog
+     */
+    @Composable
+    fun OKButton() {
+        TextButton(modifier = Modifier.padding(end = 8.dp),
+            colors = ButtonDefaults.buttonColors(
+                contentColor = MaterialTheme.colors.secondary,
+                backgroundColor = Color.Transparent
+            ),
+            onClick = {
+                mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
+                    MediaDiscoveryViewSettings.ENABLED.ordinal)
+            }) {
+            Text(text = getString(R.string.cloud_drive_media_discovery_banner_ok), fontSize = 16.sp)
+        }
+    }
 
     private fun openPhoto(photo: Photo) {
         ImageViewerActivity.getIntentForChildren(

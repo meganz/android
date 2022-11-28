@@ -4040,7 +4040,7 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Groep verlaten</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album"></string>
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Een album met deze naam bestaat al. Voer een andere naam in.</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -4052,4 +4052,36 @@
         <item quantity="one">Added %d item to “%s“</item>
         <item quantity="other">Added %d items to “%s”</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Betalingsinformatie</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Pro-lidmaatschap abonnement verloopt binnenkort</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Uw betaling voor het %1$s abonnement is ontvangen.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Uw betaling voor het %1$s abonnement is onsuccesvol.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Uw Pro-lidmaatschap abonnement verloopt over 1 dag.</item>
+        <item quantity="other">Uw Pro-lidmaatschap abonnement verloopt over %1$d dagen.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Uw Pro lidmaatschap abonnement verliep 1 dag geleden</item>
+        <item quantity="other">Uw Pro lidmaatschap abonnement verliep %1$d dagen geleden.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Eerdere vergaderingen</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Terugkerende vergadering</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

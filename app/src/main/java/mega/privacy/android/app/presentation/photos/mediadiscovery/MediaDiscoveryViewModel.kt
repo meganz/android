@@ -22,11 +22,14 @@ import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
+import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import org.jetbrains.anko.collections.forEachWithIndex
 import javax.inject.Inject
 
@@ -37,6 +40,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getPhotosByFolderId: GetPhotosByFolderId,
     private val getCameraSortOrder: GetCameraSortOrder,
     private val setCameraSortOrder: SetCameraSortOrder,
+    private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
+    private val setMediaDiscoveryView: SetMediaDiscoveryView,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
@@ -48,6 +53,14 @@ class MediaDiscoveryViewModel @Inject constructor(
         viewModelScope.launch {
             val sortOrder = getCameraSortOrder()
             setCurrentSort(sort = mapSortOrderToSort(sortOrder))
+
+            monitorMediaDiscoveryView().collectLatest { mediaDiscoverViewSettings ->
+                mediaDiscoverViewSettings?.let { settings ->
+                    _state.update {
+                        it.copy(mediaDiscoveryViewSettings = settings)
+                    }
+                }
+            }
         }
     }
 
@@ -221,6 +234,18 @@ class MediaDiscoveryViewModel @Inject constructor(
     fun updateZoomLevel(zoomLevel: ZoomLevel) {
         _state.update {
             it.copy(currentZoomLevel = zoomLevel)
+        }
+    }
+
+    /**
+     * Set media discovery view is enabled
+     */
+    fun setMediaDiscoveryViewSettings(mediaDiscoveryViewSettings: Int) {
+        viewModelScope.launch {
+            setMediaDiscoveryView(mediaDiscoveryViewSettings)
+            _state.update {
+                it.copy(mediaDiscoveryViewSettings = mediaDiscoveryViewSettings)
+            }
         }
     }
 }

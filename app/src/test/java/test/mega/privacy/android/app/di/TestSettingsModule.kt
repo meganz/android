@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import org.mockito.kotlin.any
@@ -66,6 +68,8 @@ object TestSettingsModule {
         mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
     val monitorHideRecentActivity =
         mock<MonitorHideRecentActivity> { on { invoke() }.thenReturn(emptyFlow()) }
+    val monitorMediaDiscoveryView =
+        mock<MonitorMediaDiscoveryView> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
@@ -117,7 +121,13 @@ object TestSettingsModule {
     fun provideMonitorHideRecentActivity(): MonitorHideRecentActivity = monitorHideRecentActivity
 
     @Provides
+    fun provideMonitorMediaDiscoveryView(): MonitorMediaDiscoveryView = monitorMediaDiscoveryView
+
+    @Provides
     fun provideSetHideRecentActivity(): SetHideRecentActivity = mock()
+
+    @Provides
+    fun provideSetMediaDiscoveryView(): SetMediaDiscoveryView = mock()
 
     @Provides
     fun provideToggleAutoAcceptQRLinks(): ToggleAutoAcceptQRLinks =

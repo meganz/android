@@ -45,6 +45,7 @@ import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
+import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
@@ -117,8 +118,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import timber.log.Timber
@@ -132,7 +131,7 @@ import kotlin.math.roundToInt
  */
 @AndroidEntryPoint
 class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
-    MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
+    MegaTransferListenerInterface, VideoCompressionCallback {
 
     companion object {
 
@@ -498,6 +497,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var copyNode: CopyNode
 
     /**
+     * Set Original Fingerprint
+     */
+    @Inject
+    lateinit var setOriginalFingerprint: SetOriginalFingerprint
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -585,7 +590,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         setAttrUserListener = null
         createFolderListener = null
 
-        megaApi.removeRequestListener(this)
         megaApi.removeTransferListener(this)
 
         stopActiveHeartbeat()
@@ -1503,40 +1507,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Start request
-     */
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
-
-    /**
-     * Update request
-     */
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-
-    /**
-     * Finish request
-     */
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish: %s", request.requestString)
-        try {
-            requestFinished(request, e)
-        } catch (th: Throwable) {
-            Timber.e(th)
-            th.printStackTrace()
-        }
-    }
-
-    private fun requestFinished(request: MegaRequest, e: MegaError) {
-        when (request.type) {
-            MegaRequest.TYPE_PAUSE_TRANSFERS -> {
-                Timber.d("PauseTransfer false received")
-                if (e.errorCode == MegaError.API_OK) {
-                    endService()
-                }
-            }
-        }
-    }
-
-    /**
      * Callback when getting Primary folder handle from Primary attributes completes.
      *
      * @param handle      Primary folder handle stored in Primary attributes.
@@ -1586,13 +1556,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (!isSuccessful) {
             endService()
         }
-    }
-
-    /**
-     * Temporary error on request
-     */
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.w("onRequestTemporaryError: %s", request.requestString)
     }
 
     /**
@@ -1683,17 +1646,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             val isSecondary = node?.parentHandle == getSecondarySyncHandle()
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
-                node?.let { onUploadSuccess(it, record.isSecondary) }
-                val originalFingerprint = record.originFingerprint
-                megaApi.setOriginalFingerprint(node, originalFingerprint, this)
-                record.latitude?.let { latitude ->
-                    record.longitude?.let { longitude ->
-                        megaApi.setNodeCoordinates(
-                            node,
-                            latitude.toDouble(),
-                            longitude.toDouble(),
-                            null
-                        )
+                node?.let { nonNullNode ->
+                    onUploadSuccess(node = nonNullNode, isSecondary = record.isSecondary)
+                    handleSetOriginalFingerprint(node = nonNullNode,
+                        originalFingerprint = record.originFingerprint.orEmpty())
+                    record.latitude?.let { latitude ->
+                        record.longitude?.let { longitude ->
+                            megaApi.setNodeCoordinates(
+                                nonNullNode,
+                                latitude.toDouble(),
+                                longitude.toDouble(),
+                                null
+                            )
+                        }
                     }
                 }
                 val src = record.localPath?.let { File(it) }
@@ -1748,6 +1713,25 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             endService()
         }
         updateUpload()
+    }
+
+    /**
+     * Sets the original fingerprint by calling [setOriginalFingerprint] and logs the result
+     *
+     * @param node the [MegaNode] to attach the [originalFingerprint] to
+     * @param originalFingerprint the fingerprint of the file before modification
+     */
+    private fun handleSetOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
+        coroutineScope?.launch {
+            runCatching {
+                setOriginalFingerprint(
+                    node = node,
+                    originalFingerprint = originalFingerprint,
+                )
+            }.onSuccess {
+                Timber.d("Set original fingerprint successful")
+            }.onFailure { error -> Timber.e("Set original fingerprint error: $error") }
+        }
     }
 
     private suspend fun updateUpload() {

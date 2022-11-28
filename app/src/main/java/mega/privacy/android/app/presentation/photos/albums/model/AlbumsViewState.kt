@@ -23,5 +23,5 @@ data class AlbumsViewState(
     val isInputNameValid: Boolean = true,
     val createDialogErrorMessage: Int? = null,
     val isAlbumCreatedSuccessfully: Boolean = false,
-    val snackBarMessage: String = ""
+    val snackBarMessage: String = "",
 )

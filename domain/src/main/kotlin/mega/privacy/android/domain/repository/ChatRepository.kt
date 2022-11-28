@@ -133,4 +133,30 @@ interface ChatRepository {
      * @param contactsData      List of contacts to add
      */
     suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
+
+    /**
+     * Set public chat to private.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest].
+     */
+    suspend fun setPublicChatToPrivate(
+        chatId: Long,
+    ): ChatRequest
+
+    /**
+     * Query chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun queryChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Remove chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun removeChatLink(chatId: Long): ChatRequest
 }

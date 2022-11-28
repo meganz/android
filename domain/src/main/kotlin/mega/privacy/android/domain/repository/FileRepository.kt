@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 
 /**
  * File repository
@@ -56,4 +57,26 @@ interface FileRepository {
      * @return a flow of all global node updates
      */
     fun monitorNodeUpdates(): Flow<List<Node>>
+
+    /**
+     * Get offline node information
+     *
+     * @param nodeId
+     * @return Offline node information if found
+     */
+    suspend fun getOfflineNodeInformation(nodeId: NodeId): OfflineNodeInformation?
+
+    /**
+     * Get offline path
+     *
+     * @return root path for offline files
+     */
+    suspend fun getOfflinePath(): String
+
+    /**
+     * Get offline inbox path
+     *
+     * @return offline files inbox path
+     */
+    suspend fun getOfflineInboxPath(): String
 }

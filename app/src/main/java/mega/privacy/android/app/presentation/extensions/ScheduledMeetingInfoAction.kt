@@ -12,6 +12,7 @@ internal val ScheduledMeetingInfoAction.title: Int
         ScheduledMeetingInfoAction.ShareFiles -> R.string.title_chat_shared_files_info
         ScheduledMeetingInfoAction.ManageChatHistory -> R.string.title_properties_manage_chat
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> R.string.make_chat_private_option
+        ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> R.string.private_chat
     }
 
 internal val ScheduledMeetingInfoAction.description: Int?
@@ -23,6 +24,7 @@ internal val ScheduledMeetingInfoAction.description: Int?
         ScheduledMeetingInfoAction.ShareFiles -> null
         ScheduledMeetingInfoAction.ManageChatHistory -> null
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> R.string.make_chat_private_option_text
+        ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> R.string.make_chat_private_option_text
     }
 
 internal val ScheduledMeetingInfoAction.icon: Int?
@@ -34,4 +36,5 @@ internal val ScheduledMeetingInfoAction.icon: Int?
         ScheduledMeetingInfoAction.ShareFiles -> R.drawable.ic_share_files
         ScheduledMeetingInfoAction.ManageChatHistory -> R.drawable.ic_manage_history
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> null
+        ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> null
     }

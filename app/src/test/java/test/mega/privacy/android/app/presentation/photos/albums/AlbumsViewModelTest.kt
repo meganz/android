@@ -461,7 +461,7 @@ class AlbumsViewModelTest {
         }
 
     @Test
-    fun `test that creating an album with an system album title will not create the album`() =
+    fun `test that creating an album with a system album title will not create the album`() =
         runTest {
             val defaultAlbums: Map<Album, PhotoPredicate> = mapOf(
                 Album.FavouriteAlbum to { true },
@@ -530,6 +530,22 @@ class AlbumsViewModelTest {
             }
             verifyNoInteractions(createAlbum)
 
+        }
+
+    @Test
+    fun `test that creating an album with all spaces will not create the album`() =
+        runTest {
+            underTest.state.test {
+                awaitItem()
+                underTest.createNewAlbum("      ", proscribedStrings)
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    R.string.photos_create_album_error_message_systems_album,
+                    item.createDialogErrorMessage
+                )
+            }
+            verifyNoInteractions(createAlbum)
         }
 
     @Test

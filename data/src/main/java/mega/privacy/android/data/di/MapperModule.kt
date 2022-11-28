@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -31,6 +32,7 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
 import mega.privacy.android.data.mapper.PricingMapper
@@ -70,6 +72,7 @@ import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
+import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toMediaStoreFileType
@@ -79,6 +82,7 @@ import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
+import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
@@ -417,4 +421,14 @@ internal class MapperModule {
     @Provides
     fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
         ::toChatScheduledMeetingOccur
+
+    @Provides
+    fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
+        ::toOfflineNodeInformation
+
+    /**
+     * Provide [CountryMapper] mapper
+     */
+    @Provides
+    fun provideCountryMapper(): CountryMapper = ::toCountry
 }
