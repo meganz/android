@@ -1719,15 +1719,16 @@ public class PdfViewerActivity extends PasscodeActivity
         super.onActivityResult(requestCode, resultCode, intent);
 
         Timber.d("onActivityResult: %d____%d", requestCode, resultCode);
-        if (intent == null) {
-            return;
-        }
 
         if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return;
         }
 
         if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
+            return;
+        }
+
+        if (intent == null) {
             return;
         }
 
