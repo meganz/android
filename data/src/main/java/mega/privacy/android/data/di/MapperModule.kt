@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -71,6 +72,7 @@ import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
+import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toMediaStoreFileType
@@ -423,4 +425,10 @@ internal class MapperModule {
     @Provides
     fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
         ::toOfflineNodeInformation
+
+    /**
+     * Provide [CountryMapper] mapper
+     */
+    @Provides
+    fun provideCountryMapper(): CountryMapper = ::toCountry
 }

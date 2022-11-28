@@ -273,20 +273,24 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                 .padding(start = 16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     state.scheduledMeeting?.let {
-                        Text(text = it.title,
-                            style = MaterialTheme.typography.subtitle1,
-                            color = if (MaterialTheme.colors.isLight) black else white,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis)
+                        it.title?.let { title ->
+                            Text(text = title,
+                                style = MaterialTheme.typography.subtitle1,
+                                color = if (MaterialTheme.colors.isLight) black else white,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis)
+                        }
                     }
                 }
                 state.scheduledMeeting?.let {
-                    Text(text = it.date,
-                        style = MaterialTheme.typography.subtitle2,
-                        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis)
+                    it.date?.let { date ->
+                        Text(text = date,
+                            style = MaterialTheme.typography.subtitle2,
+                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
+                    }
                 }
             }
         }

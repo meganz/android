@@ -191,7 +191,7 @@ class GlobalListener @Inject constructor(
     }
 
     override fun onEvent(api: MegaApiJava, event: MegaEvent) {
-        Timber.d("Event received: %s", event.text)
+        Timber.d("Event received: text(${event.text}), type(${event.type}), number(${event.number})")
 
         when (event.type) {
             MegaEvent.EVENT_STORAGE -> {

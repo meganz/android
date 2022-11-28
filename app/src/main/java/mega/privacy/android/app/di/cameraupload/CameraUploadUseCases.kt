@@ -41,6 +41,7 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.data.repository.FilesRepository
@@ -314,6 +315,16 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetNodeByFingerprint(filesRepository: FilesRepository): GetNodeByFingerprint =
             GetNodeByFingerprint(filesRepository::getNodeByFingerprint)
+
+        /**
+         * Provide the [SetOriginalFingerprint] implementation
+         *
+         * @param filesRepository [FilesRepository]
+         * @return [SetOriginalFingerprint]
+         */
+        @Provides
+        fun provideSetOriginalFingerprint(filesRepository: FilesRepository): SetOriginalFingerprint =
+            SetOriginalFingerprint(filesRepository::setOriginalFingerprint)
 
         /**
          * Provide the [GetParentMegaNode] implementation

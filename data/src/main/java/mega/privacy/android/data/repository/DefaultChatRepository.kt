@@ -166,9 +166,18 @@ internal class DefaultChatRepository @Inject constructor(
     override fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting? =
         megaChatApiGateway.getScheduledMeeting(chatId, schedId)?.let(chatScheduledMeetingMapper)
 
-    override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
+    override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting> =
         withContext(ioDispatcher) {
-            megaChatApiGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
+            val newList = ArrayList<ChatScheduledMeeting>()
+
+            megaChatApiGateway.getScheduledMeetingsByChat(chatId)?.let { listRecived ->
+                listRecived.forEach { schedMeet ->
+                    val item: ChatScheduledMeeting = chatScheduledMeetingMapper(schedMeet)
+                    newList.add(item)
+                }
+            }
+
+            return@withContext newList
         }
 
     override suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>? =

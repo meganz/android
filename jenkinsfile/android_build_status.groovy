@@ -1,11 +1,6 @@
 BUILD_STEP = ""
 
-// Below values will be read from MR description and are used to decide SDK versions
-SDK_BRANCH = "develop"
-MEGACHAT_BRANCH = "develop"
-
 GMS_APK_BUILD_LOG = "gms_build.log"
-HMS_APK_BUILD_LOG = "hms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
 MODULE_LIST = ['app', 'domain', 'sdk', 'data']
@@ -278,19 +273,18 @@ pipeline {
                 }
             }
         }
-        stage('Build APK (GMS+HMS+QA)') {
+        stage('Build APK (GMS+QA)') {
             when {
                 expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Build APK (GMS+HMS+QA)'
+                    BUILD_STEP = 'Build APK (GMS+QA)'
                 }
-                gitlabCommitStatus(name: 'Build APK (GMS+HMS)') {
+                gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
                     // Finish building and packaging the APK
                     sh "./gradlew clean"
                     sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
-                    sh "./gradlew app:assembleHmsRelease 2>&1  | tee ${HMS_APK_BUILD_LOG}"
                     sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
 
                     sh """
@@ -298,12 +292,8 @@ pipeline {
                             echo GMS APK build failed. Exitting....
                             exit 1
                         fi
-                        if grep -q -m 1 \"^FAILURE: \" ${HMS_APK_BUILD_LOG}; then
-                            echo HMS APK build failed. Exitting....
-                            exit 1
-                        fi
                         if grep -q -m 1 \"^FAILURE: \" ${QA_APK_BUILD_LOG}; then
-                            echo HMS APK build failed. Exitting....
+                            echo QA APK build failed. Exitting....
                             exit 1
                         fi
                     """
@@ -488,7 +478,7 @@ String buildTestResults() {
 }
 
 /**
- * Combines the GMS, HMS and QA Build Warnings into one String
+ * Combines the GMS and QA Build Warnings into one String
  *
  * @return A String that contains some or all Build Warnings combined together.
  * If there are no Build Warnings, return "None".
@@ -500,14 +490,6 @@ String getBuildWarnings() {
         println("gmsBuildWarnings = $gmsBuildWarnings")
         if (!gmsBuildWarnings.isEmpty()) {
             result = "<details><summary>:warning: GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(gmsBuildWarnings) + "</details>"
-        }
-    }
-
-    if (fileExists(HMS_APK_BUILD_LOG)) {
-        String hmsBuildWarnings = sh(script: "cat ${HMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
-        println("hmsBuildWarnings = $hmsBuildWarnings")
-        if (!hmsBuildWarnings.isEmpty()) {
-            result += "<details><summary>:warning: HMS Build Warnings :warning:</summary>" + wrapBuildWarnings(hmsBuildWarnings) + "</details>"
         }
     }
 
