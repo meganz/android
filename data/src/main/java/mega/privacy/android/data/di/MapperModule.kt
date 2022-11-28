@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
+import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
@@ -64,6 +65,7 @@ import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
 import mega.privacy.android.data.mapper.toChatScheduledMeeting
@@ -431,4 +433,11 @@ internal class MapperModule {
      */
     @Provides
     fun provideCountryMapper(): CountryMapper = ::toCountry
+
+    /**
+     * Provide chat list item mapper
+     */
+    @Provides
+    fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
+
 }

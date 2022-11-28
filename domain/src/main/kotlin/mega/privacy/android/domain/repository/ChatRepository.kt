@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
@@ -159,4 +160,11 @@ interface ChatRepository {
      * @return          [ChatRequest]
      */
     suspend fun removeChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Monitor updates on chat list item.
+     *
+     * @return A flow of [ChatListItem].
+     */
+    fun monitorChatListItemUpdates(): Flow<ChatListItem>
 }
