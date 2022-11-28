@@ -64,7 +64,7 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun retryPendingConnections(
         disconnect: Boolean,
-        listener: MegaChatRequestListenerInterface?
+        listener: MegaChatRequestListenerInterface?,
     ) = chatApi.retryPendingConnections(disconnect, listener)
 
     override val chatUpdates: Flow<ChatUpdate>
@@ -259,6 +259,16 @@ internal class MegaChatApiFacade @Inject constructor(
         chatId: Long,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.setPublicChatToPrivate(chatId, listener)
+
+    override fun queryChatLink(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.queryChatLink(chatId, listener)
+
+    override fun removeChatLink(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.removeChatLink(chatId, listener)
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE

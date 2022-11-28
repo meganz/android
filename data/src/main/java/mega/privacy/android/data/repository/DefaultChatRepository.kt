@@ -103,7 +103,7 @@ internal class DefaultChatRepository @Inject constructor(
                     enabledVideo,
                     enabledAudio,
                     OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestChatCallCompleted(continuation)
+                        onRequestFinish = onRequestCompleted(continuation)
                     ))
             }
         }
@@ -119,12 +119,12 @@ internal class DefaultChatRepository @Inject constructor(
                 enabledVideo,
                 enabledAudio,
                 OptionalMegaChatRequestListenerInterface(
-                    onRequestFinish = onRequestChatCallCompleted(continuation)
+                    onRequestFinish = onRequestCompleted(continuation)
                 ))
         }
     }
 
-    private fun onRequestChatCallCompleted(continuation: Continuation<ChatRequest>) =
+    private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
@@ -207,8 +207,26 @@ internal class DefaultChatRepository @Inject constructor(
             suspendCoroutine { continuation ->
                 megaChatApiGateway.setPublicChatToPrivate(chatId,
                     OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestChatCallCompleted(continuation)
+                        onRequestFinish = onRequestCompleted(continuation)
                     ))
             }
         }
+
+    override suspend fun queryChatLink(chatId: Long): ChatRequest = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaChatApiGateway.queryChatLink(chatId,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                ))
+        }
+    }
+
+    override suspend fun removeChatLink(chatId: Long): ChatRequest = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaChatApiGateway.removeChatLink(chatId,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                ))
+        }
+    }
 }
