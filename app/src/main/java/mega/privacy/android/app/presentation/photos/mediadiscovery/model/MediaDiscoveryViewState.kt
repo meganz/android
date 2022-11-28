@@ -5,6 +5,8 @@ import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 
 data class MediaDiscoveryViewState(
     val uiPhotoList: List<UIPhoto> = emptyList(),
@@ -17,4 +19,5 @@ data class MediaDiscoveryViewState(
     val daysCardList: List<DateCard> = emptyList(),
     val scrollStartIndex: Int = 0,
     val scrollStartOffset: Int = 0,
+    val mediaDiscoveryViewSettings: Int = MediaDiscoveryViewSettings.INITIAL.ordinal
 )

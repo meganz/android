@@ -34,12 +34,6 @@ interface AccountInfoWrapper {
     val accountTypeString: String
 
     /**
-     * Request account details
-     *
-     */
-    fun requestAccountDetails()
-
-    /**
      * Handle account detail
      *
      * @param request

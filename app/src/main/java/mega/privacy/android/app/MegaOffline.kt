@@ -18,6 +18,13 @@ import mega.privacy.android.app.utils.OfflineUtils
  * @property origin         Origin of the node available offline (Incoming share, Inbox or Other)
  * @property handleIncoming Handle of the node available offline in case it comes from an incoming share
  */
+@Deprecated(
+    message = "MegaOffline has been deprecated in favour of OfflineInformation",
+    replaceWith = ReplaceWith(
+        expression = "mega.privacy.android.data.model.node.OfflineInformation"
+    ),
+    level = DeprecationLevel.WARNING
+)
 @Parcelize
 data class MegaOffline(
     var id: Int = -1,

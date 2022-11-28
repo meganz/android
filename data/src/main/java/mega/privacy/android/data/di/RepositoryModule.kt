@@ -21,6 +21,7 @@ import mega.privacy.android.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
+import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.data.repository.DefaultSettingsRepository
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -159,4 +161,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
+
+    @Binds
+    abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
 }

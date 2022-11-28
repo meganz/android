@@ -57,10 +57,23 @@ interface UIPreferencesGateway {
     fun monitorHideRecentActivity(): Flow<Boolean?>
 
     /**
+     * Monitor media discovery view
+     *
+     * @return media discovery state
+     */
+    fun monitorMediaDiscoveryView(): Flow<Int?>
+
+    /**
      * Set hide recent activity
      *
      * @param value
      */
     suspend fun setHideRecentActivity(value: Boolean)
 
+    /**
+     * Set media discovery view
+     *
+     * @param value
+     */
+    suspend fun setMediaDiscoveryView(value: Int)
 }

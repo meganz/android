@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.DefaultMonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.DefaultMonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
@@ -24,12 +25,14 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 
 /**
@@ -58,6 +61,12 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindMonitorHideRecentActivity(implementation: DefaultMonitorHideRecentActivity): MonitorHideRecentActivity
+
+    /**
+     * Provide MonitorMediaDiscoveryView implementation
+     */
+    @Binds
+    abstract fun bindMonitorMediaDiscoveryView(implementation: DefaultMonitorMediaDiscoveryView): MonitorMediaDiscoveryView
 
     companion object {
         @Provides
@@ -148,5 +157,11 @@ abstract class SettingsUseCases {
         fun provideSetHideRecentActivity(settingsRepository: SettingsRepository): SetHideRecentActivity =
             SetHideRecentActivity(settingsRepository::setHideRecentActivity)
 
+        /**
+         * Provide SetMediaDiscoveryView implementation
+         */
+        @Provides
+        fun provideSetMediaDiscoveryView(settingsRepository: SettingsRepository): SetMediaDiscoveryView =
+            SetMediaDiscoveryView(settingsRepository::setMediaDiscoveryView)
     }
 }

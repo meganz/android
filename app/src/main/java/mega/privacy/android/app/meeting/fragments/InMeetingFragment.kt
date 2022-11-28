@@ -917,9 +917,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it?.let {
                 Timber.d("Chat has changed")
                 inMeetingViewModel.setChatId(it)
-                if (!sharedModel.isChatOpen) {
-                    chatManagement.openChatRoom(it)
-                }
+                chatManagement.openChatRoom(it)
             }
         }
 

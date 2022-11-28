@@ -4071,7 +4071,7 @@
         <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[B]EMPTY[/B] [A]ALBUM[/A]</string>
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
     <!-- Albums sub-section for all system and user albums -->
     <string name="photos_album_subsection_my_albums">My albums</string>
     <!-- Albums sub-section for all shared albums -->
@@ -4083,5 +4083,15 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s Weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">Media discovery view</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">Automatically open folders that contain only images and videos in media discovery view. This lets you see media in gallery mode and filter by date.</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. This lets you see media in gallery mode and filter by date. You can disable this in Settings.</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">Settings</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">OK, got it</string>
 </resources>

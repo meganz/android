@@ -52,6 +52,22 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
     }
 
+    override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.cancelAllUploadTransfers(OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(Result.success(Unit))
+                        } else {
+                            continuation.failWithError(error)
+                        }
+                    }
+                }
+            ))
+        }
+    }
+
     private suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
         megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
     }

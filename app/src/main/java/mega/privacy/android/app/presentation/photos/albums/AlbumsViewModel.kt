@@ -61,6 +61,8 @@ class AlbumsViewModel @Inject constructor(
 
     private val albumJobs: MutableMap<AlbumId, Job> = mutableMapOf()
 
+    private var createAlbumJob: Job? = null
+
     private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
         return if (getFeatureFlag(AppFeatures.DynamicAlbum)) {
@@ -205,22 +207,28 @@ class AlbumsViewModel @Inject constructor(
      *
      * @param title the name of the album
      */
-    fun createNewAlbum(title: String, proscribedStrings: List<String>) = viewModelScope.launch {
-        try {
-            val finalTitle = title.ifEmpty {
-                _state.value.createAlbumPlaceholderTitle
-            }.trim()
-            if (checkTitleValidity(finalTitle, proscribedStrings)) {
-                val album = createAlbum(finalTitle)
-                _state.update {
-                    it.copy(currentAlbum = album, isAlbumCreatedSuccessfully = true)
+    fun createNewAlbum(title: String, proscribedStrings: List<String>) {
+        if (createAlbumJob?.isActive == true) return
+        createAlbumJob = viewModelScope.launch {
+            try {
+                val finalTitle = title.ifEmpty {
+                    _state.value.createAlbumPlaceholderTitle
+                }.trim()
+                if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                    val album = createAlbum(finalTitle)
+                    _state.update {
+                        it.copy(
+                            currentAlbum = album,
+                            isAlbumCreatedSuccessfully = true,
+                        )
+                    }
+                    Timber.d("Current album: ${album.title}")
                 }
-                Timber.d("Current album: ${album.title}")
-            }
-        } catch (exception: Exception) {
-            Timber.e(exception)
-            _state.update {
-                it.copy(isAlbumCreatedSuccessfully = false)
+            } catch (exception: Exception) {
+                Timber.e(exception)
+                _state.update {
+                    it.copy(isAlbumCreatedSuccessfully = false)
+                }
             }
         }
     }
@@ -228,6 +236,11 @@ class AlbumsViewModel @Inject constructor(
 
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
         albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
+
+    internal fun getCurrentUIAlbum(): UIAlbum? {
+        val currentAlbum = _state.value.currentAlbum
+        return _state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+    }
 
     /**
      * Get the default album title
@@ -250,15 +263,11 @@ class AlbumsViewModel @Inject constructor(
         it.id is Album.UserAlbum
     }.map { it.title }
 
-    private fun getAllSystemAlbumsNames() = _state.value.albums.filter {
-        it.id !is Album.UserAlbum
-    }.map { it.title }
-
     private fun checkTitleValidity(title: String, proscribedStrings: List<String>): Boolean {
         var errorMessage: Int? = null
         var isTitleValid = true
 
-        if (title in (getAllSystemAlbumsNames() + proscribedStrings)) {
+        if (title.isEmpty() || title.lowercase() in proscribedStrings.map { it.lowercase() }) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_systems_album
         } else if (title in getAllUserAlbumsNames()) {

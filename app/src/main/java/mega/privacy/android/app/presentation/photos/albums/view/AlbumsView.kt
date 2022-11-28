@@ -43,6 +43,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.caption
 import mega.privacy.android.presentation.theme.grey_alpha_054
@@ -60,6 +61,7 @@ fun AlbumsView(
     setInputValidity: (Boolean) -> Unit = {},
     openPhotosSelectionActivity: (AlbumId) -> Unit = {},
     setIsAlbumCreatedSuccessfully: (Boolean) -> Unit = {},
+    allPhotos: List<Photo> = emptyList(),
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -186,7 +188,9 @@ fun AlbumsView(
         } else {
             setIsAlbumCreatedSuccessfully(false)
             openDialog.value = false
-            openPhotosSelectionActivity((albumsViewState.currentAlbum as Album.UserAlbum).id)
+            if (allPhotos.isNotEmpty()) {
+                openPhotosSelectionActivity((albumsViewState.currentAlbum as Album.UserAlbum).id)
+            }
         }
     }
 }

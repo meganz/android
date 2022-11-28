@@ -3936,16 +3936,45 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">グループから退出</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album"></string>
+    <string name="photos_create_album_error_message_systems_album">このアルバム名は使用できません。別の名前を入力してください。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">この名前のアルバムはすでに存在します。別の名前を入力してください。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新しいアルバム（%d）</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">項目を「%s」に追加</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="other">%d項目を「%s」に追加しました</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">お支払い情報</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Proメンバーシッププランが間もなく失効いたします</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">%1$sプランのお支払いをお受けいたしました。</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">%1$sプランのお支払いに失敗しました。</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="other">お客様のProメンバーシッププランは%1$d日後に失効いたします。</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="other">お客様のProメンバーシッププランは%1$d日前に失効いたしました。</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[A]アルバム[/A]が[B]空[/B]です</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">私のアルバム</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">共有アルバム</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">過去のミーティング</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">今後のミーティング</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">定期ミーティング</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s毎週</string>
 </resources>

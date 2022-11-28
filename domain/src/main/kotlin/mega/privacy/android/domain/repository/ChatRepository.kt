@@ -3,6 +3,8 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -74,5 +76,68 @@ interface ChatRepository {
      * @param chatId      Chat Id
      * @return [ChatRoom] containing the updated data.
      */
-    fun getChatRoom(chatId: Long): ChatRoom?
+    suspend fun getChatRoom(chatId: Long): ChatRoom?
+
+    /**
+     * Monitor updates on scheduled meetings
+     *
+     * @return          A flow of [ChatScheduledMeeting]
+     */
+    fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
+
+    /**
+     * Monitor updates on scheduled meeting occurrences
+     *
+     * @return          A flow of schedIds
+     */
+    fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return The scheduled meeting.
+     */
+    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @return The list of scheduled meetings occurrences.
+     */
+    suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>?
+
+    /**
+     * Invite contacts to chat.
+     *
+     * @param chatId            The Chat id.
+     * @param contactsData      List of contacts to add
+     */
+    suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
+
+    /**
+     * Query chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun queryChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Remove chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun removeChatLink(chatId: Long): ChatRequest
 }

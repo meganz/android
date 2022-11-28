@@ -10,6 +10,8 @@ import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
@@ -30,6 +32,7 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
 import mega.privacy.android.data.mapper.PricingMapper
@@ -63,6 +66,8 @@ import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
+import mega.privacy.android.data.mapper.toChatScheduledMeeting
+import mega.privacy.android.data.mapper.toChatScheduledMeetingOccur
 import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
@@ -77,6 +82,7 @@ import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
+import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
@@ -402,6 +408,23 @@ internal class MapperModule {
      */
     @Provides
     fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
+
+    /**
+     * Provide chat scheduled meeting mapper
+     */
+    @Provides
+    fun provideChatScheduledMeetingMapper(): ChatScheduledMeetingMapper = ::toChatScheduledMeeting
+
+    /**
+     * Provide chat scheduled meeting occurr mapper
+     */
+    @Provides
+    fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
+        ::toChatScheduledMeetingOccur
+
+    @Provides
+    fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
+        ::toOfflineNodeInformation
 
     /**
      * Provide [CountryMapper] mapper

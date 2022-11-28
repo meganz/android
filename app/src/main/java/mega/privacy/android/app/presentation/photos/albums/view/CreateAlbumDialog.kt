@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.presentation.controls.MegaDialog
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.caption
@@ -67,7 +69,11 @@ fun CreateNewAlbumDialog(
     val proscribedString = listOf(
         stringResource(id = R.string.photos_album_subsection_my_albums),
         stringResource(id = R.string.photos_album_subsection_shared_albums),
+        stringResource(id = R.string.title_favourites_album),
+        stringResource(id = R.string.photos_album_title_gif),
+        stringResource(id = R.string.photos_album_title_raw),
     )
+    val maxCharacter = 250
 
     val inputColor = if (isInputValid()) {
         if (MaterialTheme.colors.isLight) {
@@ -114,7 +120,7 @@ fun CreateNewAlbumDialog(
 
     MegaDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.padding(horizontal = 40.dp),
+        modifier = Modifier.padding(horizontal = 40.dp).widthIn(max = 280.dp),
         onDismissRequest = onDismissRequest,
         titleStringID = R.string.photos_album_creation_dialog_title,
         body = {
@@ -123,7 +129,9 @@ fun CreateNewAlbumDialog(
                     value = textState,
                     onValueChange = {
                         onDialogInputChange(true)
-                        textState = it
+                        if (it.length <= maxCharacter) {
+                            textState = it
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -211,7 +219,9 @@ fun CreateNewAlbumDialog(
         },
         confirmButton = {
             Button(
-                onClick = { onDialogPositiveButtonClicked(textState, proscribedString) },
+                onClick = {
+                    onDialogPositiveButtonClicked(textState, proscribedString)
+                },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,
                 ),

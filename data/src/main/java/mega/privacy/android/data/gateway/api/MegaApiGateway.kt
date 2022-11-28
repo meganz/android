@@ -414,6 +414,13 @@ interface MegaApiGateway {
     fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
+     * Cancels all [MegaTransfer] uploads
+     *
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?)
+
+    /**
      * Gets the number of unread user alerts for the logged in user.
      *
      * @return Number of unread user alerts.
@@ -737,6 +744,21 @@ interface MegaApiGateway {
     )
 
     /**
+     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name
+     *
+     * @param nodeToCopy the [MegaNode] to copy
+     * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun copyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
      * Creates a copy of MegaRecentActionBucket required for its usage in the app.
      *
      * @param bucket The MegaRecentActionBucket received.
@@ -1026,4 +1048,19 @@ interface MegaApiGateway {
      */
     fun resetSmsVerifiedPhoneNumber(listener: MegaRequestListenerInterface?)
 
+
+    /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     * @param listener
+     */
+    fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
 }

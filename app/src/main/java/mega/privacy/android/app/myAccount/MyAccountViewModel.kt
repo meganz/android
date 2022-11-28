@@ -18,6 +18,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -71,6 +72,8 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -106,6 +109,8 @@ class MyAccountViewModel @Inject constructor(
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
+    private val getAccountDetails: GetAccountDetails,
+    private val getExtendedAccountDetail: GetExtendedAccountDetail,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -398,11 +403,15 @@ class MyAccountViewModel @Inject constructor(
 
         when (requestCode) {
             REQUEST_CODE_REFRESH -> {
-                val app = MegaApplication.getInstance()
-
-                app.askForAccountDetails()
-                app.askForExtendedAccountDetails()
-                LiveEventBus.get(EVENT_REFRESH).post(true)
+                viewModelScope.launch {
+                    getAccountDetails(true)
+                    getExtendedAccountDetail(
+                        sessions = true,
+                        purchases = false,
+                        transactions = false
+                    )
+                    LiveEventBus.get(EVENT_REFRESH).post(true)
+                }
             }
             TAKE_PICTURE_PROFILE_CODE -> addProfileAvatar(null)
             CHOOSE_PICTURE_PROFILE_CODE -> {

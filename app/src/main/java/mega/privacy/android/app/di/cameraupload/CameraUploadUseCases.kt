@@ -68,6 +68,8 @@ import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
+import mega.privacy.android.domain.usecase.DefaultResetPrimaryTimeline
+import mega.privacy.android.domain.usecase.DefaultResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultRestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
@@ -101,6 +103,8 @@ import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
+import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -399,6 +403,18 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindGetDefaultNodeHandle(getDefaultNodeHandle: DefaultGetDefaultNodeHandle): GetDefaultNodeHandle
+
+    /**
+     * Provide the [ResetPrimaryTimeline] implementation
+     */
+    @Binds
+    abstract fun bindResetPrimaryTimeline(resetPrimaryTimeline: DefaultResetPrimaryTimeline): ResetPrimaryTimeline
+
+    /**
+     * Provide the [ResetSecondaryTimeline] implementation
+     */
+    @Binds
+    abstract fun bindResetSecondaryTimeline(resetSecondaryTimeline: DefaultResetSecondaryTimeline): ResetSecondaryTimeline
 
     /**
      * Provide the [GetPrimarySyncHandle] implementation

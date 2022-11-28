@@ -60,6 +60,7 @@ class SettingsFragmentTest {
 
     private val idlingResource = CountingIdlingResource("IdleCounter")
     private val hide = MutableStateFlow(false)
+    private val mediaDiscoveryViewState = MutableStateFlow(0)
     private val initialScreen = 0
     private val startScreen = MutableStateFlow(initialScreen)
 
@@ -74,6 +75,7 @@ class SettingsFragmentTest {
 
     private fun initialiseMockDefaults() {
         whenever(TestSettingsModule.monitorHideRecentActivity()).thenReturn(hide)
+        whenever(TestSettingsModule.monitorMediaDiscoveryView()).thenReturn(mediaDiscoveryViewState)
     }
 
     @After

@@ -20,6 +20,7 @@ import javax.inject.Inject
 private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
 private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
 private const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
+private const val MEDIA_DISCOVERY_VIEW = "MEDIA_DISCOVERY_VIEW"
 private const val uiPreferenceFileName = USER_INTERFACE_PREFERENCES
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = uiPreferenceFileName,
@@ -41,6 +42,7 @@ internal class UIPreferencesDatastore @Inject constructor(
 ) : UIPreferencesGateway {
     private val preferredStartScreenKey = intPreferencesKey(PREFERRED_START_SCREEN)
     private val hideRecentActivityKey = booleanPreferencesKey(HIDE_RECENT_ACTIVITY)
+    private val mediaDiscoveryViewKey = intPreferencesKey(MEDIA_DISCOVERY_VIEW)
 
     override fun monitorPreferredStartScreen() = context.uiPreferenceDataStore.data
         .catch { exception ->
@@ -86,9 +88,25 @@ internal class UIPreferencesDatastore @Inject constructor(
             it[hideRecentActivityKey]
         }
 
+    override fun monitorMediaDiscoveryView(): Flow<Int?> = context.uiPreferenceDataStore.data
+        .catch { exception ->
+            if (exception is IOException)
+                emit(emptyPreferences())
+            else
+                throw  exception
+        }.map {
+            it[mediaDiscoveryViewKey]
+        }
+
     override suspend fun setHideRecentActivity(value: Boolean) {
         context.uiPreferenceDataStore.edit {
             it[hideRecentActivityKey] = value
+        }
+    }
+
+    override suspend fun setMediaDiscoveryView(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[mediaDiscoveryViewKey] = value
         }
     }
 }

@@ -308,7 +308,19 @@ internal class MegaApiFacade @Inject constructor(
         MegaApiAndroid.base64ToHandle(base64Handle)
 
     override fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?) {
-        megaApi.cancelTransfer(transfer, listener)
+        if (listener != null) {
+            megaApi.cancelTransfer(transfer, listener)
+        } else {
+            megaApi.cancelTransfer(transfer)
+        }
+    }
+
+    override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
+        if (listener != null) {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
+        } else {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+        }
     }
 
     override suspend fun getNumUnreadUserAlerts(): Int = megaApi.numUnreadUserAlerts
@@ -462,6 +474,17 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getRecentActionsAsync(days, maxNodes, listener)
 
+    override fun copyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        listener?.let {
+            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, it)
+        } ?: megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+    }
+
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
         megaApi.copyBucket(bucket)
 
@@ -484,7 +507,7 @@ internal class MegaApiFacade @Inject constructor(
         storage: Boolean,
         transfer: Boolean,
         pro: Boolean,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         megaApi.getSpecificAccountDetails(storage, transfer, pro, listener)
     }
@@ -585,5 +608,14 @@ internal class MegaApiFacade @Inject constructor(
         } else {
             megaApi.resetSmsVerifiedPhoneNumber(listener)
         }
+    }
+
+    override fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
 }

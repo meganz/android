@@ -60,9 +60,11 @@ import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
+import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
-import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
+import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -163,6 +165,12 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetNodeFromCloud() = mock<GetNodeFromCloud>()
+
+    @Provides
+    fun provideResetPrimaryTimeline() = mock<ResetPrimaryTimeline>()
+
+    @Provides
+    fun provideResetSecondaryTimeline() = mock<ResetSecondaryTimeline>()
 
     @Provides
     fun provideUpdateTimeStamp() = mock<UpdateCameraUploadTimeStamp>()

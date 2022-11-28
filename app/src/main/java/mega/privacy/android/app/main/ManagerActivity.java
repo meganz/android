@@ -8161,7 +8161,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             ((MegaApplication) getApplication()).askForFullAccountInfo();
-            ((MegaApplication) getApplication()).askForExtendedAccountDetails();
+            viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                 viewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));

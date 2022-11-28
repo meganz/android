@@ -105,7 +105,8 @@ class ManagerViewModelTest {
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
             monitorConnectivity = monitorConnectivity,
-            broadcastUploadPauseState = mock()
+            broadcastUploadPauseState = mock(),
+            getExtendedAccountDetail = mock(),
         )
     }
 

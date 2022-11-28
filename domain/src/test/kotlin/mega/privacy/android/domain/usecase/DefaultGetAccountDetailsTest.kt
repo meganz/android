@@ -29,6 +29,7 @@ class DefaultGetAccountDetailsTest {
         whenever(accountRepository.storageCapacityUsedIsBlank()).thenReturn(true)
         underTest(false)
 
+        verify(accountRepository).resetAccountDetailsTimeStamp()
         verify(accountRepository).requestAccount()
     }
 
@@ -38,6 +39,7 @@ class DefaultGetAccountDetailsTest {
         whenever(isDatabaseEntryStale()).thenReturn(false)
         underTest(true)
 
+        verify(accountRepository).resetAccountDetailsTimeStamp()
         verify(accountRepository).requestAccount()
     }
 
@@ -47,6 +49,7 @@ class DefaultGetAccountDetailsTest {
         whenever(isDatabaseEntryStale()).thenReturn(false)
         underTest(false)
 
+        verify(accountRepository, never()).resetAccountDetailsTimeStamp()
         verify(accountRepository, never()).requestAccount()
     }
 }

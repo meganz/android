@@ -26,23 +26,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -51,37 +52,49 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.black
+import mega.privacy.android.presentation.theme.grey_alpha_054
+import mega.privacy.android.presentation.theme.grey_alpha_087
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
+import mega.privacy.android.presentation.theme.white_alpha_054
+import mega.privacy.android.presentation.theme.white_alpha_087
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumPhotosSelectionScreen(
     viewModel: AlbumPhotosSelectionViewModel = viewModel(),
     onBackClicked: () -> Unit,
-    onCompletion: (message: String) -> Unit,
+    onCompletion: (albumId: AlbumId, message: String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLight = MaterialTheme.colors.isLight
     val lazyGridState = rememberLazyGridState()
+    val coroutineScope = rememberCoroutineScope()
 
     var showSelectLocationDialog by rememberSaveable { mutableStateOf(false) }
     var showMoreMenu by rememberSaveable { mutableStateOf(false) }
+
+    if (state.isInvalidAlbum) onBackClicked()
 
     handleSelectLocationDialog(
         showSelectLocationDialog = showSelectLocationDialog,
         selectedLocation = state.selectedLocation,
         onLocationSelected = { location ->
             showSelectLocationDialog = false
+            coroutineScope.launch { lazyGridState.scrollToItem(0) }
 
             viewModel.updateLocation(location)
             viewModel.filterPhotos()
         },
-        onDialogDismissed = { showSelectLocationDialog = false },
+        onDialogDismissed = {
+            showSelectLocationDialog = false
+        },
     )
 
-    handleCompletion(
+    handleAddPhotosCompletion(
         album = state.album,
         selectedPhotoIds = state.selectedPhotoIds,
         isSelectionCompleted = state.isSelectionCompleted,
@@ -93,6 +106,7 @@ fun AlbumPhotosSelectionScreen(
             AlbumPhotosSelectionHeader(
                 album = state.album,
                 selectedLocation = state.selectedLocation,
+                isLocationDetermined = state.isLocationDetermined,
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
@@ -103,9 +117,15 @@ fun AlbumPhotosSelectionScreen(
                         viewModel.clearSelection()
                     }
                 },
-                onFilterClicked = { showSelectLocationDialog = true },
-                onMoreClicked = { showMoreMenu = true },
-                onMoreDismissed = { showMoreMenu = false },
+                onFilterClicked = {
+                    showSelectLocationDialog = true
+                },
+                onMoreClicked = {
+                    showMoreMenu = true
+                },
+                onMoreDismissed = {
+                    showMoreMenu = false
+                },
                 onSelectAllClicked = {
                     showMoreMenu = false
                     viewModel.selectAllPhotos()
@@ -117,7 +137,10 @@ fun AlbumPhotosSelectionScreen(
             )
         },
         floatingActionButton = {
-            state.album?.let { album ->
+            val album = state.album
+            val photos = state.photos
+
+            if (album != null && photos.isNotEmpty()) {
                 FloatingActionButton(
                     onClick = {
                         viewModel.addPhotos(
@@ -130,7 +153,7 @@ fun AlbumPhotosSelectionScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_check),
                         contentDescription = null,
-                        tint = white,
+                        tint = white.takeIf { isLight } ?: black,
                     )
                 }
             }
@@ -157,6 +180,7 @@ fun AlbumPhotosSelectionScreen(
 private fun AlbumPhotosSelectionHeader(
     album: Album.UserAlbum?,
     selectedLocation: TimelinePhotosSource,
+    isLocationDetermined: Boolean,
     numSelectedPhotos: Int,
     showFilterMenu: Boolean,
     showMoreMenu: Boolean,
@@ -186,13 +210,18 @@ private fun AlbumPhotosSelectionHeader(
                             album?.title.orEmpty(),
                         ),
                         fontWeight = FontWeight.W500,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
                         style = MaterialTheme.typography.subtitle1,
                     )
-                    Text(
-                        text = selectedLocation.text(),
-                        modifier = Modifier.alpha(0.54f),
-                        style = MaterialTheme.typography.caption,
-                    )
+
+                    if (isLocationDetermined) {
+                        Text(
+                            text = selectedLocation.text(),
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            style = MaterialTheme.typography.caption,
+                        )
+                    }
                 }
             }
         },
@@ -253,7 +282,9 @@ private fun AlbumPhotosSelectionContent(
 ) {
     PhotosGridView(
         currentZoomLevel = ZoomLevel.Grid_3,
-        photoDownland = onPhotoDownload,
+        photoDownland = { _, photo, callback ->
+            onPhotoDownload(photo, callback)
+        },
         lazyGridState = lazyGridState,
         onClick = onPhotoSelection,
         onLongPress = onPhotoSelection,
@@ -284,6 +315,8 @@ private fun SelectLocationDialog(
     onLocationSelected: (TimelinePhotosSource) -> Unit,
     onDialogDismissed: () -> Unit,
 ) {
+    val isLight = MaterialTheme.colors.isLight
+
     Dialog(onDismissRequest = onDialogDismissed) {
         Card(shape = RoundedCornerShape(2.dp)) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -292,7 +325,13 @@ private fun SelectLocationDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onLocationSelected(location) }
+                            .clickable {
+                                if (location == selectedLocation) {
+                                    onDialogDismissed()
+                                } else {
+                                    onLocationSelected(location)
+                                }
+                            }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         verticalAlignment = CenterVertically,
                     ) {
@@ -303,12 +342,20 @@ private fun SelectLocationDialog(
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
                             text = location.text(),
-                            modifier = Modifier.alpha(
-                                1f.takeIf { location == selectedLocation } ?: 0.54f
-                            ),
+                            color = if (isLight) {
+                                grey_alpha_087.takeIf {
+                                    location == selectedLocation
+                                } ?: grey_alpha_054
+                            } else {
+                                white_alpha_087.takeIf {
+                                    location == selectedLocation
+                                } ?: white_alpha_054
+                            },
+                            fontWeight = FontWeight.W400,
+                            style = MaterialTheme.typography.subtitle2,
                         )
                     }
-                    Spacer(modifier = Modifier.size(8.dp))
+                    Spacer(modifier = Modifier.size(4.dp))
                 }
                 Text(
                     text = stringResource(id = R.string.button_cancel).uppercase(),
@@ -327,24 +374,23 @@ private fun SelectLocationDialog(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun handleCompletion(
+private fun handleAddPhotosCompletion(
     album: Album.UserAlbum?,
     selectedPhotoIds: Set<Long>,
     isSelectionCompleted: Boolean,
-    onCompletion: (message: String) -> Unit,
+    onCompletion: (albumId: AlbumId, message: String) -> Unit,
 ) {
-    if (isSelectionCompleted) {
-        val message = "".takeIf { selectedPhotoIds.isEmpty() } ?: album?.title?.let { albumName ->
-            pluralStringResource(
-                id = R.plurals.photos_album_selection_added,
-                count = selectedPhotoIds.size,
-                selectedPhotoIds.size,
-                albumName
-            )
-        }.orEmpty()
+    val albumId = album?.id
+    if (albumId != null && isSelectionCompleted) {
+        val message = "".takeIf { selectedPhotoIds.isEmpty() } ?: pluralStringResource(
+            id = R.plurals.photos_album_selection_added,
+            count = selectedPhotoIds.size,
+            selectedPhotoIds.size,
+            album.title,
+        )
 
         LaunchedEffect(Unit) {
-            onCompletion(message)
+            onCompletion(album.id, message)
         }
     }
 }

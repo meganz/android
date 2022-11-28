@@ -4040,7 +4040,7 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Gruppe verlassen</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album"></string>
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -4052,4 +4052,36 @@
         <item quantity="one">Added %d item to “%s“</item>
         <item quantity="other">Added %d items to “%s”</item>
     </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Informationen zur Zahlung</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Ihr Pro-Abonnement läuft bald ab</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Wir haben Ihre Zahlung für das %1$s-Abonnement erhalten.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Ihre Zahlung für das %1$s-Abonnement ist fehlgeschlagen.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Ihr Pro-Abonnement läuft in einem Tag ab.</item>
+        <item quantity="other">Ihr Pro-Abonnement läuft in %1$d Tagen ab.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Ihr Pro-Abonnement ist vor einem Tag abgelaufen.</item>
+        <item quantity="other">Ihr Pro-Abonnement ist vor %1$d Tagen abgelaufen.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Vergangene Meetings</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Wiederkehrendes Meeting</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

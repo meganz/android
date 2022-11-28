@@ -168,6 +168,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setHideRecentActivity(value: Boolean) =
         uiPreferencesGateway.setHideRecentActivity(value)
 
+    override fun monitorMediaDiscoveryView(): Flow<Int?> =
+        uiPreferencesGateway.monitorMediaDiscoveryView()
+
+    override suspend fun setMediaDiscoveryView(value: Int) =
+        uiPreferencesGateway.setMediaDiscoveryView(value)
+
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()
 
