@@ -19,6 +19,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
+import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
 import mega.privacy.android.data.mapper.SubscriptionPlanMapper
@@ -48,18 +49,21 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [AccountRepository]
  *
- * @property myAccountInfoFacade
- * @property megaApiGateway
- * @property megaChatApiGateway
- * @property ioDispatcher
- * @property userUpdateMapper
- * @property localStorageGateway
- * @property userAccountMapper
- * @property accountTypeMapper
- * @property subscriptionPlanMapper
- * @property currencyMapper
- * @property skuMapper
- * @property subscriptionPlanListMapper
+ * @property myAccountInfoFacade        [AccountInfoWrapper]
+ * @property megaApiGateway             [MegaApiGateway]
+ * @property megaChatApiGateway         [MegaChatApiGateway]
+ * @property dbHandler                  [DatabaseHandler]
+ * @property ioDispatcher               [CoroutineDispatcher]
+ * @property userUpdateMapper           [UserUpdateMapper]
+ * @property localStorageGateway        [MegaLocalStorageGateway]
+ * @property userAccountMapper          [UserAccountMapper]
+ * @property accountTypeMapper          [AccountTypeMapper]
+ * @property subscriptionPlanMapper     [SubscriptionPlanMapper]
+ * @property currencyMapper             [CurrencyMapper]
+ * @property skuMapper                  [SkuMapper]
+ * @property subscriptionPlanListMapper [SubscriptionPlanListMapper]
+ * @property megaAchievementMapper      [MegaAchievementMapper]
+ * @property myAccountCredentialsMapper [MyAccountCredentialsMapper]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -77,6 +81,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val skuMapper: SkuMapper,
     private val subscriptionPlanListMapper: SubscriptionPlanListMapper,
     private val megaAchievementMapper: MegaAchievementMapper,
+    private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -309,7 +314,7 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun getMyCredentials() = withContext(ioDispatcher) {
-        megaApiGateway.myCredentials
+        myAccountCredentialsMapper(megaApiGateway.myCredentials)
     }
 
     override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
