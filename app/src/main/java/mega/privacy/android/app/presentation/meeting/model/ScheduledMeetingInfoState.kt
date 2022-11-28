@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 /**
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
  *
- * @property buttons                                    List of available action buttons.
  * @property chatId                                     Chat id.
  * @property chatTitle                                  Chat title.
  * @property scheduledMeeting                           Current scheduled meeting item.
@@ -30,6 +29,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
  * @property snackBar                                   String resource id for showing an snackBar.
  * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
+ *  @property manageChatHistoryText                      Manage Chat History text.
+ * @property buttons                                    List of available action buttons.
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
  * @property lastParticipant                            Last participant in the chat room.
@@ -49,6 +50,7 @@ data class ScheduledMeetingInfoState(
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
     val snackBar: Int? = null,
     val leaveGroupDialog: Boolean = false,
+    val manageChatHistoryText: String = " ",
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = ChatParticipant(

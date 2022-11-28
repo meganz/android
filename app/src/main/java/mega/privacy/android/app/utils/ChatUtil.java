@@ -1476,7 +1476,7 @@ public class ChatUtil {
      */
     public static String transformSecondsInString(long seconds) {
         if (seconds == DISABLED_RETENTION_TIME)
-            return " ";
+            return "";
 
         long hours = seconds % SECONDS_IN_HOUR;
         long days = seconds % SECONDS_IN_DAY;
@@ -1508,7 +1508,7 @@ public class ChatUtil {
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
         }
 
-        return " ";
+        return "";
     }
 
     /**

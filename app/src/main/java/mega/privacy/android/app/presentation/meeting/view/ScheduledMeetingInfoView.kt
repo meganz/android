@@ -537,7 +537,7 @@ private fun ActionButton(
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            if (action != ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation || state.isHost || !state.isPublic) {
+            if (action != ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation) {
                 onButtonClicked(action)
             }
         }) {
@@ -602,23 +602,41 @@ private fun ActionButton(
             }
             ScheduledMeetingInfoAction.MeetingLink,
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants,
-            ScheduledMeetingInfoAction.ManageChatHistory,
             -> {
                 if (state.isHost) {
-                    ActionOption(action = action,
+                    ActionOption(
+                        state = state,
+                        action = action,
                         isEnabled = if (action == ScheduledMeetingInfoAction.MeetingLink) state.enabledMeetingLinkOption else state.enabledAllowNonHostAddParticipantsOption,
-                        hasSwitch = action != ScheduledMeetingInfoAction.ManageChatHistory)
-                    divider(withStartPadding = action != ScheduledMeetingInfoAction.ManageChatHistory)
+                        hasSwitch = true)
+                    divider(withStartPadding = true)
+                }
+            }
+            ScheduledMeetingInfoAction.ManageChatHistory -> {
+                if (state.isHost) {
+                    ActionOption(
+                        state = state,
+                        action = action,
+                        isEnabled = true,
+                        hasSwitch = false)
+                    divider(withStartPadding = true)
+
                 }
             }
             ScheduledMeetingInfoAction.ChatNotifications -> {
-                ActionOption(action = action,
+                ActionOption(
+                    state = state,
+                    action = action,
                     isEnabled = state.enabledChatNotificationsOption,
                     hasSwitch = true)
                 divider(withStartPadding = true)
             }
             ScheduledMeetingInfoAction.ShareFiles -> {
-                ActionOption(action = action, isEnabled = true, hasSwitch = false)
+                ActionOption(
+                    state = state,
+                    action = action,
+                    isEnabled = true,
+                    hasSwitch = false)
                 divider(withStartPadding = state.isHost)
             }
         }
@@ -747,12 +765,14 @@ fun divider(withStartPadding: Boolean) {
 /**
  * Show action buttons options
  *
+ * @param state         [ScheduledMeetingInfoState]
  * @param action        [ScheduledMeetingInfoAction]
  * @param isEnabled     True, if the option must be enabled. False if not
  * @param hasSwitch     True, if the option has a switch. False if not
  */
 @Composable
 private fun ActionOption(
+    state: ScheduledMeetingInfoState,
     action: ScheduledMeetingInfoAction,
     isEnabled: Boolean,
     hasSwitch: Boolean,
@@ -774,7 +794,13 @@ private fun ActionOption(
                 }
             }
 
-            ActionText(actionText = action.title)
+            Column(modifier = Modifier
+                .fillMaxSize()) {
+                ActionText(actionText = action.title)
+                if (action == ScheduledMeetingInfoAction.ManageChatHistory && state.manageChatHistoryText.isNotEmpty()) {
+                    ActionSubtitleText(state.manageChatHistoryText)
+                }
+            }
         }
 
         if (hasSwitch) {
@@ -790,6 +816,20 @@ private fun ActionOption(
 
         }
     }
+}
+
+/**
+ * Subtitle text of the available options
+ *
+ * @param text subtitle text
+ */
+@Composable
+private fun ActionSubtitleText(text: String) {
+    Text(modifier = Modifier
+        .padding(start = 32.dp, end = 23.dp),
+        style = MaterialTheme.typography.subtitle2,
+        text = text,
+        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
 }
 
 /**
