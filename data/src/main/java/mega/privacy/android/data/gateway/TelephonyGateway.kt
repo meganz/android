@@ -20,6 +20,6 @@ internal interface TelephonyGateway {
      * @param number
      * @param countryCode
      */
-    suspend fun formatPhoneNumber(number: String, countryCode: String): String
+    suspend fun formatPhoneNumber(number: String, countryCode: String): String?
 
 }

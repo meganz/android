@@ -23,7 +23,6 @@ internal class TelephonyFacade @Inject constructor(@ApplicationContext private v
         return tm?.isNetworkRoaming ?: false
     }
 
-    override suspend fun formatPhoneNumber(number: String, countryCode: String): String {
-        return PhoneNumberUtils.formatNumberToE164(number, countryCode)
-    }
+    override suspend fun formatPhoneNumber(number: String, countryCode: String): String? =
+        PhoneNumberUtils.formatNumberToE164(number, countryCode)
 }
