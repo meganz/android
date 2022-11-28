@@ -10505,7 +10505,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void setPendingActionsBadge() {
-        pendingActionsBadge.setVisibility(View.VISIBLE);
         //// TODO Get pending actions count from SDK api and add a badge on UI
     }
 
