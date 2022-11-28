@@ -5,11 +5,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.presentation.favourites.facade.DateUtilFacade
-import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilFacade
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilFacade
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.data.wrapper.DateUtilWrapper
 
 @Module
 @InstallIn(SingletonComponent::class)
