@@ -119,6 +119,19 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/verify_user_option"
+                style="@style/BottomSheetOption"
+                android:text="Verify Joshua Pandey"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_change_permissions"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
                 android:id="@+id/properties_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_info"
