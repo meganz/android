@@ -81,6 +81,13 @@ interface ChatRepository {
     fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
 
     /**
+     * Get meeting chat rooms
+     *
+     * @return  List of [ChatRoom]
+     */
+    suspend fun getMeetingChatRooms(): List<ChatRoom>?
+
+    /**
      * Gets chat room if it exists
      *
      * @param chatId      Chat Id
@@ -103,19 +110,26 @@ interface ChatRepository {
     fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
 
     /**
+     * Get all scheduled meetings
+     *
+     * @return List of scheduled meetings
+     */
+    suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>?
+
+    /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
      *
      * @param chatId  MegaChatHandle that identifies a chat room
      * @param schedId MegaChatHandle that identifies a scheduled meeting
      * @return The scheduled meeting.
      */
-    fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
+    suspend fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
 
     /**
      * Get a list of all scheduled meeting for a chatroom
      *
      * @param chatId MegaChatHandle that identifies a chat room
-     * @return The scheduled meeting.
+     * @return List of scheduled meeting.
      */
     suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>
 
