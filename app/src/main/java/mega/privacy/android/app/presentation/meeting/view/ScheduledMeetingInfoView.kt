@@ -454,7 +454,9 @@ private fun ActionButton(
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            onButtonClicked(action)
+            if (action != ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation || state.isHost || !state.isPublic) {
+                onButtonClicked(action)
+            }
         }) {
         when (action) {
             ScheduledMeetingInfoAction.ShareMeetingLink -> {
@@ -471,13 +473,36 @@ private fun ActionButton(
                 divider(withStartPadding = true)
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
-                if (state.isHost) {
+                if (state.isHost && state.isPublic) {
                     Text(modifier = Modifier.padding(start = 14.dp,
                         end = 16.dp,
                         top = 18.dp),
                         style = MaterialTheme.typography.button,
-                        text = stringResource(id = action.title),
+                        text = stringResource(id = action.title).uppercase(),
                         color = MaterialTheme.colors.secondary)
+
+                    action.description?.let { description ->
+                        Text(modifier = Modifier.padding(start = 14.dp,
+                            end = 16.dp,
+                            top = 10.dp,
+                            bottom = 8.dp),
+                            style = MaterialTheme.typography.subtitle2,
+                            text = stringResource(id = description),
+                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                    }
+
+                    divider(withStartPadding = false)
+                }
+            }
+            ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation,
+            -> {
+                if (state.isHost && !state.isPublic) {
+                    Text(modifier = Modifier.padding(start = 14.dp,
+                        end = 16.dp,
+                        top = 18.dp),
+                        style = MaterialTheme.typography.subtitle1,
+                        text = stringResource(id = action.title),
+                        color = if (MaterialTheme.colors.isLight) black else white)
 
                     action.description?.let { description ->
                         Text(modifier = Modifier.padding(start = 14.dp,

@@ -2,26 +2,33 @@ package mega.privacy.android.app.presentation.meeting
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
@@ -120,6 +127,47 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
             }
     }
 
+    /**
+     * Open shared files
+     */
+    private fun openSharedFiles() {
+        val intent =
+            Intent(this@ScheduledMeetingInfoActivity, NodeAttachmentHistoryActivity::class.java)
+        intent.putExtra("chatId", chatRoomId)
+        startActivity(intent)
+    }
+
+    /**
+     * Shows dialog to confirm making the chat private
+     */
+    private fun showConfirmationPrivateChatDialog() {
+        Timber.d("Show Enable encryption key rotation dialog")
+        var dialog: AlertDialog? = null
+        val dialogBuilder =
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+
+        val dialogView = this.layoutInflater.inflate(R.layout.dialog_chat_link_options, null)
+        dialogBuilder.setView(dialogView)
+
+        val actionButton = dialogView.findViewById<Button>(R.id.chat_link_button_action)
+        actionButton.text = getString(R.string.general_enable)
+        actionButton.setOnClickListener {
+            dialog?.dismiss()
+            viewModel.enableEncryptedKeyRotation()
+        }
+
+        val title = dialogView.findViewById<TextView>(R.id.chat_link_title)
+        title.text = getString(R.string.make_chat_private_option)
+
+        val text = dialogView.findViewById<TextView>(R.id.text_chat_link)
+        text.text = getString(R.string.context_make_private_chat_warning_text)
+
+        val secondText = dialogView.findViewById<TextView>(R.id.second_text_chat_link)
+        secondText.visibility = View.GONE
+        dialog = dialogBuilder.create()
+        dialog.show()
+    }
+
     @Composable
     private fun ScheduledMeetingInfoView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
@@ -127,7 +175,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
         val uiState by viewModel.state.collectAsState()
         AndroidTheme(isDark = isDark) {
             ScheduledMeetingInfoView(state = uiState,
-                onButtonClicked = { viewModel::onActionTap },
+                onButtonClicked = ::onActionTap,
                 onEditClicked = { viewModel::onEditTap },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
                 onSeeMoreClicked = { viewModel::onSeeMoreTap },
@@ -135,6 +183,22 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                 onParticipantClicked = { viewModel::onParticipantTap },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = { finish() })
+        }
+    }
+
+    /**
+     * Tap in a button action
+     */
+    private fun onActionTap(action: ScheduledMeetingInfoAction) {
+        when (action) {
+            ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
+            ScheduledMeetingInfoAction.ShareMeetingLink -> viewModel.onShareMeetingLinkTap()
+            ScheduledMeetingInfoAction.ChatNotifications -> viewModel.onChatNotificationsTap()
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
+            ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
+            ScheduledMeetingInfoAction.ManageChatHistory -> viewModel.onManageChatHistoryTap()
+            ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
+            ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
         }
     }
 }
