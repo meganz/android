@@ -27,9 +27,11 @@ import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
+import mega.privacy.android.domain.usecase.GetOfflineFile
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
@@ -119,4 +121,10 @@ object FavouritesTestModule {
 
     @Provides
     fun provideCreateAlbum(): CreateAlbum = mock()
+
+    @Provides
+    fun provideIsAvailableOffline(): IsAvailableOffline = mock()
+
+    @Provides
+    fun provideGetOfflineFile(): GetOfflineFile = mock()
 }
