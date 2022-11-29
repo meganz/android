@@ -1,7 +1,7 @@
 package mega.privacy.android.data.facade
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -31,7 +31,20 @@ class AppEventFacadeTest {
     fun `test that broadcast upload pause state fires an event`() = runTest {
         underTest.monitorCameraUploadPauseState.test {
             underTest.broadcastUploadPauseState()
-            Truth.assertThat(awaitItem()).isTrue()
+            assertThat(awaitItem()).isTrue()
         }
+    }
+
+    @Test
+    fun `test that set SMS Verification Shown set the correct state`() = runTest {
+        underTest.setSMSVerificationShown(true)
+        assertThat(underTest.isSMSVerificationShown()).isTrue()
+        underTest.setSMSVerificationShown(false)
+        assertThat(underTest.isSMSVerificationShown()).isFalse()
+    }
+
+    @Test
+    fun `test that is SMSVerification Shown default value is the correct one`() = runTest {
+        assertThat(underTest.isSMSVerificationShown()).isFalse()
     }
 }
