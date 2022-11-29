@@ -164,4 +164,10 @@ interface AccountRepository {
      *
      */
     suspend fun resetExtendedAccountDetailsTimestamp()
+
+    /**
+     * Check Achievements are enabled or not
+     */
+    suspend fun areAchievementsEnabled(): Boolean
+
 }
