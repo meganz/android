@@ -20,7 +20,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.presentation.favourites.FavouritesFragment
-import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFolderNode
