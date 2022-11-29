@@ -15,17 +15,19 @@ import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 @InstallIn(SingletonComponent::class)
 abstract class SMSVerificationModule {
 
-    /**
-     * Provides the Use Case [SetSMSVerificationShown]
-     */
-    @Provides
-    fun provideSetSMSVerificationShown(repository: SMSVerificationRepository): SetSMSVerificationShown =
-        SetSMSVerificationShown(repository::setSMSVerificationShown)
+    companion object {
+        /**
+         * Provides the Use Case [SetSMSVerificationShown]
+         */
+        @Provides
+        fun provideSetSMSVerificationShown(repository: SMSVerificationRepository): SetSMSVerificationShown =
+            SetSMSVerificationShown(repository::setSMSVerificationShown)
 
-    /**
-     * Provides the Use Case [IsSMSVerificationShown]
-     */
-    @Provides
-    fun provideIsSMSVerificationShown(repository: SMSVerificationRepository): IsSMSVerificationShown =
-        IsSMSVerificationShown(repository::isSMSVerificationShown)
+        /**
+         * Provides the Use Case [IsSMSVerificationShown]
+         */
+        @Provides
+        fun provideIsSMSVerificationShown(repository: SMSVerificationRepository): IsSMSVerificationShown =
+            IsSMSVerificationShown(repository::isSMSVerificationShown)
+    }
 }

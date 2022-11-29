@@ -27,8 +27,9 @@ internal class AppEventFacade @Inject constructor(
     override suspend fun broadcastUploadPauseState() =
         _monitorCameraUploadPauseState.emit(true)
 
-    override suspend fun setSMSVerificationShown(isShown: Boolean) =
-        _isSMSVerificationShownState.emit(isShown)
+    override suspend fun setSMSVerificationShown(isShown: Boolean) {
+        _isSMSVerificationShownState.value = isShown
+    }
 
     override suspend fun isSMSVerificationShown(): Boolean = _isSMSVerificationShownState.value
 }
