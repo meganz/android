@@ -24,6 +24,7 @@ import mega.privacy.android.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
+import mega.privacy.android.data.repository.DefaultSMSVerificationRepository
 import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
+import mega.privacy.android.domain.repository.SMSVerificationRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
@@ -164,4 +166,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
+
+    @Binds
+    abstract fun bindSMSVerificationRepository(repository: DefaultSMSVerificationRepository): SMSVerificationRepository
 }
