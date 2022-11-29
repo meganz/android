@@ -293,6 +293,14 @@ interface MegaChatApiGateway {
     fun inviteToChat(chatId: Long, userHandle: Long, listener: MegaChatRequestListenerInterface?)
 
     /**
+     * Get basic information about a public chat.
+     *
+     * @param link      Public chat link.
+     * @param listener  Listener.
+     */
+    fun checkChatLink(link: String, listener: MegaChatRequestListenerInterface?)
+
+    /**
      * Set the chat mode to private
      * @param chatId    Chat id.
      * @param listener  Listener.
