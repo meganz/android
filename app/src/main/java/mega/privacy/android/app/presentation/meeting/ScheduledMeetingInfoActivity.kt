@@ -80,7 +80,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, _, finish, inviteParticipantAction, chatNotificationsText) ->
+                viewModel.state.collect { (chatId, _, finish, inviteParticipantAction, timestampDnd) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
@@ -89,7 +89,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                     if (chatRoomId != chatId)
                         chatRoomId = chatId
 
-                    enabledChatNotification = chatNotificationsText.isEmpty()
+                    enabledChatNotification = timestampDnd == null
 
                     inviteParticipantAction?.let { action ->
                         viewModel.removeInviteParticipantsAction()
