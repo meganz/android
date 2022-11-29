@@ -317,4 +317,8 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
         dbHandler.resetExtendedAccountDetailsTimestamp()
     }
+
+    override suspend fun areAchievementsEnabled() = withContext(ioDispatcher) {
+        megaApiGateway.isAchievementsEnabled()
+    }
 }
