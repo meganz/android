@@ -24,13 +24,13 @@ import mega.privacy.android.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
-import mega.privacy.android.data.repository.DefaultSMSVerificationRepository
 import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
+import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.TransfersRepository
@@ -53,13 +53,13 @@ import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
-import mega.privacy.android.domain.repository.SMSVerificationRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.repository.VerificationRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -168,5 +168,5 @@ internal abstract class RepositoryModule {
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
 
     @Binds
-    abstract fun bindSMSVerificationRepository(repository: DefaultSMSVerificationRepository): SMSVerificationRepository
+    abstract fun bindVerificationRepository(repository: DefaultVerificationRepository): VerificationRepository
 }

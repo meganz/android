@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.repository
 
 /**
- * SMS Verification repository
+ * Verification repository
  */
-interface SMSVerificationRepository {
+interface VerificationRepository {
 
     /**
      * Set the status for SMSVerification

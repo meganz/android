@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.domain.repository.SMSVerificationRepository
+import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 
@@ -20,14 +20,14 @@ abstract class SMSVerificationModule {
          * Provides the Use Case [SetSMSVerificationShown]
          */
         @Provides
-        fun provideSetSMSVerificationShown(repository: SMSVerificationRepository): SetSMSVerificationShown =
+        fun provideSetSMSVerificationShown(repository: VerificationRepository): SetSMSVerificationShown =
             SetSMSVerificationShown(repository::setSMSVerificationShown)
 
         /**
          * Provides the Use Case [IsSMSVerificationShown]
          */
         @Provides
-        fun provideIsSMSVerificationShown(repository: SMSVerificationRepository): IsSMSVerificationShown =
+        fun provideIsSMSVerificationShown(repository: VerificationRepository): IsSMSVerificationShown =
             IsSMSVerificationShown(repository::isSMSVerificationShown)
     }
 }
