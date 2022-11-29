@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -97,14 +98,6 @@ interface ContactsRepository {
     ): List<ContactItem>
 
     /**
-     * Gets the credentials of the given user.
-     *
-     * @param userEmail The contact's email.
-     * @return The contact's credentials.
-     */
-    suspend fun getContactCredentials(userEmail: String): String?
-
-    /**
      * Gets the name of the given user: The alias if any, the full name in other case.
      * If not available then returns the email.
      *
@@ -152,4 +145,12 @@ interface ContactsRepository {
      * @param userEmail The contact's email.
      */
     suspend fun verifyCredentials(userEmail: String)
+
+    /**
+     * Gets contact's credentials.
+     *
+     * @param userEmail User's email.
+     * @return [AccountCredentials.ContactCredentials]
+     */
+    suspend fun getContactCredentials(userEmail: String): AccountCredentials.ContactCredentials?
 }

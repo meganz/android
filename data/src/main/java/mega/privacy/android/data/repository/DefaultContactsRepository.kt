@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
@@ -50,17 +51,18 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [ContactsRepository]
  *
- * @property megaApiGateway         [MegaApiGateway]
- * @property megaChatApiGateway     [MegaChatApiGateway]
- * @property ioDispatcher           [CoroutineDispatcher]
- * @property cacheFolderGateway     [CacheFolderGateway]
- * @property contactRequestMapper   [ContactRequestMapper]
- * @property userLastGreenMapper    [UserLastGreenMapper]
- * @property userUpdateMapper       [UserUpdateMapper]
- * @property megaChatPeerListMapper [MegaChatPeerListMapper]
- * @property onlineStatusMapper     [OnlineStatusMapper]
- * @property contactItemMapper      [ContactItemMapper]
- * @property contactDataMapper      [ContactDataMapper]
+ * @property megaApiGateway           [MegaApiGateway]
+ * @property megaChatApiGateway       [MegaChatApiGateway]
+ * @property ioDispatcher             [CoroutineDispatcher]
+ * @property cacheFolderGateway       [CacheFolderGateway]
+ * @property contactRequestMapper     [ContactRequestMapper]
+ * @property userLastGreenMapper      [UserLastGreenMapper]
+ * @property userUpdateMapper         [UserUpdateMapper]
+ * @property megaChatPeerListMapper   [MegaChatPeerListMapper]
+ * @property onlineStatusMapper       [OnlineStatusMapper]
+ * @property contactItemMapper        [ContactItemMapper]
+ * @property contactDataMapper        [ContactDataMapper]
+ * @property contactCredentialsMapper [ContactCredentialsMapper]
  */
 internal class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -74,6 +76,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val onlineStatusMapper: OnlineStatusMapper,
     private val contactItemMapper: ContactItemMapper,
     private val contactDataMapper: ContactDataMapper,
+    private val contactCredentialsMapper: ContactCredentialsMapper,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -415,13 +418,11 @@ internal class DefaultContactsRepository @Inject constructor(
         return updatedList.sortList()
     }
 
-    override suspend fun getContactCredentials(userEmail: String) = withContext(ioDispatcher) {
-        megaApiGateway.getContact(userEmail)?.let {
-            suspendCoroutine { continuation ->
-                megaApiGateway.getUserCredentials(it, OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onGetUserCredentialsCompleted(continuation)
-                ))
-            }
+    private suspend fun getUserCredentials(user: MegaUser) = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.getUserCredentials(user, OptionalMegaRequestListenerInterface(
+                onRequestFinish = onGetUserCredentialsCompleted(continuation)
+            ))
         }
     }
 
@@ -476,6 +477,20 @@ internal class DefaultContactsRepository @Inject constructor(
                 continuation.resumeWith(Result.success(Unit))
             } else {
                 continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun getContactCredentials(userEmail: String) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getContact(userEmail)?.let { user ->
+                val userCredentials = getUserCredentials(user)
+                val name = getAlias(user.handle) ?: getFullName(userEmail) ?: userEmail
+
+                contactCredentialsMapper(
+                    userCredentials,
+                    userEmail,
+                    name
+                )
             }
         }
 }
