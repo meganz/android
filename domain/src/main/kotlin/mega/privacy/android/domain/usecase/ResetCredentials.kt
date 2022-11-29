@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Verifies the credentials of a given user.
+ * Resets the credentials of a given user.
  */
-fun interface VerifyCredentials {
+fun interface ResetCredentials {
 
     /**
      * Invoke.
