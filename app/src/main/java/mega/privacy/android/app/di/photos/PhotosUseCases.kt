@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
+import mega.privacy.android.domain.usecase.DefaultRemoveAlbums
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 
 @Module
@@ -103,6 +105,9 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
+
+    @Binds
+    abstract fun bindRemoveAlbums(useCase: DefaultRemoveAlbums): RemoveAlbums
 
     companion object {
         @Provides
