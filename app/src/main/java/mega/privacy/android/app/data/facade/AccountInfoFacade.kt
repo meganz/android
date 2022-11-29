@@ -12,6 +12,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.domain.entity.account.MegaSku
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -68,6 +69,9 @@ class AccountInfoFacade @Inject constructor(
         sendBroadcastUpdateAccountDetails()
         accountDetail.emit(request.megaAccountDetails)
     }
+
+    override val availableSkus: List<MegaSku>
+        get() = myAccountInfo.availableSkus
 
     // we have to continue send broadcast receiver it will replace by accountDetail SharedFlow
     private fun sendBroadcastUpdateAccountDetails() {
