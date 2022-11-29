@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.presentation.contact.authenticitycredendials
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityAuthenticityCredentialsBinding
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.VerifyCredentialsListener
