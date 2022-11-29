@@ -9,6 +9,7 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
@@ -183,6 +184,14 @@ interface MegaChatApiGateway {
      * @return The chat conversation.
      */
     fun getChatRoom(chatId: Long): MegaChatRoom?
+
+    /**
+     * Get chat list item.
+     *
+     * @param chatId    Chat Id
+     * @return          Chat list item
+     */
+    fun getChatListItem(chatId: Long): MegaChatListItem?
 
     /**
      * Gets the MegaChatCall

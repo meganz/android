@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -81,19 +82,27 @@ interface ChatRepository {
     fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
 
     /**
-     * Get meeting chat rooms
-     *
-     * @return  List of [ChatRoom]
-     */
-    suspend fun getMeetingChatRooms(): List<ChatRoom>?
-
-    /**
      * Gets chat room if it exists
      *
      * @param chatId      Chat Id
      * @return [ChatRoom] containing the updated data.
      */
     suspend fun getChatRoom(chatId: Long): ChatRoom?
+
+    /**
+     * Get meeting chat rooms
+     *
+     * @return  List of [ChatRoom]
+     */
+    suspend fun getMeetingChatRooms(): List<CombinedChatRoom>?
+
+    /**
+     * Gets combined chat room if it exists
+     *
+     * @param chatId      Chat Id
+     * @return [CombinedChatRoom] containing the updated data.
+     */
+    suspend fun getCombinedChatRoom(chatId: Long): CombinedChatRoom?
 
     /**
      * Monitor updates on scheduled meetings
@@ -131,7 +140,7 @@ interface ChatRepository {
      * @param chatId MegaChatHandle that identifies a chat room
      * @return List of scheduled meeting.
      */
-    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>
+    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
 
     /**
      * Get a list of all scheduled meeting occurrences for a chatroom

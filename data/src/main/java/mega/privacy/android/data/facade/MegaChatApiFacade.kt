@@ -205,6 +205,9 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatRoom(chatId: Long): MegaChatRoom? =
         chatApi.getChatRoom(chatId)
 
+    override fun getChatListItem(chatId: Long): MegaChatListItem? =
+        chatApi.getChatListItem(chatId)
+
     override fun getChatCall(chatId: Long): MegaChatCall? =
         chatApi.getChatCall(chatId)
 
