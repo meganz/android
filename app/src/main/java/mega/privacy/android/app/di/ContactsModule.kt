@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.StartConversation
+import mega.privacy.android.domain.usecase.VerifyCredentials
 
 /**
  * Contacts module.
@@ -74,4 +75,8 @@ class ContactsModule {
     @Provides
     fun provideAreCredentialsVerified(contactsRepository: ContactsRepository): AreCredentialsVerified =
         AreCredentialsVerified(contactsRepository::areCredentialsVerified)
+
+    @Provides
+    fun provideVerifyCredentials(contactsRepository: ContactsRepository): VerifyCredentials =
+        VerifyCredentials(contactsRepository::verifyCredentials)
 }
