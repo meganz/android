@@ -15,12 +15,12 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
  *
  * @property chatId                                     Chat id.
- * @property chatTitle                                  Chat title.
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property finish                                     True, if the activity is to be terminated.
  * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
- * @property chatNotificationsText                      Chat notifications text.
- * @property manageChatHistoryText                      Manage Chat History text.
+ * @property timestampDnd                               Timestamp of Dnd.
+ * @property timestampRetentionTime                     Timestamp of retention time.
+ * @property chatTitle                                  Chat title.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property isPublic                                   If chat room is public.
@@ -36,12 +36,12 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1,
-    val chatTitle: String = "",
     val scheduledMeeting: ScheduledMeetingItem? = null,
     val finish: Boolean = false,
     val inviteParticipantAction: InviteParticipantsAction? = null,
-    val chatNotificationsText: String = " ",
-    val manageChatHistoryText: String = " ",
+    val timestampDnd: Long? = null,
+    val timestampRetentionTime: Long? = null,
+    val chatTitle: String = "",
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val isPublic: Boolean = false,

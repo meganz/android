@@ -23,9 +23,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ChatUtil.transformSecondsInString
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -39,9 +37,9 @@ import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -99,11 +97,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Observe changes in Chat notifications
      */
     val chatNotificationsObserver = Observer<Any> {
-        _state.update {
-            it.copy(
-                chatNotificationsText = getPushNotificationText(chatId)
-            )
-        }
+        updateTimestampDnd(chatId)
     }
 
     init {
@@ -158,11 +152,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             isHost = ownPrivilege == ChatRoomPermission.Moderator,
                             isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                             enabledAllowNonHostAddParticipantsOption = isOpenInvite,
-                            manageChatHistoryText = getRetentionTimeText(retentionTime),
-                            chatNotificationsText = getPushNotificationText(chatId),
                             isPublic = isPublic
                         )
                     }
+                    updateTimestampDnd(chatId)
+                    updateTimestampRetentionTime(retentionTime)
                 }
             }
         }
@@ -181,15 +175,15 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onSuccess { scheduledMeetingList ->
                 Timber.d("Scheduled meeting obtained")
                 scheduledMeetingList?.let { list ->
-                    list.forEach { schedMeeting ->
-                        if (schedMeeting.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+                    list.forEach { scheduledMeetReceived ->
+                        if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
                                 it.copy(scheduledMeeting = ScheduledMeetingItem(
-                                    chatId = schedMeeting.chatId,
-                                    scheduledMeetingId = schedMeeting.schedId,
-                                    title = schedMeeting.title,
-                                    description = schedMeeting.description,
-                                    date = schedMeeting.getFormattedDate())
+                                    chatId = scheduledMeetReceived.chatId,
+                                    scheduledMeetingId = scheduledMeetReceived.schedId,
+                                    title = scheduledMeetReceived.title,
+                                    description = scheduledMeetReceived.description,
+                                    date = scheduledMeetReceived.getFormattedDate())
                                 )
                             }
                             return@forEach
@@ -238,16 +232,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             it.copy(isPublic = chat.isPublic)
                         }
                     ChatRoomChanges.RetentionTime -> {
+                        updateTimestampRetentionTime(chat.retentionTime)
+
                         val intentRetentionTime =
                             Intent(ACTION_UPDATE_RETENTION_TIME)
                         intentRetentionTime.putExtra(RETENTION_TIME,
                             chat.retentionTime)
                         getInstance().sendBroadcast(intentRetentionTime)
-                        _state.update {
-                            it.copy(
-                                manageChatHistoryText = getRetentionTimeText(chat.retentionTime)
-                            )
-                        }
                     }
                     else -> {}
                 }
@@ -260,46 +251,46 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     private fun getScheduledMeetingUpdates() {
         viewModelScope.launch {
-            monitorScheduledMeetingUpdates().collectLatest { schedMeetReceived ->
-                when (schedMeetReceived.changes) {
+            monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+                when (scheduledMeetReceived.changes) {
                     ScheduledMeetingChanges.NewScheduledMeeting -> {
-                        if (schedMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+                        if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
                                 it.copy(scheduledMeeting = ScheduledMeetingItem(
-                                    schedMeetReceived.chatId,
-                                    schedMeetReceived.schedId,
-                                    schedMeetReceived.title,
-                                    schedMeetReceived.description,
-                                    schedMeetReceived.getFormattedDate())
+                                    scheduledMeetReceived.chatId,
+                                    scheduledMeetReceived.schedId,
+                                    scheduledMeetReceived.title,
+                                    scheduledMeetReceived.description,
+                                    scheduledMeetReceived.getFormattedDate())
                                 )
                             }
                         }
                     }
                     ScheduledMeetingChanges.Title -> {
                         _state.value.scheduledMeeting?.let {
-                            if (schedMeetReceived.schedId == it.scheduledMeetingId) {
+                            if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
-                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(title = schedMeetReceived.title))
+                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(title = scheduledMeetReceived.title))
                                 }
                             }
                         }
                     }
                     ScheduledMeetingChanges.Description -> {
                         _state.value.scheduledMeeting?.let {
-                            if (schedMeetReceived.schedId == it.scheduledMeetingId) {
+                            if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
                                     state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                                        description = schedMeetReceived.description))
+                                        description = scheduledMeetReceived.description))
                                 }
                             }
                         }
                     }
                     ScheduledMeetingChanges.StartDate -> {
                         _state.value.scheduledMeeting?.let {
-                            if (schedMeetReceived.schedId == it.scheduledMeetingId) {
+                            if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
                                     state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                                        date = schedMeetReceived.getFormattedDate()
+                                        date = scheduledMeetReceived.getFormattedDate()
                                     ))
                                 }
                             }
@@ -312,45 +303,42 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Get text of Chat notifications
+     * Update timestamp of Do not disturb mode
      *
      * @param id    Chat id.
-     * @return Text
      */
-    private fun getPushNotificationText(id: Long): String {
-        var text = ""
+    private fun updateTimestampDnd(id: Long) {
         getPushNotificationSettingManagement().pushNotificationSetting?.let { push ->
-            val isChatDndEnabled = push.isChatDndEnabled(id)
-            if (isChatDndEnabled) {
-                val timestampMute = push.getChatDnd(id)
-                text = if (timestampMute == 0L) {
-                    StringResourcesUtils.getString(R.string.mute_chatroom_notification_option_off)
-                } else {
-                    getCorrectStringDependingOnOptionSelected(timestampMute)
+            if (push.isChatDndEnabled(id)) {
+                _state.update {
+                    it.copy(timestampDnd = push.getChatDnd(id))
                 }
+
+                return
             }
         }
 
-        return text
+        _state.update {
+            it.copy(timestampDnd = null)
+        }
     }
 
     /**
-     * Get retention time text
+     * Update timestamp of retention time
      *
-     * @param retentionTime     Retention time
-     * @return                  Retention time text
+     * @param retentionTime    Timestamp of retention time.
      */
-    private fun getRetentionTimeText(retentionTime: Long): String {
-        var timeFormatted = transformSecondsInString(retentionTime)
-        if (timeFormatted.isNotEmpty()) {
-            timeFormatted =
-                StringResourcesUtils.getString(R.string.subtitle_properties_manage_chat)
-                    .toString() + " " + timeFormatted
+    private fun updateTimestampRetentionTime(retentionTime: Long) {
+        if (retentionTime == Constants.DISABLED_RETENTION_TIME) {
+            _state.update {
+                it.copy(timestampRetentionTime = null)
+            }
+        } else {
+            _state.update {
+                it.copy(timestampRetentionTime = retentionTime)
+            }
         }
-
-        return timeFormatted
     }
-
 
     /**
      * Invite participants to the chat room
@@ -550,7 +538,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
     }
-
 
     /**
      * Format ZonedDateTime to a readable date
