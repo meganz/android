@@ -272,6 +272,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
 
+    override fun checkChatLink(
+        link: String,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.checkChatLink(link, listener)
+
     override fun setPublicChatToPrivate(
         chatId: Long,
         listener: MegaChatRequestListenerInterface?,

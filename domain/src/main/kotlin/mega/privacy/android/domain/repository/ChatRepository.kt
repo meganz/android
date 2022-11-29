@@ -159,6 +159,16 @@ interface ChatRepository {
     suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
 
     /**
+     * Obtain basic information abouts a public chat.
+     *
+     * @param link  Public chat link.
+     * @return      [ChatRequest].
+     */
+    suspend fun checkChatLink(
+        link: String,
+    ): ChatRequest
+
+    /**
      * Set public chat to private.
      *
      * @param chatId    The Chat id.

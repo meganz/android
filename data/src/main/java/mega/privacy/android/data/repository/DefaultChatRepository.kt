@@ -32,9 +32,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -239,6 +237,16 @@ internal class DefaultChatRepository @Inject constructor(
             contactsData.forEach { email ->
                 val userHandle = megaApiGateway.getContact(email)?.handle ?: -1
                 megaChatApiGateway.inviteToChat(chatId, userHandle, null)
+            }
+        }
+
+    override suspend fun checkChatLink(link: String): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.checkChatLink(link,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
             }
         }
 
