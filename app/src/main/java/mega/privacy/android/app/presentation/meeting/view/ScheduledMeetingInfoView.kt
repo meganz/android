@@ -642,7 +642,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = state.timestampDnd == null,
+                    isEnabled = state.dndSeconds == null,
                     hasSwitch = true)
                 divider(withStartPadding = true)
             }
@@ -813,15 +813,15 @@ private fun ActionOption(
                 .fillMaxSize()) {
                 ActionText(actionText = action.title)
 
-                state.timestampRetentionTime?.let { time ->
+                state.retentionTimeSeconds?.let { time ->
                     if (action == ScheduledMeetingInfoAction.ManageChatHistory) {
-                        manageChatHistorySubtitle(timestampRetentionTime = time)
+                        manageChatHistorySubtitle(seconds = time)
                     }
                 }
 
-                state.timestampDnd?.let { time ->
+                state.dndSeconds?.let { time ->
                     if (action == ScheduledMeetingInfoAction.ChatNotifications) {
-                        chatNotificationSubtitle(timestampDnd = time)
+                        chatNotificationSubtitle(seconds = time)
                     }
                 }
             }
@@ -1052,11 +1052,11 @@ private fun ContactStatus(
 /**
  * Manage chat history subtitle
  *
- * @param timestampRetentionTime Text of subtitle
+ * @param seconds  Retention time seconds
  */
 @Composable
-private fun manageChatHistorySubtitle(timestampRetentionTime: Long) {
-    var text = transformSecondsInString(timestampRetentionTime)
+private fun manageChatHistorySubtitle(seconds: Long) {
+    var text = transformSecondsInString(seconds)
     if (text.isNotEmpty()) {
         text =
             stringResource(R.string.subtitle_properties_manage_chat) + " " + text
@@ -1068,14 +1068,14 @@ private fun manageChatHistorySubtitle(timestampRetentionTime: Long) {
 /**
  * Chat notification subtitle
  *
- * @param timestampDnd Text of subtitle
+ * @param seconds  Dnd seconds
  */
 @Composable
-private fun chatNotificationSubtitle(timestampDnd: Long) {
-    val text = if (timestampDnd == 0L) {
+private fun chatNotificationSubtitle(seconds: Long) {
+    val text = if (seconds == 0L) {
         stringResource(R.string.mute_chatroom_notification_option_off)
     } else {
-        getStringForDndTime(timestampDnd)
+        getStringForDndTime(seconds)
     }
 
     ActionSubtitleText(text)

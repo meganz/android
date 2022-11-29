@@ -18,8 +18,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property finish                                     True, if the activity is to be terminated.
  * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
- * @property timestampDnd                               Timestamp of Dnd.
- * @property timestampRetentionTime                     Timestamp of retention time.
+ * @property dndSeconds                                 Do not disturb seconds.
+ * @property retentionTimeSeconds                       Retention time seconds.
  * @property chatTitle                                  Chat title.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
@@ -39,8 +39,8 @@ data class ScheduledMeetingInfoState(
     val scheduledMeeting: ScheduledMeetingItem? = null,
     val finish: Boolean = false,
     val inviteParticipantAction: InviteParticipantsAction? = null,
-    val timestampDnd: Long? = null,
-    val timestampRetentionTime: Long? = null,
+    val dndSeconds: Long? = null,
+    val retentionTimeSeconds: Long? = null,
     val chatTitle: String = "",
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
