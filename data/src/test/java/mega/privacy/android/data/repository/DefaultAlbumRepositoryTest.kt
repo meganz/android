@@ -30,6 +30,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultAlbumRepositoryTest {
@@ -249,6 +250,31 @@ class DefaultAlbumRepositoryTest {
 
         val actualUserSet = underTest.getUserSet(albumId)
         assertThat(expectedUserSet).isEqualTo(actualUserSet)
+    }
+
+    @Test
+    fun `test that remove albums returns correct result`() = runTest {
+        val albumIds = listOf(
+            AlbumId(1L),
+            AlbumId(2L),
+            AlbumId(3L),
+        )
+
+        whenever(megaApiGateway.removeSet(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                },
+            )
+        }
+
+        try {
+            underTest.removeAlbums(albumIds)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
+        }
     }
 
     private fun createUserSet(

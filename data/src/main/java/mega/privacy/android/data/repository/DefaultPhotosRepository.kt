@@ -188,7 +188,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapPhotoNodesToImages(megaNodes: List<MegaNode>): List<Photo> {
         return megaNodes.filter {
-            !megaApiFacade.isInRubbish(it)
+            it.isValidPhotoNode()
         }.map { megaNode ->
             mapMegaNodeToImage(megaNode)
         }
@@ -201,11 +201,17 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapPhotoNodesToVideos(megaNodes: List<MegaNode>): List<Photo> {
         return megaNodes.filter {
-            !megaApiFacade.isInRubbish(it)
+            it.isValidPhotoNode()
         }.map { megaNode ->
             mapMegaNodeToVideo(megaNode)
         }
     }
+
+    /**
+     * Check valid Photo Node, not include Photo nodes that are in rubbish bin or without thumbnail
+     */
+    private suspend fun MegaNode.isValidPhotoNode() =
+        !megaApiFacade.isInRubbish(this) && this.hasThumbnail()
 
     /**
      * Convert the MegaNode to Image

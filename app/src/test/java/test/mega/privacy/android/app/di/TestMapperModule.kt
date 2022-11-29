@@ -14,7 +14,6 @@ import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
-import mega.privacy.android.data.mapper.SkuMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import org.mockito.kotlin.mock
 
@@ -47,7 +46,4 @@ object TestMapperModule {
 
     @Provides
     fun provideAchievementsMapper(): UIMegaAchievementMapper = mock()
-
-    @Provides
-    fun provideSkuMapper(): SkuMapper = mock()
 }

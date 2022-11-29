@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -89,6 +90,21 @@ interface ChatRepository {
     suspend fun getChatRoom(chatId: Long): ChatRoom?
 
     /**
+     * Get meeting chat rooms
+     *
+     * @return  List of [ChatRoom]
+     */
+    suspend fun getMeetingChatRooms(): List<CombinedChatRoom>?
+
+    /**
+     * Gets combined chat room if it exists
+     *
+     * @param chatId      Chat Id
+     * @return [CombinedChatRoom] containing the updated data.
+     */
+    suspend fun getCombinedChatRoom(chatId: Long): CombinedChatRoom?
+
+    /**
      * Monitor updates on scheduled meetings
      *
      * @return          A flow of [ChatScheduledMeeting]
@@ -103,21 +119,28 @@ interface ChatRepository {
     fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
 
     /**
+     * Get all scheduled meetings
+     *
+     * @return List of scheduled meetings
+     */
+    suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>?
+
+    /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
      *
      * @param chatId  MegaChatHandle that identifies a chat room
      * @param schedId MegaChatHandle that identifies a scheduled meeting
      * @return The scheduled meeting.
      */
-    fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
+    suspend fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
 
     /**
      * Get a list of all scheduled meeting for a chatroom
      *
      * @param chatId MegaChatHandle that identifies a chat room
-     * @return The scheduled meeting.
+     * @return List of scheduled meeting.
      */
-    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>
+    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
 
     /**
      * Get a list of all scheduled meeting occurrences for a chatroom

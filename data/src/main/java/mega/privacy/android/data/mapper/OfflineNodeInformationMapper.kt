@@ -12,9 +12,16 @@ internal fun toOfflineNodeInformation(offline: OfflineInformation): OfflineNodeI
     return when (offline.origin) {
         OfflineInformation.INCOMING -> IncomingShareOfflineNodeInformation(
             path = offline.path,
+            name = offline.name,
             incomingHandle = offline.handleIncoming,
         )
-        OfflineInformation.INBOX -> InboxOfflineNodeInformation(path = offline.path)
-        else -> OtherOfflineNodeInformation(path = offline.path)
+        OfflineInformation.INBOX -> InboxOfflineNodeInformation(
+            path = offline.path,
+            name = offline.name
+        )
+        else -> OtherOfflineNodeInformation(
+            path = offline.path,
+            name = offline.name
+        )
     }
 }

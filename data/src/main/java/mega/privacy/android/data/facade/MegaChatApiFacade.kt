@@ -11,6 +11,7 @@ import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
@@ -186,6 +187,9 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.setOpenInvite(chatId, enabled, listener)
 
+    override fun getMeetingChatRooms(): List<MegaChatRoom>? =
+        chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
+
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
 
@@ -200,6 +204,9 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun getChatRoom(chatId: Long): MegaChatRoom? =
         chatApi.getChatRoom(chatId)
+
+    override fun getChatListItem(chatId: Long): MegaChatListItem? =
+        chatApi.getChatListItem(chatId)
 
     override fun getChatCall(chatId: Long): MegaChatCall? =
         chatApi.getChatCall(chatId)
@@ -241,6 +248,9 @@ internal class MegaChatApiFacade @Inject constructor(
             chatApi.addSchedMeetingListener(listener)
             awaitClose { chatApi.removeSchedMeetingListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    override fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>? =
+        chatApi.allScheduledMeetings
 
     override fun getScheduledMeeting(
         chatId: Long,

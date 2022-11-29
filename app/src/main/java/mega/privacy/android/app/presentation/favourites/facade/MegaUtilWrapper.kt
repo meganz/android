@@ -20,6 +20,10 @@ interface MegaUtilWrapper {
      * @param nodeId current nodeId
      * @return true is available offline
      */
+    @Deprecated(
+        message = "Method replaced with use case IsAvailableOffline",
+        level = DeprecationLevel.WARNING
+    )
     suspend fun availableOffline(context: Context, nodeId: Long): Boolean
 
     /**
