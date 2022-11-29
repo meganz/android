@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -14,15 +15,18 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
+import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
-import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChatNotInitializedException
@@ -61,6 +65,11 @@ class DefaultAccountRepositoryTest {
     private val subscriptionOptionListMapper = mock<SubscriptionOptionListMapper>()
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val dbHandler = mock<DatabaseHandler>()
+
+    private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
+        { credentials: String? ->
+            (credentials?.getCredentials()?.let { AccountCredentials.MyAccountCredentials(it) })
+        }
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -101,6 +110,7 @@ class DefaultAccountRepositoryTest {
             subscriptionOptionListMapper = subscriptionOptionListMapper,
             megaAchievementMapper = megaAchievementMapper,
             dbHandler = dbHandler,
+            myAccountCredentialsMapper = myAccountCredentialsMapper,
         )
     }
 
@@ -375,9 +385,10 @@ class DefaultAccountRepositoryTest {
     fun `test that getMyCredentials returns valid credentials if api returns valid credentials`() =
         runTest {
             val validCredentials = "KJ9hFK67vhj3cNCIUHAi8ccwciojiot4hVE5yab3"
+            val expectedCredentials = toMyAccountCredentials(validCredentials)
 
             whenever(megaApiGateway.myCredentials).thenReturn(validCredentials)
-            assertThat(underTest.getMyCredentials()).isEqualTo(validCredentials)
+            assertThat(underTest.getMyCredentials()).isEqualTo(expectedCredentials)
         }
 
     @Test

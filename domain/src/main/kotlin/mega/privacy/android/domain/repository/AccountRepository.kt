@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -151,7 +152,7 @@ interface AccountRepository {
      *
      * @return Fingerprint of the signing key of the current account.
      */
-    suspend fun getMyCredentials(): String?
+    suspend fun getMyCredentials(): AccountCredentials.MyAccountCredentials?
 
     /**
      * Reset account details time stamp

@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -67,5 +68,12 @@ abstract class AccountModule {
         @Provides
         fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
             IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
+
+        /**
+         * Provides the Use Case [GetMyCredentials]
+         */
+        @Provides
+        fun provideGetMyCredentials(accountRepository: AccountRepository): GetMyCredentials =
+            GetMyCredentials(accountRepository::getMyCredentials)
     }
 }
