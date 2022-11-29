@@ -1075,7 +1075,7 @@ private fun chatNotificationSubtitle(timestampDnd: Long) {
     val text = if (timestampDnd == 0L) {
         stringResource(R.string.mute_chatroom_notification_option_off)
     } else {
-        getCorrectStringDependingOnOptionSelected(timestampDnd)
+        getStringForDndTime(timestampDnd)
     }
 
     ActionSubtitleText(text)
@@ -1133,16 +1133,16 @@ fun transformSecondsInString(seconds: Long): String {
 }
 
 /**
- * Get the appropriate String depending on the option selected in Dnd.
+ * Get the appropriate text depending on the time selected for the do not disturb option
  *
- * @param timestamp     The time in minutes that notifications of a chat is muted.
+ * @param seconds       The seconds which have been set for do not disturb mode
  * @return              The right string
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun getCorrectStringDependingOnOptionSelected(timestamp: Long): String {
+fun getStringForDndTime(seconds: Long): String {
     val cal = Calendar.getInstance()
-    cal.timeInMillis = timestamp * 1000
+    cal.timeInMillis = seconds * 1000
 
     val calToday = Calendar.getInstance()
     calToday.timeInMillis = System.currentTimeMillis()
