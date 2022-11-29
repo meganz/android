@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
-import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode

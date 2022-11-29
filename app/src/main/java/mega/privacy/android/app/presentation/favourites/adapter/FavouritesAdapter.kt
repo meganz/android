@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.favourites
+package mega.privacy.android.app.presentation.favourites.adapter
 
 import android.content.Context
 import android.net.Uri
@@ -7,12 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
@@ -35,8 +33,8 @@ import java.io.File
  */
 class FavouritesAdapter(
     private val sortByHeaderViewModel: SortByHeaderViewModel? = null,
-    private val onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
-    private val onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean = { _, _, _ -> false },
+    private val onItemClicked: (info: Favourite) -> Unit,
+    private val onLongClicked: (info: Favourite) -> Boolean = { _ -> false },
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
     private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesViewHolder>(FavouritesDiffCallback) {
@@ -65,7 +63,6 @@ class FavouritesAdapter(
     override fun onBindViewHolder(holder: FavouritesViewHolder, position: Int) {
         holder.bind(
             item = getItem(position),
-            position = position,
             sortByHeaderViewModel = sortByHeaderViewModel,
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
@@ -74,28 +71,6 @@ class FavouritesAdapter(
         )
     }
 
-    /**
-     * Start the animation
-     * @param context Context
-     * @param imageView the ImageView that adds the animation
-     * @param position the position of item that adds the animation
-     */
-    fun startAnimation(context: Context, imageView: ImageView, position: Int) {
-        val flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip)
-        flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
-        flipAnimation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
-                notifyItemChanged(position)
-            }
-
-            override fun onAnimationEnd(animation: Animation) {
-                notifyItemChanged(position)
-            }
-
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
-        imageView.startAnimation(flipAnimation)
-    }
 }
 
 /**
@@ -104,7 +79,7 @@ class FavouritesAdapter(
 class FavouritesViewHolder(
     private val context: Context,
     private val binding: ViewBinding,
-) : RecyclerView.ViewHolder(binding.root) {
+) : Selectable(binding.root) {
 
     /**
      * bind data
@@ -117,11 +92,10 @@ class FavouritesViewHolder(
      */
     fun bind(
         item: FavouriteItem,
-        position: Int,
         sortByHeaderViewModel: SortByHeaderViewModel?,
-        onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
+        onItemClicked: (info: Favourite) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
-        onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean,
+        onLongClicked: (info: Favourite) -> Boolean,
         getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
     ) {
         with(binding) {
@@ -177,14 +151,14 @@ class FavouritesViewHolder(
                         itemVersionsIcon.isVisible = favourite.typedNode.hasVersion
                         itemFileInfo.text = favourite.info
                         itemFavouriteLayout.setOnClickListener {
-                            onItemClicked(favourite, imageSelected, position)
+                            onItemClicked(favourite)
                         }
                         itemThreeDots.setOnClickListener {
                             onThreeDotsClicked(favourite)
                         }
 
                         itemFavouriteLayout.setOnLongClickListener {
-                            onLongClicked(favourite, imageSelected, position)
+                            onLongClicked(favourite)
                         }
                     }
                 }
@@ -196,6 +170,17 @@ class FavouritesViewHolder(
                 }
                 else -> {}
             }
+        }
+    }
+
+    override fun animate(listener: Animation.AnimationListener, isSelected: Boolean) {
+        (binding as? ItemFavouriteBinding)?.let {
+            val flipAnimation = if (isSelected) AnimationUtils.loadAnimation(context,
+                R.anim.multiselect_flip_reverse) else AnimationUtils.loadAnimation(context,
+                R.anim.multiselect_flip)
+            flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
+            flipAnimation.setAnimationListener(listener)
+            it.imageSelected.startAnimation(flipAnimation)
         }
     }
 
@@ -211,5 +196,13 @@ object FavouritesDiffCallback : DiffUtil.ItemCallback<FavouriteItem>() {
 
     override fun areContentsTheSame(oldInfo: FavouriteItem, newInfo: FavouriteItem): Boolean {
         return oldInfo == newInfo
+    }
+
+    override fun getChangePayload(oldItem: FavouriteItem, newItem: FavouriteItem): Any? {
+        return when {
+            oldItem.favourite?.isSelected == false && newItem.favourite?.isSelected == true -> NOT_SELECTED_TO_SELECTED
+            oldItem.favourite?.isSelected == true && newItem.favourite?.isSelected == false -> SELECTED_TO_NOT_SELECTED
+            else -> null
+        }
     }
 }

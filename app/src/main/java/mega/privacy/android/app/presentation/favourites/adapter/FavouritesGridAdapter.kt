@@ -1,20 +1,18 @@
-package mega.privacy.android.app.presentation.favourites
+package mega.privacy.android.app.presentation.favourites.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.ItemFavouriteGridBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -41,8 +39,8 @@ import java.io.File
  */
 class FavouritesGridAdapter(
     private val sortByHeaderViewModel: SortByHeaderViewModel? = null,
-    private val onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
-    private val onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean = { _, _, _ -> false },
+    private val onItemClicked: (info: Favourite) -> Unit,
+    private val onLongClicked: (info: Favourite) -> Boolean = { _ -> false },
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
     private val getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesGridViewHolder>(FavouritesDiffCallback) {
@@ -75,7 +73,6 @@ class FavouritesGridAdapter(
     override fun onBindViewHolder(holder: FavouritesGridViewHolder, position: Int) {
         holder.bind(
             item = getItem(position),
-            position = position,
             sortByHeaderViewModel = sortByHeaderViewModel,
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
@@ -94,28 +91,6 @@ class FavouritesGridAdapter(
         }
     }
 
-    /**
-     * Start the animation
-     * @param context Context
-     * @param imageView the ImageView that adds the animation
-     * @param position the position of item that adds the animation
-     */
-    fun startAnimation(context: Context, imageView: ImageView, position: Int) {
-        val flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip)
-        flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
-        flipAnimation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
-                notifyItemChanged(position)
-            }
-
-            override fun onAnimationEnd(animation: Animation) {
-                notifyItemChanged(position)
-            }
-
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
-        imageView.startAnimation(flipAnimation)
-    }
 }
 
 /**
@@ -123,12 +98,11 @@ class FavouritesGridAdapter(
  */
 class FavouritesGridViewHolder(
     private val binding: ViewBinding,
-) : RecyclerView.ViewHolder(binding.root) {
+) : Selectable(binding.root) {
 
     /**
      * bind data
      * @param item FavouriteItem
-     * @param position position of current item
      * @param sortByHeaderViewModel SortByHeaderViewModel
      * @param onItemClicked The item clicked listener
      * @param onThreeDotsClicked The three dots view clicked listener
@@ -136,11 +110,10 @@ class FavouritesGridViewHolder(
      */
     fun bind(
         item: FavouriteItem,
-        position: Int,
         sortByHeaderViewModel: SortByHeaderViewModel?,
-        onItemClicked: (info: Favourite, icon: ImageView, position: Int) -> Unit,
+        onItemClicked: (info: Favourite) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
-        onLongClicked: (info: Favourite, icon: ImageView, position: Int) -> Boolean,
+        onLongClicked: (info: Favourite) -> Boolean,
         getThumbnail: (handle: Long, (file: File?) -> Unit) -> Unit,
     ) {
         with(binding) {
@@ -211,10 +184,10 @@ class FavouritesGridViewHolder(
                         }
                         itemGirdFavourite.apply {
                             setOnLongClickListener {
-                                onLongClicked(info, icSelected, position)
+                                onLongClicked(info)
                             }
                             setOnClickListener {
-                                onItemClicked(info, icSelected, position)
+                                onItemClicked(info)
                             }
                         }
                     } ?: run {
@@ -260,4 +233,15 @@ class FavouritesGridViewHolder(
         MimeTypeList.typeForName(name).run {
             isAudio || isVideo || isImage || isPdf || isMp4Video || isGIF
         }
+
+    override fun animate(listener: Animation.AnimationListener, isSelected: Boolean) {
+        (binding as? ItemFavouriteBinding)?.let {
+            val flipAnimation = if (isSelected) AnimationUtils.loadAnimation(binding.root.context,
+                R.anim.multiselect_flip_reverse) else AnimationUtils.loadAnimation(binding.root.context,
+                R.anim.multiselect_flip)
+            flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
+            flipAnimation.setAnimationListener(listener)
+            it.imageSelected.startAnimation(flipAnimation)
+        }
+    }
 }
