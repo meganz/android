@@ -24,6 +24,11 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 
+/**
+ * A row of buttons to switch time view
+ *
+ * Year/Month/Days/All (YMDA)
+ */
 @Composable
 fun TimeSwitchBar(
     timeBarTabs: List<TimeBarTab> = TimeBarTab.values().asList(),
@@ -45,7 +50,7 @@ fun TimeSwitchBar(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
                 .requiredWidthIn(max = 360.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             val selectedIndex = selectedTimeBarTab.ordinal
             timeBarTabs.mapIndexed { index, timeBarTab ->
@@ -75,7 +80,9 @@ fun TimeSwitchBar(
                         else
                             colorResource(id = R.color.grey_alpha_012_black)),
                     modifier = Modifier
-                        .height(36.dp),
+                        .height(36.dp)
+                        .fillMaxWidth()
+                        .weight(1f),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Text(
