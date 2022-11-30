@@ -211,10 +211,9 @@ class MediaDiscoveryFragment : Fragment() {
                     }
                     CardListView(dateCards = dateCards, lazyGridState = lazyGridState)
                 }
-
-                if (uiState.selectedPhotoIds.isEmpty()) {
-                    TimeSwitchBar(uiState = uiState)
-                }
+            }
+            if (uiState.selectedPhotoIds.isEmpty()) {
+                TimeSwitchBar(uiState = uiState)
             }
         }
     }
