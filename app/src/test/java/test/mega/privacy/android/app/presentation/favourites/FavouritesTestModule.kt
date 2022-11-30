@@ -50,10 +50,11 @@ object FavouritesTestModule {
     val getFavouriteFolderInfo = mock<GetFavouriteFolderInfo>()
     val stringUtilWrapper = mock<StringUtilWrapper>()
     val favouriteMapper = mock<FavouriteMapper> {
-        on { invoke(any(), any(), any(), any(), any()) }.thenReturn(mock())
+        on { invoke(any(), any(), any(), any(), any(), any()) }.thenReturn(mock())
     }
     val getThumbnail = mock<GetThumbnail>()
     val megaUtilWrapper = mock<MegaUtilWrapper>()
+    val isAvailableOffline = mock<IsAvailableOffline>{ onBlocking { invoke(any()) }.thenReturn(false)}
 
     @Provides
     fun provideGetAllFavorites(): GetAllFavorites = getAllFavourites
@@ -122,8 +123,9 @@ object FavouritesTestModule {
     @Provides
     fun provideCreateAlbum(): CreateAlbum = mock()
 
+
     @Provides
-    fun provideIsAvailableOffline(): IsAvailableOffline = mock()
+    fun provideIsAvailableOffline(): IsAvailableOffline = isAvailableOffline
 
     @Provides
     fun provideGetOfflineFile(): GetOfflineFile = mock()

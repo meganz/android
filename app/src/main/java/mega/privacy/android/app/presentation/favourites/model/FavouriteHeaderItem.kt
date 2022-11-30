@@ -8,7 +8,6 @@ import mega.privacy.android.app.utils.Constants.HEADER_VIEW_TYPE
  */
 data class FavouriteHeaderItem(
     override val favourite: Favourite?,
-    override val forceUpdate: Boolean = false,
     val orderStringId: Int?
 ): FavouriteItem {
     override val type = HEADER_VIEW_TYPE
