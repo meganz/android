@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
 
 /**
@@ -8,7 +9,7 @@ import nz.mega.sdk.MegaError
  *
  * @return The translated string if any.
  */
-internal fun MegaError.getErrorStringId() =
+internal fun MegaException.getErrorStringId(): Int? =
     when (errorCode) {
         MegaError.API_OK -> R.string.api_ok
         MegaError.API_EINTERNAL -> R.string.api_einternal
@@ -20,7 +21,7 @@ internal fun MegaError.getErrorStringId() =
             when (errorString) {
                 "Terms of Service breached" -> R.string.api_etoomany_ec_download
                 "Too many concurrent connections or transfers" -> R.string.api_etoomay
-                else -> errorString
+                else -> null
             }
         MegaError.API_ERANGE -> R.string.api_erange
         MegaError.API_EEXPIRED -> R.string.api_eexpired
@@ -29,7 +30,7 @@ internal fun MegaError.getErrorStringId() =
             when (errorString) {
                 "Upload produces recursivity" -> R.string.api_ecircular_ec_upload
                 "Circular linkage detected" -> R.string.api_ecircular
-                else -> errorString
+                else -> null
             }
         MegaError.API_EACCESS -> R.string.api_eaccess
         MegaError.API_EEXIST -> R.string.api_eexist
@@ -40,7 +41,7 @@ internal fun MegaError.getErrorStringId() =
             if (errorString == "Not accessible due to ToS/AUP violation" || errorString == "Blocked") {
                 R.string.error_download_takendown_file
             } else {
-                errorString
+                null
             }
         MegaError.API_EOVERQUOTA -> R.string.api_eoverquota
         MegaError.API_ETEMPUNAVAIL -> R.string.api_etempunavail
@@ -58,12 +59,7 @@ internal fun MegaError.getErrorStringId() =
         MegaError.PAYMENT_EFRAUD -> R.string.payment_efraud
         MegaError.PAYMENT_ETOOMANY -> R.string.payment_etoomay
         MegaError.PAYMENT_EBALANCE -> R.string.payment_ebalance
-        MegaError.PAYMENT_EGENERIC ->
-            if (errorCode > 0) {
-                R.string.api_error_http
-            } else {
-                R.string.payment_egeneric_api_error_unknown
-            }
+        MegaError.PAYMENT_EGENERIC -> R.string.payment_egeneric_api_error_unknown
         else ->
             if (errorCode > 0) {
                 R.string.api_error_http
