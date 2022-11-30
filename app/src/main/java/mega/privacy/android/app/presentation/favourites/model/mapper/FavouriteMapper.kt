@@ -23,8 +23,10 @@ typealias FavouriteMapper = (
     @JvmSuppressWildcards TypedNode,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards StringUtilWrapper,
+    @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards (String) -> Int,
 ) -> @JvmSuppressWildcards Favourite
+
 
 /**
  * Convert NodeInfo to Favourite
@@ -39,6 +41,7 @@ internal fun toFavourite(
     nodeInfo: TypedNode,
     isAvailableOffline: Boolean,
     stringUtil: StringUtilWrapper,
+    isSelected: Boolean,
     getFileIcon: (String) -> Int = { 0 },
 ) = when (nodeInfo) {
     is TypedFolderNode -> {
@@ -46,6 +49,7 @@ internal fun toFavourite(
             node,
             getFolderInfo(nodeInfo, stringUtil),
             isAvailableOffline,
+            isSelected,
         )
     }
     is TypedFileNode -> {
@@ -54,6 +58,7 @@ internal fun toFavourite(
             getFileInfo(nodeInfo, stringUtil),
             isAvailableOffline,
             getFileIcon,
+            isSelected,
         )
     }
 }
@@ -70,6 +75,7 @@ private fun TypedFolderNode.createFolder(
     node: MegaNode,
     folderInfo: String,
     isAvailableOffline: Boolean,
+    isSelected: Boolean,
 ) = FavouriteFolder(
     icon = getFolderIcon(this),
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
@@ -78,6 +84,7 @@ private fun TypedFolderNode.createFolder(
     info = folderInfo,
     isAvailableOffline = isAvailableOffline,
     typedNode = this,
+    isSelected = isSelected,
 )
 
 /**
@@ -93,6 +100,7 @@ private fun TypedFileNode.createFile(
     fileInfo: String,
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
+    isSelected: Boolean,
 ) = FavouriteFile(
     icon = getFileIcon(name),
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
@@ -102,6 +110,7 @@ private fun TypedFileNode.createFile(
     isAvailableOffline = isAvailableOffline,
     thumbnailPath = thumbnailPath?.takeIf { type.hasThumbnail() },
     typedNode = this,
+    isSelected = isSelected,
 )
 
 private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
