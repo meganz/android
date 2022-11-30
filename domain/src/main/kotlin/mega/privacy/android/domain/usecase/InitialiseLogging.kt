@@ -6,8 +6,9 @@ package mega.privacy.android.domain.usecase
  */
 interface InitialiseLogging {
     /**
-     * invoke
+     * Invoke
      *
+     * @param overrideEnabledSettings Forces logging enabled if true regardless of user settings
      */
-    suspend operator fun invoke()
+    suspend operator fun invoke(overrideEnabledSettings: Boolean)
 }
