@@ -127,6 +127,7 @@ fun ContactCredentials(
         Column {
             Text(modifier = Modifier.padding(top = 19.dp, start = 72.dp, end = 72.dp),
                 style = MaterialTheme.typography.subtitle1,
+                color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
                 text = name)
 
             Text(modifier = Modifier.padding(start = 72.dp, end = 72.dp),
@@ -166,6 +167,7 @@ fun ContactCredentials(
 fun MyCredentials(state: AuthenticityCredentialsState) {
     Text(modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp),
         style = MaterialTheme.typography.body2,
+        color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
         letterSpacing = 0.sp,
         lineHeight = 15.sp,
         text = stringResource(id = R.string.authenticity_credentials_explanation))
