@@ -179,6 +179,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_activated_delete_has_100_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
+        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(true))
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()

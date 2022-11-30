@@ -115,7 +115,7 @@ class FavouriteFolderViewModelTest {
                     )
                 )
             )
-            whenever(favouriteMapper(any(), any(), any(), any(), any())).thenReturn(mock())
+            whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
             whenever(megaUtilWrapper.availableOffline(anyOrNull(),
                 anyOrNull())).thenReturn(true)
@@ -141,7 +141,7 @@ class FavouriteFolderViewModelTest {
                     )
                 )
             )
-            whenever(favouriteMapper(any(), any(), any(), any(), any())).thenReturn(mock())
+            whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
             whenever(megaUtilWrapper.availableOffline(anyOrNull(),
                 anyOrNull())).thenReturn(true)
