@@ -28,7 +28,8 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
 
         <LinearLayout
             android:id="@+id/items_layout"
@@ -43,6 +44,7 @@
                 android:id="@+id/send_manage_meeting_link_option"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/context_send_file_to_chat"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
@@ -53,6 +55,7 @@
                 android:id="@+id/copy_manage_meeting_link_option"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/context_copy"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
@@ -63,6 +66,7 @@
                 android:id="@+id/share_manage_meeting_link_option"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/general_share"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
