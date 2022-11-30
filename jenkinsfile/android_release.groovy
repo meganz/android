@@ -54,7 +54,7 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        ARTIFACTORY_RELEASE_URL = "$ARTIFACTORY_BASE_URL/artifactory/android-mega/release'"
+        ARTIFACTORY_RELEASE_URL = ""
     }
     post {
         failure {
@@ -144,9 +144,9 @@ pipeline {
                     script {
                         sh '''
                             cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${GITLAB_BASE_URL}/sdk/sdk.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git
                             git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${GITLAB_BASE_URL}/megachat/MEGAchat.git
+                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git
                             git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
                             git submodule sync
                             git submodule update --init --recursive --remote 
@@ -369,7 +369,7 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
 
-                        String targetPath = "$ARTIFACTORY_RELEASE_URL/${artifactoryUploadPath()}/"
+                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${artifactoryUploadPath()}/"
 
                         withEnv([
                                 "TARGET_PATH=${targetPath}"
@@ -513,7 +513,7 @@ static boolean isDefined(String value) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${GITLAB_BASE_URL}/sdk/sdk.git"
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -526,7 +526,7 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${GITLAB_BASE_URL}/megachat/MEGAchat.git"
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -550,7 +550,7 @@ private void sendToMR(String message) {
         def mrNumber = env.gitlabMergeRequestIid
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "${GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
         }
     }
@@ -629,15 +629,15 @@ private String megaChatSdkCommitId() {
  */
 private String getBuildVersionInfo() {
 
-    String artifactoryUrl = "${ARTIFACTORY_RELEASE_URL}/${artifactoryUploadPath()}"
+    String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${artifactoryUploadPath()}"
     String artifactVersion = readAppVersion2()
 
     String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
     String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
 
-    String appCommitLink = "${GITLAB_BASE_URL}/mobile/android/android/-/commit/" + appCommitId()
-    String sdkCommitLink = "${GITLAB_BASE_URL}/sdk/sdk/-/commit/" + sdkCommitId()
-    String chatCommitLink = "${GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + megaChatSdkCommitId()
+    String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + appCommitId()
+    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + sdkCommitId()
+    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + megaChatSdkCommitId()
 
     String appBranch = env.gitlabSourceBranch
     String sdkBranch = SDK_BRANCH
@@ -786,7 +786,7 @@ private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
         // upload Jenkins console log to GitLab and get download link
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
     }

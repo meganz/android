@@ -833,7 +833,7 @@ private String getSdkPublishType() {
  * "20221109.084452-rel"
  *
  * The version info is extracted from below line in the log:
- * "[pool-4-thread-1] Deploying artifact: ${ARTIFACTORY_BASE_URL}/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/20221109.084452-rel/sdk-20221109.084452-rel.aar"
+ * "[pool-4-thread-1] Deploying artifact: ARTIFACTORY_BASE_URL/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/20221109.084452-rel/sdk-20221109.084452-rel.aar"
  *
  * @return the version text of the SDK that has just been published to Artifactory
  */
