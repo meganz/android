@@ -1,16 +1,14 @@
-package mega.privacy.android.app.di
+package mega.privacy.android.domain.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.domain.usecase.GetAccountAchievements
+import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
+import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
@@ -24,8 +22,8 @@ import mega.privacy.android.domain.usecase.RetryPendingConnections
  *
  */
 @Module
-@InstallIn(SingletonComponent::class, ViewModelComponent::class)
-abstract class AccountModule {
+@DisableInstallInCheck
+internal abstract class InternalAccountModule {
 
     /**
      * Binds the Use Case [MonitorUserUpdates] to its implementation [DefaultMonitorUserUpdates]

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -6,8 +6,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
-import mega.privacy.android.domain.usecase.GetAccountAchievements
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

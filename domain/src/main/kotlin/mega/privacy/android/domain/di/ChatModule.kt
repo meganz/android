@@ -1,9 +1,8 @@
-package mega.privacy.android.app.di
+package mega.privacy.android.domain.di
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
@@ -26,8 +25,8 @@ import mega.privacy.android.domain.usecase.StartChatCall
  * Provides all chats and calls implementation.
  */
 @Module
-@InstallIn(SingletonComponent::class, ViewModelComponent::class)
-class ChatModule {
+@InstallIn(SingletonComponent::class)
+internal class ChatModule {
 
     /**
      * Provides the Use Case [SetOpenInvite]
