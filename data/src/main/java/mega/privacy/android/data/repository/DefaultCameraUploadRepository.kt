@@ -218,6 +218,15 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.setSecondaryFolderPath(secondaryFolderPath)
         }
 
+    override suspend fun setPrimaryFolderHandle(primaryHandle: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setPrimaryFolderHandle(primaryHandle)
+    }
+
+    override suspend fun setSecondaryFolderHandle(secondaryHandle: Long) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setSecondaryFolderHandle(secondaryHandle)
+        }
+
     override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
         withContext(ioDispatcher) {
             localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)

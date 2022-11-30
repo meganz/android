@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
@@ -175,6 +176,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideResetSecondaryTimeline() = mock<ResetSecondaryTimeline>()
+
+    @Provides
+    fun provideResetCameraUploadTimelines() = mock<ResetCameraUploadTimelines>()
 
     @Provides
     fun provideUpdateTimeStamp() = mock<UpdateCameraUploadTimeStamp>()

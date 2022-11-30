@@ -239,6 +239,16 @@ interface CameraUploadRepository {
     suspend fun setSecondaryFolderPath(secondaryFolderPath: String)
 
     /**
+     * Set primary folder handle
+     */
+    suspend fun setPrimaryFolderHandle(primaryHandle: Long)
+
+    /**
+     * Set secondary folder handle
+     */
+    suspend fun setSecondaryFolderHandle(secondaryHandle: Long)
+
+    /**
      * Get remove GPS preference
      * if not set (null), then remove GPS
      *
