@@ -319,6 +319,7 @@ class GetMeetingListUseCase @Inject constructor(
             lastMessage = lastMessageFormatted,
             lastMessageIcon = lastMessageIcon,
             isPublic = isPublic,
+            isActive = isActive,
             isMuted = isMuted,
             hasPermissions = hasPermissions,
             firstUser = firstUser,

@@ -73,7 +73,7 @@ class MeetingListViewModel @Inject constructor(
         meetings.map { items ->
             val searchQuery = queryString
             if (!searchQuery.isNullOrBlank() && !items.isNullOrEmpty()) {
-                items.filter { (_, title, lastMessage, _, _, _, _, firstUser, lastUser, _, _, _) ->
+                items.filter { (_, title, lastMessage, _, _, _, _, _, firstUser, lastUser, _, _, _) ->
                     title.contains(searchQuery, true)
                             || lastMessage?.contains(searchQuery, true) == true
                             || firstUser.firstName?.contains(searchQuery, true) == true
