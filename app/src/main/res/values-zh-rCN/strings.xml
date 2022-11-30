@@ -357,7 +357,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">正在创建文件夹</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">清空回收站</string>
+    <string name="context_clear_rubbish">Empty Rubbish bin</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">您即将永久移除回收站中的所有项目。</string>
     <!-- send cancel subscriptions dialog -->
@@ -1617,7 +1617,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">分享使用</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[A]回收站[/A][B]为空[/B]</string>
+    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[A]您的云盘[/A][B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -2130,9 +2130,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">您有新的消息</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">回收站定时清理</string>
+    <string name="settings_rb_scheduler_enable_title">Rubbish bin emptying scheduler</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">回收站会自动为您清理。</string>
+    <string name="settings_rb_scheduler_enable_subtitle">The Rubbish bin is emptied for you automatically.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">最短期限为7天。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2148,7 +2148,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">当解压的视频大于</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">要禁用回收站定时清理或设置更长的保留期限，请订阅Pro会员方案。</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish bin emptying scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">天</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3977,4 +3977,14 @@
     <string name="meetings_list_recurring_meeting_label">定期会议</string>
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">每周%s</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">媒体发现视图</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">在媒体发现视图中自动打开只包含图片和视频的文件夹。这让您可以在图库模式下看到媒体，并按日期过滤。</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">由于这个文件夹只包含图片和视频，我们已经自动在媒体发现视图中打开它。这可以让你在图库模式下看到媒体，并按日期过滤。您可以在设置中停用这个功能。</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">设置</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">好的，明白了</string>
 </resources>
