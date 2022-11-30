@@ -53,8 +53,6 @@ pipeline {
         CONSOLE_LOG_FILE = 'console.txt'
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-
-        ARTIFACTORY_RELEASE_URL = ""
     }
     post {
         failure {
