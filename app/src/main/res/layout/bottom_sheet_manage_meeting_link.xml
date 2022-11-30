@@ -1,0 +1,76 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/manage_meeting_link_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Title -->
+    <RelativeLayout
+        android:id="@+id/manage_meeting_link_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/manage_meeting_link_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="Anyone with this link can join the meeting and view the meeting chat."
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
+
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp">
+
+            <!-- Options -->
+            <TextView
+                android:id="@+id/send_manage_meeting_link_option"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:text="@string/context_send_file_to_chat"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:drawableStartCompat="@drawable/ic_send_to_contact"
+                app:drawableTint="?android:attr/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/copy_manage_meeting_link_option"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:text="@string/context_copy"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:drawableStartCompat="@drawable/ic_copy_white"
+                app:drawableTint="?android:attr/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/share_manage_meeting_link_option"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:text="@string/general_share"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:drawableStartCompat="@drawable/ic_social_share_white"
+                app:drawableTint="?android:attr/textColorSecondary" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

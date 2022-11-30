@@ -545,17 +545,19 @@ private fun ActionButton(
         }) {
         when (action) {
             ScheduledMeetingInfoAction.ShareMeetingLink -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(modifier = Modifier.padding(start = 72.dp,
-                        end = 16.dp,
-                        top = 16.dp,
-                        bottom = 16.dp),
-                        style = MaterialTheme.typography.button,
-                        text = stringResource(id = action.title),
-                        color = MaterialTheme.colors.secondary)
-                }
+                if (state.isHost && state.isPublic && state.enabledMeetingLinkOption) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(modifier = Modifier.padding(start = 72.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 16.dp),
+                            style = MaterialTheme.typography.button,
+                            text = stringResource(id = action.title),
+                            color = MaterialTheme.colors.secondary)
+                    }
 
-                divider(withStartPadding = true)
+                    divider(withStartPadding = true)
+                }
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
                 if (state.isHost && state.isPublic) {
@@ -642,7 +644,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = state.timestampDnd == null,
+                    isEnabled = state.dndSeconds == null,
                     hasSwitch = true)
                 divider(withStartPadding = true)
             }
@@ -813,13 +815,13 @@ private fun ActionOption(
                 .fillMaxSize()) {
                 ActionText(actionText = action.title)
 
-                state.timestampRetentionTime?.let { time ->
+                state.retentionTimeSeconds?.let { time ->
                     if (action == ScheduledMeetingInfoAction.ManageChatHistory) {
                         manageChatHistorySubtitle(timestampRetentionTime = time)
                     }
                 }
 
-                state.timestampDnd?.let { time ->
+                state.dndSeconds?.let { time ->
                     if (action == ScheduledMeetingInfoAction.ChatNotifications) {
                         chatNotificationSubtitle(timestampDnd = time)
                     }
