@@ -73,7 +73,7 @@ project('sdk') {
 artifactory {
     clientConfig.setIncludeEnvVars(true)
 
-    contextUrl = "https://artifactory.developers.mega.co.nz/artifactory/mega-gradle"
+    contextUrl = "${System.env.ARTIFACTORY_BASE_URL}/artifactory/mega-gradle"
     publish {
         repository {
             repoKey = "mega-sdk-android" // The Artifactory repository key to publish to

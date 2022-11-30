@@ -674,7 +674,7 @@ private void downloadJenkinsConsoleLog(String downloaded) {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
     }
