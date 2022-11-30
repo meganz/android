@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.photos.timeline.model
 
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+
 enum class ApplyFilterMediaType(val type: FilterMediaType, val source: TimelinePhotosSource) {
 
     ALL_MEDIA_IN_CD_AND_CU(FilterMediaType.ALL_MEDIA, TimelinePhotosSource.ALL_PHOTOS),
