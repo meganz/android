@@ -1,18 +1,11 @@
 package mega.privacy.android.app.di
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.data.repository.FilesRepository
-import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
-import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 
 /**
  * Shared use case module
@@ -23,20 +16,6 @@ import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 @InstallIn(SingletonComponent::class)
 abstract class SharedUseCaseModule {
 
-    /**
-     * Bind is database entry stale
-     *
-     */
-    @Binds
-    abstract fun bindIsDatabaseEntryStale(implementation: DefaultIsDatabaseEntryStale): IsDatabaseEntryStale
-
-    /**
-     * Bind get extended account detail
-     *
-     */
-    @Binds
-    abstract fun bindGetExtendedAccountDetail(implementation: DefaultGetExtendedAccountDetail): GetExtendedAccountDetail
-
     companion object {
         /**
          * Provide check access error extended
@@ -44,9 +23,5 @@ abstract class SharedUseCaseModule {
         @Provides
         fun provideCheckAccessErrorExtended(repository: FilesRepository) =
             CheckAccessErrorExtended(repository::checkAccessErrorExtended)
-
-        @Provides
-        fun provideGetSpecificAccountDetail(repository: AccountRepository) =
-            GetSpecificAccountDetail(repository::getSpecificAccountDetail)
     }
 }

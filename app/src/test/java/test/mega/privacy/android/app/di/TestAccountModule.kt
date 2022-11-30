@@ -2,11 +2,10 @@ package test.mega.privacy.android.app.di
 
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.di.AccountModule
+import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
@@ -15,7 +14,7 @@ import org.mockito.kotlin.mock
 
 @TestInstallIn(
     replaces = [AccountModule::class],
-    components = [SingletonComponent::class, ViewModelComponent::class]
+    components = [SingletonComponent::class]
 )
 @Module
 object TestAccountModule {

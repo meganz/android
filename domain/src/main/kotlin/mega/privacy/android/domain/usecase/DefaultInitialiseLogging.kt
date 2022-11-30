@@ -18,7 +18,7 @@ import javax.inject.Inject
  * @property areChatLogsEnabled
  * @property coroutineDispatcher
  */
-class DefaultInitialiseLogging @Inject constructor(
+internal class DefaultInitialiseLogging @Inject constructor(
     private val loggingRepository: LoggingRepository,
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
