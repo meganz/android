@@ -778,4 +778,22 @@ class MeetingActivityViewModel @Inject constructor(
 
         return result
     }
+
+    /**
+     * Method to check if the chat call exists
+     *
+     * @param chatId The chat ID
+     * @return True if the call exists or false otherwise
+     */
+    fun checkChatCall(chatId: Long): Boolean {
+        megaChatApiGateway.getChatCall(chatId)?.let { return true }
+        return false
+    }
+
+    /**
+     * Method to finish the [MeetingActivity]
+     */
+    fun finishMeetingActivity() {
+        _finishMeetingActivity.value = true
+    }
 }

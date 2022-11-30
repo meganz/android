@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
@@ -10,7 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment.ClickCallback
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -30,6 +33,20 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         releaseVideoAndHideKeyboard()
         firstName = binding.editFirstName.text.toString()
         lastName = binding.editLastName.text.toString()
+
+        if (!sharedModel.checkChatCall(chatId)) {
+            MeetingHasEndedDialogFragment(object : ClickCallback {
+                override fun onViewMeetingChat() {}
+                override fun onLeave() {
+                    val intent = Intent(requireContext(), LeftMeetingActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(intent)
+                    sharedModel.finishMeetingActivity()
+                }
+            }, true).show(parentFragmentManager,
+                MeetingHasEndedDialogFragment.TAG)
+            return
+        }
 
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
