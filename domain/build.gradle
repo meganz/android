@@ -1,6 +1,7 @@
 plugins {
     id 'kotlin'
     id 'com.android.lint'
+    id 'kotlin-kapt'
 }
 
 lint {
@@ -14,6 +15,7 @@ apply from: "$project.rootDir/tools/jacoco.gradle"
 compileKotlin {
     kotlinOptions {
         jvmTarget = "11"
+        suppressWarnings = isCiBuild()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
@@ -21,6 +23,9 @@ compileKotlin {
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "javax.inject:javax.inject:1"
+
+    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
+    implementation "com.google.dagger:hilt-core:$hiltVersion"
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"

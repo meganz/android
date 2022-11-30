@@ -1,223 +1,144 @@
 package mega.privacy.android.app.presentation.favourites
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
-import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
-import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
-import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
-import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteListItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
-import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
-import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
-import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
+import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
+import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.RemoveFavourites
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * The view model regarding favourites
- * @param context Context
- * @param getAllFavorites GetAllFavorites
- * @param favouriteMapper FavouriteMapper
- * @param stringUtilWrapper StringUtilWrapper
- * @param removeFavourites RemoveFavourites
- * @param getSortOrder GetCloudSortOrder
- * @param megaUtilWrapper MegaUtilWrapper
- * @param fetchNode FetchNodeWrapper
+ * Favourites view model
+ *
+ * @property getAllFavorites
+ * @property favouriteMapper
+ * @property stringUtilWrapper
+ * @property removeFavourites
+ * @property getSortOrder
+ * @property fetchNode
+ * @property mapOrder
+ * @property headerMapper
+ * @property monitorConnectivity
+ * @property isAvailableOffline
  */
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getAllFavorites: GetAllFavorites,
     private val favouriteMapper: FavouriteMapper,
     private val stringUtilWrapper: StringUtilWrapper,
     private val removeFavourites: RemoveFavourites,
     private val getSortOrder: GetFavouriteSortOrder,
-    private val megaUtilWrapper: MegaUtilWrapper,
     private val fetchNode: FetchNodeWrapper,
     private val mapOrder: MapFavouriteSortOrder,
-) :
-    ViewModel() {
-    private val _favouritesState =
-        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading(false))
+    private val headerMapper: HeaderMapper,
+    private val monitorConnectivity: MonitorConnectivity,
+    private val isAvailableOffline: IsAvailableOffline,
+) : ViewModel() {
+
+    private val query = MutableStateFlow<String?>(null)
+    private lateinit var order: MutableStateFlow<FavouriteSortOrder>
+    private val selected = MutableStateFlow<Set<NodeId>>(emptySet())
+    private val _state =
+        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading(false, isConnected = true))
 
     /**
      * The favouritesState for observing the favourites state.
      */
-    val favouritesState = _favouritesState.asStateFlow()
-
-    private val _favouritesEventState = MutableSharedFlow<FavouritesEventState>(replay = 0)
-
-    /**
-     * The favouritesState for observing the event state.
-     */
-    val favouritesEventState = _favouritesEventState.asSharedFlow()
-
-    private var currentNodeJob: Job? = null
-
-    private val favouriteSourceList = mutableListOf<Favourite>()
-
-    private val favouriteList = mutableListOf<Favourite>()
+    val favouritesState: StateFlow<FavouriteLoadState> = _state
 
     private val itemsSelected = mutableMapOf<Long, Favourite>()
 
-    /**
-     * Enable search
-     */
-    fun enableSearch() {
-        searchMode = true
-    }
-
-    private var searchMode = false
-        set(value) {
-            field = value
-            _favouritesState.update { state ->
-                when (state) {
-                    is FavouriteLoadState.Empty -> state.copy(showSearch = value)
-                    is FavouriteLoadState.Error -> state.copy(showSearch = value)
-                    is FavouriteLoadState.Loading -> state.copy(showSearch = value)
-                    is FavouriteLoadState.Success -> state.copy(showSearch = value)
-                }
-            }
-        }
-
-    private var searchQuery: String? = null
-
-    private var isList: Boolean = true
-
     init {
-        getFavourites()
-    }
-
-    /**
-     * Get favourites
-     */
-    fun getFavourites() {
-        _favouritesState.update {
-            FavouriteLoadState.Loading(false)
-        }
-        // Cancel the previous job avoid to repeatedly observed
-        currentNodeJob?.cancel()
-        currentNodeJob = viewModelScope.launch {
-            runCatching {
-                getAllFavorites().collectLatest { favouriteInfoList ->
-                    _favouritesState.update {
-                        when {
-                            favouriteInfoList.isEmpty() -> {
-                                FavouriteLoadState.Empty(false)
-                            }
-                            else -> {
-                                withContext(ioDispatcher) {
-                                    buildFavouriteSourceList(favouriteInfoList)
-                                    FavouriteLoadState.Success(
-                                        favouriteListToFavouriteItemList(
-                                            favouriteList = reorganizeFavouritesByConditions(
-                                                getSortOrder(),
-                                                if (searchMode) {
-                                                    searchQuery
-                                                } else {
-                                                    null
-                                                }),
-                                            isList = isList
-                                        ),
-                                        showSearch = searchMode
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }.onFailure { exception ->
-                Timber.e(exception.message)
+        viewModelScope.launch {
+            order = MutableStateFlow(getSortOrder())
+            combine(order,
+                query,
+                getAllFavorites(),
+                selected,
+                monitorConnectivity(),
+                ::mapToFavourite).collectLatest { newState ->
+                _state.update { newState }
             }
         }
     }
 
-    /**
-     * Open file
-     * @param favourite Favourite
-     */
-    fun openFile(favourite: Favourite) {
-        viewModelScope.launch {
-            _favouritesEventState.emit(
-                if (favourite is FavouriteFolder) {
-                    FavouritesEventState.OpenFolder(favourite.typedNode.id.id)
-                } else {
-                    FavouritesEventState.OpenFile(favourite as FavouriteFile)
-                }
-            )
-        }
+    private suspend fun mapToFavourite(
+        order: FavouriteSortOrder,
+        search: String?,
+        nodes: List<TypedNode>,
+        selectedNodes: Set<NodeId>,
+        isConnected: Boolean,
+    ): FavouriteLoadState {
+        return if (nodes.isEmpty()) FavouriteLoadState.Empty(search != null, isConnected)
+        else FavouriteLoadState.Success(
+            favourites = createFavouriteItemsList(order, nodes, search, selectedNodes),
+            showSearch = search != null,
+            selectedItems = selectedNodes,
+            isConnected = isConnected,
+        )
     }
 
-    /**
-     * Three dots clicked
-     * @param favourite Favourite
-     */
-    fun threeDotsClicked(favourite: Favourite) {
-        viewModelScope.launch {
-            _favouritesEventState.emit(
-                if (megaUtilWrapper.isOnline(context)) {
-                    FavouritesEventState.OpenBottomSheetFragment(favourite)
-                } else {
-                    FavouritesEventState.Offline
-                }
+    private suspend fun createFavouriteItemsList(
+        order: FavouriteSortOrder,
+        nodes: List<TypedNode>,
+        search: String?,
+        selectedNodes: Set<NodeId>,
+    ) = listOf(
+        headerMapper(order)
+    ) + nodes.filter {
+        search == null || it.name.contains(search, ignoreCase = true)
+    }.mapTypedNodesListToFavourites(selectedNodes)
+        .sortBy(order)
+        .map {
+            FavouriteListItem(
+                favourite = it,
             )
         }
-    }
+
 
     /**
      * Determine that search menu whether is shown.
      * @return true is shown.
      */
-    fun shouldShowSearchMenu() = favouriteList.isNotEmpty()
+    fun shouldShowSearchMenu() = _state.value.showSearch
 
     /**
      * Filter the items that matches the query
      * @param query search query
      */
-    fun searchQuery(query: String) {
-        searchQuery = query
-        getFavouritesByConditions(query = query)
+    fun searchQuery(queryString: String) {
+        query.update { queryString }
     }
 
     /**
      * Exit search mode
      */
     fun exitSearch() {
-        searchMode = false
-        searchQuery = null
-        getFavourites()
+        query.update { null }
     }
 
     /**
@@ -225,40 +146,20 @@ class FavouritesViewModel @Inject constructor(
      * @param item the item that is clicked
      */
     fun itemSelected(item: Favourite) {
-        val items = favouriteList.map { favourite ->
-            if (favourite.typedNode.id == item.typedNode.id) {
-                if (favourite.isSelected) {
-                    itemsSelected.remove(favourite.typedNode.id.id)
-                } else {
-                    itemsSelected[favourite.typedNode.id.id] = favourite
-                }
-                (favourite as? FavouriteFile)?.copy(isSelected = !favourite.isSelected)
-                    ?: (favourite as FavouriteFolder).copy(
-                        isSelected = !favourite.isSelected
-                    )
-            } else {
-                favourite
-            }
+        val nodeId = item.typedNode.id
+        selected.update {
+            if (it.contains(nodeId)) it - nodeId else it + nodeId
         }
-        updateFavouritesStateUnderActionMode(items)
     }
 
     /**
      * Select all items
      */
     fun selectAll() {
-        itemsSelectedClear()
-        val items = favouriteList.map {
-            (it as? FavouriteFile)?.copy(isSelected = true) ?: (it as FavouriteFolder).copy(
-                isSelected = true
-            )
-        }
-        itemsSelected.putAll(
-            items.map {
-                Pair(it.typedNode.id.id, it)
+        (_state.value as? FavouriteLoadState.Success)?.favourites?.mapNotNull { it.favourite?.typedNode?.id }
+            ?.toSet()?.let { allNodes ->
+                selected.update { allNodes }
             }
-        )
-        updateFavouritesStateUnderActionMode(items)
     }
 
     /**
@@ -275,45 +176,7 @@ class FavouritesViewModel @Inject constructor(
      * Clear the items that are selected
      */
     fun clearSelections() {
-        itemsSelected.clear()
-        val items = favouriteList.map {
-            (it as? FavouriteFile)?.copy(isSelected = false) ?: (it as FavouriteFolder).copy(
-                isSelected = false
-            )
-        }
-        updateFavouritesStateUnderActionMode(items)
-    }
-
-    /**
-     * Updated favourites state when items are changed under action mode
-     * @param items the new favourite list
-     */
-    private fun updateFavouritesStateUnderActionMode(items: List<Favourite>) {
-        viewModelScope.launch {
-            _favouritesEventState.emit(FavouritesEventState.ActionModeState(itemsSelected.size))
-            if (favouriteList.isNotEmpty()) {
-                favouriteList.clear()
-            }
-            favouriteList.addAll(items)
-            _favouritesState.update {
-                FavouriteLoadState.Success(
-                    favourites = favouriteListToFavouriteItemList(
-                        favouriteList = items,
-                        isList = isList
-                    ),
-                    showSearch = searchMode
-                )
-            }
-        }
-    }
-
-    /**
-     * Clear the selected item map
-     */
-    private fun itemsSelectedClear() {
-        if (itemsSelected.isNotEmpty()) {
-            itemsSelected.clear()
-        }
+        selected.update { emptySet() }
     }
 
     /**
@@ -321,215 +184,35 @@ class FavouritesViewModel @Inject constructor(
      */
     fun getItemsSelected(): Map<Long, Favourite> = itemsSelected
 
-    /**
-     * Convert the Favourite list to FavouriteItem list, add the header and placeholder items.
-     * @param favouriteList Favourite list
-     * @param isList true is list, otherwise is grid
-     * @param forceUpdate item whether is force updated
-     * @param headerForceUpdate header item whether is force update
-     * @return FavouriteItem list
-     */
-    private suspend fun favouriteListToFavouriteItemList(
-        favouriteList: List<Favourite>,
-        isList: Boolean,
-        forceUpdate: Boolean = false,
-        headerForceUpdate: Boolean = false,
-        order: FavouriteSortOrder? = null,
-    ): List<FavouriteItem> {
-        val favouriteItemList = mutableListOf<FavouriteItem>()
-        favouriteItemList.add(
-            FavouriteHeaderItem(
-                favourite = null,
-                forceUpdate = headerForceUpdate,
-                orderStringId = getFavouriteSortHeaderStringIdentifier(order
-                    ?: getSortOrder())
-            )
-        )
-        favouriteList.map { favourite ->
-            favouriteItemList.add(
-                FavouriteListItem(
-                    favourite = favourite,
-                    forceUpdate = forceUpdate
-                )
-            )
-        }
-        if (isList) {
-            if (favouriteItemList.any {
-                    it.type == ITEM_PLACEHOLDER_TYPE
-                }) {
-                favouriteItemList.removeIf {
-                    it.type == ITEM_PLACEHOLDER_TYPE
-                }
-            }
-        } else {
-            // If the number of favourite folders cannot be divisible by 2,
-            // add placeholder view to make sure folder is not displayed with file in same row.
-            if (favouriteList.filterIsInstance<FavouriteFolder>().size % 2 != 0) {
-                favouriteItemList.add(
-                    // Get the index of last folder and add placeholder in next position of last folder
-                    // The position of last folder is index + 1, so that the next position is index + 2
-                    index = favouriteList.indexOfLast { it is FavouriteFolder } + 2,
-                    element = FavouritePlaceholderItem())
+    private suspend fun List<TypedNode>.mapTypedNodesListToFavourites(selectedNodes: Set<NodeId>): List<Favourite> =
+        mapNotNull { favouriteInfo ->
+            val nodeId = favouriteInfo.id
+            val node = this@FavouritesViewModel.fetchNode(nodeId.id) ?: return@mapNotNull null
+            this@FavouritesViewModel.favouriteMapper(
+                node,
+                favouriteInfo,
+                isAvailableOffline(favouriteInfo),
+                stringUtilWrapper,
+                selectedNodes.contains(nodeId),
+            ) { name ->
+                MimeTypeList.typeForName(name).iconResourceId
             }
         }
-
-        return favouriteItemList
-    }
-
-    private fun getFavouriteSortHeaderStringIdentifier(order: FavouriteSortOrder) = when (order) {
-        FavouriteSortOrder.Label -> R.string.title_label
-        is FavouriteSortOrder.ModifiedDate -> R.string.sortby_date
-        is FavouriteSortOrder.Name -> R.string.sortby_name
-        is FavouriteSortOrder.Size -> R.string.sortby_size
-    }
-
-    /**
-     * Force update data when switch between list and gird
-     * @param isList true is list, otherwise is grid
-     */
-    fun forceUpdateData(isList: Boolean) {
-        this.isList = isList
-        if (favouriteList.isNotEmpty()) {
-            viewModelScope.launch {
-                _favouritesState.update {
-                    FavouriteLoadState.Success(
-                        favouriteListToFavouriteItemList(
-                            favouriteList = favouriteList,
-                            isList = isList,
-                            forceUpdate = true,
-                            headerForceUpdate = true
-                        ),
-                        showSearch = searchMode
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Get favourites by conditions
-     * @param order sort order
-     * @param query search query
-     */
-    fun getFavouritesByConditions(
-        order: FavouriteSortOrder? = null,
-        query: String? = null,
-    ) {
-        viewModelScope.launch {
-            _favouritesState.update {
-                FavouriteLoadState.Success(
-                    favouriteListToFavouriteItemList(
-                        favouriteList = reorganizeFavouritesByConditions(
-                            order ?: getSortOrder(),
-                            query ?: if (searchMode) {
-                                searchQuery
-                            } else {
-                                null
-                            }),
-                        isList = isList
-                    ),
-                    showSearch = searchMode
-                )
-            }
-        }
-    }
-
-    /**
-     * Reorganize favourites by conditions
-     * @param order sort order
-     * @param query search query
-     * @return List<Favourite>
-     */
-    private fun reorganizeFavouritesByConditions(
-        order: FavouriteSortOrder,
-        query: String? = null,
-    ): List<Favourite> {
-        if (favouriteList.isNotEmpty()) {
-            favouriteList.clear()
-        }
-        favouriteList.addAll(
-            getFilteredAndSortedFavourites(order, query)
-        )
-        return favouriteList
-    }
-
-    private fun getFilteredAndSortedFavourites(
-        order: FavouriteSortOrder,
-        query: String?,
-    ): List<Favourite> {
-        val sortedList = sortOrder(favouriteSourceList, order)
-        return query?.let { getFavouritesByQuery(sortedList, it) } ?: sortedList
-    }
-
-
-    /**
-     * Build favourite source list
-     * @param list List<FavouriteInfo>
-     */
-    private suspend fun buildFavouriteSourceList(list: List<TypedNode>) {
-        if (favouriteSourceList.isNotEmpty()) {
-            favouriteSourceList.clear()
-        }
-        favouriteSourceList.addAll(
-            list.mapNotNull { favouriteInfo ->
-                val nodeId = favouriteInfo.id
-                val node = fetchNode(nodeId.id) ?: return@mapNotNull null
-                favouriteMapper(
-                    node,
-                    favouriteInfo,
-                    megaUtilWrapper.availableOffline(
-                        context,
-                        nodeId.id
-                    ),
-                    stringUtilWrapper
-                ) { name ->
-                    MimeTypeList.typeForName(name).iconResourceId
-                }
-            }
-        )
-    }
 
     /**
      * Sort order for FavouriteInfo list and place the folders at the top
-     * @param list favouriteInfo list
+     * @param this@sortOrder favouriteInfo list
      * @param order sort order
      * @return List<FavouriteInfo>
      */
-    private fun sortOrder(list: List<Favourite>, order: FavouriteSortOrder): List<Favourite> =
-        mutableListOf<Favourite>().apply {
-            addAll(list)
-            sortWith { item1, item2 ->
-                if (order.sortDescending) {
-                    item2.typedNode.compareTo(item1.typedNode, order)
-                } else {
-                    item1.typedNode.compareTo(item2.typedNode, order)
-                }
-            }
-        }
-
-
-    /**
-     * Sort order for Favourite list
-     * @param list favourite list
-     * @param query search query
-     * @return List<FavouriteInfo>
-     */
-    private fun getFavouritesByQuery(
-        list: List<Favourite>,
-        query: String,
-    ): List<Favourite> =
-        mutableListOf<Favourite>().apply {
-            if (query.isNotEmpty()) {
-                addAll(
-                    list.filter { info ->
-                        info.typedNode.name.contains(query, true)
-                    }
-                )
+    private fun List<Favourite>.sortBy(order: FavouriteSortOrder): List<Favourite> =
+        this.sortedWith { item1, item2 ->
+            if (order.sortDescending) {
+                item2.typedNode.compareTo(item1.typedNode, order)
             } else {
-                addAll(list)
+                item1.typedNode.compareTo(item2.typedNode, order)
             }
         }
-
 
     private fun TypedNode.compareTo(other: TypedNode, order: FavouriteSortOrder): Int {
         return when (this) {
@@ -570,7 +253,8 @@ class FavouritesViewModel @Inject constructor(
      *
      * @param order
      */
-    fun onOrderChange(order: SortOrder) {
-        getFavouritesByConditions(order = mapOrder(order))
+    fun onOrderChange(sortOrder: SortOrder) {
+        order.update { mapOrder(sortOrder) }
     }
+
 }

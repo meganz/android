@@ -13,5 +13,5 @@ fun interface MonitorChatListItemUpdates {
      *
      * @return Flow of [ChatListItem].
      */
-    operator fun invoke(): Flow<ChatListItem>
+    suspend operator fun invoke(): Flow<ChatListItem>
 }

@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Default get extended account detail
  *
  */
-class DefaultGetExtendedAccountDetail @Inject constructor(
+internal class DefaultGetExtendedAccountDetail @Inject constructor(
     private val repository: AccountRepository,
 ) : GetExtendedAccountDetail {
     override suspend fun invoke(sessions: Boolean, purchases: Boolean, transactions: Boolean) {

@@ -1,10 +1,12 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -97,6 +99,27 @@ internal class DefaultAlbumRepository @Inject constructor(
                 megaApiGateway.createSetElement(albumID.id, photoID.id)
             }
         }
+
+    override suspend fun removeAlbums(albumIds: List<AlbumId>) = withContext(ioDispatcher) {
+        albumIds.map { albumId ->
+            async {
+                suspendCoroutine { continuation ->
+                    megaApiGateway.removeSet(
+                        albumId.id,
+                        OptionalMegaRequestListenerInterface(
+                            onRequestFinish = { _, error ->
+                                if (error.errorCode == MegaError.API_OK) {
+                                    continuation.resumeWith(Result.success(Unit))
+                                } else {
+                                    continuation.failWithError(error)
+                                }
+                            }
+                        ),
+                    )
+                }
+            }
+        }.joinAll()
+    }
 
     private fun MegaSet.toUserSet(): UserSet = userSetMapper(id(), name(), cover(), ts())
 

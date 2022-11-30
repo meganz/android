@@ -14,5 +14,5 @@ fun interface MonitorScheduledMeetingUpdates {
      *
      * @return          Flow of [ChatRoom].
      */
-    operator fun invoke(): Flow<ChatScheduledMeeting>
+    suspend operator fun invoke(): Flow<ChatScheduledMeeting>
 }

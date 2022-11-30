@@ -19,8 +19,8 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.data.logging.LineNumberDebugTree
 import mega.privacy.android.data.logging.LogFlowTree
-import mega.privacy.android.data.qualifier.ChatLogger
-import mega.privacy.android.data.qualifier.SdkLogger
+import mega.privacy.android.domain.qualifier.ChatLogger
+import mega.privacy.android.domain.qualifier.SdkLogger
 import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher

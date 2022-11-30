@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Implementation of GetAccountAchievements
  */
-class DefaultGetAccountAchievements @Inject constructor(private val accountRepository: AccountRepository) :
+internal class DefaultGetAccountAchievements @Inject constructor(private val accountRepository: AccountRepository) :
     GetAccountAchievements {
 
     override suspend fun invoke(

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
@@ -8,31 +9,37 @@ import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInform
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class OfflineNodeInformationMapperTest {
 
     private val expectedPath = "path"
+    private val expectedName = "name"
     private val expectedIncomingHandle = "incomingHandle"
 
     @Test
-    fun `test that incoming offline node contains path and incoming handle`() = runTest{
+    fun `test that incoming offline node contains correct values`() = runTest {
         val origin = OfflineInformation.INCOMING
         val input = getInput(origin)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
             IncomingShareOfflineNodeInformation(
                 path = expectedPath,
+                name = expectedName,
                 incomingHandle = expectedIncomingHandle,
             )
         )
     }
 
     @Test
-    fun `test that inbox offline node is the correct type and contains path`() = runTest{
+    fun `test that inbox offline node is the correct type and contains correct values`() = runTest {
         val origin = OfflineInformation.INBOX
         val input = getInput(origin)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
-            InboxOfflineNodeInformation(path = expectedPath)
+            InboxOfflineNodeInformation(
+                path = expectedPath,
+                name = expectedName
+            )
         )
     }
 
@@ -43,7 +50,10 @@ class OfflineNodeInformationMapperTest {
         val input = getInput(origin)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
-            OtherOfflineNodeInformation(expectedPath)
+            OtherOfflineNodeInformation(
+                path = expectedPath,
+                name = expectedName
+            )
         )
     }
 
@@ -51,7 +61,7 @@ class OfflineNodeInformationMapperTest {
         id = 1,
         handle = "handle",
         path = expectedPath,
-        name = "name",
+        name = expectedName,
         parentId = 1,
         type = null,
         origin = origin,

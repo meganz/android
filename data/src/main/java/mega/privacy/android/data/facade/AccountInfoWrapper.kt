@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import mega.privacy.android.domain.entity.account.MegaSku
 import nz.mega.sdk.MegaRequest
 
 /**
@@ -39,4 +40,9 @@ interface AccountInfoWrapper {
      * @param request
      */
     suspend fun handleAccountDetail(request: MegaRequest)
+
+    /**
+     * Available skus
+     */
+    val availableSkus: List<MegaSku>
 }

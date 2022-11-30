@@ -9,7 +9,6 @@ import mega.privacy.android.app.data.mapper.DataMapper
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.data.mapper.toData
 import mega.privacy.android.app.data.mapper.toPushMessage
-import mega.privacy.android.app.data.mapper.toSkuMapper
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
@@ -19,8 +18,9 @@ import mega.privacy.android.app.mediaplayer.mapper.toRepeatToggleModeMapper
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
 import mega.privacy.android.app.presentation.achievements.toUIMegaAchievement
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
-import mega.privacy.android.data.mapper.SkuMapper
+import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
 
 /**
  * Module for providing mapper dependencies
@@ -60,12 +60,6 @@ class MapperModule {
     fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = ::toRepeatModeMapper
 
     /**
-     * Provide SKU mapper
-     */
-    @Provides
-    fun provideSkuMapper(): SkuMapper = ::toSkuMapper
-
-    /**
      * Provide UIMegaAchievementMapper
      */
     @Provides
@@ -77,4 +71,9 @@ class MapperModule {
     @Provides
     fun providePlaylistItemMapper(): PlaylistItemMapper = ::toPlaylistItemMapper
 
+    /**
+     * Provide header mapper
+     */
+    @Provides
+    fun provideHeaderMapper(): HeaderMapper = ::toHeader
 }

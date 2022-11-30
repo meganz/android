@@ -1,10 +1,11 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.SubscriptionPlan
+import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -96,11 +97,11 @@ interface AccountRepository {
     suspend fun isBusinessAccountActive(): Boolean
 
     /**
-     * Get the List of SubscriptionPlans
+     * Get the List of SubscriptionOptions
      *
-     * @return List of SubscriptionPlans
+     * @return List of SubscriptionOptions
      */
-    suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+    suspend fun getSubscriptionOptions(): List<SubscriptionOption>
 
     /**
      * Returns if accounts achievements enabled
@@ -151,7 +152,7 @@ interface AccountRepository {
      *
      * @return Fingerprint of the signing key of the current account.
      */
-    suspend fun getMyCredentials(): String?
+    suspend fun getMyCredentials(): AccountCredentials.MyAccountCredentials?
 
     /**
      * Reset account details time stamp
@@ -164,4 +165,10 @@ interface AccountRepository {
      *
      */
     suspend fun resetExtendedAccountDetailsTimestamp()
+
+    /**
+     * Check Achievements are enabled or not
+     */
+    suspend fun areAchievementsEnabled(): Boolean
+
 }

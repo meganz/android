@@ -35,9 +35,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
@@ -49,6 +51,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -84,6 +87,7 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -136,6 +140,9 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var dbH: DatabaseHandler
+
+    @Inject
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
 
     var numberOfClicksKarere = 0
     var numberOfClicksSDK = 0
@@ -234,19 +241,17 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         }
     }
 
+    private val enableClickCount = 5
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupView() = with(binding) {
         loginTextView.apply {
             text = requireContext().getFormattedStringOrDefault(R.string.login_to_mega)
             setOnClickListener {
                 numberOfClicksKarere++
-                if (numberOfClicksKarere == Constants.CLICKS_ENABLE_DEBUG) {
-                    if (loggingSettings.areKarereLogsEnabled()) {
-                        numberOfClicksKarere = 0
-                        loggingSettings.setStatusLoggerKarere(requireActivity(), false)
-                    } else {
-                        (requireActivity() as LoginActivity).showConfirmationEnableLogsKarere()
-                    }
+                if (numberOfClicksKarere == enableClickCount) {
+                    numberOfClicksKarere = 0
+                    toggleKarereLogs()
                 }
             }
             val onLongPress = Runnable {
@@ -350,13 +355,9 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         textNewToMega.setOnClickListener {
             numberOfClicksSDK++
-            if (numberOfClicksSDK == Constants.CLICKS_ENABLE_DEBUG) {
-                if (loggingSettings.areSDKLogsEnabled()) {
-                    numberOfClicksSDK = 0
-                    loggingSettings.setStatusLoggerSDK(requireActivity(), false)
-                } else {
-                    (requireActivity() as LoginActivity).showConfirmationEnableLogsSDK()
-                }
+            if (numberOfClicksSDK == enableClickCount) {
+                numberOfClicksSDK = 0
+                toggleSdkLogs()
             }
         }
 
@@ -410,6 +411,30 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (passwdTemp != null && emailTemp != null) {
             submitFormConfirmAccount()
+        }
+    }
+
+    private fun toggleSdkLogs() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
+                if (loggingSettings.areSDKLogsEnabled()) {
+                    loggingSettings.setStatusLoggerSDK(requireActivity(), false)
+                } else {
+                    (requireActivity() as LoginActivity).showConfirmationEnableLogsSDK()
+                }
+            }
+        }
+    }
+
+    private fun toggleKarereLogs() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
+                if (loggingSettings.areKarereLogsEnabled()) {
+                    loggingSettings.setStatusLoggerKarere(requireActivity(), false)
+                } else {
+                    (requireActivity() as LoginActivity).showConfirmationEnableLogsKarere()
+                }
+            }
         }
     }
 

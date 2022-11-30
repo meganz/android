@@ -20,6 +20,7 @@ import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -145,6 +146,11 @@ public class RubbishBinFragment extends Fragment {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (!managerViewModel.isConnected()) {
+                ((ManagerActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                return false;
+            }
+
             List<MegaNode> documents = adapter.getSelectedNodes();
 
             switch (item.getItemId()) {

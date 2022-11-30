@@ -8,14 +8,13 @@ import android.view.MenuItem
 import android.view.MenuItem.SHOW_AS_ACTION_ALWAYS
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -25,8 +24,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -40,13 +41,17 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesGridAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.SelectAnimator
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
+import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
-import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
+import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -54,7 +59,9 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 
@@ -83,6 +90,11 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private lateinit var listLayoutManager: RecyclerView.LayoutManager
 
     private var isList: Boolean = true
+
+    /**
+     * Is online - Temporary variable to hold state until view is migrated to compose
+     */
+    private var isOnLine: Boolean = false
 
     private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
         if (it && !isActionMode) {
@@ -130,36 +142,32 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private fun setupAdapter() {
         listAdapter = FavouritesAdapter(
             sortByHeaderViewModel = sortByHeaderViewModel,
-            onItemClicked = { item, icon, position ->
-                itemClicked(item, icon, position)
-            },
-            onThreeDotsClicked = { item ->
-                viewModel.threeDotsClicked(item)
-            },
-            onLongClicked = { item, icon, position ->
-                itemLongClicked(item, icon, position)
-            },
-            getThumbnail = { handle, onFinished ->
-                thumbnailViewMode.getThumbnail(handle, onFinished)
-            }
+            onItemClicked = ::itemClicked,
+            onThreeDotsClicked = ::threeDotsClicked,
+            onLongClicked = ::itemLongClicked,
+            getThumbnail = thumbnailViewMode::getThumbnail
         )
 
         gridAdapter = FavouritesGridAdapter(
             sortByHeaderViewModel = sortByHeaderViewModel,
-            onItemClicked = { item, icon, position ->
-                itemClicked(item, icon, position)
-            },
-            onThreeDotsClicked = { item ->
-                viewModel.threeDotsClicked(item)
-            },
-            onLongClicked = { item, icon, position ->
-                itemLongClicked(item, icon, position)
-            },
-            getThumbnail = { handle, onFinished ->
-                thumbnailViewMode.getThumbnail(handle, onFinished)
-            }
+            onItemClicked = ::itemClicked,
+            onThreeDotsClicked = ::threeDotsClicked,
+            onLongClicked = ::itemLongClicked,
+            getThumbnail = thumbnailViewMode::getThumbnail
         )
         switchListGridView(sortByHeaderViewModel.isList)
+    }
+
+    /**
+     * Three dots clicked
+     * @param favourite Favourite
+     */
+    private fun threeDotsClicked(favourite: Favourite) {
+        if (isOnLine) {
+            openBottomSheet(favourite.node)
+        } else {
+            showOfflineNotification()
+        }
     }
 
     /**
@@ -168,75 +176,31 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.favouritesState.collect { favouritesState ->
-                    setViewVisible(favouritesState)
-                    if (!favouritesState.showSearch) {
-                        requireActivity().invalidateOptionsMenu()
-                    }
-                    if (favouritesState is FavouriteLoadState.Success) {
-                        if (sortByHeaderViewModel.isList) {
-                            listAdapter.submitList(favouritesState.favourites)
-                        } else {
-                            gridAdapter.submitList(favouritesState.favourites)
+                viewModel.favouritesState
+                    .combine(
+                        getListFlow()
+                    ) { state, isList ->
+                        Pair(state, isList)
+                    }.collect { (favouritesState, isList) ->
+                        handleConnectivityState(favouritesState.isConnected)
+                        if (isList != this@FavouritesFragment.isList) {
+                            switchListGridView(isList)
+                        }
+                        setViewVisible(favouritesState)
+                        if (!favouritesState.showSearch) {
+                            requireActivity().invalidateOptionsMenu()
+                        }
+                        if (favouritesState is FavouriteLoadState.Success) {
+                            if (isList) {
+                                listAdapter.submitList(favouritesState.favourites)
+                            } else {
+                                gridAdapter.submitList(formatGridList(favouritesState))
+                            }
+                            handleSelectedItems(favouritesState.selectedItems)
                         }
                     }
-                }
             }
         }
-
-        viewModel.favouritesEventState.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
-        ).onEach { eventState ->
-            when (eventState) {
-                is FavouritesEventState.Offline -> {
-                    Snackbar.make(
-                        requireView(),
-                        getString(R.string.error_server_connection_problem),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }
-                is FavouritesEventState.OpenBottomSheetFragment -> {
-                    (activity as ManagerActivity).showNodeOptionsPanel(
-                        eventState.favourite.node,
-                        NodeOptionsBottomSheetDialogFragment.FAVOURITES_IN_TAB_MODE
-                    )
-                }
-                is FavouritesEventState.OpenFile -> {
-                    openNode(eventState.favouriteFile)
-                }
-                is FavouritesEventState.OpenFolder -> {
-                    findNavController().navigate(
-                        HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
-                            eventState.parentHandle
-                        )
-                    )
-                }
-                is FavouritesEventState.ActionModeState -> {
-                    eventState.selectedCount.let { selectedCount ->
-                        if (selectedCount > 0) {
-                            hideFabButton()
-                            if (!isActionMode) {
-                                activateActionMode()
-                                isActionMode = true
-                            }
-                            actionMode?.run {
-                                menuUpdated(
-                                    menu = menu,
-                                    count = selectedCount,
-                                    items = viewModel.getItemsSelected()
-                                )
-                            }
-                            actionMode?.title = selectedCount.toString()
-                        } else {
-                            actionMode?.finish()
-                            this@FavouritesFragment.isActionMode = false
-                            showFabButton()
-                        }
-                    }
-                }
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
@@ -245,16 +209,68 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.onOrderChange(order = it.first)
+            viewModel.onOrderChange(sortOrder = it.first)
         })
 
-        sortByHeaderViewModel.listGridChangeEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { isList ->
-                if (isList != this.isList) {
-                    switchListGridView(isList)
-                }
-            })
+    }
+
+    private fun getListFlow() = flow {
+        emit(sortByHeaderViewModel.isList)
+        emitAll(sortByHeaderViewModel.listGridChangeEvent.asFlow().map { it.peekContent() })
+    }
+
+    private fun formatGridList(favouritesState: FavouriteLoadState.Success): List<FavouriteItem> {
+        val list = favouritesState.favourites.toMutableList()
+        if (list.any { it.favourite is FavouriteFolder }) {
+            val firstFileIndex = list.indexOfFirst { it.favourite is FavouriteFile }
+            if (firstFileIndex % 2 == 0) {
+                list.add(firstFileIndex, FavouritePlaceholderItem())
+            }
+        }
+        return list
+    }
+
+    private fun handleSelectedItems(selectedItems: Set<NodeId>) {
+        val selectedCount = selectedItems.size
+        if (selectedCount > 0) {
+            hideFabButton()
+            if (!isActionMode) {
+                activateActionMode()
+                isActionMode = true
+            }
+            actionMode?.run {
+                menuUpdated(
+                    menu = menu,
+                    count = selectedCount,
+                    items = viewModel.getItemsSelected()
+                )
+            }
+            actionMode?.title = selectedCount.toString()
+        } else {
+            actionMode?.finish()
+            this@FavouritesFragment.isActionMode = false
+            showFabButton()
+        }
+    }
+
+    private fun openBottomSheet(node: MegaNode) {
+        (activity as ManagerActivity).showNodeOptionsPanel(
+            node,
+            NodeOptionsBottomSheetDialogFragment.FAVOURITES_IN_TAB_MODE
+        )
+    }
+
+    private fun handleConnectivityState(isConnected: Boolean) {
+        isOnLine = isConnected
+        if (!isConnected) showOfflineNotification()
+    }
+
+    private fun showOfflineNotification() {
+        Snackbar.make(
+            requireView(),
+            getString(R.string.error_server_connection_problem),
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     /**
@@ -348,7 +364,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         if (actionMode != null) {
             RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
         }
-        viewModel.enableSearch()
+        viewModel.searchQuery("")
         hideFabButton()
     }
 
@@ -405,8 +421,8 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             showAsActionAndVisibility(findItem(R.id.cab_menu_download), true)
             showAsActionAndVisibility(findItem(R.id.cab_menu_share_link), true)
             showAsActionAndVisibility(
-                findItem(R.id.cab_menu_share_folder), !items.values.any {
-                    it !is FavouriteFolder
+                findItem(R.id.cab_menu_share_folder), items.values.all {
+                    it is FavouriteFolder
                 }
             )
             showAsActionAndVisibility(findItem(R.id.cab_menu_share_out), true)
@@ -435,16 +451,24 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * Item clicked
      * @param item Favourite item
      */
-    private fun itemClicked(item: Favourite, icon: ImageView, position: Int) {
+    private fun itemClicked(item: Favourite) {
         if (isActionMode) {
             viewModel.itemSelected(item)
-            if (isList) {
-                listAdapter.startAnimation(requireActivity(), icon, position)
-            } else {
-                gridAdapter.startAnimation(requireActivity(), icon, position)
-            }
         } else {
-            viewModel.openFile(item)
+            openFavourite(item)
+        }
+    }
+
+    private fun openFavourite(item: Favourite) {
+        when (item) {
+            is FavouriteFile -> openNode(item)
+            is FavouriteFolder -> {
+                findNavController().navigate(
+                    HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
+                        item.typedNode.id.id
+                    )
+                )
+            }
         }
     }
 
@@ -453,14 +477,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * @param item Favourite item
      * @return true to make the view long clickable, false otherwise
      */
-    private fun itemLongClicked(item: Favourite, icon: ImageView, position: Int): Boolean {
+    private fun itemLongClicked(item: Favourite): Boolean {
         if (Util.isOnline(context)) {
             viewModel.itemSelected(item)
-            if (isList) {
-                listAdapter.startAnimation(requireActivity(), icon, position)
-            } else {
-                gridAdapter.startAnimation(requireActivity(), icon, position)
-            }
         } else {
             callManager {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
@@ -491,7 +510,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                     spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
                 }
             }
+            itemAnimator = SelectAnimator()
         }
-        viewModel.forceUpdateData(isList)
     }
 }

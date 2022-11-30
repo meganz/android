@@ -8,7 +8,7 @@ import javax.inject.Inject
  * Create sdk log entry implementation of [CreateLogEntry]
  *
  */
-class CreateSdkLogEntry @Inject constructor(
+internal class CreateSdkLogEntry @Inject constructor(
     private val createTraceString: CreateTraceString,
 ) : CreateLogEntry {
     override suspend fun invoke(request: CreateLogEntryRequest): LogEntry? {
