@@ -53,7 +53,7 @@ allprojects {
             url 'https://developer.huawei.com/repo/'
         }
         maven {
-            url "https://artifactory.developers.mega.co.nz/artifactory/mega-gradle/mega-sdk-android"
+            url "${System.getenv("ARTIFACTORY_URL_GRADLE")}/artifactory/mega-gradle/mega-sdk-android"
         }
     }
     apply plugin: 'com.jfrog.artifactory'
