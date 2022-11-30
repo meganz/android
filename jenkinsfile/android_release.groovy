@@ -54,12 +54,7 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        ARTIFACTORY_BASE_URL = credentials('ARTIFACTORY_BASE_URL')
         ARTIFACTORY_RELEASE_URL = "$ARTIFACTORY_BASE_URL/artifactory/android-mega/release'"
-        GITLAB_BASE_URL = credentials('MEGA_ANDROID_GITLAB_BASE_URL')
-
-        ARTIFACTORY_URL_GRADLE = "https://artifactory.developers.mega.co.nz"
-        GITLAB_URL_GRADLE = "https://code.developers.mega.co.nz"
     }
     post {
         failure {

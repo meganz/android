@@ -63,12 +63,6 @@ pipeline {
         // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
         SDK_LOG_FILE_NAME = "sdk_build_log.txt"
         LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
-
-        ARTIFACTORY_BASE_URL = credentials('ARTIFACTORY_BASE_URL')
-        GITLAB_BASE_URL = credentials('MEGA_ANDROID_GITLAB_BASE_URL')
-
-        ARTIFACTORY_URL_GRADLE = "https://artifactory.developers.mega.co.nz"
-        GITLAB_URL_GRADLE = "https://code.developers.mega.co.nz"
     }
     post {
         failure {
@@ -559,7 +553,7 @@ private void checkoutMegaChatSdkByTag(String megaChatTag) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${GITLAB_BASE_URL}/sdk/sdk.git'
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git'
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -572,7 +566,7 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${GITLAB_BASE_URL}/megachat/MEGAchat.git'
+    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git'
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -813,7 +807,7 @@ private String lastCommitMessage() {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
     }
@@ -866,7 +860,7 @@ private String getSdkVersionText() {
  */
 private String getSdkAarArtifactoryPage() {
     String version = getSdkVersionText()
-    return "${ARTIFACTORY_BASE_URL}/ui/repos/tree/Properties/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
+    return "${env.ARTIFACTORY_BASE_URL}/ui/repos/tree/Properties/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
 }
 
 /**

@@ -24,7 +24,7 @@ boolean shouldUsePrebuiltSdk() {
 def queryPrebuiltSdkProperty(String property, String version) {
     def commit = "N/A"
     def stdout = new ByteArrayOutputStream()
-    def url = "${System.getenv("ARTIFACTORY_URL_GRADLE")}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
+    def url = "${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
     exec {
         workingDir '.'
         commandLine 'curl', url

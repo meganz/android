@@ -96,12 +96,6 @@ pipeline {
         GOOGLE_MAP_API_URL = "https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k"
         GOOGLE_MAP_API_FILE = 'default_google_maps_api.zip'
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
-
-        ARITFACTORY_BASE_URL = credentials('ARTIFACTORY_BASE_URL')
-        GITLAB_BASE_URL = credentials('MEGA_ANDROID_GITLAB_BASE_URL')
-
-        ARTIFACTORY_URL_GRADLE = "https://artifactory.developers.mega.co.nz"
-        GITLAB_URL_GRADLE = "https://code.developers.mega.co.nz"
     }
     post {
         failure {
@@ -680,7 +674,7 @@ private void downloadJenkinsConsoleLog(String downloaded) {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
     }
