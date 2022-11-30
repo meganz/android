@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
+
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.CreateChatLink
 
 /**
  * Chats module.
@@ -28,6 +30,20 @@ import mega.privacy.android.domain.usecase.StartChatCall
 @Module
 @InstallIn(SingletonComponent::class)
 internal class ChatModule {
+
+    /**
+     * Provides the Use Case [GetChatRoom]
+     */
+    @Provides
+    fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
+        GetChatRoom(chatRepository::getChatRoom)
+
+    /**
+     * Provides the Use Case [GetScheduledMeetingByChat]
+     */
+    @Provides
+    fun provideGetScheduledMeetingByChat(chatRepository: ChatRepository): GetScheduledMeetingByChat =
+        GetScheduledMeetingByChat(chatRepository::getScheduledMeetingsByChat)
 
     /**
      * Provides the Use Case [SetOpenInvite]
@@ -51,39 +67,11 @@ internal class ChatModule {
         AnswerChatCall(chatRepository::answerChatCall)
 
     /**
-     * Provides the Use Case [GetChatRoom]
-     */
-    @Provides
-    fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
-        GetChatRoom(chatRepository::getChatRoom)
-
-    /**
-     * Provides the Use Case [MonitorChatRoomUpdates]
-     */
-    @Provides
-    fun provideMonitorChatRoomUpdates(chatRepository: ChatRepository): MonitorChatRoomUpdates =
-        MonitorChatRoomUpdates(chatRepository::monitorChatRoomUpdates)
-
-    /**
      * Provides the Use Case [InviteToChat]
      */
     @Provides
     fun provideInviteToChat(chatRepository: ChatRepository): InviteToChat =
         InviteToChat(chatRepository::inviteToChat)
-
-    /**
-     * Provides the Use Case [MonitorScheduledMeetingUpdates]
-     */
-    @Provides
-    fun provideMonitorScheduledMeetingUpdates(chatRepository: ChatRepository): MonitorScheduledMeetingUpdates =
-        MonitorScheduledMeetingUpdates(chatRepository::monitorScheduledMeetingsUpdates)
-
-    /**
-     * Provides the Use Case [GetScheduledMeetingByChat]
-     */
-    @Provides
-    fun provideGetScheduledMeetingByChat(chatRepository: ChatRepository): GetScheduledMeetingByChat =
-        GetScheduledMeetingByChat(chatRepository::getScheduledMeetingsByChat)
 
     /**
      * Provides the Use Case [LeaveChat]
@@ -93,18 +81,25 @@ internal class ChatModule {
         LeaveChat(chatRepository::leaveChat)
 
     /**
-     * Provides the Use Case [CheckChatLink]
-     */
-    @Provides
-    fun provideCheckChatLink(chatRepository: ChatRepository): CheckChatLink =
-        CheckChatLink(chatRepository::checkChatLink)
-
-    /**
      * Provides the Use Case [SetPublicChatToPrivate]
      */
     @Provides
     fun provideSetPublicChatToPrivate(chatRepository: ChatRepository): SetPublicChatToPrivate =
         SetPublicChatToPrivate(chatRepository::setPublicChatToPrivate)
+
+    /**
+     * Provides the Use Case [CreateChatLink]
+     */
+    @Provides
+    fun provideCreateChatLink(chatRepository: ChatRepository): CreateChatLink =
+        CreateChatLink(chatRepository::createChatLink)
+
+    /**
+     * Provides the Use Case [RemoveChatLink]
+     */
+    @Provides
+    fun provideRemoveChatLink(chatRepository: ChatRepository): RemoveChatLink =
+        RemoveChatLink(chatRepository::removeChatLink)
 
     /**
      * Provides the Use Case [QueryChatLink]
@@ -114,11 +109,25 @@ internal class ChatModule {
         QueryChatLink(chatRepository::queryChatLink)
 
     /**
-     * Provides the Use Case [RemoveChatLink]
+     * Provides the Use Case [CheckChatLink]
      */
     @Provides
-    fun provideRemoveChatLink(chatRepository: ChatRepository): RemoveChatLink =
-        RemoveChatLink(chatRepository::removeChatLink)
+    fun provideCheckChatLink(chatRepository: ChatRepository): CheckChatLink =
+        CheckChatLink(chatRepository::checkChatLink)
+
+    /**
+     * Provides the Use Case [MonitorScheduledMeetingUpdates]
+     */
+    @Provides
+    fun provideMonitorScheduledMeetingUpdates(chatRepository: ChatRepository): MonitorScheduledMeetingUpdates =
+        MonitorScheduledMeetingUpdates(chatRepository::monitorScheduledMeetingsUpdates)
+
+    /**
+     * Provides the Use Case [MonitorChatRoomUpdates]
+     */
+    @Provides
+    fun provideMonitorChatRoomUpdates(chatRepository: ChatRepository): MonitorChatRoomUpdates =
+        MonitorChatRoomUpdates(chatRepository::monitorChatRoomUpdates)
 
     /**
      * Provides the Use Case [MonitorChatListItemUpdates]

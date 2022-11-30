@@ -21,6 +21,31 @@ interface ChatRepository {
     fun notifyChatLogout(): Flow<Boolean>
 
     /**
+     * Gets chat room if it exists
+     *
+     * @param chatId      Chat Id
+     * @return [ChatRoom] containing the updated data.
+     */
+    suspend fun getChatRoom(chatId: Long): ChatRoom?
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param scheduledMeetingId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    suspend fun getScheduledMeeting(chatId: Long, scheduledMeetingId: Long): ChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return List of scheduled meeting.
+     */
+    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
+
+    /**
      * Update open invite setting.
      *
      * @param chatId   The Chat id.
@@ -74,22 +99,6 @@ interface ChatRepository {
     suspend fun getChatFilesFolderId(): NodeId?
 
     /**
-     * Monitor updates on chat room item update
-     *
-     * @param chatId    Chat Id.
-     * @return          A flow of [ChatRoom]
-     */
-    fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
-
-    /**
-     * Gets chat room if it exists
-     *
-     * @param chatId      Chat Id
-     * @return [ChatRoom] containing the updated data.
-     */
-    suspend fun getChatRoom(chatId: Long): ChatRoom?
-
-    /**
      * Get meeting chat rooms
      *
      * @return  List of [ChatRoom]
@@ -105,42 +114,11 @@ interface ChatRepository {
     suspend fun getCombinedChatRoom(chatId: Long): CombinedChatRoom?
 
     /**
-     * Monitor updates on scheduled meetings
-     *
-     * @return          A flow of [ChatScheduledMeeting]
-     */
-    fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
-
-    /**
-     * Monitor updates on scheduled meeting occurrences
-     *
-     * @return          A flow of schedIds
-     */
-    fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
-
-    /**
      * Get all scheduled meetings
      *
      * @return List of scheduled meetings
      */
     suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>?
-
-    /**
-     * Get a scheduled meeting given a chatId and a scheduled meeting id
-     *
-     * @param chatId  MegaChatHandle that identifies a chat room
-     * @param schedId MegaChatHandle that identifies a scheduled meeting
-     * @return The scheduled meeting.
-     */
-    suspend fun getScheduledMeeting(chatId: Long, schedId: Long): ChatScheduledMeeting?
-
-    /**
-     * Get a list of all scheduled meeting for a chatroom
-     *
-     * @param chatId MegaChatHandle that identifies a chat room
-     * @return List of scheduled meeting.
-     */
-    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
 
     /**
      * Get a list of all scheduled meeting occurrences for a chatroom
@@ -159,16 +137,6 @@ interface ChatRepository {
     suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
 
     /**
-     * Obtain basic information abouts a public chat.
-     *
-     * @param link  Public chat link.
-     * @return      [ChatRequest].
-     */
-    suspend fun checkChatLink(
-        link: String,
-    ): ChatRequest
-
-    /**
      * Set public chat to private.
      *
      * @param chatId    The Chat id.
@@ -176,6 +144,32 @@ interface ChatRepository {
      */
     suspend fun setPublicChatToPrivate(
         chatId: Long,
+    ): ChatRequest
+
+    /**
+     * Create chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun createChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Remove chat link.
+     *
+     * @param chatId    The Chat id.
+     * @return          [ChatRequest]
+     */
+    suspend fun removeChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Obtain basic information abouts a public chat.
+     *
+     * @param link  Public chat link.
+     * @return      [ChatRequest].
+     */
+    suspend fun checkChatLink(
+        link: String,
     ): ChatRequest
 
     /**
@@ -187,17 +181,31 @@ interface ChatRepository {
     suspend fun queryChatLink(chatId: Long): ChatRequest
 
     /**
-     * Remove chat link.
+     * Monitor updates on chat room item update
      *
-     * @param chatId    The Chat id.
-     * @return          [ChatRequest]
+     * @param chatId    Chat Id.
+     * @return          A flow of [ChatRoom]
      */
-    suspend fun removeChatLink(chatId: Long): ChatRequest
+    suspend fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
+
+    /**
+     * Monitor updates on scheduled meetings
+     *
+     * @return          A flow of [ChatScheduledMeeting]
+     */
+    suspend fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
+
+    /**
+     * Monitor updates on scheduled meeting occurrences
+     *
+     * @return          A flow of scheduledMeetingIds
+     */
+    suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
 
     /**
      * Monitor updates on chat list item.
      *
      * @return A flow of [ChatListItem].
      */
-    fun monitorChatListItemUpdates(): Flow<ChatListItem>
+    suspend fun monitorChatListItemUpdates(): Flow<ChatListItem>
 }

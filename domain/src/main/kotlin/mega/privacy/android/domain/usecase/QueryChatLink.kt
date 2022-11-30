@@ -10,8 +10,8 @@ fun interface QueryChatLink {
     /**
      * Invoke.
      *
-     * @param chatId  The chat id.
-     * @return The chat conversation handle.
+     * @param chatId    The chat id.
+     * @return          ChatRequest
      */
     suspend operator fun invoke(
         chatId: Long
