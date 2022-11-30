@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Create chat log entry implementation of [CreateLogEntry]
  *
  */
-class CreateChatLogEntry @Inject constructor(
+internal class CreateChatLogEntry @Inject constructor(
     private val createTraceString: CreateTraceString,
     private val getCurrentTimeString: GetCurrentTimeString,
 ) : CreateLogEntry {

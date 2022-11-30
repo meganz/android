@@ -7,7 +7,6 @@ import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
  */
 data class FavouriteListItem(
     override val favourite: Favourite,
-    override val forceUpdate: Boolean = false,
 ) : FavouriteItem {
     override val type = ITEM_VIEW_TYPE
 }

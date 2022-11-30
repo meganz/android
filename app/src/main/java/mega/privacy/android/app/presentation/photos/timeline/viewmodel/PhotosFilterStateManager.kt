@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 
 fun TimelineViewModel.updateFilterMediaType(mediaType: FilterMediaType) {
@@ -97,7 +97,7 @@ internal fun TimelineViewModel.updateFilterState(
     }
 }
 
-private fun TimelineViewModel.filterAllPhotos(photos: List<Photo>): List<Photo> = photos
+private fun filterAllPhotos(photos: List<Photo>): List<Photo> = photos
 
 private suspend fun TimelineViewModel.filterCloudDrivePhotos(photos: List<Photo>): List<Photo> =
     getCloudDrivePhotos(photos)
@@ -106,7 +106,7 @@ private suspend fun TimelineViewModel.filterCameraUploadPhotos(photos: List<Phot
     getCameraUploadPhotos(photos)
 
 
-private fun TimelineViewModel.filterAllImages(photos: List<Photo>): List<Photo> =
+private fun filterAllImages(photos: List<Photo>): List<Photo> =
     photos.filterIsInstance<Photo.Image>()
 
 
@@ -116,7 +116,7 @@ private suspend fun TimelineViewModel.filterCloudDriveImages(photos: List<Photo>
 private suspend fun TimelineViewModel.filterCameraUploadImages(photos: List<Photo>): List<Photo> =
     getCameraUploadPhotos(photos).filterIsInstance<Photo.Image>()
 
-private fun TimelineViewModel.filterAllVideos(photos: List<Photo>): List<Photo> =
+private fun filterAllVideos(photos: List<Photo>): List<Photo> =
     photos.filterIsInstance<Photo.Video>()
 
 

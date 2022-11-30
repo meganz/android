@@ -154,7 +154,9 @@ class FavouriteFolderFragmentTest {
                 any(),
                 any(),
                 any(),
-                any())).thenReturn(
+                any(),
+                anyOrNull(),
+            )).thenReturn(
                 favourite
             )
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)

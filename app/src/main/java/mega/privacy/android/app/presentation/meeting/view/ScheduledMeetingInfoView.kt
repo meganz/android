@@ -44,6 +44,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -52,6 +53,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -113,7 +115,7 @@ fun ScheduledMeetingInfoView(
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -202,7 +204,7 @@ fun ScheduledMeetingInfoView(
         }
     }
 
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
+    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackBarHostState)
 
     onScrollChange(!firstItemVisible)
 }
@@ -601,13 +603,26 @@ private fun ActionButton(
                 }
             }
             ScheduledMeetingInfoAction.MeetingLink,
-            ScheduledMeetingInfoAction.AllowNonHostAddParticipants,
             -> {
+                if (state.isHost && state.isPublic) {
+                    ActionOption(
+                        state = state,
+                        action = action,
+                        isEnabled =
+                        if (action == ScheduledMeetingInfoAction.MeetingLink)
+                            state.enabledMeetingLinkOption
+                        else
+                            state.enabledAllowNonHostAddParticipantsOption,
+                        hasSwitch = true)
+                    divider(withStartPadding = true)
+                }
+            }
+            ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
                 if (state.isHost) {
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = if (action == ScheduledMeetingInfoAction.MeetingLink) state.enabledMeetingLinkOption else state.enabledAllowNonHostAddParticipantsOption,
+                        isEnabled = state.enabledAllowNonHostAddParticipantsOption,
                         hasSwitch = true)
                     divider(withStartPadding = true)
                 }
@@ -627,7 +642,7 @@ private fun ActionButton(
                 ActionOption(
                     state = state,
                     action = action,
-                    isEnabled = state.enabledChatNotificationsOption,
+                    isEnabled = state.dndSeconds == null,
                     hasSwitch = true)
                 divider(withStartPadding = true)
             }
@@ -797,8 +812,17 @@ private fun ActionOption(
             Column(modifier = Modifier
                 .fillMaxSize()) {
                 ActionText(actionText = action.title)
-                if (action == ScheduledMeetingInfoAction.ManageChatHistory && state.manageChatHistoryText.isNotEmpty()) {
-                    ActionSubtitleText(state.manageChatHistoryText)
+
+                state.retentionTimeSeconds?.let { time ->
+                    if (action == ScheduledMeetingInfoAction.ManageChatHistory) {
+                        manageChatHistorySubtitle(seconds = time)
+                    }
+                }
+
+                state.dndSeconds?.let { time ->
+                    if (action == ScheduledMeetingInfoAction.ChatNotifications) {
+                        chatNotificationSubtitle(seconds = time)
+                    }
                 }
             }
         }
@@ -1022,6 +1046,119 @@ private fun ContactStatus(
     Image(modifier = modifier,
         painter = painterResource(id = statusIcon),
         contentDescription = "Contact status")
+}
+
+
+/**
+ * Manage chat history subtitle
+ *
+ * @param seconds  Retention time seconds
+ */
+@Composable
+private fun manageChatHistorySubtitle(seconds: Long) {
+    var text = transformSecondsInString(seconds)
+    if (text.isNotEmpty()) {
+        text =
+            stringResource(R.string.subtitle_properties_manage_chat) + " " + text
+    }
+
+    ActionSubtitleText(text)
+}
+
+/**
+ * Chat notification subtitle
+ *
+ * @param seconds  Dnd seconds
+ */
+@Composable
+private fun chatNotificationSubtitle(seconds: Long) {
+    val text = if (seconds == 0L) {
+        stringResource(R.string.mute_chatroom_notification_option_off)
+    } else {
+        getStringForDndTime(seconds)
+    }
+
+    ActionSubtitleText(text)
+}
+
+/**
+ * Get appropriate String from the seconds of retention time.
+ *
+ * @param seconds   The retention time in seconds
+ * @return          The right text
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun transformSecondsInString(seconds: Long): String {
+    if (seconds == Constants.DISABLED_RETENTION_TIME)
+        return ""
+
+    val years = seconds % Constants.SECONDS_IN_YEAR
+    if (years == 0L) {
+        return stringResource(R.string.subtitle_properties_manage_chat_label_year)
+    }
+
+    val months = seconds % Constants.SECONDS_IN_MONTH_30
+    if (months == 0L) {
+        val month = (seconds / Constants.SECONDS_IN_MONTH_30).toInt()
+        return pluralStringResource(R.plurals.subtitle_properties_manage_chat_label_months,
+            month,
+            month)
+    }
+
+    val weeks = seconds % Constants.SECONDS_IN_WEEK
+    if (weeks == 0L) {
+        val week = (seconds / Constants.SECONDS_IN_WEEK).toInt()
+        return pluralStringResource(R.plurals.subtitle_properties_manage_chat_label_weeks,
+            week,
+            week)
+    }
+
+    val days = seconds % Constants.SECONDS_IN_DAY
+    if (days == 0L) {
+        val day = (seconds / Constants.SECONDS_IN_DAY).toInt()
+        return pluralStringResource(R.plurals.label_time_in_days_full,
+            day,
+            day)
+    }
+
+    val hours = seconds % Constants.SECONDS_IN_HOUR
+    if (hours == 0L) {
+        val hour = (seconds / Constants.SECONDS_IN_HOUR).toInt()
+        return pluralStringResource(R.plurals.subtitle_properties_manage_chat_label_hours,
+            hour,
+            hour)
+    }
+    return ""
+}
+
+/**
+ * Get the appropriate text depending on the time selected for the do not disturb option
+ *
+ * @param seconds       The seconds which have been set for do not disturb mode
+ * @return              The right string
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun getStringForDndTime(seconds: Long): String {
+    val cal = Calendar.getInstance()
+    cal.timeInMillis = seconds * 1000
+
+    val calToday = Calendar.getInstance()
+    calToday.timeInMillis = System.currentTimeMillis()
+
+    val calTomorrow = Calendar.getInstance()
+    calTomorrow.add(Calendar.DATE, +1)
+
+    val df =
+        SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(Locale.getDefault(),
+            "HH:mm"), Locale.getDefault())
+    val tz = cal.timeZone
+
+    df.timeZone = tz
+
+    return pluralStringResource(R.plurals.chat_notifications_muted_until_specific_time,
+        cal[Calendar.HOUR_OF_DAY], df.format(cal.time))
 }
 
 /**
