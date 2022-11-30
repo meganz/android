@@ -547,7 +547,7 @@ class SettingsFragment :
         internal const val GITHUB_URL = "https://github.com/meganz/android"
         internal const val TERMS_OF_SERVICE_URL = "https://mega.nz/terms"
         internal const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
-        internal const val HELP_CENTRE_URL = "https://mega.nz/help/client/android"
+        internal const val HELP_CENTRE_URL = "https://help.mega.io/installs-apps/mobile"
     }
 
     override fun onFragmentResult(requestKey: String, result: Bundle) {
