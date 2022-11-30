@@ -14,5 +14,5 @@ fun interface MonitorChatRoomUpdates {
      * @param chatId    Chat id.
      * @return          Flow of [ChatRoom].
      */
-    operator fun invoke(chatId: Long): Flow<ChatRoom>
+    suspend operator fun invoke(chatId: Long): Flow<ChatRoom>
 }
