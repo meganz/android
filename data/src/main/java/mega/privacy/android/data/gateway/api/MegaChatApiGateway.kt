@@ -9,6 +9,7 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
@@ -131,6 +132,13 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Get meeting chat rooms
+     *
+     * @return  The list of chat rooms
+     */
+    fun getMeetingChatRooms(): List<MegaChatRoom>?
+
+    /**
      * Gets a 1to1 chat conversation if exists.
      *
      * @param userHandle The user handle.
@@ -176,6 +184,14 @@ interface MegaChatApiGateway {
      * @return The chat conversation.
      */
     fun getChatRoom(chatId: Long): MegaChatRoom?
+
+    /**
+     * Get chat list item.
+     *
+     * @param chatId    Chat Id
+     * @return          Chat list item
+     */
+    fun getChatListItem(chatId: Long): MegaChatListItem?
 
     /**
      * Gets the MegaChatCall
@@ -232,6 +248,13 @@ interface MegaChatApiGateway {
     val scheduledMeetingUpdates: Flow<ScheduledMeetingUpdate>
 
     /**
+     * Get all scheduled meetings
+     *
+     * @return  List of scheduled meetings
+     */
+    fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>?
+
+    /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
      *
      * @param chatId  MegaChatHandle that identifies a chat room
@@ -244,7 +267,7 @@ interface MegaChatApiGateway {
      * Get a list of all scheduled meeting for a chatroom
      *
      * @param chatId MegaChatHandle that identifies a chat room
-     * @return The scheduled meeting.
+     * @return List of scheduled meetings.
      */
     fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>?
 
@@ -268,6 +291,14 @@ interface MegaChatApiGateway {
      * @param listener      Listener.
      */
     fun inviteToChat(chatId: Long, userHandle: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Get basic information about a public chat.
+     *
+     * @param link      Public chat link.
+     * @param listener  Listener.
+     */
+    fun checkChatLink(link: String, listener: MegaChatRequestListenerInterface?)
 
     /**
      * Set the chat mode to private

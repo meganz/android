@@ -4,10 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
@@ -15,6 +17,8 @@ import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.toContactCredentials
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -45,8 +49,16 @@ class DefaultContactsRepositoryTest {
     private val contactItemMapper = mock<ContactItemMapper>()
     private val contactDataMapper = mock<ContactDataMapper>()
 
+    private val contactCredentialsMapper: ContactCredentialsMapper =
+        { credentials: String?, email: String, name: String ->
+            (credentials?.getCredentials()?.let {
+                AccountCredentials.ContactCredentials(it, email, name)
+            })
+        }
+
     private val userEmail = "test@mega.nz"
     private val user = mock<MegaUser> { on { email }.thenReturn(userEmail) }
+    private val userName = "Test User Name"
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
     private val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
 
@@ -64,6 +76,7 @@ class DefaultContactsRepositoryTest {
             onlineStatusMapper = onlineStatusMapper,
             contactItemMapper = contactItemMapper,
             contactDataMapper = contactDataMapper,
+            contactCredentialsMapper = contactCredentialsMapper,
         )
     }
 
@@ -71,21 +84,39 @@ class DefaultContactsRepositoryTest {
     fun `test that get contact credentials returns valid credentials if user exists and api returns valid credentials`() =
         runTest {
             val validCredentials = "KJ9hFK67vhj3cNCIUHAi8ccwciojiot4hVE5yab3"
-            val request = mock<MegaRequest> {
+            val requestCredentials = mock<MegaRequest> {
                 on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
                 on { paramType }.thenReturn(MegaApiJava.USER_ATTR_ED25519_PUBLIC_KEY)
                 on { password }.thenReturn(validCredentials)
             }
+            val alias = "testAlias"
+            val requestAlias = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_ALIAS)
+                on { name }.thenReturn(alias)
+            }
+            val expectedCredentials = toContactCredentials(
+                validCredentials,
+                userEmail,
+                alias
+            )
 
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.getUserCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
-                    request,
+                    requestCredentials,
                     success
                 )
             }
-            assertThat(underTest.getContactCredentials(userEmail)).isEqualTo(validCredentials)
+            whenever(megaApiGateway.getUserAlias(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    requestAlias,
+                    success
+                )
+            }
+            assertThat(underTest.getContactCredentials(userEmail)).isEqualTo(expectedCredentials)
         }
 
     @Test(expected = MegaException::class)

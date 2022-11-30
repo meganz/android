@@ -15,12 +15,13 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.presentation.favourites.FavouritesFragment
-import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -38,6 +39,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.di.TestInitialiseUseCases
 import test.mega.privacy.android.app.di.TestMapperModule
 import test.mega.privacy.android.app.di.TestSortOrderUseCases
 import test.mega.privacy.android.app.di.TestWrapperModule
@@ -110,6 +112,8 @@ class FavouritesFragmentTest {
 
     @Test
     fun test_that_clicked_three_dot_and_the_snack_bar_shows_error_message_when_offline() {
+        val connected = MutableStateFlow(true)
+        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(connected)
         launchFragmentInHiltContainer<FavouritesFragment>()
 
         val threeDotClicked = object : ViewAction {
@@ -124,6 +128,8 @@ class FavouritesFragmentTest {
             }
 
         }
+
+        connected.tryEmit(false)
         recycleView().perform(RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(1,
             threeDotClicked))
 
@@ -151,11 +157,14 @@ class FavouritesFragmentTest {
                 flowOf(list)
             )
             whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
-            whenever(FavouritesTestModule.favouriteMapper(any(),
+            whenever(FavouritesTestModule.favouriteMapper(
+                any(),
                 anyOrNull(),
                 anyOrNull(),
                 anyOrNull(),
-                anyOrNull())).thenReturn(
+                anyOrNull(),
+                anyOrNull(),
+            )).thenReturn(
                 favourite)
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
             whenever(TestWrapperModule.fetchNodeWrapper(any())).thenReturn(node)

@@ -97,7 +97,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Observe changes in Chat notifications
      */
     val chatNotificationsObserver = Observer<Any> {
-        updateTimestampDnd(chatId)
+        updateDndSeconds(chatId)
     }
 
     init {
@@ -155,8 +155,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             isPublic = isPublic
                         )
                     }
-                    updateTimestampDnd(chatId)
-                    updateTimestampRetentionTime(retentionTime)
+                    updateDndSeconds(chatId)
+                    updateRetentionTimeSeconds(retentionTime)
                 }
             }
         }
@@ -232,7 +232,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             it.copy(isPublic = chat.isPublic)
                         }
                     ChatRoomChanges.RetentionTime -> {
-                        updateTimestampRetentionTime(chat.retentionTime)
+                        updateRetentionTimeSeconds(chat.retentionTime)
 
                         val intentRetentionTime =
                             Intent(ACTION_UPDATE_RETENTION_TIME)
@@ -303,15 +303,15 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Update timestamp of Do not disturb mode
+     * Update seconds of Do not disturb mode
      *
      * @param id    Chat id.
      */
-    private fun updateTimestampDnd(id: Long) {
+    private fun updateDndSeconds(id: Long) {
         getPushNotificationSettingManagement().pushNotificationSetting?.let { push ->
             if (push.isChatDndEnabled(id)) {
                 _state.update {
-                    it.copy(timestampDnd = push.getChatDnd(id))
+                    it.copy(dndSeconds = push.getChatDnd(id))
                 }
 
                 return
@@ -319,23 +319,23 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }
 
         _state.update {
-            it.copy(timestampDnd = null)
+            it.copy(dndSeconds = null)
         }
     }
 
     /**
-     * Update timestamp of retention time
+     * Update retention time seconds
      *
-     * @param retentionTime    Timestamp of retention time.
+     * @param retentionTime    Retention time seconds
      */
-    private fun updateTimestampRetentionTime(retentionTime: Long) {
+    private fun updateRetentionTimeSeconds(retentionTime: Long) {
         if (retentionTime == Constants.DISABLED_RETENTION_TIME) {
             _state.update {
-                it.copy(timestampRetentionTime = null)
+                it.copy(retentionTimeSeconds = null)
             }
         } else {
             _state.update {
-                it.copy(timestampRetentionTime = retentionTime)
+                it.copy(retentionTimeSeconds = retentionTime)
             }
         }
     }

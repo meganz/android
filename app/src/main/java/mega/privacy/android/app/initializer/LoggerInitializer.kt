@@ -10,8 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BuildConfig
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.InitialiseLogging
 
 /**
@@ -39,6 +41,12 @@ class LoggerInitializer : Initializer<Unit> {
         fun enableLogAllToConsole(): EnableLogAllToConsole
 
         /**
+         * Get feature flag value
+         *
+         */
+        fun getFeatureFlagValue(): GetFeatureFlagValue
+
+        /**
          * App scope
          *
          */
@@ -61,7 +69,9 @@ class LoggerInitializer : Initializer<Unit> {
             }
         }
         entryPoint.appScope().launch {
-            entryPoint.initialiseLogging().invoke()
+            val permanentEnabled =
+                entryPoint.getFeatureFlagValue().invoke(AppFeatures.PermanentLogging)
+            entryPoint.initialiseLogging().invoke(permanentEnabled)
         }
     }
 

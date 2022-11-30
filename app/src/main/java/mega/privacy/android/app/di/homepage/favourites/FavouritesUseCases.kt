@@ -9,10 +9,14 @@ import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.usecase.DefaultGetAllFavorites
 import mega.privacy.android.domain.usecase.DefaultGetFavouriteFolderInfo
 import mega.privacy.android.domain.usecase.DefaultGetFavouriteSortOrder
+import mega.privacy.android.domain.usecase.DefaultGetOfflineFile
+import mega.privacy.android.domain.usecase.DefaultIsAvailableOffline
 import mega.privacy.android.domain.usecase.DefaultMapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
+import mega.privacy.android.domain.usecase.GetOfflineFile
+import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
 
@@ -40,6 +44,12 @@ abstract class FavouritesUseCases {
 
     @Binds
     abstract fun bindMapFavouriteSortOrder(implementation: DefaultMapFavouriteSortOrder): MapFavouriteSortOrder
+
+    @Binds
+    abstract fun bindIsAvailableOffline(implementation: DefaultIsAvailableOffline): IsAvailableOffline
+
+    @Binds
+    abstract fun bindGetOfflineFile(implementation: DefaultGetOfflineFile): GetOfflineFile
 
 
     companion object {

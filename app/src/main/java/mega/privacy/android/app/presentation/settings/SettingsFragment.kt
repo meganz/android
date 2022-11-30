@@ -66,6 +66,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
@@ -77,6 +78,7 @@ import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivit
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -87,6 +89,9 @@ class SettingsFragment :
 
     @Inject
     lateinit var additionalPreferences: Set<@JvmSuppressWildcards PreferenceResource>
+
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     private var numberOfClicksKarere = 0
     private var numberOfClicksAppVersion = 0
@@ -400,12 +405,17 @@ class SettingsFragment :
     }
 
     private fun toggleLogger() {
-        if (viewModel.disableLogger()) {
-            view?.let {
-                Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!getFeatureFlag(AppFeatures.PermanentLogging)) {
+                if (viewModel.disableLogger()) {
+                    view?.let {
+                        Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    showConfirmationEnableLogs(this@SettingsFragment::enableSdkLogger)
+                }
             }
-        } else {
-            showConfirmationEnableLogs(this@SettingsFragment::enableSdkLogger)
         }
     }
 
@@ -417,12 +427,17 @@ class SettingsFragment :
     }
 
     private fun toggleChatLogger() {
-        if (viewModel.disableChatLogger()) {
-            view?.let {
-                Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (!getFeatureFlag(AppFeatures.PermanentLogging)) {
+                if (viewModel.disableChatLogger()) {
+                    view?.let {
+                        Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    showConfirmationEnableLogs(this@SettingsFragment::enableChatLogger)
+                }
             }
-        } else {
-            showConfirmationEnableLogs(this@SettingsFragment::enableChatLogger)
         }
     }
 

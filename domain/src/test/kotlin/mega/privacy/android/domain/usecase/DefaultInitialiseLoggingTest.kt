@@ -45,7 +45,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
-        underTest()
+        underTest(false)
 
         verify(loggingRepository, times(1)).getSdkLoggingFlow()
         verify(loggingRepository, times(1)).logToSdkFile(sdkMessage)
@@ -58,7 +58,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
-        underTest()
+        underTest(false)
 
         verify(loggingRepository, times(1)).getChatLoggingFlow()
         verify(loggingRepository, times(1)).logToChatFile(chatMessage)
@@ -71,7 +71,7 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(flowOf(false))
         whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
 
-        underTest()
+        underTest(false)
 
         verify(loggingRepository, never()).logToSdkFile(any())
 
@@ -83,9 +83,24 @@ class DefaultInitialiseLoggingTest {
         whenever(areSdkLogsEnabled()).thenReturn(emptyFlow())
         whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
 
-        underTest()
+        underTest(false)
 
         verify(loggingRepository, never()).logToChatFile(any())
+
+        verifyNoMoreInteractions(loggingRepository)
+    }
+
+    @Test
+    fun `test that override supersedes chat and sdk setting`() = runTest{
+        whenever(areSdkLogsEnabled()).thenReturn(flowOf(false))
+        whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
+
+        underTest(true)
+
+        verify(loggingRepository, times(1)).getSdkLoggingFlow()
+        verify(loggingRepository, times(1)).logToSdkFile(sdkMessage)
+        verify(loggingRepository, times(1)).getChatLoggingFlow()
+        verify(loggingRepository, times(1)).logToChatFile(chatMessage)
 
         verifyNoMoreInteractions(loggingRepository)
     }

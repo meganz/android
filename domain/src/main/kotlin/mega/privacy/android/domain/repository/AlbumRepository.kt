@@ -62,4 +62,11 @@ interface AlbumRepository {
      * @return a flow of all new element ids update
      */
     fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<NodeId>>
+
+    /**
+     * Remove user albums
+     * @param albumIds the album ids to be removed
+     * @return throw exception if the operation fails
+     */
+    suspend fun removeAlbums(albumIds: List<AlbumId>)
 }

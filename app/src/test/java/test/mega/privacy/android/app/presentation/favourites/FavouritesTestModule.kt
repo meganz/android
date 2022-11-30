@@ -27,9 +27,11 @@ import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
+import mega.privacy.android.domain.usecase.GetOfflineFile
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
@@ -48,10 +50,11 @@ object FavouritesTestModule {
     val getFavouriteFolderInfo = mock<GetFavouriteFolderInfo>()
     val stringUtilWrapper = mock<StringUtilWrapper>()
     val favouriteMapper = mock<FavouriteMapper> {
-        on { invoke(any(), any(), any(), any(), any()) }.thenReturn(mock())
+        on { invoke(any(), any(), any(), any(), any(), any()) }.thenReturn(mock())
     }
     val getThumbnail = mock<GetThumbnail>()
     val megaUtilWrapper = mock<MegaUtilWrapper>()
+    val isAvailableOffline = mock<IsAvailableOffline>{ onBlocking { invoke(any()) }.thenReturn(false)}
 
     @Provides
     fun provideGetAllFavorites(): GetAllFavorites = getAllFavourites
@@ -119,4 +122,11 @@ object FavouritesTestModule {
 
     @Provides
     fun provideCreateAlbum(): CreateAlbum = mock()
+
+
+    @Provides
+    fun provideIsAvailableOffline(): IsAvailableOffline = isAvailableOffline
+
+    @Provides
+    fun provideGetOfflineFile(): GetOfflineFile = mock()
 }

@@ -13,6 +13,7 @@ import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
@@ -44,8 +45,7 @@ import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
@@ -70,6 +70,7 @@ import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
 import mega.privacy.android.data.mapper.toChatScheduledMeeting
 import mega.privacy.android.data.mapper.toChatScheduledMeetingOccur
+import mega.privacy.android.data.mapper.toCombinedChatRoom
 import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
@@ -93,8 +94,7 @@ import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
-import mega.privacy.android.data.mapper.toSubscriptionPlan
-import mega.privacy.android.data.mapper.toSubscriptionPlanList
+import mega.privacy.android.data.mapper.toSubscriptionOptionList
 import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toSyncRecordType
 import mega.privacy.android.data.mapper.toSyncRecordTypeInt
@@ -327,12 +327,6 @@ internal class MapperModule {
         ::UserAccount
 
     /**
-     * Provide subscription plan mapper
-     */
-    @Provides
-    fun provideSubscriptionPlanMapper(): SubscriptionPlanMapper = ::toSubscriptionPlan
-
-    /**
      * Provide pricing mapper
      */
     @Provides
@@ -354,8 +348,8 @@ internal class MapperModule {
      * Provide subscription plan list mapper
      */
     @Provides
-    fun provideSubscriptionPlanListMapper(): SubscriptionPlanListMapper =
-        ::toSubscriptionPlanList
+    fun provideSubscriptionOptionListMapper(): SubscriptionOptionListMapper =
+        ::toSubscriptionOptionList
 
     /**
      * Provide mega achievement mapper
@@ -398,6 +392,12 @@ internal class MapperModule {
      */
     @Provides
     fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
+
+    /**
+     * Provide combined chat room mapper
+     */
+    @Provides
+    fun provideCombinedChatRoomMapper(): CombinedChatRoomMapper = ::toCombinedChatRoom
 
     /**
      * Provide [MyAccountCredentialsMapper] mapper

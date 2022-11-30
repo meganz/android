@@ -30,6 +30,7 @@ import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
+import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.TransfersRepository
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.repository.VerificationRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -164,4 +166,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
+
+    @Binds
+    abstract fun bindVerificationRepository(repository: DefaultVerificationRepository): VerificationRepository
 }

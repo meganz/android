@@ -21,6 +21,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentFavouriteFolderBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.SelectAnimator
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
@@ -83,17 +85,12 @@ class FavouriteFolderFragment : Fragment() {
      */
     private fun setupAdapter() {
         adapter = FavouritesAdapter(
-            onItemClicked = { item, _, _ ->
-                viewModel.openFile(item)
-            },
-            onThreeDotsClicked = { item ->
-                viewModel.threeDotsClicked(item)
-            },
-            getThumbnail = { handle, onFinished ->
-                thumbnailViewModel.getThumbnail(handle, onFinished)
-            }
+            onItemClicked = viewModel::openFile,
+            onThreeDotsClicked = viewModel::threeDotsClicked,
+            getThumbnail = thumbnailViewModel::getThumbnail
         )
         binding.fileListViewBrowser.adapter = adapter
+        binding.fileListViewBrowser.itemAnimator = SelectAnimator()
     }
 
     /**

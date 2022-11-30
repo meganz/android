@@ -7,25 +7,26 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
-import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.SkuMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
+import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.domain.entity.Pricing
-import mega.privacy.android.domain.entity.Subscription
-import mega.privacy.android.domain.entity.SubscriptionPlan
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChatNotInitializedException
@@ -60,12 +61,15 @@ class DefaultAccountRepositoryTest {
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val userAccountMapper = ::UserAccount
     private val accountTypeMapper = mock<AccountTypeMapper>()
-    private val subscriptionPlanMapper = mock<SubscriptionPlanMapper>()
-    private val currencyMapper = mock<CurrencyMapper>()
-    private val skuMapper = mock<SkuMapper>()
-    private val subscriptionPlanListMapper = mock<SubscriptionPlanListMapper>()
+    private val currencyMapper = ::Currency
+    private val subscriptionOptionListMapper = mock<SubscriptionOptionListMapper>()
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val dbHandler = mock<DatabaseHandler>()
+
+    private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
+        { credentials: String? ->
+            (credentials?.getCredentials()?.let { AccountCredentials.MyAccountCredentials(it) })
+        }
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -81,18 +85,14 @@ class DefaultAccountRepositoryTest {
         on { currencyName }.thenReturn("EUR")
     }
 
-    private val subscriptionPlan = SubscriptionPlan(
-        pricing = Pricing(
-            amount = 13,
-            currency = currencyMapper("EUR"),
-            sku = skuMapper(toAccountType(1), 1)),
-        subscription = Subscription(
-            handle = 1560943707714440503,
-            level = toAccountType(1),
-            months = 1,
-            storage = 450,
-            transfer = 450,
-        ),
+    private val subscriptionOption = SubscriptionOption(
+        accountType = toAccountType(1),
+        months = 1,
+        handle = 1560943707714440503,
+        storage = 450,
+        transfer = 450,
+        amount = CurrencyPoint.SystemCurrencyPoint(13),
+        currency = currencyMapper("EUR"),
     )
 
     @Before
@@ -106,12 +106,11 @@ class DefaultAccountRepositoryTest {
             localStorageGateway = mock(),
             userAccountMapper = userAccountMapper,
             accountTypeMapper = accountTypeMapper,
-            subscriptionPlanMapper = subscriptionPlanMapper,
             currencyMapper = currencyMapper,
-            skuMapper = skuMapper,
-            subscriptionPlanListMapper = subscriptionPlanListMapper,
+            subscriptionOptionListMapper = subscriptionOptionListMapper,
             megaAchievementMapper = megaAchievementMapper,
             dbHandler = dbHandler,
+            myAccountCredentialsMapper = myAccountCredentialsMapper,
         )
     }
 
@@ -168,7 +167,7 @@ class DefaultAccountRepositoryTest {
     }
 
     @Test
-    fun `test that get subscription plans returns successfully if no error is thrown`() =
+    fun `test that get subscription options returns successfully if no error is thrown`() =
         runTest {
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest> {
@@ -179,13 +178,11 @@ class DefaultAccountRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_OK)
             }
 
-            whenever(subscriptionPlanListMapper(
+            whenever(subscriptionOptionListMapper(
                 request,
-                subscriptionPlanMapper,
                 currencyMapper,
-                skuMapper,
             )).thenReturn(
-                listOf(subscriptionPlan)
+                listOf(subscriptionOption)
             )
 
             whenever(megaApiGateway.getPricing(any())).thenAnswer {
@@ -196,13 +193,13 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            val actual = underTest.getSubscriptionPlans()
+            val actual = underTest.getSubscriptionOptions()
 
-            assertThat(actual[0]).isSameInstanceAs(subscriptionPlan)
+            assertThat(actual[0]).isSameInstanceAs(subscriptionOption)
         }
 
     @Test(expected = MegaException::class)
-    fun `test that get subscription plans throws an exception when the api returns an error`() =
+    fun `test that get subscription options throws an exception when the api returns an error`() =
         runTest {
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest> {
@@ -213,13 +210,11 @@ class DefaultAccountRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_OK + 1)
             }
 
-            whenever(subscriptionPlanListMapper(
+            whenever(subscriptionOptionListMapper(
                 request,
-                subscriptionPlanMapper,
                 currencyMapper,
-                skuMapper,
             )).thenReturn(
-                listOf(subscriptionPlan)
+                listOf(subscriptionOption)
             )
 
             whenever(megaApiGateway.getPricing(any())).thenAnswer {
@@ -229,7 +224,7 @@ class DefaultAccountRepositoryTest {
                     error
                 )
             }
-            underTest.getSubscriptionPlans()
+            underTest.getSubscriptionOptions()
         }
 
     @Test
@@ -390,9 +385,10 @@ class DefaultAccountRepositoryTest {
     fun `test that getMyCredentials returns valid credentials if api returns valid credentials`() =
         runTest {
             val validCredentials = "KJ9hFK67vhj3cNCIUHAi8ccwciojiot4hVE5yab3"
+            val expectedCredentials = toMyAccountCredentials(validCredentials)
 
             whenever(megaApiGateway.myCredentials).thenReturn(validCredentials)
-            assertThat(underTest.getMyCredentials()).isEqualTo(validCredentials)
+            assertThat(underTest.getMyCredentials()).isEqualTo(expectedCredentials)
         }
 
     @Test

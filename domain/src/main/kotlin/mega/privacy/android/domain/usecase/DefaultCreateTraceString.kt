@@ -5,7 +5,7 @@ import javax.inject.Inject
 /**
  * Default create trace string implementation of [CreateTraceString]
  */
-class DefaultCreateTraceString @Inject constructor() : CreateTraceString {
+internal class DefaultCreateTraceString @Inject constructor() : CreateTraceString {
     override suspend fun invoke(
         trace: List<StackTraceElement>,
         loggingClasses: List<String>,

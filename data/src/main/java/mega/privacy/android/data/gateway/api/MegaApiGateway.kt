@@ -987,6 +987,24 @@ interface MegaApiGateway {
     suspend fun getSetElements(sid: Long): MegaSetElementList
 
     /**
+     * Request to remove a Set
+     *
+     * The associated request type with this request is MegaRequest::TYPE_REMOVE_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be removed
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set could not be found.
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid the id of the Set to be removed
+     * @param listener MegaRequestListener to track this request
+     */
+    fun removeSet(sid: Long, listener: MegaRequestListenerInterface)
+
+    /**
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
