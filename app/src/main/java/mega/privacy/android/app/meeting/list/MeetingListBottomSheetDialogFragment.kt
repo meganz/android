@@ -117,6 +117,9 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.header.imgThumbnail.isVisible = false
         }
 
+        binding.btnLeave.isVisible = meeting.isActive
+        binding.dividerArchive.isVisible = meeting.isActive
+
         binding.btnInfo.setOnClickListener {
             activity?.lifecycleScope?.launch {
                 val scheduleMeetingEnabled = getFeatureFlag(AppFeatures.ScheduleMeeting)
