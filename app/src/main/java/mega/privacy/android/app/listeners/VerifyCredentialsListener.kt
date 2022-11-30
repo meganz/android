@@ -1,7 +1,7 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Intent
-import mega.privacy.android.app.AuthenticityCredentialsActivity
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.constants.BroadcastConstants
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
