@@ -37,4 +37,10 @@ interface DeviceGateway {
      *
      */
     fun getCurrentTimeInMillis(): Long
+
+    /**
+     * Elapsed realtime
+     *
+     */
+    fun getElapsedRealtime() : Long
 }

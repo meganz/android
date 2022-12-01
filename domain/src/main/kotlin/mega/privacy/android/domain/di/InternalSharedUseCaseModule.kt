@@ -5,9 +5,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 
@@ -39,5 +41,9 @@ internal abstract class InternalSharedUseCaseModule {
         @Provides
         fun provideGetSpecificAccountDetail(repository: AccountRepository) =
             GetSpecificAccountDetail(repository::getSpecificAccountDetail)
+
+        @Provides
+        fun provideGetPaymentMethod(repository: BillingRepository) =
+            GetPaymentMethod(repository::getPaymentMethod)
     }
 }
