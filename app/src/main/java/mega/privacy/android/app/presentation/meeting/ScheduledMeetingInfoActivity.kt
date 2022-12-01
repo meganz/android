@@ -79,6 +79,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
     private var bottomSheetDialogFragment: ManageMeetingLinkBottomSheetDialogFragment? = null
 
+    private var nodeAttacher: MegaAttacher? = null
+
     /**
      * Perform Activity initialization
      */
@@ -166,7 +168,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * @param data Intent containing the info to send.
      */
     private fun handleActivityResult(data: Intent?) {
-        MegaAttacher(this@ScheduledMeetingInfoActivity as ActivityLauncher).handleActivityResult(
+        nodeAttacher = MegaAttacher(this as ActivityLauncher)
+        nodeAttacher?.handleActivityResult(
             Constants.REQUEST_CODE_SELECT_CHAT,
             RESULT_OK,
             data,
@@ -296,6 +299,14 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
         }
+    }
+
+    /**
+     * onDestroy
+     */
+    override fun onDestroy() {
+        nodeAttacher = null
+        super.onDestroy()
     }
 
     companion object {

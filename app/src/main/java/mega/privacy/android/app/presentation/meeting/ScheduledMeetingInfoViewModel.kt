@@ -393,11 +393,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 queryChatLink(chatId)
-            }.onFailure { _ ->
-                _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
+            }.onFailure { exception ->
+                Timber.e(exception)
             }.onSuccess { request ->
                 _state.update {
-                    it.copy(enabledMeetingLinkOption = true,
+                    it.copy(enabledMeetingLinkOption = request.text != null,
                         meetingLink = request.text)
                 }
             }
@@ -413,6 +413,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 removeChatLink(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
+                showSnackBar(R.string.general_text_error)
             }.onSuccess { _ ->
                 _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
             }

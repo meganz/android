@@ -272,8 +272,17 @@ internal class DefaultChatRepository @Inject constructor(
             suspendCoroutine { continuation ->
                 megaChatApiGateway.queryChatLink(chatId,
                     OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
+                        onRequestFinish = onRequestQueryChatLinkCompleted(continuation)
                     ))
+            }
+        }
+
+    private fun onRequestQueryChatLinkCompleted(continuation: Continuation<ChatRequest>) =
+        { request: MegaChatRequest, error: MegaChatError ->
+            if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_NOENT) {
+                continuation.resumeWith(Result.success(chatRequestMapper(request)))
+            } else {
+                continuation.failWithError(error)
             }
         }
 
