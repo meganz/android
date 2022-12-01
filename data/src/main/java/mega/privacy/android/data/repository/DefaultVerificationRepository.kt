@@ -31,15 +31,17 @@ internal class DefaultVerificationRepository @Inject constructor(
                         val codedCountryCode = mutableListOf<String>()
                         val listMap = request.megaStringListMap
                         val keyList = listMap.keys
-                        for (i in 0 until keyList.size()) {
-                            val key = keyList[i]
-                            val contentBuffer = StringBuffer()
-                            contentBuffer.append("$key:")
-                            for (j in 0 until listMap[key].size()) {
-                                val dialCode = listMap[key][j]
-                                contentBuffer.append("$dialCode,")
+                        if (listMap != null) {
+                            for (i in 0 until keyList.size()) {
+                                val key = keyList[i]
+                                val contentBuffer = StringBuffer()
+                                contentBuffer.append("$key:")
+                                for (j in 0 until listMap[key].size()) {
+                                    val dialCode = listMap[key][j]
+                                    contentBuffer.append("$dialCode,")
+                                }
+                                codedCountryCode.add(contentBuffer.toString())
                             }
-                            codedCountryCode.add(contentBuffer.toString())
                         }
                         continuation.resumeWith(Result.success(codedCountryCode))
                     } else {
