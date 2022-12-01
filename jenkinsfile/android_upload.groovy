@@ -3,7 +3,8 @@
  * 1. Build and upload Android APK to Firebase AppDistribution
  * 2. Build SDK and publish to Artifactory
  */
-
+import groovy.json.JsonSlurperClassic
+import groovy.json.JsonOutput
 
 BUILD_STEP = ''
 
@@ -245,7 +246,7 @@ pipeline {
             }
         }
 
-       stage('Build SDK') {
+        stage('Build SDK') {
             when {
                 expression { triggerByPublishSdkCmd() }
             }
@@ -303,6 +304,20 @@ pipeline {
                 script {
                     BUILD_STEP = 'Clean Android'
                     sh './gradlew clean'
+                }
+            }
+        }
+        stage('Enable Permanent Logging') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Enable Permanent Logging'
+
+                    def featureFlagFile = "app/src/main/assets/featuretoggle/feature_flags.json"
+                    setFeatureFlag(featureFlagFile, "PermanentLogging", true)
+                    sh("cat $featureFlagFile")
                 }
             }
         }
@@ -877,4 +892,45 @@ String getSdkGitHash() {
  */
 String getMegaChatSdkGitHash() {
     return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
+}
+
+/**
+ *  Check the feature flag json file and set the feature flag
+ *  If the feature_flag.json file already contains the flagName, set the flagValue.
+ *  Otherwise add the flagName with specified flagValue.
+ *  If featureFlagFile does not exist, a new file will be created.
+ *
+ * @param featureFlagFile relative path of the feature_flag.json file
+ * @param flagName name of the feature flag
+ * @param flagValue boolean value of the flag
+ */
+def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
+    def flagList
+    if (fileExists(featureFlagFile)) {
+        def fileContents = readFile(featureFlagFile)
+        flagList = new JsonSlurperClassic().parseText(fileContents)
+    } else {
+        println("setFeatureFlag() $featureFlagFile not exist!")
+        flagList = new ArrayList()
+    }
+
+    def exist = false
+    for (feature in flagList) {
+        def name = feature["name"]
+        if (name == flagName) {
+            feature["value"] = flagValue
+            exist = true
+            break
+        }
+    }
+
+    if (!exist) {
+        def newFeature = new HashMap<String, String>()
+        newFeature["value"] = flagValue
+        newFeature["name"] = flagName
+        flagList.add(newFeature)
+    }
+
+    def result = JsonOutput.prettyPrint(JsonOutput.toJson(flagList))
+    writeFile file: featureFlagFile, text: result.toString()
 }
