@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -359,9 +360,27 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun setCurrentMediaType(mediaType: FilterMediaType) {
+        _state.update {
+            it.copy(currentMediaType = mediaType)
+        }
+    }
+
     fun setSnackBarMessage(snackBarMessage: String) {
         _state.update {
             it.copy(snackBarMessage = snackBarMessage)
+        }
+    }
+
+    fun showSortByDialog(showSortByDialog: Boolean) {
+        _state.update {
+            it.copy(showSortByDialog = showSortByDialog)
+        }
+    }
+
+    fun showFilterDialog(showFilterDialog: Boolean) {
+        _state.update {
+            it.copy(showFilterDialog = showFilterDialog)
         }
     }
 }

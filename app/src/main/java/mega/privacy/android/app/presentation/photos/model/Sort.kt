@@ -22,5 +22,12 @@ enum class Sort {
     /**
      * Sort by videos with newest first
      */
-    VIDEOS,
+    VIDEOS;
+
+    companion object {
+        /**
+         * The default selected media type
+         */
+        val DEFAULT = NEWEST
+    }
 }

@@ -51,12 +51,15 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.view.showSortByDialog
+import mega.privacy.android.app.presentation.photos.view.FilterDialog
+import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -175,14 +178,15 @@ class AlbumDynamicContentFragment : Fragment() {
             (configuration.screenWidthDp.dp - 1.dp) / 3
         }
 
-        val photos = remember(uiState.albums, uiState.currentSort) {
+        val photos = remember(uiState.albums, uiState.currentSort, uiState.currentMediaType) {
             uiState.currentAlbum?.let { album ->
                 val sourcePhotos = uiState.albums.getAlbumPhotos(album)
-                if (uiState.currentSort == Sort.NEWEST) {
-                    sourcePhotos.sortedByDescending { it.modificationTime }
-                } else {
-                    sourcePhotos.sortedBy { it.modificationTime }
-                }
+                sourcePhotos
+                    .applyFilter(currentMediaType = uiState.currentMediaType)
+                    .takeIf {
+                        sourcePhotos.setFilterMenuItemVisibility()
+                    }?.applySortBy(currentSort = uiState.currentSort)
+                    ?: sourcePhotos.applySortBy(currentSort = uiState.currentSort)
             } ?: emptyList()
         }
 
@@ -221,15 +225,58 @@ class AlbumDynamicContentFragment : Fragment() {
                 )
             }
 
-            if (uiState.currentAlbum is Album.UserAlbum && isAccountHasPhotos) {
+            if (showFilterFabButton(uiState)) {
+                FilterFabButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 24.dp, bottom = 88.dp)
+                )
+            }
+
+            if (showAddFabButton(uiState)) {
                 AddFabButton(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(16.dp)
                 )
             }
+
+            if (uiState.showSortByDialog) {
+                SortByDialog(
+                    onDialogDismissed = {
+                        albumsViewModel.showSortByDialog(showSortByDialog = false)
+                    },
+                    selectedOption = uiState.currentSort,
+                    onOptionSelected = {
+                        albumsViewModel.setCurrentSort(it)
+                    }
+                )
+            }
+
+            if (uiState.showFilterDialog) {
+                FilterDialog(
+                    onDialogDismissed = {
+                        albumsViewModel.showFilterDialog(showFilterDialog = false)
+                    },
+                    selectedOption = uiState.currentMediaType,
+                    onOptionSelected = {
+                        albumsViewModel.setCurrentMediaType(it)
+                    }
+                )
+            }
         }
     }
+
+    @Composable
+    private fun showFilterFabButton(uiState: AlbumsViewState) =
+        (uiState.currentMediaType != FilterMediaType.ALL_MEDIA
+                && uiState.selectedPhotoIds.isEmpty())
+
+    @Composable
+    private fun showAddFabButton(uiState: AlbumsViewState) =
+        uiState.currentAlbum is Album.UserAlbum
+                && isAccountHasPhotos
+                && uiState.selectedPhotoIds.isEmpty()
 
     @Composable
     private fun AddFabButton(
@@ -246,7 +293,33 @@ class AlbumDynamicContentFragment : Fragment() {
                 } else {
                     R.drawable.ic_add
                 }),
-                contentDescription = "",
+                contentDescription = "Add",
+                tint = if (!MaterialTheme.colors.isLight) {
+                    Color.Black
+                } else {
+                    Color.White
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun FilterFabButton(
+        modifier: Modifier,
+    ) {
+        FloatingActionButton(
+            onClick = { albumsViewModel.showFilterDialog(true) },
+            modifier = modifier
+                .size(40.dp),
+            backgroundColor = if (!MaterialTheme.colors.isLight) {
+                Color.White
+            } else {
+                Color.Black
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_filter_light),
+                contentDescription = "Filter",
                 tint = if (!MaterialTheme.colors.isLight) {
                     Color.Black
                 } else {
@@ -283,6 +356,20 @@ class AlbumDynamicContentFragment : Fragment() {
             onBackPressedDispatcher?.onBackPressed()
         }
     }
+
+    private fun List<Photo>.applySortBy(currentSort: Sort) =
+        if (currentSort == Sort.NEWEST) {
+            this.sortedByDescending { it.modificationTime }
+        } else {
+            this.sortedBy { it.modificationTime }
+        }
+
+    private fun List<Photo>.applyFilter(currentMediaType: FilterMediaType) =
+        when (currentMediaType) {
+            FilterMediaType.ALL_MEDIA -> this
+            FilterMediaType.IMAGES -> this.filterIsInstance<Photo.Image>()
+            FilterMediaType.VIDEOS -> this.filterIsInstance<Photo.Video>()
+        }
 
     private fun openPhoto(photo: Photo) {
         albumsViewModel.state.value.currentAlbum?.let { album ->
@@ -377,7 +464,7 @@ class AlbumDynamicContentFragment : Fragment() {
         albumsViewModel.state.value.currentAlbum?.let { album ->
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
-            menu.findItem(R.id.action_menu_filter)?.isVisible = photos.isNotEmpty()
+            photos.setFilterMenuItemVisibility()
             if (album is Album.UserAlbum) {
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
                 menu.findItem(R.id.action_menu_delete)?.isVisible = true
@@ -385,20 +472,23 @@ class AlbumDynamicContentFragment : Fragment() {
         }
     }
 
+    private fun List<Photo>.setFilterMenuItemVisibility(): Boolean {
+        val showFilterMenuItem = this.isNotEmpty() &&
+                this.count { it is Photo.Image } != this.size
+        if (!showFilterMenuItem) {
+            albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
+        }
+        menu?.findItem(R.id.action_menu_filter)?.isVisible = showFilterMenuItem
+        return showFilterMenuItem
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_menu_sort_by -> {
-                showSortByDialog(
-                    context = managerActivity,
-                    checkedItem = albumsViewModel.state.value.currentSort.ordinal,
-                    onClickListener = { _, i ->
-                        albumsViewModel.setCurrentSort(Sort.values()[i])
-                    },
-                )
+                albumsViewModel.showSortByDialog(showSortByDialog = true)
             }
             R.id.action_menu_filter -> {
-                //TODO
-                Toast.makeText(activity, "Filter is developing...", Toast.LENGTH_SHORT).show()
+                albumsViewModel.showFilterDialog(showFilterDialog = true)
             }
             R.id.action_menu_delete -> {
                 //TODO
