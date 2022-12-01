@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityPaymentBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.service.iab.BillingManagerImpl
@@ -27,6 +28,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
+import java.util.BitSet
 
 /**
  * Activity for managing upgrade account payments.
@@ -73,7 +75,9 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
         val upgradeType = intent.getIntExtra(UPGRADE_TYPE, INVALID_VALUE)
 
         setupUpgradeType(upgradeType)
-        setupPaymentMethods(upgradeType)
+        collectFlow(viewModel.paymentBitSet) { paymentBitSet ->
+            setupPaymentMethods(upgradeType, paymentBitSet)
+        }
 
         binding.monthlyButton.setOnClickListener { binding.yearlyButton.isChecked = false }
         binding.monthlyText.setOnClickListener {
@@ -154,10 +158,8 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    private fun setupPaymentMethods(upgradeType: Int) {
+    private fun setupPaymentMethods(upgradeType: Int, paymentBitSet: BitSet?) {
         viewModel.checkProductAccounts() ?: return
-
-        val paymentBitSet = viewModel.getPaymentBitSet()
 
         if (paymentBitSet == null) {
             Timber.w("Not payment bit set received!!!")

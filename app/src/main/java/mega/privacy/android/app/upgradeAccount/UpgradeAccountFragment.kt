@@ -84,7 +84,7 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.refreshAccountInfo()
+        viewModel.refreshPricing()
         setupView()
         setupObservers()
 
@@ -339,12 +339,8 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
                 return
             }
 
-            if (getPaymentBitSet() == null) {
-                Timber.w("PaymentBitSet Null")
-                return
-            }
-
-            refreshAccountInfo()
+            refreshPricing()
+            getPaymentMethod()
             subscriptionCheck(upgradeType)
         }
     }

@@ -6,7 +6,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
@@ -14,23 +18,30 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
+import mega.privacy.android.app.utils.Constants.FREE
+import mega.privacy.android.app.utils.Constants.PRO_I
+import mega.privacy.android.app.utils.Constants.PRO_II
+import mega.privacy.android.app.utils.Constants.PRO_III
+import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.DBUtil.callToPricing
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.text.NumberFormat
-import java.util.*
+import java.util.BitSet
+import java.util.Currency
 import javax.inject.Inject
 
 @HiltViewModel
 class ChooseUpgradeAccountViewModel @Inject constructor(
-    private val myAccountInfo: MyAccountInfo
+    private val myAccountInfo: MyAccountInfo,
+    private val getPaymentMethod: GetPaymentMethod,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -46,9 +57,31 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
     private val currentUpgradeClickedAndSubscription =
         MutableLiveData<Pair<Int, SubscriptionMethod>?>()
 
+    private val _paymentBitSet = MutableStateFlow(BitSet())
+
+    /**
+     * Payment method
+     */
+    val paymentBitSet = _paymentBitSet.asStateFlow()
+
     fun onUpgradeClick(): LiveData<Int> = upgradeClick
     fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, SubscriptionMethod>?> =
         currentUpgradeClickedAndSubscription
+
+    init {
+        getPaymentMethod()
+    }
+
+    /**
+     * Get payment method
+     *
+     */
+    fun getPaymentMethod() {
+        viewModelScope.launch {
+            val paymentMethod = getPaymentMethod(false)
+            _paymentBitSet.value = convertToBitSet(paymentMethod.flag)
+        }
+    }
 
     /**
      * Check the current subscription
@@ -87,8 +120,6 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun getAccountType(): Int = myAccountInfo.accountType
 
-    fun getPaymentBitSet(): BitSet? = myAccountInfo.paymentBitSet
-
     fun isInventoryFinished(): Boolean = myAccountInfo.isInventoryFinished
 
     fun isPurchasedAlready(sku: String): Boolean = myAccountInfo.isPurchasedAlready(sku)
@@ -104,17 +135,6 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
             MegaApplication.getInstance().askForPricing()
             null
         } else productAccounts
-    }
-
-    /**
-     * Asks for account info if needed: Pricing and payment methods.
-     */
-    fun refreshAccountInfo() {
-        refreshPricing()
-
-        if (callToPaymentMethods()) {
-            MegaApplication.getInstance().askForPaymentMethods()
-        }
     }
 
     /**
@@ -137,7 +157,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
     fun getPriceString(
         context: Context,
         product: Product,
-        monthlyBasePrice: Boolean
+        monthlyBasePrice: Boolean,
     ): Spanned {
         // First get the "default" pricing details from the MEGA server
         var price = product.amount / 100.00
