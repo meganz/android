@@ -277,7 +277,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = { finish() },
                 onDismiss = { viewModel.dismissDialog() },
-                onLeaveGroupDialog = { viewModel.leaveChat() })
+                onLeaveGroupDialog = { viewModel.leaveChat() },
+                onSnackbarShown = viewModel::snackbarShown)
         }
     }
 

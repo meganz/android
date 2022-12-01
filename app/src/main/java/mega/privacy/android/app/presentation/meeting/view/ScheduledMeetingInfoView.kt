@@ -30,6 +30,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -112,10 +113,12 @@ fun ScheduledMeetingInfoView(
     onBackPressed: () -> Unit,
     onDismiss: () -> Unit,
     onLeaveGroupDialog: () -> Unit,
+    onSnackbarShown: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-    val snackBarHostState = remember { SnackbarHostState() }
+
+    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -195,16 +198,21 @@ fun ScheduledMeetingInfoView(
             }
         }
 
-        state.snackBar?.let { id ->
-            val msg = stringResource(id = id)
+        if (state.snackBar != null) {
+            val msg = stringResource(id = state.snackBar)
+
             LaunchedEffect(scaffoldState.snackbarHostState) {
-                scaffoldState.snackbarHostState.showSnackbar(message = msg,
-                    duration = SnackbarDuration.Long)
+                val s = scaffoldState.snackbarHostState.showSnackbar(message = msg,
+                    duration = SnackbarDuration.Short)
+
+                if (s == SnackbarResult.Dismissed) {
+                    onSnackbarShown()
+                }
             }
         }
     }
 
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackBarHostState)
+    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     onScrollChange(!firstItemVisible)
 }
@@ -1293,7 +1301,8 @@ fun PreviewScheduledMeetingInfoView() {
             onScrollChange = {},
             onBackPressed = {},
             onDismiss = {},
-            onLeaveGroupDialog = {}
+            onLeaveGroupDialog = {},
+            onSnackbarShown = {}
         )
     }
 }

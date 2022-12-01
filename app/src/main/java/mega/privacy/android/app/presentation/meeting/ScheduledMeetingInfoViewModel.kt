@@ -413,7 +413,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 removeChatLink(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
-                _state.update { it.copy(snackBar = R.string.general_text_error) }
             }.onSuccess { _ ->
                 _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
             }
@@ -429,7 +428,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 createChatLink(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
-                _state.update { it.copy(snackBar = R.string.general_text_error) }
+                showSnackBar(R.string.general_text_error)
             }.onSuccess { request ->
                 _state.update {
                     it.copy(enabledMeetingLinkOption = true,
@@ -449,19 +448,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         viewModelScope.launch {
             inviteToChat(_state.value.chatId, contacts)
         }
-
-        _state.update { it.copy(snackBar = R.string.invite_sent) }
+        showSnackBar(R.string.invite_sent)
     }
 
     /**
      * Edit scheduled meeting if there is internet connection, shows an error if not.
      */
     fun onEditTap() {
-        if (isConnected) {
-            Timber.d("Edit scheduled meeting")
-        } else {
-            showError()
-        }
+        Timber.d("Edit scheduled meeting")
     }
 
     /**
@@ -507,7 +501,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(exception)
                 dismissDialog()
-                _state.update { it.copy(snackBar = R.string.general_error) }
+                showSnackBar(R.string.general_error)
             }.onSuccess { result ->
                 Timber.d("Chat left ")
                 if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
@@ -549,7 +543,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         } else {
-            showError()
+            showSnackBar(R.string.check_internet_connection_error)
         }
     }
 
@@ -571,9 +565,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             } else {
                 createChatLink()
             }
-
         } else {
-            showError()
+            showSnackBar(R.string.check_internet_connection_error)
         }
     }
 
@@ -588,7 +581,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     setOpenInvite(chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(snackBar = R.string.general_text_error) }
+                    showSnackBar(R.string.general_text_error)
                 }.onSuccess { result ->
                     _state.update {
                         it.copy(
@@ -598,7 +591,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         } else {
-            showError()
+            showSnackBar(R.string.check_internet_connection_error)
         }
     }
 
@@ -607,14 +600,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun enableEncryptedKeyRotation() {
         if (_state.value.participantItemList.size > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
-            _state.update { it.copy(snackBar = R.string.warning_make_chat_private) }
+            showSnackBar(R.string.warning_make_chat_private)
         } else {
             viewModelScope.launch {
                 runCatching {
                     getPublicChatToPrivate(chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(snackBar = R.string.general_error) }
+                    showSnackBar(R.string.general_error)
                 }.onSuccess { _ ->
                     _state.update { it.copy(isPublic = false) }
                 }
@@ -645,15 +638,17 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         _state.value.meetingLink?.let { meetingLink ->
             val clip = ClipData.newPlainText(Constants.COPIED_TEXT_LABEL, meetingLink)
             clipboard.setPrimaryClip(clip)
-            _state.update { it.copy(snackBar = R.string.chat_link_copied_clipboard) }
+            showSnackBar(R.string.scheduled_meetings_meeting_link_copied)
         }
     }
 
     /**
-     * Add error when there is no internet connection
+     * Show snackBar with a text
+     *
+     * @param stringId String id.
      */
-    private fun showError() {
-        _state.update { it.copy(snackBar = R.string.check_internet_connection_error) }
+    private fun showSnackBar(stringId: Int) {
+        _state.update { it.copy(snackBar = stringId) }
     }
 
     /**
@@ -665,6 +660,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").format(startDateTime) +
                 " - ${DateTimeFormatter.ofPattern("HH:mm").format(endDateTime)}"
 
+
+    /**
+     * Updates state after shown snackBar.
+     */
+    fun snackbarShown() = _state.update { it.copy(snackBar = null) }
 
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
