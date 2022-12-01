@@ -161,5 +161,4 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindTelephonyGateway(telephonyFacade: TelephonyFacade): TelephonyGateway
-
 }

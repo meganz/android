@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 
 
 /**
@@ -14,4 +15,10 @@ interface BillingRepository {
      * @return formatted local price string
      */
     suspend fun getLocalPricing(sku: String): MegaSku?
+
+    /**
+     * Get payment method
+     *
+     */
+    suspend fun getPaymentMethod(clearCache: Boolean): PaymentMethodFlags
 }
