@@ -7,12 +7,14 @@ import mega.privacy.android.domain.entity.contacts.AccountCredentials
  *
  * @property contactCredentials     [AccountCredentials.ContactCredentials].
  * @property areCredentialsVerified True if credentials are verified, false otherwise.
+ * @property isVerifyingCredentials True if is already verifying credentials, false otherwise.
  * @property myAccountCredentials   [AccountCredentials.MyAccountCredentials].
  * @property error                  String resource id for showing an error.
  */
 data class AuthenticityCredentialsState(
     val contactCredentials: AccountCredentials.ContactCredentials? = null,
     val areCredentialsVerified: Boolean = false,
+    val isVerifyingCredentials: Boolean = false,
     val myAccountCredentials: AccountCredentials.MyAccountCredentials? = null,
     val error: Int? = null,
 )
