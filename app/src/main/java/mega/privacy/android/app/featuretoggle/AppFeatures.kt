@@ -19,11 +19,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Secure("Indicates if user is cryptographically secure", false),
 
     /**
-     * New MediaDiscovery toggle
-     */
-    NewMediaDiscovery("Enable new mediaDiscovery feature", true),
-
-    /**
      * User albums toggle
      */
     UserAlbums("Enable user albums feature", false),
