@@ -926,7 +926,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun isWifiConstraintSatisfied(): Boolean =
         !isWifiNotSatisfied().also {
-            if (!it) Timber.w("Cannot start, Wi-Fi required")
+            if (it) Timber.w("Cannot start, Wi-Fi required")
         }
 
     /**
