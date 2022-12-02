@@ -90,30 +90,31 @@ class AuthenticityCredentialsViewModel @Inject constructor(
     /**
      * Verifies contact credentials.
      */
-    private fun verifyContactCredentials() =
+    private fun verifyContactCredentials() = state.value.contactCredentials?.let {
+        _state.update { it.copy(isVerifyingCredentials = true) }
+
         viewModelScope.launch {
-            state.value.contactCredentials?.let {
-                kotlin.runCatching {
-                    _state.update { it.copy(isVerifyingCredentials = true) }
-                    verifyCredentials(it.email)
-                }.onSuccess {
-                    _state.update {
-                        it.copy(
-                            areCredentialsVerified = true,
-                            isVerifyingCredentials = false,
-                            error = R.string.label_verified)
-                    }
-                }.onFailure { showError(it) }
-            }
+            kotlin.runCatching {
+                verifyCredentials(it.email)
+            }.onSuccess {
+                _state.update {
+                    it.copy(
+                        areCredentialsVerified = true,
+                        isVerifyingCredentials = false,
+                        error = R.string.label_verified)
+                }
+            }.onFailure { showError(it) }
         }
+    }
 
     /**
      * Reset contact credentials.
      */
-    private fun resetContactCredentials() = viewModelScope.launch {
-        state.value.contactCredentials?.let {
+    private fun resetContactCredentials() = state.value.contactCredentials?.let {
+        _state.update { it.copy(isVerifyingCredentials = true) }
+
+        viewModelScope.launch {
             kotlin.runCatching {
-                _state.update { it.copy(isVerifyingCredentials = true) }
                 resetCredentials(it.email)
             }.onSuccess {
                 _state.update {
