@@ -52,7 +52,6 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.notification.model.extensions.title
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -319,20 +318,12 @@ class AlbumDynamicContentFragment : Fragment() {
             onClick = { albumsViewModel.showFilterDialog(true) },
             modifier = modifier
                 .size(40.dp),
-            backgroundColor = if (!MaterialTheme.colors.isLight) {
-                Color.White
-            } else {
-                Color.Black
-            }
+            backgroundColor = Color.White
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_filter_light),
                 contentDescription = "Filter",
-                tint = if (!MaterialTheme.colors.isLight) {
-                    Color.Black
-                } else {
-                    Color.White
-                }
+                tint = Color.Black
             )
         }
     }
