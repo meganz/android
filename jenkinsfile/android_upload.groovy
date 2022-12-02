@@ -25,6 +25,7 @@ DATA_UNIT_TEST_SUMMARY = ""
  */
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
+UPLOAD_COVERAGE_REPORT = "upload_coverage"
 
 // The log file of publishing pre-built SDK to Artifatory
 ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
@@ -472,7 +473,7 @@ pipeline {
 
         stage('Unit Test') {
             when {
-                expression { triggerByPush() }
+                expression { triggerByPush() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -499,7 +500,7 @@ pipeline {
 
         stage('Upload Code Coverage') {
             when {
-                expression { triggerByPush() }
+                expression { triggerByPush() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -745,6 +746,16 @@ private boolean triggerByDeliverQaCmd() {
     return env.gitlabActionType == "NOTE" &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.startsWith(DELIVER_QA_CMD)
+}
+
+/**
+ * Check if this build is triggered by a upload_coverage command
+ * @return
+ */
+private boolean triggerByUploadCoverage() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT)
 }
 
 /**
