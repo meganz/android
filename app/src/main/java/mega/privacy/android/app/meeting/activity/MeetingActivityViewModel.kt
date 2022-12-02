@@ -790,7 +790,7 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Check if there is an existing chat-link for an public chat
+     * Check if the call exists
      */
     fun checkIfCallExists(link: String) {
         viewModelScope.launch {
@@ -812,9 +812,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param list MegaHandleList with the call ID
      * @return True, if the meeting is finished. False, if not.
      */
-    fun isMeetingEnded(list: List<Long>?): Boolean {
-        return list == null || list[0] == MEGACHAT_INVALID_HANDLE
-    }
+    fun isMeetingEnded(list: List<Long>?): Boolean = list == null || list[0] == MEGACHAT_INVALID_HANDLE
 
     /**
      * Method to finish the [MeetingActivity]
