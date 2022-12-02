@@ -57,6 +57,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
             whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 isMasterBusinessAccount = true,
+                accountTypeIdentifier = AccountType.BUSINESS
             ))
             whenever(isBusinessAccountActive()).thenReturn(true)
 
@@ -68,6 +69,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
         runTest {
             whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
+                accountTypeIdentifier = AccountType.BUSINESS
             ))
             whenever(isBusinessAccountActive()).thenReturn(true)
 
@@ -80,6 +82,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
         runTest {
             whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
+                accountTypeIdentifier = AccountType.BUSINESS
             ))
             whenever(isBusinessAccountActive()).thenReturn(false)
 
@@ -93,10 +96,25 @@ class DefaultCheckEnableCameraUploadsStatusTest {
             whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 isMasterBusinessAccount = true,
+                accountTypeIdentifier = AccountType.BUSINESS
             ))
             whenever(isBusinessAccountActive()).thenReturn(false)
 
             assertEquals(underTest.invoke(),
                 EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
         }
+
+    @Test
+    fun `test that CAN_ENABLE_CAMERA_UPLOADS is returned when the user is Pro Flexi account`() =
+        runTest {
+            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
+                isBusinessAccount = true,
+                accountTypeIdentifier = AccountType.PRO_FLEXI
+            ))
+            whenever(isBusinessAccountActive()).thenReturn(true)
+
+            assertEquals(underTest.invoke(),
+                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
+        }
+
 }
