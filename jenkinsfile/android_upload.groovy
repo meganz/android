@@ -25,7 +25,7 @@ DATA_UNIT_TEST_SUMMARY = ""
  */
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
-UPLOAD_COVERAGE_REPORT = "upload_coverage"
+UPLOAD_COVERAGE_REPORT_CMD = "upload_coverage"
 
 // The log file of publishing pre-built SDK to Artifatory
 ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
@@ -122,7 +122,7 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-                if (triggerByDeliverQaCmd() || triggerByPush()) {
+                if (triggerByDeliverQaCmd() || triggerByUploadCoverage() || triggerByPush()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
                 } else if (triggerByPublishSdkCmd()) {
@@ -150,7 +150,7 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -228,7 +228,7 @@ pipeline {
         }
         stage('Download Google Map API Key') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -303,7 +303,7 @@ pipeline {
         }
         stage('Clean Android build') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -314,7 +314,7 @@ pipeline {
         }
         stage('Enable Permanent Logging') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -328,7 +328,7 @@ pipeline {
         }
         stage('Build APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -344,7 +344,7 @@ pipeline {
         }
         stage('Sign APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -373,7 +373,7 @@ pipeline {
         }
         stage('Upload APK(GMS) to Firebase') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -399,7 +399,7 @@ pipeline {
         }
         stage('Build QA APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -415,7 +415,7 @@ pipeline {
 
         stage('Upload QA APK(GMS) to Firebase') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -440,7 +440,7 @@ pipeline {
 
         stage('Clean up Android') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -456,7 +456,7 @@ pipeline {
         }
         stage('Clean up SDK') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -755,7 +755,7 @@ private boolean triggerByDeliverQaCmd() {
 private boolean triggerByUploadCoverage() {
     return env.gitlabActionType == "NOTE" &&
             env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT)
+            env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT_CMD)
 }
 
 /**
@@ -823,7 +823,9 @@ def parseCommandParameter() {
         command = DELIVER_QA_CMD
     } else if (triggerByPublishSdkCmd()) {
         command = PUBLISH_SDK_CMD
-    } else {
+    } else if (triggerByUploadCoverage()) {
+        command = UPLOAD_COVERAGE_REPORT_CMD
+    } {
         return result
     }
 
