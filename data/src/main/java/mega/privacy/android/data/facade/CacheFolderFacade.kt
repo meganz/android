@@ -86,17 +86,15 @@ internal class CacheFolderFacade @Inject constructor(
             .plus(fileGateway.getDirSize(cacheExtDir))
     }
 
-    override fun clearCache() {
-        appScope.launch(ioDispatcher) {
-            Timber.d("clearCache")
-            try {
-                fileGateway.deleteFolderAndSubFolders(context.cacheDir)
-            } catch (e: IOException) {
-                Timber.e(e)
-                Timber.e("Exception deleting private cache", e)
-            }
-            clearPublicCache()
+    override suspend fun clearCache() {
+        Timber.d("clearCache")
+        try {
+            fileGateway.deleteFolderAndSubFolders(context.cacheDir)
+        } catch (e: IOException) {
+            Timber.e(e)
+            Timber.e("Exception deleting private cache", e)
         }
+        clearPublicCache()
     }
 
     override fun deleteCacheFolderIfEmpty(folderName: String) {
