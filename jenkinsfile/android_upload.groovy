@@ -825,7 +825,7 @@ def parseCommandParameter() {
         command = PUBLISH_SDK_CMD
     } else if (triggerByUploadCoverage()) {
         command = UPLOAD_COVERAGE_REPORT_CMD
-    } {
+    } else {
         return result
     }
 
