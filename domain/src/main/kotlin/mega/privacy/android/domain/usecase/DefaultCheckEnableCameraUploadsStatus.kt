@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
@@ -31,13 +32,10 @@ class DefaultCheckEnableCameraUploadsStatus @Inject constructor(
     override suspend fun invoke(): EnableCameraUploadsStatus = withContext(ioDispatcher) {
         val userAccount = getAccountDetails(forceRefresh = true)
 
-        if (userAccount.isMasterBusinessAccount) {
-            checkBusinessAccountStatus(isMasterBusinessAccount = true)
-        } else if (userAccount.isBusinessAccount) {
-            checkBusinessAccountStatus(isMasterBusinessAccount = false)
-        } else {
+        if (userAccount.isBusinessAccount && userAccount.accountTypeIdentifier == AccountType.BUSINESS)
+            checkBusinessAccountStatus(isMasterBusinessAccount = userAccount.isMasterBusinessAccount)
+        else
             EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
-        }
     }
 
     /**
