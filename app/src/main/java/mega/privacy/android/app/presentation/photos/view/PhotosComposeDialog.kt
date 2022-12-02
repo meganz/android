@@ -42,17 +42,16 @@ internal fun SortByDialog(
                 Spacer(modifier = Modifier.size(12.dp))
                 listOf(
                     Sort.NEWEST,
-                    Sort.OLDEST
+                    Sort.OLDEST,
                 ).forEach { option ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                if (option == selectedOption) {
-                                    onDialogDismissed()
-                                } else {
+                                if (option != selectedOption) {
                                     onOptionSelected(option)
                                 }
+                                onDialogDismissed()
                             }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -63,7 +62,7 @@ internal fun SortByDialog(
                         )
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
-                            text = option.name,
+                            text = option.text(),
                             color = if (isLight) {
                                 grey_alpha_087.takeIf {
                                     option == selectedOption
@@ -89,7 +88,7 @@ internal fun SortByDialog(
                 modifier = Modifier.padding(end = 16.dp)
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel),
+                    text = stringResource(id = R.string.general_cancel).uppercase(),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -121,11 +120,10 @@ internal fun FilterDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                if (option == selectedOption) {
-                                    onDialogDismissed()
-                                } else {
+                                if (option != selectedOption) {
                                     onOptionSelected(option)
                                 }
+                                onDialogDismissed()
                             }
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -136,7 +134,7 @@ internal fun FilterDialog(
                         )
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
-                            text = option.name,
+                            text = option.text(),
                             color = if (isLight) {
                                 grey_alpha_087.takeIf {
                                     option == selectedOption
@@ -162,7 +160,7 @@ internal fun FilterDialog(
                 modifier = Modifier.padding(end = 16.dp)
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel),
+                    text = stringResource(id = R.string.general_cancel).uppercase(),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -175,4 +173,19 @@ internal fun FilterDialog(
             dismissOnClickOutside = true
         ),
     )
+}
+
+@Composable
+private fun Sort.text(): String = when (this) {
+    Sort.NEWEST -> stringResource(id = R.string.sortby_date_newest)
+    Sort.OLDEST -> stringResource(id = R.string.sortby_date_oldest)
+    Sort.PHOTOS -> stringResource(id = R.string.sortby_type_photo_first)
+    Sort.VIDEOS -> stringResource(id = R.string.sortby_type_video_first)
+}
+
+@Composable
+private fun FilterMediaType.text(): String = when (this) {
+    FilterMediaType.ALL_MEDIA -> stringResource(id = R.string.filter_button_all_media_type)
+    FilterMediaType.IMAGES -> stringResource(id = R.string.section_images)
+    FilterMediaType.VIDEOS -> stringResource(id = R.string.sortby_type_video_first)
 }

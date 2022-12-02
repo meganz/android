@@ -481,8 +481,9 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun List<Photo>.setFilterMenuItemVisibility(): Boolean {
+        val imageCount = this.count { it is Photo.Image }
         val showFilterMenuItem = this.isNotEmpty() &&
-                this.count { it is Photo.Image } != this.size
+                imageCount != this.size && imageCount != 0
         if (!showFilterMenuItem) {
             albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
         }
