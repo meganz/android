@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -41,6 +42,7 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetLocalAudioChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -53,6 +55,7 @@ import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -68,6 +71,9 @@ import javax.inject.Inject
  * It's very common that two or more fragments in Meeting activity need to communicate with each other.
  * These fragments can share a ViewModel using their activity scope to handle this communication.
  * MeetingActivityViewModel shares state of Mic, Camera and Speaker for all Fragments
+ *
+ * @property checkChatLink  [CheckChatLink]
+ * @property state          Current view state as [MeetingState]
  */
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
@@ -79,9 +85,13 @@ class MeetingActivityViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val cameraGateway: CameraGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
+    private val checkChatLink: CheckChatLink,
     monitorConnectivity: MonitorConnectivity,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
+
+    private val _state = MutableStateFlow(MeetingState())
+    val state: StateFlow<MeetingState> = _state
 
     // Avatar
     private val _avatarLiveData = MutableLiveData<Bitmap>()
@@ -780,14 +790,30 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Method to check if the chat call exists
-     *
-     * @param chatId The chat ID
-     * @return True if the call exists or false otherwise
+     * Check if there is an existing chat-link for an public chat
      */
-    fun checkChatCall(chatId: Long): Boolean {
-        megaChatApiGateway.getChatCall(chatId)?.let { return true }
-        return false
+    fun checkIfCallExists(link: String) {
+        viewModelScope.launch {
+            runCatching {
+                checkChatLink(link)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { request ->
+                _state.update {
+                    it.copy(isMeetingEnded = isMeetingEnded(request.handleList))
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to know if a meeting has ended
+     *
+     * @param list MegaHandleList with the call ID
+     * @return True, if the meeting is finished. False, if not.
+     */
+    fun isMeetingEnded(list: List<Long>?): Boolean {
+        return list == null || list[0] == MEGACHAT_INVALID_HANDLE
     }
 
     /**

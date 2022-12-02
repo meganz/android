@@ -8,8 +8,12 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -34,31 +38,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         firstName = binding.editFirstName.text.toString()
         lastName = binding.editLastName.text.toString()
 
-        if (!sharedModel.checkChatCall(chatId)) {
-            MeetingHasEndedDialogFragment(object : ClickCallback {
-                override fun onViewMeetingChat() {}
-                override fun onLeave() {
-                    val intent = Intent(requireContext(), LeftMeetingActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                    sharedModel.finishMeetingActivity()
-                }
-            }, true).show(parentFragmentManager,
-                MeetingHasEndedDialogFragment.TAG)
-            return
-        }
-
-        val action = JoinMeetingFragmentDirections
-            .actionGlobalInMeeting(
-                MeetingActivity.MEETING_ACTION_GUEST,
-                chatId,
-                MEGACHAT_INVALID_HANDLE,
-                meetingName,
-                meetingLink,
-                firstName,
-                lastName
-            )
-        findNavController().navigate(action)
+        sharedModel.checkIfCallExists(meetingLink)
     }
 
     /**
@@ -101,6 +81,41 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         reLayoutCameraPreviewView()
         binding.typeMeetingEditText.visibility = View.GONE
         watchChangeOfGuestName()
+
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                sharedModel.state.collect { (isMeetingEnded) ->
+                    isMeetingEnded?.let {
+                        if (it) {
+                            MeetingHasEndedDialogFragment(object : ClickCallback {
+                                override fun onViewMeetingChat() {}
+                                override fun onLeave() {
+                                    val intent =
+                                        Intent(requireContext(), LeftMeetingActivity::class.java)
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                    startActivity(intent)
+                                    sharedModel.finishMeetingActivity()
+                                }
+                            }, true).show(parentFragmentManager,
+                                MeetingHasEndedDialogFragment.TAG)
+                        } else {
+                            val action = JoinMeetingFragmentDirections
+                                .actionGlobalInMeeting(
+                                    MeetingActivity.MEETING_ACTION_GUEST,
+                                    chatId,
+                                    MEGACHAT_INVALID_HANDLE,
+                                    meetingName,
+                                    meetingLink,
+                                    firstName,
+                                    lastName
+                                )
+                            findNavController().navigate(action)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun setProfileAvatar() {
