@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.albums.model
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 
 /**
  * @property albums
@@ -17,6 +18,8 @@ import mega.privacy.android.domain.entity.photos.Album
  * @property snackBarMessage
  * @property showSortByDialog
  * @property showFilterDialog
+ * @property deletedAlbumIds
+ * @property albumDeletedMessage
  */
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
@@ -31,4 +34,6 @@ data class AlbumsViewState(
     val snackBarMessage: String = "",
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
+    val deletedAlbumIds: Set<AlbumId> = setOf(),
+    val albumDeletedMessage: String = "",
 )
