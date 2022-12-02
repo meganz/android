@@ -982,7 +982,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun isPrimaryFolderEstablished(): Boolean {
         val primarySyncHandle = getPrimarySyncHandle()
-        if (primarySyncHandle != MegaApiJava.INVALID_HANDLE) {
+        if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
         val isPrimaryFolderInRubbish = isNodeInRubbish(primarySyncHandle)
