@@ -18,7 +18,6 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -98,6 +98,7 @@ import javax.inject.Inject
  * @property applicationScope
  * @property getAccountDetails
  * @property getExtendedAccountDetail
+ * @property getPaymentMethod
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
@@ -190,6 +191,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var getExtendedAccountDetail: GetExtendedAccountDetail
+
+    @Inject
+    lateinit var getPaymentMethod: GetPaymentMethod
 
     var localIpAddress: String? = ""
 
@@ -317,7 +321,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
-            megaApi.getPaymentMethods(null)
+            getPaymentMethod(true)
             if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
                 getAccountDetails(true)
             } else {
@@ -333,15 +337,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      *
      */
     fun askForPricing() = megaApi.getPricing(null)
-
-    /**
-     * Ask for payment methods
-     *
-     */
-    fun askForPaymentMethods() {
-        Timber.d("askForPaymentMethods")
-        megaApi.getPaymentMethods(null)
-    }
 
     /**
      * Ask for account details
@@ -377,18 +372,18 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
      */
     fun refreshAccountInfo() {
         //Check if the call is recently
-        if (runBlocking { isDatabaseEntryStale() }
-            || myAccountInfo.usedFormatted.trim().isEmpty()) {
-            Timber.d("megaApi.getAccountDetails SEND")
-            askForAccountDetails()
-        }
-        if (DBUtil.callToExtendedAccountDetails()) {
-            Timber.d("megaApi.getExtendedAccountDetails SEND")
-            askForExtendedAccountDetails()
-        }
-        if (DBUtil.callToPaymentMethods()) {
-            Timber.d("megaApi.getPaymentMethods SEND")
-            askForPaymentMethods()
+        applicationScope.launch {
+            if (isDatabaseEntryStale()
+                || myAccountInfo.usedFormatted.trim().isEmpty()
+            ) {
+                Timber.d("megaApi.getAccountDetails SEND")
+                askForAccountDetails()
+            }
+            if (DBUtil.callToExtendedAccountDetails()) {
+                Timber.d("megaApi.getExtendedAccountDetails SEND")
+                askForExtendedAccountDetails()
+            }
+            getPaymentMethod(false)
         }
     }
 

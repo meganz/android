@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.DefaultAccountRepository
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
+import mega.privacy.android.data.repository.DefaultBillingRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
@@ -37,6 +38,7 @@ import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
+import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -169,4 +171,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindVerificationRepository(repository: DefaultVerificationRepository): VerificationRepository
+
+    @Binds
+    abstract fun bindBillingRepository(repository: DefaultBillingRepository): BillingRepository
 }

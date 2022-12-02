@@ -1,20 +1,20 @@
 package mega.privacy.android.app.globalmanagement
 
 import android.util.Base64
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate
 import mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.account.MegaSku
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -27,7 +27,6 @@ import timber.log.Timber
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.BitSet
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,7 +58,6 @@ class MyAccountInfo @Inject constructor(
     var usedStorage = INVALID_VALUE.toLong()
     var accountType = INVALID_VALUE
     private var accountInfo: MegaAccountDetails? = null
-    var paymentBitSet: BitSet? = null
     var numberOfSubscriptions = -INVALID_VALUE.toLong()
     var subscriptionStatus = INVALID_VALUE
     var subscriptionRenewTime = INVALID_VALUE.toLong()
@@ -118,7 +116,6 @@ class MyAccountInfo @Inject constructor(
         usedStorage = INVALID_VALUE.toLong()
         accountType = INVALID_VALUE
         accountInfo = null
-        paymentBitSet = null
         numberOfSubscriptions = INVALID_VALUE.toLong()
         subscriptionStatus = INVALID_VALUE
         subscriptionRenewTime = INVALID_VALUE.toLong()

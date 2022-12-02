@@ -19,14 +19,13 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERI
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
 import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
-import mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS
 import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
-import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
@@ -67,6 +66,7 @@ class BackgroundRequestListener @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getSpecificAccountDetail: GetSpecificAccountDetail,
     private val getAccountDetails: GetAccountDetails,
+    private val getPaymentMethod: GetPaymentMethod,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -110,7 +110,6 @@ class BackgroundRequestListener @Inject constructor(
             MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
             MegaRequest.TYPE_SET_ATTR_USER -> handleSetAttrUserRequest(request, e)
             MegaRequest.TYPE_GET_PRICING -> handleGetPricingRequest(e, request)
-            MegaRequest.TYPE_GET_PAYMENT_METHODS -> handleGetPaymentMethodsRequest(e, request)
             MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS -> handleCreditCardQuerySubscriptionsRequest(
                 e,
                 request
@@ -128,21 +127,6 @@ class BackgroundRequestListener @Inject constructor(
             Timber.d("NUMBER OF SUBS: %s", myAccountInfo.numberOfSubscriptions)
             val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
             intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION)
-            application.sendBroadcast(intent)
-        }
-    }
-
-    private fun handleGetPaymentMethodsRequest(
-        e: MegaError,
-        request: MegaRequest,
-    ) {
-        Timber.d("Payment methods request")
-        myAccountInfo.getPaymentMethodsBoolean = true
-        if (e.errorCode == MegaError.API_OK) {
-            dbH.setPaymentMethodsTimeStamp()
-            myAccountInfo.paymentBitSet = convertToBitSet(request.number)
-            val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            intent.putExtra(ACTION_TYPE, UPDATE_PAYMENT_METHODS)
             application.sendBroadcast(intent)
         }
     }
@@ -277,7 +261,7 @@ class BackgroundRequestListener @Inject constructor(
     private fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
-            megaApi.getPaymentMethods(null)
+            getPaymentMethod(true)
             if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
                 getAccountDetails(true)
             } else {

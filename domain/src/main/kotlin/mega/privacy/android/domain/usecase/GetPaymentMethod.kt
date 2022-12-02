@@ -11,5 +11,5 @@ fun interface GetPaymentMethod {
      * Invoke
      *
      */
-    suspend operator fun invoke(forceRefresh: Boolean): PaymentMethodFlags?
+    suspend operator fun invoke(forceRefresh: Boolean): PaymentMethodFlags
 }
