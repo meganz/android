@@ -369,10 +369,14 @@ class AlbumsViewModel @Inject constructor(
 
     fun selectAllPhotos() {
         _state.value.currentAlbum?.let { album ->
-            val albumPhotosHandles =
-                _state.value.albums.getAlbumPhotos(album).map { photo ->
-                    photo.id
-                }
+            val currentAlbumPhotos = _state.value.albums.getAlbumPhotos(album)
+            val albumPhotosHandles = when (_state.value.currentMediaType) {
+                FilterMediaType.ALL_MEDIA -> currentAlbumPhotos.map { it.id }
+                FilterMediaType.IMAGES -> currentAlbumPhotos.filterIsInstance<Photo.Image>()
+                    .map { it.id }
+                FilterMediaType.VIDEOS -> currentAlbumPhotos.filterIsInstance<Photo.Video>()
+                    .map { it.id }
+            }
             _state.update {
                 it.copy(selectedPhotoIds = albumPhotosHandles.toMutableSet())
             }
