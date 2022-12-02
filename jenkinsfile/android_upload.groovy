@@ -228,7 +228,7 @@ pipeline {
         }
         stage('Download Google Map API Key') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -314,7 +314,7 @@ pipeline {
         }
         stage('Enable Permanent Logging') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -328,7 +328,7 @@ pipeline {
         }
         stage('Build APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -344,7 +344,7 @@ pipeline {
         }
         stage('Sign APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -373,7 +373,7 @@ pipeline {
         }
         stage('Upload APK(GMS) to Firebase') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -399,7 +399,7 @@ pipeline {
         }
         stage('Build QA APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -415,7 +415,7 @@ pipeline {
 
         stage('Upload QA APK(GMS) to Firebase') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
             }
             steps {
                 script {
