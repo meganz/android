@@ -4094,4 +4094,23 @@
     <string name="cloud_drive_media_discovery_banner_settings">Settings</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
     <string name="cloud_drive_media_discovery_banner_ok">OK, got it</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">Meeting link copied to the clipboard</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="one">“%s” album deleted</item>
+        <item quantity="other">%d albums deleted</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="one">Delete album?</item>
+        <item quantity="other">Delete albums?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
+        <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
+    </plurals>
 </resources>
