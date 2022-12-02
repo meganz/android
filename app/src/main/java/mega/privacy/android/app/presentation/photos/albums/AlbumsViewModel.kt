@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetUserAlbums
+import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import timber.log.Timber
 import javax.inject.Inject
@@ -53,6 +54,7 @@ class AlbumsViewModel @Inject constructor(
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
     private val createAlbum: CreateAlbum,
+    private val removeAlbums: RemoveAlbums,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -60,6 +62,7 @@ class AlbumsViewModel @Inject constructor(
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
 
+    private var albumJob: Job? = null
     private val albumJobs: MutableMap<AlbumId, Job> = mutableMapOf()
 
     private var createAlbumJob: Job? = null
@@ -116,13 +119,22 @@ class AlbumsViewModel @Inject constructor(
     /**
      * User albums with real-time updates
      */
-    private fun loadUserAlbums() = viewModelScope.launch {
-        if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
+    private fun loadUserAlbums() {
+        albumJob?.cancel()
+        albumJob = viewModelScope.launch {
+            if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
 
-        getUserAlbums()
-            .catch { exception -> Timber.e(exception) }
-            .collectLatest(::handleUserAlbums)
+            getUserAlbums()
+                .catch { exception -> Timber.e(exception) }
+                .mapLatest(::filterActiveAlbums)
+                .collectLatest(::handleUserAlbums)
+        }
     }
+
+    private suspend fun filterActiveAlbums(albums: List<Album.UserAlbum>) =
+        withContext(defaultDispatcher) {
+            albums.filter { album -> album.id !in _state.value.deletedAlbumIds }
+        }
 
     private suspend fun handleUserAlbums(userAlbums: List<Album.UserAlbum>) {
         _state.update { state ->
@@ -201,6 +213,34 @@ class AlbumsViewModel @Inject constructor(
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
 
         systemUIAlbums + updatedUserUIAlbums
+    }
+
+    fun deleteAlbums(albumIds: List<AlbumId>) {
+        if (albumIds.isEmpty()) return
+
+        removeAlbumIds(albumIds)
+        updateInActiveAlbums(albumIds)
+        loadUserAlbums()
+    }
+
+    private fun removeAlbumIds(albumIds: List<AlbumId>) = viewModelScope.launch {
+        try {
+            removeAlbums(albumIds)
+        } catch (exception: Exception) {
+            Timber.e(exception)
+        }
+    }
+
+    private fun updateInActiveAlbums(albumIds: List<AlbumId>) {
+        _state.update { state ->
+            state.copy(deletedAlbumIds = state.deletedAlbumIds + albumIds)
+        }
+    }
+
+    fun updateAlbumDeletedMessage(message: String) {
+        _state.update {
+            it.copy(albumDeletedMessage = message)
+        }
     }
 
     /**

@@ -26,7 +26,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +50,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.notification.model.extensions.title
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -85,6 +89,8 @@ class AlbumDynamicContentFragment : Fragment() {
     // Action mode
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: AlbumContentActionModeCallback
+
+    private var closeScreen by mutableStateOf(false)
 
     companion object {
         @JvmStatic
@@ -189,6 +195,8 @@ class AlbumDynamicContentFragment : Fragment() {
                     ?: sourcePhotos.applySortBy(currentSort = uiState.currentSort)
             } ?: emptyList()
         }
+
+        if (closeScreen) Back()
 
         Box {
             if (photos.isNotEmpty()) {
@@ -491,8 +499,7 @@ class AlbumDynamicContentFragment : Fragment() {
                 albumsViewModel.showFilterDialog(showFilterDialog = true)
             }
             R.id.action_menu_delete -> {
-                //TODO
-                Toast.makeText(activity, "Delete is developing...", Toast.LENGTH_SHORT).show()
+                handleAlbumDeletion()
             }
             R.id.action_menu_rename -> {
                 //TODO
@@ -500,6 +507,20 @@ class AlbumDynamicContentFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun handleAlbumDeletion() {
+        val album = albumsViewModel.state.value.currentAlbum as? Album.UserAlbum
+        albumsViewModel.deleteAlbums(albumIds = listOfNotNull(album?.id))
+        albumsViewModel.updateAlbumDeletedMessage(
+            message = context?.getQuantityStringOrDefault(
+                R.plurals.photos_album_deleted_message,
+                quantity = 1,
+                album?.title,
+            ).orEmpty()
+        )
+
+        closeScreen = true
     }
 
     /**

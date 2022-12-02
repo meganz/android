@@ -346,7 +346,8 @@ class PhotosFragment : Fragment() {
             setInputValidity = albumsViewModel::setNewAlbumNameValidity,
             openPhotosSelectionActivity = this::openAlbumPhotosSelection,
             setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
-            allPhotos = timelineViewModel.state.value.photos
+            allPhotos = timelineViewModel.state.value.photos,
+            clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
@@ -662,6 +663,11 @@ class PhotosFragment : Fragment() {
 
             Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
         }
+    }
+
+    override fun onPause() {
+        albumsViewModel.updateAlbumDeletedMessage(message = "")
+        super.onPause()
     }
 
     override fun onDestroy() {
