@@ -215,6 +215,6 @@ abstract class RatingHandler(val context: Context) {
  * Listener for completing call review action
  *
  */
-interface OnCompleteListener {
+fun interface OnCompleteListener {
     fun onComplete()
 }
