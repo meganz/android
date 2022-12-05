@@ -629,4 +629,7 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
+
+    override fun isChatNotifiable(chatId: Long): Boolean =
+        megaApi.isChatNotifiable(chatId)
 }
