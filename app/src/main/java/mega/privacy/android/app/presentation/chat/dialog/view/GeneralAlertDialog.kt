@@ -9,15 +9,19 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.app.R
 import mega.privacy.android.presentation.theme.Typography
-
+import mega.privacy.android.presentation.theme.dark_grey
+import mega.privacy.android.presentation.theme.grey_alpha_060
+import mega.privacy.android.presentation.theme.grey_alpha_087
+import mega.privacy.android.presentation.theme.teal_200
+import mega.privacy.android.presentation.theme.teal_300
+import mega.privacy.android.presentation.theme.white
+import mega.privacy.android.presentation.theme.white_alpha_060
 
 /**
  * General alert dialog
@@ -54,9 +58,9 @@ fun GeneralAlertDialog(
                 {
                     Text(
                         color = if (MaterialTheme.colors.isLight)
-                            colorResource(id = R.color.teal_300)
+                            teal_300
                         else
-                            colorResource(id = R.color.teal_200),
+                            teal_200,
                         text = stringResource(id = confirmButton))
                 }
             },
@@ -65,9 +69,9 @@ fun GeneralAlertDialog(
                 {
                     Text(
                         color = if (MaterialTheme.colors.isLight)
-                            colorResource(id = R.color.teal_300)
+                            teal_300
                         else
-                            colorResource(id = R.color.teal_200),
+                            teal_200,
                         text = stringResource(id = dismissButton))
                 }
             },
@@ -80,9 +84,9 @@ fun GeneralAlertDialog(
                     textAlign = TextAlign.Center,
                     style = Typography.h6,
                     color = if (MaterialTheme.colors.isLight)
-                        colorResource(id = R.color.grey_alpha_087)
+                        grey_alpha_087
                     else
-                        colorResource(id = R.color.white),
+                        white,
                     fontWeight = FontWeight.Bold,
                     text = stringResource(id = title))
             },
@@ -95,14 +99,14 @@ fun GeneralAlertDialog(
                     text = stringResource(id = description),
                     style = Typography.subtitle1,
                     color = if (MaterialTheme.colors.isLight)
-                        colorResource(id = R.color.grey_alpha_060)
+                        grey_alpha_060
                     else
-                        colorResource(id = R.color.white_alpha_060))
+                        white_alpha_060)
             },
             backgroundColor = if (MaterialTheme.colors.isLight)
-                colorResource(id = R.color.white)
+                white
             else
-                colorResource(id = R.color.dark_grey)
+                dark_grey
         )
     }
 }
