@@ -242,9 +242,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
         val firstPlayUri = if (type == FOLDER_LINK_ADAPTER) {
             if (isMegaApiFolder(type)) {
-                mediaPlayerRepository.getLocalLinkFromMegaApiFolder(firstPlayHandle)
+                mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(firstPlayHandle)
             } else {
-                mediaPlayerRepository.getLocalLinkFromMegaApi(firstPlayHandle)
+                mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(firstPlayHandle)
             }?.let { url ->
                 Uri.parse(url)
             }
@@ -567,11 +567,18 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     if (localPath != null && isLocalFile(typedNode, localPath)) {
                         mediaItemFromFile(File(localPath), typedNode.id.id.toString())
                     } else {
-                        val url = if (isMegaApiFolder(type)) {
-                            mediaPlayerRepository.getLocalLinkFromMegaApiFolder(typedNode.id.id)
-                        } else {
-                            mediaPlayerRepository.getLocalLinkFromMegaApi(typedNode.id.id)
-                        }
+                        val url =
+                            if (type == FOLDER_LINK_ADAPTER) {
+                                if (isMegaApiFolder(type)) {
+                                    mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(
+                                        typedNode.id.id)
+                                } else {
+                                    mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(
+                                        typedNode.id.id)
+                                }
+                            } else {
+                                mediaPlayerRepository.getLocalLinkFromMegaApi(typedNode.id.id)
+                            }
                         if (url == null) {
                             null
                         } else {
