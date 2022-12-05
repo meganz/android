@@ -17,12 +17,20 @@ interface MediaPlayerRepository {
     suspend fun getTypedNodeByHandle(handle: Long): TypedNode?
 
     /**
-     * Returns a URL to a node in the local HTTP proxy server from MegaApiFolder
+     * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApiFolder
      *
      * @param nodeHandle node Handle
      * @return URL to the node in the local HTTP proxy server, otherwise NULL
      */
-    suspend fun getLocalLinkFromMegaApiFolder(nodeHandle: Long): String?
+    suspend fun getLocalLinkForFolderLinkFromMegaApiFolder(nodeHandle: Long): String?
+
+    /**
+     * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApi
+     *
+     * @param nodeHandle node Handle
+     * @return URL to the node in the local HTTP proxy server, otherwise NULL
+     */
+    suspend fun getLocalLinkForFolderLinkFromMegaApi(nodeHandle: Long): String?
 
     /**
      * Returns a URL to a node in the local HTTP proxy server from MegaApi
