@@ -829,21 +829,25 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 updateActionModeTitle();
             }
         } else {
-            Timber.d("Open chat: Position: %d, Chat ID: %d", position, chats.get(position).getChatId());
-            Intent intent = new Intent(context, ChatActivity.class);
-            intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra(CHAT_ID, adapterList.getChatAt(position).getChatId());
-            this.startActivity(intent);
-            if (context instanceof ManagerActivity) {
-                if (searchViewModel.isSearchQueryValid()) {
+            MegaChatListItem chat = adapterList.getChatAt(position);
+            if (chat != null) {
+                Timber.d("Open chat: Position: %d, Chat ID: %d", position, chat.getChatId());
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
+                intent.putExtra(CHAT_ID, chat.getChatId());
+                this.startActivity(intent);
+
+                if (context instanceof ManagerActivity && searchViewModel.isSearchQueryValid()) {
                     closeSearch();
                     ((ManagerActivity) context).closeSearchView();
-                }
-            } else if (context instanceof ArchivedChatsActivity) {
-                if (((ArchivedChatsActivity) context).querySearch != null && !((ArchivedChatsActivity) context).querySearch.isEmpty()) {
+                } else if (context instanceof ArchivedChatsActivity &&
+                        ((ArchivedChatsActivity) context).querySearch != null &&
+                        !((ArchivedChatsActivity) context).querySearch.isEmpty()) {
                     closeSearch();
                     ((ArchivedChatsActivity) context).closeSearchView();
                 }
+            } else {
+                Timber.e("Chat is null");
             }
         }
     }
