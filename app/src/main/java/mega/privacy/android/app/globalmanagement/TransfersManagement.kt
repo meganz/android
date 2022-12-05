@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -127,50 +128,59 @@ class TransfersManagement @Inject constructor(
         /**
          * Creates the initial notification when a service starts.
          *
-         * @param notificationChannelId   Identifier of the notification channel.
-         * @param notificationChannelName Name of the notification channel.
-         * @param mNotificationManager    NotificationManager to create the notification.
          * @param mBuilder                Builder to create the notification.
          * @return The initial notification created.
          */
         @JvmStatic
         fun createInitialServiceNotification(
+            mBuilder: Notification.Builder,
+        ): Notification {
+            mBuilder.apply {
+                setSmallIcon(R.drawable.ic_stat_notify)
+                setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
+                setContentTitle(getString(R.string.download_preparing_files))
+                setAutoCancel(true)
+            }
+
+            return mBuilder.build()
+        }
+
+        /**
+         * Creates the initial notification when a service starts.
+         *
+         * @param notificationChannelId   Identifier of the notification channel.
+         * @param notificationChannelName Name of the notification channel.
+         * @param mNotificationManager    NotificationManager to create the notification.
+         * @return The initial notification created.
+         */
+        @JvmStatic
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun createInitialServiceNotification(
             notificationChannelId: String?,
             notificationChannelName: String?,
             mNotificationManager: NotificationManager,
             mBuilderCompat: NotificationCompat.Builder,
-            mBuilder: Notification.Builder,
-        ): Notification =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    notificationChannelId,
-                    notificationChannelName,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ).apply {
-                    setShowBadge(true)
-                    setSound(null, null)
-                }
-
-                mNotificationManager.createNotificationChannel(channel)
-
-                mBuilderCompat.apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
-                    color = getColor(MegaApplication.getInstance(), R.color.red_600_red_300)
-                    setContentTitle(getString(R.string.download_preparing_files))
-                    setAutoCancel(true)
-                }
-
-                mBuilderCompat.build()
-            } else {
-                mBuilder.apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
-                    setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    setContentTitle(getString(R.string.download_preparing_files))
-                    setAutoCancel(true)
-                }
-
-                mBuilder.build()
+        ): Notification {
+            val channel = NotificationChannel(
+                notificationChannelId,
+                notificationChannelName,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                setShowBadge(true)
+                setSound(null, null)
             }
+
+            mNotificationManager.createNotificationChannel(channel)
+
+            mBuilderCompat.apply {
+                setSmallIcon(R.drawable.ic_stat_notify)
+                color = getColor(MegaApplication.getInstance(), R.color.red_600_red_300)
+                setContentTitle(getString(R.string.download_preparing_files))
+                setAutoCancel(true)
+            }
+
+            return mBuilderCompat.build()
+        }
     }
 
     private var networkTimer: CountDownTimer? = null
