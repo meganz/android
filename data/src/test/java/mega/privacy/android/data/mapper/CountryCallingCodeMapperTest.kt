@@ -33,4 +33,10 @@ class CountryCallingCodeMapperTest {
         val actual = toCountryCallingCodes(listMap)
         Truth.assertThat(actual).isEqualTo(listOf("$countryCode:$callingCode,"))
     }
+
+    @Test
+    fun `test that invoke with null returns empty list `() {
+        val actual = toCountryCallingCodes(null)
+        Truth.assertThat(actual).isEqualTo(emptyList<String>())
+    }
 }
