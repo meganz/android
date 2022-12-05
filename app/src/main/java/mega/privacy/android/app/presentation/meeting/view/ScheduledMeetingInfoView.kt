@@ -30,6 +30,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -112,10 +113,12 @@ fun ScheduledMeetingInfoView(
     onBackPressed: () -> Unit,
     onDismiss: () -> Unit,
     onLeaveGroupDialog: () -> Unit,
+    onSnackbarShown: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-    val snackBarHostState = remember { SnackbarHostState() }
+
+    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
@@ -189,22 +192,31 @@ fun ScheduledMeetingInfoView(
                     }
                 }
 
+                item(key = "Scheduled meeting description") {
+                    ScheduledMeetingDescriptionView(state = state)
+                }
+
                 item(key = "Leave group") {
                     LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
                 }
             }
         }
 
-        state.snackBar?.let { id ->
-            val msg = stringResource(id = id)
+        if (state.snackBar != null) {
+            val msg = stringResource(id = state.snackBar)
+
             LaunchedEffect(scaffoldState.snackbarHostState) {
-                scaffoldState.snackbarHostState.showSnackbar(message = msg,
-                    duration = SnackbarDuration.Long)
+                val s = scaffoldState.snackbarHostState.showSnackbar(message = msg,
+                    duration = SnackbarDuration.Short)
+
+                if (s == SnackbarResult.Dismissed) {
+                    onSnackbarShown()
+                }
             }
         }
     }
 
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackBarHostState)
+    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     onScrollChange(!firstItemVisible)
 }
@@ -545,17 +557,19 @@ private fun ActionButton(
         }) {
         when (action) {
             ScheduledMeetingInfoAction.ShareMeetingLink -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(modifier = Modifier.padding(start = 72.dp,
-                        end = 16.dp,
-                        top = 16.dp,
-                        bottom = 16.dp),
-                        style = MaterialTheme.typography.button,
-                        text = stringResource(id = action.title),
-                        color = MaterialTheme.colors.secondary)
-                }
+                if (state.isHost && state.isPublic && state.enabledMeetingLinkOption) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(modifier = Modifier.padding(start = 72.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 16.dp),
+                            style = MaterialTheme.typography.button,
+                            text = stringResource(id = action.title),
+                            color = MaterialTheme.colors.secondary)
+                    }
 
-                divider(withStartPadding = true)
+                    divider(withStartPadding = true)
+                }
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
                 if (state.isHost && state.isPublic) {
@@ -760,6 +774,48 @@ private fun LeaveGroupButton(
             style = MaterialTheme.typography.button,
             text = stringResource(id = R.string.meetings_scheduled_meeting_info_leave_group_label),
             color = if (MaterialTheme.colors.isLight) red_600 else red_300)
+    }
+}
+
+/**
+ * Scheduled meeting info description view
+ *
+ * @param state [ScheduledMeetingInfoState]
+ */
+@Composable
+private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
+    state.scheduledMeeting?.let { schedMeet ->
+        schedMeet.description?.let { description ->
+            divider(withStartPadding = false)
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 16.dp)) {
+                Row(modifier = Modifier
+                    .weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RectangleShape)
+                            .wrapContentSize(Alignment.Center)
+
+                    ) {
+                        Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
+                            contentDescription = "Scheduled meeting description icon",
+                            tint = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                    }
+
+                    Column(modifier = Modifier
+                        .fillMaxSize()) {
+                        Text(modifier = Modifier
+                            .padding(start = 32.dp, end = 23.dp),
+                            style = MaterialTheme.typography.subtitle1,
+                            text = description,
+                            color = if (MaterialTheme.colors.isLight) black else white)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1291,7 +1347,8 @@ fun PreviewScheduledMeetingInfoView() {
             onScrollChange = {},
             onBackPressed = {},
             onDismiss = {},
-            onLeaveGroupDialog = {}
+            onLeaveGroupDialog = {},
+            onSnackbarShown = {}
         )
     }
 }

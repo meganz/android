@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
  * @property dndSeconds                                 Do not disturb seconds.
  * @property retentionTimeSeconds                       Retention time seconds.
+ * @property meetingLink                                Meeting link.
  * @property chatTitle                                  Chat title.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
@@ -41,6 +42,7 @@ data class ScheduledMeetingInfoState(
     val inviteParticipantAction: InviteParticipantsAction? = null,
     val dndSeconds: Long? = null,
     val retentionTimeSeconds: Long? = null,
+    val meetingLink: String? = null,
     val chatTitle: String = "",
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,

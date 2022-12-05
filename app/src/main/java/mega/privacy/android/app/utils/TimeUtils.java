@@ -17,8 +17,12 @@ import androidx.appcompat.app.AlertDialog;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -177,59 +181,53 @@ public class TimeUtils implements Comparator<Calendar> {
      * @return The date formatted string.
      */
     public static String formatDate(long timestamp, int format, boolean humanized) {
+        ZonedDateTime timestampDateTime = ZonedDateTime.ofInstant(
+                Instant.ofEpochSecond(timestamp),
+                ZoneId.systemDefault()
+        );
 
-        Locale locale = Locale.getDefault();
-        DateFormat df;
-
+        DateTimeFormatter dateTimeFormatter;
         switch (format) {
             case DATE_SHORT_FORMAT:
-                df = new SimpleDateFormat("EEE d MMM", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern("EEE d MMM");
                 break;
             case DATE_SHORT_SHORT_FORMAT:
-                df = new SimpleDateFormat("d MMM", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern("d MMM");
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
-                df = new SimpleDateFormat("MMM d, yyyy", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
                 break;
             case DATE_WEEK_DAY_FORMAT:
-                df = new SimpleDateFormat("EEEE, d MMM", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, d MMM");
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
-                df = new SimpleDateFormat(getBestDateTimePattern(locale, "yyyy-MM-dd HH:mm"), locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 break;
             case DATE_LONG_FORMAT:
             default:
-                df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, locale);
+                dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG);
                 break;
         }
 
-        Calendar cal = calculateDateFromTimestamp(timestamp);
-
         if (humanized) {
-            // Check if date is today, yesterday, tomorrow or less of a week
-            Calendar calToday = Calendar.getInstance();
-            Calendar calYesterday = Calendar.getInstance();
-            calYesterday.add(Calendar.DATE, -1);
-            Calendar calTomorrow = Calendar.getInstance();
-            calTomorrow.add(Calendar.DATE, 1);
-            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+            LocalDate todayDate = LocalDate.now(ZoneId.systemDefault());
+            LocalDate timestampDate = timestampDateTime.toLocalDate();
 
-            if (tc.compare(cal, calToday) == 0) {
+            // Check if date is today, yesterday, tomorrow or less of a week
+            if (timestampDate.equals(todayDate)) {
                 return getString(R.string.label_today);
-            } else if (tc.compare(cal, calYesterday) == 0) {
+            } else if (timestampDate == todayDate.minusDays(1)) {
                 return getString(R.string.label_yesterday);
-            } else if (tc.compare(cal, calTomorrow) == 0) {
-                return getString(R.string.tomorrow_date, new SimpleDateFormat("d MMM yyyy", locale)
-                        .format(cal.getTime()));
-            } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
-                return new SimpleDateFormat("EEEE, d MMM yyyy", locale).format(cal.getTime());
+            } else if (timestampDate == todayDate.plusDays(1)) {
+                DateTimeFormatter tomorrowFormat = DateTimeFormatter.ofPattern("d MMM yyyy");
+                return getString(R.string.tomorrow_date, tomorrowFormat.format(timestampDateTime));
+            } else if (timestampDate.isBefore(todayDate.plusWeeks(1))) {
+                DateTimeFormatter futureFormat = DateTimeFormatter.ofPattern("EEEE, d MMM yyyy");
+                return futureFormat.format(timestampDateTime);
             }
         }
 
-        TimeZone tz = cal.getTimeZone();
-        df.setTimeZone(tz);
-        Date date = cal.getTime();
-        return df.format(date);
+        return dateTimeFormatter.format(timestampDateTime);
     }
 
     public static boolean isTodayOrYesterday(long timestamp) {

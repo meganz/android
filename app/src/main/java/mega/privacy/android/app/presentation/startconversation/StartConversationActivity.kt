@@ -123,7 +123,8 @@ class StartConversationActivity : ComponentActivity() {
     private fun onNewGroup() {
         resultLauncher.launch(Intent(this, AddContactActivity::class.java)
             .putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-            .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true))
+            .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
+            .putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true))
     }
 
     private fun onNewMeeting() {

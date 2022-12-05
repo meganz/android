@@ -75,7 +75,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        viewModel.refreshAccountInfo()
+        viewModel.refreshPricing()
         setupView()
         setupObservers()
         initPayments()

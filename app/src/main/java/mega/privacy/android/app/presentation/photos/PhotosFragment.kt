@@ -53,6 +53,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
@@ -345,7 +346,8 @@ class PhotosFragment : Fragment() {
             setInputValidity = albumsViewModel::setNewAlbumNameValidity,
             openPhotosSelectionActivity = this::openAlbumPhotosSelection,
             setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
-            allPhotos = timelineViewModel.state.value.photos
+            allPhotos = timelineViewModel.state.value.photos,
+            clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
@@ -609,7 +611,7 @@ class PhotosFragment : Fragment() {
     fun loadPhotos() {}
 
     fun openAlbum(album: UIAlbum) {
-        albumsViewModel.setCurrentAlbum(album.id)
+        resetAlbumContentState(album)
         activity?.lifecycleScope?.launch {
             val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
             if (dynamicAlbumEnabled) {
@@ -619,6 +621,12 @@ class PhotosFragment : Fragment() {
                 managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }
         }
+    }
+
+    private fun resetAlbumContentState(album: UIAlbum) {
+        albumsViewModel.setCurrentAlbum(album.id)
+        albumsViewModel.setCurrentSort(Sort.DEFAULT)
+        albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
     }
 
     private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
@@ -655,6 +663,11 @@ class PhotosFragment : Fragment() {
 
             Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
         }
+    }
+
+    override fun onPause() {
+        albumsViewModel.updateAlbumDeletedMessage(message = "")
+        super.onPause()
     }
 
     override fun onDestroy() {

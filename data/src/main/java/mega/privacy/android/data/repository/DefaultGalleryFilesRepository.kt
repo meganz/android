@@ -106,6 +106,8 @@ internal class DefaultGalleryFilesRepository @Inject constructor(
                 DATA
             )
 
+            val retriever = MediaMetadataRetriever()
+
             context.contentResolver.query(
                 queryUri,
                 projection,
@@ -122,37 +124,48 @@ internal class DefaultGalleryFilesRepository @Inject constructor(
                     val id = cursor.getLong(idColumn)
                     val date = cursor.getString(dateColumn)
                     val title = cursor.getString(titleColumn)
-
                     val contentUri = ContentUris.withAppendedId(
                         queryUri,
                         id
                     )
-
                     val path = cursor.getString(dataColumn)
-                    val retriever = MediaMetadataRetriever()
-                    retriever.setDataSource(context, contentUri)
-                    val duration =
-                        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    val durationText = getGalleryVideoDuration(duration?.toLongOrNull() ?: 0)
-                    val file = FileGalleryItem(
-                        id = id,
-                        isImage = false,
-                        isTakePicture = false,
-                        title = title,
-                        fileUri = contentUri.toString(),
-                        dateAdded = date.toLong(),
-                        duration = durationText,
-                        isSelected = false,
-                        filePath = path
-                    )
 
-                    trySend(file)
+                    try {
+                        retriever.setDataSource(context, contentUri)
+                        val duration =
+                            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+
+                        var durationText = ""
+                        if (duration != null) {
+                            durationText = getGalleryVideoDuration(duration.toLong())
+                        } else {
+                            Timber.w("No duration found")
+                        }
+
+                        val file = FileGalleryItem(
+                            id = id,
+                            isImage = false,
+                            isTakePicture = false,
+                            title = title,
+                            fileUri = contentUri.toString(),
+                            dateAdded = date.toLong(),
+                            duration = durationText,
+                            isSelected = false,
+                            filePath = path
+                        )
+
+                        trySend(file)
+
+                    } catch (ex: Exception) {
+                        Timber.e(ex)
+                    }
                 }
             } ?: kotlin.run {
                 Timber.e("Cursor is null")
             }
-
-            awaitClose {}
+            awaitClose {
+                retriever.release()
+            }
         }
 
     /**

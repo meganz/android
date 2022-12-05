@@ -993,8 +993,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (isBusinessAccount()) {
                         supportInvalidateOptionsMenu();
                     }
-                } else if (actionType == UPDATE_PAYMENT_METHODS) {
-                    Timber.d("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
         }

@@ -1,0 +1,72 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/manage_meeting_link_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout
+        android:id="@+id/manage_meeting_link_title_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/manage_meeting_link_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="@string/scheduled_meetings_share_meeting_link_panel_title"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/manage_meeting_link_title_layout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/send_manage_meeting_link_option"
+                style="@style/BottomSheetOption"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:text="@string/context_send_file_to_chat"
+                app:drawableStartCompat="@drawable/ic_send_to_contact"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/copy_manage_meeting_link_option"
+                style="@style/BottomSheetOption"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:text="@string/context_copy"
+                app:drawableStartCompat="@drawable/ic_copy_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/send_manage_meeting_link_option" />
+
+            <TextView
+                android:id="@+id/share_manage_meeting_link_option"
+                style="@style/BottomSheetOption"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:text="@string/general_share"
+                app:drawableStartCompat="@drawable/ic_social_share_white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/copy_manage_meeting_link_option" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

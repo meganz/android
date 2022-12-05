@@ -86,17 +86,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
-    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val actionType = intent?.getIntExtra(BroadcastConstants.ACTION_TYPE,
-                BroadcastConstants.INVALID_ACTION)
-
-            if (actionType == Constants.UPDATE_PAYMENT_METHODS) {
-                Timber.d("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS")
-            }
-        }
-    }
-
     private val onAccountUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE && waitingForConfirmAccount) {
@@ -124,7 +113,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     override fun onDestroy() {
         Timber.d("onDestroy")
         chatRequestHandler.setIsLoggingRunning(false)
-        unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(onAccountUpdateReceiver)
         super.onDestroy()
     }
@@ -166,9 +154,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     }
 
     private fun setupObservers() {
-        registerReceiver(updateMyAccountReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS))
-
         registerReceiver(onAccountUpdateReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE).apply {
                 addAction(BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE)

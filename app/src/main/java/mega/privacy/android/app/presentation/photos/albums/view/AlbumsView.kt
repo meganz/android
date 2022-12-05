@@ -6,25 +6,33 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -32,11 +40,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
@@ -47,9 +59,12 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.caption
 import mega.privacy.android.presentation.theme.grey_alpha_054
+import mega.privacy.android.presentation.theme.grey_alpha_087
 import mega.privacy.android.presentation.theme.subtitle2
+import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
+import mega.privacy.android.presentation.theme.white_alpha_087
 
 @Composable
 fun AlbumsView(
@@ -62,8 +77,10 @@ fun AlbumsView(
     openPhotosSelectionActivity: (AlbumId) -> Unit = {},
     setIsAlbumCreatedSuccessfully: (Boolean) -> Unit = {},
     allPhotos: List<Photo> = emptyList(),
+    clearAlbumDeletedMessage: () -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
+    val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
     val openDialog = rememberSaveable { mutableStateOf(false) }
@@ -149,6 +166,22 @@ fun AlbumsView(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
         ) {
+            if (albumsViewState.albumDeletedMessage.isNotEmpty()) {
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(8.dp, 80.dp),
+                    backgroundColor = black.takeIf { isLight } ?: white,
+                ) {
+                    Text(text = albumsViewState.albumDeletedMessage)
+                }
+
+                LaunchedEffect(Unit) {
+                    delay(3000L)
+                    clearAlbumDeletedMessage()
+                }
+            }
+
             val placeholderText =
                 stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
             FloatingActionButton(
@@ -190,6 +223,77 @@ fun AlbumsView(
             openDialog.value = false
             if (allPhotos.isNotEmpty()) {
                 openPhotosSelectionActivity((albumsViewState.currentAlbum as Album.UserAlbum).id)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun DeleteAlbumsConfirmationDialog(
+    selectedAlbumIds: Set<AlbumId>,
+    onCancelClicked: () -> Unit,
+    onDeleteClicked: (albumIds: List<AlbumId>) -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    Dialog(
+        onDismissRequest = onCancelClicked,
+        properties = DialogProperties(dismissOnClickOutside = false),
+    ) {
+        Card(shape = RoundedCornerShape(4.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 20.dp),
+            ) {
+                Text(
+                    text = pluralStringResource(
+                        id = R.plurals.photos_album_delete_confirmation_title,
+                        count = selectedAlbumIds.size,
+                    ),
+                    color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.h6,
+                )
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                Text(
+                    text = pluralStringResource(
+                        id = R.plurals.photos_album_delete_confirmation_description,
+                        count = selectedAlbumIds.size,
+                    ),
+                    color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                    style = MaterialTheme.typography.subtitle1,
+                )
+
+                Spacer(modifier = Modifier.size(42.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.button_cancel),
+                        modifier = Modifier.clickable { onCancelClicked() },
+                        color = teal_300,
+                        style = MaterialTheme.typography.button,
+                    )
+
+                    Spacer(modifier = Modifier.size(24.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.delete_button),
+                        modifier = Modifier.clickable {
+                            onCancelClicked()
+                            onDeleteClicked(selectedAlbumIds.toList())
+                        },
+                        color = teal_300,
+                        style = MaterialTheme.typography.button,
+                    )
+                }
             }
         }
     }

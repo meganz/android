@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.SharedUseCaseModule
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import org.mockito.kotlin.mock
@@ -30,4 +31,7 @@ object TestSharedUseCases {
 
     @Provides
     fun provideGetSpecificAccountDetail() = mock<GetSpecificAccountDetail>()
+
+    @Provides
+    fun provideGetPaymentMethod() = mock<GetPaymentMethod>()
 }
