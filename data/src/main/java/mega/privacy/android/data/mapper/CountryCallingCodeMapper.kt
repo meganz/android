@@ -1,7 +1,5 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.domain.entity.contacts.ContactRequest
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaStringListMap
 
 
@@ -11,7 +9,7 @@ import nz.mega.sdk.MegaStringListMap
 typealias CountryCallingCodeMapper = (@JvmSuppressWildcards MegaStringListMap) -> List<String>
 
 /**
- * Map [MegaContactRequest] to [ContactRequest]
+ * Map [MegaStringListMap] to [List]
  */
 internal fun toCountryCallingCodes(callingCodes: MegaStringListMap?): List<String> {
     return callingCodes?.let {
