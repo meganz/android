@@ -16,12 +16,22 @@ import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
+import javax.inject.Inject
 
 /**
  * The Fragment is used for displaying the finished items of transfer.
  */
 @AndroidEntryPoint
 class CompletedTransfersFragment : TransfersBaseFragment() {
+    /**
+     * MegaApiAndroid injection
+     */
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
+
     private lateinit var adapter: MegaCompletedTransfersAdapter
 
     override fun onCreateView(
@@ -43,8 +53,9 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
             getString(R.string.completed_transfers_empty_new))
 
-        adapter =
-            MegaCompletedTransfersAdapter(requireActivity(), viewModel.getCompletedTransfers())
+        adapter = MegaCompletedTransfersAdapter(context = requireActivity(),
+            transfers = viewModel.getCompletedTransfers(),
+            megaApi = megaApi)
         setupFlow()
         setCompletedTransfers()
         binding.transfersListView.adapter = adapter
@@ -63,14 +74,14 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
                 }
                 is CompletedTransfersState.TransferFinishUpdated -> {
                     setEmptyView(transfersState.newTransfers.size)
-                    adapter.setTransfers(transfersState.newTransfers)
+                    adapter.setCompletedTransfers(transfersState.newTransfers)
                     requireActivity().invalidateOptionsMenu()
                 }
                 is CompletedTransfersState.TransferRemovedUpdated -> {
                     adapter.removeItemData(transfersState.index, transfersState.newTransfers)
                 }
                 is CompletedTransfersState.ClearTransfersUpdated -> {
-                    adapter.setTransfers(emptyList())
+                    adapter.setCompletedTransfers(emptyList())
                     setEmptyView(0)
                 }
                 else -> {}
