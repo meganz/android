@@ -6,10 +6,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.domain.repository.VerificationRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringListMap
 import org.junit.Before
 import org.junit.Test
@@ -23,6 +23,7 @@ class DefaultVerificationRepositoryTest {
     private lateinit var underTest: VerificationRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val countryCallingCodeMapper = mock<CountryCallingCodeMapper>()
 
     @Before
     fun setUp() {
@@ -30,6 +31,7 @@ class DefaultVerificationRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             mock(),
+            countryCallingCodeMapper = countryCallingCodeMapper,
         )
     }
 
@@ -37,22 +39,10 @@ class DefaultVerificationRepositoryTest {
     fun `test that get Country calling returns a successful result`() = runTest {
         val countryCode = "AD"
         val callingCode = "376"
-        val keyList = mock<MegaStringList> {
-            on { size() }.thenReturn(1)
-        }
-        whenever(keyList[0]).thenReturn(countryCode)
+        val expected = listOf("$countryCode:$callingCode,")
 
-        val listMap = mock<MegaStringListMap>() {
-            on { size() }.thenReturn(1)
-            on { keys }.thenReturn(keyList)
-        }
-
-        val mockDialCodes = mock<MegaStringList> {
-            on { size() }.thenReturn(1)
-        }
-        whenever(mockDialCodes[0]).thenReturn(callingCode)
-
-        whenever(listMap[countryCode]).thenReturn(mockDialCodes)
+        val listMap = mock<MegaStringListMap>()
+        whenever(countryCallingCodeMapper.invoke(listMap)).thenReturn(expected)
 
         val megaError = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)
@@ -71,6 +61,6 @@ class DefaultVerificationRepositoryTest {
             )
         }
         val actual = underTest.getCountryCallingCodes()
-        Truth.assertThat(actual).isEqualTo(listOf("$countryCode:$callingCode,"))
+        Truth.assertThat(actual).isEqualTo(expected)
     }
 }
