@@ -29,6 +29,9 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
@@ -76,6 +79,9 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
+import mega.privacy.android.domain.usecase.RootNodeExists
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -122,6 +128,16 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
 
+    @IoDispatcher
+    @Inject
+    lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    lateinit var getDownloadCount: GetNumPendingDownloadsNonBackground
+
+    @Inject
+    lateinit var rootNodeExists: RootNodeExists
+
     private var errorCount = 0
     private var alreadyDownloaded = 0
     private var isForeground = false
@@ -129,13 +145,11 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     private var openFile = true
     private var downloadByTap = false
     private var type: String? = ""
-    private var isOverquota = false
-    private var downloadedBytesToOverquota: Long = 0
-    private var rootNode: MegaNode? = null
-    private var app: MegaApplication? = null
-    var pendingIntents = ArrayList<Intent>()
-    lateinit var lock: WifiManager.WifiLock
-    lateinit var wl: PowerManager.WakeLock
+    private var isOverQuota = false
+    private var downloadedBytesToOverQuota: Long = 0
+    private var pendingIntents = ArrayList<Intent>()
+    lateinit var wifiLock: WifiManager.WifiLock
+    lateinit var wakeLock: PowerManager.WakeLock
     private var currentFile: File? = null
     private var currentDir: File? = null
     private var currentDocument: MegaNode? = null
@@ -143,7 +157,6 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     private var backgroundTransfers: MutableSet<Int> = HashSet()
     private val storeToAdvancedDevices: MutableMap<Long, Uri> = mutableMapOf()
     private val fromMediaViewers: MutableMap<Long, Boolean> = mutableMapOf()
-    private lateinit var mBuilderCompat: NotificationCompat.Builder
     private lateinit var mNotificationManager: NotificationManager
     private var offlineNode: MegaNode? = null
     private var isLoggingIn = false
@@ -175,21 +188,38 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
-        app = getInstance()
-        megaApi.addRequestListener(this)
+        initialiseService()
+
+    }
+
+    private fun initialiseService() {
         isForeground = false
         canceled = false
+        CoroutineScope(ioDispatcher).launch {
+            megaApi.addRequestListener(this@DownloadService)
+            initialiseWifiLock()
+            initialiseWakeLock()
+            mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            setReceivers()
+            setRxSubscription()
+        }
+        startForeground()
+    }
+
+    private fun initialiseWifiLock() {
         val wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF
         val wifiManager =
             applicationContext.applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
-        lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock")
-        val pm = getSystemService(POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega:DownloadServicePowerLock")
-        mBuilderCompat = NotificationCompat.Builder(applicationContext)
-        mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        startForeground()
-        rootNode = megaApi.rootNode
+        wifiLock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock")
+    }
 
+    private fun initialiseWakeLock() {
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock =
+            pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega:DownloadServicePowerLock")
+    }
+
+    private fun setReceivers() {
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -201,6 +231,9 @@ class DownloadService : Service(), MegaRequestListenerInterface {
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION))
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .observeForever(stopServiceObserver)
+    }
+
+    private fun setRxSubscription() {
         val subscription = getGlobalTransferUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -244,16 +277,20 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     }
 
     private fun startForeground() {
-        if (megaApi.getNumPendingDownloadsNonBackground() <= 0) {
-            return
-        }
-        isForeground = try {
-            startForeground(Constants.NOTIFICATION_DOWNLOAD,
-                createInitialNotification())
-            true
-        } catch (e: Exception) {
-            Timber.w(e)
-            false
+        CoroutineScope(ioDispatcher).launch {
+            if (getDownloadCount() > 0) {
+                isForeground = kotlin.runCatching {
+                    val notification = createInitialNotification()
+                    startForeground(Constants.NOTIFICATION_DOWNLOAD,
+                        notification)
+                }.fold(
+                    onSuccess = { true },
+                    onFailure = {
+                        Timber.w(it)
+                        false
+                    }
+                )
+            }
         }
     }
 
@@ -284,21 +321,9 @@ class DownloadService : Service(), MegaRequestListenerInterface {
 
     override fun onDestroy() {
         Timber.d("onDestroy")
-        if (lock != null && lock.isHeld) try {
-            lock.release()
-        } catch (ex: Exception) {
-        }
-        if (wl != null && wl.isHeld) try {
-            wl.release()
-        } catch (ex: Exception) {
-        }
-        if (megaApi != null) {
-            megaApi.removeRequestListener(this)
-        }
-        if (megaChatApi != null) {
-            megaChatApi.saveCurrentState()
-        }
-        rootNode = null
+        releaseLocks()
+        megaApi.removeRequestListener(this)
+        megaChatApi.saveCurrentState()
         // remove all the generated folders in cache folder on SD card.
         val fs = externalCacheDirs
         if (fs.size > 1 && fs[1] != null) {
@@ -315,11 +340,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Timber.d("onStartCommand")
         canceled = false
-        if (intent == null) {
-            Timber.w("intent==null")
-            return START_NOT_STICKY
-        }
-        if (intent.action != null && intent.action == ACTION_CANCEL) {
+        if (intent.action == ACTION_CANCEL) {
             Timber.d("Cancel intent")
             canceled = true
             megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
@@ -358,54 +379,31 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                 .post(MegaTransfer.TYPE_DOWNLOAD)
             return
         }
-        var hash = intent.getLongExtra(EXTRA_HASH, -1)
-        val url = intent.getStringExtra(EXTRA_URL)
+
         isDownloadForOffline = intent.getBooleanExtra(EXTRA_DOWNLOAD_FOR_OFFLINE, false)
-        val isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false)
+
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true)
         downloadByTap = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_TAP, false)
         type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE)
-        var contentUri: Uri? = null
-        if (intent.getStringExtra(EXTRA_CONTENT_URI) != null) {
-            contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI))
+
+        CoroutineScope(ioDispatcher).launch {
+            processIntent(intent)
         }
-        val highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false)
+    }
+
+    private suspend fun processIntent(
+        intent: Intent,
+    ) {
+
+        if (addPendingIntentIfNotLoggedIn(intent)) return
+        if (handlePublicNode(intent)) return
+
+        val isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false)
         val fromMV = intent.getBooleanExtra(EXTRA_FROM_MV, false)
         Timber.d("fromMV: %s", fromMV)
-        val credentials = dbH.credentials
-        if (credentials != null) {
-            val gSession = credentials.session
-            if (rootNode == null) {
-                rootNode = megaApi.rootNode
-                isLoggingIn = MegaApplication.isLoggingIn
-                if (!isLoggingIn) {
-                    isLoggingIn = true
-                    MegaApplication.isLoggingIn = isLoggingIn
-                    ChatUtil.initMegaChatApi(gSession)
-                    pendingIntents.add(intent)
-                    if (type?.contains(Constants.APP_DATA_VOICE_CLIP) == true && type?.contains(
-                            Constants.APP_DATA_BACKGROUND_TRANSFER) == true
-                    ) {
-                        updateProgressNotification()
-                    }
-                    megaApi.fastLogin(gSession)
-                    return
-                } else {
-                    Timber.w("Another login is processing")
-                }
-                pendingIntents.add(intent)
-                return
-            }
-        }
-        if (url != null) {
-            Timber.d("Public node")
-            currentDir = File(intent.getStringExtra(EXTRA_PATH))
-            currentDir?.mkdirs()
-            megaApi.getPublicNode(url)
-            return
-        }
-        val serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING)
-        val node: MegaNode = getNodeForIntent(serialize, hash, isFolderLink) ?: return
+        val contentUri = intent.getStringExtra(EXTRA_CONTENT_URI)?.let { Uri.parse(it) }
+        val highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false)
+        val node: MegaNode = getNodeForIntent(intent, isFolderLink) ?: return
 
         fromMediaViewers[node.handle] = fromMV
         currentDir = getDir(intent)
@@ -426,12 +424,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
             }
             return
         }
-        if (!wl.isHeld) {
-            wl.acquire()
-        }
-        if (!lock.isHeld) {
-            lock.acquire()
-        }
+        acquireLocks()
         if (contentUri != null || currentDir?.isDirectory == true) {
             if (contentUri != null) {
                 //To download to Advanced Devices
@@ -454,7 +447,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                 }
             }
             if (currentDir?.absolutePath?.contains(OfflineUtils.OFFLINE_DIR) == true) {
-//			Save for offline: do not open when finishes
+                //			Save for offline: do not open when finishes
                 openFile = false
             }
             if (isFolderLink) {
@@ -482,32 +475,79 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
+    private fun handlePublicNode(intent: Intent): Boolean {
+        val url = intent.getStringExtra(EXTRA_URL) ?: return false
+        Timber.d("Public node")
+        val path = intent.getStringExtra(EXTRA_PATH) ?: return false
+        currentDir = File(path)
+        currentDir?.mkdirs()
+        megaApi.getPublicNode(url)
+        return true
+    }
+
+    private suspend fun addPendingIntentIfNotLoggedIn(intent: Intent): Boolean {
+        val credentials = dbH.credentials
+        if (credentials != null) {
+            val gSession = credentials.session
+            if (!rootNodeExists()) {
+                isLoggingIn = MegaApplication.isLoggingIn
+                if (!isLoggingIn) {
+                    isLoggingIn = true
+                    MegaApplication.isLoggingIn = isLoggingIn
+                    ChatUtil.initMegaChatApi(gSession)
+                    pendingIntents.add(intent)
+                    if (type?.contains(Constants.APP_DATA_VOICE_CLIP) == true && type?.contains(
+                            Constants.APP_DATA_BACKGROUND_TRANSFER) == true
+                    ) {
+                        updateProgressNotification()
+                    }
+                    megaApi.fastLogin(gSession)
+                    return true
+                } else {
+                    Timber.w("Another login is processing")
+                }
+                pendingIntents.add(intent)
+                return true
+            }
+        }
+        return false
+    }
+
     private fun getNodeForIntent(
-        serialize: String?,
-        hash: Long,
+        intent: Intent,
         isFolderLink: Boolean,
     ): MegaNode? {
-        var hash1 = hash
-        val node: MegaNode?
-        if (serialize != null) {
-            Timber.d("serializeString: %s", serialize)
-            node = MegaNode.unserialize(serialize)
-            if (node != null) {
-                hash1 = node.handle
-                Timber.d("hash after unserialize: %s", hash1)
-            } else {
-                Timber.w("Node is NULL after unserialize")
+        val serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING)
+        val hash = intent.getLongExtra(EXTRA_HASH, -1)
+        val node = when {
+            serialize != null -> {
+                deserialiseNode(serialize)
             }
-        } else if (isFolderLink) {
-            node = megaApiFolder.getNodeByHandle(hash1)
-        } else {
-            node = megaApi.getNodeByHandle(hash1)
+            isFolderLink -> {
+                megaApiFolder.getNodeByHandle(hash)
+            }
+            else -> {
+                megaApi.getNodeByHandle(hash)
+            }
         }
         if (node == null) {
             Timber.w("Node not found")
         }
         currentDocument = node
         return node
+    }
+
+    private fun deserialiseNode(
+        serialize: String?,
+    ): MegaNode? {
+        Timber.d("serializeString: %s", serialize)
+        val result = MegaNode.unserialize(serialize)
+        if (result != null) {
+            Timber.d("hash after unserialize: %s", result.handle)
+        } else {
+            Timber.w("Node is NULL after unserialize")
+        }
+        return result
     }
 
     /**
@@ -538,17 +578,9 @@ class DownloadService : Service(), MegaRequestListenerInterface {
 
     private fun onQueueComplete(handle: Long) {
         Timber.d("onQueueComplete")
-        if (lock != null && lock.isHeld) try {
-            lock.release()
-        } catch (ex: Exception) {
-        }
-        if (wl != null && wl.isHeld) try {
-            wl.release()
-        } catch (ex: Exception) {
-        }
+        releaseLocks()
         showCompleteNotification(handle)
         stopForeground()
-        rootNode = null
         val pendingDownloads = megaApi.getNumPendingDownloadsNonBackground()
         Timber.d("onQueueComplete: total of files before reset %s", pendingDownloads)
         if (pendingDownloads <= 0) {
@@ -585,6 +617,19 @@ class DownloadService : Service(), MegaRequestListenerInterface {
             errorEBlocked = 0
             errorCount = 0
             alreadyDownloaded = 0
+        }
+    }
+
+    private fun releaseLocks() {
+        if (wifiLock.isHeld) try {
+            wifiLock.release()
+        } catch (ex: Exception) {
+            Timber.e(ex)
+        }
+        if (wakeLock.isHeld) try {
+            wakeLock.release()
+        } catch (ex: Exception) {
+            Timber.e(ex)
         }
     }
 
@@ -738,7 +783,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                     mBuilderCompatO.build())
             } else {
-                mBuilderCompat
+                val builder = NotificationCompat.Builder(this)
+                builder
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setContentIntent(pendingIntent)
@@ -746,7 +792,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false)
                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                    mBuilderCompat.build())
+                    builder.build())
             }
         } else {
             try {
@@ -795,14 +841,15 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                                     mBuilderCompatO.build())
                             } else {
-                                mBuilderCompat
+                                val builder = NotificationCompat.Builder(this)
+                                builder
                                     .setSmallIcon(R.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
                                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompat.build())
+                                    builder.build())
                             }
                         }
                     } else if (MimeTypeList.typeForName(currentFile?.name).isVideoReproducible || MimeTypeList.typeForName(
@@ -830,14 +877,15 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                                     mBuilderCompatO.build())
                             } else {
-                                mBuilderCompat
+                                val builder = NotificationCompat.Builder(this)
+                                builder
                                     .setSmallIcon(R.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
                                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompat.build())
+                                    builder.build())
                             }
                         }
                     } else if (MimeTypeList.typeForName(currentFile?.name).isImage) {
@@ -864,7 +912,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                                     mBuilderCompatO.build())
                             } else {
-                                mBuilderCompat
+                                val builder = NotificationCompat.Builder(this)
+                                builder
                                     .setSmallIcon(R.drawable.ic_stat_notify)
                                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                                     .setContentIntent(pendingIntent)
@@ -872,7 +921,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
                                 mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompat.build())
+                                    builder.build())
                             }
                         }
                     } else {
@@ -897,7 +946,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                             mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                                 mBuilderCompatO.build())
                         } else {
-                            mBuilderCompat
+                            val builder = NotificationCompat.Builder(this)
+                            builder
                                 .setSmallIcon(R.drawable.ic_stat_notify)
                                 .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                                 .setContentIntent(pendingIntent)
@@ -905,7 +955,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                                 .setContentTitle(notificationTitle).setContentText(size)
                                 .setOngoing(false)
                             mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                mBuilderCompat.build())
+                                builder.build())
                         }
                     }
                 } else {
@@ -931,7 +981,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                         mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                             mBuilderCompatO.build())
                     } else {
-                        mBuilderCompat
+                        val builder = NotificationCompat.Builder(this)
+                        builder
                             .setSmallIcon(R.drawable.ic_stat_notify)
                             .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                             .setContentIntent(pendingIntent)
@@ -939,7 +990,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                             .setContentTitle(notificationTitle).setContentText(size)
                             .setOngoing(false)
                         mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                            mBuilderCompat.build())
+                            builder.build())
                     }
                 }
             } catch (e: Exception) {
@@ -965,7 +1016,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                     mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
                         mBuilderCompatO.build())
                 } else {
-                    mBuilderCompat
+                    val builder = NotificationCompat.Builder(this)
+                    builder
                         .setSmallIcon(R.drawable.ic_stat_notify)
                         .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                         .setContentIntent(pendingIntent)
@@ -973,7 +1025,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                         .setContentTitle(notificationTitle).setContentText(size)
                         .setOngoing(false)
                     mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                        mBuilderCompat.build())
+                        builder.build())
                 }
             }
         }
@@ -989,14 +1041,14 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         val totalSizePendingTransfer = megaApi.totalDownloadBytes
         val totalSizeTransferred = megaApi.totalDownloadedBytes
         val update: Boolean
-        if (isOverquota) {
+        if (isOverQuota) {
             Timber.d("Overquota flag! is TRUE")
-            if (downloadedBytesToOverquota <= totalSizeTransferred) {
+            if (downloadedBytesToOverQuota <= totalSizeTransferred) {
                 update = false
             } else {
                 update = true
                 Timber.d("Change overquota flag")
-                isOverquota = false
+                isOverQuota = false
             }
         } else {
             Timber.d("NOT overquota flag")
@@ -1005,7 +1057,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         if (update) {
             /* refresh UI every 1 seconds to avoid too much workload on main thread
              * while in paused status, the update should not be avoided*/
-            if (!isOverquota) {
+            if (!isOverQuota) {
                 val now = System.currentTimeMillis()
                 lastUpdated =
                     if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(
@@ -1128,7 +1180,6 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         Timber.d("cancel")
         canceled = true
         stopForeground()
-        rootNode = null
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -1200,14 +1251,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                     }
                 }
                 if (canceled) {
-                    if (lock != null && lock.isHeld) try {
-                        lock.release()
-                    } catch (ex: Exception) {
-                    }
-                    if (wl != null && wl.isHeld) try {
-                        wl.release()
-                    } catch (ex: Exception) {
-                    }
+                    releaseLocks()
                     Timber.d("Download canceled: %s", transfer.nodeHandle)
                     if (isVoiceClip) {
                         resultTransfersVoiceClip(transfer.nodeHandle,
@@ -1363,14 +1407,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
             if (transfer?.type == MegaTransfer.TYPE_DOWNLOAD) {
                 if (canceled) {
                     Timber.d("Transfer cancel: %s", transfer.nodeHandle)
-                    if (lock != null && lock.isHeld) try {
-                        lock.release()
-                    } catch (ex: Exception) {
-                    }
-                    if (wl != null && wl.isHeld) try {
-                        wl.release()
-                    } catch (ex: Exception) {
-                    }
+                    releaseLocks()
                     megaApi.cancelTransfer(transfer)
                     cancel()
                     return@fromCallable null
@@ -1406,8 +1443,8 @@ Error: ${e.errorCode} ${e.errorString}""")
                     if (e.value != 0L) {
                         Timber.w("TRANSFER OVERQUOTA ERROR: %s", e.errorCode)
                         checkTransferOverQuota(true)
-                        downloadedBytesToOverquota = megaApi.totalDownloadedBytes
-                        isOverquota = true
+                        downloadedBytesToOverQuota = megaApi.totalDownloadedBytes
+                        isOverQuota = true
                     }
                 }
             }
@@ -1499,8 +1536,7 @@ Error: ${e.errorCode} ${e.errorString}""")
             }
             val appData = getSDCardAppData(intent)
             Timber.d("Public node download launched")
-            if (!wl.isHeld) wl.acquire()
-            if (!lock.isHeld) lock.acquire()
+            acquireLocks()
             if (currentDir?.isDirectory == true) {
                 Timber.d("To downloadPublic(dir)")
                 val localPath = currentDir?.absolutePath + "/"
@@ -1516,6 +1552,11 @@ Error: ${e.errorCode} ${e.errorString}""")
                 }
             }
         }
+    }
+
+    private fun acquireLocks() {
+        if (!wakeLock.isHeld) wakeLock.acquire()
+        if (!wifiLock.isHeld) wifiLock.acquire()
     }
 
     override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
