@@ -49,10 +49,21 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getLocalLinkFromMegaApiFolder(nodeHandle: Long): String? =
+    override suspend fun getLocalLinkForFolderLinkFromMegaApi(nodeHandle: Long): String? =
         withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
-                megaApiFolder.httpServerGetLocalLink(megaNode)
+            megaApiFolder.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
+                megaApiFolder.authorizeNode(megaNode)
+            }?.let {
+                megaApi.httpServerGetLocalLink(it)
+            }
+        }
+
+    override suspend fun getLocalLinkForFolderLinkFromMegaApiFolder(nodeHandle: Long): String? =
+        withContext(ioDispatcher) {
+            megaApiFolder.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
+                megaApiFolder.authorizeNode(megaNode)
+            }?.let {
+                megaApiFolder.httpServerGetLocalLink(it)
             }
         }
 
