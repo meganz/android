@@ -4097,11 +4097,11 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Meeting link copied to the clipboard</string>
+    <string name="scheduled_meetings_meeting_link_copied">Copied link to clipboard</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">“%s” album deleted</item>
-        <item quantity="other">%d albums deleted</item>
+        <item quantity="other">Deleted %d albums</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">

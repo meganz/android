@@ -357,7 +357,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">正在建立資料夾</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">空的垃圾筒</string>
+    <string name="context_clear_rubbish">清空垃圾筒</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">您將會永久清除垃圾筒中所有的檔案。</string>
     <!-- send cancel subscriptions dialog -->
@@ -3990,14 +3990,14 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">知道此連結的任何人都可以加入會議並查看會議對話。</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">連結已複製到剪貼簿</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="other"></item>
+        <item quantity="other">已刪除%d個相簿</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="other"></item>
+        <item quantity="other">是否刪除相簿？</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">

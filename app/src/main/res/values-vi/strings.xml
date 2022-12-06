@@ -1872,13 +1872,13 @@
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Viết tin nhắn cho %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Xác thực 2-bước</string>
+    <string name="settings_2fa">Xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Chức năng Xác Thực 2-Bước sẽ thêm một lớp bảo mật thứ nhì cho tài khoản.</string>
+    <string name="setting_subtitle_2fa">Xác&#160;thực 2&#160;yếu&#160;tố sẽ thêm một lớp bảo&#160;mật thứ&#160;hai cho tài&#160;khoản của bạn.</string>
     <!-- Title of the screen Two-Factor Authentication -->
-    <string name="title_2fa">Tại sao cần sử dụng xác thực 2-bước?</string>
+    <string name="title_2fa">Tại sao cần sử dụng xác&#160;thực 2&#160;yếu&#160;tố?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">Chức năng xác thực 2-bước là một lớp bảo mật thứ nhì cho tài khoản. Nghĩa là trong trường hợp có người biết mật khẩu để lén vào tài khoản sẽ không thể vào được, và buộc phải nhập thêm đoạn mã 6 chữ số mà chỉ chủ sở hữu tài khoản mới có.</string>
+    <string name="two_factor_authentication_explain">Xác&#160;thực 2&#160;yếu&#160;tố là một lớp bảo&#160;mật thứ&#160;hai cho tài&#160;khoản của bạn. Nghĩa là trong trường&#160;hợp có người biết mật&#160;khẩu muốn lén vào tài&#160;khoản sẽ không&#160;thể vào được, và buộc phải nhập thêm đoạn mã 6&#160;chữ&#160;số mà chỉ chủ&#160;sở&#160;hữu tài&#160;khoản mới có.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Bắt Đầu Thiết Lập</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -1894,11 +1894,11 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Lỗi phát sinh khi khởi tạo đoạn chủng tử hay mã QR, xin thử lại.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Xác Thực 2-Bước được bật</string>
+    <string name="title_2fa_enabled">Xác&#160;thực 2&#160;yếu&#160;tố được bật</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Thực.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Xin lưu <b>Mã Phục Hồi</b> cho tài khoản của bạn ở nơi an toàn, để tránh trường hợp mất khả năng truy cập vào ứng dụng, hoặc khi bạn muốn tắt Xác Thực 2-Bước.</string>
+    <string name="recommendation_2fa_enabled">Xin lưu <b>Mã Phục Hồi</b> cho tài&#160;khoản của bạn ở nơi an&#160;toàn, để tránh trường&#160;hợp mất khả&#160;năng truy&#160;cập vào ứng&#160;dụng, hoặc khi bạn muốn tắt đi xác&#160;thực 2&#160;yếu&#160;tố.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1914,23 +1914,23 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Tắt</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">Lỗi phát sinh khi thực hiện tắt chức năng xác thực 2-bước. Xin thử lại.</string>
+    <string name="error_disable_2fa">Lỗi phát sinh khi thực hiện tắt đi xác&#160;thực 2&#160;yếu&#160;tố. Xin thử lại.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">Lỗi phát sinh khi thử bật tính năng xác thực 2-bước. Xin thử lại.</string>
+    <string name="error_enable_2fa">Lỗi phát sinh khi cố gắng bật xác&#160;thực 2&#160;yếu&#160;tố. Xin thử lại.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Bật xác thực 2-bước</string>
+    <string name="title_enable_2fa">Bật xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
-    <string name="label_2fa_disabled">Xác thực 2-bước đã tắt</string>
+    <string name="label_2fa_disabled">Xác&#160;thực 2&#160;yếu&#160;tố đã tắt</string>
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Mở trong</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Hiện không có ứng dụng nào phù hợp để bật chức năng xác thực 2-bước cho thiết bị này</string>
+    <string name="intent_not_available_2fa">Hiện không có ứng&#160;dụng nào phù&#160;hợp để bật xác&#160;thực 2&#160;yếu&#160;tố cho thiết&#160;bị của bạn</string>
     <!-- Text button -->
     <string name="general_close">Đóng</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Xuất ra Mã Phục Hồi để hoàn tất</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">App Xác Thực 2-Bước</string>
+    <string name="no_authentication_apps_title">App Xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một App Lập Xác Thực hay không?</string>
     <!-- Label Play Store -->
@@ -3990,14 +3990,14 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Bất kỳ ai có đường liên&#160;kết này đều có thể tham&#160;gia cuộc&#160;họp và xem tin&#160;nhắn của cuộc&#160;họp.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">Đã sao&#160;chép đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="other"></item>
+        <item quantity="other">Đã xóa %d albums</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="other"></item>
+        <item quantity="other">Xóa albums?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">

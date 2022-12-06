@@ -4311,20 +4311,20 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Każda osoba posiadająca ten link może dołączyć do spotkania i obejrzeć czat spotkania.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">Link skopiowany do schowka</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Album “%s” został usunięty</item>
+        <item quantity="few">Usunięto %d albumów</item>
+        <item quantity="many">Usunięto %d albumów</item>
+        <item quantity="other">Usunięto %d albumów</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Usunąć album?</item>
+        <item quantity="few">Usunąć albumy?</item>
+        <item quantity="many">Usunąć albumy?</item>
+        <item quantity="other">Usunąć albumy?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">

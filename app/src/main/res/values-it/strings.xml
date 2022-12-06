@@ -375,7 +375,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creazione della cartella</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Empty Rubbish bin</string>
+    <string name="context_clear_rubbish">Svuota il cestino</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Stai per rimuovere in modo permanente tutti gli elementi presenti nel tuo Cestino.</string>
     <!-- send cancel subscriptions dialog -->
@@ -1691,7 +1691,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Condividi utilizzando</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <string name="context_empty_rubbish_bin">[B]Svuota il [/B][A]Cestino[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Nessun file nel tuo[/B] [A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -2230,9 +2230,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Potresti avere dei nuovi messaggi</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Rubbish bin emptying scheduler</string>
+    <string name="settings_rb_scheduler_enable_title">Programmatore svuotamento del cestino</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">The Rubbish bin is emptied for you automatically.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">Il cestino viene svuotato automaticamente per te.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">Il periodo minimo è di 7 giorni.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2248,7 +2248,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Se i video da comprimere sono più grandi di</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish bin emptying scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Per disattivare la pulizia automatica del cestino o impostare un periodo più lungo di svuotamento, per favore abbonati ad un piano Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">giorni</string>
     <!-- Title of the option to generate a public chat link -->
@@ -4178,7 +4178,7 @@
         <item quantity="other">L\’abbonamento del tuo piano Pro è scaduto %1$d giorni fa.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <string name="photos_user_album_empty_album">[A]Album[/A] [B]vuoto[/B]</string>
     <!-- Albums sub-section for all system and user albums -->
     <string name="photos_album_subsection_my_albums">I miei album</string>
     <!-- Albums sub-section for all shared albums -->
@@ -4204,18 +4204,18 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Chiunque con questo link può unirsi al meeting e vedere la chat.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">Link copiato negli appunti</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Album “%s” eliminato</item>
+        <item quantity="many">%d di album eliminati</item>
+        <item quantity="other">%d album eliminati</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Eliminare l\’album?</item>
+        <item quantity="many">Eliminare gli album?</item>
+        <item quantity="other">Eliminare gli album?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">

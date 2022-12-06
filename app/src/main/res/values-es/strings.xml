@@ -129,7 +129,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">No volver a mostrar</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">¿Está seguro de que quieres cancelar el proceso de inicio de sesión?</string>
+    <string name="confirm_cancel_login">¿Confirmas que quieres cancelar el proceso de inicio de sesión?</string>
     <!-- Login button -->
     <string name="login_text">Iniciar sesión</string>
     <!-- email label -->
@@ -375,7 +375,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creando carpeta</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Empty Rubbish bin</string>
+    <string name="context_clear_rubbish">Vaciar papelera</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Eliminarás permanentemente todos los elementos de la papelera.</string>
     <!-- send cancel subscriptions dialog -->
@@ -475,7 +475,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Enviar</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Gracias por tu mensaje. ¿Estás seguro de que quieres cancelar la suscripción?</string>
+    <string name="confirmation_cancel_subscriptions">Gracias por tu mensaje. ¿Confirmas que quieres cancelar la suscripción?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Tu suscripción no se ha cancelado. Indica una razón para cancelarla.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
@@ -1132,7 +1132,7 @@
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
     <string name="sms_logout">[A]Cierra sesión[/A] para usar otra cuenta de MEGA</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
-    <string name="confirm_logout_from_sms_verification">¿Quieres cerrar sesión y salir de tu cuenta?</string>
+    <string name="confirm_logout_from_sms_verification">¿Confirmas que desea cerrar sesión y salir de tu cuenta?</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">%1$s ha eliminado el mensaje</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
@@ -1477,9 +1477,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">¿Estás seguro de que quieres mover esta carpeta a la Papelera? Se desactivarán las Subídas de la cámara.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivarán las Subídas de la cámara.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">¿Estás seguro de que quieres mover esta carpeta a la Papelera? Se desactivará la subida multimedia secundaria.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la subida multimedia secundaria.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing a file -->
@@ -1691,7 +1691,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Compartir usando</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <string name="context_empty_rubbish_bin">[A]Papelera [/A][B]vacía[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No hay archivos en tu [/B][A]Nube[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -2222,7 +2222,7 @@
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]de %2$s usado[/B]</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_text">¿Estás seguro de que quieres cambiar a un servidor de prueba? Tu cuenta podría sufrir daños irreparables.</string>
+    <string name="staging_api_url_text">¿Confirmas que quieres cambiar a un servidor de prueba? Tu cuenta podría sufrir daños irreparables.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">¿Abrir cámara?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
@@ -2232,7 +2232,7 @@
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
     <string name="settings_rb_scheduler_enable_title">Limpieza automática de la papelera</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">The Rubbish bin is emptied for you automatically.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">La Papelera se vacía automáticamente.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">El período mínimo es de 7 días.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2248,7 +2248,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Si los vídeos a comprimir son superiores a</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish bin emptying scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Para desactivar la limpieza automática de la Papelera o establecer un período de retención más largo, amplía tu cuenta a Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">días</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3092,7 +3092,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Eliminar automáticamente mensajes con más de:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">¿Seguro que quieres limpiar el historial de mensajes de esta conversación?</string>
+    <string name="confirmation_clear_chat_history">¿Confirmas que quieres limpiar el historial de mensajes de esta conversación?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 año</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3642,7 +3642,7 @@
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permite el uso de datos móviles para cargar imágenes de alta resolución al obtener una vista previa. Si está opción está desactivada, la imagen original solo se cargará cuando hagas zoom.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">Vas a eliminar tu carpeta Backups. Se borrarán todos los backups que hayas configurado. ¿Seguro que quieres hacerlo?</string>
+    <string name="backup_remove_root_folder">Vas a eliminar tu carpeta Backups. Se borrarán todos los backups que hayas configurado. ¿Confirmas que quieres hacerlo?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mover “%1s” a la Papelera</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -3662,7 +3662,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">El contenido de esta carpeta forma parte de un backup sincronizado con una carpeta local. Realizar esta acción parará la sincronización y desactivará el backup. Podrás volver a reactivar el backup a través de la aplicación de escritorio de MEGA. ¿Estás seguro de que quieres continuar?</string>
+    <string name="backup_add_item_text">El contenido de esta carpeta forma parte de un backup sincronizado con una carpeta local. Realizar esta acción parará la sincronización y desactivará el backup. Podrás volver a reactivar el backup a través de la aplicación de escritorio de MEGA. ¿Confirmas que quieres continuar?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4204,18 +4204,18 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Los que tengan este enlace podrán unirse a la reunión y ver el chat de la reunión.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">Enlace copiado al portapapeles</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">El álbum “%s” ha sido eliminado</item>
+        <item quantity="many">Se han eliminado %d de álbumes</item>
+        <item quantity="other">Se han eliminado %d álbumes</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">¿Eliminar el álbum?</item>
+        <item quantity="many">¿Eliminar los álbumes?</item>
+        <item quantity="other">¿Eliminar los álbumes?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">

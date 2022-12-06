@@ -4204,18 +4204,18 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Quiconque a ce lien peut se joindre à la réunion et lire la conversation de la réunion.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">Le lien a été copié dans le presse-papiers</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">L’album «&#160;%s» a été supprimé</item>
+        <item quantity="many">%d d’albums ont été supprimés</item>
+        <item quantity="other">%d&#160;albums ont été supprimés</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Supprimer l’album ?</item>
+        <item quantity="many">Supprimer les albums ?</item>
+        <item quantity="other">Supprimer les albums ?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">

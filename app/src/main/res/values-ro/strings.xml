@@ -4199,20 +4199,18 @@
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
     <string name="cloud_drive_media_discovery_banner_ok">OK, am înțeles</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_share_meeting_link_panel_title"></string>
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied"></string>
+    <string name="scheduled_meetings_meeting_link_copied">Copied link to clipboard</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">“%s” album deleted</item>
+        <item quantity="other">Deleted %d albums</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Delete album?</item>
+        <item quantity="other">Delete albums?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
