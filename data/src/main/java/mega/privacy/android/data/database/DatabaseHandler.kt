@@ -220,7 +220,6 @@ interface DatabaseHandler {
     fun setCamSyncFileUpload(fileUpload: Int)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()
-    fun setPaymentMethodsTimeStamp()
     fun setPricingTimestamp()
     fun setExtendedAccountDetailsTimestamp()
     fun resetExtendedAccountDetailsTimestamp()

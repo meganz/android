@@ -42,33 +42,6 @@ public class DBUtil {
         }
     }
 
-    public static boolean callToPaymentMethods() {
-        Timber.d("callToPaymentMethods");
-        dbH = MegaApplication.getInstance().getDbH();
-
-        attributes = dbH.getAttributes();
-        if (attributes != null) {
-            String oldTimestamp = attributes.getPaymentMethodsTimeStamp();
-            if ((oldTimestamp != null) && (oldTimestamp.trim() != "") && (!oldTimestamp.isEmpty())) {
-                long timestampMinDifference = Util.calculateTimestampMinDifference(oldTimestamp);
-                Timber.d("Last call made: %d min ago", timestampMinDifference);
-                if (timestampMinDifference > Constants.PAYMENT_METHODS_MIN_DIFFERENCE) {
-                    Timber.d("API call getPaymentMethods");
-                    return true;
-                } else {
-                    Timber.d("NOT call getPaymentMethods");
-                    return false;
-                }
-            } else {
-                Timber.d("Not valid value - API call getPaymentMethods");
-                return true;
-            }
-        } else {
-            Timber.d("Attributes is NULL - API call getPaymentMethods");
-            return true;
-        }
-    }
-
     public static void resetAccountDetailsTimeStamp() {
         Timber.d("resetAccountDetailsTimeStamp");
         dbH = MegaApplication.getInstance().getDbH();
