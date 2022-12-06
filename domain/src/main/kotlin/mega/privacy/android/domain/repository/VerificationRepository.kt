@@ -14,4 +14,9 @@ interface VerificationRepository {
      * check whether SMS Verification Shown or not
      */
     suspend fun isSMSVerificationShown(): Boolean
+
+    /**
+     * get country calling codes
+     */
+    suspend fun getCountryCallingCodes(): List<String>
 }
