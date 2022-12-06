@@ -19,4 +19,9 @@ interface VerificationRepository {
      * get country calling codes
      */
     suspend fun getCountryCallingCodes(): List<String>
+
+    /**
+     * logout
+     */
+    suspend fun logout()
 }
