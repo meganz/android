@@ -568,7 +568,7 @@ private void checkoutMegaChatSdkByTag(String megaChatTag) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -581,7 +581,7 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
