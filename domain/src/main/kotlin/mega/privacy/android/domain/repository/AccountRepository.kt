@@ -171,4 +171,9 @@ interface AccountRepository {
      */
     suspend fun areAchievementsEnabled(): Boolean
 
+    /**
+     * logout
+     */
+    suspend fun logout()
+
 }

@@ -21,12 +21,7 @@ interface VerificationRepository {
     suspend fun getCountryCallingCodes(): List<String>
 
     /**
-     * logout
-     */
-    suspend fun logout()
-
-    /**
-     * logout
+     * send SMS Verification Code
      */
     suspend fun sendSMSVerificationCode(phoneNumber: String)
 }
