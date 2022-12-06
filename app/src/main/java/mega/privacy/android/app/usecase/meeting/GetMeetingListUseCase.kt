@@ -43,7 +43,6 @@ import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
 import java.time.Instant
-import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAccessor
