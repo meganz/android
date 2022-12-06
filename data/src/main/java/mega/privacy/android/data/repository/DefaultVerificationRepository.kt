@@ -49,23 +49,28 @@ internal class DefaultVerificationRepository @Inject constructor(
                             }
                             MegaError.API_ETEMPUNAVAIL -> {
                                 continuation.failWithException(SMSVerificationException.LimitReached(
-                                    error.errorCode))
+                                    error.errorCode,
+                                ))
                             }
                             MegaError.API_EACCESS -> {
                                 continuation.failWithException(SMSVerificationException.AlreadyVerified(
-                                    error.errorCode))
+                                    error.errorCode,
+                                ))
                             }
                             MegaError.API_EARGS -> {
                                 continuation.failWithException(SMSVerificationException.InvalidPhoneNumber(
-                                    error.errorCode))
+                                    error.errorCode,
+                                ))
                             }
                             MegaError.API_EEXIST -> {
                                 continuation.failWithException(SMSVerificationException.AlreadyExists(
-                                    error.errorCode))
+                                    error.errorCode,
+                                ))
                             }
                             else -> {
                                 continuation.failWithException(SMSVerificationException.Unknown(
-                                    error.errorCode))
+                                    error.errorCode,
+                                ))
                             }
                         }
                     }
