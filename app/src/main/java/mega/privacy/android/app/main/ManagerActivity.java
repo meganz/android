@@ -359,6 +359,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -4564,6 +4565,10 @@ public class ManagerActivity extends TransfersManagementActivity
             case CLOUD_DRIVE: {
                 if (!isInMDMode) {
                     selectDrawerItemCloudDrive();
+                } else {
+                    Long mediaHandle = viewModel.getSafeBrowserParentHandle();
+                    skipToMediaDiscoveryFragment(
+                            MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle);
                 }
 
                 if (openFolderRefresh) {
