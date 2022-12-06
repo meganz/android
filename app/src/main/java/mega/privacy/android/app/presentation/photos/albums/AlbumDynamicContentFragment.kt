@@ -356,7 +356,7 @@ class AlbumDynamicContentFragment : Fragment() {
         modifier: Modifier,
     ) {
         Snackbar(
-            modifier = modifier.padding(8.dp).alpha(0.87f),
+            modifier = modifier.padding(8.dp),
             backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
         ) {
             Text(
