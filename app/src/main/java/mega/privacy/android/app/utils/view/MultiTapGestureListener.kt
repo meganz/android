@@ -20,7 +20,7 @@ import kotlin.math.hypot
 class MultiTapGestureListener constructor(
     private val zoomableDraweeView: ZoomableDraweeView,
     private val onSingleTapCallback: () -> Unit,
-    private val onZoomCallback: () -> Unit,
+    private val onZoomCallback: (Float, Float, Float) -> Unit,
 ) : SimpleOnGestureListener() {
 
     private val doubleTapViewPoint = PointF()
@@ -54,7 +54,8 @@ class MultiTapGestureListener constructor(
         distanceX: Float,
         distanceY: Float,
     ): Boolean {
-        onZoomCallback.invoke()
+        val zc = this.zoomableDraweeView.zoomableController as AbstractAnimatedZoomableController
+        onZoomCallback.invoke(e1.x, e1.y, zc.scaleFactor)
         return super.onScroll(e1, e2, distanceX, distanceY)
     }
 
@@ -64,7 +65,6 @@ class MultiTapGestureListener constructor(
      * @param event
      */
     override fun onDoubleTapEvent(event: MotionEvent): Boolean {
-        onZoomCallback.invoke()
         val zc = this.zoomableDraweeView.zoomableController as AbstractAnimatedZoomableController
         val vp = PointF(event.x, event.y)
         val ip = zc.mapViewToImage(vp)
@@ -74,11 +74,13 @@ class MultiTapGestureListener constructor(
                 this.doubleTapViewPoint.set(vp)
                 this.doubleTapImagePoint.set(ip)
                 this.doubleTapScale = zc.scaleFactor
+                onZoomCallback.invoke(event.x, event.y, zc.scaleFactor)
             }
             MotionEvent.ACTION_UP -> {
                 if (this.doubleTapScroll) {
                     maxScale = this.calcScale(vp)
                     zc.zoomToPoint(maxScale, this.doubleTapImagePoint, this.doubleTapViewPoint)
+                    onZoomCallback.invoke(event.x, event.y, maxScale)
                 } else {
                     maxScale = zc.maxScaleFactor / doubleTapMaxScaleDivider
                     val minScale = zc.minScaleFactor
@@ -89,6 +91,7 @@ class MultiTapGestureListener constructor(
                             DefaultZoomableController.LIMIT_ALL,
                             durationMs,
                             null as Runnable?)
+                        onZoomCallback.invoke(event.x, event.y, maxScale)
                     } else {
                         zc.zoomToPoint(minScale,
                             ip,
@@ -96,6 +99,7 @@ class MultiTapGestureListener constructor(
                             DefaultZoomableController.LIMIT_ALL,
                             durationMs,
                             null as Runnable?)
+                        onZoomCallback.invoke(0.0f, 0.0f, minScale)
                     }
                 }
                 this.doubleTapScroll = false
@@ -105,6 +109,7 @@ class MultiTapGestureListener constructor(
                 if (this.doubleTapScroll) {
                     maxScale = this.calcScale(vp)
                     zc.zoomToPoint(maxScale, this.doubleTapImagePoint, this.doubleTapViewPoint)
+                    onZoomCallback.invoke(event.x, event.y, maxScale)
                 }
             }
         }

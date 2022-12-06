@@ -1,5 +1,6 @@
 package mega.privacy.android.app.imageviewer
 
+import android.graphics.PointF
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
@@ -24,6 +25,7 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.memory.BasePool
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.facebook.samples.zoomable.AbstractAnimatedZoomableController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
@@ -65,10 +67,16 @@ class ImageViewerPageFragment : Fragment() {
     private var hasScreenBeenRotated = false
     private var hasZoomBeenTriggered = false
     private val viewModel by activityViewModels<ImageViewerViewModel>()
-    private val itemId by lazy { arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id") }
+    private val itemId by lazy {
+        arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id")
+    }
     private val enableZoom by lazy { arguments?.getBoolean(EXTRA_ENABLE_ZOOM, true) ?: true }
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
+
+    private var currentXOffset: Float = 0.0f
+    private var currentYOffset: Float = 0.0f
+    private var currentZoomScale: Float = 0.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +86,7 @@ class ImageViewerPageFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = PageImageViewerBinding.inflate(inflater, container, false)
         return binding.root
@@ -124,11 +132,14 @@ class ImageViewerPageFragment : Fragment() {
                         onSingleTapCallback = {
                             viewModel.showToolbar(!viewModel.isToolbarShown())
                         },
-                        onZoomCallback = {
+                        onZoomCallback = { xOffset, yOffset, zoomScale ->
                             if (!hasZoomBeenTriggered) {
                                 hasZoomBeenTriggered = true
                                 viewModel.loadSingleImage(itemId, fullSize = true)
                             }
+                            currentZoomScale = zoomScale
+                            currentXOffset = xOffset
+                            currentYOffset = yOffset
                         }
                     )
                 )
@@ -143,7 +154,7 @@ class ImageViewerPageFragment : Fragment() {
                         e1: MotionEvent,
                         e2: MotionEvent,
                         distanceX: Float,
-                        distanceY: Float
+                        distanceY: Float,
                     ): Boolean {
                         if (e2.pointerCount > 1) navigateToViewer()
                         return super.onScroll(e1, e2, distanceX, distanceY)
@@ -188,7 +199,7 @@ class ImageViewerPageFragment : Fragment() {
      * @param imageResult   ImageResult to obtain images from
      */
     private fun showPreviewImage(
-        imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult
+        imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult,
     ) {
         val previewImageRequest = imageResult?.previewUri?.toImageRequest(false)
         val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest(false)
@@ -221,13 +232,14 @@ class ImageViewerPageFragment : Fragment() {
      * ImageResult to obtain images from
      */
     private fun showFullImage(
-        imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult
+        imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult,
     ) {
         val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest(true) ?: run {
             showPreviewImage(imageResult)
             return
         }
-        val previewImageRequest = (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest(false)
+        val previewImageRequest =
+            (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest(false)
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
             .setImageRequest(fullImageRequest)
@@ -252,13 +264,14 @@ class ImageViewerPageFragment : Fragment() {
         override fun onFinalImageSet(
             id: String?,
             imageInfo: ImageInfo?,
-            animatable: Animatable?
+            animatable: Animatable?,
         ) {
             val imageResult = viewModel.getImageItem(itemId)?.imageResult ?: return
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
                 }
+                restoreCurrentZoomAndOffset()
             }
         }
 
@@ -277,6 +290,16 @@ class ImageViewerPageFragment : Fragment() {
                     if (imageResult.isVideo) showVideoButton()
                 }
             }
+        }
+    }
+    
+    private fun restoreCurrentZoomAndOffset() {
+        if (currentZoomScale != 0.0f) {
+            val zoomableController =
+                binding.image.zoomableController as AbstractAnimatedZoomableController
+            val viewPoint = PointF(currentXOffset, currentYOffset)
+            val imagePoint = zoomableController.mapViewToImage(viewPoint)
+            zoomableController.zoomToPoint(currentZoomScale, imagePoint, viewPoint)
         }
     }
 
@@ -322,7 +345,8 @@ class ImageViewerPageFragment : Fragment() {
             )
 
         if (isFullImage) {
-            imageRequestBuilder.resizeOptions = ResizeOptions.forDimensions(screenSize.width, screenSize.height)
+            imageRequestBuilder.resizeOptions =
+                ResizeOptions.forDimensions(screenSize.width, screenSize.height)
         } else {
             imageRequestBuilder.cacheChoice = ImageRequest.CacheChoice.SMALL
         }
