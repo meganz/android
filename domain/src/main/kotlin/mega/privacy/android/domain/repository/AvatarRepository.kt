@@ -21,4 +21,18 @@ interface AvatarRepository {
      * get avatar file
      */
     suspend fun getMyAvatarFile(): File?
+
+    /**
+     * Get avatar file for an user
+     *
+     * @param userHandle  User handle
+     */
+    suspend fun getAvatarFile(userHandle: Long): File?
+
+    /**
+     * Get avatar color for an user
+     *
+     * @param userHandle  User handle
+     */
+    suspend fun getAvatarColor(userHandle: Long): Int
 }

@@ -379,6 +379,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
+    override suspend fun getUserAvatarColor(userHandle: Long): String =
+        megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
+
     override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
