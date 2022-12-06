@@ -16,11 +16,20 @@ MEGACHAT_COMMIT = ""
 SDK_TAG = ""
 MEGACHAT_TAG = ""
 
+APP_UNIT_TEST_SUMMARY = ""
+DOMAIN_UNIT_TEST_SUMMARY = ""
+DATA_UNIT_TEST_SUMMARY = ""
+
+APP_COVERAGE = ""
+DOMAIN_COVERAGE = ""
+DATA_COVERAGE = ""
+
 /**
  * GitLab commands that can trigger this job.
  */
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
+UPLOAD_COVERAGE_REPORT_CMD = "upload_coverage"
 
 // The log file of publishing pre-built SDK to Artifatory
 ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
@@ -117,7 +126,7 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-                if (triggerByDeliverQaCmd() || triggerByPush()) {
+                if (triggerByDeliverQaCmd() || triggerByUploadCoverage() || triggerByPush()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
                 } else if (triggerByPublishSdkCmd()) {
@@ -145,7 +154,7 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -298,7 +307,7 @@ pipeline {
         }
         stage('Clean Android build') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -435,7 +444,7 @@ pipeline {
 
         stage('Clean up Android') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -451,7 +460,7 @@ pipeline {
         }
         stage('Clean up SDK') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -462,6 +471,110 @@ pipeline {
                         cd ${WORKSPACE}/sdk/src/main/jni
                         bash build.sh clean
                     """
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            when {
+                expression { triggerByPush() || triggerByUploadCoverage() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = "Unit Test"
+                }
+                gitlabCommitStatus(name: 'Unit Test') {
+                    // Compile and run unit tests for available modules
+                    sh "./gradlew testGmsDebugUnitTest"
+                    sh "./gradlew domain:test"
+                    sh "./gradlew :data:testGmsDebugUnitTest"
+                    // sh "./gradlew lint:test" we dont care about the percentage of lint
+
+                    script {
+                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
+                        // If UnitTest is failed, summary is collected at post.failure{} phase
+                        // We have to collect the report here, before they are cleaned in the last stage.
+                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                    }
+                }
+            }
+        }
+
+        stage('Upload Code Coverage') {
+            when {
+                expression { triggerByPush() || triggerByUploadCoverage() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = "Upload Code Coverage"
+                }
+                gitlabCommitStatus(name: 'Upload Code Coverage') {
+                    script {
+                        withCredentials([
+                                string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                                string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                        ]) {
+                            String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
+                            // domain coverage
+                            sh "./gradlew domain:jacocoTestReport"
+
+                            // data coverage
+                            sh "./gradlew data:testGmsDebugUnitTestCoverage"
+
+                            // temporarily disable the failed test cases
+                            sh "rm -frv ${WORKSPACE}/app/src/testDebug"
+
+                            // run coverage for app module
+                            sh "./gradlew app:createUnitTestCoverageReport"
+
+                            // restore failed test cases
+                            sh "git checkout -- app/src/testDebug"
+
+                            DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                            DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                            APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                            def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
+                            def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
+                            def dataSummaryCoverageArray = DATA_COVERAGE.split('=')[1].split('/')
+                            def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
+                            def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
+                            def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
+
+                            String appTestResultsRow = "| **app** | " +
+                                    "${appSummaryCoverageArray[0]} | " +
+                                    "${appSummaryCoverageArray[1]} | " +
+                                    "${appSummaryArray[0]} | " +
+                                    "${appSummaryArray[1]} | " +
+                                    "${appSummaryArray[2]} | " +
+                                    "${appSummaryArray[3]} | " +
+                                    "${appSummaryArray[4]} | "
+
+                            String domainTestResultsRow = "| **domain** | " +
+                                    "${domainSummaryCoverageArray[0]} | " +
+                                    "${domainSummaryCoverageArray[1]} | " +
+                                    "${domainSummaryArray[0]} | " +
+                                    "${domainSummaryArray[1]} | " +
+                                    "${domainSummaryArray[2]} | " +
+                                    "${domainSummaryArray[3]} | " +
+                                    "${domainSummaryArray[4]} | "
+
+                            String dataTestResultsRow = "| **data** | " +
+                                    "${dataSummaryCoverageArray[0]} | " +
+                                    "${dataSummaryCoverageArray[1]} | " +
+                                    "${dataSummaryArray[0]} | " +
+                                    "${dataSummaryArray[1]} | " +
+                                    "${dataSummaryArray[2]} | " +
+                                    "${dataSummaryArray[3]} | " +
+                                    "${dataSummaryArray[4]} | "
+
+
+                            writeFile file: 'coverage_summary.txt', text: "$appTestResultsRow\n$domainTestResultsRow\n$dataTestResultsRow"
+
+                            sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/coverage_summary.txt\" \"${targetPath}/coverage_summary.txt\""
+                        }
+                    }
                 }
             }
         }
@@ -640,6 +753,16 @@ private boolean triggerByDeliverQaCmd() {
 }
 
 /**
+ * Check if this build is triggered by a upload_coverage command
+ * @return
+ */
+private boolean triggerByUploadCoverage() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT_CMD)
+}
+
+/**
  * Check if this build is triggered by a publish_sdk command
  * @return
  */
@@ -704,6 +827,8 @@ def parseCommandParameter() {
         command = DELIVER_QA_CMD
     } else if (triggerByPublishSdkCmd()) {
         command = PUBLISH_SDK_CMD
+    } else if (triggerByUploadCoverage()) {
+        command = UPLOAD_COVERAGE_REPORT_CMD
     } else {
         return result
     }
@@ -933,4 +1058,28 @@ def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
 
     def result = JsonOutput.prettyPrint(JsonOutput.toJson(flagList))
     writeFile file: featureFlagFile, text: result.toString()
+}
+
+/**
+ * Analyse unit test report and get the summary string
+ * @param testReportPath path of the unit test report in xml format
+ * @return summary string of unit test
+ */
+String unitTestSummary(String testReportPath) {
+    return sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportPath}",
+            returnStdout: true).trim()
+}
+
+/**
+ * Reads and calculates the Test Coverage by a given csv format report
+ * @param csvReportPath path to the csv coverage file, generated by JaCoCo
+ * @return a String containing the Test Coverage report
+ */
+String getTestCoverageSummary(String csvReportPath) {
+    summary = sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/coverage_report.py ${csvReportPath}",
+            returnStdout: true).trim()
+    print("coverage path(${csvReportPath}): ${summary}")
+    return summary
 }
