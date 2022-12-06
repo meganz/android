@@ -8,6 +8,7 @@ import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.Logout
+import mega.privacy.android.domain.usecase.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 
 /**
@@ -44,5 +45,12 @@ abstract class SMSVerificationModule {
          */
         @Provides
         fun provideLogout(repository: VerificationRepository): Logout = Logout(repository::logout)
+
+        /**
+         * Provides the Use Case [SendSMSVerificationCode]
+         */
+        @Provides
+        fun provideSendSMSVerificationCode(repository: VerificationRepository): SendSMSVerificationCode =
+            SendSMSVerificationCode(repository::sendSMSVerificationCode)
     }
 }

@@ -24,4 +24,9 @@ interface VerificationRepository {
      * logout
      */
     suspend fun logout()
+
+    /**
+     * logout
+     */
+    suspend fun sendSMSVerificationCode(phoneNumber: String)
 }
