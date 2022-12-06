@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -137,7 +138,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         var nodeHandle = MegaApiJava.INVALID_HANDLE
         if (savedInstanceState != null) {
             nodeHandle =
-                savedInstanceState.getLong(Constants.EXTRA_NODE_HANDLE, MegaApiJava.INVALID_HANDLE)
+                savedInstanceState.getLong(INTENT_EXTRA_NODE_HANDLE, MegaApiJava.INVALID_HANDLE)
         }
         intent?.extras?.let { extras ->
             if (nodeHandle == MegaApiJava.INVALID_HANDLE) {
@@ -922,7 +923,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     public override fun onSaveInstanceState(outState: Bundle) {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
-        outState.putLong(Constants.EXTRA_NODE_HANDLE, node!!.handle)
+        outState.putLong(INTENT_EXTRA_NODE_HANDLE, node!!.handle)
         outState.putBoolean(CHECKING_REVERT_VERSION,
             checkPermissionRevertVersionDialog != null && checkPermissionRevertVersionDialog!!.isShowing)
         outState.putLong(SELECTED_NODE_HANDLE, selectedNodeHandle)

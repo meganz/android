@@ -9,7 +9,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH;
 import static mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER;
@@ -144,6 +143,7 @@ import static mega.privacy.android.app.utils.Util.showMessageRandom;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;

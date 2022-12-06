@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -15,6 +16,16 @@ import java.util.LinkedList
 import java.util.Queue
 import javax.inject.Inject
 import kotlin.math.max
+
+/**
+ * Intent action for broadcast on camera upload attributes change
+ */
+const val BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE"
+
+/**
+ * Intent extra data if camera upload folder is secondary
+ */
+const val INTENT_EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER"
 
 /**
  * Camera Upload Media Facade implements [CameraUploadMediaGateway]
@@ -35,6 +46,16 @@ internal class CameraUploadMediaFacade @Inject constructor(
         } ?: LinkedList<CameraUploadMedia>().also {
             Timber.d("Extract 0 Media - Cursor is NULL")
         }
+
+    override suspend fun sendUpdateFolderIconBroadcast(
+        nodeHandle: Long,
+        isSecondary: Boolean,
+    ) {
+        val intent = Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE)
+        intent.putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary)
+        intent.putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
+        context.sendBroadcast(intent)
+    }
 
     private fun getPageSize(isVideo: Boolean): Int = if (isVideo) 50 else 1000
 
