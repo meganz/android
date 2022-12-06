@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
-import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -31,7 +30,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -56,9 +54,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.ViewUtils.isVisible
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.sortOrderToInt
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -70,6 +66,9 @@ import java.util.Collections
 import java.util.Stack
 import javax.inject.Inject
 
+/**
+ * Fragment is for Rubbish Bin
+ */
 @AndroidEntryPoint
 class RubbishBinFragment : Fragment() {
 
@@ -80,9 +79,6 @@ class RubbishBinFragment : Fragment() {
         @JvmStatic
         fun newInstance() = RubbishBinFragment()
     }
-
-    @Inject
-    lateinit var dbH: DatabaseHandler
 
     @MegaApi
     @Inject
@@ -263,6 +259,9 @@ class RubbishBinFragment : Fragment() {
         DragToExitSupport.observeDragSupportEvents(viewLifecycleOwner, recyclerView, Constants.VIEWER_FROM_RUBBISH_BIN)
     }
 
+    /**
+     * This method checks scroll of recycler view
+     */
     fun checkScroll() {
         recyclerView?.let {
             if ((it.canScrollVertically(-1) && it.isVisible()) ||
@@ -282,6 +281,13 @@ class RubbishBinFragment : Fragment() {
         (requireActivity() as ManagerActivity).showNewSortByPanel(Constants.ORDER_CLOUD)
     }
 
+    /**
+     * This method will format text to be displayed on fragment when we need to show empty message
+     * @param text Text to be formatted and displayed
+     * @param colorResPrimary Primary color for the text to be highlighted
+     * @param colorResSecondary Secondary color for the text to be displayed
+     * @throws Exception
+     */
     @Throws(Exception::class)
     private fun formatRequiredText(
         text: String,
@@ -304,6 +310,13 @@ class RubbishBinFragment : Fragment() {
         }
     }
 
+    /**
+     * Action to be performed based on adapter's items
+     * @param textRubbishBinParentHandle text when rubbishBinParentHandle rubbish node and rubbishBinParentHandle are same and no items are present in adapter
+     * @param textGeneric generic text to be displayed when adapter has no count
+     * @param colorPrimary Primary color for the text to be highlighted
+     * @param colorSecondary Secondary color for the text to be displayed
+     */
     private fun checkAndConfigureAdapter(
         textRubbishBinParentHandle: String,
         textGeneric: String,
@@ -358,6 +371,10 @@ class RubbishBinFragment : Fragment() {
         }
     }
 
+    /**
+     * With this method, when adapter's multiselect is off,
+     * turn it on and activate action mode
+     */
     fun activateActionMode() {
         Timber.d("activateActionMode")
         if (adapter?.isMultipleSelect == false) {
@@ -438,6 +455,9 @@ class RubbishBinFragment : Fragment() {
 
     }
 
+    /**
+     * Select all items from adapter
+     */
     fun selectAll() {
         adapter?.let {
             if (it.isMultipleSelect) {
@@ -454,8 +474,16 @@ class RubbishBinFragment : Fragment() {
         Handler(Looper.getMainLooper()).post { updateActionModeTitle() }
     }
 
-    fun showSelectMenuItem() = adapter?.isMultipleSelect ?:false
+    /**
+     * To show select menu item
+     * @return if adapter's multiselect is on or off
+     */
+    fun showSelectMenuItem() = adapter?.isMultipleSelect ?: false
 
+    /**
+     * When an item clicked from adapter it calls below method
+     * @param position Position of item which is clicked
+     */
     fun itemClick(position: Int) {
         Timber.d("Position:$position")
         if (adapter?.isMultipleSelect == true) {
@@ -743,14 +771,17 @@ class RubbishBinFragment : Fragment() {
         }
     }
 
-    /*
-     * Disable selection
+    /**
+     * Hides multi select option
      */
     fun hideMultipleSelect() {
         adapter?.isMultipleSelect = false
         actionMode?.finish()
     }
 
+    /**
+     * On back pressed clicked on activity
+     */
     fun onBackPressed(): Int {
         return adapter?.let {
             with(requireActivity() as ManagerActivity) {
@@ -799,8 +830,16 @@ class RubbishBinFragment : Fragment() {
         }
     }
 
+    /**
+     * Get current recyclerview
+     * @return RecyclerView
+     */
     fun getRecyclerView() = recyclerView
 
+    /**
+     * This method set nodes and updates the adapter
+     * @param nodes List of Mega Nodes
+     */
     fun setNodes(nodes: List<MegaNode>) {
         Timber.d("setNodes")
         this.nodes = nodes
@@ -820,10 +859,19 @@ class RubbishBinFragment : Fragment() {
         }
     }
 
+    /**
+     * Updates the adapter items
+     */
     fun notifyDataSetChanged() = adapter?.notifyDataSetChanged()
 
+    /**
+     * If adapter's multiple select is on or off
+     */
     fun isMultipleselect() = adapter?.isMultipleSelect ?: false
 
+    /**
+     * Gets total number of items in an adapter
+     */
     fun getItemCount() = adapter?.itemCount ?: -1
 
     override fun onDestroyView() {
