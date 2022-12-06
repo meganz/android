@@ -7,6 +7,10 @@ import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.LocalPricingMapper
+import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.LocalPricing
+import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.exception.MegaException
@@ -33,6 +37,9 @@ class DefaultBillingRepositoryTest {
     private val megaSkuObject2 = MegaSku("mega.android.pro2.onemonth", 9990000, "EUR")
     private val skuString = "mega.android.pro1.onemonth"
     private val megaSkuList = listOf(megaSkuObject2, megaSkuObject1)
+    private val localPricing =
+        LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString)
+    private val localPricingMapper = mock<LocalPricingMapper>()
 
     @Before
     fun setUp() {
@@ -41,6 +48,7 @@ class DefaultBillingRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             paymentMethodFlagsCache = paymentMethodFlagsCache,
+            localPricingMapper = localPricingMapper,
         )
     }
 
@@ -48,10 +56,11 @@ class DefaultBillingRepositoryTest {
     fun `test that get local pricing returns successfully`() =
         runTest {
             whenever(accountInfoWrapper.availableSkus).thenReturn(megaSkuList)
+            whenever(localPricingMapper(megaSkuObject1)).thenReturn(localPricing)
 
             val actual = underTest.getLocalPricing(skuString)
 
-            Truth.assertThat(actual).isEqualTo(megaSkuObject1)
+            Truth.assertThat(actual).isEqualTo(localPricing)
         }
 
     @Test
