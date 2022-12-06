@@ -243,6 +243,18 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun showDeleteAlbumsConfirmation() {
+        _state.update {
+            it.copy(showDeleteAlbumsConfirmation = true)
+        }
+    }
+
+    fun closeDeleteAlbumsConfirmation() {
+        _state.update {
+            it.copy(showDeleteAlbumsConfirmation = false)
+        }
+    }
+
     /**
      * Create a new album
      *

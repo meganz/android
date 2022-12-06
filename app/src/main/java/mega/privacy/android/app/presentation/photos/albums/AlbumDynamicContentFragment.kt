@@ -57,6 +57,7 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumConte
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
+import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -196,6 +197,15 @@ class AlbumDynamicContentFragment : Fragment() {
         }
 
         if (closeScreen) Back()
+
+        if (uiState.showDeleteAlbumsConfirmation) {
+            val album = uiState.currentAlbum as? Album.UserAlbum
+            DeleteAlbumsConfirmationDialog(
+                selectedAlbumIds = listOfNotNull(album?.id),
+                onCancelClicked = albumsViewModel::closeDeleteAlbumsConfirmation,
+                onDeleteClicked = { deleteAlbum() },
+            )
+        }
 
         Box {
             if (photos.isNotEmpty()) {
@@ -502,6 +512,15 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleAlbumDeletion() {
+        val photos = albumsViewModel.getCurrentUIAlbum()?.photos.orEmpty()
+        if (photos.isEmpty()) {
+            deleteAlbum()
+        } else {
+            albumsViewModel.showDeleteAlbumsConfirmation()
+        }
+    }
+
+    private fun deleteAlbum() {
         val album = albumsViewModel.state.value.currentAlbum as? Album.UserAlbum
         albumsViewModel.deleteAlbums(albumIds = listOfNotNull(album?.id))
         albumsViewModel.updateAlbumDeletedMessage(
