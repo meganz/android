@@ -8,7 +8,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.BillingRepository
@@ -19,6 +19,11 @@ import javax.inject.Inject
 /**
  * Default implementation of [BillingRepository]
  *
+ * @property accountInfoWrapper
+ * @property megaApiGateway
+ * @property ioDispatcher
+ * @property paymentMethodFlagsCache
+ * @property localPricingMapper
  */
 
 internal class DefaultBillingRepository @Inject constructor(
@@ -26,12 +31,13 @@ internal class DefaultBillingRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val paymentMethodFlagsCache: Cache<PaymentMethodFlags>,
+    private val localPricingMapper: LocalPricingMapper,
 ) : BillingRepository {
 
-    override suspend fun getLocalPricing(sku: String): MegaSku? =
+    override suspend fun getLocalPricing(sku: String) =
         accountInfoWrapper.availableSkus.firstOrNull { megaSku ->
             megaSku.sku == sku
-        }
+        }?.let { localPricingMapper(it) }
 
     override suspend fun getPaymentMethod(clearCache: Boolean): PaymentMethodFlags =
         paymentMethodFlagsCache.get()?.takeUnless { clearCache }
