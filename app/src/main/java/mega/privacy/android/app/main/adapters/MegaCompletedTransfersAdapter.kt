@@ -91,18 +91,20 @@ class MegaCompletedTransfersAdapter(
                 defaultIcon.setImageResource(MimeTypeList.typeForName(fileName).iconResourceId)
                 MimeTypeList.typeForName(fileName).let { mimeTypeList ->
                     if (mimeTypeList.isImage || mimeTypeList.isVideo) {
-                        val handle = completedTransfer.nodeHandle.toLong()
-                        val thumbnail =
-                            getThumbnailFromCache(handle) ?: megaApi.getNodeByHandle(handle)
-                                ?.let { node ->
-                                    getThumbnailFromFolder(node, context)
-                                }
-                        if (thumbnail != null)
-                            thumbnailIcon.setImageBitmap(
-                                getRoundedBitmap(context, thumbnail, dp2px(THUMB_CORNER_RADIUS_DP)))
-
-                        defaultIcon.isVisible = thumbnail == null
-                        thumbnailIcon.isVisible = thumbnail != null
+                        completedTransfer.nodeHandle?.toLong()?.let { handle ->
+                            val thumbnail =
+                                getThumbnailFromCache(handle) ?: megaApi.getNodeByHandle(handle)
+                                    ?.let { node ->
+                                        getThumbnailFromFolder(node, context)
+                                    }
+                            if (thumbnail != null)
+                                thumbnailIcon.setImageBitmap(
+                                    getRoundedBitmap(context,
+                                        thumbnail,
+                                        dp2px(THUMB_CORNER_RADIUS_DP)))
+                            defaultIcon.isVisible = thumbnail == null
+                            thumbnailIcon.isVisible = thumbnail != null
+                        }
                     }
                 }
                 iconDownloadUploadView.setImageResource(

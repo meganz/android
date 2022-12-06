@@ -10828,7 +10828,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            if (transfer.getIsOfflineFile()) {
+            if (transfer.isOfflineFile()) {
                 File offlineFile = new File(transfer.getOriginalPath());
                 saveOffline(offlineFile.getParentFile(), node, ManagerActivity.this);
             } else {
@@ -10857,7 +10857,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void openTransferLocation(AndroidCompletedTransfer transfer) {
         if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
-            if (transfer.getIsOfflineFile()) {
+            if (transfer.isOfflineFile()) {
                 selectDrawerItem(drawerItem = DrawerItem.HOMEPAGE);
                 openFullscreenOfflineFragment(
                         removeInitialOfflinePath(transfer.getPath()) + SEPARATOR);
