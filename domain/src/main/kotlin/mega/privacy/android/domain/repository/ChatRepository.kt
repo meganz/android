@@ -2,7 +2,6 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
-import mega.privacy.android.domain.entity.GroupChatPeer
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -217,12 +216,4 @@ interface ChatRepository {
      * @return          True if notifications has to be created, false otherwise.
      */
     suspend fun isChatNotifiable(chatId: Long): Boolean
-
-    /**
-     * Get peers from a chat group
-     *
-     * @param chatId    Chat Id
-     * @return          List of chat peers within that group
-     */
-    suspend fun getGroupChatPeers(chatId: Long): List<GroupChatPeer>
 }

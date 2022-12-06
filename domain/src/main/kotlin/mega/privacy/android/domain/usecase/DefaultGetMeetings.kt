@@ -12,6 +12,7 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.GetMeetingsRepository
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -24,6 +25,7 @@ class DefaultGetMeetings @Inject constructor(
     private val chatRepository: ChatRepository,
     private val contactsRepository: ContactsRepository,
     private val accountRepository: AccountRepository,
+    private val getMeetingRepository: GetMeetingsRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetMeetings {
 
@@ -48,12 +50,12 @@ class DefaultGetMeetings @Inject constructor(
                         }
                         1L -> {
                             val myHandle = accountRepository.getUserAccount().userId?.id
-                            val lastChatRoomPeer = chatRepository.getGroupChatPeers(chatRoom.chatId)?.lastOrNull()?.userHandle
+                            val lastChatRoomPeer = getMeetingRepository.getGroupChatPeers(chatRoom.chatId)?.lastOrNull()?.userHandle
                             firstUserChar = contactsRepository.getUserFirstName(myHandle.toString())?.firstOrNull()
                             lastUserChar = contactsRepository.getUserFirstName(lastChatRoomPeer.toString())?.firstOrNull()
                         }
                         else -> {
-                            val chatRoomPeers = chatRepository.getGroupChatPeers(chatRoom.chatId)
+                            val chatRoomPeers = getMeetingRepository.getGroupChatPeers(chatRoom.chatId)
                             chatRoomPeers.firstOrNull()?.userHandle?.toString()?.let { handle ->
                                 firstUserChar = contactsRepository.getUserFirstName(handle)?.firstOrNull()
                             }

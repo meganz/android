@@ -20,19 +20,16 @@ import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
-import mega.privacy.android.data.mapper.mapChatRoomOwnPrivilege
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
-import mega.privacy.android.domain.entity.GroupChatPeer
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
@@ -322,27 +319,5 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun isChatNotifiable(chatId: Long): Boolean =
         withContext(ioDispatcher) {
             megaApiGateway.isChatNotifiable(chatId)
-        }
-
-    override suspend fun getGroupChatPeers(chatId: Long): List<GroupChatPeer> =
-        withContext(ioDispatcher) {
-            val chatRoom = megaChatApiGateway.getChatRoom(chatId)
-                ?: throw ChatRoomDoesNotExistException()
-
-            if (!chatRoom.isGroup || chatRoom.peerCount == 0L) {
-                emptyList()
-            } else {
-                mutableListOf<GroupChatPeer>().apply {
-                    for (index in 0..chatRoom.peerCount) {
-                        add(
-                            GroupChatPeer(
-                                chatRoom.getPeerHandle(index),
-                                chatRoom.getPeerPrivilege(index).mapChatRoomOwnPrivilege(),
-                                chatRoom.getPeerEmail(index),
-                                chatRoom.getPeerFullname(index),
-                            ))
-                    }
-                }
-            }
         }
 }
