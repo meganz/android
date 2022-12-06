@@ -313,9 +313,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getPricingTimeStamp(): String? =
         dbHandler.attributes?.pricingTimeStamp
 
-    override suspend fun getPaymentMethodsTimeStamp(): String? =
-        dbHandler.attributes?.paymentMethodsTimeStamp
-
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)
     }

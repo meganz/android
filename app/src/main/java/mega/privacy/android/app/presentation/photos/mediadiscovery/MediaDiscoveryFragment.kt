@@ -103,7 +103,6 @@ class MediaDiscoveryFragment : Fragment() {
         managerActivity = activity as ManagerActivity
         actionModeCallback =
             MediaDiscoveryActionModeCallback(this)
-        managerActivity.showHideBottomNavigationView(true)
     }
 
     override fun onCreateView(

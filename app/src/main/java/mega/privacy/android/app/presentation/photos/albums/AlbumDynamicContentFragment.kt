@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.FloatingActionButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
@@ -32,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -71,7 +71,9 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.dark_grey
+import mega.privacy.android.presentation.theme.white
 import javax.inject.Inject
 
 /**
@@ -354,7 +356,8 @@ class AlbumDynamicContentFragment : Fragment() {
         modifier: Modifier,
     ) {
         Snackbar(
-            modifier = modifier.padding(8.dp)
+            modifier = modifier.padding(8.dp).alpha(0.87f),
+            backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
         ) {
             Text(
                 text = message

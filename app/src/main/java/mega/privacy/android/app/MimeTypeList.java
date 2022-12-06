@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import mega.privacy.android.data.mapper.MimeTypeMapperKt;
+
 /*
  * Mime type for files
  */
@@ -111,75 +113,11 @@ public class MimeTypeList {
             extension = fixedName.substring(index + 1);
         }
 
-        String detectedType;
-        if (extension.equals("dcr")) {
-            detectedType = "image/dcr";
-        } else {
-            detectedType = MimeTypeMap.getSingleton()
-                    .getMimeTypeFromExtension(extension);
-        }
-
-        if (detectedType == null) {
-            switch (extension) {
-                case "mkv":
-                    detectedType = "video/x-matroska";
-                    break;
-                case "heic":
-                    detectedType = "image/heic";
-                    break;
-                case "url":
-                    detectedType = "web/url";
-                    break;
-                case "webp":
-                    detectedType = "image/webp";
-                    break;
-                case "3fr":
-                    detectedType = "image/3fr";
-                    break;
-                case "iiq":
-                    detectedType = "image/iiq";
-                    break;
-                case "k25":
-                    detectedType = "image/k25";
-                    break;
-                case "kdc":
-                    detectedType = "image/kdc";
-                    break;
-                case "mef":
-                    detectedType = "image/mef";
-                    break;
-                case "mos":
-                    detectedType = "image/mos";
-                    break;
-                case "mrw":
-                    detectedType = "image/mrw";
-                    break;
-                case "raw":
-                    detectedType = "image/raw";
-                    break;
-                case "rwl":
-                    detectedType = "image/rwl";
-                    break;
-                case "sr2":
-                    detectedType = "image/sr2";
-                    break;
-                case "srf":
-                    detectedType = "image/srf";
-                    break;
-                case "x3f":
-                    detectedType = "image/x3f";
-                    break;
-                case "cr3":
-                    detectedType = "image/cr3";
-                    break;
-                case "ciff":
-                    detectedType = "image/ciff";
-                    break;
-                default:
-                    detectedType = "application/octet-stream";
-                    break;
-            }
-        }
+        String detectedType = MimeTypeMapperKt.getMimeType(
+                extension,
+                MimeTypeMap.getSingleton()
+                        ::getMimeTypeFromExtension
+        );
 
         return new MimeTypeList(detectedType, extension);
     }

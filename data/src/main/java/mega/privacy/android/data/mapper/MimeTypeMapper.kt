@@ -19,7 +19,7 @@ typealias DefaultMimeTypeMapper = (String) -> String?
  * @receiver
  * @return
  */
-internal fun getMimeType(extension: String, defaultMapper: (String) -> String?) =
+fun getMimeType(extension: String, defaultMapper: (String) -> String?) =
     extension.lowercase().let {
         if (it == "dcr") {
             "image/dcr"
