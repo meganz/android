@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.FloatingActionButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
@@ -69,6 +70,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.dark_grey
 import javax.inject.Inject
 
 /**
@@ -318,12 +320,20 @@ class AlbumDynamicContentFragment : Fragment() {
             onClick = { albumsViewModel.showFilterDialog(true) },
             modifier = modifier
                 .size(40.dp),
-            backgroundColor = Color.White
+            backgroundColor = if (MaterialTheme.colors.isLight) {
+                Color.White
+            } else {
+                dark_grey
+            }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_filter_light),
                 contentDescription = "Filter",
-                tint = Color.Black
+                tint = if (MaterialTheme.colors.isLight) {
+                    Color.Black
+                } else {
+                    Color.White
+                }
             )
         }
     }
@@ -432,13 +442,11 @@ class AlbumDynamicContentFragment : Fragment() {
         actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
             actionModeCallback
         )
-        managerActivity.showHideBottomNavigationView(true)
     }
 
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
-        managerActivity.showHideBottomNavigationView(false)
     }
 
     private fun handleActionMode(photo: Photo) {
