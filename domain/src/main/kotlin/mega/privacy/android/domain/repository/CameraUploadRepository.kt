@@ -348,6 +348,14 @@ interface CameraUploadRepository {
     suspend fun getChargingOnSize(): Int
 
     /**
+     * Update camera upload folder (node list) icon
+     *
+     * @param nodeHandle    updated node handle
+     * @param isSecondary   if updated node handle is secondary media
+     */
+    suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
+
+    /**
      * Get the media queue for a given media type
      *
      * @param mediaStoreFileType different media store file type
