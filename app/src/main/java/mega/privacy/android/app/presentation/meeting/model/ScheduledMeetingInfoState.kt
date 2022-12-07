@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property retentionTimeSeconds                       Retention time seconds.
  * @property meetingLink                                Meeting link.
  * @property chatTitle                                  Chat title.
+ * @property openSendToChat                             True, open sent to chat screen. False, otherwise.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property isPublic                                   If chat room is public.
@@ -44,6 +45,7 @@ data class ScheduledMeetingInfoState(
     val retentionTimeSeconds: Long? = null,
     val meetingLink: String? = null,
     val chatTitle: String = "",
+    val openSendToChat: Boolean = false,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val isPublic: Boolean = false,

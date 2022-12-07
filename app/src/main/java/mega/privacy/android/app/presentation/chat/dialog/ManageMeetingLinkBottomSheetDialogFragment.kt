@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetManageMeetingLinkBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaChatApiJava
@@ -78,7 +77,7 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
         }
 
         binding.sendManageMeetingLinkOption.setOnClickListener {
-            (requireActivity() as ScheduledMeetingInfoActivity).openSendToChat()
+            viewModel.openSendToChat(true)
             setStateBottomSheetBehaviorHidden()
         }
 

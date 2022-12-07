@@ -667,6 +667,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun snackbarShown() = _state.update { it.copy(snackBar = null) }
 
+    /**
+     * Open send to screen
+     */
+    fun openSendToChat(shouldOpen: Boolean) {
+        _state.update { it.copy(openSendToChat = shouldOpen) }
+    }
+
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
     }
