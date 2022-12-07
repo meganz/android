@@ -632,4 +632,12 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
+
+    override fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkCreate(renew, listener)
+    }
+
+    override fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkDelete(handle, listener)
+    }
 }

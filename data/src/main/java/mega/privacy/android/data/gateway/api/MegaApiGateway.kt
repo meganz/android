@@ -1103,4 +1103,22 @@ interface MegaApiGateway {
         transactions: Boolean,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Create a contact link
+     *
+     * @param renew – True to invalidate the previous contact link (if any).
+     * @param listener – MegaRequestListener to track this request
+     */
+    fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Delete a contact link
+     *
+     * @param handle   Handle of the contact link to delete
+     *                 If the parameter is INVALID_HANDLE, the active contact link is deleted
+     * @param listener MegaRequestListener to track this request
+     *
+     */
+    fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface)
 }
