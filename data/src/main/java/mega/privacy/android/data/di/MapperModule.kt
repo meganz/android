@@ -39,6 +39,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
+import mega.privacy.android.data.mapper.PricingMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -92,6 +93,7 @@ import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
+import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toRecentActionBucket
 import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toShareModel
@@ -452,4 +454,11 @@ internal class MapperModule {
 
     @Provides
     fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
+
+    /**
+     * Provide pricing mapper
+     *
+     */
+    @Provides
+    fun providePricingMapper(): PricingMapper = ::toPricing
 }

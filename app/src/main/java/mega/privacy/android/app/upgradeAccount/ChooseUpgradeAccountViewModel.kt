@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.Product
+import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
