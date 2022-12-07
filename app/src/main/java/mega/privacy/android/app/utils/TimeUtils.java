@@ -205,7 +205,9 @@ public class TimeUtils implements Comparator<Calendar> {
                 break;
             case DATE_LONG_FORMAT:
             default:
-                dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG);
+                dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT)
+                        .withLocale(Locale.getDefault())
+                        .withZone(ZoneId.systemDefault());
                 break;
         }
 
