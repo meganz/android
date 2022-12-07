@@ -57,6 +57,7 @@ import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -106,6 +107,7 @@ import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
+import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -447,4 +449,7 @@ internal class MapperModule {
      */
     @Provides
     fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper = ::toCountryCallingCodes
+
+    @Provides
+    fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
 }

@@ -11,11 +11,13 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -48,6 +50,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val videoQualityMapper: VideoQualityMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -240,8 +243,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getRemoveGpsDefault()
     }
 
-    override suspend fun getUploadVideoQuality(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getUploadVideoQuality()
+    override suspend fun getUploadVideoQuality(): VideoQuality? = withContext(ioDispatcher) {
+        videoQualityMapper(localStorageGateway.getUploadVideoQuality())
     }
 
     override suspend fun getKeepFileNames(): Boolean = withContext(ioDispatcher) {
