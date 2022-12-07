@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.LocalPricing
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
+import mega.privacy.android.domain.entity.billing.Pricing
 
 
 /**
@@ -21,4 +22,10 @@ interface BillingRepository {
      *
      */
     suspend fun getPaymentMethod(clearCache: Boolean): PaymentMethodFlags
+
+    /**
+     * Get pricing
+     *
+     */
+    suspend fun getPricing(clearCache: Boolean): Pricing
 }
