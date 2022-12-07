@@ -1,7 +1,4 @@
-package mega.privacy.android.app
-
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+package mega.privacy.android.domain.entity
 
 /**
  * Data class containing all the required to present a product (PRO plan subscription) available.
@@ -15,14 +12,13 @@ import kotlinx.parcelize.Parcelize
  * @property currency   Currency of the product
  * @property isBusiness Flag to indicate if the product is business or not
  */
-@Parcelize
 data class Product(
-    var handle: Long,
-    var level: Int,
-    var months: Int,
-    var storage: Int,
-    var transfer: Int,
-    var amount: Int,
-    var currency: String?,
-    var isBusiness: Boolean,
-) : Parcelable
+    val handle: Long,
+    val level: Int,
+    val months: Int,
+    val storage: Int,
+    val transfer: Int,
+    val amount: Int,
+    val currency: String?,
+    val isBusiness: Boolean,
+)

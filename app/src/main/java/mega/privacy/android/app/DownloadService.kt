@@ -77,6 +77,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -1365,7 +1366,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     private fun resultTransfersVoiceClip(nodeHandle: Long, result: Int) {
         Timber.d("nodeHandle =  $nodeHandle, the result is $result")
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED)
-        intent.putExtra(Constants.EXTRA_NODE_HANDLE, nodeHandle)
+        intent.putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
         intent.putExtra(Constants.EXTRA_RESULT_TRANSFER, result)
         sendBroadcast(intent)
     }

@@ -494,11 +494,6 @@ interface MegaLocalStorageGateway {
     suspend fun getPricingTimeStamp(): String?
 
     /**
-     * Gets payment methods timestamp
-     */
-    suspend fun getPaymentMethodsTimeStamp(): String?
-
-    /**
      * This method is to clear Camera Sync Records from the Database
      *
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record

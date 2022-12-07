@@ -116,6 +116,7 @@ import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 
 /**
  * Provides the use case implementation for camera upload
@@ -166,6 +167,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetPendingSyncRecords(cameraUploadRepository: CameraUploadRepository): GetPendingSyncRecords =
             GetPendingSyncRecords(cameraUploadRepository::getPendingSyncRecords)
+
+        /**
+         * Provide the [UpdateFolderIconBroadcast]
+         */
+        @Provides
+        fun provideUpdateFolderIconBroadcast(cameraUploadRepository: CameraUploadRepository): UpdateFolderIconBroadcast =
+            UpdateFolderIconBroadcast(cameraUploadRepository::sendUpdateFolderIconBroadcast)
 
         /**
          * Provide the [MediaLocalPathExists] implementation

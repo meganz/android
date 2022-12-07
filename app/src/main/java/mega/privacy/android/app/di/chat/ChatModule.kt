@@ -10,7 +10,9 @@ import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
+import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.DefaultGetMeetings
+import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -33,6 +35,12 @@ import mega.privacy.android.domain.usecase.StartChatCall
 @Module
 @InstallIn(SingletonComponent::class, ViewModelComponent::class)
 abstract class ChatModule {
+
+    /**
+     * Get chat participants
+     */
+    @Binds
+    abstract fun bindGetChatParticipants(useCase: DefaultGetChatParticipants): GetChatParticipants
 
     /**
      * Get chat meetings

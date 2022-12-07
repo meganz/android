@@ -17,7 +17,7 @@ class DefaultGetCameraUploadSelectionQuery @Inject constructor(
 
     override suspend fun invoke(timestampType: SyncTimeStamp): String? {
         val currentTimeStamp =
-            cameraUploadRepository.getSyncTimeStamp(timestampType)?.toLongOrNull() ?: 0L
+            cameraUploadRepository.getSyncTimeStamp(timestampType) ?: 0L
 
         // Do not create selection query if secondary preferences are not enabled or set (null)
         if (timestampType == SyncTimeStamp.SECONDARY_PHOTO || timestampType == SyncTimeStamp.SECONDARY_VIDEO) {

@@ -630,6 +630,24 @@ class AlbumsViewModelTest {
         }
     }
 
+    @Test
+    fun `test that delete album confirmation is shown properly`() = runTest {
+        underTest.showDeleteAlbumsConfirmation()
+        underTest.state.test {
+            val showDeleteAlbumsConfirmation = awaitItem().showDeleteAlbumsConfirmation
+            assertThat(showDeleteAlbumsConfirmation).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that delete album confirmation is closed properly`() = runTest {
+        underTest.closeDeleteAlbumsConfirmation()
+        underTest.state.test {
+            val showDeleteAlbumsConfirmation = awaitItem().showDeleteAlbumsConfirmation
+            assertThat(showDeleteAlbumsConfirmation).isFalse()
+        }
+    }
+
     private fun createUserAlbum(
         id: AlbumId = AlbumId(0L),
         title: String = "",

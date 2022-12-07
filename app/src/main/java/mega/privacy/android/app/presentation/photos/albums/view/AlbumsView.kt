@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,10 +22,13 @@ import androidx.compose.material.Card
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,6 +70,7 @@ import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
 import mega.privacy.android.presentation.theme.white_alpha_087
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumsView(
     albumsViewState: AlbumsViewState,
@@ -88,121 +93,128 @@ fun AlbumsView(
     val displayFAB by produceState(initialValue = false) {
         value = isUserAlbumsEnabled()
     }
+    val scaffoldState = rememberScaffoldState()
 
-    LazyVerticalGrid(
-        contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        columns = GridCells.Fixed(grids),
-        modifier = Modifier.fillMaxSize()
+    if (albumsViewState.albumDeletedMessage.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = albumsViewState.albumDeletedMessage,
+            )
+            delay(3000L)
+            clearAlbumDeletedMessage()
+        }
+    }
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        snackbarHost = { snackbarHostState ->
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { snackbarData ->
+                    Snackbar(
+                        snackbarData = snackbarData,
+                        backgroundColor = black.takeIf { isLight } ?: white,
+                    )
+                }
+            )
+        },
+        floatingActionButton = {
+            if (displayFAB) {
+                val placeholderText =
+                    stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
+                FloatingActionButton(
+                    onClick = {
+                        openDialog.value = true
+                        setDialogInputPlaceholder(placeholderText)
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Create new album",
+                        tint = if (!MaterialTheme.colors.isLight) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    )
+                }
+            }
+        },
     ) {
-        items(
-            items = albumsViewState.albums,
-            key = { it.id.toString() + it.coverPhoto?.id.toString() }
-        ) { album ->
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        openAlbum(album)
-                    }
-                    .clip(RoundedCornerShape(10.dp))
-                    .fillMaxSize()
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val imageState = produceState<String?>(initialValue = null) {
-                        album.coverPhoto?.let {
-                            downloadPhoto(
-                                false,
-                                it
-                            ) { downloadSuccess ->
-                                if (downloadSuccess) {
-                                    value = it.thumbnailFilePath
+        LazyVerticalGrid(
+            contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            columns = GridCells.Fixed(grids),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(
+                items = albumsViewState.albums,
+                key = { it.id.toString() + it.coverPhoto?.id.toString() }
+            ) { album ->
+                Box(
+                    modifier = Modifier
+                        .clickable {
+                            openAlbum(album)
+                        }
+                        .clip(RoundedCornerShape(10.dp))
+                        .fillMaxSize()
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        val imageState = produceState<String?>(initialValue = null) {
+                            album.coverPhoto?.let {
+                                downloadPhoto(
+                                    false,
+                                    it
+                                ) { downloadSuccess ->
+                                    if (downloadSuccess) {
+                                        value = it.thumbnailFilePath
+                                    }
                                 }
                             }
                         }
-                    }
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(imageState.value)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null,
-                        placeholder = if (!MaterialTheme.colors.isLight) {
-                            painterResource(id = R.drawable.ic_album_cover_d)
-                        } else {
-                            painterResource(id = R.drawable.ic_album_cover)
-                        },
-                        error = if (!MaterialTheme.colors.isLight) {
-                            painterResource(id = R.drawable.ic_album_cover_d)
-                        } else {
-                            painterResource(id = R.drawable.ic_album_cover)
-                        },
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(10.dp))
-                            .aspectRatio(1f)
-                    )
-                    MiddleEllipsisText(
-                        modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                        text = album.title,
-                        style = subtitle2,
-                        color = if (MaterialTheme.colors.isLight) black else white,
-                        fontWeight = FontWeight.Medium
-                    )
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(imageState.value)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = null,
+                            placeholder = if (!MaterialTheme.colors.isLight) {
+                                painterResource(id = R.drawable.ic_album_cover_d)
+                            } else {
+                                painterResource(id = R.drawable.ic_album_cover)
+                            },
+                            error = if (!MaterialTheme.colors.isLight) {
+                                painterResource(id = R.drawable.ic_album_cover_d)
+                            } else {
+                                painterResource(id = R.drawable.ic_album_cover)
+                            },
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(10.dp))
+                                .aspectRatio(1f)
+                        )
+                        MiddleEllipsisText(
+                            modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
+                            text = album.title,
+                            style = subtitle2,
+                            color = if (MaterialTheme.colors.isLight) black else white,
+                            fontWeight = FontWeight.Medium
+                        )
 
-                    Text(
-                        text = album.count.toString(),
-                        style = caption,
-                        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                    )
+                        Text(
+                            text = album.count.toString(),
+                            style = caption,
+                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                        )
+                    }
                 }
             }
         }
     }
 
     if (displayFAB) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            if (albumsViewState.albumDeletedMessage.isNotEmpty()) {
-                Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(8.dp, 80.dp),
-                    backgroundColor = black.takeIf { isLight } ?: white,
-                ) {
-                    Text(text = albumsViewState.albumDeletedMessage)
-                }
-
-                LaunchedEffect(Unit) {
-                    delay(3000L)
-                    clearAlbumDeletedMessage()
-                }
-            }
-
-            val placeholderText =
-                stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
-            FloatingActionButton(
-                modifier = Modifier.padding(all = 16.dp),
-                onClick = {
-                    openDialog.value = true
-                    setDialogInputPlaceholder(placeholderText)
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Create new album",
-                    tint = if (!MaterialTheme.colors.isLight) {
-                        Color.Black
-                    } else {
-                        Color.White
-                    }
-                )
-            }
-        }
-
         if (!albumsViewState.isAlbumCreatedSuccessfully) {
             if (openDialog.value) {
                 CreateNewAlbumDialog(
@@ -230,8 +242,8 @@ fun AlbumsView(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun DeleteAlbumsConfirmationDialog(
-    selectedAlbumIds: Set<AlbumId>,
+fun DeleteAlbumsConfirmationDialog(
+    selectedAlbumIds: List<AlbumId>,
     onCancelClicked: () -> Unit,
     onDeleteClicked: (albumIds: List<AlbumId>) -> Unit,
 ) {
@@ -288,7 +300,7 @@ private fun DeleteAlbumsConfirmationDialog(
                         text = stringResource(id = R.string.delete_button),
                         modifier = Modifier.clickable {
                             onCancelClicked()
-                            onDeleteClicked(selectedAlbumIds.toList())
+                            onDeleteClicked(selectedAlbumIds)
                         },
                         color = teal_300,
                         style = MaterialTheme.typography.button,
