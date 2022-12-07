@@ -574,11 +574,20 @@ interface MegaApiGateway {
     suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
 
     /**
-     * get user avatar color
+     * Get the default color for the avatar
      *
      * @param megaUser
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
      */
     suspend fun getUserAvatarColor(megaUser: MegaUser): String
+
+    /**
+     * Get the default color for the avatar
+     *
+     * @param userHandle
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
+     */
+    suspend fun getUserAvatarColor(userHandle: Long): String
 
     /**
      * Get user avatar
