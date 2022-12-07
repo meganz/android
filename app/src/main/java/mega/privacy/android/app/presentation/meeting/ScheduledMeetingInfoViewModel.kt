@@ -460,9 +460,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * See more participants in the list.
+     * See more or less participants in the list.
      */
-    fun onSeeMoreTap() {
+    fun onSeeMoreOrLessTap() {
+        _state.update { state ->
+            state.copy(seeMoreVisible = !state.seeMoreVisible)
+        }
+
     }
 
     /**
