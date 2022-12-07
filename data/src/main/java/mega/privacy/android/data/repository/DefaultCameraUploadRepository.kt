@@ -162,13 +162,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.saveSyncRecord(record)
     }
 
-    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): String? {
+    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long? {
         return withContext(ioDispatcher) {
             when (type) {
                 SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
+                    ?.toLongOrNull()
                 SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.getVideoTimeStamp()
+                    ?.toLongOrNull()
                 SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.getSecondaryPhotoTimeStamp()
+                    ?.toLongOrNull()
                 SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.getSecondaryVideoTimeStamp()
+                    ?.toLongOrNull()
             }
         }
     }

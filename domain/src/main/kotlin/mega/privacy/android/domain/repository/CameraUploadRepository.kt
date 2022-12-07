@@ -60,7 +60,7 @@ interface CameraUploadRepository {
      *
      * @return sync timestamp
      */
-    suspend fun getSyncTimeStamp(type: SyncTimeStamp): String?
+    suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long?
 
     /**
      * Set camera upload sync timestamp
