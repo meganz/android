@@ -16,7 +16,7 @@ internal fun toChatRoom(megaChatRoom: MegaChatRoom): ChatRoom =
         mapChanges(megaChatRoom.changes),
         megaChatRoom.title,
         megaChatRoom.hasCustomTitle(),
-        mapOwnPrivilege(megaChatRoom.ownPrivilege),
+        userPermission[megaChatRoom.ownPrivilege] ?: ChatRoomPermission.Unknown,
         megaChatRoom.isGroup,
         megaChatRoom.isPublic,
         megaChatRoom.isPreview,
@@ -28,16 +28,6 @@ internal fun toChatRoom(megaChatRoom: MegaChatRoom): ChatRoom =
         megaChatRoom.isOpenInvite,
         megaChatRoom.isSpeakRequest,
     )
-
-private fun mapOwnPrivilege(ownPrivilege: Int): ChatRoomPermission =
-    when (ownPrivilege) {
-        MegaChatRoom.PRIV_RM -> ChatRoomPermission.Removed
-        MegaChatRoom.PRIV_RO -> ChatRoomPermission.ReadOnly
-        MegaChatRoom.PRIV_STANDARD -> ChatRoomPermission.Standard
-        MegaChatRoom.PRIV_MODERATOR -> ChatRoomPermission.Moderator
-        else -> ChatRoomPermission.Unknown
-
-    }
 
 private fun mapChanges(changes: Int): ChatRoomChanges {
     return when (changes) {
