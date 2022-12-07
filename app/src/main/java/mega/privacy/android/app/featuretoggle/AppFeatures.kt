@@ -36,7 +36,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Dynamic album layout toggle
      */
-    DynamicAlbum("Enable dynamic album feature", false),
+    DynamicAlbum("Enable dynamic album feature", true),
 
     /**
      * App Test toggle
