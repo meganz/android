@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.entity.VideoQuality
+
 /**
  * The use case interface to enable camera uploads
  */
@@ -15,7 +17,7 @@ interface EnablePhotosCameraUpload {
         path: String?,
         syncVideo: Boolean,
         enableCellularSync: Boolean,
-        videoQuality: Int,
+        videoQuality: VideoQuality,
         conversionChargingOnSize: Int,
     )
 }

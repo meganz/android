@@ -1,8 +1,14 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
+/**
+ * Default enable photos camera upload
+ *
+ * @property settingsRepository
+ */
 class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) : EnablePhotosCameraUpload {
@@ -11,17 +17,19 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
         path: String?,
         syncVideo: Boolean,
         enableCellularSync: Boolean,
-        videoQuality: Int,
+        videoQuality: VideoQuality,
         conversionChargingOnSize: Int,
     ) {
-        settingsRepository.setCameraUploadLocalPath(path)
-        settingsRepository.setCamSyncWifi(!enableCellularSync)
-        settingsRepository.setCameraUploadFileType(syncVideo)
-        settingsRepository.setCameraFolderExternalSDCard(false)
-        settingsRepository.setCameraUploadVideoQuality(videoQuality)
-        settingsRepository.setConversionOnCharging(true)
-        settingsRepository.setChargingOnSize(conversionChargingOnSize)
-        // After target and local folder setup, then enable CU.
-        settingsRepository.setEnableCameraUpload(true)
+        with(settingsRepository) {
+            setCameraUploadLocalPath(path)
+            setCamSyncWifi(!enableCellularSync)
+            setCameraUploadFileType(syncVideo)
+            setCameraFolderExternalSDCard(false)
+            setCameraUploadVideoQuality(videoQuality)
+            setConversionOnCharging(true)
+            setChargingOnSize(conversionChargingOnSize)
+            // After target and local folder setup, then enable CU.
+            setEnableCameraUpload(true)
+        }
     }
 }
