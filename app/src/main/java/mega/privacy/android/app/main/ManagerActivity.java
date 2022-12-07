@@ -275,7 +275,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
-import mega.privacy.android.app.Product;
+import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;

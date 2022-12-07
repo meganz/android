@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.app.Product
+import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
