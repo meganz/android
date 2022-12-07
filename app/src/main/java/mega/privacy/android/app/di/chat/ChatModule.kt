@@ -8,9 +8,13 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
-
 import mega.privacy.android.domain.usecase.CheckChatLink
+import mega.privacy.android.domain.usecase.CreateChatLink
+import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
+import mega.privacy.android.domain.usecase.DefaultGetMeetings
+import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
@@ -22,9 +26,6 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
-import mega.privacy.android.domain.usecase.CreateChatLink
-import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
-import mega.privacy.android.domain.usecase.GetChatParticipants
 
 /**
  * Chats module.
@@ -40,6 +41,12 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindGetChatParticipants(useCase: DefaultGetChatParticipants): GetChatParticipants
+
+    /**
+     * Get chat meetings
+     */
+    @Binds
+    abstract fun bindGetMeetings(useCase: DefaultGetMeetings): GetMeetings
 
     companion object {
         /**

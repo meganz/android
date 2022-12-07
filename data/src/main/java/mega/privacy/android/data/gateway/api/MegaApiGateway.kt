@@ -1121,4 +1121,12 @@ interface MegaApiGateway {
      *
      */
     fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Returns whether notifications about a chat have to be generated.
+     *
+     * @param chatId    Chat id
+     * @return          True if notifications has to be created, false otherwise.
+     */
+    fun isChatNotifiable(chatId: Long): Boolean
 }
