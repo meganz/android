@@ -10,6 +10,7 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -67,6 +68,7 @@ class DefaultCameraUploadRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = mock(),
             broadcastReceiverGateway = mock(),
+            videoQualityMapper = ::toVideoQuality,
         )
     }
 
@@ -186,12 +188,6 @@ class DefaultCameraUploadRepositoryTest {
     fun `test camera upload retrieves remove GPS preference`() = runTest {
         whenever(localStorageGateway.getRemoveGpsDefault()).thenReturn(false)
         assertThat(underTest.getRemoveGpsDefault()).isEqualTo(false)
-    }
-
-    @Test
-    fun `test camera upload retrieves upload video quality`() = runTest {
-        whenever(localStorageGateway.getUploadVideoQuality()).thenReturn("")
-        assertThat(underTest.getUploadVideoQuality()).isEqualTo("")
     }
 
     @Test
