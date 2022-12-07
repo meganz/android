@@ -98,12 +98,17 @@ internal class DefaultAvatarRepository @Inject constructor(
     override suspend fun getAvatarFile(userHandle: Long): File? =
         withContext(ioDispatcher) {
             val email = getUserEmail(userHandle)
-            val file = cacheFolderGateway.buildAvatarFile(email + FileConstant.JPG_EXTENSION)
+            getAvatarFile(email)
+        }
+
+    override suspend fun getAvatarFile(userEmail: String): File? =
+        withContext(ioDispatcher) {
+            val file = cacheFolderGateway.buildAvatarFile(userEmail + FileConstant.JPG_EXTENSION)
                 ?: error("Could not generate avatar file")
 
             suspendCoroutine { continuation ->
                 megaApiGateway.getContactAvatar(
-                    email,
+                    userEmail,
                     file.absolutePath,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { _: MegaRequest, error: MegaError ->

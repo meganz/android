@@ -25,6 +25,13 @@ interface AvatarRepository {
     /**
      * Get avatar file for an user
      *
+     * @param userEmail  User email
+     */
+    suspend fun getAvatarFile(userEmail: String): File?
+
+    /**
+     * Get avatar file for an user
+     *
      * @param userHandle  User handle
      */
     suspend fun getAvatarFile(userHandle: Long): File?
