@@ -334,19 +334,19 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun backupTimestampsAndFolderHandle(
         primaryUploadFolderHandle: Long,
         secondaryUploadFolderHandle: Long,
-        camSyncTimeStamp: String?,
-        camVideoSyncTimeStamp: String?,
-        secSyncTimeStamp: String?,
-        secVideoSyncTimeStamp: String?,
+        camSyncTimeStamp: Long?,
+        camVideoSyncTimeStamp: Long?,
+        secSyncTimeStamp: Long?,
+        secVideoSyncTimeStamp: Long?,
     ) {
         withContext(ioDispatcher) {
             cameraTimestampsPreferenceGateway.backupTimestampsAndFolderHandle(
                 primaryUploadFolderHandle,
                 secondaryUploadFolderHandle,
-                camSyncTimeStamp,
-                camVideoSyncTimeStamp,
-                secSyncTimeStamp,
-                secVideoSyncTimeStamp)
+                camSyncTimeStamp?.toString(),
+                camVideoSyncTimeStamp?.toString(),
+                secSyncTimeStamp?.toString(),
+                secVideoSyncTimeStamp?.toString())
         }
     }
 
