@@ -203,7 +203,7 @@ class TimelineViewModel @Inject constructor(
                 path = localFile?.absolutePath,
                 syncVideo = _state.value.cuUploadsVideos,
                 enableCellularSync = _state.value.cuUseCellularConnection,
-                videoQuality = VideoQuality.ORIGINAL.value,
+                videoQuality = VideoQuality.ORIGINAL,
                 conversionChargingOnSize = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
             )
             Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
