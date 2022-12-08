@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
@@ -336,8 +337,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             monitorChatListItemUpdates().collectLatest { item ->
                 when (item.changes) {
                     ChatListItemChanges.LastMessage -> {
-                        if (item.lastMessageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE ||
-                            item.lastMessageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE
+                        if (item.lastMessageType == ChatRoomLastMessage.PublicHandleCreate ||
+                            item.lastMessageType == ChatRoomLastMessage.PublicHandleDelete
                         ) {
                             queryChatLink()
                         }
@@ -460,9 +461,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * See more participants in the list.
+     * See more or less participants in the list.
      */
-    fun onSeeMoreTap() {
+    fun onSeeMoreOrLessTap() {
+        _state.update { state ->
+            state.copy(seeMoreVisible = !state.seeMoreVisible)
+        }
+
     }
 
     /**
@@ -666,6 +671,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Updates state after shown snackBar.
      */
     fun snackbarShown() = _state.update { it.copy(snackBar = null) }
+
+    /**
+     * Open send to screen
+     */
+    fun openSendToChat(shouldOpen: Boolean) {
+        _state.update { it.copy(openSendToChat = shouldOpen) }
+    }
 
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100

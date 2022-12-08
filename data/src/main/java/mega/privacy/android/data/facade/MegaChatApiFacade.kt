@@ -297,7 +297,14 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.createChatLink(chatId, listener)
 
-    companion object {
-        const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
-    }
+    override fun getOnlineStatus(): Int =
+        chatApi.onlineStatus
+
+    override fun getMyUserHandle(): Long = chatApi.myUserHandle
+
+    override fun getMyFullname(): String = chatApi.myFullname
+
+    override fun getMyEmail(): String = chatApi.myEmail
+
+    override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
 }

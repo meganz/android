@@ -171,4 +171,24 @@ interface AccountRepository {
      */
     suspend fun areAchievementsEnabled(): Boolean
 
+    /**
+     * logout
+     */
+    suspend fun logout()
+
+    /**
+     * Create a contact link
+     *
+     * @param renew – True to invalidate the previous contact link (if any).
+     * @return string of contact link.
+     */
+    suspend fun createContactLink(renew: Boolean): String
+
+    /**
+     * Delete a contact link
+     *
+     * @param handle   Handle of the contact link to delete
+     *                 If the parameter is INVALID_HANDLE, the active contact link is deleted
+     */
+    suspend fun deleteContactLink(handle: Long)
 }

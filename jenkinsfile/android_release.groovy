@@ -140,7 +140,7 @@ pipeline {
                 }
                 withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                     script {
-                        sh '''
+                        sh """
                             cd ${WORKSPACE}
                             git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git
                             git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
@@ -153,7 +153,7 @@ pipeline {
                             cd ../../megachat/sdk
                             git fetch
                             cd ${WORKSPACE}
-                        '''
+                        """
                     }
                 }
 

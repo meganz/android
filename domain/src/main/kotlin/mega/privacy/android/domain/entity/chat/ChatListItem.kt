@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 
 /**
@@ -35,7 +36,7 @@ data class ChatListItem(
     val unreadCount: Int = 0,
     val lastMessage: String = "",
     val lastMessageId: Long = -1,
-    val lastMessageType: Int = 0,
+    val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
     val lastMessageSender: Long,
     val lastTimestamp: Long,
     val isGroup: Boolean = false,

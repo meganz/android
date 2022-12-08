@@ -1,7 +1,8 @@
 package mega.privacy.android.domain.repository
 
-import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.LocalPricing
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
+import mega.privacy.android.domain.entity.billing.Pricing
 
 
 /**
@@ -9,16 +10,22 @@ import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
  */
 interface BillingRepository {
     /**
-     * Get local price and local currency for specific plan available at Google Store or Huawei Store
+     * Get local pricing for specific option available at Google Store
      *
-     * @param sku [String] specific string for each subscription plan
-     * @return formatted local price string
+     * @param sku [String] specific string for each subscription option
+     * @return LocalPricing?
      */
-    suspend fun getLocalPricing(sku: String): MegaSku?
+    suspend fun getLocalPricing(sku: String): LocalPricing?
 
     /**
      * Get payment method
      *
      */
     suspend fun getPaymentMethod(clearCache: Boolean): PaymentMethodFlags
+
+    /**
+     * Get pricing
+     *
+     */
+    suspend fun getPricing(clearCache: Boolean): Pricing
 }

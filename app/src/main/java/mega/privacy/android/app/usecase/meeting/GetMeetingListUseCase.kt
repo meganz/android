@@ -13,14 +13,10 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.meeting.list.MeetingItem
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -32,8 +28,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -48,13 +42,12 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.File
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAccessor
 import java.util.Calendar
-import java.util.Calendar.DAY_OF_YEAR
-import java.util.Calendar.HOUR_OF_DAY
-import java.util.Calendar.MINUTE
-import java.util.Calendar.getInstance
 import javax.inject.Inject
-import kotlin.random.Random
 
 /**
  * Get meeting list use case
@@ -71,17 +64,11 @@ class GetMeetingListUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatChangesUseCase: GetChatChangesUseCase,
     private val getLastMessageUseCase: GetLastMessageUseCase,
-    private val getFeatureFlag: GetFeatureFlagValue,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
 
     private val hourFormat by lazy { SimpleDateFormat("hh:mm") }
-    private var enableScheduleMeetings = false
-
-    init {
-        CoroutineScope(defaultDispatcher).launch {
-            enableScheduleMeetings = getFeatureFlag(AppFeatures.ScheduleMeeting)
-        }
+    private val scheduleTimeFormatter: DateTimeFormatter by lazy {
+        DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss").withZone(ZoneOffset.UTC)
     }
 
     /**
@@ -279,10 +266,10 @@ class GetMeetingListUseCase @Inject constructor(
             onSuccess = { lastMessageFormatted = it },
             onError = Timber::w
         )
-        val isScheduled = enableScheduleMeetings && Random.nextBoolean()
+        val scheduledMeeting = megaChatApi.getScheduledMeetingsByChat(chatId).firstOrNull()
         var isRecurring = false
         val lastMessageIcon = when {
-            isScheduled ->
+            scheduledMeeting != null ->
                 null
             chatListItem.lastMessageType == MegaChatMessage.TYPE_VOICE_CLIP ->
                 R.drawable.ic_mic_on_small
@@ -294,17 +281,12 @@ class GetMeetingListUseCase @Inject constructor(
         var startTime: Calendar? = null
         var endTime: Calendar? = null
         var formattedScheduledTimestamp: String? = null
-        if (isScheduled) {
-            isRecurring = Random.nextBoolean()
-            startTime = getInstance().apply {
-                set(DAY_OF_YEAR, get(DAY_OF_YEAR) + Random.nextInt(7))
-                set(HOUR_OF_DAY, Random.nextInt(20))
-                set(MINUTE, Random.nextInt(60))
-            }
-            endTime = getInstance().apply {
-                timeInMillis = startTime.timeInMillis
-                set(HOUR_OF_DAY, get(HOUR_OF_DAY) + Random.nextInt(1, 4))
-            }
+        if (scheduledMeeting != null) {
+            isRecurring = false
+            val parsedStartTime = scheduleTimeFormatter.parse(scheduledMeeting.startDateTime())
+            val parsedEndTime = scheduleTimeFormatter.parse(scheduledMeeting.endDateTime())
+            startTime = parsedStartTime.toCalendar()
+            endTime = parsedEndTime.toCalendar()
             val scheduleText = "${hourFormat.format(startTime.time)} - ${hourFormat.format(endTime.time)}"
             formattedScheduledTimestamp = if (isRecurring) {
                 StringResourcesUtils.getString(R.string.meetings_list_scheduled_meeting_weekly_label, scheduleText)
@@ -390,4 +372,9 @@ class GetMeetingListUseCase @Inject constructor(
         lastMessageType == MegaChatMessage.TYPE_CONTAINS_META
                 && megaChatApi.getMessage(chatId, lastMessageId)
             ?.containsMeta?.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
+
+    private fun TemporalAccessor.toCalendar(): Calendar =
+        Calendar.getInstance().apply {
+            timeInMillis = Instant.from(this@toCalendar).toEpochMilli()
+        }
 }

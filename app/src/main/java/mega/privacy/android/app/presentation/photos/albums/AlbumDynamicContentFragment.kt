@@ -356,7 +356,7 @@ class AlbumDynamicContentFragment : Fragment() {
         modifier: Modifier,
     ) {
         Snackbar(
-            modifier = modifier.padding(8.dp).alpha(0.87f),
+            modifier = modifier.padding(8.dp),
             backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
         ) {
             Text(
@@ -395,19 +395,24 @@ class AlbumDynamicContentFragment : Fragment() {
 
     private fun openPhoto(photo: Photo) {
         albumsViewModel.state.value.currentAlbum?.let { album ->
-            val albumPhotosHandles =
-                albumsViewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
-                    photo.id
-                }
+            albumsViewModel.state.value.apply {
+                val sourcePhotos = albums.getAlbumPhotos(album)
+                val currentAlbumPhotos = sourcePhotos
+                    .applyFilter(currentMediaType = currentMediaType)
+                    .takeIf {
+                        currentMediaType != FilterMediaType.ALL_MEDIA
+                    }?.applySortBy(currentSort = currentSort)
+                    ?: sourcePhotos.applySortBy(currentSort = currentSort)
 
-            val intent = ImageViewerActivity.getIntentForChildren(
-                requireContext(),
-                albumPhotosHandles.toLongArray(),
-                photo.id,
-            )
+                val intent = ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    currentAlbumPhotos.map { it.id }.toLongArray(),
+                    photo.id,
+                )
 
-            startActivity(intent)
-            managerActivity.overridePendingTransition(0, 0)
+                startActivity(intent)
+                managerActivity.overridePendingTransition(0, 0)
+            }
         }
     }
 

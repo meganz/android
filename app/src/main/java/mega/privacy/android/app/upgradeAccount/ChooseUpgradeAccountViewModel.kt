@@ -6,15 +6,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
@@ -23,26 +22,27 @@ import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
-import mega.privacy.android.app.utils.DBUtil.callToPricing
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.GetPricing
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.text.NumberFormat
-import java.util.BitSet
 import java.util.Currency
 import javax.inject.Inject
 
 @HiltViewModel
-class ChooseUpgradeAccountViewModel @Inject constructor(
+internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     private val getPaymentMethod: GetPaymentMethod,
-) : BaseRxViewModel() {
+    private val getPricing: GetPricing,
+) : ViewModel() {
 
     companion object {
         const val TYPE_STORAGE_LABEL = 0
@@ -57,12 +57,12 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
     private val currentUpgradeClickedAndSubscription =
         MutableLiveData<Pair<Int, SubscriptionMethod>?>()
 
-    private val _paymentBitSet = MutableStateFlow(BitSet())
+    private val _state = MutableStateFlow(ChooseUpgradeAccountState())
 
     /**
      * Payment method
      */
-    val paymentBitSet = _paymentBitSet.asStateFlow()
+    val state = _state.asStateFlow()
 
     fun onUpgradeClick(): LiveData<Int> = upgradeClick
     fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, SubscriptionMethod>?> =
@@ -70,6 +70,7 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
 
     init {
         getPaymentMethod()
+        refreshPricing()
     }
 
     /**
@@ -79,7 +80,9 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
     fun getPaymentMethod() {
         viewModelScope.launch {
             val paymentMethod = getPaymentMethod(false)
-            _paymentBitSet.value = convertToBitSet(paymentMethod.flag)
+            _state.update {
+                it.copy(paymentBitSet = convertToBitSet(paymentMethod.flag))
+            }
         }
     }
 
@@ -124,25 +127,19 @@ class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun isPurchasedAlready(sku: String): Boolean = myAccountInfo.isPurchasedAlready(sku)
 
-    fun getProductAccounts(): ArrayList<Product>? = myAccountInfo.productAccounts
+    fun getProductAccounts(): List<Product> = state.value.product
 
     fun isBillingAvailable(): Boolean = !myAccountInfo.availableSkus.isNullOrEmpty()
-
-    fun checkProductAccounts(): ArrayList<Product>? {
-        val productAccounts = getProductAccounts()
-
-        return if (productAccounts == null) {
-            MegaApplication.getInstance().askForPricing()
-            null
-        } else productAccounts
-    }
 
     /**
      * Asks for pricing if needed.
      */
     fun refreshPricing() {
-        if (callToPricing()) {
-            MegaApplication.getInstance().askForPricing()
+        viewModelScope.launch {
+            val pricing = getPricing(false)
+            _state.update {
+                it.copy(product = pricing.products)
+            }
         }
     }
 

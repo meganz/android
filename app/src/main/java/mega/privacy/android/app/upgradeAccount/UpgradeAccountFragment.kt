@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentUpgradeAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
@@ -26,6 +27,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.Product
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -57,7 +59,7 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
 
         when (action) {
             Constants.UPDATE_ACCOUNT_DETAILS -> showAvailableAccount()
-            Constants.UPDATE_GET_PRICING -> setPricingInfo()
+            Constants.UPDATE_GET_PRICING -> setPricingInfo(viewModel.getProductAccounts())
         }
     }
 
@@ -148,7 +150,6 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
         checkScroll()
         setAccountDetails()
         showAvailableAccount()
-        setPricingInfo()
     }
 
     /**
@@ -164,6 +165,9 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
             updateMyAccountReceiver,
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
+        viewLifecycleOwner.collectFlow(viewModel.state) {
+            setPricingInfo(it.product)
+        }
         viewModel.onUpgradeClick().observe(viewLifecycleOwner) { upgradeType ->
             startActivity(
                 Intent(requireActivity(), PaymentActivity::class.java)
@@ -212,11 +216,9 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
         }
     }
 
-    private fun setPricingInfo() {
-        val productAccounts = viewModel.getProductAccounts()
-
-        if (productAccounts == null) {
-            Timber.d("productAccounts == null")
+    private fun setPricingInfo(productAccounts: List<Product>) {
+        if (productAccounts.isEmpty()) {
+            Timber.d("productAccounts empty")
             viewModel.refreshPricing()
             return
         }

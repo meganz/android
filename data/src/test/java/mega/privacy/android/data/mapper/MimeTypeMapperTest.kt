@@ -13,10 +13,7 @@ class MimeTypeMapperTest {
 
     private val mimeTypeMap = mapOf(
         "dcr" to "image/dcr",
-        "mkv" to "video/x-matroska",
-        "heic" to "image/heic",
         "url" to "web/url",
-        "webp" to "image/webp",
         "3fr" to "image/3fr",
         "iiq" to "image/iiq",
         "k25" to "image/k25",

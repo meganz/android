@@ -275,7 +275,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
-import mega.privacy.android.app.Product;
+import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -8948,7 +8948,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private Product getPRO3OneMonth() {
-        List<Product> products = myAccountInfo.getProductAccounts();
+        List<Product> products = viewModel.getProductAccounts();
         if (products != null) {
             for (Product product : products) {
                 if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {

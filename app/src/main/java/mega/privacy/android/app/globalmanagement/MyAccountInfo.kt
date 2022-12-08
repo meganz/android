@@ -2,7 +2,6 @@ package mega.privacy.android.app.globalmanagement
 
 import android.util.Base64
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
@@ -19,10 +18,8 @@ import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
-import nz.mega.sdk.MegaCurrency
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaPricing
 import timber.log.Timber
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -88,12 +85,8 @@ class MyAccountInfo @Inject constructor(
     var lastSessionFormattedDate: String? = null
     var createSessionTimeStamp = INVALID_VALUE.toLong()
 
-    var productAccounts: ArrayList<Product>? = null
-
     var availableSkus: List<MegaSku> = ArrayList()
     var activeSubscription: MegaPurchase? = null
-
-    var pricing: MegaPricing? = null
 
     var numVersions = INVALID_VALUE
     var previousVersionsSize = INVALID_VALUE.toLong()
@@ -146,12 +139,8 @@ class MyAccountInfo @Inject constructor(
         lastSessionFormattedDate = null
         createSessionTimeStamp = INVALID_VALUE.toLong()
 
-        productAccounts = null
-
         availableSkus = ArrayList()
         activeSubscription = null
-
-        pricing = null
 
         numVersions = INVALID_VALUE
         previousVersionsSize = INVALID_VALUE.toLong()
@@ -368,35 +357,6 @@ class MyAccountInfo @Inject constructor(
 
         firstLetter = fullName[0].toString() + ""
         firstLetter = firstLetter?.uppercase(Locale.getDefault())
-    }
-
-    fun setProductAccounts(p: MegaPricing, c: MegaCurrency) {
-        if (productAccounts == null) {
-            productAccounts = ArrayList()
-        } else {
-            productAccounts?.clear()
-        }
-
-        for (i in 0 until p.numProducts) {
-            Timber.d(
-                "p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___"
-                        + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i)
-                        + "___" + p.getGBTransfer(i)
-            )
-
-            val account = Product(
-                p.getHandle(i),
-                p.getProLevel(i),
-                p.getMonths(i),
-                p.getGBStorage(i),
-                p.getGBTransfer(i),
-                p.getAmount(i),
-                c.currencyName,
-                p.isBusinessType(i)
-            )
-
-            productAccounts?.add(account)
-        }
     }
 
     fun getFormattedPreviousVersionsSize(): String? {

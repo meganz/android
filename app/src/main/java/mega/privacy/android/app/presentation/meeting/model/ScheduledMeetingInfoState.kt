@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property retentionTimeSeconds                       Retention time seconds.
  * @property meetingLink                                Meeting link.
  * @property chatTitle                                  Chat title.
+ * @property openSendToChat                             True, open sent to chat screen. False, otherwise.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property isPublic                                   If chat room is public.
@@ -44,6 +45,7 @@ data class ScheduledMeetingInfoState(
     val retentionTimeSeconds: Long? = null,
     val meetingLink: String? = null,
     val chatTitle: String = "",
+    val openSendToChat: Boolean = false,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val isPublic: Boolean = false,
@@ -55,31 +57,26 @@ data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = ChatParticipant(
-        participantId = -1,
-        contact = ContactItem(handle = -1,
-            email = "first@mega.nz",
-            ContactData(fullName = "First", alias = null, avatarUri = null),
-            defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
-            visibility = UserVisibility.Visible,
-            timestamp = -1,
-            areCredentialsVerified = false,
-            status = UserStatus.Online,
-            lastSeen = null),
-        privilege = ChatRoomPermission.Moderator
-    ),
+        handle = -1,
+        data = ContactData(fullName = "First", null, null),
+        email = "first@mega.nz",
+        privilege = ChatRoomPermission.Unknown,
+        defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
+        areCredentialsVerified = false,
+        isMe = false,
+        status = UserStatus.Invalid,
+        lastSeen = null),
+
     val lastParticipant: ChatParticipant? = ChatParticipant(
-        participantId = -1,
-        contact = ContactItem(handle = -1,
-            email = "last@mega.nz",
-            ContactData(fullName = "Last", alias = null, avatarUri = null),
-            defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
-            visibility = UserVisibility.Visible,
-            timestamp = -1,
-            areCredentialsVerified = false,
-            status = UserStatus.Online,
-            lastSeen = null),
-        privilege = ChatRoomPermission.Moderator
-    ),
+        handle = -1,
+        data = ContactData(fullName = "Last", null, null),
+        email = "last@mega.nz",
+        privilege = ChatRoomPermission.Unknown,
+        defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
+        areCredentialsVerified = false,
+        isMe = false,
+        status = UserStatus.Invalid,
+        lastSeen = null),
 
     ) {
 

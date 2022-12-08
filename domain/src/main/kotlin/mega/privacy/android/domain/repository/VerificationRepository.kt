@@ -19,4 +19,14 @@ interface VerificationRepository {
      * get country calling codes
      */
     suspend fun getCountryCallingCodes(): List<String>
+
+    /**
+     * send SMS Verification Code
+     */
+    suspend fun sendSMSVerificationCode(phoneNumber: String)
+
+    /**
+     * reset sms verified phone number
+     */
+    suspend fun resetSMSVerifiedPhoneNumber()
 }

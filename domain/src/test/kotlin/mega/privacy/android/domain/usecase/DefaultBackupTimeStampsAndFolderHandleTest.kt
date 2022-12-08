@@ -18,7 +18,7 @@ class DefaultBackupTimeStampsAndFolderHandleTest {
 
     private val primaryHandle = 1L
     private val secondaryHandle = 2L
-    private val timestamps = "123456"
+    private val timestamps = 123456L
 
     private val cameraUploadRepository = mock<CameraUploadRepository> {
         onBlocking {
