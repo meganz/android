@@ -107,6 +107,7 @@ class ManagerViewModelTest {
             monitorConnectivity = monitorConnectivity,
             broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
+            getPricing = mock(),
         )
     }
 

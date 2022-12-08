@@ -18,7 +18,6 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
-import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
 import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
@@ -34,7 +34,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
@@ -67,6 +66,7 @@ class BackgroundRequestListener @Inject constructor(
     private val getSpecificAccountDetail: GetSpecificAccountDetail,
     private val getAccountDetails: GetAccountDetails,
     private val getPaymentMethod: GetPaymentMethod,
+    private val getPricing: GetPricing,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -109,7 +109,6 @@ class BackgroundRequestListener @Inject constructor(
             MegaRequest.TYPE_FETCH_NODES -> handleFetchNodeRequest(e)
             MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
             MegaRequest.TYPE_SET_ATTR_USER -> handleSetAttrUserRequest(request, e)
-            MegaRequest.TYPE_GET_PRICING -> handleGetPricingRequest(e, request)
             MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS -> handleCreditCardQuerySubscriptionsRequest(
                 e,
                 request
@@ -128,20 +127,6 @@ class BackgroundRequestListener @Inject constructor(
             val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
             intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION)
             application.sendBroadcast(intent)
-        }
-    }
-
-    private fun handleGetPricingRequest(e: MegaError, request: MegaRequest) {
-        if (e.errorCode == MegaError.API_OK) {
-            val p: MegaPricing = request.pricing
-            dbH.setPricingTimestamp()
-            myAccountInfo.setProductAccounts(p, request.currency)
-            myAccountInfo.pricing = p
-            val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            intent.putExtra(ACTION_TYPE, UPDATE_GET_PRICING)
-            application.sendBroadcast(intent)
-        } else {
-            Timber.e("Error TYPE_GET_PRICING: %s", e.errorCode)
         }
     }
 
@@ -267,7 +252,7 @@ class BackgroundRequestListener @Inject constructor(
             } else {
                 getSpecificAccountDetail(storage = false, transfer = true, pro = true)
             }
-            megaApi.getPricing(null)
+            getPricing(true)
             megaApi.creditCardQuerySubscriptions(null)
         }
     }

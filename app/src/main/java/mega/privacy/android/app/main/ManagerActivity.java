@@ -8948,7 +8948,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private Product getPRO3OneMonth() {
-        List<Product> products = myAccountInfo.getProductAccounts();
+        List<Product> products = viewModel.getProductAccounts();
         if (products != null) {
             for (Product product : products) {
                 if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {
