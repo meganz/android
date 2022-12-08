@@ -26,7 +26,6 @@ import mega.privacy.android.presentation.theme.white_alpha_060
 /**
  * General alert dialog
  *
- * @param show                      True, it should be shown. False, it should be hidden.
  * @param title                     Id of title text.
  * @param description               Id of description text.
  * @param confirmButton             Id of confirmButton text.
@@ -36,7 +35,6 @@ import mega.privacy.android.presentation.theme.white_alpha_060
  */
 @Composable
 fun GeneralAlertDialog(
-    show: Boolean,
     title: Int,
     description: Int,
     confirmButton: Int,
@@ -46,67 +44,65 @@ fun GeneralAlertDialog(
     onDismiss: () -> Unit,
     onConfirmButton: () -> Unit,
 ) {
-    if (show) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            properties = DialogProperties(
-                dismissOnBackPress = shouldDismissOnBackPress,
-                dismissOnClickOutside = shouldDismissOnClickOutside
-            ),
-            confirmButton = {
-                TextButton(onClick = { onConfirmButton() })
-                {
-                    Text(
-                        color = if (MaterialTheme.colors.isLight)
-                            teal_300
-                        else
-                            teal_200,
-                        text = stringResource(id = confirmButton))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onDismiss() })
-                {
-                    Text(
-                        color = if (MaterialTheme.colors.isLight)
-                            teal_300
-                        else
-                            teal_200,
-                        text = stringResource(id = dismissButton))
-                }
-            },
-            title = {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(
+            dismissOnBackPress = shouldDismissOnBackPress,
+            dismissOnClickOutside = shouldDismissOnClickOutside
+        ),
+        confirmButton = {
+            TextButton(onClick = { onConfirmButton() })
+            {
                 Text(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth()
-                        .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                    textAlign = TextAlign.Center,
-                    style = Typography.h6,
                     color = if (MaterialTheme.colors.isLight)
-                        grey_alpha_087
+                        teal_300
                     else
-                        white,
-                    fontWeight = FontWeight.Bold,
-                    text = stringResource(id = title))
-            },
-            text = {
+                        teal_200,
+                    text = stringResource(id = confirmButton))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() })
+            {
                 Text(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth()
-                        .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                    text = stringResource(id = description),
-                    style = Typography.subtitle1,
                     color = if (MaterialTheme.colors.isLight)
-                        grey_alpha_060
+                        teal_300
                     else
-                        white_alpha_060)
-            },
-            backgroundColor = if (MaterialTheme.colors.isLight)
-                white
-            else
-                dark_grey
-        )
-    }
+                        teal_200,
+                    text = stringResource(id = dismissButton))
+            }
+        },
+        title = {
+            Text(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .wrapContentWidth()
+                    .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
+                textAlign = TextAlign.Center,
+                style = Typography.h6,
+                color = if (MaterialTheme.colors.isLight)
+                    grey_alpha_087
+                else
+                    white,
+                fontWeight = FontWeight.Bold,
+                text = stringResource(id = title))
+        },
+        text = {
+            Text(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .wrapContentWidth()
+                    .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
+                text = stringResource(id = description),
+                style = Typography.subtitle1,
+                color = if (MaterialTheme.colors.isLight)
+                    grey_alpha_060
+                else
+                    white_alpha_060)
+        },
+        backgroundColor = if (MaterialTheme.colors.isLight)
+            white
+        else
+            dark_grey
+    )
 }

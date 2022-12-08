@@ -133,22 +133,22 @@ fun ScheduledMeetingInfoView(
             )
         }
     ) { paddingValues ->
+
+        LeaveGroupAlertDialog(
+            state = state,
+            onDismiss = { onDismiss() },
+            onLeave = { onLeaveGroupDialog() })
+
+        AddParticipantsAlertDialog(
+            state = state,
+            onDismiss = { onDismiss() },
+            onInvite = { onInviteParticipantsDialog() })
+
         LazyColumn(state = listState,
             modifier = Modifier.padding(paddingValues)) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
-            item(key = "Scheduled meeting leave group dialog") {
-                LeaveGroupAlertDialog(
-                    state = state,
-                    onDismiss = { onDismiss() },
-                    onLeave = { onLeaveGroupDialog() })
-            }
 
-            item(key = "Scheduled meeting add participants dialogs") {
-                AddParticipantsAlertDialog(
-                    state = state,
-                    onDismiss = { onDismiss() },
-                    onInvite = { onInviteParticipantsDialog() })
-            }
+
 
             state.apply {
                 items(buttons) { button ->
@@ -187,10 +187,10 @@ fun ScheduledMeetingInfoView(
                 item(key = "Scheduled meeting description") {
                     ScheduledMeetingDescriptionView(state = state)
                 }
+            }
 
-                item(key = "Leave group") {
-                    LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
-                }
+            item(key = "Leave group") {
+                LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
             }
         }
 
@@ -226,17 +226,17 @@ private fun LeaveGroupAlertDialog(
     onDismiss: () -> Unit,
     onLeave: () -> Unit,
 ) {
-
-    GeneralAlertDialog(
-        show = state.leaveGroupDialog,
-        title = R.string.title_confirmation_leave_group_chat,
-        description = R.string.confirmation_leave_group_chat,
-        confirmButton = R.string.general_leave,
-        dismissButton = R.string.general_cancel,
-        shouldDismissOnBackPress = true,
-        shouldDismissOnClickOutside = true,
-        onDismiss = onDismiss,
-        onConfirmButton = onLeave)
+    if (state.leaveGroupDialog) {
+        GeneralAlertDialog(
+            title = R.string.title_confirmation_leave_group_chat,
+            description = R.string.confirmation_leave_group_chat,
+            confirmButton = R.string.general_leave,
+            dismissButton = R.string.general_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onLeave)
+    }
 }
 
 /**
@@ -253,27 +253,29 @@ private fun AddParticipantsAlertDialog(
     onInvite: () -> Unit,
 ) {
 
-    GeneralAlertDialog(
-        show = state.addParticipantsNoContactsDialog,
-        title = R.string.chat_add_participants_no_contacts_title,
-        description = R.string.chat_add_participants_no_contacts_message,
-        confirmButton = R.string.contact_invite,
-        dismissButton = R.string.button_cancel,
-        shouldDismissOnBackPress = true,
-        shouldDismissOnClickOutside = true,
-        onDismiss = onDismiss,
-        onConfirmButton = onInvite)
+    if (state.addParticipantsNoContactsDialog) {
+        GeneralAlertDialog(
+            title = R.string.chat_add_participants_no_contacts_title,
+            description = R.string.chat_add_participants_no_contacts_message,
+            confirmButton = R.string.contact_invite,
+            dismissButton = R.string.button_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onInvite)
+    }
 
-    GeneralAlertDialog(
-        show = state.addParticipantsNoContactsLeftToAddDialog,
-        title = R.string.chat_add_participants_no_contacts_left_to_add_title,
-        description = R.string.chat_add_participants_no_contacts_left_to_add_message,
-        confirmButton = R.string.contact_invite,
-        dismissButton = R.string.button_cancel,
-        shouldDismissOnBackPress = true,
-        shouldDismissOnClickOutside = true,
-        onDismiss = onDismiss,
-        onConfirmButton = onInvite)
+    if (state.addParticipantsNoContactsLeftToAddDialog) {
+        GeneralAlertDialog(
+            title = R.string.chat_add_participants_no_contacts_left_to_add_title,
+            description = R.string.chat_add_participants_no_contacts_left_to_add_message,
+            confirmButton = R.string.contact_invite,
+            dismissButton = R.string.button_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onInvite)
+    }
 }
 
 /**
