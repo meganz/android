@@ -148,8 +148,6 @@ fun ScheduledMeetingInfoView(
             modifier = Modifier.padding(paddingValues)) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
 
-
-
             state.apply {
                 items(buttons) { button ->
                     ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
@@ -187,10 +185,10 @@ fun ScheduledMeetingInfoView(
                 item(key = "Scheduled meeting description") {
                     ScheduledMeetingDescriptionView(state = state)
                 }
-            }
 
-            item(key = "Leave group") {
-                LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
+                item(key = "Leave group") {
+                    LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
+                }
             }
         }
 

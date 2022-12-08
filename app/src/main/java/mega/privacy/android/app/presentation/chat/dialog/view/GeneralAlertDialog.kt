@@ -8,16 +8,18 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.presentation.theme.Typography
-import mega.privacy.android.presentation.theme.dark_grey
+import mega.privacy.android.app.R
 import mega.privacy.android.presentation.theme.grey_alpha_060
 import mega.privacy.android.presentation.theme.grey_alpha_087
+import mega.privacy.android.presentation.theme.h6
+import mega.privacy.android.presentation.theme.subtitle1
 import mega.privacy.android.presentation.theme.teal_200
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
@@ -33,8 +35,10 @@ import mega.privacy.android.presentation.theme.white_alpha_060
  * @param onDismiss                 When dismiss the alert dialog.
  * @param onConfirmButton           When confirm the alert dialog.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GeneralAlertDialog(
+    modifier: Modifier = Modifier,
     title: Int,
     description: Int,
     confirmButton: Int,
@@ -44,16 +48,21 @@ fun GeneralAlertDialog(
     onDismiss: () -> Unit,
     onConfirmButton: () -> Unit,
 ) {
+
     AlertDialog(
+        modifier = modifier
+            .padding(horizontal = 40.dp),
         onDismissRequest = { onDismiss() },
         properties = DialogProperties(
             dismissOnBackPress = shouldDismissOnBackPress,
-            dismissOnClickOutside = shouldDismissOnClickOutside
+            dismissOnClickOutside = shouldDismissOnClickOutside,
+            usePlatformDefaultWidth = false,
         ),
         confirmButton = {
             TextButton(onClick = { onConfirmButton() })
             {
                 Text(
+                    modifier = modifier.padding(bottom = 18.dp),
                     color = if (MaterialTheme.colors.isLight)
                         teal_300
                     else
@@ -65,6 +74,7 @@ fun GeneralAlertDialog(
             TextButton(onClick = { onDismiss() })
             {
                 Text(
+                    modifier = modifier.padding(bottom = 18.dp),
                     color = if (MaterialTheme.colors.isLight)
                         teal_300
                     else
@@ -74,27 +84,24 @@ fun GeneralAlertDialog(
         },
         title = {
             Text(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .wrapContentWidth()
-                    .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                textAlign = TextAlign.Center,
-                style = Typography.h6,
+                modifier = modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp),
+                textAlign = TextAlign.Start,
+                style = h6,
                 color = if (MaterialTheme.colors.isLight)
                     grey_alpha_087
                 else
                     white,
-                fontWeight = FontWeight.Bold,
                 text = stringResource(id = title))
         },
         text = {
             Text(
-                modifier = Modifier
+                modifier = modifier
                     .wrapContentHeight()
                     .wrapContentWidth()
-                    .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
+                    .padding(start = 24.dp, end = 24.dp, top = 16.dp),
                 text = stringResource(id = description),
-                style = Typography.subtitle1,
+                textAlign = TextAlign.Start,
+                style = subtitle1,
                 color = if (MaterialTheme.colors.isLight)
                     grey_alpha_060
                 else
@@ -103,6 +110,6 @@ fun GeneralAlertDialog(
         backgroundColor = if (MaterialTheme.colors.isLight)
             white
         else
-            dark_grey
+            colorResource(id = R.color.action_mode_background),
     )
 }
