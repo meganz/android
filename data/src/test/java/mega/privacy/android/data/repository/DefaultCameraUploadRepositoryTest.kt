@@ -10,6 +10,7 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
@@ -69,6 +70,7 @@ class DefaultCameraUploadRepositoryTest {
             appEventGateway = mock(),
             broadcastReceiverGateway = mock(),
             videoQualityMapper = ::toVideoQuality,
+            syncStatusIntMapper = ::syncStatusToInt
         )
     }
 
@@ -244,7 +246,7 @@ class DefaultCameraUploadRepositoryTest {
         whenever(localStorageGateway.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING.value)).thenReturn(
             listOf(fakeRecord)
         )
-        assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING.value)).isEqualTo(
+        assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)).isEqualTo(
             listOf(fakeRecord)
         )
     }

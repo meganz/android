@@ -289,7 +289,7 @@ abstract class CameraUploadUseCases {
          */
         @Provides
         fun provideGetVideoSyncRecordsByStatus(cameraUploadRepository: CameraUploadRepository): GetVideoSyncRecordsByStatus =
-            GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it.value) }
+            GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it) }
 
         /**
          * Provide the [GetVideoQuality] implementation
