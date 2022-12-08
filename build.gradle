@@ -68,6 +68,7 @@ task clean(type: Delete) {
 ext {
     // App
     appVersion = "v9999_test"
+    versionCode = new Date().format("yyDHHMM").toInteger()
 
     // Sdk and tools
     compileSdkVersion = 33

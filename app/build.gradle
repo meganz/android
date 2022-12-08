@@ -9,8 +9,6 @@ apply plugin: 'jacoco'
 
 apply from: "$project.rootDir/tools/util.gradle"
 
-ext.versionCode = generateVersionCode()
-
 /**
  * For Continuous Delivery with Firebase AppDistribution <p/>
  * For Android builds in CD pipeline, read the environment variable and
@@ -21,9 +19,9 @@ ext.versionCode = generateVersionCode()
 def readVersionName() {
     def versionNameTag = System.getenv('APK_VERSION_NAME_FOR_CD')
     if (versionNameTag != null && !versionNameTag.isEmpty()) {
-        return "$rootProject.appVersion (${versionCode}${versionNameTag})"
+        return "$rootProject.appVersion (${rootProject.versionCode}${versionNameTag})"
     } else {
-        return "$rootProject.appVersion (${versionCode})"
+        return "$rootProject.appVersion (${rootProject.versionCode})"
     }
 }
 
@@ -40,16 +38,6 @@ def readReleaseNotes() {
     } else {
         return "Release Notes not available"
     }
-}
-
-/**
- * Generate the version code based on the date using the format yyDHHMM
- * ex: 220010900, 223411614
- *
- * @return the formatted string used for version code
- */
-def generateVersionCode() {
-    return new Date().format("yyDHHMM").toInteger()
 }
 
 /**
@@ -107,7 +95,7 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode versionCode
+        versionCode rootProject.versionCode
         versionName readVersionName()
 
         multiDexEnabled true
