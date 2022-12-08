@@ -270,8 +270,8 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
+                    restoreCurrentZoomAndOffset()
                 }
-                restoreCurrentZoomAndOffset()
             }
         }
 
