@@ -148,12 +148,27 @@ class DefaultMediaPlayerRepositoryTest {
     }
 
     @Test
-    fun `test that get local link from mega api folder`() = runTest {
+    fun `test that get local link for folder link using MegaApi`() = runTest {
+        val node = mock<MegaNode>()
         val expectedLocalLink = "local link"
-        whenever(megaApi.getMegaNodeByHandle(expectedHandle)).thenReturn(mock())
+        whenever(megaApiFolder.getMegaNodeByHandle(expectedHandle)).thenReturn(node)
+        whenever(megaApiFolder.authorizeNode(node)).thenReturn(node)
+        whenever(megaApi.httpServerGetLocalLink(any())).thenReturn(expectedLocalLink)
+
+        val actual = underTest.getLocalLinkForFolderLinkFromMegaApi(expectedHandle)
+
+        assertThat(actual).isEqualTo(expectedLocalLink)
+    }
+
+    @Test
+    fun `test that get local link for folder link using MegaApiFolder`() = runTest {
+        val node = mock<MegaNode>()
+        val expectedLocalLink = "local link"
+        whenever(megaApiFolder.getMegaNodeByHandle(expectedHandle)).thenReturn(node)
+        whenever(megaApiFolder.authorizeNode(node)).thenReturn(node)
         whenever(megaApiFolder.httpServerGetLocalLink(any())).thenReturn(expectedLocalLink)
 
-        val actual = underTest.getLocalLinkFromMegaApiFolder(expectedHandle)
+        val actual = underTest.getLocalLinkForFolderLinkFromMegaApiFolder(expectedHandle)
 
         assertThat(actual).isEqualTo(expectedLocalLink)
     }

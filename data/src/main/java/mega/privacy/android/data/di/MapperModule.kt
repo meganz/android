@@ -18,11 +18,13 @@ import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -56,6 +58,7 @@ import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -76,8 +79,10 @@ import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
+import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
@@ -104,6 +109,7 @@ import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
+import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -327,10 +333,10 @@ internal class MapperModule {
         ::UserAccount
 
     /**
-     * Provide pricing mapper
+     * Provide local pricing mapper
      */
     @Provides
-    fun providePricingMapper(): PricingMapper = ::toPricing
+    fun provideLocalPricingMapper(): LocalPricingMapper = ::toLocalPricing
 
     /**
      * Provide currency mapper
@@ -440,4 +446,19 @@ internal class MapperModule {
     @Provides
     fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
 
+    /**
+     * Provide country calling codes mapper
+     */
+    @Provides
+    fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper = ::toCountryCallingCodes
+
+    @Provides
+    fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
+
+    /**
+     * Provide pricing mapper
+     *
+     */
+    @Provides
+    fun providePricingMapper(): PricingMapper = ::toPricing
 }

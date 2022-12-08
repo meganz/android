@@ -208,4 +208,12 @@ interface ChatRepository {
      * @return A flow of [ChatListItem].
      */
     suspend fun monitorChatListItemUpdates(): Flow<ChatListItem>
+
+    /**
+     * Returns whether notifications about a chat have to be generated.
+     *
+     * @param chatId    Chat id
+     * @return          True if notifications has to be created, false otherwise.
+     */
+    suspend fun isChatNotifiable(chatId: Long): Boolean
 }

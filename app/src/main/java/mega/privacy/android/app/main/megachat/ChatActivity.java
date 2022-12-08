@@ -113,7 +113,6 @@ import static mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_CHAT_LINK
 import static mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_UNKNOWN_LINK;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR;
-import static mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE;
 import static mega.privacy.android.app.utils.Constants.EXTRA_RESULT_TRANSFER;
 import static mega.privacy.android.app.utils.Constants.EXTRA_TRANSFER_TYPE;
 import static mega.privacy.android.app.utils.Constants.FORWARD_ONLY_OPTION;
@@ -205,6 +204,7 @@ import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static mega.privacy.android.data.facade.FileFacadeKt.INTENT_EXTRA_NODE_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -1269,7 +1269,7 @@ public class ChatActivity extends PasscodeActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                long nodeHandle = intent.getLongExtra(EXTRA_NODE_HANDLE, 0);
+                long nodeHandle = intent.getLongExtra(INTENT_EXTRA_NODE_HANDLE, 0);
                 int resultTransfer = intent.getIntExtra(EXTRA_RESULT_TRANSFER, 0);
                 if (adapter != null) {
                     adapter.finishedVoiceClipDownload(nodeHandle, resultTransfer);

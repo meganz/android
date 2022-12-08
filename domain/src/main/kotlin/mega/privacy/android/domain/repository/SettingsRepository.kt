@@ -337,10 +337,10 @@ interface SettingsRepository {
     suspend fun backupTimestampsAndFolderHandle(
         primaryUploadFolderHandle: Long,
         secondaryUploadFolderHandle: Long,
-        camSyncTimeStamp: String?,
-        camVideoSyncTimeStamp: String?,
-        secSyncTimeStamp: String?,
-        secVideoSyncTimeStamp: String?,
+        camSyncTimeStamp: Long?,
+        camVideoSyncTimeStamp: Long?,
+        secSyncTimeStamp: Long?,
+        secVideoSyncTimeStamp: Long?,
     )
 
 

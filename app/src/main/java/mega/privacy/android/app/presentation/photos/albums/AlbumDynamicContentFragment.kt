@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -57,6 +58,7 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumConte
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
+import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -69,6 +71,9 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.presentation.theme.black
+import mega.privacy.android.presentation.theme.dark_grey
+import mega.privacy.android.presentation.theme.white
 import javax.inject.Inject
 
 /**
@@ -197,6 +202,15 @@ class AlbumDynamicContentFragment : Fragment() {
 
         if (closeScreen) Back()
 
+        if (uiState.showDeleteAlbumsConfirmation) {
+            val album = uiState.currentAlbum as? Album.UserAlbum
+            DeleteAlbumsConfirmationDialog(
+                selectedAlbumIds = listOfNotNull(album?.id),
+                onCancelClicked = albumsViewModel::closeDeleteAlbumsConfirmation,
+                onDeleteClicked = { deleteAlbum() },
+            )
+        }
+
         Box {
             if (photos.isNotEmpty()) {
                 DynamicView(
@@ -318,12 +332,20 @@ class AlbumDynamicContentFragment : Fragment() {
             onClick = { albumsViewModel.showFilterDialog(true) },
             modifier = modifier
                 .size(40.dp),
-            backgroundColor = Color.White
+            backgroundColor = if (MaterialTheme.colors.isLight) {
+                Color.White
+            } else {
+                dark_grey
+            }
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_filter_light),
                 contentDescription = "Filter",
-                tint = Color.Black
+                tint = if (MaterialTheme.colors.isLight) {
+                    Color.Black
+                } else {
+                    Color.White
+                }
             )
         }
     }
@@ -334,7 +356,8 @@ class AlbumDynamicContentFragment : Fragment() {
         modifier: Modifier,
     ) {
         Snackbar(
-            modifier = modifier.padding(8.dp)
+            modifier = modifier.padding(8.dp),
+            backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
         ) {
             Text(
                 text = message
@@ -372,19 +395,24 @@ class AlbumDynamicContentFragment : Fragment() {
 
     private fun openPhoto(photo: Photo) {
         albumsViewModel.state.value.currentAlbum?.let { album ->
-            val albumPhotosHandles =
-                albumsViewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
-                    photo.id
-                }
+            albumsViewModel.state.value.apply {
+                val sourcePhotos = albums.getAlbumPhotos(album)
+                val currentAlbumPhotos = sourcePhotos
+                    .applyFilter(currentMediaType = currentMediaType)
+                    .takeIf {
+                        currentMediaType != FilterMediaType.ALL_MEDIA
+                    }?.applySortBy(currentSort = currentSort)
+                    ?: sourcePhotos.applySortBy(currentSort = currentSort)
 
-            val intent = ImageViewerActivity.getIntentForChildren(
-                requireContext(),
-                albumPhotosHandles.toLongArray(),
-                photo.id,
-            )
+                val intent = ImageViewerActivity.getIntentForChildren(
+                    requireContext(),
+                    currentAlbumPhotos.map { it.id }.toLongArray(),
+                    photo.id,
+                )
 
-            startActivity(intent)
-            managerActivity.overridePendingTransition(0, 0)
+                startActivity(intent)
+                managerActivity.overridePendingTransition(0, 0)
+            }
         }
     }
 
@@ -432,13 +460,11 @@ class AlbumDynamicContentFragment : Fragment() {
         actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
             actionModeCallback
         )
-        managerActivity.showHideBottomNavigationView(true)
     }
 
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
-        managerActivity.showHideBottomNavigationView(false)
     }
 
     private fun handleActionMode(photo: Photo) {
@@ -502,6 +528,15 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleAlbumDeletion() {
+        val photos = albumsViewModel.getCurrentUIAlbum()?.photos.orEmpty()
+        if (photos.isEmpty()) {
+            deleteAlbum()
+        } else {
+            albumsViewModel.showDeleteAlbumsConfirmation()
+        }
+    }
+
+    private fun deleteAlbum() {
         val album = albumsViewModel.state.value.currentAlbum as? Album.UserAlbum
         albumsViewModel.deleteAlbums(albumIds = listOfNotNull(album?.id))
         albumsViewModel.updateAlbumDeletedMessage(

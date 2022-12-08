@@ -379,6 +379,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
+    override suspend fun getUserAvatarColor(userHandle: Long): String =
+        megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
+
     override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
@@ -629,4 +632,15 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
+
+    override fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkCreate(renew, listener)
+    }
+
+    override fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkDelete(handle, listener)
+    }
+
+    override fun isChatNotifiable(chatId: Long): Boolean =
+        megaApi.isChatNotifiable(chatId)
 }

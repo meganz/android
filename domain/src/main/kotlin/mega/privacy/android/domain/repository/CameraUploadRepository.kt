@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoQuality
 import java.util.Queue
 
 /**
@@ -59,7 +60,7 @@ interface CameraUploadRepository {
      *
      * @return sync timestamp
      */
-    suspend fun getSyncTimeStamp(type: SyncTimeStamp): String?
+    suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long?
 
     /**
      * Set camera upload sync timestamp
@@ -261,7 +262,7 @@ interface CameraUploadRepository {
      *
      * @return upload video quality
      */
-    suspend fun getUploadVideoQuality(): String?
+    suspend fun getUploadVideoQuality(): VideoQuality?
 
     /**
      * Get keep file names preference
@@ -346,6 +347,14 @@ interface CameraUploadRepository {
      * @return charging on size int
      */
     suspend fun getChargingOnSize(): Int
+
+    /**
+     * Update camera upload folder (node list) icon
+     *
+     * @param nodeHandle    updated node handle
+     * @param isSecondary   if updated node handle is secondary media
+     */
+    suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
 
     /**
      * Get the media queue for a given media type

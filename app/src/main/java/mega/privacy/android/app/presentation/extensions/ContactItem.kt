@@ -20,7 +20,7 @@ fun ContactItem.getAvatarFirstLetter(): String =
  * @param text String to obtain the first letter.
  * @return The first letter of the string to be painted in the default avatar.
  */
-private fun getAvatarFirstLetter(text: String): String {
+fun getAvatarFirstLetter(text: String): String {
     val unknown = "U"
 
     if (text.isEmpty()) {

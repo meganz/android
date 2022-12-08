@@ -1,7 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.graphics.BitmapFactory
-import android.graphics.Color
+import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,9 +11,12 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.DefaultAvatarRepository.Companion.AVATAR_PRIMARY_COLOR
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -21,10 +24,13 @@ import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default [AvatarRepository] implementation
@@ -89,11 +95,57 @@ internal class DefaultAvatarRepository @Inject constructor(
     override suspend fun getMyAvatarFile(): File? =
         cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
 
-    private fun getColor(color: String?): Int {
-        return if (color == null) {
-            avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)
-        } else Color.parseColor(color)
-    }
+    override suspend fun getAvatarFile(userHandle: Long): File? =
+        withContext(ioDispatcher) {
+            val email = getUserEmail(userHandle)
+            getAvatarFile(email)
+        }
+
+    override suspend fun getAvatarFile(userEmail: String): File? =
+        withContext(ioDispatcher) {
+            val file = cacheFolderGateway.buildAvatarFile(userEmail + FileConstant.JPG_EXTENSION)
+                ?: error("Could not generate avatar file")
+
+            suspendCoroutine { continuation ->
+                megaApiGateway.getContactAvatar(
+                    userEmail,
+                    file.absolutePath,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(file))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    ))
+            }
+        }
+
+    override suspend fun getAvatarColor(userHandle: Long): Int =
+        withContext(ioDispatcher) {
+            getColor(megaApiGateway.getUserAvatarColor(userHandle))
+        }
+
+    private suspend fun getUserEmail(userHandle: Long): String =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserEmail(
+                    userHandle,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(request.email))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    ))
+            }
+        }
+
+    private fun getColor(color: String?): Int =
+        color?.toColorInt() ?: avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)
 
     companion object {
         /**

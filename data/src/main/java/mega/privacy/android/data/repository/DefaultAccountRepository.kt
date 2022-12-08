@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -320,5 +321,17 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun areAchievementsEnabled() = withContext(ioDispatcher) {
         megaApiGateway.isAchievementsEnabled()
+    }
+
+    override suspend fun logout() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            megaApiGateway.logout(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
     }
 }

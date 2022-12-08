@@ -9,7 +9,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH;
 import static mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER;
@@ -144,6 +143,7 @@ import static mega.privacy.android.app.utils.Util.showMessageRandom;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -275,7 +275,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
-import mega.privacy.android.app.Product;
+import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -359,6 +359,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -4564,6 +4565,10 @@ public class ManagerActivity extends TransfersManagementActivity
             case CLOUD_DRIVE: {
                 if (!isInMDMode) {
                     selectDrawerItemCloudDrive();
+                } else {
+                    Long mediaHandle = viewModel.getSafeBrowserParentHandle();
+                    skipToMediaDiscoveryFragment(
+                            MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle);
                 }
 
                 if (openFolderRefresh) {
@@ -10828,7 +10833,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            if (transfer.getIsOfflineFile()) {
+            if (transfer.isOfflineFile()) {
                 File offlineFile = new File(transfer.getOriginalPath());
                 saveOffline(offlineFile.getParentFile(), node, ManagerActivity.this);
             } else {
@@ -10857,7 +10862,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void openTransferLocation(AndroidCompletedTransfer transfer) {
         if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
-            if (transfer.getIsOfflineFile()) {
+            if (transfer.isOfflineFile()) {
                 selectDrawerItem(drawerItem = DrawerItem.HOMEPAGE);
                 openFullscreenOfflineFragment(
                         removeInitialOfflinePath(transfer.getPath()) + SEPARATOR);

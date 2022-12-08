@@ -68,7 +68,6 @@ public class Constants {
 
     public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
-    public static final String EXTRA_NODE_HANDLE = "NODE_HANDLE";
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
