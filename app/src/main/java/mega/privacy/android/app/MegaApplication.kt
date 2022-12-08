@@ -53,6 +53,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -195,6 +196,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     @Inject
     lateinit var getPaymentMethod: GetPaymentMethod
 
+    @Inject
+    internal lateinit var getPricing: GetPricing
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -327,16 +331,10 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             } else {
                 getSpecificAccountDetail(storage = false, transfer = true, pro = true)
             }
-            megaApi.getPricing(null)
+            getPricing(true)
             megaApi.creditCardQuerySubscriptions(null)
         }
     }
-
-    /**
-     * Ask for pricing
-     *
-     */
-    fun askForPricing() = megaApi.getPricing(null)
 
     /**
      * Ask for account details

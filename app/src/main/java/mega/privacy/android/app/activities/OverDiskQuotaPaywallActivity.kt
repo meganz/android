@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
@@ -84,6 +85,9 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
         upgradeButton = findViewById(R.id.upgrade_button)
         upgradeButton?.setOnClickListener(this)
+        collectFlow(viewModel.pricing) {
+            getProPlanNeeded()
+        }
     }
 
     override fun onDestroy() {
@@ -236,14 +240,12 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
      * space used by the user.
      */
     private fun getProPlanNeeded(): String {
-        val plans = myAccountInfo.pricing ?: return getString(R.string.pro_account)
-
         val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
-
-        for (i in 0 until plans.numProducts) {
-            if (plans.getGBStorage(i) > myAccountInfo.usedStorage / gb) {
-                proPlanNeeded = plans.getProLevel(i)
-                return when (plans.getProLevel(i)) {
+        val products = viewModel.pricing.value.products
+        products.forEach {
+            if (it.storage > myAccountInfo.usedStorage / gb) {
+                proPlanNeeded = it.level
+                return when (it.level) {
                     1 -> getString(R.string.pro1_account)
                     2 -> getString(R.string.pro2_account)
                     3 -> getString(R.string.pro3_account)
