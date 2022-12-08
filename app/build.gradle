@@ -619,28 +619,3 @@ task createUnitTestCoverageReport(dependsOn: ['instrumentClasses', 'testGmsDebug
         }
     }
 }
-
-//can call this like `./gradlew incrementVersionCode build`
-task incrementVersion {
-    description = "Increments the version code in the version.properties file"
-
-    doLast {
-        File versionPropsFile = file('version.properties')
-
-        if (versionPropsFile.canRead()) {
-            Properties versionProps = new Properties()
-
-            versionProps.load(new FileInputStream(versionPropsFile))
-
-            def code = versionProps['VERSION_CODE'].toInteger() + 1
-            def patch = versionProps['VERSION_PATCH'].toInteger() + 1
-
-            versionProps['VERSION_CODE'] = code.toString()
-            versionProps['VERSION_PATCH'] = patch.toString()
-            versionProps.store(versionPropsFile.newWriter(), null)
-            println "VERSION_CODE incremented to "+code
-        } else {
-            throw new GradleException("Could not read version.properties!")
-        }
-    }
-}
