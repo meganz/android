@@ -334,4 +334,36 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        val value = megaApiGateway.handleToBase64(request.nodeHandle)
+                        continuation.resumeWith(Result.success("https://mega.nz/C!$value"))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                }
+            )
+            megaApiGateway.contactLinkCreate(renew, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun deleteContactLink(handle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            megaApiGateway.contactLinkDelete(handle, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
 }
