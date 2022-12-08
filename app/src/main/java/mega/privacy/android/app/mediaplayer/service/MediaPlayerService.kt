@@ -98,10 +98,27 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
         }
 
+    private val playingPositionUpdateHandler = Handler()
+    private val playingPositionUpdateRunnable = object : Runnable {
+        override fun run() {
+            // Save the current playing position of current item every second
+            with(mediaPlayerGateway) {
+                viewModelGateway.putCurrentPlayingPosition(
+                    getCurrentMediaItem()?.mediaId?.toLong(),
+                    getCurrentPlayingPosition(),
+                    getCurrentItemDuration()
+                )
+            }
+            playingPositionUpdateHandler.postDelayed(this, INTERVAL_SAVE_PLAYING_POSITION)
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
-
         viewModelGateway.setAudioPlayer(this is AudioPlayerService)
+        if (!viewModelGateway.isAudioPlayer()) {
+            viewModelGateway.getPlayingPositionHistoriesFromLocal(PREFERENCE_KEY_VIDEO_EXIT_TIME)
+        }
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
         createPlayer()
@@ -132,9 +149,27 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 ) {
                     handle?.run {
                         setCurrentPlayingHandle(this.toLong())
+                        val currentHandle = this.toLong()
+                        // Check current item whether includes the playing position history,
+                        // if yes, seek to playing position history
+                        viewModelGateway.checkAndSeekToPlayingPositionHistory(currentHandle) {
+                            mediaPlayerGateway.playerSeekToPositionMs(it)
+                        }
                         if (isUpdateName) {
                             val nodeName = getPlaylistItem(this)?.nodeName ?: ""
                             metadata.value = Metadata(null, null, null, nodeName)
+                        }
+                    }
+                }
+
+                override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
+                    if (!viewModelGateway.isAudioPlayer()) {
+                        // Only Start the handler to save playing position when the video is playing
+                        if (isPlaying) {
+                            playingPositionUpdateHandler.post(playingPositionUpdateRunnable)
+                        } else {
+                            playingPositionUpdateHandler.removeCallbacks(
+                                playingPositionUpdateRunnable)
                         }
                     }
                 }
@@ -156,16 +191,16 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 }
 
                 override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
-                    setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPlayingPosition())
+                    setPaused(!playWhenReady)
                 }
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
                     when {
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
-                            setPaused(true, mediaPlayerGateway.getCurrentPlayingPosition())
+                            setPaused(true)
                         }
                         state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
-                            setPaused(false, mediaPlayerGateway.getCurrentPlayingPosition())
+                            setPaused(false)
                         }
                     }
                 }
@@ -326,6 +361,13 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun onDestroy() {
         super.onDestroy()
+        if (!viewModelGateway.isAudioPlayer()) {
+            // Save the playing position history to local when the service is destroyed
+            viewModelGateway.savePlayingPositionHistories(PREFERENCE_KEY_VIDEO_EXIT_TIME)
+            // Remove the handler that save the current playing position
+            playingPositionUpdateHandler.removeCallbacks(playingPositionUpdateRunnable)
+        }
+        mediaPlayerGateway.getCurrentPlayingPosition()
         viewModelGateway.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
 
@@ -446,6 +488,9 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1
+
+        private const val PREFERENCE_KEY_VIDEO_EXIT_TIME = "PREFERENCE_KEY_VIDEO_EXIT_TIME"
+        private const val INTERVAL_SAVE_PLAYING_POSITION: Long = 1000
 
         private const val INTENT_EXTRA_KEY_COMMAND = "command"
         private const val COMMAND_CREATE = 1
