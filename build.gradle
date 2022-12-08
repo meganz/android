@@ -68,7 +68,7 @@ task clean(type: Delete) {
 ext {
     // App
     appVersion = "v9999_test"
-    versionCode = 9999
+    versionCode = generateVersionCode()
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -141,6 +141,16 @@ ext {
 
 ext.isCiBuild = { ->
     return System.getenv("BUILD_NUMBER") != null
+}
+
+/**
+ * Generate the version code based on the date using the format yyDHHMM
+ * ex: 220010900, 223411614
+ *
+ * @return the formatted string used for version code
+ */
+static def generateVersionCode() {
+    return new Date().format("yyDHHMM").toInteger()
 }
 
 apply from: "$project.rootDir/tools/prebuilt-sdk.gradle"

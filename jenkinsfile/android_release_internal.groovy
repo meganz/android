@@ -113,24 +113,6 @@ pipeline {
                 }
             }
         }
-        stage('Increment version') {
-            steps {
-                script {
-                    BUILD_STEP = 'Increment version'
-
-                    // increment version
-                    sh './gradlew app:incrementVersion'
-
-                    // push commit
-                    sh '''
-                        commit_message="Increment version code"
-                        git add . -A
-                        git commit -m $commit_message
-                        git push
-                       '''
-                }
-            }
-        }
         stage('Fetch SDK Submodules') {
             steps {
                 script {
