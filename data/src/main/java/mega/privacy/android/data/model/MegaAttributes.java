@@ -13,7 +13,6 @@ public class MegaAttributes {
     private String askSizeDownload;
     private String askNoAppDownload;
     private String accountDetailsTimeStamp;
-    private String pricingTimeStamp;
     private String extendedAccountDetailsTimeStamp;
     private String invalidateSdkCache;
     private String useHttpsOnly;
@@ -27,8 +26,7 @@ public class MegaAttributes {
     private String transferQueueStatus;
 
     public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload,
-                          String accountDetailsTimeStamp,
-                          String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
+                          String accountDetailsTimeStamp, String extendedAccountDetailsTimeStamp,
                           String invalidateSdkCache, String useHttpsOnly, String showCopyright,
                           String showNotifOff, String lastPublicHandle,
                           String lastPublicHandleTimeStamp, int lastPublicHandleType, @NonNull StorageState storageState,
@@ -38,7 +36,6 @@ public class MegaAttributes {
         this.askNoAppDownload = askNoAppDownload;
         this.askSizeDownload = askSizeDownload;
         this.accountDetailsTimeStamp = accountDetailsTimeStamp;
-        this.pricingTimeStamp = pricingTimeStamp;
         this.extendedAccountDetailsTimeStamp = extendedAccountDetailsTimeStamp;
         this.invalidateSdkCache = invalidateSdkCache;
         this.useHttpsOnly = useHttpsOnly;
@@ -90,14 +87,6 @@ public class MegaAttributes {
 
     public void setAccountDetailsTimeStamp(String accountDetailsTimeStamp) {
         this.accountDetailsTimeStamp = accountDetailsTimeStamp;
-    }
-
-    public String getPricingTimeStamp() {
-        return pricingTimeStamp;
-    }
-
-    public void setPricingTimeStamp(String pricingTimeStamp) {
-        this.pricingTimeStamp = pricingTimeStamp;
     }
 
     public String getExtendedAccountDetailsTimeStamp() {

@@ -35,6 +35,7 @@ internal class DefaultBillingRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val paymentMethodFlagsCache: Cache<PaymentMethodFlags>,
     private val pricingCache: Cache<Pricing>,
+    private val numberOfSubscriptionCache: Cache<Long>,
     private val pricingMapper: PricingMapper,
     private val localPricingMapper: LocalPricingMapper,
 ) : BillingRepository {
@@ -51,6 +52,10 @@ internal class DefaultBillingRepository @Inject constructor(
     override suspend fun getPaymentMethod(clearCache: Boolean): PaymentMethodFlags =
         paymentMethodFlagsCache.get()?.takeUnless { clearCache }
             ?: fetchPaymentMethodFlags().also { paymentMethodFlagsCache.set(it) }
+
+    override suspend fun getNumberOfSubscription(clearCache: Boolean): Long =
+        numberOfSubscriptionCache.get()?.takeUnless { clearCache }
+            ?: fetchNumberOfSubscription().also { numberOfSubscriptionCache.set(it) }
 
     private suspend fun fetchPaymentMethodFlags(): PaymentMethodFlags = withContext(ioDispatcher) {
         Timber.d("getPaymentMethod")
@@ -77,6 +82,18 @@ internal class DefaultBillingRepository @Inject constructor(
                 pricingMapper(it.pricing, it.currency)
             }
             megaApiGateway.getPricing(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    private suspend fun fetchNumberOfSubscription(): Long = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                it.number
+            }
+            megaApiGateway.creditCardQuerySubscriptions(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
             }

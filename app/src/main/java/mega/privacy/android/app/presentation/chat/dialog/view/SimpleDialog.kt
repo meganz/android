@@ -49,7 +49,6 @@ fun SimpleDialog(
         modifier = Modifier
             .padding(horizontal = 40.dp)
             .widthIn(max = 280.dp),
-
         properties = DialogProperties(
             dismissOnBackPress = shouldDismissOnBackPress,
             dismissOnClickOutside = shouldDismissOnClickOutside,
@@ -57,14 +56,13 @@ fun SimpleDialog(
         ),
         onDismissRequest = { onDismiss() },
 
-        titleStringID = title,
+        titleString = stringResource(id = title),
         titleAlign = TextAlign.Start,
         body = {
             Text(
                 modifier = Modifier
                     .wrapContentHeight()
-                    .wrapContentWidth()
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp),
+                    .wrapContentWidth(),
                 text = stringResource(id = description),
                 textAlign = TextAlign.Start,
                 style = subtitle1,
@@ -72,7 +70,6 @@ fun SimpleDialog(
                     grey_alpha_060
                 else
                     white_alpha_060)
-
         },
         confirmButton = {
             Button(

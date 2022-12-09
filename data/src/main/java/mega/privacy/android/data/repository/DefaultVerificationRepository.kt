@@ -85,4 +85,16 @@ internal class DefaultVerificationRepository @Inject constructor(
                 }
             }
         }
+
+    override suspend fun resetSMSVerifiedPhoneNumber() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            megaApiGateway.resetSmsVerifiedPhoneNumber(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

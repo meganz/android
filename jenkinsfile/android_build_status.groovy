@@ -1,3 +1,8 @@
+import groovy.json.JsonSlurperClassic
+
+import java.math.RoundingMode
+import java.text.DecimalFormat
+
 BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
@@ -24,6 +29,7 @@ DOMAIN_COVERAGE = ""
 DATA_COVERAGE = ""
 COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
+ARTIFACTORY_DEVELOP_CODE_COVERAGE = ""
 
 /**
  * common.groovy file with common methods
@@ -62,7 +68,7 @@ String getLastCommitMessage() {
         return '**N/A**'
     } else {
         // use markdown backticks to format commit message into a code block
-        return "\n\\`\\`\\`\n$lastCommitMessage\n\\`\\`\\`\n".stripIndent().stripMargin()
+        return "\n```\n$lastCommitMessage\n```\n".stripIndent().stripMargin()
     }
 }
 
@@ -175,7 +181,7 @@ pipeline {
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
                                 buildLintSummaryTable(jsonLintReportLink) + "\n\n" +
-                                buildTestResults()
+                                buildCodeComparisonResults()
 
                         // Send mergeRequestMessage to MR
                         common.sendToMR(mergeRequestMessage)
@@ -366,6 +372,42 @@ pipeline {
                 }
             }
         }
+        stage('Compare Coverage') {
+            when {
+                expression { (!shouldSkipBuild()) }
+            }
+            steps {
+                script {
+                    BUILD_STEP = "Compare Coverage"
+                }
+                gitlabCommitStatus(name: 'Compare Coverage') {
+                    script {
+                        withCredentials([
+                                string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                                string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                        ]) {
+                            String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
+
+                            // Navigate to the "/cicd/coverage/" path
+                            // Download the code coverage from Artifactory.
+                            // Afterwards, rename the downloaded code coverage text file to "develop_coverage_summary.txt"
+                            sh """
+                                cd ${WORKSPACE}
+                                rm -frv cicd
+                                mkdir -pv ${WORKSPACE}/cicd/coverage
+                                cd ${WORKSPACE}/cicd/coverage
+                                curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o develop_coverage_summary.txt ${developCoverageLocation}
+                                ls
+                            """
+
+                            // Once the file has been downloaded, call the script to parse the Code Coverage results
+                            ARTIFACTORY_DEVELOP_CODE_COVERAGE = "${getArtifactoryDevelopCodeCoverage("$WORKSPACE/cicd/coverage/develop_coverage_summary.txt")}"
+                            println("ARTIFACTORY_DEVELOP_CODE_COVERAGE from Groovy: ${ARTIFACTORY_DEVELOP_CODE_COVERAGE}")
+                        }
+                    }
+                }
+            }
+        }
         stage('Lint Check') {
             when {
                 expression { (!shouldSkipBuild()) }
@@ -402,7 +444,7 @@ pipeline {
 String buildLintSummaryTable(String jsonLintReportLink) {
 
     // Declare a JsonSlurperClassic object
-    def jsonSlurperClassic = new groovy.json.JsonSlurperClassic()
+    def jsonSlurperClassic = new JsonSlurperClassic()
 
     // Declare the initial value for the String
     String tableStr = "**Lint Summary:** (${jsonLintReportLink}):" + "\n\n" +
@@ -430,51 +472,189 @@ String buildLintSummaryTable(String jsonLintReportLink) {
 }
 
 /**
- * Returns a Markdown table-formatted String that holds all Test Results for available modules
+ * Compares the Code Coverage results of all available modules between the source branch and
+ * the latest develop branch from Artifactory
  *
- * @return String that contains all Test Results for available modules
+ * @return A Markdown-formatted table String that contains the Code Coverage results of all
+ * available modules between the source branch and the latest develop branch from Artifactory
  */
-String buildTestResults() {
-    // Break down the Test Summary Reports into String arrays.
-    // As dictated in junit_report.py, each value in the String is separated by a comma.
-    // Use "," as the delimiter in order to split all values, then add them in their respective String arrays.
-    def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
-    def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
-    def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
+String buildCodeComparisonResults() {
+    def latestDevelopResults = new JsonSlurperClassic().parseText(ARTIFACTORY_DEVELOP_CODE_COVERAGE)
 
-    String appTestResultsRow = "| **app** | " +
-            "${APP_COVERAGE} | " +
-            "${appSummaryArray[0]} | " +
-            "${appSummaryArray[1]} | " +
-            "${appSummaryArray[2]} | " +
-            "${appSummaryArray[3]} | " +
-            "${appSummaryArray[4]} | " +
-            "${APP_UNIT_TEST_RESULT} |"
+    String tableString = "**Code Coverage and Comparison:**".concat("\n\n")
+            .concat("| Module | Test Cases | Coverage | Coverage Change |").concat("\n")
+            .concat("|:---|:---|:---|:---|").concat("\n")
 
-    String domainTestResultsRow = "| **domain** | " +
-            "${DOMAIN_COVERAGE} | " +
-            "${domainSummaryArray[0]} | " +
-            "${domainSummaryArray[1]} | " +
-            "${domainSummaryArray[2]} | " +
-            "${domainSummaryArray[3]} | " +
-            "${domainSummaryArray[4]} | " +
-            "${DOMAIN_UNIT_TEST_RESULT} |"
+    def currentModuleTestCases = []
+    def currentModuleCoverage = ""
+    def currentModuleTestResultsLink = ""
 
-    String dataTestResultsRow = "| **data** | " +
-            "${DATA_COVERAGE} | " +
-            "${dataSummaryArray[0]} | " +
-            "${dataSummaryArray[1]} | " +
-            "${dataSummaryArray[2]} | " +
-            "${dataSummaryArray[3]} | " +
-            "${dataSummaryArray[4]} | " +
-            "${DATA_UNIT_TEST_RESULT} |"
+    for (def latestDevelopModuleResults in latestDevelopResults) {
+        // Compare the name from moduleResult with a static module name
+        switch (latestDevelopModuleResults.name) {
+            case "**app**":
+                currentModuleTestCases = APP_UNIT_TEST_SUMMARY.split(',')
+                currentModuleCoverage = APP_COVERAGE
+                currentModuleTestResultsLink = APP_UNIT_TEST_RESULT
+                break
+            case "**domain**":
+                currentModuleTestCases = DOMAIN_UNIT_TEST_SUMMARY.split(',')
+                currentModuleCoverage = DOMAIN_COVERAGE
+                currentModuleTestResultsLink = DOMAIN_UNIT_TEST_RESULT
+                break
+            case "**data**":
+                currentModuleTestCases = DATA_UNIT_TEST_SUMMARY.split(',')
+                currentModuleCoverage = DATA_COVERAGE
+                currentModuleTestResultsLink = DATA_UNIT_TEST_RESULT
+                break
+        }
+        println("Current Coverage of ${latestDevelopModuleResults.name}: $currentModuleCoverage")
 
-    "**Code Coverage:**" + "\n\n" +
-    "| Module | Coverage | Total Cases | Skipped | Errors | Failure | Duration (s) | Test Report |\n" +
-            "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n" +
-            "$appTestResultsRow\n" +
-            "$domainTestResultsRow\n" +
-            "$dataTestResultsRow\n"
+        // Build the Columns
+        String testCasesColumn = buildTestCasesColumn(currentModuleTestCases, currentModuleTestResultsLink, latestDevelopModuleResults)
+        String coverageColumn = buildCoverageColumn(currentModuleCoverage, latestDevelopModuleResults)
+        String coverageChangeColumn = buildCoverageChangeColumn(currentModuleCoverage, latestDevelopModuleResults)
+
+        // Add a Column for every item in the list
+        tableString = tableString.concat("| ${latestDevelopModuleResults.name} | $testCasesColumn | $coverageColumn | $coverageChangeColumn |").concat("\n")
+    }
+
+    return tableString
+}
+
+/**
+ * Builds a Markdown-formatted String of the test cases of a specific module from the current
+ * branch and the latest develop branch in Artifactory
+ *
+ * @param currentModuleTestCases The Module results of the current branch
+ * @param currentModuleTestResultsLink The link to the Module test results of the current branch
+ * @param latestDevelopModuleTestCases The Module results of the latest develop branch in Artifactory
+ *
+ * @return A String that serves as an entry for the "Test Cases" column
+ */
+String buildTestCasesColumn(def currentModuleTestCases,
+                            def currentModuleTestResultsLink,
+                            def latestDevelopModuleTestCases
+) {
+    // Build the "Current Branch" Column first
+    String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
+
+    if (currentModuleTestCases[0].toInteger() > 0) {
+        currentBranchColumn = currentBranchColumn.concat("_Total Cases:_ ")
+                .concat("**${currentModuleTestCases[0]}**").concat("<br>")
+    }
+    if (currentModuleTestCases[1].toInteger() > 0) {
+        currentBranchColumn = currentBranchColumn.concat("_Skipped Cases:_ ")
+                .concat("**${currentModuleTestCases[1]}**").concat("<br>")
+    }
+    if (currentModuleTestCases[2].toInteger() > 0) {
+        currentBranchColumn = currentBranchColumn.concat("_Error Cases:_ ")
+                .concat("**${currentModuleTestCases[2]}**").concat("<br>")
+    }
+    if (currentModuleTestCases[3].toInteger() > 0) {
+        currentBranchColumn = currentBranchColumn.concat("_Failed Cases:_ ")
+                .concat("**${currentModuleTestCases[3]}**").concat("<br>")
+    }
+    currentBranchColumn = currentBranchColumn.concat("_Duration (s):_ ")
+            .concat("**${currentModuleTestCases[4]}**").concat("<br>")
+    currentBranchColumn = currentBranchColumn.concat("_Test Report Link:_")
+            .concat("<br>").concat(currentModuleTestResultsLink).concat("<br><br>")
+
+
+    // Afterwards, build the "Latest develop Branch" Column
+    String latestDevelopColumn = "**Latest develop Branch:**".concat("<br><br>")
+
+    if (latestDevelopModuleTestCases.totalTestCases.toInteger() > 0) {
+        latestDevelopColumn = latestDevelopColumn.concat("_Total Cases:_ ")
+                .concat("**${latestDevelopModuleTestCases.totalTestCases}**").concat("<br>")
+    }
+    if (latestDevelopModuleTestCases.skippedTestCases.toInteger() > 0) {
+        latestDevelopColumn = latestDevelopColumn.concat("_Skipped Cases:_ ")
+                .concat("**${latestDevelopModuleTestCases.skippedTestCases}**").concat("<br>")
+    }
+    if (latestDevelopModuleTestCases.errorTestCases.toInteger() > 0) {
+        latestDevelopColumn = latestDevelopColumn.concat("_Error Cases:_ ")
+                .concat("**${latestDevelopModuleTestCases.errorTestCases}**").concat("<br>")
+    }
+    if (latestDevelopModuleTestCases.failedTestCases.toInteger() > 0) {
+        latestDevelopColumn = latestDevelopColumn.concat("_Failed Cases:_ ")
+                .concat("**${latestDevelopModuleTestCases.failedTestCases}**").concat("<br>")
+    }
+    latestDevelopColumn = latestDevelopColumn.concat("_Duration (s):_ ")
+            .concat("**${latestDevelopModuleTestCases.duration}**")
+
+    currentBranchColumn.concat(latestDevelopColumn)
+}
+
+/**
+ * Builds a Markdown-formatted String of the coverage of a specific module from the current
+ * branch and the latest develop branch in Artifactory
+ *
+ * @param currentModuleCoverage The Module results of the current branch
+ * @param latestDevelopModuleCoverage The Module results of the latest develop branch in Artifactory
+ *
+ * @return A String that serves as an entry for the "Coverage" column
+ */
+String buildCoverageColumn(def currentModuleCoverage, def latestDevelopModuleCoverage) {
+    def df = new DecimalFormat("0.00")
+
+    // Build the "Current Branch" Column first
+    String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
+
+    def currentInitialArray = currentModuleCoverage.split('=')
+    def currentLineArray = currentInitialArray[1].split('/')
+
+    currentBranchColumn = currentBranchColumn.concat("_Total Lines:_ ")
+            .concat("**${currentLineArray[1]}**").concat("<br>")
+    currentBranchColumn = currentBranchColumn.concat("_Covered Lines:_ ")
+            .concat("**${currentLineArray[0]}**").concat("<br>")
+    currentBranchColumn = currentBranchColumn.concat("_Percentage Covered_: ")
+            .concat("**${currentInitialArray[0]}**").concat("<br><br>")
+
+    // Afterwards, build the "Latest develop Branch" Column
+    String latestDevelopColumn = "**Latest develop Branch:**".concat("<br><br>")
+
+    def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleCoverage.totalLines)
+    def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleCoverage.coveredLines)
+    def latestDevelopLinePercentage = df.format((latestDevelopCoveredLines / latestDevelopTotalLines) * 100)
+
+    latestDevelopColumn = latestDevelopColumn.concat("_Total Lines:_ ")
+            .concat("**${latestDevelopModuleCoverage.totalLines}**").concat("<br>")
+    latestDevelopColumn = latestDevelopColumn.concat("_Covered Lines:_ ")
+            .concat("**${latestDevelopModuleCoverage.coveredLines}**").concat("<br>")
+    latestDevelopColumn = latestDevelopColumn.concat("_Percentage Covered_: ")
+            .concat("**$latestDevelopLinePercentage%**")
+
+    return currentBranchColumn.concat(latestDevelopColumn)
+}
+
+/**
+ * Builds a Markdown-formatted String of the coverage change of a specific module from the current
+ * branch and the latest develop branch in Artifactory
+ *
+ * @param currentModuleCoverage The Module results of the current branch
+ * @param latestDevelopModuleCoverage The Module results of the latest develop branch in Artifactory
+ *
+ * @return A String that serves as an entry for the "Coverage Change" column
+ */
+String buildCoverageChangeColumn(def currentModuleCoverage, def latestDevelopModuleCoverage) {
+    def currentModuleLinePercentage = currentModuleCoverage.split("%")[0]
+    def currentModuleBigDecimal = new BigDecimal(currentModuleLinePercentage).setScale(2, RoundingMode.HALF_UP)
+
+    def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleCoverage.totalLines)
+    def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleCoverage.coveredLines)
+    def latestDevelopLinePercentage = (latestDevelopCoveredLines / latestDevelopTotalLines) * 100
+    def latestDevelopBigDecimal = new BigDecimal(latestDevelopLinePercentage).setScale(2, RoundingMode.HALF_UP)
+
+    def result = currentModuleBigDecimal - latestDevelopBigDecimal
+
+    if (result > 0) {
+        return "**+$result%**"
+    } else if (result < 0) {
+        return "**$result%**"
+    } else {
+        return "**No Change**"
+    }
 }
 
 /**
@@ -658,6 +838,20 @@ String getTestCoverageSummary(String csvReportPath) {
 }
 
 /**
+ * Parses the file that contains the Code Coverage results of the latest develop branch from Artifactory
+ * into a formatted String, so that the results can be easily transformed and displayed in the Gitlab MR
+ * @param coveragePath The full path to the file containing the Code Coverage from the latest develop
+ * @return A formatted String of the Code Coverage
+ */
+String getArtifactoryDevelopCodeCoverage(String coveragePath) {
+    summary = sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/artifactory_develop_code_coverage.py ${coveragePath}",
+            returnStdout: true).trim()
+    print("artifactory develop coverage path(${coveragePath}): ${summary}")
+    return summary
+}
+
+/**
  * download jenkins build console log and save to file.
  */
 private void downloadJenkinsConsoleLog(String downloaded) {
@@ -675,7 +869,7 @@ private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
         final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
+        link = new JsonSlurperClassic().parseText(response).markdown
         return link
     }
     return link

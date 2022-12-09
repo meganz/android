@@ -91,11 +91,12 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                         setupPlayerView()
                     } else {
                         binding.playerView.isVisible = false
+                        adapter?.setCurrentPlayingPosition(serviceGateway?.getCurrentPlayingPosition())
                     }
                     if (getPlaylistItems().isNotEmpty()) {
                         adapter?.submitList(getPlaylistItems())
                     }
-                    if (!isPaused()) {
+                    if (isAudioPlayer() && !isPaused()) {
                         positionUpdateHandler.post(positionUpdateRunnable)
                     }
                     tryObservePlaylist()
@@ -303,10 +304,14 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     viewLifecycleOwner.lifecycle,
                     Lifecycle.State.RESUMED
                 ).onEach { paused ->
-                    if (paused) {
-                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-                    } else {
-                        positionUpdateHandler.post(positionUpdateRunnable)
+                    playerServiceViewModelGateway?.let {
+                        if (isAudioPlayer) {
+                            if (paused) {
+                                positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
+                            } else {
+                                positionUpdateHandler.post(positionUpdateRunnable)
+                            }
+                        }
                     }
                     adapter?.refreshPausedState(paused)
                 }.launchIn(viewLifecycleOwner.lifecycleScope)

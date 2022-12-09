@@ -41,6 +41,7 @@ class DefaultBillingRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val paymentMethodFlagsCache = mock<Cache<PaymentMethodFlags>>()
     private val pricingCache = mock<Cache<Pricing>>()
+    private val numberOfSubscriptionCache = mock<Cache<Long>>()
     private val megaSkuObject1 = MegaSku("mega.android.pro1.onemonth", 9990000, "EUR")
     private val megaSkuObject2 = MegaSku("mega.android.pro2.onemonth", 9990000, "EUR")
     private val skuString = "mega.android.pro1.onemonth"
@@ -59,7 +60,8 @@ class DefaultBillingRepositoryTest {
             paymentMethodFlagsCache = paymentMethodFlagsCache,
             pricingCache = pricingCache,
             localPricingMapper = localPricingMapper,
-            pricingMapper = pricingMapper
+            pricingMapper = pricingMapper,
+            numberOfSubscriptionCache = numberOfSubscriptionCache,
         )
     }
 
@@ -189,5 +191,70 @@ class DefaultBillingRepositoryTest {
             }
 
             underTest.getPaymentMethod(true)
+        }
+
+    @Test
+    fun `when clear cache false and numberOfSubscription cache return value then no getCreditCardQuerySubscriptions api call`() =
+        runTest {
+            whenever(numberOfSubscriptionCache.get()).thenReturn(1L)
+
+            underTest.getNumberOfSubscription(false)
+            verifyNoMoreInteractions(megaApiGateway)
+        }
+
+    @Test
+    fun `when clear cache false and numberOfSubscription cache return null then getCreditCardQuerySubscriptions api call`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val expectedNumberOfSubscription = 10L
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS)
+                on { number }.thenReturn(expectedNumberOfSubscription)
+            }
+
+            whenever(megaApiGateway.creditCardQuerySubscriptions(listener = any())).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+            whenever(numberOfSubscriptionCache.get()).thenReturn(null)
+
+            underTest.getNumberOfSubscription(false)
+            verify(numberOfSubscriptionCache, times(1)).set(expectedNumberOfSubscription)
+        }
+
+    @Test
+    fun `test when getCreditCardQuerySubscriptions with clearCache as true then ignore cache and call API`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val previousNumberOfSubscription = 9L
+            val expectNumberOfSubscription = 10L
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS)
+                on { number }.thenReturn(expectNumberOfSubscription)
+            }
+
+            whenever(megaApiGateway.creditCardQuerySubscriptions(listener = any())).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            whenever(numberOfSubscriptionCache.get()).thenReturn(previousNumberOfSubscription)
+
+            underTest.getNumberOfSubscription(true)
+            verify(numberOfSubscriptionCache, times(1)).set(expectNumberOfSubscription)
         }
 }

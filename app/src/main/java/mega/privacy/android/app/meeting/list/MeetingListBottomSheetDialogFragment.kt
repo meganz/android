@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
@@ -27,18 +26,13 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import javax.inject.Inject
 
 /**
  * Meeting list bottom sheet dialog fragment that displays meeting options
  */
 @AndroidEntryPoint
 class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
-
-    @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     companion object {
         private const val TAG = "MeetingListBottomSheetDialogFragment"
@@ -122,8 +116,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.btnInfo.setOnClickListener {
             activity?.lifecycleScope?.launch {
-                val scheduleMeetingEnabled = getFeatureFlag(AppFeatures.ScheduleMeeting)
-                val intent = if (scheduleMeetingEnabled) {
+                val intent = if (meeting.isScheduled()) {
                     Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
                         putExtra(CHAT_ID, chatId)
                         putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)

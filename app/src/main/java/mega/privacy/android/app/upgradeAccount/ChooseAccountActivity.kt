@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.IntentConstants
@@ -23,7 +24,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
@@ -34,6 +35,7 @@ import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.Product
 import timber.log.Timber
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
@@ -63,7 +65,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
 
         when (action) {
-            UPDATE_GET_PRICING -> setPricingInfo()
+            UPDATE_GET_PRICING -> setPricingInfo(viewModel.getProductAccounts())
         }
     }
 
@@ -170,9 +172,12 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     }
 
     private fun setupObservers() {
+        collectFlow(viewModel.state) {
+            setPricingInfo(it.product)
+        }
         registerReceiver(
             updateMyAccountReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
     }
 
@@ -199,11 +204,9 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    private fun setPricingInfo() {
-        val productAccounts = viewModel.getProductAccounts()
-
-        if (productAccounts == null) {
-            Timber.d("productAccounts == null")
+    private fun setPricingInfo(productAccounts: List<Product>) {
+        if (productAccounts.isEmpty()) {
+            Timber.d("productAccounts is Empty")
             viewModel.refreshPricing()
             return
         }
