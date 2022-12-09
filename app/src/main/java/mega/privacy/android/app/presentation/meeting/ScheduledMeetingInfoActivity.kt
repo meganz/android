@@ -89,19 +89,26 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, finish, inviteParticipantAction, timestampDnd, _, meetingLink) ->
+                viewModel.state.collect { (chatId, _, finish, inviteParticipantAction, dndSecond, _, meetingLink, _, openSendToChat) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
                     }
 
-                    if (chatRoomId != chatId)
+                    if (chatRoomId != chatId) {
                         chatRoomId = chatId
+                    }
 
-                    enabledChatNotification = timestampDnd == null
+                    enabledChatNotification = dndSecond == null
 
-                    if (link != meetingLink)
+                    if (link != meetingLink) {
                         link = meetingLink
+                    }
+
+                    if (openSendToChat) {
+                        viewModel.openSendToChat(false)
+                        sendToChatLauncher.launch(Unit)
+                    }
 
                     inviteParticipantAction?.let { action ->
                         viewModel.removeInviteParticipantsAction()
@@ -191,13 +198,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
-     * Open send to screen
-     */
-    fun openSendToChat() {
-        sendToChatLauncher.launch(Unit)
-    }
-
-    /**
      * Open shared files
      */
     private fun openSharedFiles() {
@@ -274,7 +274,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onButtonClicked = ::onActionTap,
                 onEditClicked = { viewModel::onEditTap },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
-                onSeeMoreClicked = { viewModel::onSeeMoreTap },
+                onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
                 onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
                 onParticipantClicked = { viewModel::onParticipantTap },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },

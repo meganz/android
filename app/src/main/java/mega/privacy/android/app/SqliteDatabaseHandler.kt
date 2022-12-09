@@ -2079,7 +2079,6 @@ class SqliteDatabaseHandler(
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.askSizeDownload))
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.askNoAppDownload))
         values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.accountDetailsTimeStamp))
-        values.put(KEY_PRICING_TIMESTAMP, encrypt(attr.pricingTimeStamp))
         values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
             encrypt(attr.extendedAccountDetailsTimeStamp))
         values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.invalidateSdkCache))
@@ -2129,8 +2128,6 @@ class SqliteDatabaseHandler(
                     }
                     val accountDetailsTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor,
                         KEY_ACCOUNT_DETAILS_TIMESTAMP)))
-                    val pricingTimeStamp =
-                        decrypt(cursor.getString(getColumnIndex(cursor, KEY_PRICING_TIMESTAMP)))
                     val extendedAccountDetailsTimeStamp = decrypt(cursor.getString(getColumnIndex(
                         cursor,
                         KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP)))
@@ -2168,7 +2165,6 @@ class SqliteDatabaseHandler(
                         askSizeDownload,
                         askNoAppDownload,
                         accountDetailsTimeStamp,
-                        pricingTimeStamp,
                         extendedAccountDetailsTimeStamp,
                         invalidateSdkCache,
                         useHttpsOnly,
@@ -3198,29 +3194,6 @@ class SqliteDatabaseHandler(
                 } else {
                     values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP,
                         encrypt(accountDetailsTimeStamp.toString()))
-                    db.insert(TABLE_ATTRIBUTES, null, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setPricingTimestamp() {
-        Timber.d("setPricingTimestamp")
-        val creditCardTimestamp = System.currentTimeMillis() / 1000
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            db.rawQuery(selectQuery, null).use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTE_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_PRICING_TIMESTAMP= '${
-                            encrypt(creditCardTimestamp.toString())
-                        }' WHERE $KEY_ID = '1'"
-                    db.execSQL(UPDATE_ATTRIBUTE_TABLE)
-                } else {
-                    values.put(KEY_PRICING_TIMESTAMP, encrypt(creditCardTimestamp.toString()))
                     db.insert(TABLE_ATTRIBUTES, null, values)
                 }
             }
@@ -4633,6 +4606,7 @@ class SqliteDatabaseHandler(
         private const val KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp"
         @Deprecated("Unused database properties")
         private const val KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp"
+        @Deprecated("Unused database properties")
         private const val KEY_PRICING_TIMESTAMP = "pricingtimestamp"
         private const val KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp"
         private const val KEY_CHAT_HANDLE = "chathandle"

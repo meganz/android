@@ -216,7 +216,7 @@
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Shared items</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">Rubbish Bin</string>
+    <string name="section_rubbish_bin">Rubbish bin</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
     <string name="section_contacts">Contacts</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
@@ -230,7 +230,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">My Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Camera Uploads</string>
+    <string name="section_photo_sync">Camera uploads</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Incoming</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -358,7 +358,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Copying</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Move to Rubbish Bin</string>
+    <string name="context_move_to_trash">Move to the Rubbish bin</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Remove from MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -368,7 +368,7 @@
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Empty Rubbish bin</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">You are about to permanently remove all items from your Rubbish Bin.</string>
+    <string name="clear_rubbish_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Send</string>
     <!-- Menu option to delete one or multiple selected items. -->
@@ -427,7 +427,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items were not moved successfully</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to the Rubbish Bin successfully</string>
+    <string name="context_correctly_moved_to_rubbish">Moved to the Rubbish bin successfully</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
@@ -455,9 +455,9 @@
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d items were not copied</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish Bin emptied successfully</string>
+    <string name="rubbish_bin_emptied">Rubbish bin emptied successfully</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
+    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish bin has not been emptied</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -542,17 +542,17 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi or mobile data</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Camera Uploads in progress</string>
+    <string name="cam_sync_syncing">Camera uploads in progress</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Do you want to stop Camera Uploads?</string>
+    <string name="cam_sync_cancel_sync">Do you want to stop Camera uploads?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Uploading files of media folders</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Checking for files to be uploaded</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Initialising Camera Uploads</string>
+    <string name="settings_camera_notif_initializing_title">Initialising Camera uploads</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Camera Uploads have been disabled. Your local folder is unavailable.</string>
+    <string name="camera_notif_primary_local_unavailable">Camera uploads have been disabled. Your local folder is unavailable.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Media Uploads have been disabled. Your local folder is unavailable.</string>
     <!-- settings of the Appearance section -->
@@ -640,7 +640,7 @@
         <item>Import from device</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Enable Camera Uploads</string>
+    <string name="settings_camera_upload_on">Enable Camera uploads</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">How to upload</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -671,7 +671,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Local Camera folder</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">MEGA Camera Uploads folder</string>
+    <string name="settings_mega_camera_upload_folder">MEGA Camera uploads folder</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Local Secondary folder</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -1441,13 +1441,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Removing contact from shared folder</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Move to Rubbish Bin?</string>
+    <string name="confirmation_move_to_rubbish">Move to the Rubbish bin?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish bin? This will disable Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish Bin? This will disable Secondary Media Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish bin? This will disable Secondary media uploads.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Move to Rubbish Bin?</string>
+    <string name="confirmation_move_to_rubbish_plural">Move to Rubbish bin?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Delete from MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1767,7 +1767,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Quality</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+    <string name="on_refuse_storage_permission">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Low</item>
@@ -2371,7 +2371,7 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">This setting will take effect the next time Camera Uploads runs</string>
+    <string name="message_keep_device_name">This setting will take effect the next time Camera uploads runs</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s has been compressed</string>
     <!-- notification title when compressing video -->
@@ -2608,7 +2608,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Your photos in the cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
+    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Enter your password</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2777,7 +2777,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Something went wrong</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3249,13 +3249,13 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+        <item quantity="one">1 item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
+        <item quantity="other">1 item moved to the Rubbish bin, but %d items not moved. Try again later.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+        <item quantity="one">1 item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
+        <item quantity="other">%d items moved to the Rubbish bin, but 1 item not moved. Try again later.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3269,13 +3269,13 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items moved to the Rubbish Bin successfully</item>
+        <item quantity="one">1 item moved to the Rubbish bin successfully</item>
+        <item quantity="other">%d items moved to the Rubbish bin successfully</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbish Bin successfully</item>
+        <item quantity="one">1 item was not moved to the Rubbish bin successfully</item>
+        <item quantity="other">%d items were not moved to the Rubbish bin successfully</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3546,7 +3546,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Move “%1s” to Rubbish Bin</string>
+    <string name="backup_remove_folder_title">Move “%1s” to Rubbish bin</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Disable backup</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -4097,11 +4097,11 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Meeting link copied to the clipboard</string>
+    <string name="scheduled_meetings_meeting_link_copied">Copied link to clipboard</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">“%s” album deleted</item>
-        <item quantity="other">%d albums deleted</item>
+        <item quantity="other">Deleted %d albums</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4113,4 +4113,6 @@
         <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
         <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
 </resources>

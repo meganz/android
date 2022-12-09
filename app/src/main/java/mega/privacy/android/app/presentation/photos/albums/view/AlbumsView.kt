@@ -7,18 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -26,6 +21,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
@@ -48,7 +44,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -60,15 +55,17 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.presentation.controls.MegaDialog
 import mega.privacy.android.presentation.theme.black
+import mega.privacy.android.presentation.theme.button
 import mega.privacy.android.presentation.theme.caption
 import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.grey_alpha_087
+import mega.privacy.android.presentation.theme.subtitle1
 import mega.privacy.android.presentation.theme.subtitle2
+import mega.privacy.android.presentation.theme.teal_200
 import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
-import mega.privacy.android.presentation.theme.white_alpha_087
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -249,64 +246,50 @@ fun DeleteAlbumsConfirmationDialog(
 ) {
     val isLight = MaterialTheme.colors.isLight
 
-    Dialog(
+    MegaDialog(
+        titleString = pluralStringResource(
+            id = R.plurals.photos_album_delete_confirmation_title,
+            count = selectedAlbumIds.size,
+        ),
+        body = {
+            Text(
+                modifier = Modifier.padding(),
+                text = pluralStringResource(
+                    id = R.plurals.photos_album_delete_confirmation_description,
+                    count = selectedAlbumIds.size,
+                ),
+                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                style = subtitle1,
+            )
+        },
         onDismissRequest = onCancelClicked,
-        properties = DialogProperties(dismissOnClickOutside = false),
-    ) {
-        Card(shape = RoundedCornerShape(4.dp)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 20.dp),
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onCancelClicked()
+                    onDeleteClicked(selectedAlbumIds)
+                },
             ) {
                 Text(
-                    text = pluralStringResource(
-                        id = R.plurals.photos_album_delete_confirmation_title,
-                        count = selectedAlbumIds.size,
-                    ),
-                    color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.h6,
+                    text = stringResource(id = R.string.delete_button),
+                    style = button,
+                    color = teal_300.takeIf { isLight } ?: teal_200
                 )
-
-                Spacer(modifier = Modifier.size(16.dp))
-
-                Text(
-                    text = pluralStringResource(
-                        id = R.plurals.photos_album_delete_confirmation_description,
-                        count = selectedAlbumIds.size,
-                    ),
-                    color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                    style = MaterialTheme.typography.subtitle1,
-                )
-
-                Spacer(modifier = Modifier.size(42.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.button_cancel),
-                        modifier = Modifier.clickable { onCancelClicked() },
-                        color = teal_300,
-                        style = MaterialTheme.typography.button,
-                    )
-
-                    Spacer(modifier = Modifier.size(24.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.delete_button),
-                        modifier = Modifier.clickable {
-                            onCancelClicked()
-                            onDeleteClicked(selectedAlbumIds)
-                        },
-                        color = teal_300,
-                        style = MaterialTheme.typography.button,
-                    )
-                }
             }
-        }
-    }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onCancelClicked()
+                },
+            ) {
+                Text(
+                    text = stringResource(id = R.string.button_cancel),
+                    style = button,
+                    color = teal_300.takeIf { isLight } ?: teal_200
+                )
+            }
+        },
+        properties = DialogProperties(dismissOnClickOutside = false),
+    )
 }

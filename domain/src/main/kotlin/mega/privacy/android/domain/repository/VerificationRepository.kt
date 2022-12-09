@@ -24,4 +24,9 @@ interface VerificationRepository {
      * send SMS Verification Code
      */
     suspend fun sendSMSVerificationCode(phoneNumber: String)
+
+    /**
+     * reset sms verified phone number
+     */
+    suspend fun resetSMSVerifiedPhoneNumber()
 }

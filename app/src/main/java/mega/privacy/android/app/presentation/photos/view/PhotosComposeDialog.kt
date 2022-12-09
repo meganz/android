@@ -53,7 +53,7 @@ internal fun SortByDialog(
                                 }
                                 onDialogDismissed()
                             }
-                            .padding(horizontal = 24.dp, vertical = 12.dp),
+                            .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
@@ -80,12 +80,11 @@ internal fun SortByDialog(
             }
         },
         onDismissRequest = onDialogDismissed,
-        titleStringID = R.string.action_sort_by,
+        titleString = stringResource(id = R.string.action_sort_by),
         confirmButton = {},
         dismissButton = {
             TextButton(
                 onClick = onDialogDismissed,
-                modifier = Modifier.padding(end = 16.dp)
             ) {
                 Text(
                     text = stringResource(id = R.string.general_cancel).uppercase(),
@@ -125,7 +124,7 @@ internal fun FilterDialog(
                                 }
                                 onDialogDismissed()
                             }
-                            .padding(horizontal = 24.dp, vertical = 12.dp),
+                            .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(
@@ -152,12 +151,11 @@ internal fun FilterDialog(
             }
         },
         onDismissRequest = onDialogDismissed,
-        titleStringID = R.string.photos_action_filter,
+        titleString = stringResource(id = R.string.photos_action_filter),
         confirmButton = {},
         dismissButton = {
             TextButton(
                 onClick = onDialogDismissed,
-                modifier = Modifier.padding(end = 16.dp)
             ) {
                 Text(
                     text = stringResource(id = R.string.general_cancel).uppercase(),

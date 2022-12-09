@@ -333,4 +333,35 @@ interface MegaChatApiGateway {
      * @param listener      Listener.
      */
     fun createChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Get my user handle
+     *
+     * @return My user handle
+     */
+    fun getMyUserHandle(): Long
+
+    /**
+     * Get my full name
+     *
+     * @return My full name
+     */
+    fun getMyFullname(): String
+
+    /**
+     * Get my email
+     *
+     * @return My full email
+     */
+    fun getMyEmail(): String
+
+    /**
+     * Get Chat Invalid Handle
+     */
+    fun getChatInvalidHandle(): Long
+
+    /**
+     * Get my chat status
+     */
+    fun getOnlineStatus(): Int
 }

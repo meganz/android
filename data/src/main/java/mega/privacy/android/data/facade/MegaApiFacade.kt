@@ -640,4 +640,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface) {
         megaApi.contactLinkDelete(handle, listener)
     }
+
+    override fun isChatNotifiable(chatId: Long): Boolean =
+        megaApi.isChatNotifiable(chatId)
 }

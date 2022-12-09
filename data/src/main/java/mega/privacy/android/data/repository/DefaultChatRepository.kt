@@ -315,4 +315,9 @@ internal class DefaultChatRepository @Inject constructor(
             .mapNotNull { it.item }
             .map(chatListItemMapper)
             .flowOn(ioDispatcher)
+
+    override suspend fun isChatNotifiable(chatId: Long): Boolean =
+        withContext(ioDispatcher) {
+            megaApiGateway.isChatNotifiable(chatId)
+        }
 }
