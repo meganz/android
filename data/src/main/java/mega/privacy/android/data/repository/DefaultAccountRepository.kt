@@ -231,8 +231,8 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun isAccountAchievementsEnabled(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.isAccountAchievementsEnabled()
+    override suspend fun areAccountAchievementsEnabled(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.areAccountAchievementsEnabled()
     }
 
     override suspend fun getAccountAchievements(
@@ -317,10 +317,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
         dbHandler.resetExtendedAccountDetailsTimestamp()
-    }
-
-    override suspend fun areAchievementsEnabled() = withContext(ioDispatcher) {
-        megaApiGateway.isAchievementsEnabled()
     }
 
     override suspend fun logout() = withContext(ioDispatcher) {

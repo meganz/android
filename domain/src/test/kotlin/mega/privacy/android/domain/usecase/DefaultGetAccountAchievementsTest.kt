@@ -29,14 +29,14 @@ class DefaultGetAccountAchievementsTest {
 
     @Test
     fun `test that data is null when is achievements enabled is false`() = runTest {
-        whenever(accountRepository.isAccountAchievementsEnabled()).thenReturn(false)
+        whenever(accountRepository.areAccountAchievementsEnabled()).thenReturn(false)
         verify(accountRepository, never()).getAccountAchievements(any(), any())
         verifyNoMoreInteractions(accountRepository)
     }
 
     @Test
     fun `test that data is not null and mega achievement is returned`() = runTest {
-        whenever(accountRepository.isAccountAchievementsEnabled()).thenReturn(true)
+        whenever(accountRepository.areAccountAchievementsEnabled()).thenReturn(true)
         whenever(accountRepository.getAccountAchievements(AchievementType.MEGA_ACHIEVEMENT_WELCOME,
             5L)).thenReturn(achievement)
         val actual = underTest(AchievementType.MEGA_ACHIEVEMENT_WELCOME, 5L)
