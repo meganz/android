@@ -510,13 +510,13 @@ String buildCodeComparisonResults() {
         }
         println("Current Coverage of ${latestDevelopModuleResults.name}: $currentModuleCoverage")
 
-        // Build the Rows
-        String testCasesRow = buildTestCasesRow(currentModuleTestCases, currentModuleTestResultsLink, latestDevelopModuleResults)
-        String coverageRow = buildCoverageRow(currentModuleCoverage, latestDevelopModuleResults)
-        String coverageChangeRow = buildCoverageChangeRow(currentModuleCoverage, latestDevelopModuleResults)
+        // Build the Columns
+        String testCasesColumn = buildTestCasesColumn(currentModuleTestCases, currentModuleTestResultsLink, latestDevelopModuleResults)
+        String coverageColumn = buildCoverageColumn(currentModuleCoverage, latestDevelopModuleResults)
+        String coverageChangeColumn = buildCoverageChangeColumn(currentModuleCoverage, latestDevelopModuleResults)
 
-        // Add a Row for every item in the list
-        tableString = tableString.concat("| ${latestDevelopModuleResults.name} | $testCasesRow | $coverageRow | $coverageChangeRow |").concat("\n")
+        // Add a Column for every item in the list
+        tableString = tableString.concat("| ${latestDevelopModuleResults.name} | $testCasesColumn | $coverageColumn | $coverageChangeColumn |").concat("\n")
     }
 
     return tableString
@@ -530,60 +530,60 @@ String buildCodeComparisonResults() {
  * @param currentModuleTestResultsLink The link to the Module test results of the current branch
  * @param latestDevelopModuleTestCases The Module results of the latest develop branch in Artifactory
  *
- * @return A String that serves as a Row entry for the "Test Cases" column
+ * @return A String that serves as an entry for the "Test Cases" column
  */
-String buildTestCasesRow(def currentModuleTestCases,
-                         def currentModuleTestResultsLink,
-                         def latestDevelopModuleTestCases
+String buildTestCasesColumn(def currentModuleTestCases,
+                            def currentModuleTestResultsLink,
+                            def latestDevelopModuleTestCases
 ) {
-    // Build the "Current Branch" row first
-    String currentBranchRow = "**Current Branch:**".concat("<br><br>")
+    // Build the "Current Branch" Column first
+    String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
 
     if (currentModuleTestCases[0].toInteger() > 0) {
-        currentBranchRow = currentBranchRow.concat("_Total Cases:_ ")
+        currentBranchColumn = currentBranchColumn.concat("_Total Cases:_ ")
                 .concat("**${currentModuleTestCases[0]}**").concat("<br>")
     }
     if (currentModuleTestCases[1].toInteger() > 0) {
-        currentBranchRow = currentBranchRow.concat("_Skipped Cases:_ ")
+        currentBranchColumn = currentBranchColumn.concat("_Skipped Cases:_ ")
                 .concat("**${currentModuleTestCases[1]}**").concat("<br>")
     }
     if (currentModuleTestCases[2].toInteger() > 0) {
-        currentBranchRow = currentBranchRow.concat("_Error Cases:_ ")
+        currentBranchColumn = currentBranchColumn.concat("_Error Cases:_ ")
                 .concat("**${currentModuleTestCases[2]}**").concat("<br>")
     }
     if (currentModuleTestCases[3].toInteger() > 0) {
-        currentBranchRow = currentBranchRow.concat("_Failed Cases:_ ")
+        currentBranchColumn = currentBranchColumn.concat("_Failed Cases:_ ")
                 .concat("**${currentModuleTestCases[3]}**").concat("<br>")
     }
-    currentBranchRow = currentBranchRow.concat("_Duration (s):_ ")
+    currentBranchColumn = currentBranchColumn.concat("_Duration (s):_ ")
             .concat("**${currentModuleTestCases[4]}**").concat("<br>")
-    currentBranchRow = currentBranchRow.concat("_Test Report Link:_")
+    currentBranchColumn = currentBranchColumn.concat("_Test Report Link:_")
             .concat("<br>").concat(currentModuleTestResultsLink).concat("<br><br>")
 
 
-    // Afterwards, build the "Latest develop Branch" row
-    String latestDevelopRow = "**Latest develop Branch:**".concat("<br><br>")
+    // Afterwards, build the "Latest develop Branch" Column
+    String latestDevelopColumn = "**Latest develop Branch:**".concat("<br><br>")
 
     if (latestDevelopModuleTestCases.totalTestCases.toInteger() > 0) {
-        latestDevelopRow = latestDevelopRow.concat("_Total Cases:_ ")
+        latestDevelopColumn = latestDevelopColumn.concat("_Total Cases:_ ")
                 .concat("**${latestDevelopModuleTestCases.totalTestCases}**").concat("<br>")
     }
     if (latestDevelopModuleTestCases.skippedTestCases.toInteger() > 0) {
-        latestDevelopRow = latestDevelopRow.concat("_Skipped Cases:_ ")
+        latestDevelopColumn = latestDevelopColumn.concat("_Skipped Cases:_ ")
                 .concat("**${latestDevelopModuleTestCases.skippedTestCases}**").concat("<br>")
     }
     if (latestDevelopModuleTestCases.errorTestCases.toInteger() > 0) {
-        latestDevelopRow = latestDevelopRow.concat("_Error Cases:_ ")
+        latestDevelopColumn = latestDevelopColumn.concat("_Error Cases:_ ")
                 .concat("**${latestDevelopModuleTestCases.errorTestCases}**").concat("<br>")
     }
     if (latestDevelopModuleTestCases.failedTestCases.toInteger() > 0) {
-        latestDevelopRow = latestDevelopRow.concat("_Failed Cases:_ ")
+        latestDevelopColumn = latestDevelopColumn.concat("_Failed Cases:_ ")
                 .concat("**${latestDevelopModuleTestCases.failedTestCases}**").concat("<br>")
     }
-    latestDevelopRow = latestDevelopRow.concat("_Duration (s):_ ")
+    latestDevelopColumn = latestDevelopColumn.concat("_Duration (s):_ ")
             .concat("**${latestDevelopModuleTestCases.duration}**")
 
-    currentBranchRow.concat(latestDevelopRow)
+    currentBranchColumn.concat(latestDevelopColumn)
 }
 
 /**
@@ -593,39 +593,39 @@ String buildTestCasesRow(def currentModuleTestCases,
  * @param currentModuleCoverage The Module results of the current branch
  * @param latestDevelopModuleCoverage The Module results of the latest develop branch in Artifactory
  *
- * @return A String that serves as a Row entry for the "Coverage" column
+ * @return A String that serves as an entry for the "Coverage" column
  */
-String buildCoverageRow(def currentModuleCoverage, def latestDevelopModuleCoverage) {
+String buildCoverageColumn(def currentModuleCoverage, def latestDevelopModuleCoverage) {
     def df = new DecimalFormat("0.00")
 
-    // Build the "Current Branch" row first
-    String currentBranchRow = "**Current Branch:**".concat("<br><br>")
+    // Build the "Current Branch" Column first
+    String currentBranchColumn = "**Current Branch:**".concat("<br><br>")
 
     def currentInitialArray = currentModuleCoverage.split('=')
     def currentLineArray = currentInitialArray[1].split('/')
 
-    currentBranchRow = currentBranchRow.concat("_Total Lines:_ ")
+    currentBranchColumn = currentBranchColumn.concat("_Total Lines:_ ")
             .concat("**${currentLineArray[1]}**").concat("<br>")
-    currentBranchRow = currentBranchRow.concat("_Covered Lines:_ ")
+    currentBranchColumn = currentBranchColumn.concat("_Covered Lines:_ ")
             .concat("**${currentLineArray[0]}**").concat("<br>")
-    currentBranchRow = currentBranchRow.concat("_Percentage Covered_: ")
+    currentBranchColumn = currentBranchColumn.concat("_Percentage Covered_: ")
             .concat("**${currentInitialArray[0]}**").concat("<br><br>")
 
-    // Build the "Latest develop Branch" row
-    String latestDevelopRow = "**Latest develop Branch:**".concat("<br><br>")
+    // Afterwards, build the "Latest develop Branch" Column
+    String latestDevelopColumn = "**Latest develop Branch:**".concat("<br><br>")
 
     def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleCoverage.totalLines)
     def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleCoverage.coveredLines)
     def latestDevelopLinePercentage = df.format((latestDevelopCoveredLines / latestDevelopTotalLines) * 100)
 
-    latestDevelopRow = latestDevelopRow.concat("_Total Lines:_ ")
+    latestDevelopColumn = latestDevelopColumn.concat("_Total Lines:_ ")
             .concat("**${latestDevelopModuleCoverage.totalLines}**").concat("<br>")
-    latestDevelopRow = latestDevelopRow.concat("_Covered Lines:_ ")
+    latestDevelopColumn = latestDevelopColumn.concat("_Covered Lines:_ ")
             .concat("**${latestDevelopModuleCoverage.coveredLines}**").concat("<br>")
-    latestDevelopRow = latestDevelopRow.concat("_Percentage Covered_: ")
+    latestDevelopColumn = latestDevelopColumn.concat("_Percentage Covered_: ")
             .concat("**$latestDevelopLinePercentage%**")
 
-    return currentBranchRow.concat(latestDevelopRow)
+    return currentBranchColumn.concat(latestDevelopColumn)
 }
 
 /**
@@ -635,9 +635,9 @@ String buildCoverageRow(def currentModuleCoverage, def latestDevelopModuleCovera
  * @param currentModuleCoverage The Module results of the current branch
  * @param latestDevelopModuleCoverage The Module results of the latest develop branch in Artifactory
  *
- * @return A String that serves as a Row entry for the "Coverage Change" column
+ * @return A String that serves as an entry for the "Coverage Change" column
  */
-String buildCoverageChangeRow(def currentModuleCoverage, def latestDevelopModuleCoverage) {
+String buildCoverageChangeColumn(def currentModuleCoverage, def latestDevelopModuleCoverage) {
     def currentModuleLinePercentage = currentModuleCoverage.split("%")[0]
     def currentModuleBigDecimal = new BigDecimal(currentModuleLinePercentage).setScale(2, RoundingMode.HALF_UP)
 
