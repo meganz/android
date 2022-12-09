@@ -61,7 +61,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.chat.dialog.view.GeneralAlertDialog
+import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.ContactStatus
 import mega.privacy.android.app.presentation.contact.DefaultContactAvatar
 import mega.privacy.android.app.presentation.contact.UriAvatar
@@ -225,7 +225,7 @@ private fun LeaveGroupAlertDialog(
     onLeave: () -> Unit,
 ) {
     if (state.leaveGroupDialog) {
-        GeneralAlertDialog(
+        SimpleDialog(
             title = R.string.title_confirmation_leave_group_chat,
             description = R.string.confirmation_leave_group_chat,
             confirmButton = R.string.general_leave,
@@ -252,7 +252,7 @@ private fun AddParticipantsAlertDialog(
 ) {
 
     if (state.addParticipantsNoContactsDialog) {
-        GeneralAlertDialog(
+        SimpleDialog(
             title = R.string.chat_add_participants_no_contacts_title,
             description = R.string.chat_add_participants_no_contacts_message,
             confirmButton = R.string.contact_invite,
@@ -264,7 +264,7 @@ private fun AddParticipantsAlertDialog(
     }
 
     if (state.addParticipantsNoContactsLeftToAddDialog) {
-        GeneralAlertDialog(
+        SimpleDialog(
             title = R.string.chat_add_participants_no_contacts_left_to_add_title,
             description = R.string.chat_add_participants_no_contacts_left_to_add_message,
             confirmButton = R.string.contact_invite,
