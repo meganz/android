@@ -76,7 +76,7 @@ class ImageViewerPageFragment : Fragment() {
 
     private var currentXOffset: Float = 0.0f
     private var currentYOffset: Float = 0.0f
-    private var currentZoomScale: Float = 0.0f
+    private var currentZoomScale: Float = 1.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -184,7 +184,6 @@ class ImageViewerPageFragment : Fragment() {
             imageResult.getProgressPercentage()?.let {
                 binding.progress.progress = it
             }
-            if (imageResult.isFullyLoaded) binding.progress.hide()
         }
 
         if (!hasScreenBeenRotated) {
@@ -272,6 +271,7 @@ class ImageViewerPageFragment : Fragment() {
                     if (imageResult.isVideo) showVideoButton()
                     restoreCurrentZoomAndOffset()
                 }
+                binding.progress.hide()
             }
         }
 
@@ -288,13 +288,15 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
+                    restoreCurrentZoomAndOffset()
                 }
+                binding.progress.hide()
             }
         }
     }
     
     private fun restoreCurrentZoomAndOffset() {
-        if (currentZoomScale != 0.0f) {
+        if (currentZoomScale != 1.0f) {
             val zoomableController =
                 binding.image.zoomableController as AbstractAnimatedZoomableController
             val viewPoint = PointF(currentXOffset, currentYOffset)
