@@ -487,6 +487,7 @@ String buildCodeComparisonResults() {
 
     def currentModuleTestCases = []
     def currentModuleCoverage = ""
+    def currentModuleTestResultsLink = ""
 
     for (def latestDevelopModuleResults in latestDevelopResults) {
         // Compare the name from moduleResult with a static module name
@@ -494,20 +495,23 @@ String buildCodeComparisonResults() {
             case "**app**":
                 currentModuleTestCases = APP_UNIT_TEST_SUMMARY.split(',')
                 currentModuleCoverage = APP_COVERAGE
+                currentModuleTestResultsLink = APP_UNIT_TEST_RESULT
                 break
             case "**domain**":
                 currentModuleTestCases = DOMAIN_UNIT_TEST_SUMMARY.split(',')
                 currentModuleCoverage = DOMAIN_COVERAGE
+                currentModuleTestResultsLink = DOMAIN_UNIT_TEST_RESULT
                 break
             case "**data**":
                 currentModuleTestCases = DATA_UNIT_TEST_SUMMARY.split(',')
                 currentModuleCoverage = DATA_COVERAGE
+                currentModuleTestResultsLink = DATA_UNIT_TEST_RESULT
                 break
         }
         println("Current Coverage of ${latestDevelopModuleResults.name}: $currentModuleCoverage")
 
         // Build the Rows
-        String testCasesRow = buildTestCasesRow(currentModuleTestCases, latestDevelopModuleResults)
+        String testCasesRow = buildTestCasesRow(currentModuleTestCases, currentModuleTestResultsLink, latestDevelopModuleResults)
         String coverageRow = buildCoverageRow(currentModuleCoverage, latestDevelopModuleResults)
         String coverageChangeRow = buildCoverageChangeRow(currentModuleCoverage, latestDevelopModuleResults)
 
@@ -523,11 +527,15 @@ String buildCodeComparisonResults() {
  * branch and the latest develop branch in Artifactory
  *
  * @param currentModuleTestCases The Module results of the current branch
+ * @param currentModuleTestResultsLink The link to the Module test results of the current branch
  * @param latestDevelopModuleTestCases The Module results of the latest develop branch in Artifactory
  *
  * @return A String that serves as a Row entry for the "Test Cases" column
  */
-String buildTestCasesRow(def currentModuleTestCases, def latestDevelopModuleTestCases) {
+String buildTestCasesRow(def currentModuleTestCases,
+                         def currentModuleTestResultsLink,
+                         def latestDevelopModuleTestCases
+) {
     // Build the "Current Branch" row first
     String currentBranchRow = "**Current Branch:**".concat("<br><br>")
 
@@ -550,7 +558,7 @@ String buildTestCasesRow(def currentModuleTestCases, def latestDevelopModuleTest
     currentBranchRow = currentBranchRow.concat("_Duration (s):_ ")
             .concat("**${currentModuleTestCases[4]}**").concat("<br>")
     currentBranchRow = currentBranchRow.concat("_Test Report Link:_")
-            .concat("<br>").concat(APP_UNIT_TEST_RESULT).concat("<br><br>")
+            .concat("<br>").concat(currentModuleTestResultsLink).concat("<br><br>")
 
 
     // Afterwards, build the "Latest develop Branch" row
