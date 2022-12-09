@@ -15,16 +15,19 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.mapper.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
+import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -65,6 +68,7 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val chatListItemMapper: ChatListItemMapper,
+    private val chatCallMapper: ChatCallMapper,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
 ) : ChatRepository {
 
@@ -316,6 +320,13 @@ internal class DefaultChatRepository @Inject constructor(
             .filterIsInstance<ChatUpdate.OnChatListItemUpdate>()
             .mapNotNull { it.item }
             .map(chatListItemMapper)
+            .flowOn(ioDispatcher)
+
+    override suspend fun monitorChatCallUpdates(): Flow<ChatCall> =
+        megaChatApiGateway.chatCallUpdates
+            .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
+            .mapNotNull { it.item }
+            .map(chatCallMapper)
             .flowOn(ioDispatcher)
 
     override suspend fun isChatNotifiable(chatId: Long): Boolean =
