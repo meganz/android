@@ -23,3 +23,13 @@ internal class ExpiringCache<T>(
         curValue = value
     }
 }
+
+internal class PermanentCache<T> : Cache<T> {
+    private var curValue: T? = null
+
+    override fun get(): T? = curValue
+
+    override fun set(value: T?) {
+        curValue = value
+    }
+}
