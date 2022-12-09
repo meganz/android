@@ -1,7 +1,6 @@
 package mega.privacy.android.data.gateway
 
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
 import java.io.IOException
 
@@ -23,7 +22,7 @@ interface FileGateway {
      *
      */
     @Throws(IOException::class)
-    suspend fun deleteFolderAndSubFolders(f: File?)
+    fun deleteFolderAndSubFolders(f: File?)
 
     /**
      * Is file available
