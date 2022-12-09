@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
@@ -28,10 +30,16 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +58,7 @@ import mega.privacy.android.presentation.theme.grey_alpha_087
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
 import mega.privacy.android.presentation.theme.white_alpha_087
+import mega.privacy.android.presentation.theme.yellow_100
 
 /**
  * Authenticity credentials view.
@@ -118,13 +127,57 @@ fun ContactCredentials(
     state: AuthenticityCredentialsState,
     onButtonClicked: () -> Unit,
 ) {
+    var isBannerVisible by remember { mutableStateOf(true) }
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(color = if (MaterialTheme.colors.isLight) white else dark_grey)) {
-        val name = stringResource(id = R.string.label_contact_credentials,
-            state.contactCredentials?.name ?: "")
+        val name = if (state.isMandatoryFingerPrintVerificationNeeded) {
+            state.contactCredentials?.name ?: ""
+        } else {
+            stringResource(id = R.string.label_contact_credentials,
+                state.contactCredentials?.name ?: "")
+        }
 
         Column {
+            if (state.isMandatoryFingerPrintVerificationNeeded) {
+                if (isBannerVisible) {
+                    Box(modifier = Modifier
+                        .testTag("CONTACT_VERIFICATION_BANNER_VIEW")
+                        .fillMaxWidth()
+                        .background(color = yellow_100),
+                        contentAlignment = Alignment.CenterEnd) {
+                        Text(modifier = Modifier.padding(start = 24.dp,
+                            top = 14.dp,
+                            bottom = 14.dp,
+                            end = 48.dp),
+                            style = MaterialTheme.typography.body2,
+                            color = if (MaterialTheme.colors.isLight) black else white_alpha_087,
+                            text = stringResource(id = R.string.shared_items_verify_credentials_verify_person_banner_label))
+
+                        IconButton(
+                            onClick = { isBannerVisible = false },
+                            modifier = Modifier.padding(start = 310.dp),
+                            enabled = true,
+                            content = {
+                                Icon(painter = painterResource(id = R.drawable.ic_remove_chat_toolbar),
+                                    contentDescription = "")
+                            }
+                        )
+                    }
+                }
+
+                Text(modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp),
+                    style = MaterialTheme.typography.body2,
+                    color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
+                    text = if (state.isMandatoryFingerPrintVerificationNeeded) {
+                        // This lint is expected for now. This will get removed later when more conditions are added to decide the text
+                        stringResource(id = R.string.shared_items_verify_credentials_header_incoming)
+                    } else {
+                        stringResource(id = R.string.shared_items_verify_credentials_header_outgoing)
+                    })
+            }
+
             Text(modifier = Modifier.padding(top = 19.dp, start = 72.dp, end = 72.dp),
                 style = MaterialTheme.typography.subtitle1,
                 color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
@@ -165,12 +218,22 @@ fun ContactCredentials(
  */
 @Composable
 fun MyCredentials(state: AuthenticityCredentialsState) {
+
+    var credentialsExplanation = stringResource(id = R.string.authenticity_credentials_explanation)
+    var yourCredentials = stringResource(id = R.string.label_your_credentials)
+    if (state.isMandatoryFingerPrintVerificationNeeded) {
+        credentialsExplanation =
+            stringResource(id = R.string.shared_items_verify_credentials_information)
+        yourCredentials =
+            stringResource(id = R.string.shared_items_verify_credentials_my_credentials)
+    }
+
     Text(modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp),
         style = MaterialTheme.typography.body2,
         color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
         letterSpacing = 0.sp,
         lineHeight = 15.sp,
-        text = stringResource(id = R.string.authenticity_credentials_explanation))
+        text = credentialsExplanation)
 
     Card(modifier = Modifier
         .padding(start = 50.dp, top = 32.dp, end = 50.dp, bottom = 32.dp),
@@ -180,7 +243,7 @@ fun MyCredentials(state: AuthenticityCredentialsState) {
         Column {
             Text(modifier = Modifier
                 .padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
-                text = stringResource(id = R.string.label_your_credentials).uppercase(),
+                text = yourCredentials.uppercase(),
                 color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087)
 
             CredentialsView(modifier = Modifier

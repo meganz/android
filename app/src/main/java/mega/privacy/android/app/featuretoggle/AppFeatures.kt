@@ -16,7 +16,8 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Indicates if the user is cryptographically secure
      */
-    Secure("Indicates if user is cryptographically secure", false),
+    MandatoryFingerprintVerification("Indicates if mandatory fingerprint verification needs to be done",
+        false),
 
     /**
      * User albums toggle

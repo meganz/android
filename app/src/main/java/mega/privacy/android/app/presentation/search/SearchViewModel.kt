@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -24,6 +25,7 @@ import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.RootNodeExists
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -46,6 +48,7 @@ class SearchViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val getFeatureFlagValue: GetFeatureFlagValue,
 ) : ViewModel() {
 
     /**
@@ -65,6 +68,14 @@ class SearchViewModel @Inject constructor(
      */
     val stateLiveData = _state.map { Event(it) }.asLiveData()
 
+    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
+
+    /**
+     * State for [MandatoryFingerPrintVerification] feature flag value
+     */
+    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
+        _mandatoryFingerPrintVerificationState
+
     /**
      * Monitor global node updates
      */
@@ -75,6 +86,9 @@ class SearchViewModel @Inject constructor(
             .map { Event(it) }
             .asLiveData()
 
+    init {
+        isMandatoryFingerprintRequired()
+    }
 
     /**
      * Current search cancel token after a search request has been performed
@@ -324,4 +338,15 @@ class SearchViewModel @Inject constructor(
      * Get Cloud Sort Order
      */
     fun getOrder() = runBlocking { getCloudSortOrder() }
+
+    /**
+     * Gets the feature flag value & updates state
+     */
+    fun isMandatoryFingerprintRequired() {
+        viewModelScope.launch {
+            _mandatoryFingerPrintVerificationState.update {
+                getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification)
+            }
+        }
+    }
 }
