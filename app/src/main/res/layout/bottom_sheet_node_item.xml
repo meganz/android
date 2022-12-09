@@ -121,7 +121,7 @@
             <TextView
                 android:id="@+id/verify_user_option"
                 style="@style/BottomSheetOption"
-                android:text="Verify Joshua Pandey"
+                android:text="@string/shared_items_bottom_sheet_menu_verify_user"
                 android:visibility="gone"
                 app:drawableStartCompat="@drawable/ic_change_permissions"/>
 

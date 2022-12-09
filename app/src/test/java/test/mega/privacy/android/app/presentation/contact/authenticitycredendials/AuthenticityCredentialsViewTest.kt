@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.contact.authenticitycredendials
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -141,6 +142,22 @@ class AuthenticityCredentialsViewTest {
         ))
 
         composeTestRule.onNodeWithText(error).assertExists()
+    }
+
+    @Test
+    fun test_that_contact_verification_text_views_exists() {
+        initComposeRuleContent(AuthenticityCredentialsState(
+            contactCredentials = contactCredentials,
+            myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
+            isMandatoryFingerPrintVerificationNeeded = true
+        ))
+        composeTestRule.onNodeWithTag("CONTACT_VERIFICATION_BANNER_VIEW").assertExists()
+        composeTestRule.onNodeWithText(R.string.shared_items_verify_credentials_verify_person_banner_label)
+            .assertExists()
+        composeTestRule.onNodeWithText(R.string.shared_items_verify_credentials_information)
+            .assertExists()
+        composeTestRule.onNodeWithText(R.string.authenticity_credentials_label)
+            .assertExists()
     }
 
     private fun initComposeRuleContent(
