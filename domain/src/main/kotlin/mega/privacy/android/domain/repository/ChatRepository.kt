@@ -216,4 +216,11 @@ interface ChatRepository {
      * @return          True if notifications has to be created, false otherwise.
      */
     suspend fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Monitor muted chats
+     *
+     * @return  A flow of Booleans indicating some changes has been made
+     */
+    fun monitorMutedChats(): Flow<Boolean>
 }

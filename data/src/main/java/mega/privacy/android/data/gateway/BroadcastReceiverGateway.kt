@@ -14,4 +14,9 @@ internal interface BroadcastReceiverGateway {
      * monitor charging state
      */
     val monitorChargingStoppedState: Flow<Boolean>
+
+    /**
+     * Monitor muted chats
+     */
+    val monitorMutedChats: Flow<Boolean>
 }

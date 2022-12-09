@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -64,6 +65,7 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val chatListItemMapper: ChatListItemMapper,
+    private val broadcastReceiverGateway: BroadcastReceiverGateway,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> =
@@ -320,4 +322,7 @@ internal class DefaultChatRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.isChatNotifiable(chatId)
         }
+
+    override fun monitorMutedChats(): Flow<Boolean> =
+        broadcastReceiverGateway.monitorMutedChats
 }
