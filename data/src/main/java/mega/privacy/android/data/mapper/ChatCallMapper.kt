@@ -44,7 +44,7 @@ internal fun toChatCall(megaChatCall: MegaChatCall): ChatCall =
 
 private fun MegaHandleList.mapToHandleList(): List<Long> =
     mutableListOf<Long>().apply {
-        for (i in 0..size) {
-            add(this@mapToHandleList.get(i.toLong()))
+        for (i in 0..size()) {
+            add(this@mapToHandleList.get(i))
         }
     }
