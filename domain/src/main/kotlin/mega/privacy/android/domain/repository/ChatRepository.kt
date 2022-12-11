@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -210,10 +211,24 @@ interface ChatRepository {
     suspend fun monitorChatListItemUpdates(): Flow<ChatListItem>
 
     /**
+     * Monitor chat call updates
+     *
+     * @return A flow of [ChatCall]
+     */
+    suspend fun monitorChatCallUpdates(): Flow<ChatCall>
+
+    /**
      * Returns whether notifications about a chat have to be generated.
      *
      * @param chatId    Chat id
      * @return          True if notifications has to be created, false otherwise.
      */
     suspend fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Monitor muted chats
+     *
+     * @return  A flow of Booleans indicating some changes has been made
+     */
+    fun monitorMutedChats(): Flow<Boolean>
 }
