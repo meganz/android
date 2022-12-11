@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property chatId                                     Chat id.
  * @property scheduledMeeting                           Current scheduled meeting item.
  * @property finish                                     True, if the activity is to be terminated.
- * @property inviteParticipantAction                    [InviteParticipantsAction] required when invite participants.
+ * @property openAddContact                             True, if should open Add contact screen. False, if not.
  * @property dndSeconds                                 Do not disturb seconds.
  * @property retentionTimeSeconds                       Retention time seconds.
  * @property meetingLink                                Meeting link.
@@ -31,6 +31,8 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property enabledAllowNonHostAddParticipantsOption   True if is enabled the allow non-host participants option, false otherwise.
  * @property snackBar                                   String resource id for showing an snackBar.
  * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
+ * @property addParticipantsNoContactsDialog            True if show add participants no contacts dialog, false if not.
+ * @property addParticipantsNoContactsLeftToAddDialog   True if show add participants no contacts left to add dialog, false if not.
  * @property buttons                                    List of available action buttons.
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
@@ -40,7 +42,7 @@ data class ScheduledMeetingInfoState(
     val chatId: Long = -1,
     val scheduledMeeting: ScheduledMeetingItem? = null,
     val finish: Boolean = false,
-    val inviteParticipantAction: InviteParticipantsAction? = null,
+    val openAddContact: Boolean? = null,
     val dndSeconds: Long? = null,
     val retentionTimeSeconds: Long? = null,
     val meetingLink: String? = null,
@@ -54,6 +56,8 @@ data class ScheduledMeetingInfoState(
     val enabledAllowNonHostAddParticipantsOption: Boolean = true,
     val snackBar: Int? = null,
     val leaveGroupDialog: Boolean = false,
+    val addParticipantsNoContactsDialog: Boolean = false,
+    val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = ChatParticipant(
