@@ -839,6 +839,7 @@ public class ManagerActivity extends TransfersManagementActivity
     View chatBadge;
     View callBadge;
     View pendingActionsBadge;
+    BottomNavigationItemView sharedItemsView;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -1802,10 +1803,8 @@ public class ManagerActivity extends TransfersManagementActivity
         setChatBadge();
 
         // Navi button Shared Items
-        BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+        sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
         pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
-        sharedItemsView.addView(pendingActionsBadge);
-        pendingActionsBadge.setVisibility(View.GONE);
         setPendingActionsBadge();
 
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
@@ -4217,6 +4216,29 @@ public class ManagerActivity extends TransfersManagementActivity
                     tab.setIcon(R.drawable.link_ic);
                 }
             }).attach();
+
+            if(incomingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                //// TODO hardcoded number for now. This will get changed after SDK changes are available
+                TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
+                if(incomingSharesTab != null ) {
+                    incomingSharesTab.getOrCreateBadge().setNumber(2);
+                }
+            }
+
+            if(outgoingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
+                if(outgoingSharesTab != null) {
+                    outgoingSharesTab.getOrCreateBadge().setNumber(2);
+                }
+            }
+
+            if(linksViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                TabLayout.Tab linksTab = tabLayoutShares.getTabAt(2);
+                if(linksTab != null) {
+                    linksTab.getOrCreateBadge().setNumber(1);
+                }
+            }
+
         }
 
         updateSharesTab();
@@ -10500,7 +10522,11 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void setPendingActionsBadge() {
-        //// TODO Get pending actions count from SDK api and add a badge on UI
+        if(incomingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            sharedItemsView.addView(pendingActionsBadge);
+            TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
+            tvPendingActionsCount.setText("5");
+        }
     }
 
     private void setCallBadge() {

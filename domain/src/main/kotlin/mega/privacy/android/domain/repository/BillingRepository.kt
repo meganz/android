@@ -28,4 +28,10 @@ interface BillingRepository {
      *
      */
     suspend fun getPricing(clearCache: Boolean): Pricing
+
+    /**
+     * Get credit card query subscriptions
+     *
+     */
+    suspend fun getNumberOfSubscription(clearCache: Boolean): Long
 }

@@ -164,7 +164,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private AlertDialog cannotOpenFileDialog;
 
-    private boolean isPublicUserVerificationPending;
+    private MegaUser user;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
@@ -254,10 +254,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
-        if(isPublicUserVerificationPending) {
 
+        if(searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
             ////TODO This flag for false for now. This will get manipulated after SDK changes
             TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
+            nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
             optionVerifyUser.setVisibility(View.VISIBLE);
             optionVerifyUser.setOnClickListener(this);
             optionDownload.setOnClickListener(null);
@@ -841,7 +842,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         for (int j = 0; j < sharesIncoming.size(); j++) {
             MegaShare mS = sharesIncoming.get(j);
             if (mS.getNodeHandle() == node.getHandle()) {
-                MegaUser user = megaApi.getContact(mS.getUser());
+                user = megaApi.getContact(mS.getUser());
                 if (user != null) {
                     nodeInfo.setText(getMegaUserNameDB(user));
                 } else {
@@ -1019,6 +1020,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 Intent version = new Intent(getActivity(), VersionsFileActivity.class);
                 version.putExtra("handle", node.getHandle());
                 requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
+                break;
+            case R.id.verify_user_option:
                 break;
             default:
                 break;
