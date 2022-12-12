@@ -33,7 +33,6 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
 /**
@@ -74,8 +73,8 @@ class ImageViewerPageFragment : Fragment() {
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
 
-    private var currentXOffset: Float = 0.0f
-    private var currentYOffset: Float = 0.0f
+    private var currentImagePoint: PointF = PointF(0.0f, 0.0f)
+    private var currentViewPoint: PointF = PointF(0.0f, 0.0f)
     private var currentZoomScale: Float = 1.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,14 +131,14 @@ class ImageViewerPageFragment : Fragment() {
                         onSingleTapCallback = {
                             viewModel.showToolbar(!viewModel.isToolbarShown())
                         },
-                        onZoomCallback = { xOffset, yOffset, zoomScale ->
+                        onZoomCallback = { zoomScale, ip, vp ->
                             if (!hasZoomBeenTriggered) {
                                 hasZoomBeenTriggered = true
                                 viewModel.loadSingleImage(itemId, fullSize = true)
                             }
                             currentZoomScale = zoomScale
-                            currentXOffset = xOffset
-                            currentYOffset = yOffset
+                            currentImagePoint = ip
+                            currentViewPoint = vp
                         }
                     )
                 )
@@ -299,9 +298,7 @@ class ImageViewerPageFragment : Fragment() {
         if (currentZoomScale != 1.0f) {
             val zoomableController =
                 binding.image.zoomableController as AbstractAnimatedZoomableController
-            val viewPoint = PointF(currentXOffset, currentYOffset)
-            val imagePoint = zoomableController.mapViewToImage(viewPoint)
-            zoomableController.zoomToPoint(currentZoomScale, imagePoint, viewPoint)
+            zoomableController.zoomToPoint(currentZoomScale, currentImagePoint, currentViewPoint)
         }
     }
 
