@@ -1121,4 +1121,12 @@ interface MegaApiGateway {
      * @return          True if notifications has to be created, false otherwise.
      */
     fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Invite contact
+     *
+     * @param email     User email
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun inviteContact(email: String, listener: MegaRequestListenerInterface)
 }

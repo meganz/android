@@ -330,5 +330,18 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun getMyEmail(): String = chatApi.myEmail
 
+    override fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.removeFromChat(chatId, handle, listener)
+
+    override fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        privilege: Int,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.updateChatPermissions(chatId, handle, privilege, listener)
+
     override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
 }
