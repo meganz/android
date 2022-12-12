@@ -9,6 +9,12 @@ apply plugin: 'jacoco'
 
 apply from: "$project.rootDir/tools/util.gradle"
 
+/**
+ * For Continuous Delivery in Google Play Internal Channel <p/>
+ * For Android builds in CD pipeline, read the environment variable and assign to version code
+ * For local builds, compute string with formatted date and assign to version code
+ * @return app's version name
+ */
 def readVersionCode() {
     def versionCodeTag = System.getenv('APK_VERSION_CODE_FOR_CD')
     if (versionCodeTag != null && !versionCodeTag.isEmpty()) {

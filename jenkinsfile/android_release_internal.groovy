@@ -53,6 +53,7 @@ pipeline {
 
         CONSOLE_LOG_FILE = 'console.txt'
 
+        // CD pipeline uses this environment variable to assign version code
         APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDHHmm', TimeZone.getTimeZone("GMT"))}"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
@@ -700,11 +701,13 @@ private void checkSDKVersion() {
 }
 
 /**
- * read the version name and version code from source code(build.gradle)
+ * read the version name from source code(build.gradle)
+ * read the version code from environment variable
+ *
  * @return a tuple of version code and version name
  */
 def readAppVersion() {
-    String versionCode = APK_VERSION_CODE_FOR_CD //sh(script: "grep versionCode build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim()
+    String versionCode = APK_VERSION_CODE_FOR_CD
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
     String commitId = appShortCommitId()
     String fullVersionName = versionName + "-" + commitId
@@ -742,7 +745,7 @@ private String lastCommitMessage() {
  * @return true if triggered branch is 'develop', otherwise return false.
  */
 private boolean isOnDevelopBranch() {
-    return true //env.gitlabSourceBranch != null && env.gitlabSourceBranch == "develop"
+    return env.gitlabSourceBranch != null && env.gitlabSourceBranch == "develop"
 }
 
 private void deleteAllFilesExcept(String folder, String except) {
