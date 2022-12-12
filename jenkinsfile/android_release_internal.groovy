@@ -53,6 +53,8 @@ pipeline {
 
         CONSOLE_LOG_FILE = 'console.txt'
 
+        APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDHHmm')}"
+
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
@@ -690,7 +692,7 @@ private void checkSDKVersion() {
  * @return a tuple of version code and version name
  */
 def readAppVersion() {
-    String versionCode = sh(script: "grep versionCode build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim()
+    String versionCode = APK_VERSION_CODE_FOR_CD //sh(script: "grep versionCode build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim()
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
     return [versionName, versionCode]
 }
