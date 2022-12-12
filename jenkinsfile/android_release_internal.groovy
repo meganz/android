@@ -62,35 +62,13 @@ pipeline {
         failure {
             script {
                 downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-
-                if (hasGitLabMergeRequest()) {
-                    String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
-
-                    def message = releaseFailureMessage("<br/>") +
-                            "<br/>Build Log:\t${link}"
-                    sendToMR(message)
-                } else {
-                    slackSend color: 'danger', message: releaseFailureMessage("\n")
-                    slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
-                }
+                slackSend color: 'danger', message: releaseFailureMessage("\n")
+                slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
             }
         }
         success {
             script {
-                if (!isOnDevelopBranch()) {
-                    sendToMR(skipMessage("<br/>"))
-                } else if (hasGitLabMergeRequest()) {
-                    downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                    String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
-
-                    def message = releaseSuccessMessage("<br/>") +
-                                "<br/>Build Log:\t${link}"
-                        sendToMR(message)
-
-                        sendToMR(getBuildVersionInfo())
-
-                        slackSend color: "good", message: releaseSuccessMessage("\n")
-                }
+                slackSend color: "good", message: releaseSuccessMessage("\n")
             }
         }
     }
