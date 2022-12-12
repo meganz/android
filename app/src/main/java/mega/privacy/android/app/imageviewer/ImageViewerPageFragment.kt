@@ -270,8 +270,8 @@ class ImageViewerPageFragment : Fragment() {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
                     restoreCurrentZoomAndOffset()
+                    binding.progress.hide()
                 }
-                binding.progress.hide()
             }
         }
 
@@ -289,8 +289,8 @@ class ImageViewerPageFragment : Fragment() {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
                     restoreCurrentZoomAndOffset()
+                    binding.progress.hide()
                 }
-                binding.progress.hide()
             }
         }
     }
