@@ -444,7 +444,8 @@ pipeline {
                             rolloutPercentage: '0',
                             additionalVersionCodes: '476',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
-                            recentChangeList: getRecentChangeList(release_notes)
+                            recentChangeList: getRecentChangeList(release_notes),
+                            releaseName: readAppVersion1()
                 }
             }
         }
