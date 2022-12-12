@@ -51,6 +51,8 @@ internal class CacheFolderFacade @Inject constructor(
                 fileGateway.deleteFolderAndSubFolders(context.externalCacheDir)
             } catch (e: IOException) {
                 Timber.e("IOException deleting external cache", e)
+            } catch (e: Exception) {
+                Timber.e("Exception deleting external cache", e)
             }
         }
     }
