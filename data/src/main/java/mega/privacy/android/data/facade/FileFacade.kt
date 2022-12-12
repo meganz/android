@@ -71,7 +71,7 @@ class FileFacade @Inject constructor(
                         FileProvider.getUriForFile(context,
                             "mega.privacy.android.app.providers.fileprovider",
                             fileToDelete)
-                    } catch (e: IllegalArgumentException) {
+                    } catch (e: Exception) {
                         Uri.fromFile(fileToDelete)
                     }
                     data = contentUri
