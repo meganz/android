@@ -16,9 +16,9 @@ apply from: "$project.rootDir/tools/util.gradle"
  * @return app's version name
  */
 def readVersionCode() {
-    def versionCodeTag = System.getenv('APK_VERSION_CODE_FOR_CD')
-    if (versionCodeTag != null && !versionCodeTag.isEmpty()) {
-        return versionCodeTag.toInteger()
+    def versionCode = System.getenv('APK_VERSION_CODE_FOR_CD')
+    if (versionCode != null && !versionCode.isEmpty()) {
+        return versionCode.toInteger()
     } else {
         return new Date().format("yyDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
     }
