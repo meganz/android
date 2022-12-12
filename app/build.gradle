@@ -14,7 +14,7 @@ def readVersionCode() {
     if (versionCodeTag != null && !versionCodeTag.isEmpty()) {
         return versionCodeTag.toInteger()
     } else {
-        return new Date().format("yyDHHmm").toInteger()
+        return new Date().format("yyDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
     }
 }
 

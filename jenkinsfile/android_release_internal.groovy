@@ -53,7 +53,7 @@ pipeline {
 
         CONSOLE_LOG_FILE = 'console.txt'
 
-        APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDHHmm')}"
+        APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDHHmm', TimeZone.getTimeZone("GMT"))}"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
