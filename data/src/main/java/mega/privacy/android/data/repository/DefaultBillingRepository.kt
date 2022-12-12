@@ -55,7 +55,9 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override suspend fun getNumberOfSubscription(clearCache: Boolean): Long =
         numberOfSubscriptionCache.get()?.takeUnless { clearCache }
-            ?: fetchNumberOfSubscription().also { numberOfSubscriptionCache.set(it) }
+            ?: fetchNumberOfSubscription().also {
+                numberOfSubscriptionCache.set(it)
+            }
 
     private suspend fun fetchPaymentMethodFlags(): PaymentMethodFlags = withContext(ioDispatcher) {
         Timber.d("getPaymentMethod")

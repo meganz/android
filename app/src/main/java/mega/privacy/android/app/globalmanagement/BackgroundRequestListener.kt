@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
@@ -16,14 +15,13 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
-import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
 import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
@@ -67,6 +65,7 @@ class BackgroundRequestListener @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
+    private val getNumberOfSubscription: GetNumberOfSubscription,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -109,24 +108,7 @@ class BackgroundRequestListener @Inject constructor(
             MegaRequest.TYPE_FETCH_NODES -> handleFetchNodeRequest(e)
             MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
             MegaRequest.TYPE_SET_ATTR_USER -> handleSetAttrUserRequest(request, e)
-            MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS -> handleCreditCardQuerySubscriptionsRequest(
-                e,
-                request
-            )
             MegaRequest.TYPE_PAUSE_TRANSFERS -> dbH.transferQueueStatus = request.flag
-        }
-    }
-
-    private fun handleCreditCardQuerySubscriptionsRequest(
-        e: MegaError,
-        request: MegaRequest,
-    ) {
-        if (e.errorCode == MegaError.API_OK) {
-            myAccountInfo.numberOfSubscriptions = request.number
-            Timber.d("NUMBER OF SUBS: %s", myAccountInfo.numberOfSubscriptions)
-            val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION)
-            application.sendBroadcast(intent)
         }
     }
 
@@ -253,7 +235,7 @@ class BackgroundRequestListener @Inject constructor(
                 getSpecificAccountDetail(storage = false, transfer = true, pro = true)
             }
             getPricing(true)
-            megaApi.creditCardQuerySubscriptions(null)
+            getNumberOfSubscription(true)
         }
     }
 }

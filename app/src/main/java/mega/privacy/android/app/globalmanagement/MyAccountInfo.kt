@@ -55,7 +55,6 @@ class MyAccountInfo @Inject constructor(
     var usedStorage = INVALID_VALUE.toLong()
     var accountType = INVALID_VALUE
     private var accountInfo: MegaAccountDetails? = null
-    var numberOfSubscriptions = -INVALID_VALUE.toLong()
     var subscriptionStatus = INVALID_VALUE
     var subscriptionRenewTime = INVALID_VALUE.toLong()
     var proExpirationTime = INVALID_VALUE.toLong()
@@ -109,7 +108,6 @@ class MyAccountInfo @Inject constructor(
         usedStorage = INVALID_VALUE.toLong()
         accountType = INVALID_VALUE
         accountInfo = null
-        numberOfSubscriptions = INVALID_VALUE.toLong()
         subscriptionStatus = INVALID_VALUE
         subscriptionRenewTime = INVALID_VALUE.toLong()
         proExpirationTime = INVALID_VALUE.toLong()

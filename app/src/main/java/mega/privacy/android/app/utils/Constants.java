@@ -133,7 +133,6 @@ public class Constants {
     public static final int UPDATE_IMAGE_DRAG = 9001;
     public static final int UPDATE_GET_PRICING = 9002;
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
-    public static final int UPDATE_CREDIT_CARD_SUBSCRIPTION = 9004;
 
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
