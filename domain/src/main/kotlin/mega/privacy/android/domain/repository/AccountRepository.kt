@@ -106,7 +106,7 @@ interface AccountRepository {
     /**
      * Returns if accounts achievements enabled
      */
-    suspend fun isAccountAchievementsEnabled(): Boolean
+    suspend fun areAccountAchievementsEnabled(): Boolean
 
     /**
      * Get account achievements
@@ -165,11 +165,6 @@ interface AccountRepository {
      *
      */
     suspend fun resetExtendedAccountDetailsTimestamp()
-
-    /**
-     * Check Achievements are enabled or not
-     */
-    suspend fun areAchievementsEnabled(): Boolean
 
     /**
      * logout

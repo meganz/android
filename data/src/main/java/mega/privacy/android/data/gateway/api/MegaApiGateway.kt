@@ -860,7 +860,7 @@ interface MegaApiGateway {
     /**
      * Returns if accounts achievements enabled
      */
-    suspend fun isAccountAchievementsEnabled(): Boolean
+    suspend fun areAccountAchievementsEnabled(): Boolean
 
     /**
      * Get account achievements
@@ -1048,14 +1048,6 @@ interface MegaApiGateway {
      * @param listener [MegaRequestListenerInterface] to track this request
      */
     fun getCountryCallingCodes(listener: MegaRequestListenerInterface)
-
-    /**
-     * Returns whether MEGA Achievements are enabled for the open account
-     *
-     * @return True if enabled, false otherwise.
-     */
-
-    fun isAchievementsEnabled(): Boolean
 
     /**
      * Logout of the MEGA account invalidating the session
