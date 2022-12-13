@@ -18,7 +18,6 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils.ScaleType
 import com.facebook.imagepipeline.common.Priority
-import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.memory.BasePool
@@ -31,7 +30,6 @@ import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
 /**
@@ -68,7 +66,6 @@ class ImageViewerPageFragment : Fragment() {
     private val itemId by lazy { arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id") }
     private val enableZoom by lazy { arguments?.getBoolean(EXTRA_ENABLE_ZOOM, true) ?: true }
     private val controllerListener by lazy { buildImageControllerListener() }
-    private val screenSize: Size by lazy { requireContext().getScreenSize() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -310,8 +307,8 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? {
-        val imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(this)
+    private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? =
+        ImageRequestBuilder.newBuilderWithSource(this)
             .setRotationOptions(RotationOptions.autoRotate())
             .setRequestPriority(
                 if (lifecycle.currentState == Lifecycle.State.RESUMED) {
@@ -320,13 +317,12 @@ class ImageViewerPageFragment : Fragment() {
                     Priority.LOW
                 }
             )
-
-        if (isFullImage) {
-            imageRequestBuilder.resizeOptions = ResizeOptions.forDimensions(screenSize.width, screenSize.height)
-        } else {
-            imageRequestBuilder.cacheChoice = ImageRequest.CacheChoice.SMALL
-        }
-
-        return imageRequestBuilder.build()
-    }
+            .setCacheChoice(
+                if (isFullImage) {
+                    ImageRequest.CacheChoice.DEFAULT
+                } else {
+                    ImageRequest.CacheChoice.SMALL
+                }
+            )
+            .build()
 }
