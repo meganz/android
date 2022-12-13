@@ -98,6 +98,11 @@ internal class DefaultChatRepository @Inject constructor(
             megaChatApiGateway.getChatRoom(chatId)?.let(chatRoomMapper)
         }
 
+    override suspend fun getChatCall(chatId: Long): ChatCall? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatCall(chatId)?.let(chatCallMapper)
+        }
+
     override suspend fun getScheduledMeeting(
         chatId: Long,
         scheduledMeetingId: Long,

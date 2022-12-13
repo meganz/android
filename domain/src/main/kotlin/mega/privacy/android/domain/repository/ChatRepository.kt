@@ -31,6 +31,14 @@ interface ChatRepository {
     suspend fun getChatRoom(chatId: Long): ChatRoom?
 
     /**
+     * Gets chat call if it exists
+     *
+     * @param chatId    Chat Id
+     * @return          [ChatCall]
+     */
+    suspend fun getChatCall(chatId: Long): ChatCall?
+
+    /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
      *
      * @param chatId  MegaChatHandle that identifies a chat room
