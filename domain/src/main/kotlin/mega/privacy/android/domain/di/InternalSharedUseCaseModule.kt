@@ -9,6 +9,7 @@ import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
@@ -50,5 +51,9 @@ internal abstract class InternalSharedUseCaseModule {
         @Provides
         fun provideGetPricing(repository: BillingRepository) =
             GetPricing(repository::getPricing)
+
+        @Provides
+        fun provideGetNumberOfSubscription(repository: BillingRepository) =
+            GetNumberOfSubscription(repository::getNumberOfSubscription)
     }
 }

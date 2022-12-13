@@ -269,9 +269,8 @@ interface PlayerServiceViewModelGateway {
     /**
      * Set paused
      * @param paused the paused state
-     * @param currentPosition current position when the media is paused
      */
-    fun setPaused(paused: Boolean, currentPosition: Long? = null)
+    fun setPaused(paused: Boolean)
 
     /**
      * Handle player error.
@@ -335,4 +334,39 @@ interface PlayerServiceViewModelGateway {
      * Reset retry state
      */
     fun resetRetryState()
+
+    /**
+     * Save the playing position histories to DataStore
+     *
+     * @param key the key of DataStore
+     */
+    fun savePlayingPositionHistories(key: String?)
+
+    /**
+     * Get the playing position histories from local
+     *
+     * @param key the key of DataStore
+     * @return playing position histories
+     */
+    fun getPlayingPositionHistoriesFromLocal(key: String?)
+
+    /**
+     * Put current playing position
+     *
+     * @param mediaId current media item id
+     * @param playingPosition current playing position
+     * @param duration the duration of current playing item
+     */
+    fun putCurrentPlayingPosition(mediaId: Long?, playingPosition: Long, duration: Long)
+
+    /**
+     * Check the current item whether includes the playing position history, if yes, seek to playing position history.
+     *
+     * @param currentPlayingHandle the handle of current playing item
+     * @param seekToPlayingPosition the function that seek to playing position
+     */
+    fun checkAndSeekToPlayingPositionHistory(
+        currentPlayingHandle: Long,
+        seekToPlayingPosition: (positionMs: Long) -> Unit,
+    )
 }

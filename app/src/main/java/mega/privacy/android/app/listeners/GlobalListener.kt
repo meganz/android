@@ -43,6 +43,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import nz.mega.sdk.MegaApiAndroid
@@ -72,6 +73,7 @@ class GlobalListener @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
+    private val getNumberOfSubscription: GetNumberOfSubscription,
 ) : MegaGlobalListenerInterface {
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
@@ -154,7 +156,7 @@ class GlobalListener @Inject constructor(
             getPricing(true)
             dbH.resetExtendedAccountDetailsTimestamp()
             getAccountDetails(forceRefresh = true)
-            api.creditCardQuerySubscriptions(null)
+            getNumberOfSubscription(true)
         }
     }
 

@@ -11,9 +11,8 @@ import javax.inject.Inject
 class DefaultGetPreview @Inject constructor(private val repository: ImageRepository) :
     GetPreview {
 
-    override suspend fun invoke(nodeId: Long): File? {
-        return repository.getPreviewFromLocal(nodeId) ?: repository.getPreviewFromServer(
+    override suspend fun invoke(nodeId: Long) =
+        repository.getPreviewFromLocal(nodeId) ?: repository.getPreviewFromServer(
             nodeId
         )
-    }
 }

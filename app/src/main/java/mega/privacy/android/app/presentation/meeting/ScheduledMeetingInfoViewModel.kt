@@ -21,7 +21,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
-import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -222,11 +221,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Remove invite participants action
+     * Remove open add contact screen
      */
-    fun removeInviteParticipantsAction() {
+    fun removeAddContact() {
         _state.update {
-            it.copy(inviteParticipantAction = null)
+            it.copy(openAddContact = null)
         }
     }
 
@@ -480,11 +479,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Dismiss alert dialog
+     * Dismiss alert dialogs
      */
     fun dismissDialog() {
         _state.update { state ->
-            state.copy(leaveGroupDialog = false)
+            state.copy(leaveGroupDialog = false,
+                addParticipantsNoContactsDialog = false,
+                addParticipantsNoContactsLeftToAddDialog = false)
         }
     }
 
@@ -533,17 +534,18 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 when {
                     contactList.isEmpty() -> {
                         _state.update {
-                            it.copy(inviteParticipantAction = InviteParticipantsAction.NO_CONTACTS_DIALOG)
+                            it.copy(addParticipantsNoContactsDialog = true, openAddContact = false)
                         }
                     }
                     ChatUtil.areAllMyContactsChatParticipants(chatId) -> {
                         _state.update {
-                            it.copy(inviteParticipantAction = InviteParticipantsAction.NO_MORE_CONTACTS_DIALOG)
+                            it.copy(addParticipantsNoContactsLeftToAddDialog = true,
+                                openAddContact = false)
                         }
                     }
                     else -> {
                         _state.update {
-                            it.copy(inviteParticipantAction = InviteParticipantsAction.ADD_CONTACTS)
+                            it.copy(openAddContact = true)
                         }
                     }
                 }

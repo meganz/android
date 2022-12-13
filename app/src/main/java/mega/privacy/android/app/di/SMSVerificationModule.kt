@@ -4,9 +4,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.VerificationRepository
+import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
+import mega.privacy.android.domain.usecase.ResetSMSVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 
@@ -45,5 +48,20 @@ abstract class SMSVerificationModule {
         @Provides
         fun provideSendSMSVerificationCode(repository: VerificationRepository): SendSMSVerificationCode =
             SendSMSVerificationCode(repository::sendSMSVerificationCode)
+
+        /**
+         * Provides the Use Case [ResetSMSVerifiedPhoneNumber]
+         */
+        @Provides
+        fun provideResetSMSVerifiedPhoneNumber(repository: VerificationRepository): ResetSMSVerifiedPhoneNumber =
+            ResetSMSVerifiedPhoneNumber(repository::resetSMSVerifiedPhoneNumber)
+
+        /**
+         * Provides the Use Case [AreAccountAchievementsEnabled]
+         */
+        @Provides
+        fun provideAreAccountAchievementsEnabled(repository: AccountRepository): AreAccountAchievementsEnabled =
+            AreAccountAchievementsEnabled(repository::areAccountAchievementsEnabled)
+
     }
 }

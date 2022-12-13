@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import java.util.Queue
@@ -318,7 +319,7 @@ interface CameraUploadRepository {
      *
      * @return list of video sync records
      */
-    suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord>
+    suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord>
 
     /**
      * Get uploaded video quality

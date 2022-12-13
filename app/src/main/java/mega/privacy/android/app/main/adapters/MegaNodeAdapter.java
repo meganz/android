@@ -143,6 +143,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
+    private Boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -1078,12 +1079,20 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     } else {
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
+
+                    if(isMandatoryFingerprintVerificationNeeded) {
+                        //// TODO This if will also contain a check from SDK which shows whether user needs to be authorised
+                        holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                    }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
                     holder.permissionsIcon.setVisibility(View.GONE);
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
+                if(isMandatoryFingerprintVerificationNeeded) {
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+                }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
             }
@@ -1495,5 +1504,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public void onCancelClicked() {
         unHandledItem = -1;
+    }
+
+    public void setMandatoryFingerprintVerificationValue(boolean isVerificationNeeded) {
+        this.isMandatoryFingerprintVerificationNeeded = isVerificationNeeded;
     }
 }
