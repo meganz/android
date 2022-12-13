@@ -10,12 +10,14 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
@@ -28,6 +30,7 @@ class DefaultTransfersRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val databaseHandler = mock<DatabaseHandler>()
     private val transferEventMapper = mock<TransferEventMapper>()
+    private val cancelToken = mock<MegaCancelToken>()
 
     @Before
     fun setUp() {
@@ -60,7 +63,7 @@ class DefaultTransfersRepositoryTest {
             appData = null,
             isSourceTemporary = false,
             shouldStartFirst = false,
-            cancelToken = null,
+            cancelToken = cancelToken,
         )
 
     @Test
@@ -89,6 +92,8 @@ class DefaultTransfersRepositoryTest {
             assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferFinish::class.java)
             awaitComplete()
         }
+        verify(cancelToken).cancel()
+        verify(megaApiGateway).removeTransferListener(any())
     }
 
     @Test
