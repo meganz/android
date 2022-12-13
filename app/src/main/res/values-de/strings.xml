@@ -1497,13 +1497,13 @@
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">Bei Installation der MEGA-Mobil-App erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage. Wir bieten Mobil-Apps für iOS und Android an.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Durch Verifikation Ihrer Telefonnummer erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage.</string>
+    <string name="paragraph_info_achievement_add_phone">Durch die Bestätigung Ihrer Telefonnummer erhalten Sie %1$s kostenlosen Extraspeicherplatz, gültig für 365 Tage.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Sie haben %1$s Speicherplatz für die Installation der MEGA Desktop App erhalten.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation der MEGA-Mobil-App erhalten.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Sie haben %1$s Speicherplatz für die Verifikation Ihrer Telefonnummer erhalten.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Sie haben %1$s Speicherplatz für die Bestätigung Ihrer Telefonnummer erhalten.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Sie haben %1$s Speicherplatz als Bonus für Ihre Anmeldung erhalten.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1541,9 +1541,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">BETREFF</string>
+    <string name="new_file_subject_when_uploading">Betreff</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Weiterleiten</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1654,7 +1654,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Teilen via</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Leerer [/B][A]Papierkorb[/A]</string>
+    <string name="context_empty_rubbish_bin">[A]Der Papierkorb ist [/A][B]leer[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">Ihr [A]Cloud Drive[/A][B] ist leer[/B]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -1935,7 +1935,7 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">Bitte geben Sie den von Ihrer Authentifizierungs-App generierten sechsstelligen Code ein.</string>
     <!-- Text button -->
-    <string name="general_verify">Überprüfen</string>
+    <string name="general_verify">Verifizieren</string>
     <!-- Text button -->
     <string name="general_next">Weiter</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -2180,9 +2180,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Sie haben neue Nachrichten</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Automatische Leerung des Papierkorbs</string>
+    <string name="settings_rb_scheduler_enable_title">Zeitplan für Leerung des Papierkorbs</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">Die Leerung des Papierkorbs erfolgt automatisch.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">Ihr Papierkorb wird regelmäßig automatisch geleert.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">Minimum: 7 Tage.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2904,7 +2904,7 @@
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d s</string>
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
-    <string name="label_verify_credentials">Identität prüfen</string>
+    <string name="label_verify_credentials">Identität verifizieren</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Nicht verifiziert</string>
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
@@ -2944,7 +2944,7 @@
     <!-- Message showing to explain what will happen when the operation of -->
     <string name="modify_phone_number_message">Hiermit entfernen Sie die aktuelle Mobilnummer aus Ihrem Account und ersetzen Sie durch eine neue.</string>
     <!-- Message for action to remove the registered phone number. -->
-    <string name="remove_phone_number_message">Dies wird die aktuelle Mobilnummer aus Ihrem Account entfernen. Sollten Sie zu einem späteren Zeitpunkt eine Mobilnummer hinzufügen, erfolgt wieder ein Verifikationsschritt.</string>
+    <string name="remove_phone_number_message">Dies wird die aktuelle Mobilnummer aus Ihrem Account entfernen. Sollten Sie zu einem späteren Zeitpunkt eine Mobilnummer hinzufügen, müssen Sie diese wieder bestätigen.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Siehe</string>
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
@@ -4040,17 +4040,17 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Gruppe verlassen</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <string name="photos_create_album_error_message_systems_album">Dieser Albumname ist nicht zulässig. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Neues Album (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">Elemente zu „%s“ hinzufügen</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="one">%d Element wurde zu „%s“ hinzugefügt</item>
+        <item quantity="other">%d Elemente wurden zu „%s“ hinzugefügt</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">Informationen zur Zahlung</string>
@@ -4071,17 +4071,66 @@
         <item quantity="other">Ihr Pro-Abonnement ist vor %1$d Tagen abgelaufen.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <string name="photos_user_album_empty_album">[A]Das Album ist [/A][B]leer[/B]</string>
     <!-- Albums sub-section for all system and user albums -->
-    <string name="photos_album_subsection_my_albums">My albums</string>
+    <string name="photos_album_subsection_my_albums">Meine Alben</string>
     <!-- Albums sub-section for all shared albums -->
-    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <string name="photos_album_subsection_shared_albums">Geteilte Alben</string>
     <!-- Header title for meeting list past meetings -->
     <string name="meetings_list_past_header">Vergangene Meetings</string>
     <!-- Label for upcoming meetings -->
-    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <string name="meetings_list_upcoming_meeting_label">Anstehendes Meeting</string>
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Wiederkehrendes Meeting</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s wöchentlich</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">Medienerkennungsansicht</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">Ordner, die nur Bilder und Videos enthalten, automatisch in der Medienerkennungsansicht öffnen. Dadurch können Sie Medien im Galeriemodus ansehen und nach Datum filtern.</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">Da dieser Ordner nur Bilder und Videos enthält, haben wir ihn automatisch in der Medienerkennungsansicht geöffnet. Dadurch können Sie Medien im Galeriemodus ansehen und nach Datum filtern. Sie können dies in den Einstellungen deaktivieren.</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">Einstellungen</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">Alles klar</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Mit diesem Link kann jeder dem Meeting beitreten und den Meeting-Chat einsehen.</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">Link in Zwischenablage kopiert</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="one">Album „%s“ gelöscht</item>
+        <item quantity="other">%d Alben gelöscht</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="one">Album löschen?</item>
+        <item quantity="other">Alben löschen?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="one">Das Album wird gelöscht, aber sein Inhalt bleibt in Ihrer Zeitleiste.</item>
+        <item quantity="other">Die Alben werden gelöscht, aber ihre Inhalte bleiben in Ihrer Zeitleiste.</item>
+    </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Weniger anzeigen</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Kontaktverifizierung</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">Wir schützen Ihre Daten mit einer Zero-Knowledge-Verschlüsselung. Um eine besonders hohe Sicherheit zu gewährleisten, bitten wir Sie, die Kontakte, mit denen Sie Informationen austauschen, zu verifizieren, bevor diese auf die freigegebenen Ordner zugreifen können.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">Wir schützen Ihre Daten mit einer Zero-Knowledge-Verschlüsselung. Um eine besonders hohe Sicherheit zu gewährleisten, bitten wir Sie, die Kontakte, von denen Sie Informationen erhalten, zu verifizieren, bevor Sie auf die freigegebenen Ordner zugreifen können.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Um Ihren Kontakt zu verifizieren, stellen Sie sicher, dass die oben angezeigten Identitätsdaten mit den Account-Identitätsdaten übereinstimmen. Sie können Ihren Kontakt bitten, Ihnen seine Identitätsdaten mitzuteilen.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Nicht entschlüsselter Ordner]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Damit Sie auf den freigegebenen Ordner zugreifen können, muss die freigebende Person Sie ebenfalls verifizieren.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">%s verifizieren</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Ihre Identitätsdaten</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

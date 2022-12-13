@@ -1263,7 +1263,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
         type == FOLDER_LINK_ADAPTER && mediaPlayerRepository.credentialsIsNull()
 
     override fun swapItems(current: Int, target: Int) {
-        playlistItemsChanged.addAll(playlistItemsFlow.value.first)
+        if (playlistItemsChanged.isEmpty()) {
+            playlistItemsChanged.addAll(playlistItemsFlow.value.first)
+        }
         Collections.swap(playlistItemsChanged, current, target)
         val index = playlistItemsChanged[current].index
         playlistItemsChanged[current] =

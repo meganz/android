@@ -1541,9 +1541,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">SUBJECT</string>
+    <string name="new_file_subject_when_uploading">Subject</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">Email</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Forward</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1844,7 +1844,7 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Recovery key</string>
     <!-- Option that permits user save on File System -->
-    <string name="option_save_on_filesystem">Save on File System</string>
+    <string name="option_save_on_filesystem">Save on file system</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Incoming call</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->

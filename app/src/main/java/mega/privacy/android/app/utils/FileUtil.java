@@ -260,7 +260,7 @@ public class FileUtil {
                 Uri contentUri;
                 try {
                     contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     contentUri = Uri.fromFile(fileToDelete);
                 }
                 mediaScanIntent.setData(contentUri);
