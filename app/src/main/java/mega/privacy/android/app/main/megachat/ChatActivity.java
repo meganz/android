@@ -5742,7 +5742,7 @@ public class ChatActivity extends PasscodeActivity
         } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
             manageTextFileIntent(this, msgId, idChat);
         } else {
-            onNodeTapped(this, node, this::saveNodeByTap, this, this);
+            onNodeTapped(this, node, this::saveNodeByTap, this, this, false);
         }
     }
 

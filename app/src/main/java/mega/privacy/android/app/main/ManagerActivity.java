@@ -7196,6 +7196,18 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
+     * Upon a node is open with, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by open with".
+     *
+     * @param node Node to be downloaded.
+     */
+    public Unit saveNodeByOpenWith(MegaNode node) {
+        PermissionUtils.checkNotificationsPermission(this);
+        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, true, true);
+        return null;
+    }
+
+    /**
      * Save nodes to device.
      *
      * @param handles         handles of nodes to save
