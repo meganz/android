@@ -40,7 +40,7 @@ interface CacheFolderGateway {
     /**
      * Clears the cache folder of app
      */
-    fun clearCache()
+    suspend fun clearCache()
 
     /**
      *  Deletes the Cache folder if it is empty

@@ -255,6 +255,39 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun selectAlbum(album: Album.UserAlbum) = viewModelScope.launch {
+        _state.update {
+            val selectedAlbumIds = withContext(defaultDispatcher) {
+                it.selectedAlbumIds + album.id
+            }
+            it.copy(selectedAlbumIds = selectedAlbumIds)
+        }
+    }
+
+    fun unselectAlbum(album: Album.UserAlbum) = viewModelScope.launch {
+        _state.update {
+            val selectedAlbumIds = withContext(defaultDispatcher) {
+                it.selectedAlbumIds - album.id
+            }
+            it.copy(selectedAlbumIds = selectedAlbumIds)
+        }
+    }
+
+    fun selectAllAlbums() = viewModelScope.launch {
+        _state.update {
+            val selectedAlbumIds = withContext(defaultDispatcher) {
+                it.albums.mapNotNull { album -> (album.id as? Album.UserAlbum)?.id }.toSet()
+            }
+            it.copy(selectedAlbumIds = selectedAlbumIds)
+        }
+    }
+
+    fun clearAlbumSelection() {
+        _state.update {
+            it.copy(selectedAlbumIds = setOf())
+        }
+    }
+
     /**
      * Create a new album
      *

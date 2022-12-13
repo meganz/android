@@ -15,6 +15,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
@@ -27,6 +28,7 @@ import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -38,7 +40,9 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -92,6 +96,11 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun getChatRoom(chatId: Long): ChatRoom? =
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatRoom(chatId)?.let(chatRoomMapper)
+        }
+
+    override suspend fun getChatCall(chatId: Long): ChatCall? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatCall(chatId)?.let(chatCallMapper)
         }
 
     override suspend fun getScheduledMeeting(
@@ -289,6 +298,55 @@ internal class DefaultChatRepository @Inject constructor(
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
                 continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun inviteContact(email: String): Boolean =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.inviteContact(email,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestInviteContactCompleted(continuation)
+                    ))
+            }
+        }
+
+    private fun onRequestInviteContactCompleted(continuation: Continuation<Boolean>) =
+        { _: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(true))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        permission: ChatRoomPermission,
+    ) =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                val privilege = when (permission) {
+                    ChatRoomPermission.Moderator -> MegaChatRoom.PRIV_MODERATOR
+                    ChatRoomPermission.Standard -> MegaChatRoom.PRIV_STANDARD
+                    ChatRoomPermission.ReadOnly -> MegaChatRoom.PRIV_RO
+                    else -> MegaChatRoom.PRIV_UNKNOWN
+                }
+                megaChatApiGateway.updateChatPermissions(chatId, handle, privilege,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
+            }
+        }
+
+    override suspend fun removeFromChat(chatId: Long, handle: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.removeFromChat(chatId, handle,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestCompleted(continuation)
+                    ))
             }
         }
 

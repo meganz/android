@@ -648,6 +648,76 @@ class AlbumsViewModelTest {
         }
     }
 
+    @Test
+    fun `test that album is selected properly`() = runTest {
+        // given
+        val expectedAlbum = Album.UserAlbum(
+            id = AlbumId(1L),
+            title = "Album 1",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        // when
+        underTest.selectAlbum(expectedAlbum)
+
+        // then
+        underTest.state.drop(1).test {
+            val selectedAlbumIds = awaitItem().selectedAlbumIds
+            assertThat(expectedAlbum.id in selectedAlbumIds).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that album is unselected properly`() = runTest {
+        // given
+        val expectedAlbum = Album.UserAlbum(
+            id = AlbumId(1L),
+            title = "Album 1",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        // when
+        underTest.selectAlbum(expectedAlbum)
+        underTest.unselectAlbum(expectedAlbum)
+
+        // then
+        underTest.state.test {
+            val selectedAlbumIds = awaitItem().selectedAlbumIds
+            assertThat(expectedAlbum.id !in selectedAlbumIds).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that album is cleared properly`() = runTest {
+        // given
+        val expectedAlbum1 = Album.UserAlbum(
+            id = AlbumId(1L),
+            title = "Album 1",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        val expectedAlbum2 = Album.UserAlbum(
+            id = AlbumId(2L),
+            title = "Album 2",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        // when
+        underTest.selectAlbum(expectedAlbum1)
+        underTest.selectAlbum(expectedAlbum2)
+        underTest.clearAlbumSelection()
+
+        // then
+        underTest.state.test {
+            val selectedAlbumIds = awaitItem().selectedAlbumIds
+            assertThat(selectedAlbumIds.isEmpty()).isTrue()
+        }
+    }
+
     private fun createUserAlbum(
         id: AlbumId = AlbumId(0L),
         title: String = "",

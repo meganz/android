@@ -370,4 +370,31 @@ interface MegaChatApiGateway {
      * Get my chat status
      */
     fun getOnlineStatus(): Int
+
+    /**
+     *  Remove participant from chat
+     *
+     * @param chatId    Chat id
+     * @param handle    User handle
+     * @param listener  Listener
+     */
+    fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Update participant permissions
+     * @param chatId        Chat id.
+     * @param handle        User handle.
+     * @param privilege     User privilege.
+     * @param listener      Listener.
+     */
+    fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        privilege: Int,
+        listener: MegaChatRequestListenerInterface?,
+    )
 }

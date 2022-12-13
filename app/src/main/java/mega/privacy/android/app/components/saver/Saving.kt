@@ -49,7 +49,7 @@ abstract class Saving : Parcelable {
     ): AutoPlayInfo
 
 
-    abstract fun isDownloadByTap(): Boolean
+    abstract fun isDownloadForPreview(): Boolean
 
     companion object {
         @Parcelize
@@ -69,7 +69,7 @@ abstract class Saving : Parcelable {
                 snackbarShower: SnackbarShower?
             ) = AutoPlayInfo.NO_AUTO_PLAY
 
-            override fun isDownloadByTap(): Boolean = false
+            override fun isDownloadForPreview(): Boolean = false
         }
     }
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -28,6 +29,14 @@ interface ChatRepository {
      * @return [ChatRoom] containing the updated data.
      */
     suspend fun getChatRoom(chatId: Long): ChatRoom?
+
+    /**
+     * Gets chat call if it exists
+     *
+     * @param chatId    Chat Id
+     * @return          [ChatCall]
+     */
+    suspend fun getChatCall(chatId: Long): ChatCall?
 
     /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
@@ -180,6 +189,42 @@ interface ChatRepository {
      * @return          [ChatRequest]
      */
     suspend fun queryChatLink(chatId: Long): ChatRequest
+
+    /**
+     * Update chat permissions
+     *
+     * @param chatId        The chat id.
+     * @param handle        User handle.
+     * @param permission    User privilege.
+     * @return              The Chat Request.
+     */
+    suspend fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        permission: ChatRoomPermission,
+    ): ChatRequest
+
+    /**
+     * Remove participant from chat
+     *
+     * @param chatId    The Chat id.
+     * @param handle    User handle
+     * @return          [ChatRequest]
+     */
+    suspend fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+    ): ChatRequest
+
+    /**
+     * Invite contact
+     *
+     * @param email    User email
+     * @return
+     */
+    suspend fun inviteContact(
+        email: String,
+    ): Boolean
 
     /**
      * Monitor updates on chat room item update

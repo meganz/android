@@ -261,7 +261,8 @@ class NodeSaver(
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
-     * @param downloadByTap whether this download is triggered by tap
+     * @param downloadForPreview whether this download is for preview
+     * @param downloadByOpenWith whether this download is triggered by open with
      */
     @JvmOverloads
     fun saveNodes(
@@ -270,12 +271,19 @@ class NodeSaver(
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadByTap: Boolean = false,
+        downloadForPreview: Boolean = false,
+        downloadByOpenWith: Boolean = false,
     ) {
         save {
             MegaNodeSaving(
-                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize, downloadByTap = downloadByTap
+                totalSize = nodesTotalSize(nodes = nodes),
+                highPriority = highPriority,
+                isFolderLink = isFolderLink,
+                nodes = nodes,
+                fromMediaViewer = fromMediaViewer,
+                needSerialize = needSerialize,
+                downloadForPreview = downloadForPreview,
+                downloadByOpenWith = downloadByOpenWith
             )
         }
     }
@@ -652,7 +660,7 @@ class NodeSaver(
      * @return download path string
      */
     private fun getCorrectDownloadPath(parentPath: String? = null): String {
-        return if (saving.isDownloadByTap()) {
+        return if (saving.isDownloadForPreview()) {
             getDownloadLocationForPreviewingFiles().absolutePath
         } else {
             parentPath ?: getDownloadLocation()

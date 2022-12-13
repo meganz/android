@@ -1,6 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog;
 import static mega.privacy.android.app.utils.Constants.CANNOT_OPEN_FILE_SHOWN;
@@ -1000,7 +999,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.open_with_option:
-                cannotOpenFileDialog = openWith(this, requireActivity(), node, ((ManagerActivity) requireActivity())::saveNodeByTap);
+                MegaNodeUtil.onNodeTapped(
+                        requireActivity(),
+                        node,
+                        ((ManagerActivity) requireActivity())::saveNodeByOpenWith,
+                        (ManagerActivity)requireActivity(),
+                        (ManagerActivity)requireActivity(),
+                        true);
+                dismissAllowingStateLoss();
                 return;
 
             case R.id.restore_option:
