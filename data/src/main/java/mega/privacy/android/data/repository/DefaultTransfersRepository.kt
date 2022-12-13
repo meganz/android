@@ -85,7 +85,6 @@ internal class DefaultTransfersRepository @Inject constructor(
 
         awaitClose {
             cancelToken?.cancel()
-            megaApiGateway.removeTransferListener(listener)
         }
     }
 
