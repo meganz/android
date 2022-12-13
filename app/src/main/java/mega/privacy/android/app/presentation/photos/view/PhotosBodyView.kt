@@ -23,6 +23,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 
@@ -35,12 +36,14 @@ fun PhotosBodyView(
     timelineView: @Composable () -> Unit = {},
     albumsView: @Composable () -> Unit = {},
     timelineViewState: TimelineViewState = TimelineViewState(),
+    albumsViewState: AlbumsViewState = AlbumsViewState(),
 ) {
     Column {
         if (timelineViewState.selectedPhotoCount == 0) {
             PhotosTabs(
                 tabs = tabs,
                 selectedTab = selectedTab,
+                isTabSelectionEnabled = albumsViewState.selectedAlbumIds.isEmpty(),
                 onTabSelected = onTabSelected
             )
         }
@@ -50,6 +53,7 @@ fun PhotosBodyView(
             timelineView = timelineView,
             albumsView = albumsView,
             timelineViewState = timelineViewState,
+            albumsViewState = albumsViewState,
         )
     }
 }
@@ -58,6 +62,7 @@ fun PhotosBodyView(
 fun PhotosTabs(
     tabs: List<PhotosTab>,
     selectedTab: PhotosTab,
+    isTabSelectionEnabled: Boolean,
     onTabSelected: (PhotosTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -77,6 +82,7 @@ fun PhotosTabs(
             Tab(
                 selected = index == selectedTabIndex,
                 onClick = { onTabSelected(tab) },
+                enabled = isTabSelectionEnabled,
                 text = {
                     Text(
                         text = when (tab) {
@@ -101,12 +107,13 @@ fun PagerView(
     albumsView: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     timelineViewState: TimelineViewState,
+    albumsViewState: AlbumsViewState,
 ) {
     HorizontalPager(
         count = tabs.size,
         state = pagerState,
         modifier = modifier,
-        userScrollEnabled = timelineViewState.selectedPhotoCount == 0,
+        userScrollEnabled = timelineViewState.selectedPhotoCount == 0 && albumsViewState.selectedAlbumIds.isEmpty(),
     ) { pageIndex ->
         Box(
             modifier = Modifier

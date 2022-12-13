@@ -2,7 +2,10 @@ package mega.privacy.android.app.presentation.photos.albums.view
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,11 +37,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -67,6 +72,7 @@ import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
 
+@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumsView(
@@ -80,6 +86,7 @@ fun AlbumsView(
     setIsAlbumCreatedSuccessfully: (Boolean) -> Unit = {},
     allPhotos: List<Photo> = emptyList(),
     clearAlbumDeletedMessage: () -> Unit = {},
+    onAlbumSelection: (Album.UserAlbum) -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -116,7 +123,7 @@ fun AlbumsView(
             )
         },
         floatingActionButton = {
-            if (displayFAB) {
+            if (displayFAB && albumsViewState.selectedAlbumIds.isEmpty()) {
                 val placeholderText =
                     stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
                 FloatingActionButton(
@@ -151,9 +158,25 @@ fun AlbumsView(
             ) { album ->
                 Box(
                     modifier = Modifier
-                        .clickable {
-                            openAlbum(album)
-                        }
+                        .alpha(1f.takeIf {
+                            album.id is Album.UserAlbum || albumsViewState.selectedAlbumIds.isEmpty()
+                        } ?: 0.5f)
+                        .combinedClickable(
+                            onClick = {
+                                handleAlbumClicked(
+                                    album = album,
+                                    numSelectedAlbums = albumsViewState.selectedAlbumIds.size,
+                                    openAlbum = openAlbum,
+                                    onAlbumSelection = onAlbumSelection,
+                                )
+                            },
+                            onLongClick = {
+                                handleAlbumLongPressed(
+                                    album = album,
+                                    onAlbumSelection = onAlbumSelection,
+                                )
+                            }
+                        )
                         .clip(RoundedCornerShape(10.dp))
                         .fillMaxSize()
                 ) {
@@ -191,6 +214,17 @@ fun AlbumsView(
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(10.dp))
                                 .aspectRatio(1f)
+                                .then(
+                                    if (isAlbumSelected(album, albumsViewState.selectedAlbumIds))
+                                        Modifier.border(
+                                            BorderStroke(
+                                                width = 1.dp,
+                                                color = colorResource(id = R.color.teal_300),
+                                            ),
+                                            shape = RoundedCornerShape(10.dp),
+                                        )
+                                    else Modifier
+                                ),
                         )
                         MiddleEllipsisText(
                             modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
@@ -206,12 +240,22 @@ fun AlbumsView(
                             color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
                         )
                     }
+                    if (isAlbumSelected(album, albumsViewState.selectedAlbumIds)) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_select_folder),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(8.dp),
+                            tint = Color.Unspecified,
+                        )
+                    }
                 }
             }
         }
     }
 
-    if (displayFAB) {
+    if (displayFAB && albumsViewState.selectedAlbumIds.isEmpty()) {
         if (!albumsViewState.isAlbumCreatedSuccessfully) {
             if (openDialog.value) {
                 CreateNewAlbumDialog(
@@ -293,3 +337,30 @@ fun DeleteAlbumsConfirmationDialog(
         properties = DialogProperties(dismissOnClickOutside = false),
     )
 }
+
+private fun handleAlbumClicked(
+    album: UIAlbum,
+    numSelectedAlbums: Int,
+    openAlbum: (UIAlbum) -> Unit,
+    onAlbumSelection: (Album.UserAlbum) -> Unit,
+) {
+    if (numSelectedAlbums == 0) {
+        openAlbum(album)
+    } else if (album.id is Album.UserAlbum) {
+        onAlbumSelection(album.id)
+    }
+}
+
+private fun handleAlbumLongPressed(
+    album: UIAlbum,
+    onAlbumSelection: (Album.UserAlbum) -> Unit,
+) {
+    if (album.id is Album.UserAlbum) {
+        onAlbumSelection(album.id)
+    }
+}
+
+private fun isAlbumSelected(
+    album: UIAlbum,
+    selectedAlbumIds: Set<AlbumId>,
+): Boolean = album.id is Album.UserAlbum && album.id.id in selectedAlbumIds
