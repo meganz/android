@@ -22,9 +22,11 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -67,6 +69,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
+    private val videoQualityIntMapper: VideoQualityIntMapper,
 ) : SettingsRepository {
     init {
         runBlocking {
@@ -181,8 +184,8 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setCamSyncEnabled(enable)
     }
 
-    override suspend fun setCameraUploadVideoQuality(quality: Int) {
-        megaLocalStorageGateway.setCameraUploadVideoQuality(quality)
+    override suspend fun setCameraUploadVideoQuality(quality: VideoQuality) {
+        megaLocalStorageGateway.setCameraUploadVideoQuality(videoQualityIntMapper(quality))
     }
 
     override suspend fun setCameraUploadFileType(syncVideo: Boolean) {
@@ -334,19 +337,19 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun backupTimestampsAndFolderHandle(
         primaryUploadFolderHandle: Long,
         secondaryUploadFolderHandle: Long,
-        camSyncTimeStamp: String?,
-        camVideoSyncTimeStamp: String?,
-        secSyncTimeStamp: String?,
-        secVideoSyncTimeStamp: String?,
+        camSyncTimeStamp: Long?,
+        camVideoSyncTimeStamp: Long?,
+        secSyncTimeStamp: Long?,
+        secVideoSyncTimeStamp: Long?,
     ) {
         withContext(ioDispatcher) {
             cameraTimestampsPreferenceGateway.backupTimestampsAndFolderHandle(
                 primaryUploadFolderHandle,
                 secondaryUploadFolderHandle,
-                camSyncTimeStamp,
-                camVideoSyncTimeStamp,
-                secSyncTimeStamp,
-                secVideoSyncTimeStamp)
+                camSyncTimeStamp?.toString(),
+                camVideoSyncTimeStamp?.toString(),
+                secSyncTimeStamp?.toString(),
+                secVideoSyncTimeStamp?.toString())
         }
     }
 

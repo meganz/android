@@ -1,6 +1,7 @@
 package mega.privacy.android.data.model
 
 import android.webkit.MimeTypeMap
+import mega.privacy.android.data.mapper.getMimeType
 import java.util.Locale
 
 /**
@@ -27,14 +28,11 @@ data class MimeTypeList(
             if (index >= 0 && index + 1 < fixedName.length) {
                 extension = fixedName.substring(index + 1)
             }
-            val detectedType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-                ?: when (extension) {
-                    "mkv" -> "video/x-matroska"
-                    "heic" -> "image/heic"
-                    "url" -> "web/url"
-                    "webp" -> "image/webp"
-                    else -> "application/octet-stream"
-                }
+            val detectedType = getMimeType(
+                extension) {
+                MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(extension)
+            }
             return MimeTypeList(detectedType, extension)
         }
     }

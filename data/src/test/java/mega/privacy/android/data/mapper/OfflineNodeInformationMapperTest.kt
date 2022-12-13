@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
@@ -8,6 +9,7 @@ import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInform
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class OfflineNodeInformationMapperTest {
 
     private val expectedPath = "path"

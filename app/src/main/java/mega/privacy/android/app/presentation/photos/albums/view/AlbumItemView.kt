@@ -65,6 +65,7 @@ internal fun PhotosBig2SmallItems(
                         height = size * 2 + gap,
                         photo = photos[0],
                         photoDownload = photoDownload,
+                        isPreview = true,
                     )
                 },
                 photo = photos[0],
@@ -247,6 +248,7 @@ internal fun Photos2SmallBigItems(
                             height = size * 2 + gap,
                             photo = photos[1],
                             photoDownload = downloadPhoto,
+                            isPreview = true,
                         )
                     },
                     photo = photos[1],
@@ -336,15 +338,20 @@ private fun AlbumPhotoView(
     width: Dp,
     height: Dp,
     photoDownload: PhotoDownload,
+    isPreview: Boolean = false,
 ) {
     val imageState = produceState<String?>(initialValue = null) {
 
         photoDownload(
-            false,
+            isPreview,
             photo,
         ) { downloadSuccess ->
             if (downloadSuccess) {
-                value = photo.thumbnailFilePath
+                value = if (isPreview) {
+                    photo.previewFilePath
+                } else {
+                    photo.thumbnailFilePath
+                }
             }
         }
     }

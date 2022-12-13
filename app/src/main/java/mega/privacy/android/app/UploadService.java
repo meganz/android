@@ -10,7 +10,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SER
 import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
 import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
@@ -266,16 +265,26 @@ public class UploadService extends Service {
     private void startForeground() {
         try {
             startForeground(NOTIFICATION_UPLOAD,
-                    createInitialServiceNotification(NOTIFICATION_CHANNEL_UPLOAD_ID,
-                            NOTIFICATION_CHANNEL_UPLOAD_NAME,
-                            mNotificationManager,
-                            new NotificationCompat.Builder(UploadService.this, NOTIFICATION_CHANNEL_UPLOAD_ID),
-                            mBuilder));
+                    createInitialNotification());
 
             isForeground = true;
         } catch (Exception e) {
             Timber.w(e, "Error starting foreground.");
             isForeground = false;
+        }
+    }
+
+    private Notification createInitialNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return TransfersManagement.createInitialServiceNotification(
+                    NOTIFICATION_CHANNEL_UPLOAD_ID,
+                    NOTIFICATION_CHANNEL_UPLOAD_NAME,
+                    mNotificationManager,
+                    new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_UPLOAD_ID)
+            );
+
+        } else {
+            return TransfersManagement.createInitialServiceNotification(new Notification.Builder(this));
         }
     }
 
@@ -434,7 +443,7 @@ public class UploadService extends Service {
                     .addScanningTransfer(MegaTransfer.TYPE_UPLOAD, file.getAbsolutePath(), parentNode, file.isDirectory());
 
             megaApi.startUpload(file.getAbsolutePath(), parentNode, fileName, mTime, null,
-                        false, false, cancelToken);
+                    false, false, cancelToken);
         }
     }
 

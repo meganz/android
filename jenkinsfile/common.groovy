@@ -41,14 +41,14 @@ void fetchSdkSubmodules() {
     gitlabCommitStatus(name: 'Fetch SDK Submodules') {
         withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
             script {
-                sh '''
+                sh """
                     cd ${WORKSPACE}
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
+                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git
                     git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
+                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git
                     git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
                     git submodule sync
-                    git submodule update --init --recursive --remote 
+                    git submodule update --init --recursive --remote
                     cd sdk/src/main/jni/mega/sdk
                     git fetch
                     git checkout develop
@@ -58,7 +58,7 @@ void fetchSdkSubmodules() {
                     git checkout develop
                     git pull
                     cd ${WORKSPACE}
-                '''
+                """
             }
         }
     }
@@ -114,7 +114,7 @@ void sendToMR(String message) {
     if (mrNumber != null && !mrNumber.isEmpty()) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
         }
     }

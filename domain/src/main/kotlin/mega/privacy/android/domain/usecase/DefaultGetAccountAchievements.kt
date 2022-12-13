@@ -8,14 +8,14 @@ import javax.inject.Inject
 /**
  * Implementation of GetAccountAchievements
  */
-class DefaultGetAccountAchievements @Inject constructor(private val accountRepository: AccountRepository) :
+internal class DefaultGetAccountAchievements @Inject constructor(private val accountRepository: AccountRepository) :
     GetAccountAchievements {
 
     override suspend fun invoke(
         achievementType: AchievementType,
         awardIndex: Long,
     ): MegaAchievement? {
-        return if (accountRepository.isAccountAchievementsEnabled()) {
+        return if (accountRepository.areAccountAchievementsEnabled()) {
             accountRepository.getAccountAchievements(achievementType = achievementType,
                 awardIndex = awardIndex)
         } else {

@@ -5,16 +5,17 @@ import android.content.Intent
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import mega.privacy.android.app.DownloadService
-import mega.privacy.android.app.DownloadService.EXTRA_DOWNLOAD_BY_TAP
-import mega.privacy.android.app.DownloadService.EXTRA_DOWNLOAD_TO_SDCARD
-import mega.privacy.android.app.DownloadService.EXTRA_FOLDER_LINK
-import mega.privacy.android.app.DownloadService.EXTRA_FROM_MV
-import mega.privacy.android.app.DownloadService.EXTRA_HASH
-import mega.privacy.android.app.DownloadService.EXTRA_OPEN_FILE
-import mega.privacy.android.app.DownloadService.EXTRA_PATH
-import mega.privacy.android.app.DownloadService.EXTRA_SIZE
-import mega.privacy.android.app.DownloadService.EXTRA_TARGET_PATH
-import mega.privacy.android.app.DownloadService.EXTRA_TARGET_URI
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_DOWNLOAD_BY_OPEN_WITH
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_DOWNLOAD_FOR_PREVIEW
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_DOWNLOAD_TO_SDCARD
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_FOLDER_LINK
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_FROM_MV
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_HASH
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_OPEN_FILE
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_PATH
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_SIZE
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_TARGET_PATH
+import mega.privacy.android.app.DownloadService.Companion.EXTRA_TARGET_URI
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -33,6 +34,7 @@ import mega.privacy.android.app.utils.MegaNodeParceler
 import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -49,7 +51,8 @@ class MegaNodeSaving(
     private val fromMediaViewer: Boolean,
     private val needSerialize: Boolean,
     private val isVoiceClip: Boolean = false,
-    private val downloadByTap: Boolean = false,
+    private val downloadForPreview: Boolean = false,
+    private val downloadByOpenWith: Boolean = false,
 ) : Saving() {
 
     override fun totalSize() = totalSize
@@ -183,7 +186,8 @@ class MegaNodeSaving(
                         intent.putExtra(HIGH_PRIORITY_TRANSFER, true)
                     }
 
-                    intent.putExtra(EXTRA_DOWNLOAD_BY_TAP, downloadByTap)
+                    intent.putExtra(EXTRA_DOWNLOAD_FOR_PREVIEW, downloadForPreview)
+                    intent.putExtra(EXTRA_DOWNLOAD_BY_OPEN_WITH, downloadByOpenWith)
 
                     if (fromMediaViewer) {
                         intent.putExtra(EXTRA_FROM_MV, true)
@@ -211,11 +215,15 @@ class MegaNodeSaving(
                 )
             }
             numberOfNodesAlreadyDownloaded == 0 && numberOfNodesPending > 0 -> {
-                getQuantityString(
-                    R.plurals.download_began,
-                    numberOfNodesPending,
-                    numberOfNodesPending
-                )
+                if (downloadForPreview || downloadByOpenWith) {
+                    getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
+                } else {
+                    getQuantityString(
+                        R.plurals.download_began,
+                        numberOfNodesPending,
+                        numberOfNodesPending
+                    )
+                }
             }
             numberOfNodesAlreadyDownloaded == 1 -> {
                 getQuantityString(
@@ -257,6 +265,6 @@ class MegaNodeSaving(
         return AutoPlayInfo(nodes[0].name, nodes[0].handle, theOnlyLocalFilePath)
     }
 
-    override fun isDownloadByTap(): Boolean = downloadByTap
+    override fun isDownloadForPreview(): Boolean = downloadForPreview
 
 }

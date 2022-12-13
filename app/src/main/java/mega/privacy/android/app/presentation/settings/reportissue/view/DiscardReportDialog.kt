@@ -2,13 +2,11 @@ package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,7 +22,7 @@ fun DiscardReportDialog(
 ) {
     MegaDialog(
         onDismissRequest = onDiscardCancelled,
-        titleStringID = R.string.settings_help_report_issue_discard_dialog_title,
+        titleString = stringResource(id = R.string.settings_help_report_issue_discard_dialog_title),
         confirmButton = {
             TextButton(
                 onClick = onDiscard,

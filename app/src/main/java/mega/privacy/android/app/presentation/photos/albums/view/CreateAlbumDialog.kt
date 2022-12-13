@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.presentation.controls.MegaDialog
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.caption
@@ -122,7 +121,7 @@ fun CreateNewAlbumDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier.padding(horizontal = 40.dp).widthIn(max = 280.dp),
         onDismissRequest = onDismissRequest,
-        titleStringID = R.string.photos_album_creation_dialog_title,
+        titleString = stringResource(id = R.string.photos_album_creation_dialog_title),
         body = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 BasicTextField(
@@ -135,7 +134,6 @@ fun CreateNewAlbumDialog(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, top = 16.dp)
                         .background(color = Color.Transparent)
                         .indicatorLine(
                             enabled = isEnabled,

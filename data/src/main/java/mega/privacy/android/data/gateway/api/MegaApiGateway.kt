@@ -574,11 +574,20 @@ interface MegaApiGateway {
     suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
 
     /**
-     * get user avatar color
+     * Get the default color for the avatar
      *
      * @param megaUser
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
      */
     suspend fun getUserAvatarColor(megaUser: MegaUser): String
+
+    /**
+     * Get the default color for the avatar
+     *
+     * @param userHandle
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
+     */
+    suspend fun getUserAvatarColor(userHandle: Long): String
 
     /**
      * Get user avatar
@@ -851,7 +860,7 @@ interface MegaApiGateway {
     /**
      * Returns if accounts achievements enabled
      */
-    suspend fun isAccountAchievementsEnabled(): Boolean
+    suspend fun areAccountAchievementsEnabled(): Boolean
 
     /**
      * Get account achievements
@@ -1041,14 +1050,6 @@ interface MegaApiGateway {
     fun getCountryCallingCodes(listener: MegaRequestListenerInterface)
 
     /**
-     * Returns whether MEGA Achievements are enabled for the open account
-     *
-     * @return True if enabled, false otherwise.
-     */
-
-    fun isAchievementsEnabled(): Boolean
-
-    /**
      * Logout of the MEGA account invalidating the session
      *
      * @param listener [MegaRequestListenerInterface] to track this request
@@ -1094,4 +1095,38 @@ interface MegaApiGateway {
         transactions: Boolean,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Create a contact link
+     *
+     * @param renew – True to invalidate the previous contact link (if any).
+     * @param listener – MegaRequestListener to track this request
+     */
+    fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Delete a contact link
+     *
+     * @param handle   Handle of the contact link to delete
+     *                 If the parameter is INVALID_HANDLE, the active contact link is deleted
+     * @param listener MegaRequestListener to track this request
+     *
+     */
+    fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Returns whether notifications about a chat have to be generated.
+     *
+     * @param chatId    Chat id
+     * @return          True if notifications has to be created, false otherwise.
+     */
+    fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Invite contact
+     *
+     * @param email     User email
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun inviteContact(email: String, listener: MegaRequestListenerInterface)
 }

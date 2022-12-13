@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway
 
 import android.content.Context
 import android.os.Build
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -44,4 +45,6 @@ internal class AndroidDeviceGateway @Inject constructor(
     override suspend fun getSdkVersionName(): String = "Android ${Build.VERSION.RELEASE}"
 
     override fun getCurrentTimeInMillis(): Long = System.currentTimeMillis()
+
+    override fun getElapsedRealtime(): Long = SystemClock.elapsedRealtime()
 }

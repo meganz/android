@@ -19,7 +19,7 @@ import javax.inject.Inject
  * @constructor Create empty Default monitor user updates
  */
 @OptIn(FlowPreview::class)
-class DefaultMonitorUserUpdates @Inject constructor(
+internal class DefaultMonitorUserUpdates @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val accountRepository: AccountRepository,
 ) : MonitorUserUpdates {

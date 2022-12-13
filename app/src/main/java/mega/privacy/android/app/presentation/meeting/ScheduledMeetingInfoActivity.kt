@@ -23,13 +23,17 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
+import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
-import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
-import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -55,9 +59,10 @@ import javax.inject.Inject
  * @property passCodeFacade [PasscodeCheck]
  * @property getThemeMode   [GetThemeMode]
  * @property addContactLauncher
+ * @property sendToChatLauncher
  */
 @AndroidEntryPoint
-class ScheduledMeetingInfoActivity : PasscodeActivity() {
+class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -68,9 +73,11 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
     private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
-    private var chatRoomId: Long = MEGACHAT_INVALID_HANDLE
+    private lateinit var sendToChatLauncher: ActivityResultLauncher<Unit?>
 
-    private var enabledChatNotification: Boolean = false
+    private var bottomSheetDialogFragment: ManageMeetingLinkBottomSheetDialogFragment? = null
+
+    private var nodeAttacher: MegaAttacher? = null
 
     /**
      * Perform Activity initialization
@@ -80,43 +87,40 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, finish, inviteParticipantAction, timestampDnd) ->
+                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, meetingLink, _, openSendToChat) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
                     }
 
-                    if (chatRoomId != chatId)
+                    if (chatRoomId != chatId) {
                         chatRoomId = chatId
+                    }
 
-                    enabledChatNotification = timestampDnd == null
+                    enabledChatNotification = dndSecond == null
 
-                    inviteParticipantAction?.let { action ->
-                        viewModel.removeInviteParticipantsAction()
-                        when (action) {
-                            InviteParticipantsAction.ADD_CONTACTS -> {
-                                Timber.d("Open Invite participants screen")
-                                addContactLauncher.launch(Intent(this@ScheduledMeetingInfoActivity,
-                                    AddContactActivity::class.java)
-                                    .putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                        Constants.CONTACT_TYPE_MEGA)
-                                    .putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                                    .putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
-                                    .putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                        StringResourcesUtils.getString(R.string.add_participants_menu_item))
-                                )
-                            }
-                            InviteParticipantsAction.NO_CONTACTS_DIALOG -> {
-                                Timber.d("Show dialog when all contacts are chat participants.")
-                                val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
-                                dialog.show(supportFragmentManager, dialog.tag)
-                            }
-                            InviteParticipantsAction.NO_MORE_CONTACTS_DIALOG -> {
-                                Timber.d("Show dialog when there are no contacts added.")
-                                val dialog =
-                                    AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
-                                dialog.show(supportFragmentManager, dialog.tag)
-                            }
+                    if (link != meetingLink) {
+                        link = meetingLink
+                    }
+
+                    if (openSendToChat) {
+                        viewModel.openSendToChat(false)
+                        sendToChatLauncher.launch(Unit)
+                    }
+
+                    openAddContact?.let { shouldOpen ->
+                        if (shouldOpen) {
+                            viewModel.removeAddContact()
+                            Timber.d("Open Invite participants screen")
+                            addContactLauncher.launch(Intent(this@ScheduledMeetingInfoActivity,
+                                AddContactActivity::class.java)
+                                .putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE,
+                                    Constants.CONTACT_TYPE_MEGA)
+                                .putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                                .putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                                .putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                                    StringResourcesUtils.getString(R.string.add_participants_menu_item))
+                            )
                         }
                     }
                 }
@@ -140,6 +144,42 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                     Timber.e("Error adding participants")
                 }
             }
+
+        sendToChatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
+            if (data != null) {
+                viewModel.sendToChat(data) { intent ->
+                    handleActivityResult(intent)
+                }
+            }
+        }
+    }
+
+    /**
+     * Finishes the send to chat action.
+     *
+     * @param data Intent containing the info to send.
+     */
+    private fun handleActivityResult(data: Intent?) {
+        nodeAttacher = MegaAttacher(this as ActivityLauncher)
+        nodeAttacher?.handleActivityResult(
+            Constants.REQUEST_CODE_SELECT_CHAT,
+            RESULT_OK,
+            data,
+            this@ScheduledMeetingInfoActivity as SnackbarShower
+        )
+    }
+
+    /**
+     * Shows panel to get the chat link
+     */
+    private fun showGetChatLinkPanel() {
+        if (link.isNullOrEmpty() || bottomSheetDialogFragment.isBottomSheetDialogShown()) {
+            return
+        }
+        bottomSheetDialogFragment = ManageMeetingLinkBottomSheetDialogFragment()
+        (bottomSheetDialogFragment as ManageMeetingLinkBottomSheetDialogFragment)
+
+        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
     /**
@@ -165,7 +205,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                 Constants.NOTIFICATIONS_ENABLED,
                 chatRoomId)
         }
-
     }
 
     /**
@@ -210,6 +249,13 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
         startActivity(intentManageChat)
     }
 
+    /**
+     * Open invite contacts
+     */
+    private fun openInviteContact() {
+        startActivity(Intent(this@ScheduledMeetingInfoActivity, InviteContactActivity::class.java))
+    }
+
     @Composable
     private fun ScheduledMeetingInfoView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
@@ -220,13 +266,18 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
                 onButtonClicked = ::onActionTap,
                 onEditClicked = { viewModel::onEditTap },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
-                onSeeMoreClicked = { viewModel::onSeeMoreTap },
+                onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
                 onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
                 onParticipantClicked = { viewModel::onParticipantTap },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = { finish() },
                 onDismiss = { viewModel.dismissDialog() },
-                onLeaveGroupDialog = { viewModel.leaveChat() })
+                onLeaveGroupDialog = { viewModel.leaveChat() },
+                onInviteParticipantsDialog = {
+                    openInviteContact()
+                    viewModel.dismissDialog()
+                },
+                onSnackbarShown = viewModel::snackbarShown)
         }
     }
 
@@ -236,7 +287,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
         when (action) {
             ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
-            ScheduledMeetingInfoAction.ShareMeetingLink -> viewModel.onShareMeetingLinkTap()
+            ScheduledMeetingInfoAction.ShareMeetingLink -> showGetChatLinkPanel()
             ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
@@ -244,5 +295,19 @@ class ScheduledMeetingInfoActivity : PasscodeActivity() {
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
         }
+    }
+
+    /**
+     * onDestroy
+     */
+    override fun onDestroy() {
+        nodeAttacher = null
+        super.onDestroy()
+    }
+
+    companion object {
+        private var chatRoomId: Long = MEGACHAT_INVALID_HANDLE
+        private var enabledChatNotification: Boolean = false
+        private var link: String? = null
     }
 }

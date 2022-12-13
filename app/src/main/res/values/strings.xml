@@ -4130,7 +4130,7 @@
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
     <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <string name="shared_items_verify_credentials_my_credentials">My Credentials</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

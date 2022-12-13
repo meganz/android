@@ -16,12 +16,8 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Indicates if the user is cryptographically secure
      */
-    Secure("Indicates if user is cryptographically secure", false),
-
-    /**
-     * New MediaDiscovery toggle
-     */
-    NewMediaDiscovery("Enable new mediaDiscovery feature", true),
+    MandatoryFingerprintVerification("Indicates if mandatory fingerprint verification needs to be done",
+        false),
 
     /**
      * User albums toggle
@@ -41,7 +37,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Dynamic album layout toggle
      */
-    DynamicAlbum("Enable dynamic album feature", false),
+    DynamicAlbum("Enable dynamic album feature", true),
 
     /**
      * App Test toggle

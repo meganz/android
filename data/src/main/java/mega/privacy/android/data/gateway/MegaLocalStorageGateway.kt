@@ -303,6 +303,16 @@ interface MegaLocalStorageGateway {
     suspend fun getUriExternalSd(): String?
 
     /**
+     * Set primary folder handle
+     */
+    suspend fun setPrimaryFolderHandle(primaryHandle: Long)
+
+    /**
+     * Set secondary folder handle
+     */
+    suspend fun setSecondaryFolderHandle(secondaryHandle: Long)
+
+    /**
      * Is secondary media folder enabled
      */
     suspend fun isSecondaryMediaFolderEnabled(): Boolean
@@ -477,16 +487,6 @@ interface MegaLocalStorageGateway {
      * Gets attributes from DB
      */
     suspend fun getAttributes(): MegaAttributes?
-
-    /**
-     * Gets pricing timestamp.
-     */
-    suspend fun getPricingTimeStamp(): String?
-
-    /**
-     * Gets payment methods timestamp
-     */
-    suspend fun getPaymentMethodsTimeStamp(): String?
 
     /**
      * This method is to clear Camera Sync Records from the Database

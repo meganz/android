@@ -1,8 +1,11 @@
 package mega.privacy.android.data.extensions
 
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import kotlin.coroutines.Continuation
 
 /**
@@ -48,4 +51,22 @@ fun <T> Continuation<T>.failWithError(
             error.errorString
         )
     )
+}
+
+/**
+ * get a request Listener
+ */
+fun <T> Continuation<T>.getRequestListener(
+    block: (request: MegaRequest) -> T,
+): MegaRequestListenerInterface {
+    val listener = OptionalMegaRequestListenerInterface(
+        onRequestFinish = { request, error ->
+            if (error.errorCode == MegaError.API_OK) {
+                this.resumeWith(Result.success(block(request)))
+            } else {
+                this.failWithError(error)
+            }
+        }
+    )
+    return listener
 }

@@ -3,7 +3,8 @@
  * 1. Build and upload Android APK to Firebase AppDistribution
  * 2. Build SDK and publish to Artifactory
  */
-
+import groovy.json.JsonSlurperClassic
+import groovy.json.JsonOutput
 
 BUILD_STEP = ''
 
@@ -15,11 +16,20 @@ MEGACHAT_COMMIT = ""
 SDK_TAG = ""
 MEGACHAT_TAG = ""
 
+APP_UNIT_TEST_SUMMARY = ""
+DOMAIN_UNIT_TEST_SUMMARY = ""
+DATA_UNIT_TEST_SUMMARY = ""
+
+APP_COVERAGE = ""
+DOMAIN_COVERAGE = ""
+DATA_COVERAGE = ""
+
 /**
  * GitLab commands that can trigger this job.
  */
 DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
+UPLOAD_COVERAGE_REPORT_CMD = "upload_coverage"
 
 // The log file of publishing pre-built SDK to Artifatory
 ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
@@ -116,7 +126,7 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-                if (triggerByDeliverQaCmd() || triggerByPush()) {
+                if (triggerByDeliverQaCmd() || triggerByUploadCoverage() || triggerByPush()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
                 } else if (triggerByPublishSdkCmd()) {
@@ -144,7 +154,7 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -245,7 +255,7 @@ pipeline {
             }
         }
 
-       stage('Build SDK') {
+        stage('Build SDK') {
             when {
                 expression { triggerByPublishSdkCmd() }
             }
@@ -297,12 +307,26 @@ pipeline {
         }
         stage('Clean Android build') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Clean Android'
                     sh './gradlew clean'
+                }
+            }
+        }
+        stage('Enable Permanent Logging') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Enable Permanent Logging'
+
+                    def featureFlagFile = "app/src/main/assets/featuretoggle/feature_flags.json"
+                    setFeatureFlag(featureFlagFile, "PermanentLogging", true)
+                    sh("cat $featureFlagFile")
                 }
             }
         }
@@ -420,7 +444,7 @@ pipeline {
 
         stage('Clean up Android') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -436,7 +460,7 @@ pipeline {
         }
         stage('Clean up SDK') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -447,6 +471,110 @@ pipeline {
                         cd ${WORKSPACE}/sdk/src/main/jni
                         bash build.sh clean
                     """
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            when {
+                expression { triggerByPush() || triggerByUploadCoverage() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = "Unit Test"
+                }
+                gitlabCommitStatus(name: 'Unit Test') {
+                    // Compile and run unit tests for available modules
+                    sh "./gradlew testGmsDebugUnitTest"
+                    sh "./gradlew domain:test"
+                    sh "./gradlew :data:testGmsDebugUnitTest"
+                    // sh "./gradlew lint:test" we dont care about the percentage of lint
+
+                    script {
+                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
+                        // If UnitTest is failed, summary is collected at post.failure{} phase
+                        // We have to collect the report here, before they are cleaned in the last stage.
+                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                    }
+                }
+            }
+        }
+
+        stage('Upload Code Coverage') {
+            when {
+                expression { triggerByPush() || triggerByUploadCoverage() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = "Upload Code Coverage"
+                }
+                gitlabCommitStatus(name: 'Upload Code Coverage') {
+                    script {
+                        withCredentials([
+                                string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                                string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                        ]) {
+                            String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
+                            // domain coverage
+                            sh "./gradlew domain:jacocoTestReport"
+
+                            // data coverage
+                            sh "./gradlew data:testGmsDebugUnitTestCoverage"
+
+                            // temporarily disable the failed test cases
+                            sh "rm -frv ${WORKSPACE}/app/src/testDebug"
+
+                            // run coverage for app module
+                            sh "./gradlew app:createUnitTestCoverageReport"
+
+                            // restore failed test cases
+                            sh "git checkout -- app/src/testDebug"
+
+                            DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                            DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                            APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                            def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
+                            def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
+                            def dataSummaryCoverageArray = DATA_COVERAGE.split('=')[1].split('/')
+                            def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
+                            def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
+                            def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
+
+                            String appTestResultsRow = "| **app** | " +
+                                    "${appSummaryCoverageArray[0]} | " +
+                                    "${appSummaryCoverageArray[1]} | " +
+                                    "${appSummaryArray[0]} | " +
+                                    "${appSummaryArray[1]} | " +
+                                    "${appSummaryArray[2]} | " +
+                                    "${appSummaryArray[3]} | " +
+                                    "${appSummaryArray[4]} | "
+
+                            String domainTestResultsRow = "| **domain** | " +
+                                    "${domainSummaryCoverageArray[0]} | " +
+                                    "${domainSummaryCoverageArray[1]} | " +
+                                    "${domainSummaryArray[0]} | " +
+                                    "${domainSummaryArray[1]} | " +
+                                    "${domainSummaryArray[2]} | " +
+                                    "${domainSummaryArray[3]} | " +
+                                    "${domainSummaryArray[4]} | "
+
+                            String dataTestResultsRow = "| **data** | " +
+                                    "${dataSummaryCoverageArray[0]} | " +
+                                    "${dataSummaryCoverageArray[1]} | " +
+                                    "${dataSummaryArray[0]} | " +
+                                    "${dataSummaryArray[1]} | " +
+                                    "${dataSummaryArray[2]} | " +
+                                    "${dataSummaryArray[3]} | " +
+                                    "${dataSummaryArray[4]} | "
+
+
+                            writeFile file: 'coverage_summary.txt', text: "$appTestResultsRow\n$domainTestResultsRow\n$dataTestResultsRow"
+
+                            sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/coverage_summary.txt\" \"${targetPath}/coverage_summary.txt\""
+                        }
+                    }
                 }
             }
         }
@@ -553,7 +681,7 @@ private void checkoutMegaChatSdkByTag(String megaChatTag) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -566,7 +694,7 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -622,6 +750,16 @@ private boolean triggerByDeliverQaCmd() {
     return env.gitlabActionType == "NOTE" &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.startsWith(DELIVER_QA_CMD)
+}
+
+/**
+ * Check if this build is triggered by a upload_coverage command
+ * @return
+ */
+private boolean triggerByUploadCoverage() {
+    return env.gitlabActionType == "NOTE" &&
+            env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT_CMD)
 }
 
 /**
@@ -689,6 +827,8 @@ def parseCommandParameter() {
         command = DELIVER_QA_CMD
     } else if (triggerByPublishSdkCmd()) {
         command = PUBLISH_SDK_CMD
+    } else if (triggerByUploadCoverage()) {
+        command = UPLOAD_COVERAGE_REPORT_CMD
     } else {
         return result
     }
@@ -807,7 +947,7 @@ private String lastCommitMessage() {
 private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
     }
@@ -833,7 +973,7 @@ private String getSdkPublishType() {
  * "20221109.084452-rel"
  *
  * The version info is extracted from below line in the log:
- * "[pool-4-thread-1] Deploying artifact: https://artifactory.developers.mega.co.nz/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/20221109.084452-rel/sdk-20221109.084452-rel.aar"
+ * "[pool-4-thread-1] Deploying artifact: ARTIFACTORY_BASE_URL/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/20221109.084452-rel/sdk-20221109.084452-rel.aar"
  *
  * @return the version text of the SDK that has just been published to Artifactory
  */
@@ -860,7 +1000,7 @@ private String getSdkVersionText() {
  */
 private String getSdkAarArtifactoryPage() {
     String version = getSdkVersionText()
-    return "https://artifactory.developers.mega.co.nz/ui/repos/tree/Properties/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
+    return "${env.ARTIFACTORY_BASE_URL}/ui/repos/tree/Properties/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
 }
 
 /**
@@ -877,4 +1017,69 @@ String getSdkGitHash() {
  */
 String getMegaChatSdkGitHash() {
     return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
+}
+
+/**
+ *  Check the feature flag json file and set the feature flag
+ *  If the feature_flag.json file already contains the flagName, set the flagValue.
+ *  Otherwise add the flagName with specified flagValue.
+ *  If featureFlagFile does not exist, a new file will be created.
+ *
+ * @param featureFlagFile relative path of the feature_flag.json file
+ * @param flagName name of the feature flag
+ * @param flagValue boolean value of the flag
+ */
+def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
+    def flagList
+    if (fileExists(featureFlagFile)) {
+        def fileContents = readFile(featureFlagFile)
+        flagList = new JsonSlurperClassic().parseText(fileContents)
+    } else {
+        println("setFeatureFlag() $featureFlagFile not exist!")
+        flagList = new ArrayList()
+    }
+
+    def exist = false
+    for (feature in flagList) {
+        def name = feature["name"]
+        if (name == flagName) {
+            feature["value"] = flagValue
+            exist = true
+            break
+        }
+    }
+
+    if (!exist) {
+        def newFeature = new HashMap<String, String>()
+        newFeature["value"] = flagValue
+        newFeature["name"] = flagName
+        flagList.add(newFeature)
+    }
+
+    def result = JsonOutput.prettyPrint(JsonOutput.toJson(flagList))
+    writeFile file: featureFlagFile, text: result.toString()
+}
+
+/**
+ * Analyse unit test report and get the summary string
+ * @param testReportPath path of the unit test report in xml format
+ * @return summary string of unit test
+ */
+String unitTestSummary(String testReportPath) {
+    return sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/junit_report.py ${testReportPath}",
+            returnStdout: true).trim()
+}
+
+/**
+ * Reads and calculates the Test Coverage by a given csv format report
+ * @param csvReportPath path to the csv coverage file, generated by JaCoCo
+ * @return a String containing the Test Coverage report
+ */
+String getTestCoverageSummary(String csvReportPath) {
+    summary = sh(
+            script: "python3 ${WORKSPACE}/jenkinsfile/coverage_report.py ${csvReportPath}",
+            returnStdout: true).trim()
+    print("coverage path(${csvReportPath}): ${summary}")
+    return summary
 }

@@ -6,7 +6,6 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -272,6 +271,14 @@ internal class MegaLocalStorageFacade @Inject constructor(
         }
     }
 
+    override suspend fun setPrimaryFolderHandle(primaryHandle: Long) {
+        dbHandler.setCamSyncHandle(primaryHandle)
+    }
+
+    override suspend fun setSecondaryFolderHandle(secondaryHandle: Long) {
+        dbHandler.setSecondaryFolderHandle(secondaryHandle)
+    }
+
     override suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) {
         dbHandler.setCameraFolderExternalSDCard(cameraFolderExternalSDCard)
     }
@@ -302,12 +309,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getAttributes(): MegaAttributes? =
         dbHandler.attributes
-
-    override suspend fun getPricingTimeStamp(): String? =
-        dbHandler.attributes?.pricingTimeStamp
-
-    override suspend fun getPaymentMethodsTimeStamp(): String? =
-        dbHandler.attributes?.paymentMethodsTimeStamp
 
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) {
         dbHandler.saveShouldClearCamsyncRecords(clearCamSyncRecords)

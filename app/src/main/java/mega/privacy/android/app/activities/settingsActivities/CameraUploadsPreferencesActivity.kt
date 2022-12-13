@@ -11,15 +11,15 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
-import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_IS_CU_SECONDARY_FOLDER
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.PRIMARY_HANDLE
 import mega.privacy.android.app.constants.BroadcastConstants.SECONDARY_FOLDER
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED
-import mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE
+import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
+import mega.privacy.android.data.facade.INTENT_EXTRA_IS_CU_SECONDARY_FOLDER
+import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
@@ -108,8 +108,8 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
      */
     @Synchronized
     private fun setCUDestinationFolderSynchronized(intent: Intent) {
-        val handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_HANDLE)
-        val isSecondaryFolder = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false)
+        val handleInUserAttr = intent.getLongExtra(INTENT_EXTRA_NODE_HANDLE, INVALID_HANDLE)
+        val isSecondaryFolder = intent.getBooleanExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, false)
         settingsFragment?.setCUDestinationFolder(isSecondaryFolder, handleInUserAttr)
     }
 

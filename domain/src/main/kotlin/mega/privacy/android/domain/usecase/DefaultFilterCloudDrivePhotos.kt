@@ -13,36 +13,13 @@ class DefaultFilterCloudDrivePhotos @Inject constructor(
     private val photosRepository: PhotosRepository,
 ) : FilterCloudDrivePhotos {
 
-    /**
-     * Workaround for caching db read
-     */
-    private var tempCameraUploadFolderId: Long? = null
-    private var tempMediaUploadFolderId: Long? = null
-
-    override suspend fun invoke(source: List<Photo>): List<Photo> = filterCameraUploadPhotos(source)
-
-    private suspend fun filterCameraUploadPhotos(source: List<Photo>): List<Photo> {
-        createTempSyncFolderIds()
-        val filterList = source.filter {
-            !inSyncFolder(it.parentId)
+    override suspend fun invoke(source: List<Photo>) =
+        createTempSyncFolderIds().let { sync ->
+            source.filter { it.parentId !in sync }
         }
-        resetTempSyncFolderIds()
-        return filterList
-    }
 
-    private fun resetTempSyncFolderIds() {
-        tempCameraUploadFolderId = null
-        tempMediaUploadFolderId = null
-    }
-
-    private suspend fun createTempSyncFolderIds() {
-        if (tempCameraUploadFolderId == null)
-            tempCameraUploadFolderId = photosRepository.getCameraUploadFolderId()
-        if (tempMediaUploadFolderId == null)
-            tempMediaUploadFolderId = photosRepository.getMediaUploadFolderId()
-    }
-
-    private suspend fun inSyncFolder(parentId: Long): Boolean =
-        parentId == tempCameraUploadFolderId || parentId == tempMediaUploadFolderId
+    private suspend fun createTempSyncFolderIds() =
+        listOfNotNull(photosRepository.getCameraUploadFolderId(),
+            photosRepository.getMediaUploadFolderId())
 
 }
