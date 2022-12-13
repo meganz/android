@@ -205,13 +205,19 @@ object CameraUploadSyncManager {
      */
     fun sendPrimaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
         val cuBackup = databaseHandler.cuBackup
+        // When the Heartbeat Status is UP_TO_DATE, immediately set its value to PROGRESS_FINISHED (100)
+        // Otherwise, default to 0
+        val syncProgressValue = when (heartbeatStatus) {
+            HeartbeatStatus.UP_TO_DATE -> PROGRESS_FINISHED
+            else -> 0
+        }
 
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
             Timber.d("Sending Primary Folder Heartbeat, backupId = ${cuBackup.backupId}, Heartbeat Status = ${heartbeatStatus.name}")
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 heartbeatStatus.value,
-                INVALID_VALUE,
+                syncProgressValue,
                 0,
                 0,
                 0,
@@ -228,13 +234,19 @@ object CameraUploadSyncManager {
      */
     fun sendSecondaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
         val muBackup = databaseHandler.muBackup
+        // When the Heartbeat Status is UP_TO_DATE, immediately set its value to PROGRESS_FINISHED (100)
+        // Otherwise, default to 0
+        val syncProgressValue = when (heartbeatStatus) {
+            HeartbeatStatus.UP_TO_DATE -> PROGRESS_FINISHED
+            else -> 0
+        }
 
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
             Timber.d("Sending Secondary Folder Heartbeat, backupId = ${muBackup.backupId}, Heartbeat Status = ${heartbeatStatus.name}")
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 heartbeatStatus.value,
-                INVALID_VALUE,
+                syncProgressValue,
                 0,
                 0,
                 0,
