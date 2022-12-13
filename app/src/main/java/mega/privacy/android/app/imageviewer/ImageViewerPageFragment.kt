@@ -268,9 +268,13 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
-                    restoreCurrentZoomAndOffset()
+                    imageResult.previewUri?.let {
+                        applyCurrentZoomAndOffset()
+                    }
                     binding.progress.hide()
                 }
+            } else {
+                resetCurrentZoomAndOffset()
             }
         }
 
@@ -287,14 +291,19 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
-                    restoreCurrentZoomAndOffset()
                     binding.progress.hide()
                 }
             }
         }
     }
-    
-    private fun restoreCurrentZoomAndOffset() {
+
+    private fun resetCurrentZoomAndOffset() {
+        currentZoomScale = 1.0f
+        currentImagePoint = PointF(0.0f, 0.0f)
+        currentViewPoint = PointF(0.0f, 0.0f)
+    }
+
+    private fun applyCurrentZoomAndOffset() {
         if (currentZoomScale != 1.0f) {
             val zoomableController =
                 binding.image.zoomableController as AbstractAnimatedZoomableController
