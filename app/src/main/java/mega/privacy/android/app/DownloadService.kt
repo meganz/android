@@ -37,9 +37,10 @@ import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES
-import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_MS_FILE_AND_OPEN
+import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW
 import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER
 import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER_OPEN
+import mega.privacy.android.app.constants.BroadcastConstants.IS_OPEN_WITH
 import mega.privacy.android.app.constants.BroadcastConstants.NODE_HANDLE
 import mega.privacy.android.app.constants.BroadcastConstants.NODE_LOCAL_PATH
 import mega.privacy.android.app.constants.BroadcastConstants.NODE_NAME
@@ -144,7 +145,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     private var isForeground = false
     private var canceled = false
     private var openFile = true
-    private var downloadByTap = false
+    private var downloadForPreview = false
+    private var downloadByOpenWith = false
     private var type: String? = ""
     private var isOverQuota = false
     private var downloadedBytesToOverQuota: Long = 0
@@ -384,7 +386,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         isDownloadForOffline = intent.getBooleanExtra(EXTRA_DOWNLOAD_FOR_OFFLINE, false)
 
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true)
-        downloadByTap = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_TAP, false)
+        downloadForPreview = intent.getBooleanExtra(EXTRA_DOWNLOAD_FOR_PREVIEW, false)
+        downloadByOpenWith = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_OPEN_WITH, false)
         type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE)
 
         CoroutineScope(ioDispatcher).launch {
@@ -588,15 +591,16 @@ class DownloadService : Service(), MegaRequestListenerInterface {
             Timber.d("onQueueComplete: reset total downloads")
             // When download a single file by tapping it, and auto play is enabled.
             val totalDownloads = megaApi.totalDownloads - backgroundTransfers.size
-            if (totalDownloads == 1 && autoPlayInfo != null && isMSFile(autoPlayInfo?.nodeName) && downloadByTap) {
+            if (totalDownloads == 1 && autoPlayInfo != null && downloadForPreview) {
                 // If the file is Microsoft file, send the corresponding broadcast
                 sendBroadcast(Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                    .putExtra(TRANSFER_TYPE, DOWNLOAD_MS_FILE_AND_OPEN)
+                    .putExtra(TRANSFER_TYPE, DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW)
                     .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
                     .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
                     .putExtra(NUMBER_FILES, 1)
-                    .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath))
-            } else if (totalDownloads == 1 && java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled) && autoPlayInfo != null && downloadByTap) {
+                    .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath)
+                    .putExtra(IS_OPEN_WITH, downloadByOpenWith))
+            } else if (totalDownloads == 1 && java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled) && autoPlayInfo != null) {
                 sendBroadcast(Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                     .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
                     .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
@@ -632,38 +636,6 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         } catch (ex: Exception) {
             Timber.e(ex)
         }
-    }
-
-    private val wordFileExtensions = arrayOf("doc", "docx", "docm", "dot", "dotx")
-    private val pptFileExtensions =
-        arrayOf("ppt", "pptx", "pot", "potm", "potx", "ppam", "pps", "ppsm", "ppsx", "pptm")
-    private val excelFileExtensions =
-        arrayOf("xls", "xlsx", "xla", "xlam", "xll", "xlm", "xlsm", "xlt", "xltm", "xltx")
-
-    private fun isMSFile(fileName: String?): Boolean {
-        return (fileName != null) && (isWordFile(fileName) || isExcelFile(fileName) || isPowerPointFile(
-            fileName))
-    }
-
-    private fun isWordFile(fileName: String): Boolean {
-        return endsWithExtension(fileName, wordFileExtensions)
-    }
-
-    private fun isExcelFile(fileName: String): Boolean {
-        return endsWithExtension(fileName, excelFileExtensions)
-    }
-
-    private fun isPowerPointFile(fileName: String): Boolean {
-        return endsWithExtension(fileName, pptFileExtensions)
-    }
-
-    private fun endsWithExtension(fileName: String, extensions: Array<String>): Boolean {
-        for (extension in extensions) {
-            if (fileName.substring(fileName.lastIndexOf(".")).endsWith(extension)) {
-                return true
-            }
-        }
-        return false
     }
 
     private fun sendTakenDownAlert() {
@@ -798,7 +770,7 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         } else {
             try {
                 val autoPlayEnabled = java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled)
-                if (isMSFile(currentDocument?.name) || openFile && autoPlayEnabled) {
+                if (downloadForPreview || openFile && autoPlayEnabled) {
 
                     val path = FileUtil.getLocalFile(
                         megaApi.getNodeByHandle(handle))
@@ -1593,7 +1565,8 @@ Error: ${e.errorCode} ${e.errorString}""")
         const val EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY"
         const val EXTRA_OPEN_FILE = "OPEN_FILE"
         const val EXTRA_CONTENT_URI = "CONTENT_URI"
-        const val EXTRA_DOWNLOAD_BY_TAP = "EXTRA_DOWNLOAD_BY_TAP"
+        const val EXTRA_DOWNLOAD_FOR_PREVIEW = "EXTRA_DOWNLOAD_FOR_PREVIEW"
+        const val EXTRA_DOWNLOAD_BY_OPEN_WITH = "EXTRA_DOWNLOAD_BY_OPEN_WITH"
         const val EXTRA_DOWNLOAD_FOR_OFFLINE = "EXTRA_DOWNLOAD_FOR_OFFLINE"
         private var errorEBlocked = 0
     }

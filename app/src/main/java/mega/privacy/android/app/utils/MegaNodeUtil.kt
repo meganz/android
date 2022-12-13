@@ -1730,6 +1730,7 @@ object MegaNodeUtil {
         nodeDownloader: (node: MegaNode) -> Unit,
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower,
+        isOpenWith: Boolean = false,
     ) {
         val possibleLocalFile = getTappedNodeLocalFile(node)
 
@@ -1740,7 +1741,7 @@ object MegaNodeUtil {
             if (MimeTypeList.typeForName(node.name).isZip && !SDCardUtils.isLocalFolderOnSDCard(
                     context,
                     possibleLocalFile
-                )
+                ) && !isOpenWith
             ) {
                 Timber.d("The file is zip, open in-app.")
                 openZip(
