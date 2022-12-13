@@ -1888,7 +1888,7 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <!-- Text button -->
-    <string name="general_verify">確認</string>
+    <string name="general_verify">驗證</string>
     <!-- Text button -->
     <string name="general_next">下一步</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -3932,7 +3932,7 @@
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_share_meeting_link_label">分享會議連結</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_more_participants_label">查看更多</string>
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">顯示更多</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">離開群組</string>
     <!-- Error message for creating an album with a system albums name -->
@@ -4001,6 +4001,26 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="other"></item>
+        <item quantity="other">相簿將會被刪除但裡面的內容將保留在您的時間軸中。</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">顯示較少</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">聯絡人驗證</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">我們使用零知識加密保護您的資料。為了進一步確保安全性，我們要求您驗證您與之共享資訊的聯絡人，然後他們才能存取共享資料夾。</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">我們使用零知識加密保護您的資料。為確保額外的安全性，我們要求您驗證您從之接收資訊的聯絡人，然後您才能存取共享資料夾。</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相匹配。您可以要求對方分享他們的憑證給您。</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享資料夾的人也會對您進行驗證。</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">驗證：%s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">您的憑證</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

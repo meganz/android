@@ -97,7 +97,7 @@
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Tampilan thumbnail</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Cadangkan Recovery Key</string>
+    <string name="action_export_master_key">Cadangkan Kunci pemulihan</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Batalkan Langganan</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -227,7 +227,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Akun Saya</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Unggahan Kamera</string>
+    <string name="section_photo_sync">Unggahan camera</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Masuk</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -531,17 +531,17 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi atau data plan</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Unggahan Kamera sedang berjalan</string>
+    <string name="cam_sync_syncing">Unggahan camera sedang berjalan</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Apakah anda ingin menghentikan Unggahan Kamera?</string>
+    <string name="cam_sync_cancel_sync">Apakah anda ingin menghentikan Unggahan camera?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Mengupload file atau folder media</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Memeriksa file yang akan diunggah</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Menginisialisasi Unggahan Kamera</string>
+    <string name="settings_camera_notif_initializing_title">Menginisialisasi Unggahan camera</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Unggahan Kamera telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
+    <string name="camera_notif_primary_local_unavailable">Unggahan camera telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Unggahan Media telah dinonaktifkan. Folder lokal anda tidak tersedia.</string>
     <!-- settings of the Appearance section -->
@@ -629,7 +629,7 @@
         <item>Impor dari perangkat</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Aktifkan Unggahan Kamera</string>
+    <string name="settings_camera_upload_on">Aktifkan Unggahan camera</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Bagaimana cara mengunggah</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -660,7 +660,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Folder Kamera lokal</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Folder Unggahan Kamera MEGA</string>
+    <string name="settings_mega_camera_upload_folder">Folder Unggahan camera MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Folder Secondary lokal</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -764,21 +764,21 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Akun Pro&#160;Lite</string>
     <!--  -->
-    <string name="backup_title">Cadangkan Kunci Pemulihan anda</string>
+    <string name="backup_title">Cadangkan Kunci pemulihan anda</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Kata sandi anda membuka Kunci Pemulihan anda</string>
+    <string name="backup_subtitle">Kata sandi anda membuka Kunci pemulihan anda</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">Data anda hanya dapat dibaca melalui serangkaian operasi dekripsi yang dimulai dengan kunci enkripsi master anda, yang kami simpan dienkripsi dengan kata sandi anda. Ini berarti bahwa jika anda kehilangan kata sandi anda, Kunci Pemulihan anda tidak dapat didekripsi lagi, dan anda tidak bisa lagi  mendekripsi data anda.</string>
+    <string name="backup_first_paragraph">Data anda hanya dapat dibaca melalui serangkaian operasi dekripsi yang dimulai dengan kunci enkripsi master anda, yang kami simpan dienkripsi dengan kata sandi anda. Ini berarti bahwa jika anda kehilangan kata sandi anda, Kunci pemulihan anda tidak dapat didekripsi lagi, dan anda tidak bisa lagi  mendekripsi data anda.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">Mengekspor Kunci Pemulihan dan menyimpan nya di tempat yang aman membolehkan anda mengatur password baru tanpa kehilangan data.</string>
+    <string name="backup_second_paragraph">Mengekspor Kunci pemulihan dan menyimpan nya di tempat yang aman membolehkan anda mengatur password baru tanpa kehilangan data.</string>
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Orang luar yang ingin merusak tidak dapat mendapatkan akses ke akun anda hanya  dengan kunci anda. Ubah sandi membutuhkan kunci dan akses ke email anda.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Salin Kunci Pemulihan ke clipboard atau simpan sebagai file teks.</string>
+    <string name="backup_action">Salin Kunci pemulihan ke clipboard atau simpan sebagai file teks.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Simpan</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Kunci Pemulihan telah berhasil disalin</string>
+    <string name="copy_MK_confirmation">Kunci pemulihan telah berhasil disalin</string>
     <!-- Button to change the password -->
     <string name="change_pass">Ganti</string>
     <!-- Positive button to perform a general action -->
@@ -788,7 +788,7 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Lupa password anda?</string>
     <!-- Hint of the text when the user can write his master key -->
-    <string name="edit_text_insert_mk">Kunci Pemulihan anda masuk ke sini</string>
+    <string name="edit_text_insert_mk">Kunci pemulihan anda masuk ke sini</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">password tulis disini</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
@@ -816,7 +816,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Ubah sandi</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Masukkan Kunci Pemulihan anda di bawah ini</string>
+    <string name="text_dialog_insert_MK">Masukkan Kunci pemulihan anda di bawah ini</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Kata sandi anda telah dirubah.</string>
     <!-- Title of the dialog to park an account -->
@@ -830,7 +830,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Recovery link ini telah kadaluarsa, harap coba kembali.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Kunci Pemulihan anda akan digunakan untuk mengubah kata sandi anda. Tolong masukkan kata sandi baru anda</string>
+    <string name="text_reset_pass_logged_in">Kunci pemulihan anda akan digunakan untuk mengubah kata sandi anda. Tolong masukkan kata sandi baru anda</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Tingkatkan</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
@@ -854,9 +854,9 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Hapus gambar</string>
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Kunci yang anda berikan tidak sesuai dengan akun ini. Pastikan anda menggunakan Kunci Pemulihan yang benar dan coba lagi.</string>
+    <string name="incorrect_MK">Kunci yang anda berikan tidak sesuai dengan akun ini. Pastikan anda menggunakan Kunci pemulihan yang benar dan coba lagi.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Kunci Pemulihan Salah</string>
+    <string name="incorrect_MK_title">Kunci pemulihan Salah</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Mendapatkan info&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -1409,7 +1409,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Pindahkan ke Sampah?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan Unggahan Kamera.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan Unggahan camera.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Anda yakin ingin memindahkan folder ini ke Tempat Sampah? Ini akan menonaktifkan Unggahan Media Sekunder.</string>
     <!-- confirmation message before removing a file -->
@@ -1505,9 +1505,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL link</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">SUBYEK</string>
+    <string name="new_file_subject_when_uploading">Subyek</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Teruskan</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1792,15 +1792,15 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Password diterima</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Kata sandi salah.\nCadangkan Kunci Pemulihan anda sesegera mungkin!</string>
+    <string name="test_pwd_wrong">Kata sandi salah.\nCadangkan Kunci pemulihan anda sesegera mungkin!</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Salin ke clipboard</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Lanjutkan untuk keluar</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Kunci Pemulihan</string>
+    <string name="recovery_key_bottom_sheet">Kunci pemulihan</string>
     <!-- Option that permits user save on File System -->
-    <string name="option_save_on_filesystem">Simpan pada Sistem File</string>
+    <string name="option_save_on_filesystem">Simpan pada sistem file</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Panggilan masuk</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -1818,9 +1818,9 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Keamanan</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Cadangkan Kunci Pemulihan</string>
+    <string name="settings_recovery_key_title">Cadangkan Kunci pemulihan</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">Mengekspor Kunci Pemulihan dan menyimpan nya di tempat yang aman membolehkan anda mengatur password baru tanpa kehilangan data.</string>
+    <string name="settings_recovery_key_summary">Mengekspor Kunci pemulihan dan menyimpan nya di tempat yang aman membolehkan anda mengatur password baru tanpa kehilangan data.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">Tidak dapat menjangkau MEGA. Silakan periksa konektivitas anda atau coba lagi nanti.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -1836,7 +1836,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Cetak</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Kunci Pemulihan telah berhasil disimpan</string>
+    <string name="save_MK_confirmation">Kunci pemulihan telah berhasil disimpan</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Tertunda)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1898,7 +1898,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh Aplikasi Otentikasi anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci Pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan otentikasi dua faktor.</string>
+    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan otentikasi dua faktor.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Kode salah</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1928,7 +1928,7 @@
     <!-- Text button -->
     <string name="general_close">Tutup</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Ekspor Kunci Pemulihan anda untuk selesai</string>
+    <string name="backup_rk_2fa_end">Ekspor Kunci pemulihan anda untuk selesai</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Aplikasi otentikasi dua faktor</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2130,7 +2130,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Anda mungkin memiliki pesan baru</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Penjadwal pengosongan tempat sampah</string>
+    <string name="settings_rb_scheduler_enable_title">Penjadwal pengosongan Tempat Sampah</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">Tempat sampah dikosongkan untuk anda secara otomatis.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2540,7 +2540,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Foto anda di cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Unggahan Kamera adalah fitur penting untuk perangkat seluler apa pun dan kami telah melindungi anda. Buat akun anda sekarang.</string>
+    <string name="content_tour_four">Unggahan camera adalah fitur penting untuk perangkat seluler apa pun dan kami telah melindungi anda. Buat akun anda sekarang.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Masukkan password anda</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2704,7 +2704,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Akun anda saat ini [B]ditangguhkan[/B]. Anda hanya dapat menelusuri data anda.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA tidak dapat mengakses data anda. Namun, administrator akun bisnis anda dapat mengakses Unggahan Kamera anda.</string>
+    <string name="camera_uploads_business_alert">MEGA tidak dapat mengakses data anda. Namun, administrator akun bisnis anda dapat mengakses Unggahan camera anda.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Terjadi kesalahan</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3163,11 +3163,11 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="other">1 item dipindahkan ke tempat sampah tapi %d barang tidak dipindahkan. Coba lagi nanti.</item>
+        <item quantity="other">1 item dipindahkan ke Tempat Sampah tapi %d barang tidak dipindahkan. Coba lagi nanti.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="other">%dbarang dipindahkan ke tempat sampah tapi 1 barang tidak dipindahkan. Coba lagi nanti.</item>
+        <item quantity="other">%dbarang dipindahkan ke Tempat Sampah tapi 1 barang tidak dipindahkan. Coba lagi nanti.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -4001,6 +4001,27 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="other"></item>
+        <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
+        <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

@@ -4525,24 +4525,52 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">يمكن لأي شخص لديه هذا الرابط الانضمام إلى الاجتماع و الاطلاع على محادثة الاجتماع.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">تم النسخ الى حافظة النصوص</string>
+    <string name="scheduled_meetings_meeting_link_copied">تم النسخ الى الحافظة</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">“%s” album deleted</item>
-        <item quantity="other">Deleted %d albums</item>
+        <item quantity="zero">تم حذف %d ألبوم</item>
+        <item quantity="one">تم حذف الألبوم ”%s“</item>
+        <item quantity="two">تم حذف %d ألبومين</item>
+        <item quantity="few">تم حذف %d ألبومات</item>
+        <item quantity="many">تم حذف %d ألبوماً</item>
+        <item quantity="other">تم حذف %d ألبوم</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one">Delete album?</item>
-        <item quantity="other">Delete albums?</item>
+        <item quantity="zero">هل تريد حذف الألبوم؟</item>
+        <item quantity="one">هل تريد حذف الألبوم؟</item>
+        <item quantity="two">هل تريد حذف الألبومين؟</item>
+        <item quantity="few">هل تريد حذف الألبومات؟</item>
+        <item quantity="many">هل تريد حذف الألبومات؟</item>
+        <item quantity="other">هل تريد حذف الألبومات؟</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="zero"></item>
-        <item quantity="one"></item>
-        <item quantity="two"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="zero">سيتم حذف الألبوم ولكن محتوياته ستبقى في جدولك الزمني.</item>
+        <item quantity="one">سيتم حذف الألبوم ولكن محتوياته ستبقى في جدولك الزمني.</item>
+        <item quantity="two">سيتم حذف الألبومين ولكن محتوياتهما ستبقى في جدولك الزمني.</item>
+        <item quantity="few">سيتم حذف الألبومات ولكن محتوياتها ستبقى في جدولك الزمني.</item>
+        <item quantity="many">سيتم حذف الألبومات ولكن محتوياتها ستبقى في جدولك الزمني.</item>
+        <item quantity="other">سيتم حذف الألبومات ولكن محتوياتها ستبقى في جدولك الزمني.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

@@ -367,7 +367,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Se copiază</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Mută în coșul de gunoi</string>
+    <string name="context_move_to_trash">Mută în Coșul de gunoi</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Elimină de pe MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -377,7 +377,7 @@
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Empty Rubbish bin</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Ești pe cale să elimini definitiv toate elementele din coșul de gunoi.</string>
+    <string name="clear_rubbish_confirmation">Ești pe cale să elimini definitiv toate elementele din Coșul de gunoi.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Trimite</string>
     <!-- Menu option to delete one or multiple selected items. -->
@@ -437,7 +437,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d elemente nu au fost mutate cu succes</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Mutat cu succes în coșul de gunoi</string>
+    <string name="context_correctly_moved_to_rubbish">Mutat cu succes în Coșul de gunoi</string>
     <!-- error message -->
     <string name="context_no_moved">Eroare. Nu a fost mutat</string>
     <!-- success message when sharing a folder -->
@@ -555,7 +555,7 @@
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Încărcări cameră în curs</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Vrei să oprești încărcări cameră?</string>
+    <string name="cam_sync_cancel_sync">Vrei să oprești Încărcări cameră?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Încărcarea fișierelor din folderele media</string>
     <!-- title of the notification when camera upload is checking files -->
@@ -1475,13 +1475,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Eliminarea contactului de la folderul partajat</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Muți în coșul de gunoi?</string>
+    <string name="confirmation_move_to_rubbish">Muți în Coșul de gunoi?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări cameră.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Sigur vrei să muți acest folder în Coșul de gunoi? Acest lucru va dezactiva Încărcări cameră.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Sigur vrei să muți acest folder în coșul de gunoi? Acest lucru va dezactiva Încărcări media secundare.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Sigur vrei să muți acest folder în Coșul de gunoi? Acest lucru va dezactiva Încărcări media secundare.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Muți în coșul de gunoi?</string>
+    <string name="confirmation_move_to_rubbish_plural">Muți în Coșul de gunoi?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Ștergi de pe MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1577,9 +1577,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL-ul linkului</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">SUBIECT</string>
+    <string name="new_file_subject_when_uploading">Subiect</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-MAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Redirecționează</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -3335,15 +3335,15 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 element a fost mutat în coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
-        <item quantity="few">1 element a fost mutat în coșul de gunoi, însă %d elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
-        <item quantity="other">1 element a fost mutat în coșul de gunoi, însă %d de elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
+        <item quantity="one">1 element a fost mutat în Coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">1 element a fost mutat în Coșul de gunoi, însă %d elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
+        <item quantity="other">1 element a fost mutat în Coșul de gunoi, însă %d de elemente nu au fost mutate. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 element a fost mutat în coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
-        <item quantity="few">%d elemente au fost mutate în coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
-        <item quantity="other">%d de elemente au fost mutate în coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="one">1 element a fost mutat în Coșul de gunoi, însă celălalt nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="few">%d elemente au fost mutate în Coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
+        <item quantity="other">%d de elemente au fost mutate în Coșul de gunoi, însă 1 element nu a fost mutat. Încearcă din nou mai târziu.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3359,15 +3359,15 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 element mutat cu succes în coșul de gunoi</item>
-        <item quantity="few">%d elemente mutate cu succes în coșul de gunoi</item>
-        <item quantity="other">%d de elemente mutate cu succes în coșul de gunoi</item>
+        <item quantity="one">1 element mutat cu succes în Coșul de gunoi</item>
+        <item quantity="few">%d elemente mutate cu succes în Coșul de gunoi</item>
+        <item quantity="other">%d de elemente mutate cu succes în Coșul de gunoi</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 element nu a fost mutat cu succes în coșul de gunoi</item>
-        <item quantity="few">%d elemente nu au fost mutate cu succes în coșul de gunoi</item>
-        <item quantity="other">%d de elemente nu au fost mutate cu succes în coșul de gunoi</item>
+        <item quantity="one">1 element nu a fost mutat cu succes în Coșul de gunoi</item>
+        <item quantity="few">%d elemente nu au fost mutate cu succes în Coșul de gunoi</item>
+        <item quantity="other">%d de elemente nu au fost mutate cu succes în Coșul de gunoi</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3644,7 +3644,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Mută „%1s” în coșul de gunoi</string>
+    <string name="backup_remove_folder_title">Mută „%1s” în Coșul de gunoi</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Dezactivează backupul</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -4175,19 +4175,19 @@
         <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <string name="photos_user_album_empty_album">[A]Album[/A] [B]gol[/B]</string>
     <!-- Albums sub-section for all system and user albums -->
-    <string name="photos_album_subsection_my_albums">My albums</string>
+    <string name="photos_album_subsection_my_albums">Albumele mele</string>
     <!-- Albums sub-section for all shared albums -->
-    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <string name="photos_album_subsection_shared_albums">Albume partajate</string>
     <!-- Header title for meeting list past meetings -->
     <string name="meetings_list_past_header">Întâlniri din trecut</string>
     <!-- Label for upcoming meetings -->
-    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <string name="meetings_list_upcoming_meeting_label">Întâlnire viitoare</string>
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Întâlnire periodică</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s săptămânal</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Media discovery view</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4201,21 +4201,43 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Copied link to clipboard</string>
+    <string name="scheduled_meetings_meeting_link_copied">Link copiat în clipboard</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">“%s” album deleted</item>
-        <item quantity="other">Deleted %d albums</item>
+        <item quantity="one">Albumul „%s” șters</item>
+        <item quantity="few">%d albume șterse</item>
+        <item quantity="other">%d de albume șterse</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one">Delete album?</item>
-        <item quantity="other">Delete albums?</item>
+        <item quantity="one">Ștergi albumul?</item>
+        <item quantity="few">Ștergi albumele?</item>
+        <item quantity="other">Ștergi albumele?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Albumul va fi șters, însă conținutul lui va rămâne în Cronologie.</item>
+        <item quantity="few">Albumele vor fi șterse, însă conținutul lor va rămâne în Cronologie.</item>
+        <item quantity="other">Albumele vor fi șterse, însă conținutul lor va rămâne în Cronologie.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

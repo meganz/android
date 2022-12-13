@@ -357,7 +357,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Đang tạo thư mục</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Dọn thùng rác</string>
+    <string name="context_clear_rubbish">Dọn Thùng Rác</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Bạn đang chuẩn bị tiến hành xóa vĩnh viễn các mục ở trong Thùng Rác.</string>
     <!-- send cancel subscriptions dialog -->
@@ -1413,7 +1413,7 @@
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Bạn có chắc muốn chuyển thư mục này vào Thùng Rác? Thao tác ngày sẽ ngưng tính năng đăng tải thư mục Secondary Media.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Bỏ vào thùng rác?</string>
+    <string name="confirmation_move_to_rubbish_plural">Bỏ vào Thùng Rác?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Xóa khỏi MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1505,9 +1505,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Liên kết URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">TIÊU ĐỀ</string>
+    <string name="new_file_subject_when_uploading">Tiêu đề</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Chuyển tin nhắn</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1617,7 +1617,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Chia sẻ thông qua</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[A]Thùng rác[/A] [B]Trống[/B]</string>
+    <string name="context_empty_rubbish_bin">[A]Thùng Rác[/A] [B]Trống[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -2130,9 +2130,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Có vài tin nhắn mới</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Đặt lịch dọn dẹp thùng rác</string>
+    <string name="settings_rb_scheduler_enable_title">Đặt lịch dọn dẹp Thùng Rác</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">Thùng rác sẽ được tự động dọn dẹp đình kỳ cho bạn.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">Thùng Rác sẽ được tự động dọn dẹp đình kỳ cho bạn.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">Thời gian chờ tối thiểu là 7 ngày.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2148,7 +2148,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Nếu videos cần nén có kích thước lớn hơn</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Để tắt Đặt lịch dọn dẹp thùng rác hoặc muốn gia hạn chờ thời gian giữ rác được lâu hơn, xin đăng ký dùng hạng Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Để tắt Đặt lịch dọn dẹp Thùng Rác hoặc muốn gia hạn chờ thời gian giữ rác được lâu hơn, xin đăng ký dùng hạng Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">ngày</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3163,11 +3163,11 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="other">1 mục đã được chuyển vào thùng rác và %d mục đã không được chuyển. Thử lại sau.</item>
+        <item quantity="other">1 mục đã được chuyển vào Thùng Rác và %d mục đã không được chuyển. Thử lại sau.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="other">%d mục đã được chuyển vào thùng rác và 1 mục đã không chuyển được. Thử lại sau.</item>
+        <item quantity="other">%d mục đã được chuyển vào Thùng Rác và 1 mục đã không chuyển được. Thử lại sau.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -4001,6 +4001,26 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="other"></item>
+        <item quantity="other">Các albums sẽ bị xóa nhưng các nội dung có bên trong sẽ vẫn giữ lại trên Dòng Thời Gian của bạn.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ẩn đi bớt</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Xác thực liên lạc</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Để xác thực tên liên lạc, đảm bảo rằng chứng thực bạn thấy dưới đây trùng khớp với chứng thực tài khoản của họ. Bạn có thể hỏi người đó chia sẻ chứng thực cho bạn.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[thư mục chưa giải mã]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Để có thể truy cập thư mục này, người chia sẻ thư mục này cho bạn cũng cần phải xác thực bạn.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Xác thực %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Chứng thực của bạn</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

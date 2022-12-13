@@ -553,9 +553,9 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi ou données mobiles</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Les téléversements de l’appareil photo sont en cours</string>
+    <string name="cam_sync_syncing">Les Téléversements de l’appareil photo sont en cours</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Voulez-vous arrêter les téléversements de l’appareil photo ?</string>
+    <string name="cam_sync_cancel_sync">Voulez-vous arrêter les Téléversements de l’appareil photo ?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Téléversement des fichiers des dossiers de médias</string>
     <!-- title of the notification when camera upload is checking files -->
@@ -1577,9 +1577,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL du lien</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">OBJET</string>
+    <string name="new_file_subject_when_uploading">Objet</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">COURRIEL</string>
+    <string name="new_file_email_when_uploading">Adresse courriel</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Transférer</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1807,7 +1807,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualité des vidéos</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Les téléversements de l’appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l’autorisation.</string>
+    <string name="on_refuse_storage_permission">Les Téléversements de l’appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l’autorisation.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Basse</item>
@@ -2422,7 +2422,7 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">La taille totale des vidéos à compresser dépasse %s, veuillez brancher votre appareil sur son chargeur afin de poursuivre.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">Ce paramètre sera appliqué lors des prochains téléversements de l’appareil photo</string>
+    <string name="message_keep_device_name">Ce paramètre sera appliqué lors des prochains Téléversements de l’appareil photo</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s a été compressé</string>
     <!-- notification title when compressing video -->
@@ -4219,8 +4219,28 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">L’album sera supprimé, mais son contenu restera dans votre Vue chronologique.</item>
+        <item quantity="many">Les albums seront supprimés, mais leur contenu restera dans votre Vue chronologique.</item>
+        <item quantity="other">Les albums seront supprimés, mais leur contenu restera dans votre Vue chronologique.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Afficher moins</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Confirmation du contact</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">Grâce au chiffrement à connaissance nulle, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts avec qui vous partagez des renseignements avant qu’ils n’accèdent aux dossiers partagés.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">Grâce au chiffrement à connaissance nulle, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts dont vous recevez des renseignements avant que vous n’accédiez aux dossiers partagés.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Pour confirmer un contact, assurez-vous que le numéro d’identification que vous voyez ci-dessus correspond au numéro d’identification de leur compte. Vous pouvez demander à votre contact de partager son numéro d’identification avec vous.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[dossier non déchiffré]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Pour accéder au dossier partagé, la personne qui l’a partagé avec vous devrait aussi vous confirmer.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Confirmer %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Votre numéro d’identification</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

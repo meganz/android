@@ -230,7 +230,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Mijn Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Camera Uploads</string>
+    <string name="section_photo_sync">Camera uploads</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Binnenkomende</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -542,17 +542,17 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi of mobiele data</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Camera Uploads in behandeling</string>
+    <string name="cam_sync_syncing">Camera uploads in behandeling</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Wilt u Camera Uploads stoppen?</string>
+    <string name="cam_sync_cancel_sync">Wilt u Camera uploads stoppen?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Bestanden uploaden van media mappen</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Bezig met zoeken naar te uploaden bestanden</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Camera-uploads initialiseren</string>
+    <string name="settings_camera_notif_initializing_title">Camera uploads initialiseren</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Camera-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
+    <string name="camera_notif_primary_local_unavailable">Camera uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Media-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
     <!-- settings of the Appearance section -->
@@ -640,7 +640,7 @@
         <item>Importeren vanuit apparaat</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Camera Uploads Inschakelen</string>
+    <string name="settings_camera_upload_on">Camera uploads Inschakelen</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Hoe te uploaden</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -671,7 +671,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Lokale Camera map</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">MEGA Camera Uploads map</string>
+    <string name="settings_mega_camera_upload_folder">MEGA Camera uploads map</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Lokale Secundaire map</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -1443,7 +1443,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera Uploads uit.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera uploads uit.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Weet u zeker dat u deze map wilt verplaatsen naar de Prullenbak? Hierdoor worden Secundaire Media Uploads uitgeschakeld.</string>
     <!-- confirmation message before removing a file -->
@@ -1541,9 +1541,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">ONDERWERP</string>
+    <string name="new_file_subject_when_uploading">Onderwerp</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Doorversturen</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1767,7 +1767,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Kwaliteit</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Camera Uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Ga naar de instellingen pagina en geef toestemming.</string>
+    <string name="on_refuse_storage_permission">Camera uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Ga naar de instellingen pagina en geef toestemming.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Laag</item>
@@ -2371,7 +2371,7 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">De totale grootte van de te comprimeren video’s zijn groter dan %s. Geef uw apparaat op om door te gaan.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">Deze instelling gaat van kracht wanneer Camera Uploads de volgende keer wordt uitgevoerd</string>
+    <string name="message_keep_device_name">Deze instelling gaat van kracht wanneer Camera uploads de volgende keer wordt uitgevoerd</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s is gecomprimeerd</string>
     <!-- notification title when compressing video -->
@@ -2777,7 +2777,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Uw account is momenteel [B]geschorst[/B]. U kunt alleen door uw gegevens bladeren.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens. Uw zakelijke accountbeheerder heeft echter wel toegang tot uw camera-uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens. Uw zakelijke accountbeheerder heeft echter wel toegang tot uw Camera uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Er is iets fout gegaan</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3249,13 +3249,13 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item verplaatst naar de prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
-        <item quantity="other">1 item verplaasts naar de prullenbak maar %d items waren niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="one">1 item verplaatst naar de Prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="other">1 item verplaasts naar de Prullenbak maar %d items waren niet verplaatst. Probeer later nogmaals.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item verplaatst naar de prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
-        <item quantity="other">%d items verplaatst naar de prullenbak maar 1 item was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="one">1 item verplaatst naar de Prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="other">%d items verplaatst naar de Prullenbak maar 1 item was niet verplaatst. Probeer later nogmaals.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -4110,7 +4110,27 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Album wordt verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
+        <item quantity="other">Albums worden verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Minder weergeven</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verificatie</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten met wie u informatie deelt te verifiëren voordat ze toegang krijgen tot de gedeelde mappen.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten van wie u informatie ontvangt te verifiëren voordat u oegang krijgt tot de gedeelde mappen.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Om uw contactpersoon te verifiëren, moet u ervoor zorgen dat de inloggegevens die u hierboven ziet, overeenkomen met de inloggegevens van hun account. U kunt hen vragen om hun inloggegevens met u te delen.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Ongecodeerde map]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Om toegang te krijgen tot de gedeelde map, moet de persoon die deze met u heeft gedeeld, u ook verifiëren.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sverifiëren</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Uw gegevens</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

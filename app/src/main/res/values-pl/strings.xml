@@ -135,7 +135,7 @@
     <!-- Login button -->
     <string name="login_text">Zaloguj&#160;się</string>
     <!-- email label -->
-    <string name="email_text">Email</string>
+    <string name="email_text">E-mail</string>
     <!-- password label -->
     <string name="password_text">Hasło</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -147,9 +147,9 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Utwórz konto</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Wprowadź swój adres email</string>
+    <string name="error_enter_email">Wprowadź swój adres e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="error_invalid_email">Niepoprawny adres email</string>
+    <string name="error_invalid_email">Niepoprawny adres e-mail</string>
     <!-- when the user tries to log in MEGA without typing the password -->
     <string name="error_enter_password">Wprowadź hasło</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
@@ -376,7 +376,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Kopiowanie</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Przenieś do kosza</string>
+    <string name="context_move_to_trash">Przenieś do Kosza</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Usuń z MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -384,9 +384,9 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Tworzenie katalogu</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Opróżnij kosz na śmieci</string>
+    <string name="context_clear_rubbish">Opróżnij Kosz na śmieci</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Za chwilę usuniesz na stałe wszystkie przedmioty ze swojego kosza na śmieci.</string>
+    <string name="clear_rubbish_confirmation">Za chwilę usuniesz na stałe wszystkie przedmioty ze swojego Kosza na śmieci.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Wyślij</string>
     <!-- Menu option to delete one or multiple selected items. -->
@@ -447,7 +447,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d elementów nie zostało przeniesione</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Przeniesiono do kosza</string>
+    <string name="context_correctly_moved_to_rubbish">Przeniesiono do Kosza</string>
     <!-- error message -->
     <string name="context_no_moved">Błąd. Nie przeniesiono</string>
     <!-- success message when sharing a folder -->
@@ -572,7 +572,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inicjalizowanie przesyłania zdjęć z kamery</string>
+    <string name="settings_camera_notif_initializing_title">Inicjalizowanie Przesyłania zdjęć z kamery</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój katalog lokalny jest niedostępny.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -662,7 +662,7 @@
         <item>Importuj z urządzenia</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Włącz przesyłanie zdjęć z kamery</string>
+    <string name="settings_camera_upload_on">Włącz Przesyłanie zdjęć z kamery</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Jak wgrywać zdjęcia</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -830,9 +830,9 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Jest to ostatni krok do usunięcia konta. W ten sposób trwale utracisz wszystkie dane przechowywane w chmurze. Wpisz swoje hasło poniżej.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Weryfikacje email</string>
+    <string name="email_verification_title">Weryfikacje e-mail</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Sprawdź swój email aby kontynuować.</string>
+    <string name="email_verification_text">Sprawdź swój e-mail aby kontynuować.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Wystąpił błąd, spróbuj ponownie.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -846,7 +846,7 @@
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Niepoprawne dane wejściowe</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Niepoprawny adres email</string>
+    <string name="invalid_email_title">Niepoprawny adres e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Sprawdź adres e-mail ponownie.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
@@ -876,13 +876,13 @@
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Ten adres e-mail jest już używany. Proszę użyć innego adresu e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
-    <string name="mail_changed_confirm_requested">Link potwierdzający został już wygenerowany dla podanego adresu email.</string>
+    <string name="mail_changed_confirm_requested">Link potwierdzający został już wygenerowany dla podanego adresu e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Jest to Twój dotychczasowy adres e-mail.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">To jest ostatni moment na zmianę adresu email. Wprowadź swoje hasło poniżej.</string>
+    <string name="change_mail_text_last_step">To jest ostatni moment na zmianę adresu e-mail. Wprowadź swoje hasło poniżej.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
-    <string name="change_mail_title_last_step">Zmień email</string>
+    <string name="change_mail_title_last_step">Zmień e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">Zrób zdjęcie</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -896,7 +896,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Pobieranie danych&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Twój nowy adres email musi zostać zweryfikowany. Sprawdź swoją skrzynkę odbiorczą aby kontynuować.</string>
+    <string name="email_verification_text_change_mail">Twój nowy adres e-mail musi zostać zweryfikowany. Sprawdź swoją skrzynkę odbiorczą aby kontynuować.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Usunąć zdjęcia profilowe?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -933,7 +933,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Zbyt wiele nieudanych prób logowania. Zaczekaj godzinę.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">To konto nie zostało jeszcze zweryfikowane. Proszę sprawdzić email.</string>
+    <string name="account_not_validated_login">To konto nie zostało jeszcze zweryfikowane. Proszę sprawdzić e-mail.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link do katalogu jest niedostępny</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -1378,7 +1378,7 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Wyślin ponownie</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email został wysłany</string>
+    <string name="confirm_email_misspelled_email_sent">E-mail został wysłany</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Informacja do wszystkich użytkowników, dotycząca ochrony praw autorskich</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -1509,13 +1509,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Usuwanie kontaktu z udostępnionego katalogu</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Przenieść do kosza?</string>
+    <string name="confirmation_move_to_rubbish">Przenieść do Kosza?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie przesyłania z aparatu.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie Przesyłania z aparatu.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do kosza na śmieci? Spowoduje to wyłączenie dodatkowego przesyłania multimediów.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie dodatkowego przesyłania multimediów.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Przenieść do kosza?</string>
+    <string name="confirmation_move_to_rubbish_plural">Przenieść do Kosza?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Usunąć z MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1559,7 +1559,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Zaproszenie wysłane</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email nie jest prawidłowy</string>
+    <string name="invalid_email_to_invite">E-mail nie jest prawidłowy</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Po zainstalowaniu aplikacji MEGA desktop otrzymujesz %1$s bezpłatnej przestrzeni dyskowej, ważnej przez 365 dni. Aplikacja MEGA jest dostępna dla systemów Windows, macOS i większości dystrybucji Linuksa.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1571,7 +1571,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s przestrzeni dyskowej za instalację MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Otrzymałeś %1$s przestrzeni dyskowej za weryfikację Twojego numeru telefonu.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Otrzymałeś %1$s przestrzeni dyskowej za potwierdzenie swojego numeru telefonu.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Otrzymałeś %1$s powierzchni na pliki jako bonus za rejestrację.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1613,9 +1613,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">TYTUŁ</string>
+    <string name="new_file_subject_when_uploading">Tytuł</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Do przodu</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1728,7 +1728,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Udostępnij za pomocą</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Pusty [/B][A]kosz na śmieci[/A]</string>
+    <string name="context_empty_rubbish_bin">[B]Pusty [/B][A]Kosz na śmieci[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Cloud Drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -2049,7 +2049,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
     <string name="verify_2fa_subtitle_change_password">Zmień hasło</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
-    <string name="verify_2fa_subtitle_change_email">Zmień email</string>
+    <string name="verify_2fa_subtitle_change_email">Zmień e-mail</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Usuń konto</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
@@ -2215,7 +2215,7 @@
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
     <string name="confirm_account">Wprowadź hasło, w celu potwierdzenia konta</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
-    <string name="error_own_email_as_contact">Nie ma potrzeby podawania własnego adresu email</string>
+    <string name="error_own_email_as_contact">Nie ma potrzeby podawania własnego adresu e-mail</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Nieprawidłowy kod</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
@@ -2280,7 +2280,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Możesz mieć nowe wiadomości</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Harmonogram opróżniania kosza na śmieci</string>
+    <string name="settings_rb_scheduler_enable_title">Harmonogram opróżniania Kosza na śmieci</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">Kosz na śmieci jest opróżniany za Ciebie automatycznie.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2298,7 +2298,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Jeśli filmy do skompresowania są większe niż</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Aby wyłączyć harmonogram opróżniania kosza na śmieci lub ustawić dłuższy okres przechowywania, należy wykupić plan Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Aby wyłączyć harmonogram opróżniania Kosza na śmieci lub ustawić dłuższy okres przechowywania, należy wykupić plan Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dni</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2473,7 +2473,7 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">Całkowity rozmiar kompresowanych filmów przekracza %s, naładuj urządzenie, aby kontynuować.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">To ustawienie zacznie obowiązywać przy następnym uruchomieniu przesyłania z kamery</string>
+    <string name="message_keep_device_name">To ustawienie zacznie obowiązywać przy następnym uruchomieniu Przesyłania z kamery</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s został skompresowany</string>
     <!-- notification title when compressing video -->
@@ -2947,17 +2947,17 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Błąd. Katalog %1$s nie został utworzony</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Zweryfikuj swój adres email</string>
+    <string name="verify_email_label">Zweryfikuj swój adres e-mail</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Twoje konto zostało tymczasowo zablokowane dla twojego bezpieczeństwa.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Proszę postępować zgodnie z krokami zawartymi w [A]emailu weryfikacyjnym[/A], aby odblokować swoje konto.</string>
+    <string name="verify_email_and_follow_steps">Proszę postępować zgodnie z krokami zawartymi w [A]e-mailu weryfikacyjnym[/A], aby odblokować swoje konto.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Dlaczego to widzę?</string>
     <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Wyślij email ponownie</string>
+    <string name="resend_email_label">Wyślij e-mail ponownie</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
-    <string name="resend_email_error">Email już wysłany. Poczekaj kilka minut, zanim spróbujesz ponownie.</string>
+    <string name="resend_email_error">E-mail już wysłany. Poczekaj kilka minut, zanim spróbujesz ponownie.</string>
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">Zablokowane konta</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
@@ -3421,17 +3421,17 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 element został przeniesiony do kosza na śmieci, ale jeden nie został przeniesiony. Spróbuj ponownie później.</item>
-        <item quantity="few">1 element został przeniesiony do kosza na śmieci, ale %d elementów nie zostało przeniesionych. Spróbuj ponownie później.</item>
-        <item quantity="many">1 element został przeniesiony do kosza na śmieci, ale %d elementów nie zostało przeniesionych. Spróbuj ponownie później.</item>
-        <item quantity="other">1 element został przeniesiony do kosza na śmieci, ale %d elementów nie zostało przeniesionych. Spróbuj ponownie później.</item>
+        <item quantity="one">1 element został przeniesiony do Kosza na śmieci, ale jeden nie został przeniesiony. Spróbuj ponownie później.</item>
+        <item quantity="few">1 element został przeniesiony do Kosza na śmieci, ale %d elementów nie zostało przeniesionych. Spróbuj ponownie później.</item>
+        <item quantity="many">1 element został przeniesiony do Kosza na śmieci, ale %d elementów nie zostało przeniesionych. Spróbuj ponownie później.</item>
+        <item quantity="other">1 element został przeniesiony do Kosza na śmieci, ale %d elementów nie zostało przeniesionych. Spróbuj ponownie później.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 element został przeniesiony do kosza na śmieci, ale jeden element nie został przeniesiony. Spróbuj ponownie później.</item>
-        <item quantity="few">%d elementów zostało przeniesionych do kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
-        <item quantity="many">%d elementów zostało przeniesionych do kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
-        <item quantity="other">%d elementów zostało przeniesionych do kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
+        <item quantity="one">1 element został przeniesiony do Kosza na śmieci, ale jeden element nie został przeniesiony. Spróbuj ponownie później.</item>
+        <item quantity="few">%d elementów zostało przeniesionych do Kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
+        <item quantity="many">%d elementów zostało przeniesionych do Kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
+        <item quantity="other">%d elementów zostało przeniesionych do Kosza na śmieci, ale 1 element nie został przeniesiony. Spróbuj ponownie później.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3449,17 +3449,17 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 element przeniesiony do kosza</item>
-        <item quantity="few">%d elementy przeniesione do kosza</item>
-        <item quantity="many">%d elementy przeniesione do kosza</item>
-        <item quantity="other">%d elementy przeniesione do kosza</item>
+        <item quantity="one">1 element przeniesiony do Kosza</item>
+        <item quantity="few">%d elementy przeniesione do Kosza</item>
+        <item quantity="many">%d elementy przeniesione do Kosza</item>
+        <item quantity="other">%d elementy przeniesione do Kosza</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 element nie został przeniesiony do kosza</item>
-        <item quantity="few">%d elementów nie zostało przeniesionych do kosza</item>
-        <item quantity="many">%d elementów nie zostało przeniesionych do kosza</item>
-        <item quantity="other">%d elementów nie zostało przeniesionych do kosza</item>
+        <item quantity="one">1 element nie został przeniesiony do Kosza</item>
+        <item quantity="few">%d elementów nie zostało przeniesionych do Kosza</item>
+        <item quantity="many">%d elementów nie zostało przeniesionych do Kosza</item>
+        <item quantity="other">%d elementów nie zostało przeniesionych do Kosza</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3742,7 +3742,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Usuwasz katalog kopii zapasowych. Spowoduje to usunięcie wszystkich kopii zapasowych, które ustawiłeś. Czy na pewno chcesz to zrobić?</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Przenieś „%1s” do kosza</string>
+    <string name="backup_remove_folder_title">Przenieś „%1s” do Kosza</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Wyłączenie tworzenia kopii zapasowej</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -4328,9 +4328,29 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Album zostanie usunięty, ale jego zawartość pozostanie na Twojej Osi czasu.</item>
+        <item quantity="few">Albumy zostaną usunięte, ale ich zawartość pozostanie na Twojej Osi czasu.</item>
+        <item quantity="many">Albumy zostaną usunięte, ale ich zawartość pozostanie na Twojej Osi czasu.</item>
+        <item quantity="other">Albumy zostaną usunięte, ale ich zawartość pozostanie na Twojej Osi czasu.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>

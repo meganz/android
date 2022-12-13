@@ -375,9 +375,9 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creando carpeta</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Vaciar papelera</string>
+    <string name="context_clear_rubbish">Vaciar Papelera</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Eliminarás permanentemente todos los elementos de la papelera.</string>
+    <string name="clear_rubbish_confirmation">Eliminarás permanentemente todos los elementos de la Papelera.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Enviar</string>
     <!-- Menu option to delete one or multiple selected items. -->
@@ -471,7 +471,7 @@
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Estás a punto de cancelar tu suscripción MEGA. Por favor, dinos si hay algo que podamos hacer que pueda hacerte cambiar de opinión.</string>
     <!-- hint cancel subscriptions dialog -->
-    <string name="hint_cancel_subscriptions">Escribe aquí tu comentario</string>
+    <string name="hint_cancel_subscriptions">Escribe aquí tu valoración</string>
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Enviar</string>
     <!-- confirmation cancel subscriptions dialog -->
@@ -682,7 +682,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Carpeta de la cámara local</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Carpeta de la cámara en MEGA</string>
+    <string name="settings_mega_camera_upload_folder">Carpeta de las Subidas de la cámara en MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Carpeta secundaria local</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -1477,7 +1477,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivarán las Subídas de la cámara.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivarán las Subidas de la cámara.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la subida multimedia secundaria.</string>
     <!-- confirmation message before removing a file -->
@@ -1531,7 +1531,7 @@
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">Al instalar nuestra aplicación móvil, obtienes %1$s de espacio de almacenamiento válido durante 365 días. La aplicación móvil está disponible para iOS y Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Si confirmas tu número de teléfono, obtienes %1$s de espacio de almacenamiento gratuito válido durante 365 días.</string>
+    <string name="paragraph_info_achievement_add_phone">Si verificas tu número de teléfono, obtienes %1$s de espacio de almacenamiento gratuito válido durante 365 días.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Has obtenido %1$s de espacio de almacenamiento por instalar nuestra aplicación de escritorio.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -1563,7 +1563,7 @@
     <!-- mail subject -->
     <string name="setting_feedback_subject">Feedback Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Escribe tus comentarios:</string>
+    <string name="setting_feedback_body">Escribe tu valoración:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Modelo del dispositivo</string>
     <!-- mail body -->
@@ -1577,9 +1577,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL del enlace</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">ASUNTO</string>
+    <string name="new_file_subject_when_uploading">Asunto</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">CORREO ELECTRÓNICO</string>
+    <string name="new_file_email_when_uploading">Correo electrónico</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Reenviar</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1615,7 +1615,7 @@
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Sí, calificar la aplicación</string>
     <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">No, enviar comentario</string>
+    <string name="send_feedback_panel">No, enviar valoración</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">MEGA necesita permisos de lectura y escritura para descargar archivos en el almacenamiento de tu dispositivo.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
@@ -2230,7 +2230,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Podrías tener mensajes nuevos</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Limpieza automática de la papelera</string>
+    <string name="settings_rb_scheduler_enable_title">Limpieza automática de la Papelera</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">La Papelera se vacía automáticamente.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -3335,15 +3335,15 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">Se ha movido 1 elemento a la papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
-        <item quantity="many">Se ha movido 1 elemento a la papelera pero otros %d no se han podido mover. Inténtalo más tarde.</item>
-        <item quantity="other">Se ha movido 1 elemento a la papelera pero otros %d no se han podido mover. Inténtalo más tarde.</item>
+        <item quantity="one">Se ha movido 1 elemento a la Papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="many">Se ha movido 1 elemento a la Papelera pero otros %d no se han podido mover. Inténtalo más tarde.</item>
+        <item quantity="other">Se ha movido 1 elemento a la Papelera pero otros %d no se han podido mover. Inténtalo más tarde.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">Se ha movido 1 elemento a la papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
-        <item quantity="many">Se han movido %d elementos a la papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
-        <item quantity="other">Se han movido %d elementos a la papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="one">Se ha movido 1 elemento a la Papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="many">Se han movido %d elementos a la Papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="other">Se han movido %d elementos a la Papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3365,7 +3365,7 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">No se ha podido enviar 1 elemento a la papelera</item>
+        <item quantity="one">No se ha podido enviar 1 elemento a la Papelera</item>
         <item quantity="many">No se han podido enviar %d elementos a la Papelera</item>
         <item quantity="other">No se han podido enviar %d elementos a la Papelera</item>
     </plurals>
@@ -3448,13 +3448,13 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Reunión</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">Únete/empieza reunión</string>
+    <string name="start_join_meeting">Unirse/empezar reunión</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">Nueva reunión</string>
     <!-- Label that join a meeting -->
     <string name="join_meeting">Únete a la reunión</string>
     <!-- Button that create a meeting -->
-    <string name="btn_start_meeting">Empieza la reunión</string>
+    <string name="btn_start_meeting">Empezar la reunión</string>
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Únete como invitado</string>
     <!-- Hint shown to guide user on meeting name -->
@@ -4030,7 +4030,7 @@
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]No[/B] [B]hay[/B] [A]favoritos[/A]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Empieza una reunión</string>
+    <string name="meetings_list_empty_action">Empezar una reunión</string>
     <!--Description text from Meeting screen empty view-->
     <string name="meetings_list_empty_description">Hable de forma segura y privada en llamadas y videollamadas con amigos y colegas de todo el mundo.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
@@ -4219,8 +4219,28 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">El álbum se eliminará, pero su contenido permanecerá en tu Cronología.</item>
+        <item quantity="many">Los álbumes se eliminarán, pero su contenido permanecerá en tu Cronología.</item>
+        <item quantity="other">Los álbumes se eliminarán, pero su contenido permanecerá en tu Cronología.</item>
     </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ver menos</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Verificación de contacto</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">Protegemos tus datos con cifrado de conocimiento cero. Para garantizar una mayor seguridad, te pedimos que verifiques los contactos con los que compartes información antes de que puedan acceder a las carpetas compartidas.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">Protegemos tus datos con cifrado de conocimiento cero. Para garantizar una mayor seguridad, te pedimos que verifiques los contactos de los que recibes información antes de que puedas acceder a las carpetas compartidas.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Para verificar tu contacto, asegúrate de que las credenciales que ves arriba coincidan con las credenciales de su cuenta. Puedes pedirle que comparta sus credenciales contigo.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Carpeta no descifrada]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Para acceder a la carpeta compartida, la persona que la ha compartido contigo también debe verificar tus credenciales.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verificar %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Tus credenciales</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
 </resources>
