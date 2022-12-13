@@ -569,6 +569,7 @@ private String sdkCommitId() {
     return commitId
 }
 
+
 private String appCommitId() {
     String commitId = sh(
             script: """
@@ -579,18 +580,6 @@ private String appCommitId() {
     println("Android commit id = ${commitId}")
     return commitId
 }
-
-private String appShortCommitId() {
-    String commitId = sh(
-            script: """
-                cd ${WORKSPACE}
-                git rev-parse --short HEAD
-                """,
-            returnStdout: true).trim()
-    println("Android commit id = ${commitId}")
-    return commitId
-}
-
 
 private String megaChatSdkCommitId() {
     String commitId = sh(
@@ -687,9 +676,7 @@ private void checkSDKVersion() {
 def readAppVersion() {
     String versionCode = APK_VERSION_CODE_FOR_CD
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
-    String commitId = appShortCommitId()
-    String fullVersionName = versionName + "-" + commitId
-    return [fullVersionName, versionCode]
+    return [versionName, versionCode]
 }
 
 /**
