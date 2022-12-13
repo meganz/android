@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.cache.ExpiringCache
+import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
@@ -27,4 +28,9 @@ internal object LocalCacheModule {
     @Singleton
     internal fun providePricingCache(deviceGateway: DeviceGateway): Cache<Pricing> =
         ExpiringCache(deviceGateway, PRICING_CACHE_TIMEOUT_MILLISECONDS)
+
+    @Provides
+    @Singleton
+    internal fun provideNumberOfSubscriptionCache(): Cache<Long> =
+        PermanentCache()
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -85,6 +86,11 @@ interface MegaChatApiGateway {
      * Chat updates.
      */
     val chatUpdates: Flow<ChatUpdate>
+
+    /**
+     * Chat call updates
+     */
+    val chatCallUpdates: Flow<ChatCallUpdate>
 
     /**
      * Request the number of minutes since the user was seen as green by last time.
@@ -364,4 +370,31 @@ interface MegaChatApiGateway {
      * Get my chat status
      */
     fun getOnlineStatus(): Int
+
+    /**
+     *  Remove participant from chat
+     *
+     * @param chatId    Chat id
+     * @param handle    User handle
+     * @param listener  Listener
+     */
+    fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Update participant permissions
+     * @param chatId        Chat id.
+     * @param handle        User handle.
+     * @param privilege     User privilege.
+     * @param listener      Listener.
+     */
+    fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        privilege: Int,
+        listener: MegaChatRequestListenerInterface?,
+    )
 }

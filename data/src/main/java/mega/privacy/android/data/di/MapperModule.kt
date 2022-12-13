@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
+import mega.privacy.android.data.mapper.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
@@ -51,6 +52,7 @@ import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
+import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
@@ -67,8 +69,10 @@ import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
+import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toChatCall
 import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
@@ -449,6 +453,12 @@ internal class MapperModule {
     fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
 
     /**
+     * Provide chat call mapper
+     */
+    @Provides
+    fun provideChatCallMapper(): ChatCallMapper = ::toChatCall
+
+    /**
      * Provide country calling codes mapper
      */
     @Provides
@@ -472,4 +482,8 @@ internal class MapperModule {
      */
     @Provides
     fun provideVideoQualityIntMapper(): VideoQualityIntMapper = ::videoQualityToInt
+
+
+    @Provides
+    fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt
 }

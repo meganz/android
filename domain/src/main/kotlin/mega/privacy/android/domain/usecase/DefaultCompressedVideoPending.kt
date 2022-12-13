@@ -14,7 +14,8 @@ class DefaultCompressedVideoPending @Inject constructor(
 ) : CompressedVideoPending {
 
     override suspend fun invoke(): Boolean {
-        return cameraUploadRepository.getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS.value)
-            .isNotEmpty() && VideoQuality.ORIGINAL.toString() != cameraUploadRepository.getVideoQuality()
+        return cameraUploadRepository.getUploadVideoQuality() != VideoQuality.ORIGINAL && cameraUploadRepository.getVideoSyncRecordsByStatus(
+            SyncStatus.STATUS_TO_COMPRESS)
+            .isNotEmpty()
     }
 }

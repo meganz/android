@@ -897,7 +897,7 @@ public class SearchFragment extends RotatableFragment {
                     manageTextFileIntent(requireContext(), nodes.get(position), SEARCH_ADAPTER);
                 } else {
                     adapter.notifyDataSetChanged();
-                    onNodeTapped(context, nodes.get(position), ((ManagerActivity) context)::saveNodeByTap, (ManagerActivity) context, (ManagerActivity) context);
+                    onNodeTapped(context, nodes.get(position), ((ManagerActivity) context)::saveNodeByTap, (ManagerActivity) context, (ManagerActivity) context, false);
                 }
             }
         }

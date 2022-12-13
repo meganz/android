@@ -14,14 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -35,7 +32,6 @@ import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -63,9 +59,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.ContactStatus
 import mega.privacy.android.app.presentation.contact.DefaultContactAvatar
 import mega.privacy.android.app.presentation.contact.UriAvatar
@@ -85,7 +81,6 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.presentation.controls.MarqueeText
 import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.Typography
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_038
@@ -116,6 +111,7 @@ fun ScheduledMeetingInfoView(
     onBackPressed: () -> Unit,
     onDismiss: () -> Unit,
     onLeaveGroupDialog: () -> Unit,
+    onInviteParticipantsDialog: () -> Unit,
     onSnackbarShown: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -137,15 +133,20 @@ fun ScheduledMeetingInfoView(
             )
         }
     ) { paddingValues ->
+
+        LeaveGroupAlertDialog(
+            state = state,
+            onDismiss = { onDismiss() },
+            onLeave = { onLeaveGroupDialog() })
+
+        AddParticipantsAlertDialog(
+            state = state,
+            onDismiss = { onDismiss() },
+            onInvite = { onInviteParticipantsDialog() })
+
         LazyColumn(state = listState,
             modifier = Modifier.padding(paddingValues)) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
-            item(key = "Scheduled meeting dialog") {
-                ScheduledMeetingInfoAppBarAlertDialog(
-                    state = state,
-                    onDismiss = { onDismiss() },
-                    onLeave = { onLeaveGroupDialog() })
-            }
 
             state.apply {
                 items(buttons) { button ->
@@ -218,64 +219,60 @@ fun ScheduledMeetingInfoView(
  * @param onLeave                   When leave the group chat room
  */
 @Composable
-private fun ScheduledMeetingInfoAppBarAlertDialog(
+private fun LeaveGroupAlertDialog(
     state: ScheduledMeetingInfoState,
     onDismiss: () -> Unit,
     onLeave: () -> Unit,
 ) {
-
     if (state.leaveGroupDialog) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            properties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true
-            ),
-            confirmButton = {
-                TextButton(onClick = { onLeave() })
-                {
-                    Text(
-                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.teal_300) else colorResource(
-                            id = R.color.teal_200),
-                        text = stringResource(R.string.general_leave))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onDismiss() })
-                {
-                    Text(
-                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.teal_300) else colorResource(
-                            id = R.color.teal_200),
-                        text = stringResource(R.string.general_cancel))
-                }
-            },
-            title = {
-                Text(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth()
-                        .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                    textAlign = TextAlign.Center,
-                    style = Typography.h6,
-                    color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_087) else colorResource(
-                        id = R.color.white),
-                    fontWeight = FontWeight.Bold,
-                    text = stringResource(R.string.title_confirmation_leave_group_chat))
-            },
-            text = {
-                Text(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth()
-                        .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                    text = stringResource(id = R.string.confirmation_leave_group_chat),
-                    style = Typography.subtitle1,
-                    color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_060) else colorResource(
-                        id = R.color.white_alpha_060))
-            },
-            backgroundColor = if (MaterialTheme.colors.isLight) colorResource(id = R.color.white) else colorResource(
-                id = R.color.dark_grey)
-        )
+        SimpleDialog(
+            title = R.string.title_confirmation_leave_group_chat,
+            description = R.string.confirmation_leave_group_chat,
+            confirmButton = R.string.general_leave,
+            dismissButton = R.string.general_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onLeave)
+    }
+}
+
+/**
+ * Scheduled meeting info Alert Dialog
+ *
+ * @param state                     [ScheduledMeetingInfoState]
+ * @param onDismiss                 When dismiss the alert dialog
+ * @param onInvite                  When invite participants to group chat room
+ */
+@Composable
+private fun AddParticipantsAlertDialog(
+    state: ScheduledMeetingInfoState,
+    onDismiss: () -> Unit,
+    onInvite: () -> Unit,
+) {
+
+    if (state.addParticipantsNoContactsDialog) {
+        SimpleDialog(
+            title = R.string.chat_add_participants_no_contacts_title,
+            description = R.string.chat_add_participants_no_contacts_message,
+            confirmButton = R.string.contact_invite,
+            dismissButton = R.string.button_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onInvite)
+    }
+
+    if (state.addParticipantsNoContactsLeftToAddDialog) {
+        SimpleDialog(
+            title = R.string.chat_add_participants_no_contacts_left_to_add_title,
+            description = R.string.chat_add_participants_no_contacts_left_to_add_message,
+            confirmButton = R.string.contact_invite,
+            dismissButton = R.string.button_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onInvite)
     }
 }
 
@@ -1240,6 +1237,7 @@ fun PreviewScheduledMeetingInfoView() {
             onBackPressed = {},
             onDismiss = {},
             onLeaveGroupDialog = {},
+            onInviteParticipantsDialog = {},
             onSnackbarShown = {}
         )
     }

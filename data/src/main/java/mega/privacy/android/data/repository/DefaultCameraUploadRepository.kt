@@ -11,11 +11,13 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.exception.LocalStorageException
@@ -51,6 +53,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
+    private val syncStatusIntMapper: SyncStatusIntMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -311,9 +314,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             )
         }
 
-    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
+    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord> =
         withContext(ioDispatcher) {
-            localStorageGateway.getVideoSyncRecordsByStatus(syncStatusType)
+            localStorageGateway.getVideoSyncRecordsByStatus(syncStatusIntMapper(syncStatusType))
         }
 
     override suspend fun getChargingOnSizeString(): String = withContext(ioDispatcher) {

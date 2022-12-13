@@ -2,6 +2,8 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -27,6 +29,14 @@ interface ChatRepository {
      * @return [ChatRoom] containing the updated data.
      */
     suspend fun getChatRoom(chatId: Long): ChatRoom?
+
+    /**
+     * Gets chat call if it exists
+     *
+     * @param chatId    Chat Id
+     * @return          [ChatCall]
+     */
+    suspend fun getChatCall(chatId: Long): ChatCall?
 
     /**
      * Get a scheduled meeting given a chatId and a scheduled meeting id
@@ -181,6 +191,42 @@ interface ChatRepository {
     suspend fun queryChatLink(chatId: Long): ChatRequest
 
     /**
+     * Update chat permissions
+     *
+     * @param chatId        The chat id.
+     * @param handle        User handle.
+     * @param permission    User privilege.
+     * @return              The Chat Request.
+     */
+    suspend fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        permission: ChatRoomPermission,
+    ): ChatRequest
+
+    /**
+     * Remove participant from chat
+     *
+     * @param chatId    The Chat id.
+     * @param handle    User handle
+     * @return          [ChatRequest]
+     */
+    suspend fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+    ): ChatRequest
+
+    /**
+     * Invite contact
+     *
+     * @param email    User email
+     * @return
+     */
+    suspend fun inviteContact(
+        email: String,
+    ): Boolean
+
+    /**
      * Monitor updates on chat room item update
      *
      * @param chatId    Chat Id.
@@ -210,10 +256,24 @@ interface ChatRepository {
     suspend fun monitorChatListItemUpdates(): Flow<ChatListItem>
 
     /**
+     * Monitor chat call updates
+     *
+     * @return A flow of [ChatCall]
+     */
+    suspend fun monitorChatCallUpdates(): Flow<ChatCall>
+
+    /**
      * Returns whether notifications about a chat have to be generated.
      *
      * @param chatId    Chat id
      * @return          True if notifications has to be created, false otherwise.
      */
     suspend fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Monitor muted chats
+     *
+     * @return  A flow of Booleans indicating some changes has been made
+     */
+    fun monitorMutedChats(): Flow<Boolean>
 }

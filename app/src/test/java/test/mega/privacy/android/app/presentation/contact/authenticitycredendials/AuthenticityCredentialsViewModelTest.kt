@@ -14,11 +14,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsViewModel
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetCredentials
@@ -100,6 +102,13 @@ class AuthenticityCredentialsViewModelTest {
     private val monitorConnectivity =
         mock<MonitorConnectivity> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> {
+            onBlocking {
+                invoke(AppFeatures.MandatoryFingerprintVerification)
+            }.thenReturn(true)
+        }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
@@ -110,6 +119,7 @@ class AuthenticityCredentialsViewModelTest {
             verifyCredentials = verifyCredentials,
             resetCredentials = resetCredentials,
             monitorConnectivity = monitorConnectivity,
+            getFeatureFlagValue = getFeatureFlagValue,
         )
     }
 

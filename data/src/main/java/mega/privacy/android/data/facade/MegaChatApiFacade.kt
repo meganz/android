@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -15,6 +16,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -26,6 +28,7 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoomListenerInterface
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
+import nz.mega.sdk.MegaChatSession
 import javax.inject.Inject
 
 /**
@@ -118,6 +121,27 @@ internal class MegaChatApiFacade @Inject constructor(
 
             chatApi.addChatListener(listener)
             awaitClose { chatApi.removeChatListener(listener) }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    override val chatCallUpdates: Flow<ChatCallUpdate>
+        get() = callbackFlow {
+            val listener = object : MegaChatCallListenerInterface {
+                override fun onChatCallUpdate(api: MegaChatApiJava?, chatCall: MegaChatCall?) {
+                    trySend(ChatCallUpdate.OnChatCallUpdate(chatCall))
+                }
+
+                override fun onChatSessionUpdate(
+                    api: MegaChatApiJava?,
+                    chatId: Long,
+                    callId: Long,
+                    session: MegaChatSession?,
+                ) {
+                    trySend(ChatCallUpdate.OnChatSessionUpdate(chatId, callId, session))
+                }
+            }
+
+            chatApi.addChatCallListener(listener)
+            awaitClose { chatApi.removeChatCallListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate> = callbackFlow {
@@ -305,6 +329,19 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getMyFullname(): String = chatApi.myFullname
 
     override fun getMyEmail(): String = chatApi.myEmail
+
+    override fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.removeFromChat(chatId, handle, listener)
+
+    override fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        privilege: Int,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.updateChatPermissions(chatId, handle, privilege, listener)
 
     override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
 }

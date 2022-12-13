@@ -15,7 +15,7 @@ internal class DefaultGetAccountAchievements @Inject constructor(private val acc
         achievementType: AchievementType,
         awardIndex: Long,
     ): MegaAchievement? {
-        return if (accountRepository.isAccountAchievementsEnabled()) {
+        return if (accountRepository.areAccountAchievementsEnabled()) {
             accountRepository.getAccountAchievements(achievementType = achievementType,
                 awardIndex = awardIndex)
         } else {
