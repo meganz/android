@@ -137,6 +137,7 @@ ext {
     viewPagerVersion = '1.1.0-beta01'
     workVersion = '2.7.1'
     exifinterfaceVersion = '1.3.0'
+    zxingVersion = '3.4.0'
 }
 
 ext.isCiBuild = { ->
