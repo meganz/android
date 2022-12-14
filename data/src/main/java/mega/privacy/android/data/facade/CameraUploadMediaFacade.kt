@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.domain.entity.CameraUploadMedia
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.util.LinkedList
 import java.util.Queue
@@ -26,6 +27,22 @@ const val BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE"
  * Intent extra data if camera upload folder is secondary
  */
 const val INTENT_EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER"
+
+/**
+ * Intent action for broadcast to update camera upload destination folder in settings
+ */
+const val BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING =
+    "ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING"
+
+/**
+ * Intent extra data if camera upload destination folder is secondary
+ */
+const val INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY = "SECONDARY_FOLDER"
+
+/**
+ * Intent extra data of camera upload destination folder handle to be changed
+ */
+const val INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE = "PRIMARY_HANDLE"
 
 /**
  * Camera Upload Media Facade implements [CameraUploadMediaGateway]
@@ -51,10 +68,25 @@ internal class CameraUploadMediaFacade @Inject constructor(
         nodeHandle: Long,
         isSecondary: Boolean,
     ) {
-        val intent = Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE)
-        intent.putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary)
-        intent.putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
+        val intent = Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE).apply {
+            putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary)
+            putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
+        }
         context.sendBroadcast(intent)
+    }
+
+    override suspend fun sendUpdateFolderDestinationBroadcast(
+        nodeHandle: Long,
+        isSecondary: Boolean,
+    ) {
+        val destinationIntent =
+            Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).apply {
+                if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
+                    putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, isSecondary)
+                    putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, nodeHandle)
+                }
+            }
+        context.sendBroadcast(destinationIntent)
     }
 
     private fun createMediaCursor(

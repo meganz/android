@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import org.mockito.kotlin.mock
 
@@ -192,6 +193,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideUpdateFolderIconBroadcast() = mock<UpdateFolderIconBroadcast>()
+
+    @Provides
+    fun provideUpdateFolderDestinationBroadcast() = mock<UpdateFolderDestinationBroadcast>()
 
     @Provides
     fun provideGetCameraUploadSelectionQuery() = mock<GetCameraUploadSelectionQuery>()
