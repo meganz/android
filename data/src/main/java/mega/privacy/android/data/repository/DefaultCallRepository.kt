@@ -20,26 +20,24 @@ internal class DefaultCallRepository @Inject constructor(
         chatId: Long,
         video: Boolean,
         audio: Boolean,
-    ): ChatCall? {
-        cameraGateway.setFrontCamera()
+    ): ChatCall? =
         withContext(ioDispatcher) {
             runCatching {
+                cameraGateway.setFrontCamera()
                 chatRepository.startChatCall(chatId = chatId,
                     enabledVideo = video,
                     enabledAudio = audio)
             }.fold(
                 onSuccess = { request ->
                     request.chatHandle?.let { id ->
-                        chatRepository.getChatCall(id)
+                        return@withContext chatRepository.getChatCall(id)
                     }
+                    return@withContext null
                 },
                 onFailure = { exception ->
                     Timber.e(exception)
-                    null
+                    return@withContext null
                 }
             )
         }
-
-        return null
-    }
 }
