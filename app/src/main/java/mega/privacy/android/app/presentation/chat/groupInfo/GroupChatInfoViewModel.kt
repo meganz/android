@@ -22,7 +22,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
-import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.data.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.utils.CallUtil
