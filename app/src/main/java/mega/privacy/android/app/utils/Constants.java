@@ -403,7 +403,6 @@ public class Constants {
     public static final String NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING = "NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING";
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
     public static final int PRICING_MIN_DIFFERENCE = 720;
-    public static final int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
 
     public static final String HISTORY_RETENTION_DISABLED = "HISTORY_RETENTION_DISABLED";
     public static final String HISTORY_RETENTION_1_DAY = "HISTORY_RETENTION_1_DAY";

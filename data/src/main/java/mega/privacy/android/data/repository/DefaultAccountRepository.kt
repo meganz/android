@@ -261,6 +261,11 @@ internal class DefaultAccountRepository @Inject constructor(
             dbHandler.attributes?.accountDetailsTimeStamp
         }
 
+    override suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String? =
+        withContext(ioDispatcher) {
+            dbHandler.attributes?.extendedAccountDetailsTimeStamp
+        }
+
     override suspend fun getSpecificAccountDetail(
         storage: Boolean,
         transfer: Boolean,
