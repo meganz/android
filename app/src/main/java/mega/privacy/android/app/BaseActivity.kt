@@ -131,7 +131,6 @@ import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -157,7 +156,6 @@ import javax.inject.Inject
  * @property outMetrics                     [DisplayMetrics]
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
  * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
- * @property isDatabaseEntryStale
  * @property getAccountDetails
  */
 @AndroidEntryPoint
@@ -186,9 +184,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @Inject
     lateinit var loggingSettings: LegacyLoggingSettings
-
-    @Inject
-    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
 
     @JvmField
     var composite = CompositeDisposable()
@@ -901,7 +896,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     show()
                 }
                 INVITE_CONTACT_TYPE -> {
-                    setAction(R.string.contact_invite, SnackbarNavigateOption(view.context, type, userEmail))
+                    setAction(R.string.contact_invite,
+                        SnackbarNavigateOption(view.context, type, userEmail))
                     show()
                 }
                 DISMISS_ACTION_SNACKBAR -> {
@@ -938,10 +934,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
         lifecycleScope.launch {
-            if (isDatabaseEntryStale()) {
-                Timber.d("megaApi.getAccountDetails SEND")
-                getAccountDetails(true)
-            }
+            getAccountDetails(false)
         }
     }
 
