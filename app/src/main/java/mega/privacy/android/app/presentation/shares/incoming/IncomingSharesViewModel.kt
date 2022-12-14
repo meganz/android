@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -36,6 +37,7 @@ class IncomingSharesViewModel @Inject constructor(
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val getUnverifiedInComingShares: GetUnverifiedIncomingShares,
 ) : ViewModel() {
 
     /** private UI state */
@@ -76,6 +78,9 @@ class IncomingSharesViewModel @Inject constructor(
                 refreshNodes()?.let { setNodes(it) }
             }
             isMandatoryFingerprintRequired()
+            _state.update {
+                it.copy(unVerifiedInComingShares = getUnverifiedInComingShares())
+            }
         }
     }
 
