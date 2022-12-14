@@ -72,7 +72,6 @@ class MyAccountInfo @Inject constructor(
 
     var isInventoryFinished = false
     var isAccountDetailsFinished = false
-    var getPaymentMethodsBoolean = false
     var isBusinessAlertShown = false
     private var wasBusinessAlertAlreadyShown = false
 
@@ -125,7 +124,6 @@ class MyAccountInfo @Inject constructor(
 
         isInventoryFinished = false
         isAccountDetailsFinished = false
-        getPaymentMethodsBoolean = false
         isBusinessAlertShown = false
         wasBusinessAlertAlreadyShown = false
 
