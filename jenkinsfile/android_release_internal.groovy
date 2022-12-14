@@ -53,7 +53,7 @@ pipeline {
         CONSOLE_LOG_FILE = 'console.txt'
 
         // CD pipeline uses this environment variable to assign version code
-        APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDHHmm', TimeZone.getTimeZone("GMT"))}"
+        APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }

@@ -20,7 +20,7 @@ def readVersionCode() {
     if (versionCode != null && !versionCode.isEmpty()) {
         return versionCode.toInteger()
     } else {
-        return new Date().format("yyDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
+        return new Date().format("yyDDDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
     }
 }
 
