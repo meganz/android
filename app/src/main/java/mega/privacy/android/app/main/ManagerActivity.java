@@ -8197,7 +8197,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            ((MegaApplication) getApplication()).askForFullAccountInfo();
+            viewModel.askForFullAccountInfo();
             viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {

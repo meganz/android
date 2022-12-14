@@ -108,6 +108,10 @@ class ManagerViewModelTest {
             broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
             getPricing = mock(),
+            getAccountDetails = mock(),
+            getNumberOfSubscription = mock(),
+            getPaymentMethod = mock(),
+            getSpecificAccountDetail = mock()
         )
     }
 
