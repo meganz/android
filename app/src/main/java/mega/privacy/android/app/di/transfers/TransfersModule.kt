@@ -10,6 +10,7 @@ import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
+import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.AreTransfersPaused
@@ -68,6 +69,17 @@ abstract class TransfersModule {
         @Provides
         fun provideCancelAllUploadTransfers(transfersRepository: TransferRepository): CancelAllUploadTransfers =
             CancelAllUploadTransfers(transfersRepository::cancelAllUploadTransfers)
+
+        /**
+         * Provides the [StartUpload] implementation
+         *
+         * @param transfersRepository [TransfersRepository]
+         * @return [StartUpload]
+         *
+         */
+        @Provides
+        fun provideStartUpload(transfersRepository: TransfersRepository): StartUpload =
+            StartUpload(transfersRepository::startUpload)
 
         /**
          * Provides the [AreTransfersPaused] implementation

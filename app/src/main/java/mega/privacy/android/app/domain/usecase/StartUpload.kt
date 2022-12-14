@@ -1,25 +1,17 @@
-package mega.privacy.android.data.repository
+package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaTransfer
 
 /**
- * Transfers Repository
+ * Use Case to upload a file or folder
  */
-interface TransfersRepository {
+fun interface StartUpload {
 
     /**
-     * Cancels a [MegaTransfer]
-     *
-     * @param transfer the [MegaTransfer] to cancel
-     */
-    suspend fun cancelTransfer(transfer: MegaTransfer)
-
-    /**
-     * Upload a file or folder
+     * Invokes the Use Case to upload a file or folder
      *
      * @param localPath The local path of the file or folder
      * @param parentNode The parent node for the file or folder
@@ -35,9 +27,9 @@ interface TransfersRepository {
      * @param cancelToken The token to cancel an ongoing file or folder upload, which can be
      * nullable
      *
-     * @return a Flow of [GlobalTransfer]
+     * @return A flow of [GlobalTransfer]
      */
-    fun startUpload(
+    suspend operator fun invoke(
         localPath: String,
         parentNode: MegaNode,
         fileName: String?,

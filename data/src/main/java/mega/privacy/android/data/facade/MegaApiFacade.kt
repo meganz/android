@@ -71,6 +71,36 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.createSupportTicket(ticketContent, ANDROID_SUPPORT_ISSUE, listener)
     }
 
+    override fun startUpload(
+        localPath: String,
+        parentNode: MegaNode,
+        fileName: String?,
+        modificationTime: Long,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        shouldStartFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+        listener: MegaTransferListenerInterface,
+    ) {
+        megaApi.startUpload(
+            localPath,
+            parentNode,
+            fileName,
+            modificationTime,
+            appData,
+            isSourceTemporary,
+            shouldStartFirst,
+            cancelToken,
+            listener,
+        )
+    }
+
+    override fun addTransferListener(listener: MegaTransferListenerInterface) =
+        megaApi.addTransferListener(listener)
+
+    override fun removeTransferListener(listener: MegaTransferListenerInterface) =
+        megaApi.removeTransferListener(listener)
+
     override fun startUploadForSupport(
         path: String,
         listener: MegaTransferListenerInterface,
