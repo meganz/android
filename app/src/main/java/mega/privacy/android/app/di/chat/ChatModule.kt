@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.DefaultGetMeetings
+import mega.privacy.android.domain.usecase.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -51,6 +53,12 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindGetMeetings(useCase: DefaultGetMeetings): GetMeetings
+
+    /**
+     * Open call or start call and open it
+     */
+    @Binds
+    abstract fun bindOpenOrStartChatCall(useCase: DefaultOpenOrStartCall): OpenOrStartCall
 
     companion object {
         /**
