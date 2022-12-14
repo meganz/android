@@ -287,6 +287,13 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             cameraUploadMediaGateway.sendUpdateFolderIconBroadcast(nodeHandle, isSecondary)
         }
 
+    override suspend fun sendUpdateFolderDestinationBroadcast(
+        nodeHandle: Long,
+        isSecondary: Boolean,
+    ) = withContext(ioDispatcher) {
+        cameraUploadMediaGateway.sendUpdateFolderDestinationBroadcast(nodeHandle, isSecondary)
+    }
+
     override suspend fun getMediaQueue(
         mediaStoreFileType: MediaStoreFileType,
         parentPath: String?,

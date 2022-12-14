@@ -30,13 +30,12 @@ internal class DefaultCallRepository @Inject constructor(
             }.fold(
                 onSuccess = { request ->
                     request.chatHandle?.let { id ->
-                        return@withContext chatRepository.getChatCall(id)
+                        chatRepository.getChatCall(id)
                     }
-                    return@withContext null
                 },
                 onFailure = { exception ->
                     Timber.e(exception)
-                    return@withContext null
+                    null
                 }
             )
         }

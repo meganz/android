@@ -73,6 +73,11 @@ fun TimelineView(
     photosGridView: @Composable () -> Unit,
     emptyView: @Composable () -> Unit,
 ) {
+    val isBarVisible by remember {
+        derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
+    }
+    val isScrollingDown = lazyGridState.isScrollingDown()
+
     if (timelineViewState.enableCameraUploadPageShowing) {
         enableCUView()
     } else if (timelineViewState.loadPhotosDone && timelineViewState.currentShowingPhotos.isEmpty()) {
@@ -83,11 +88,6 @@ fun TimelineView(
             when (timelineViewState.selectedTimeBarTab) {
                 TimeBarTab.All -> {
                     Column {
-                        val isBarVisible by remember {
-                            derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
-                        }
-
-                        val isScrollingDown = lazyGridState.isScrollingDown()
                         if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0) {
                             EnableCameraUploadButton(onClick = onTextButtonClick) {
                                 isBarVisible || !isScrollingDown
@@ -141,7 +141,7 @@ fun TimelineView(
                         onTimeBarTabSelected = onTimeBarTabSelected,
                         selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
                     ) {
-                        timelineViewState.selectedTimeBarTab == TimeBarTab.All || !scrollInProgress
+                        isBarVisible || !isScrollingDown
                     }
                 }
             }

@@ -126,6 +126,13 @@ interface AccountRepository {
     suspend fun getAccountDetailsTimeStampInSeconds(): String?
 
     /**
+     * Get extended account details time stamp
+     *
+     * @return the latest account detail time stamp
+     */
+    suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String?
+
+    /**
      * Get specific account detail
      *
      * @param storage

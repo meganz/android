@@ -76,6 +76,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -114,6 +115,7 @@ class MyAccountViewModel @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getNumberOfSubscription: GetNumberOfSubscription,
+    private val getPaymentMethod: GetPaymentMethod,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -432,6 +434,7 @@ class MyAccountViewModel @Inject constructor(
                 viewModelScope.launch {
                     getAccountDetails(true)
                     getExtendedAccountDetail(
+                        forceRefresh = true,
                         sessions = true,
                         purchases = false,
                         transactions = false
@@ -979,5 +982,20 @@ class MyAccountViewModel @Inject constructor(
      */
     fun setOpenUpgradeFrom() {
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
+    }
+
+    /**
+     * Refresh account info
+     *
+     */
+    fun refreshAccountInfo() {
+        viewModelScope.launch {
+            getAccountDetails(forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty())
+            getExtendedAccountDetail(forceRefresh = false,
+                sessions = true,
+                purchases = false,
+                transactions = false)
+            getPaymentMethod(false)
+        }
     }
 }

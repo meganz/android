@@ -2,7 +2,6 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -12,14 +11,16 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.facade.BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
+import mega.privacy.android.data.facade.INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE
+import mega.privacy.android.data.facade.INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaStringMap
 import timber.log.Timber
-import kotlin.getValue
-import kotlin.lazy
 
 /**
  * SetAttrUserListener
@@ -96,9 +97,11 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                     MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER -> if (e.errorCode == MegaError.API_OK) {
                         val prefs = databaseHandler.preferences ?: return
                         // Database and preference update
-                        Timber.d("Set CU folders successfully primary: %d, secondary: %d",
+                        Timber.d(
+                            "Set CU folders successfully primary: %d, secondary: %d",
                             nodeHandle,
-                            parentHandle)
+                            parentHandle
+                        )
                         if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
                             CameraUploadUtil.resetPrimaryTimeline()
                             databaseHandler.setCamSyncHandle(nodeHandle)
@@ -115,8 +118,10 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                             CameraUploadUtil.resetSecondaryTimeline()
                             databaseHandler.setSecondaryFolderHandle(parentHandle)
                             prefs.megaHandleSecondaryFolder = parentHandle.toString()
-                            CameraUploadUtil.forceUpdateCameraUploadFolderIcon(true,
-                                parentHandle)
+                            CameraUploadUtil.forceUpdateCameraUploadFolderIcon(
+                                true,
+                                parentHandle
+                            )
                             //make sure to start the process once secondary is enabled
                             (context as? CameraUploadsService)?.onSetFolderAttribute() ?: run {
                                 Timber.d("Start CU by set primary, try to start CU, true.")
@@ -124,21 +129,23 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                                 JobUtil.fireCameraUploadJob(context, true)
                             }
                         }
-                        Intent(BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).run {
+                        Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).run {
                             if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
-                                putExtra(BroadcastConstants.SECONDARY_FOLDER, false)
-                                putExtra(BroadcastConstants.PRIMARY_HANDLE, nodeHandle)
+                                putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, false)
+                                putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, nodeHandle)
                             }
                             if (parentHandle != MegaApiJava.INVALID_HANDLE) {
-                                putExtra(BroadcastConstants.SECONDARY_FOLDER, true)
-                                putExtra(BroadcastConstants.PRIMARY_HANDLE, parentHandle)
+                                putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, true)
+                                putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, parentHandle)
                             }
                             MegaApplication.getInstance().sendBroadcast(this)
                         }
                     } else {
-                        Timber.w("Set CU attributes failed, error code: %d, %s",
+                        Timber.w(
+                            "Set CU attributes failed, error code: %d, %s",
                             e.errorCode,
-                            e.errorString)
+                            e.errorString
+                        )
                         JobUtil.fireStopCameraUploadJob(context)
                     }
                     MegaApiJava.USER_ATTR_RUBBISH_TIME -> if (e.errorCode == MegaError.API_OK) {
