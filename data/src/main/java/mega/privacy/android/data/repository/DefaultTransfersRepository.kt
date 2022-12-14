@@ -97,15 +97,12 @@ internal class DefaultTransfersRepository @Inject constructor(
         },
         onTransferFinish = { transfer, error ->
             channel.trySend(GlobalTransfer.OnTransferFinish(transfer, error))
-            // Close the Callback Flow when the Transfer is completed
-            channel.close()
         },
         onTransferUpdate = { transfer ->
             channel.trySend(GlobalTransfer.OnTransferUpdate(transfer))
         },
         onTransferTemporaryError = { transfer, error ->
-            channel.trySend(GlobalTransfer.OnTransferTemporaryError(transfer,
-                error))
+            channel.trySend(GlobalTransfer.OnTransferTemporaryError(transfer, error))
         },
         onTransferData = { transfer, buffer ->
             channel.trySend(GlobalTransfer.OnTransferData(transfer, buffer))

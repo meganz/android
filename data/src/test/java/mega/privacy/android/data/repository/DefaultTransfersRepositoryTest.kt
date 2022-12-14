@@ -90,7 +90,6 @@ class DefaultTransfersRepositoryTest {
         }
         startUploadFlow().test {
             assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferFinish::class.java)
-            awaitComplete()
         }
         verify(cancelToken).cancel()
         verify(megaApiGateway).removeTransferListener(any())
