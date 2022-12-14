@@ -57,7 +57,7 @@ class FileFacade @Inject constructor(
 
     @Suppress("DEPRECATION")
     @Throws(IOException::class)
-    override suspend fun deleteFolderAndSubFolders(f: File?) {
+    override fun deleteFolderAndSubFolders(f: File?) {
         f ?: return
         Timber.d("deleteFolderAndSubfolders: %s", f.absolutePath)
         val files = f.takeIf { it.isDirectory }?.listFiles().orEmpty()

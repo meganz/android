@@ -39,7 +39,7 @@ Install NDK r21d by Android Studio following [these instructions](https://develo
 
 Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`  to point to your Android NDK installation path.
 
-Default macOS path:  `export NDK_ROOT="/Users/YOUR_USER_NAME/Library/Android/sdk/ndk/21.3.6528147"`
+Default macOS path:  `export NDK_ROOT="/Users/${USER}/Library/Android/sdk/ndk/21.3.6528147"`
 
 `ln -s /path/to/ndk ${HOME}/android-ndk`
 
@@ -57,7 +57,7 @@ Export  `ANDROID_HOME`  variable or create a symbolic link at  `${HOME}/android-
 
 Export  `ANDROID_HOME`  variable or create a symbolic link at  `${HOME}/android-sdk`  to point to your Android SDK installation path.
 
-Default macOS path: `export ANDROID_HOME="/Users/YOUR_USER_NAME/Library/Android/sdk/"`)
+Default macOS path: `export ANDROID_HOME="/Users/${USER}/Library/Android/sdk/"`)
 
 `ln -s /path/to/sdk ${HOME}/android-sdk`
 
@@ -137,7 +137,7 @@ Then install CMake version 3.22.1 in `Android Studio > Tools > SDK Manager > SDK
 
 You have to tick checkbox 'Show Package Details' to display this specific version. After installation, add below line in  `~/.zshrc`
 
-`export PATH="/Users/<USER_NAME>/Library/Android/sdk/cmake/3.22.1/bin:$PATH"`
+`export PATH="/Users/${USER}/Library/Android/sdk/cmake/3.22.1/bin:$PATH"`
 
 ### 8. Running the Build Script
 

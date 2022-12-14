@@ -45,18 +45,15 @@ import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.ChangeApiServerUtil
 import mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -94,12 +91,10 @@ import javax.inject.Inject
  * @property localIpAddress
  * @property isEsid
  * @property monitorStorageStateEvent
- * @property isDatabaseEntryStale
  * @property globalNetworkStateHandler
  * @property getSpecificAccountDetail
  * @property applicationScope
  * @property getAccountDetails
- * @property getExtendedAccountDetail
  * @property getPaymentMethod
  */
 @HiltAndroidApp
@@ -176,9 +171,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
 
     @Inject
-    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
-
-    @Inject
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
 
     @Inject
@@ -190,9 +182,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var getAccountDetails: GetAccountDetails
-
-    @Inject
-    lateinit var getExtendedAccountDetail: GetExtendedAccountDetail
 
     @Inject
     lateinit var getPaymentMethod: GetPaymentMethod
@@ -337,49 +326,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             }
             getPricing(true)
             getNumberOfSubscription(true)
-        }
-    }
-
-    /**
-     * Ask for account details
-     *
-     */
-    private fun askForAccountDetails() {
-        applicationScope.launch {
-            Timber.d("askForAccountDetails")
-            getAccountDetails(true)
-        }
-    }
-
-    /**
-     * Ask for extended account details
-     *
-     */
-    private fun askForExtendedAccountDetails() {
-        Timber.d("askForExtendedAccountDetails")
-        applicationScope.launch {
-            getExtendedAccountDetail(sessions = true, purchases = false, transactions = false)
-        }
-    }
-
-    /**
-     * Refresh account info
-     *
-     */
-    fun refreshAccountInfo() {
-        //Check if the call is recently
-        applicationScope.launch {
-            if (isDatabaseEntryStale()
-                || myAccountInfo.usedFormatted.trim().isEmpty()
-            ) {
-                Timber.d("megaApi.getAccountDetails SEND")
-                askForAccountDetails()
-            }
-            if (DBUtil.callToExtendedAccountDetails()) {
-                Timber.d("megaApi.getExtendedAccountDetails SEND")
-                askForExtendedAccountDetails()
-            }
-            getPaymentMethod(false)
         }
     }
 

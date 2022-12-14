@@ -13,6 +13,7 @@ fun interface GetExtendedAccountDetail {
      * @param transactions
      */
     suspend operator fun invoke(
+        forceRefresh: Boolean,
         sessions: Boolean,
         purchases: Boolean,
         transactions: Boolean,

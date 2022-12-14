@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.di.EntryPointsModule
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -112,8 +113,8 @@ object CacheFolderManager {
 
     @JvmStatic
     @Suppress("UNUSED_PARAMETER")
-    fun clearCache(context: Context) {
-        cacheFolderGateway.clearCache()
+    fun clearCache() {
+        runBlocking { cacheFolderGateway.clearCache() }
     }
 
     @JvmStatic

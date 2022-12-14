@@ -12,10 +12,12 @@ import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.DefaultGetMeetings
+import mega.privacy.android.domain.usecase.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -23,9 +25,11 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
+import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.UpdateChatPermissions
 
 /**
  * Chats module.
@@ -55,6 +59,13 @@ abstract class ChatModule {
         @Provides
         fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
             GetChatRoom(chatRepository::getChatRoom)
+
+        /**
+         * Provides the Use Case [GetChatCall]
+         */
+        @Provides
+        fun provideGetChatCall(chatRepository: ChatRepository): GetChatCall =
+            GetChatCall(chatRepository::getChatCall)
 
         /**
          * Provides the Use Case [GetScheduledMeetingByChat]
@@ -153,5 +164,26 @@ abstract class ChatModule {
         @Provides
         fun provideMonitorChatListItemUpdates(chatRepository: ChatRepository): MonitorChatListItemUpdates =
             MonitorChatListItemUpdates(chatRepository::monitorChatListItemUpdates)
+
+        /**
+         * Provides the Use Case [UpdateChatPermissions]
+         */
+        @Provides
+        fun provideUpdateChatPermissions(chatRepository: ChatRepository): UpdateChatPermissions =
+            UpdateChatPermissions(chatRepository::updateChatPermissions)
+
+        /**
+         * Provides the Use Case [RemoveFromChat]
+         */
+        @Provides
+        fun provideRemoveFromChat(chatRepository: ChatRepository): RemoveFromChat =
+            RemoveFromChat(chatRepository::removeFromChat)
+
+        /**
+         * Provides the Use Case [InviteContact]
+         */
+        @Provides
+        fun provideInviteContact(chatRepository: ChatRepository): InviteContact =
+            InviteContact(chatRepository::inviteContact)
     }
 }

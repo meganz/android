@@ -640,4 +640,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun isChatNotifiable(chatId: Long): Boolean =
         megaApi.isChatNotifiable(chatId)
+
+    override fun inviteContact(email: String, listener: MegaRequestListenerInterface) =
+        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, listener)
 }

@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Check if local folder attribute changed
+ * Check if local folder attribute changed and reset timelines
  *
  */
 interface ResetCameraUploadTimelines {

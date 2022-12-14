@@ -67,7 +67,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "6.22.1"
+    appVersion = "7.0"
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -76,7 +76,7 @@ ext {
     buildToolsVerion = '31.0.0'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20221129.151121-dev'
+    megaSdkVersion = '20221213.092045-rel'
 
     // App dependencies
     accompanistLayoutVersion = '0.24.13-rc'
@@ -136,6 +136,7 @@ ext {
     viewPagerVersion = '1.1.0-beta01'
     workVersion = '2.7.1'
     exifinterfaceVersion = '1.3.0'
+    zxingVersion = '3.4.0'
 }
 
 ext.isCiBuild = { ->

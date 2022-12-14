@@ -240,7 +240,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onResume() {
         super.onResume()
-        app?.refreshAccountInfo()
+        viewModel.refreshAccountInfo()
     }
 
     override fun onPostResume() {
@@ -397,7 +397,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      */
     private fun updateInfo() {
         viewModel.checkVersions()
-        app?.refreshAccountInfo()
+        viewModel.refreshAccountInfo()
     }
 
     private fun setupObservers() {

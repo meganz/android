@@ -27,7 +27,7 @@ public class ManageCacheTask extends AsyncTask<String, Void, String> {
         Timber.d("doInBackground-Async Task ManageCacheTask");
 
         if (isClearOption) {
-            clearCache(MegaApplication.getInstance());
+            clearCache();
         }
 
         return Util.getSizeString(getCacheSize());

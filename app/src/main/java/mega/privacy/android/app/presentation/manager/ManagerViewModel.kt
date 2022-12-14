@@ -426,7 +426,12 @@ class ManagerViewModel @Inject constructor(
     fun askForExtendedAccountDetails() {
         Timber.d("askForExtendedAccountDetails")
         viewModelScope.launch {
-            getExtendedAccountDetail(sessions = true, purchases = false, transactions = false)
+            getExtendedAccountDetail(
+                forceRefresh = true,
+                sessions = true,
+                purchases = false,
+                transactions = false,
+            )
         }
     }
 

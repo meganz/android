@@ -7,22 +7,25 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DefaultGetExtendedAccountDetailTest {
-    private lateinit var underTest: GetExtendedAccountDetail
+    private lateinit var underTest: DefaultGetExtendedAccountDetail
     private val accountRepository = mock<AccountRepository>()
+    private val isExtendedAccountDetailStale = mock<IsExtendedAccountDetailStale>()
 
     @Before
     fun setUp() {
         underTest = DefaultGetExtendedAccountDetail(
             repository = accountRepository,
+            isExtendedAccountDetailStale = isExtendedAccountDetailStale,
         )
     }
 
     @Test
     fun `test that invoke correct account repository method`() = runTest {
-        underTest(sessions = true, purchases = true, transactions = true)
+        underTest(forceRefresh = true, sessions = true, purchases = true, transactions = true)
         verify(accountRepository).resetExtendedAccountDetailsTimestamp()
         verify(accountRepository).getExtendedAccountDetails(
             sessions = true,
@@ -30,4 +33,17 @@ internal class DefaultGetExtendedAccountDetailTest {
             transactions = true
         )
     }
+
+    @Test
+    fun `test that invoke correct account repository method if isExtendedAccountDetailStale true`() =
+        runTest {
+            whenever(isExtendedAccountDetailStale()).thenReturn(true)
+            underTest(forceRefresh = false, sessions = true, purchases = true, transactions = true)
+            verify(accountRepository).resetExtendedAccountDetailsTimestamp()
+            verify(accountRepository).getExtendedAccountDetails(
+                sessions = true,
+                purchases = true,
+                transactions = true
+            )
+        }
 }

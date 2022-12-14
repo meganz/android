@@ -260,7 +260,7 @@ public class FileUtil {
                 Uri contentUri;
                 try {
                     contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     contentUri = Uri.fromFile(fileToDelete);
                 }
                 mediaScanIntent.setData(contentUri);
@@ -572,8 +572,9 @@ public class FileUtil {
      */
     public static File getDownloadLocationForPreviewingFiles() {
         Context context = MegaApplication.getInstance();
-        File downloadsDir = context.getExternalFilesDir(DOWNLOAD_DIR);
-        return downloadsDir != null ? downloadsDir : context.getFilesDir();
+        // Using cache to save the files for previewing
+        File downloadsDir = context.getExternalCacheDir();
+        return downloadsDir != null ? downloadsDir : context.getCacheDir();
     }
 
     public static String getDownloadLocation() {

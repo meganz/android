@@ -14,6 +14,8 @@ import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.IsExtendedAccountDetailStale
+import mega.privacy.android.domain.usecase.impl.DefaultIsExtendedAccountDetailStale
 
 /**
  * Shared use case module
@@ -30,6 +32,9 @@ internal abstract class InternalSharedUseCaseModule {
      */
     @Binds
     abstract fun bindIsDatabaseEntryStale(implementation: DefaultIsDatabaseEntryStale): IsDatabaseEntryStale
+
+    @Binds
+    abstract fun bindIsExtendedAccountDetailStale(implementation: DefaultIsExtendedAccountDetailStale): IsExtendedAccountDetailStale
 
     /**
      * Bind get extended account detail
