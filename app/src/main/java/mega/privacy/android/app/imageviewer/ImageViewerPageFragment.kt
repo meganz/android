@@ -3,6 +3,7 @@ package mega.privacy.android.app.imageviewer
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Size
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -17,6 +18,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils.ScaleType
 import com.facebook.imagepipeline.common.Priority
+import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.memory.BasePool
@@ -28,6 +30,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.PerformanceRequestListener
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import timber.log.Timber
@@ -41,7 +44,8 @@ class ImageViewerPageFragment : Fragment() {
 
     companion object {
         private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
-        private const val ZOOM_MAX_SCALE_FACTOR = 20f
+        private const val MAX_ZOOM_SCALE_FACTOR = 20f
+        private const val MAX_BITMAP_SIZE = 4096
         private const val PERF_TRACE_NAME = "full_image_loading"
 
         /**
@@ -71,6 +75,7 @@ class ImageViewerPageFragment : Fragment() {
     private val itemId by lazy { arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id") }
     private val enableZoom by lazy { arguments?.getBoolean(EXTRA_ENABLE_ZOOM, true) ?: true }
     private val controllerListener by lazy { buildImageControllerListener() }
+    private val screenSize: Size by lazy { requireContext().getScreenSize() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,7 +123,7 @@ class ImageViewerPageFragment : Fragment() {
             setZoomingEnabled(enableZoom)
             setAllowTouchInterceptionWhileZoomed(!enableZoom)
             setIsLongpressEnabled(enableZoom)
-            setMaxScaleFactor(ZOOM_MAX_SCALE_FACTOR)
+            setMaxScaleFactor(MAX_ZOOM_SCALE_FACTOR)
             if (enableZoom) {
                 setTapListener(
                     MultiTapGestureListener(
@@ -327,6 +332,13 @@ class ImageViewerPageFragment : Fragment() {
                     Priority.HIGH
                 } else {
                     Priority.LOW
+                }
+            )
+            .setResizeOptions(
+                if (isFullImage) {
+                    ResizeOptions(MAX_BITMAP_SIZE, MAX_BITMAP_SIZE, MAX_BITMAP_SIZE.toFloat())
+                } else {
+                    ResizeOptions.forDimensions(screenSize.width, screenSize.height)
                 }
             )
             .setCacheChoice(

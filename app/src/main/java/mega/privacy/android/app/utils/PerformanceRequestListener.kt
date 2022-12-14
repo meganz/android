@@ -20,6 +20,14 @@ class PerformanceRequestListener(
 
     private var trace: Trace? = null
 
+    /**
+     * Called when request is about to be submitted to the Orchestrator's executor queue.
+     *
+     * @param request which triggered the event
+     * @param callerContext context of the caller of the request
+     * @param requestId unique id generated automatically for each request submission
+     * @param isPrefetch whether the request is a prefetch or not
+     */
     override fun onRequestStart(
         request: ImageRequest,
         callerContext: Any?,
@@ -34,6 +42,13 @@ class PerformanceRequestListener(
         }
     }
 
+    /**
+     * Called after successful completion of the request (all producers completed successfully).
+     *
+     * @param request which triggered the event
+     * @param requestId unique id generated automatically for each request submission
+     * @param isPrefetch whether the request is a prefetch or not
+     */
     override fun onRequestSuccess(
         request: ImageRequest,
         requestId: String,
@@ -43,6 +58,14 @@ class PerformanceRequestListener(
         trace = null
     }
 
+    /**
+     * Called after failure to complete the request (some producer failed).
+     *
+     * @param request which triggered the event
+     * @param requestId unique id generated automatically for each request submission
+     * @param throwable cause of failure
+     * @param isPrefetch whether the request is a prefetch or not
+     */
     override fun onRequestFailure(
         request: ImageRequest,
         requestId: String,
@@ -54,6 +77,11 @@ class PerformanceRequestListener(
         trace = null
     }
 
+    /**
+     * Called after the request is cancelled.
+     *
+     * @param requestId unique id generated automatically for each request submission
+     */
     override fun onRequestCancellation(
         requestId: String,
     ) {
@@ -62,12 +90,25 @@ class PerformanceRequestListener(
         trace = null
     }
 
+    /**
+     * On producer start
+     *
+     * @param requestId
+     * @param producerName
+     */
     override fun onProducerStart(
         requestId: String,
         producerName: String,
     ) {
     }
 
+    /**
+     * On producer event
+     *
+     * @param requestId
+     * @param producerName
+     * @param eventName
+     */
     override fun onProducerEvent(
         requestId: String,
         producerName: String,
@@ -75,6 +116,13 @@ class PerformanceRequestListener(
     ) {
     }
 
+    /**
+     * On producer finish with success
+     *
+     * @param requestId
+     * @param producerName
+     * @param extraMap
+     */
     override fun onProducerFinishWithSuccess(
         requestId: String,
         producerName: String,
@@ -82,6 +130,14 @@ class PerformanceRequestListener(
     ) {
     }
 
+    /**
+     * On producer finish with failure
+     *
+     * @param requestId
+     * @param producerName
+     * @param t
+     * @param extraMap
+     */
     override fun onProducerFinishWithFailure(
         requestId: String,
         producerName: String,
@@ -90,6 +146,13 @@ class PerformanceRequestListener(
     ) {
     }
 
+    /**
+     * On producer finish with cancellation
+     *
+     * @param requestId
+     * @param producerName
+     * @param extraMap
+     */
     override fun onProducerFinishWithCancellation(
         requestId: String,
         producerName: String,
@@ -97,6 +160,13 @@ class PerformanceRequestListener(
     ) {
     }
 
+    /**
+     * On ultimate producer reached
+     *
+     * @param requestId
+     * @param producerName
+     * @param successful
+     */
     override fun onUltimateProducerReached(
         requestId: String,
         producerName: String,
@@ -104,11 +174,22 @@ class PerformanceRequestListener(
     ) {
     }
 
+    /**
+     * Requires extra map
+     *
+     * @param requestId
+     * @return
+     */
     override fun requiresExtraMap(
         requestId: String,
     ): Boolean =
         false
 
+    /**
+     * Get file size in bytes as a String
+     *
+     * @return  File size
+     */
     private fun File?.getSizeInBytes(): String =
         try {
             requireNotNull(this)
