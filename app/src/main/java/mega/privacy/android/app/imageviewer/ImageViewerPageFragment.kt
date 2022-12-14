@@ -3,7 +3,6 @@ package mega.privacy.android.app.imageviewer
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Size
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -23,14 +22,16 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.memory.BasePool
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
+import com.google.firebase.perf.FirebasePerformance
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.ContextUtils.getScreenSize
+import mega.privacy.android.app.utils.PerformanceRequestListener
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Image Viewer page that shows an individual image within a list of image items
@@ -41,6 +42,7 @@ class ImageViewerPageFragment : Fragment() {
     companion object {
         private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
         private const val ZOOM_MAX_SCALE_FACTOR = 20f
+        private const val PERF_TRACE_NAME = "full_image_loading"
 
         /**
          * Main method to create a ImageViewerPageFragment.
@@ -57,6 +59,9 @@ class ImageViewerPageFragment : Fragment() {
                 }
             }
     }
+
+    @Inject
+    lateinit var firebasePerf: FirebasePerformance
 
     private lateinit var binding: PageImageViewerBinding
 
@@ -310,6 +315,13 @@ class ImageViewerPageFragment : Fragment() {
     private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? =
         ImageRequestBuilder.newBuilderWithSource(this)
             .setRotationOptions(RotationOptions.autoRotate())
+            .setRequestListener(
+                if (isFullImage) {
+                    PerformanceRequestListener(firebasePerf, PERF_TRACE_NAME)
+                } else {
+                    null
+                }
+            )
             .setRequestPriority(
                 if (lifecycle.currentState == Lifecycle.State.RESUMED) {
                     Priority.HIGH
