@@ -245,7 +245,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Partajări primite cu</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Niciun fișier în unitatea cloud</string>
+    <string name="file_browser_empty_cloud_drive">Niciun fișier în Unitatea cloud</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Folder gol</string>
     <!-- Title of the fragment Choose Account -->
@@ -1333,11 +1333,11 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importă</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Adaugă în unitatea cloud</string>
+    <string name="add_to_cloud_node_chat">Adaugă în Unitatea cloud</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Vezi contactele</string>
     <!-- Menu option -->
-    <string name="import_success_error">Eroare. Nu a fost adăugat în unitatea cloud</string>
+    <string name="import_success_error">Eroare. Nu a fost adăugat în Unitatea cloud</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Se conectează&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1411,7 +1411,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Niciun fișier selectat</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Din unitatea cloud</string>
+    <string name="attachment_upload_panel_from_cloud">Din Unitatea cloud</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1603,7 +1603,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Contul utilizatorului</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Salvează în \nunitatea mea cloud</string>
+    <string name="save_to_mega">Salvează în \nUnitatea mea cloud</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">Chatul există deja</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1631,7 +1631,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Șterge codul QR</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">În unitatea cloud</string>
+    <string name="save_cloud_drive">În Unitatea cloud</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">În sistemul de fișiere</string>
     <!-- Title of QR code section -->
@@ -1693,7 +1693,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Niciun fișier în [/B][A]unitatea cloud[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Niciun fișier în [/B][A]Unitatea cloud[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Niciun fișier [/B][A]salvat pentru offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -2300,7 +2300,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Invitația către contactul %s a fost trimisă înainte și poate fi consultată în fila Cereri trimise.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Se salvează %s în unitatea cloud&#8230;</string>
+    <string name="save_qr_cloud_drive">Se salvează %s în Unitatea cloud&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Fișiere</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2668,7 +2668,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Chat criptat</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Chat complet criptat cu apeluri vocale și video, mesagerie de grup și integrare pentru partajarea de fișiere din unitatea cloud.</string>
+    <string name="content_tour_two">Chat complet criptat cu apeluri vocale și video, mesagerie de grup și integrare pentru partajarea de fișiere din Unitatea cloud.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Creează-ți rețeaua</string>
     <!-- Content of third tour screen -->
@@ -3288,7 +3288,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Redare în fundal</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Fă backup automat fotografiilor și videoclipurilor în unitatea cloud.</string>
+    <string name="enable_cu_subtitle">Fă backup automat fotografiilor și videoclipurilor în Unitatea cloud.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Toate</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -4050,9 +4050,9 @@
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Nu acum</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">Fișier salvat în unitatea cloud.</string>
+    <string name="text_editor_creation_success">Fișier salvat în Unitatea cloud.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">Fișier nesalvat în unitatea cloud. Încearcă din nou.</string>
+    <string name="text_editor_creation_error">Fișier nesalvat în Unitatea cloud. Încearcă din nou.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Expunere de diapozitive</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -4082,7 +4082,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Niciun felement în [/B][A]backupuri[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Aici sunt stocate fișierele și folderele pentru care s-a făcut backup. Elementele pentru care s-a făcut backup sunt de tip „numai citire” pentru a le proteja împotriva modificării accidentale în unitatea cloud.\nPoți face backupuri ale elementelor de pe calculator pe MEGA folosind aplicația noastră desktop.</string>
+    <string name="backups_empty_state_body">Aici sunt stocate fișierele și folderele pentru care s-a făcut backup. Elementele pentru care s-a făcut backup sunt de tip „numai citire” pentru a le proteja împotriva modificării accidentale în Unitatea cloud.\nPoți face backupuri ale elementelor de pe calculator pe MEGA folosind aplicația noastră desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4237,7 +4237,7 @@
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
     <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <string name="shared_items_verify_credentials_my_credentials">Acreditările tale</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

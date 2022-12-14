@@ -4132,5 +4132,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Ihre Identitätsdaten</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

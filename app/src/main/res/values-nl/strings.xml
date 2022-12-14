@@ -204,7 +204,7 @@
         <item quantity="other">De geselecteerde overdrachten worden geannuleerd.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Cloud Schijf</string>
+    <string name="section_cloud_drive">Cloud schijf</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recent</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -242,7 +242,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Binnenkomende deling met</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Geen bestanden in uw Cloud Schijf</string>
+    <string name="file_browser_empty_cloud_drive">Geen bestanden in uw Cloud schijf</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Lege Map</string>
     <!-- Title of the fragment Choose Account -->
@@ -1302,11 +1302,11 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importeren</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Toevoegen aan Cloud Schijf</string>
+    <string name="add_to_cloud_node_chat">Toevoegen aan Cloud schijf</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Contacten weergeven</string>
     <!-- Menu option -->
-    <string name="import_success_error">Fout. Niet toegevoegd aan de Cloud Schijf</string>
+    <string name="import_success_error">Fout. Niet toegevoegd aan de Cloud schijf</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Verbinden&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1351,7 +1351,7 @@
     <!--  -->
     <string name="camera_uploads_cellular_connection">Gebruik mobiele verbinding</string>
     <!--  -->
-    <string name="camera_uploads_upload_videos">Video’s Uploaden</string>
+    <string name="camera_uploads_upload_videos">Video’s uploaden</string>
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profielfoto bijgewerkt</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1377,7 +1377,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Geen bestanden geselecteerd</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Van Cloud Schijf</string>
+    <string name="attachment_upload_panel_from_cloud">Van Cloud schijf</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1566,7 +1566,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Gebruikers account</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Opslaan naar mijn \nCloud Schijf</string>
+    <string name="save_to_mega">Opslaan naar mijn \nCloud schijf</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">De chat bestaat al</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1594,7 +1594,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Verwijder QR code</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">Naar Cloud Schijf</string>
+    <string name="save_cloud_drive">Naar Cloud schijf</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Naar bestandssysteem</string>
     <!-- Title of QR code section -->
@@ -1656,7 +1656,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Prullenbak[/A][B]Leegmaken[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Geen bestanden in uw [/B][A]Cloud Schijf[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Geen bestanden in uw [/B][A]Cloud schijf[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Geen bestanden[/B][A]Opgeslagen voor Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -1929,11 +1929,11 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Begin het Instellen</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Scan of kopieer de seed naar uw Authenticator Applicatie.</string>
+    <string name="explain_qr_seed_2fa_1">Scan of kopieer de seed naar uw authenticatie applicatie.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Zorg ervoor dat u een backup maakt op een veilige plek voor het geval u uw apparaat verliest.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Voer de 6-cijferige code gegenereerd door uw Authenticatie Applicatie in.</string>
+    <string name="explain_confirm_2fa">Voer de 6-cijferige code gegenereerd door uw authenticatie applicatie in.</string>
     <!-- Text button -->
     <string name="general_verify">Verifiëren</string>
     <!-- Text button -->
@@ -1943,7 +1943,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Twee-staps authenticatie ingeschakeld</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
+    <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw authenticatie applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Bewaar uw <b>Herstelsleutel</b> op een veilige locatie om problemen te voorkomen als u de toegang tot uw applicatie verliest of als u twee-staps authenticatie wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -1979,7 +1979,7 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Twee-staps authenticatie applicatie</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een Authenticatie Applicatie kunt installeren?</string>
+    <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een authenticatie applicatie kunt installeren?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2125,13 +2125,13 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Cloud Drive is bijna vol. Upgrade nu en krijg tot %1$s opslag en %2$s overdrachtstegoed.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Cloud Schijf is bijna vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast plan te nemen.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud schijf is bijna vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast plan te nemen.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Cloud Drive is vol. Upgrade naar Pro en ontvang tot %1$s opslag en %2$s overdrachtstegoed.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Cloud Schijf is vol. Upgrade nu en krijg tot %1$s opslag en %2$s overdrachtstegoed.</string>
+    <string name="text_storage_full_warning_pro_account">Cloud schijf is vol. Upgrade nu en krijg tot %1$s opslag en %2$s overdrachtstegoed.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Cloud Schijf is vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast abonnement te nemen.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud schijf is vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast abonnement te nemen.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Zie abonnementen</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2250,7 +2250,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">De uitnodiging naar contact %s was al verzonden en kan gezien worden in de Verzonden Verzoeken tabblad.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Opslaan %s in Cloud Schijf&#8230;</string>
+    <string name="save_qr_cloud_drive">Opslaan %s in Cloud schijf&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Bestanden</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2600,7 +2600,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Gecodeerd gesprek</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Volledig gecodeerd gesprek met spraak en video oproepen, groepsgesprekken en bestandsdeling integratie met uw Cloud Schijf.</string>
+    <string name="content_tour_two">Volledig gecodeerd gesprek met spraak en video oproepen, groepsgesprekken en bestandsdeling integratie met uw Cloud schijf.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Creëer uw netwerk</string>
     <!-- Content of third tour screen -->
@@ -2874,7 +2874,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">De map bestaat niet.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Het bestand kon niet gevonden worden in uw Cloud Schijf.</string>
+    <string name="warning_node_not_exists_in_cloud">Het bestand kon niet gevonden worden in uw Cloud schijf.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Opslagruimte Vol</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -2914,7 +2914,7 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Uw Gegevens</string>
+    <string name="label_your_credentials">Uw gegevens</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Resetten</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3205,7 +3205,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Afspelen op de achtergrond</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud Schijf.</string>
+    <string name="enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud schijf.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Alle</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -4132,5 +4132,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Uw gegevens</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

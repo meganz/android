@@ -1882,11 +1882,11 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Bắt Đầu Thiết Lập</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Quét hoặc sao chép đoạn chủng tử này vào app Lập Xác Thực.</string>
+    <string name="explain_qr_seed_2fa_1">Quét hoặc sao chép đoạn chủng tử này vào app lập xác thực.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Xin đảm bảo lưu dự phòng đoạn chủng tử này ở nơi an toàn để đề phòng khi mất thiết bị.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Xin nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Thực.</string>
+    <string name="explain_confirm_2fa">Xin nhập một đoạn mã dài 6 chữ số lấy từ app lập xác thực.</string>
     <!-- Text button -->
     <string name="general_verify">Xác thực</string>
     <!-- Text button -->
@@ -1896,7 +1896,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Xác&#160;thực 2&#160;yếu&#160;tố được bật</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Thực.</string>
+    <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ app lập xác thực.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Xin lưu <b>Mã Phục Hồi</b> cho tài&#160;khoản của bạn ở nơi an&#160;toàn, để tránh trường&#160;hợp mất khả&#160;năng truy&#160;cập vào ứng&#160;dụng, hoặc khi bạn muốn tắt đi xác&#160;thực 2&#160;yếu&#160;tố.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -1932,7 +1932,7 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App Xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một App Lập Xác Thực hay không?</string>
+    <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một app lập xác thực hay không?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2834,11 +2834,11 @@
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Đã xác thực</string>
     <!-- ”Verify user” dialog title -->
-    <string name="authenticity_credentials_label">Công Nhận Chứng Thực</string>
+    <string name="authenticity_credentials_label">Công nhận chứng thực</string>
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Đây là cách tốt nhất để tạo các buổi meeting người thật với nhau. Nếu bạn đã có phương thức xác minh khác như OTR hay PGP, bạn cũng có thể dùng được.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Chứng Thực của Bạn</string>
+    <string name="label_your_credentials">Chứng thực của bạn</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Đặt lại</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -4022,5 +4022,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Chứng thực của bạn</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

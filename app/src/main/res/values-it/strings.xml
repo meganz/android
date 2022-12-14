@@ -2026,11 +2026,11 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App autenticazione a due fattori</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un\’app per l\’autenticazione?</string>
+    <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un\’app di autenticazione?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’Autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
+    <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d file non sono stati condivisi</string>
     <!-- button’s text to open a full screen image -->
@@ -2892,15 +2892,15 @@
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">La tua password è stata rubata e adesso viene usata da persone non identificate per entrare nei tuoi account, incluso, ma non limitato, il tuo account MEGA.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Imposta un nickname</string>
+    <string name="add_nickname">Imposta un soprannome</string>
     <!-- Button to update a nickname for a user -->
-    <string name="edit_nickname">Modifica nickname</string>
+    <string name="edit_nickname">Modifica il soprannome</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_added">Nickname aggiunto</string>
+    <string name="snackbar_nickname_added">Soprannome aggiunto</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_removed">Nickname rimosso</string>
+    <string name="snackbar_nickname_removed">Soprannome rimosso</string>
     <!-- title of a dialog to edit or remove the nickname -->
-    <string name="nickname_title">Nickname</string>
+    <string name="nickname_title">Soprannome</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Numero di telefono</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
@@ -2986,7 +2986,7 @@
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificato</string>
     <!-- ”Verify user” dialog title -->
-    <string name="authenticity_credentials_label">Credenziali di Autenticità</string>
+    <string name="authenticity_credentials_label">Credenziali di autenticità</string>
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Sarebbe meglio farlo faccia a faccia nella vita reale. Se hai un altro canale di comunicazione verificato come OTR o PGP, puoi utilizzarlo.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4242,5 +4242,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Le tue credenziali</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

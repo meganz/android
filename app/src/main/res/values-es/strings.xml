@@ -655,9 +655,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Como subir</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Activar subida multimedia secundaria</string>
+    <string name="settings_secondary_upload_on">Activar Subida multimedia secundaria</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Desactivar subida multimedia secundaria</string>
+    <string name="settings_secondary_upload_off">Desactivar Subida multimedia secundaria</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Elige carpeta</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -1479,7 +1479,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivarán las Subidas de la cámara.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la subida multimedia secundaria.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la Subida multimedia secundaria.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing a file -->
@@ -4082,7 +4082,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]No hay [/B][A]backups[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
+    <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu Nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4242,5 +4242,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Tus credenciales</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

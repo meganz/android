@@ -1640,7 +1640,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Konto użytkownika</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Zapisz na mój\nCloud Drive</string>
+    <string name="save_to_mega">Zapisz na mój\nCloud drive</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">Ten czat już istnieje</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1730,7 +1730,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Pusty [/B][A]Kosz na śmieci[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Cloud Drive[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Cloud drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Brak plików [/B][A]Zapisane dla Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -2023,11 +2023,11 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Rozpocznij instalację</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Zeskanuj lub skopiuj materiał siewny do aplikacji Authenticator.</string>
+    <string name="explain_qr_seed_2fa_1">Zeskanuj lub skopiuj materiał siewny do aplikacji uwierzytelniającego.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Pamiętaj, aby wykonać kopię zapasową tego materiału siewnego w bezpieczne miejsce na wypadek utraty urządzenia.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Wprowadź 6-cyfrowy kod wygenerowany przez aplikację Authenticator.</string>
+    <string name="explain_confirm_2fa">Wprowadź 6-cyfrowy kod wygenerowany przez aplikację uwierzytelniającego.</string>
     <!-- Text button -->
     <string name="general_verify">Weryfikacja</string>
     <!-- Text button -->
@@ -2037,7 +2037,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Uwierzytelnianie dwuetapowe włączone</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Gdy następnym razem zalogujesz się na swoje konto, zostaniesz poproszony o podanie 6-cyfrowego kodu podanego przez aplikację Authenticator.</string>
+    <string name="description_2fa_enabled">Gdy następnym razem zalogujesz się na swoje konto, zostaniesz poproszony o podanie 6-cyfrowego kodu podanego przez aplikację uwierzytelniającego.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Zapisz swój <b>klucz odzwyskiwania</b> w bezpiecznym miejscu, aby uniknąć problemów w przypadku utraty dostępu do aplikacji, lub jeśli chcesz wyłączyć uwierzytelnianie dwuetapowe.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2073,11 +2073,11 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Aplikacja do uwierzytelniania dwuskładnikowego</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Czy chcesz otworzyć Google Play, aby zainstalować aplikację Authenticator App?</string>
+    <string name="open_play_store_2fa">Czy chcesz otworzyć Google Play, aby zainstalować aplikację uwierzytelniającego?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Potrzebujesz aplikacji uwierzytelniającej, by włączyć 2FA na MEGA. Możesz pobrać i zainstalować aplikację Google Authenticator, Duo Mobile, Authy lub Microsoft Authenticator na swój telefon lub tablet.</string>
+    <string name="text_2fa_help">Potrzebujesz aplikacji uwierzytelniającego, by włączyć 2FA na MEGA. Możesz pobrać i zainstalować aplikację Google Authenticator, Duo Mobile, Authy lub Microsoft Authenticator na swój telefon lub tablet.</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d plików nieudostępniono</string>
     <!-- button’s text to open a full screen image -->
@@ -2219,17 +2219,17 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Nieprawidłowy kod</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Cloud Drive jest prawie pełny. Przejdź na wersję Pro i uzyskaj do %1$s miejsca na dane i %2$s przydziału transferu.</string>
+    <string name="text_almost_full_warning">Cloud drive jest prawie pełny. Przejdź na wersję Pro i uzyskaj do %1$s miejsca na dane i %2$s przydziału transferu.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Cloud Drive jest prawie pełny. Uaktualnij teraz i uzyskaj do %1$s przestrzeni dyskowej i %2$s limitu transferu.</string>
+    <string name="text_almost_full_warning_pro_account">Cloud drive jest prawie pełny. Uaktualnij teraz i uzyskaj do %1$s przestrzeni dyskowej i %2$s limitu transferu.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Cloud Drive jest prawie pełny. Jeśli potrzebujesz więcej miejsca, skontaktuj się z pomocą techniczną MEGA, aby uzyskać niestandardowy plan.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud drive jest prawie pełny. Jeśli potrzebujesz więcej miejsca, skontaktuj się z pomocą techniczną MEGA, aby uzyskać niestandardowy plan.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Cloud Drive jest pełny. Przejdź na wersję Pro i uzyskaj do %1$s miejsca na dane i %2$s przydziału transferu.</string>
+    <string name="text_storage_full_warning">Cloud drive jest pełny. Przejdź na wersję Pro i uzyskaj do %1$s miejsca na dane i %2$s przydziału transferu.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
     <string name="text_storage_full_warning_pro_account">Dysk w chmurze jest pełny. Uaktualnij teraz i uzyskaj do %1$s przestrzeni dyskowej i %2$s limitu transferu.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Cloud Drive jest pełny. Jeśli potrzebujesz więcej miejsca, skontaktuj się z pomocą techniczną MEGA, aby uzyskać niestandardowy plan.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud drive jest pełny. Jeśli potrzebujesz więcej miejsca, skontaktuj się z pomocą techniczną MEGA, aby uzyskać niestandardowy plan.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Zobacz abonamenty</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2350,7 +2350,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Zaproszenie do kontaktu %s zostało wysłane wcześniej i można się z nim zapoznać na karcie Żądania wysłane.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Zapisywanie %s w Cloud Drive&#8230;</string>
+    <string name="save_qr_cloud_drive">Zapisywanie %s w Cloud drive&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Pliki</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2736,7 +2736,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Zaszyfrowany czat</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">W pełni zaszyfrowany czat z połączeniami głosowymi i wideo, przesyłanie wiadomości grupowych i integracja udostępniania plików z dyskiem Cloud Drive.</string>
+    <string name="content_tour_two">W pełni zaszyfrowany czat z połączeniami głosowymi i wideo, przesyłanie wiadomości grupowych i integracja udostępniania plików z dyskiem Cloud drive.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Stwórz swoją sieć</string>
     <!-- Content of third tour screen -->
@@ -3022,7 +3022,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Katalog nie istnieje.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Plik nie może być znaleziony w Twoim dysku Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud">Plik nie może być znaleziony w Twoim dysku Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Dysk pełny</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -4350,7 +4350,7 @@
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
     <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <string name="shared_items_verify_credentials_my_credentials">Twoje uprawnienia</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>
