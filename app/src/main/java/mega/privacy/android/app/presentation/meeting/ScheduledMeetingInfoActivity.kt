@@ -1,9 +1,12 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.CheckedTextView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -29,8 +32,16 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_AUDIO_ENABLE
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_VIDEO_ENABLE
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -46,7 +57,9 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -75,7 +88,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
     private lateinit var sendToChatLauncher: ActivityResultLauncher<Unit?>
 
-    private var bottomSheetDialogFragment: ManageMeetingLinkBottomSheetDialogFragment? = null
+    private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
 
     private var nodeAttacher: MegaAttacher? = null
 
@@ -87,7 +100,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, meetingLink, _, openSendToChat) ->
+                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, meetingLink, _, openSendToChat, openRemoveParticipantDialog, selected, openChatRoom, showChangePermissionsDialog, openChatCall) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
@@ -108,6 +121,28 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                         sendToChatLauncher.launch(Unit)
                     }
 
+                    showChangePermissionsDialog?.let {
+                        viewModel.showChangePermissionsDialog(null)
+                        showChangePermissionsDialog(it)
+                    }
+
+                    openChatRoom?.let {
+                        viewModel.openChatRoom(null)
+                        openChatRoom(it)
+                    }
+
+                    openChatCall?.let {
+                        viewModel.openChatCall(null)
+                        openChatCall(it)
+                    }
+
+                    selected?.let {
+                        if (openRemoveParticipantDialog) {
+                            viewModel.onRemoveParticipantTap(false)
+                            showRemoveParticipantDialog(it)
+                        }
+                    }
+
                     openAddContact?.let { shouldOpen ->
                         if (shouldOpen) {
                             viewModel.removeAddContact()
@@ -119,7 +154,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                                 .putExtra(INTENT_EXTRA_KEY_CHAT, true)
                                 .putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
                                 .putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                    StringResourcesUtils.getString(R.string.add_participants_menu_item))
+                                    getString(R.string.add_participants_menu_item))
                             )
                         }
                     }
@@ -177,9 +212,113 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             return
         }
         bottomSheetDialogFragment = ManageMeetingLinkBottomSheetDialogFragment()
-        (bottomSheetDialogFragment as ManageMeetingLinkBottomSheetDialogFragment)
-
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+    }
+
+    /**
+     * Shows panel to show participant's options
+     */
+    private fun showParticipantOptionsPanel(participant: ChatParticipant) {
+        if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
+            return
+        }
+        viewModel.onParticipantTap(participant)
+
+        bottomSheetDialogFragment =
+            ParticipantBottomSheetDialogFragment.newInstance(chatRoomId, participant.handle)
+        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+    }
+
+    /**
+     * Shows an alert dialog to confirm the deletion of a participant.
+     *
+     * @param participant [ChatParticipant]
+     */
+    private fun showRemoveParticipantDialog(participant: ChatParticipant) {
+        val dialogBuilder =
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+
+        val name = participant.data.fullName
+        dialogBuilder.setMessage(getString(R.string.confirmation_remove_chat_contact, name))
+            .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> viewModel.removeSelectedParticipant() }
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
+    }
+
+    /**
+     * Shows change permissions dialog
+     *
+     * @param currentPermission [ChatRoomPermission] current permission
+     */
+    fun showChangePermissionsDialog(currentPermission: ChatRoomPermission) {
+        var dialog: AlertDialog? = null
+
+        val dialogView = this.layoutInflater.inflate(R.layout.change_permissions_dialog, null)
+
+        val layoutHost =
+            dialogView.findViewById<LinearLayout>(R.id.change_permissions_dialog_administrator_layout)
+        val checkHost =
+            dialogView.findViewById<CheckedTextView>(R.id.change_permissions_dialog_administrator)
+        val layoutStandard =
+            dialogView.findViewById<LinearLayout>(R.id.change_permissions_dialog_member_layout)
+        val checkStandard =
+            dialogView.findViewById<CheckedTextView>(R.id.change_permissions_dialog_member)
+        val layoutReadOnly =
+            dialogView.findViewById<LinearLayout>(R.id.change_permissions_dialog_observer_layout)
+        val checkReadOnly =
+            dialogView.findViewById<CheckedTextView>(R.id.change_permissions_dialog_observer)
+
+        checkHost.isChecked = currentPermission == ChatRoomPermission.Moderator
+        checkStandard.isChecked = currentPermission == ChatRoomPermission.Standard
+        checkReadOnly.isChecked = currentPermission == ChatRoomPermission.ReadOnly
+
+        layoutHost.setOnClickListener {
+            dialog?.dismiss()
+            viewModel.updateParticipantPermissions(ChatRoomPermission.Moderator)
+        }
+        layoutStandard.setOnClickListener {
+            dialog?.dismiss()
+            viewModel.updateParticipantPermissions(ChatRoomPermission.Standard)
+        }
+        layoutReadOnly.setOnClickListener {
+            dialog?.dismiss()
+            viewModel.updateParticipantPermissions(ChatRoomPermission.ReadOnly)
+        }
+
+        val builder =
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                .setView(dialogView)
+                .setTitle(getString(R.string.file_properties_shared_folder_permissions))
+
+        dialog = builder.create()
+        dialog.show()
+    }
+
+    /**
+     * Open chat room
+     *
+     * @param chatId Chat id.
+     */
+    private fun openChatRoom(chatId: Long) {
+        val intentOpenChat = Intent(this@ScheduledMeetingInfoActivity, ChatActivity::class.java)
+        intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
+        intentOpenChat.putExtra(CHAT_ID, chatId)
+        this.startActivity(intentOpenChat)
+    }
+
+    /**
+     * Open chat call
+     *
+     * @param chatId Chat id.
+     */
+    private fun openChatCall(chatId: Long) {
+        val intentOpenCall = Intent(this@ScheduledMeetingInfoActivity, MeetingActivity::class.java)
+        intentOpenCall.action = MEETING_ACTION_IN
+        intentOpenCall.putExtra(MEETING_CHAT_ID, chatId)
+        intentOpenCall.putExtra(MEETING_AUDIO_ENABLE, true)
+        intentOpenCall.putExtra(MEETING_VIDEO_ENABLE, false)
+        intentOpenCall.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        this.startActivity(intentOpenCall)
     }
 
     /**
@@ -268,7 +407,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
                 onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
                 onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
-                onParticipantClicked = { viewModel::onParticipantTap },
+                onParticipantClicked = { showParticipantOptionsPanel(it) },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = { finish() },
                 onDismiss = { viewModel.dismissDialog() },

@@ -5,7 +5,6 @@ import static mega.privacy.android.app.utils.CallUtil.canCallBeStartedFromContac
 import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
 import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
 import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
-import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_MY_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CONTACT_HANDLE;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
@@ -28,6 +27,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import javax.inject.Inject;
 
@@ -36,12 +36,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -54,6 +55,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     @Inject
     PasscodeManagement passcodeManagement;
 
+    private ScheduledMeetingInfoViewModel viewModel = null;
+
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
     private long participantHandle = INVALID_HANDLE;
@@ -62,18 +65,35 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private EmojiTextView titleNameContactChatPanel;
     private RoundedImageView contactImageView;
 
+    public static ParticipantBottomSheetDialogFragment newInstance(long chatId, long participantHandle) {
+        ParticipantBottomSheetDialogFragment fragment = new ParticipantBottomSheetDialogFragment();
+        Bundle arguments = new Bundle();
+        arguments.putLong(CHAT_ID, chatId);
+        arguments.putLong(CONTACT_HANDLE, participantHandle);
+        fragment.setArguments(arguments);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
         itemsLayout = contentView.findViewById(R.id.items_layout);
         titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
 
-        if (savedInstanceState != null) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            chatId = arguments.getLong(CHAT_ID, INVALID_HANDLE);
+            participantHandle = arguments.getLong(CONTACT_HANDLE, INVALID_HANDLE);
+        } else if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             participantHandle = savedInstanceState.getLong(CONTACT_HANDLE, INVALID_HANDLE);
         } else {
             chatId = ((GroupChatInfoActivity) requireActivity()).getChatHandle();
             participantHandle = ((GroupChatInfoActivity) requireActivity()).getSelectedHandleParticipant();
+        }
+
+        if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+            viewModel = new ViewModelProvider(requireActivity()).get(ScheduledMeetingInfoViewModel.class);
         }
 
         selectedChat = megaChatApi.getChatRoom(chatId);
@@ -134,7 +154,8 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND));
         }
 
-        setContactStatus(getUserStatus(participantHandle), stateIcon, StatusIconLocation.DRAWER);
+        int userStatus = participantHandle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(participantHandle);
+        setContactStatus(userStatus, stateIcon, StatusIconLocation.DRAWER);
 
         if (participantHandle == megaApi.getMyUser().getHandle()) {
             String myFullName = chatC.getMyFullName();
@@ -244,22 +265,46 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.start_chat_group_participants_chat_layout:
-                ((GroupChatInfoActivity) requireActivity()).startConversation(participantHandle);
+                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                    if (viewModel != null) {
+                        viewModel.onSendMsgTap();
+                    }
+                } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                    ((GroupChatInfoActivity) requireActivity()).startConversation(participantHandle);
+                }
                 break;
 
             case R.id.contact_list_option_call_layout:
                 MegaApplication.setUserWaitingForCall(participantHandle);
                 if (canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                    ((GroupChatInfoActivity) requireActivity()).startCall();
+                    if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                        if (viewModel != null) {
+                            viewModel.onStartCallTap();
+                        }
+                    } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                        ((GroupChatInfoActivity) requireActivity()).startCall();
+                    }
                 }
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:
-                ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
+                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                    if (viewModel != null) {
+                        viewModel.onChangePermissionsTap();
+                    }
+                } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                    ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
+                }
                 break;
 
             case R.id.remove_group_participants_chat_layout:
-                ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
+                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                    if (viewModel != null) {
+                        viewModel.onRemoveParticipantTap(true);
+                    }
+                } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                    ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
+                }
                 break;
 
             case R.id.edit_profile_group_participants_chat_layout:
@@ -268,11 +313,23 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.leave_group_participants_chat_layout:
-                ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
+                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                    if (viewModel != null) {
+                        viewModel.onLeaveGroupTap();
+                    }
+                } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                    ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
+                }
                 break;
 
             case R.id.invite_group_participants_chat_layout:
-                ((GroupChatInfoActivity) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
+                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                    if (viewModel != null) {
+                        viewModel.onInviteContactTap();
+                    }
+                } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                    ((GroupChatInfoActivity) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
+                }
                 break;
         }
 

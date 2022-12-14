@@ -23,7 +23,7 @@ data class ChatParticipant(
     val email: String,
     val isMe: Boolean,
     val privilege: ChatRoomPermission,
-    val defaultAvatarColor: String? = "AVATAR_PRIMARY_COLOR",
+    val defaultAvatarColor: Int,
     val areCredentialsVerified: Boolean = false,
     val status: UserStatus,
     val lastSeen: Int? = null,

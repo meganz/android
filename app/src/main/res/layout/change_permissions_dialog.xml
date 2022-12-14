@@ -1,24 +1,26 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
 
 	<LinearLayout
-	    android:id="@+id/change_permissions_dialog_layout"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical">
+		android:id="@+id/change_permissions_dialog_layout"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
 
 		<LinearLayout
 			android:id="@+id/change_permissions_dialog_administrator_layout"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:orientation="horizontal">
+			android:orientation="horizontal"
+			android:layout_gravity="center_horizontal">
 
 			<CheckedTextView
 				android:id="@+id/change_permissions_dialog_administrator"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+				android:drawableStart="?android:attr/listChoiceIndicatorSingle"
+				android:layout_marginStart="17dp"
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
 				android:textAppearance="?android:attr/textAppearanceMedium"
@@ -28,7 +30,10 @@
 				android:id="@+id/administrator_text_layout"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:layout_marginTop="15dp"
+				android:layout_marginBottom="15dp"
+				android:layout_marginStart="10dp">
 
 				<TextView
 					android:id="@+id/administrator_title"
@@ -58,7 +63,8 @@
 				android:id="@+id/change_permissions_dialog_member"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+				android:drawableStart="?android:attr/listChoiceIndicatorSingle"
+				android:layout_marginStart="17dp"
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
 				android:textAppearance="?android:attr/textAppearanceMedium"
@@ -68,7 +74,10 @@
 				android:id="@+id/member_text_layout"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:layout_marginTop="15dp"
+				android:layout_marginBottom="15dp"
+				android:layout_marginStart="10dp">
 
 				<TextView
 					android:id="@+id/member_title"
@@ -98,7 +107,8 @@
 				android:id="@+id/change_permissions_dialog_observer"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+				android:drawableStart="?android:attr/listChoiceIndicatorSingle"
+				android:layout_marginStart="17dp"
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
 				android:textAppearance="?android:attr/textAppearanceMedium"
@@ -108,7 +118,10 @@
 				android:id="@+id/observer_text_layout"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:layout_marginTop="15dp"
+				android:layout_marginBottom="20dp"
+				android:layout_marginStart="10dp">
 
 				<TextView
 					android:id="@+id/observer_title"

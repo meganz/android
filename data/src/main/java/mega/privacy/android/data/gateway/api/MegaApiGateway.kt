@@ -1129,4 +1129,11 @@ interface MegaApiGateway {
      * @param listener  MegaRequestListener to track this request
      */
     fun inviteContact(email: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get outgoing contact requests
+     *
+     * @return list of [MegaContactRequest]
+     */
+    fun outgoingContactRequests(): ArrayList<MegaContactRequest>
 }

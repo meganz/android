@@ -22,7 +22,12 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property retentionTimeSeconds                       Retention time seconds.
  * @property meetingLink                                Meeting link.
  * @property chatTitle                                  Chat title.
- * @property openSendToChat                             True, open sent to chat screen. False, otherwise.
+ * @property openSendToChat                             True, open sent to chat screen. False, close it.
+ * @property openRemoveParticipantDialog                True, open remove participant dialog. False, close it.
+ * @property selected                                   [ChatParticipant] selected.
+ * @property openChatRoom                               Chat id of the chat room to send message.
+ * @property showChangePermissionsDialog                Show change permissions dialog.
+ * @property openChatCall                               Chat id of the chat room to send message.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property isPublic                                   If chat room is public.
@@ -48,6 +53,11 @@ data class ScheduledMeetingInfoState(
     val meetingLink: String? = null,
     val chatTitle: String = "",
     val openSendToChat: Boolean = false,
+    val openRemoveParticipantDialog: Boolean = false,
+    val selected: ChatParticipant? = null,
+    val openChatRoom: Long? = null,
+    val showChangePermissionsDialog: ChatRoomPermission? = null,
+    val openChatCall: Long? = null,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val isPublic: Boolean = false,
@@ -60,30 +70,9 @@ data class ScheduledMeetingInfoState(
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
-    val firstParticipant: ChatParticipant? = ChatParticipant(
-        handle = -1,
-        data = ContactData(fullName = "First", null, null),
-        email = "first@mega.nz",
-        privilege = ChatRoomPermission.Unknown,
-        defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
-        areCredentialsVerified = false,
-        isMe = false,
-        status = UserStatus.Invalid,
-        lastSeen = null),
-
-    val lastParticipant: ChatParticipant? = ChatParticipant(
-        handle = -1,
-        data = ContactData(fullName = "Last", null, null),
-        email = "last@mega.nz",
-        privilege = ChatRoomPermission.Unknown,
-        defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
-        areCredentialsVerified = false,
-        isMe = false,
-        status = UserStatus.Invalid,
-        lastSeen = null),
-
-    ) {
-
+    val firstParticipant: ChatParticipant? = null,
+    val lastParticipant: ChatParticipant? = null,
+) {
     /**
      * Check if the meeting does not contain participants
      *
