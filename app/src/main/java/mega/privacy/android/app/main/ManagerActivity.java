@@ -275,7 +275,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
-import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -420,6 +419,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
@@ -431,7 +431,6 @@ import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
@@ -589,8 +588,6 @@ public class ManagerActivity extends TransfersManagementActivity
     MegaAttributes attr = null;
     static ManagerActivity managerActivity = null;
     MegaApplication app = null;
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
     Handler handler;
     DisplayMetrics outMetrics;
     FragmentContainerView fragmentContainer;
@@ -1579,9 +1576,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         managerActivity = this;
         app = (MegaApplication) getApplication();
-        megaApi = app.getMegaApi();
-
-        megaChatApi = app.getMegaChatApi();
 
         checkChatChanges();
 
@@ -1730,7 +1724,7 @@ public class ManagerActivity extends TransfersManagementActivity
              * @param refreshStorageInfo Parameter to indicate if refresh the storage info.
              */
             private void refreshDrawerInfo(boolean refreshStorageInfo) {
-                if (!viewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
+                if (!viewModel.isConnected() || megaApi.getRootNode() == null) {
                     disableNavigationViewLayout();
                 } else {
                     resetNavigationViewLayout();
@@ -3024,12 +3018,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     void setContactStatus() {
-        if (megaChatApi == null) {
-            megaChatApi = app.getMegaChatApi();
-            composite.clear();
-            checkChatChanges();
-        }
-
         int chatStatus = megaChatApi.getOnlineStatus();
         if (contactStatus != null) {
             ChatUtil.setContactStatus(chatStatus, contactStatus, StatusIconLocation.DRAWER);
@@ -3062,10 +3050,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         Timber.d("queryIfNotificationsAreOn");
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getApplication()).getMegaApi();
-        }
-
         if (turnOnNotifications) {
             setTurnOnNotificationsFragment();
         } else {
@@ -3074,9 +3058,6 @@ public class ManagerActivity extends TransfersManagementActivity
             if (!nf.areNotificationsEnabled()) {
                 Timber.d("OFF");
                 if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")) {
-                    if (megaChatApi == null) {
-                        megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                    }
                     if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getChatListItems().size() >= 1)) {
                         setTurnOnNotificationsFragment();
                     }
@@ -4102,10 +4083,6 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("showOfflineMode");
 
         try {
-            if (megaApi == null) {
-                Timber.w("megaApi is Null in Offline mode");
-            }
-
             if (usedSpaceLayout != null) {
                 usedSpaceLayout.setVisibility(View.GONE);
             }
@@ -5504,14 +5481,8 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("onOptionsItemSelected");
         typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getApplication()).getMegaApi();
-        }
-
-        if (megaApi != null) {
-            Timber.d("retryPendingConnections");
-            megaApi.retryPendingConnections();
-        }
+        Timber.d("retryPendingConnections");
+        megaApi.retryPendingConnections();
 
         if (megaChatApi != null) {
             megaChatApi.retryPendingConnections(false, null);
@@ -8556,7 +8527,7 @@ public class ManagerActivity extends TransfersManagementActivity
     void resetNavigationViewMenu(Menu menu) {
         Timber.d("resetNavigationViewMenu()");
 
-        if (!viewModel.isConnected() || megaApi == null || megaApi.getRootNode() == null) {
+        if (!viewModel.isConnected() || megaApi.getRootNode() == null) {
             disableNavigationViewMenu(menu);
             return;
         }
@@ -10283,11 +10254,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             case CHAT:
-                if (megaChatApi == null) {
-                    hideFabButton();
-                    break;
-                }
-
                 updateFabAndShow();
                 break;
 
@@ -10542,7 +10508,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private void setCallBadge() {
-        if (!viewModel.isConnected() || megaChatApi == null || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
+        if (!viewModel.isConnected() || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
             callBadge.setVisibility(View.GONE);
             return;
         }
@@ -10770,9 +10736,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void showAddPhoneNumberInMenu() {
-        if (megaApi == null) {
-            return;
-        }
         if (canVoluntaryVerifyPhoneNumber()) {
             if (megaApi.isAchievementsEnabled()) {
                 String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), myAccountInfo.getBonusStorageSMS());

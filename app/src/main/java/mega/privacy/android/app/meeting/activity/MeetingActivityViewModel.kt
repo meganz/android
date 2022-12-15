@@ -36,7 +36,7 @@ import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
-import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.data.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
