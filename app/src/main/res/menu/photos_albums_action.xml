@@ -4,8 +4,9 @@
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_trash_bin"
         android:orderInCategory="1"
+        android:title="@string/general_remove"
         app:iconTint="?attr/colorSecondary"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_context_select_all"
