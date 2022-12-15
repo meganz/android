@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
@@ -301,7 +302,7 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
-    override suspend fun inviteContact(email: String): Boolean =
+    override suspend fun inviteContact(email: String): InviteContactRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaApiGateway.inviteContact(email,
@@ -311,12 +312,21 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
-    private fun onRequestInviteContactCompleted(continuation: Continuation<Boolean>) =
-        { _: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaError.API_OK) {
-                continuation.resumeWith(Result.success(true))
-            } else {
-                continuation.failWithError(error)
+    private fun onRequestInviteContactCompleted(continuation: Continuation<InviteContactRequest>) =
+        { request: MegaRequest, error: MegaError ->
+            when (error.errorCode) {
+                MegaError.API_OK -> continuation.resumeWith(Result.success(InviteContactRequest.Sent))
+                MegaError.API_EEXIST -> {
+                    if (megaApiGateway.outgoingContactRequests()
+                            .any { it.targetEmail == request.email }
+                    ) {
+                        continuation.resumeWith(Result.success(InviteContactRequest.AlreadySent))
+                    } else {
+                        continuation.resumeWith(Result.success(InviteContactRequest.AlreadyContact))
+                    }
+                }
+                MegaError.API_EARGS -> continuation.resumeWith(Result.success(InviteContactRequest.InvalidEmail))
+                else -> continuation.failWithError(error)
             }
         }
 
