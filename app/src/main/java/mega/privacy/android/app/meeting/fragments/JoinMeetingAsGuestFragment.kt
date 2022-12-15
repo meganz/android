@@ -83,8 +83,8 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         watchChangeOfGuestName()
 
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 sharedModel.state.collect { (isMeetingEnded) ->
                     isMeetingEnded?.let {
                         if (it) {
