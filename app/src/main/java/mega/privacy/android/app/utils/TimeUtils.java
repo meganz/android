@@ -79,7 +79,6 @@ public class TimeUtils implements Comparator<Calendar> {
                 long milliseconds2 = c2.getTimeInMillis();
 
                 long diff = milliseconds2 - milliseconds1;
-//                long diffSeconds = diff / 1000;
                 long diffMinutes = Math.abs(diff / (60 * 1000));
 
                 if (diffMinutes < 3) {
@@ -87,8 +86,6 @@ public class TimeUtils implements Comparator<Calendar> {
                 } else {
                     return 1;
                 }
-
-                //            return c1.get(Calendar.MINUTE) - c2.get(Calendar.MINUTE);
             }
         } else if (type == DATE) {
             if (c1.get(Calendar.YEAR) != c2.get(Calendar.YEAR))
@@ -276,7 +273,6 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String lastGreenDate(Context context, int minutesAgo) {
-//        minutesAgo = 1442;
         Calendar calGreen = Calendar.getInstance();
         calGreen.add(Calendar.MINUTE, -minutesAgo);
 
@@ -301,19 +297,6 @@ public class TimeUtils implements Comparator<Calendar> {
 
             return formattedDate;
         }
-        //Impossible to fit yesterday
-//        else if(tc.compare(calGreen, calYesterday)==0){
-//            TimeZone tz = calGreen.getTimeZone();
-//
-//            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
-//            df.setTimeZone(tz);
-//
-//            String time = df.format(calGreen.getTime());
-//
-//            String formattedDate = "Last seen yesterday at" + " " + time;
-//
-//            return formattedDate;
-//        }
         else {
             TimeZone tz = calGreen.getTimeZone();
 
