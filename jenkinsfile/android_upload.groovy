@@ -68,7 +68,7 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
+        APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
 
         // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
         SDK_LOG_FILE_NAME = "sdk_build_log.txt"
@@ -409,7 +409,7 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build QA APK(GMS)'
                     withEnv([
-                            "APK_VERSION_NAME_FOR_CD=${APK_VERSION_NAME_FOR_CD}_QA"
+                            "APK_VERSION_NAME_TAG_FOR_CD=_QA"
                     ]) {
                         sh './gradlew app:assembleGmsQa'
                     }
@@ -708,7 +708,7 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
  */
 private String firebaseUploadSuccessMessage(String lineBreak) {
     return ":rocket: Android APK Build uploaded successfully to Firebase AppDistribution!(${env.BUILD_NUMBER})" +
-            "${lineBreak}Version:\t${readAppVersion()}${APK_VERSION_NAME_FOR_CD}" +
+            "${lineBreak}Version:\t${readAppVersion()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
@@ -926,8 +926,8 @@ private void checkSDKVersion() {
  * @return version name plus version code. Example: "6.6(433)"
  */
 private String readAppVersion() {
-    String versionCode = sh(script: "grep versionCode build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim()
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
+    String versionCode = env.APK_VERSION_CODE_FOR_CD
     return versionName + "(" + versionCode + ")"
 }
 
