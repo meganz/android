@@ -15,7 +15,6 @@ import android.os.StatFs
 import androidx.core.app.NotificationCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +26,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.VideoCompressor
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
@@ -1270,8 +1268,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private fun onTransferStarted(globalTransfer: GlobalTransfer.OnTransferStart) {
         cuTransfers.add(globalTransfer.transfer)
-        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-            .post(MegaTransfer.TYPE_UPLOAD)
     }
 
     /**
@@ -1288,8 +1284,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 "Image Size: ${transfer.transferredBytes}"
         )
         try {
-            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-                .post(MegaTransfer.TYPE_UPLOAD)
             coroutineScope?.launch {
                 transferFinished(transfer, error)
             }
