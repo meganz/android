@@ -173,19 +173,25 @@ class DefaultGetChatParticipants @Inject constructor(
 
                             return@map this
                         } else if (item.lastMessageType == ChatRoomLastMessage.PrivChange) {
-                            apply {
-                                map { participant ->
-                                    val currentItemIndex =
-                                        this.indexOfFirst { it.handle == participant.handle }
-                                    if (currentItemIndex != -1) {
-                                        val currentItem = get(currentItemIndex)
-                                        set(currentItemIndex,
-                                            currentItem.copy(privilege = chatParticipantsRepository.getPermissions(
+                            map { participant ->
+                                if (!participant.isMe) {
+                                    apply {
+                                        val currentItemIndex = indexOf(participant)
+                                        val currentItem = this[currentItemIndex]
+                                        val newPermissions =
+                                            chatParticipantsRepository.getPermissions(
                                                 chatId,
-                                                currentItem)))
+                                                currentItem)
+                                        if (currentItem.privilege != newPermissions) {
+                                            this[currentItemIndex] =
+                                                currentItem.copy(
+                                                    privilege = newPermissions
+                                                )
+                                        }
                                     }
                                 }
                             }
+
                             return@map this
                         }
                     }
