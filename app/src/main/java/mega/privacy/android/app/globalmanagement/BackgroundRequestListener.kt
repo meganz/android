@@ -10,7 +10,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
@@ -18,14 +17,8 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERI
 import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
-import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -59,13 +52,8 @@ class BackgroundRequestListener @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersManagement: TransfersManagement,
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getSpecificAccountDetail: GetSpecificAccountDetail,
-    private val getAccountDetails: GetAccountDetails,
-    private val getPaymentMethod: GetPaymentMethod,
-    private val getPricing: GetPricing,
-    private val getNumberOfSubscription: GetNumberOfSubscription,
+    private val getFullAccountInfo: GetFullAccountInfo,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -228,14 +216,7 @@ class BackgroundRequestListener @Inject constructor(
     private fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
-            getPaymentMethod(true)
-            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
-                getAccountDetails(true)
-            } else {
-                getSpecificAccountDetail(storage = false, transfer = true, pro = true)
-            }
-            getPricing(true)
-            getNumberOfSubscription(true)
+            getFullAccountInfo()
         }
     }
 }

@@ -41,14 +41,11 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
-import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
-import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -106,10 +103,7 @@ class ManagerViewModel @Inject constructor(
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
-    private val getNumberOfSubscription: GetNumberOfSubscription,
-    private val getAccountDetails: GetAccountDetails,
-    private val getPaymentMethod: GetPaymentMethod,
-    private val getSpecificAccountDetail: GetSpecificAccountDetail,
+    private val getFullAccountInfo: GetFullAccountInfo,
 ) : ViewModel() {
 
     /**
@@ -456,14 +450,7 @@ class ManagerViewModel @Inject constructor(
     fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         viewModelScope.launch {
-            getPaymentMethod(true)
-            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
-                getAccountDetails(true)
-            } else {
-                getSpecificAccountDetail(storage = false, transfer = true, pro = true)
-            }
-            getPricing(true)
-            getNumberOfSubscription(true)
+            getFullAccountInfo()
         }
     }
 }
