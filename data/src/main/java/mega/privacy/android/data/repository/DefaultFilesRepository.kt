@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -368,4 +369,6 @@ internal class DefaultFilesRepository @Inject constructor(
     override suspend fun getOfflineInboxPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
 
+    override suspend fun getUnVerifiedInComingShares(): Int = 3
+    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
 }

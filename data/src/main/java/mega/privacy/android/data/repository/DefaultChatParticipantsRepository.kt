@@ -22,8 +22,12 @@ import javax.inject.Inject
 /**
  * Default implementation of [ChatParticipantsRepository]
  *
- * @property megaChatApiGateway [MegaChatApiGateway]
- * @property ioDispatcher CoroutineDispatcher
+ * @property megaChatApiGateway     [MegaChatApiGateway]
+ * @property megaApiGateway         [MegaApiGateway]
+ * @property avatarRepository       [AvatarRepository]
+ * @property contactsRepository     [ContactsRepository]
+ * @property requestLastGreen       [RequestLastGreen]
+ * @property ioDispatcher           [CoroutineDispatcher]
  */
 internal class DefaultChatParticipantsRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,

@@ -87,6 +87,8 @@ fun AlbumsView(
     allPhotos: List<Photo> = emptyList(),
     clearAlbumDeletedMessage: () -> Unit = {},
     onAlbumSelection: (Album.UserAlbum) -> Unit = {},
+    closeDeleteAlbumsConfirmation: () -> Unit = {},
+    deleteAlbums: (albumIds: List<AlbumId>) -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -107,6 +109,14 @@ fun AlbumsView(
             delay(3000L)
             clearAlbumDeletedMessage()
         }
+    }
+
+    if (albumsViewState.showDeleteAlbumsConfirmation) {
+        DeleteAlbumsConfirmationDialog(
+            selectedAlbumIds = albumsViewState.selectedAlbumIds.toList(),
+            onCancelClicked = closeDeleteAlbumsConfirmation,
+            onDeleteClicked = deleteAlbums,
+        )
     }
 
     Scaffold(

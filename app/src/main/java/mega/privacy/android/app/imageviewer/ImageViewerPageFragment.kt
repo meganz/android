@@ -26,14 +26,17 @@ import com.facebook.imagepipeline.memory.BasePool
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.facebook.samples.zoomable.AbstractAnimatedZoomableController
+import com.google.firebase.perf.FirebasePerformance
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
+import mega.privacy.android.app.utils.PerformanceRequestListener
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Image Viewer page that shows an individual image within a list of image items
@@ -43,7 +46,9 @@ class ImageViewerPageFragment : Fragment() {
 
     companion object {
         private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
-        private const val ZOOM_MAX_SCALE_FACTOR = 20f
+        private const val MAX_ZOOM_SCALE_FACTOR = 20f
+        private const val MAX_BITMAP_SIZE = 5000 // Android Canvas maximum bitmap size
+        private const val PERF_TRACE_NAME = "full_image_loading"
 
         /**
          * Main method to create a ImageViewerPageFragment.
@@ -60,6 +65,9 @@ class ImageViewerPageFragment : Fragment() {
                 }
             }
     }
+
+    @Inject
+    lateinit var firebasePerf: FirebasePerformance
 
     private lateinit var binding: PageImageViewerBinding
 
@@ -123,7 +131,7 @@ class ImageViewerPageFragment : Fragment() {
             setZoomingEnabled(enableZoom)
             setAllowTouchInterceptionWhileZoomed(!enableZoom)
             setIsLongpressEnabled(enableZoom)
-            setMaxScaleFactor(ZOOM_MAX_SCALE_FACTOR)
+            setMaxScaleFactor(MAX_ZOOM_SCALE_FACTOR)
             if (enableZoom) {
                 setTapListener(
                     MultiTapGestureListener(
@@ -341,9 +349,16 @@ class ImageViewerPageFragment : Fragment() {
         }
     }
 
-    private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? {
-        val imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(this)
+    private fun Uri.toImageRequest(isFullImage: Boolean): ImageRequest? =
+        ImageRequestBuilder.newBuilderWithSource(this)
             .setRotationOptions(RotationOptions.autoRotate())
+            .setRequestListener(
+                if (isFullImage) {
+                    PerformanceRequestListener(firebasePerf, PERF_TRACE_NAME)
+                } else {
+                    null
+                }
+            )
             .setRequestPriority(
                 if (lifecycle.currentState == Lifecycle.State.RESUMED) {
                     Priority.HIGH
@@ -351,14 +366,19 @@ class ImageViewerPageFragment : Fragment() {
                     Priority.LOW
                 }
             )
-
-        if (isFullImage) {
-            imageRequestBuilder.resizeOptions =
-                ResizeOptions.forDimensions(screenSize.width, screenSize.height)
-        } else {
-            imageRequestBuilder.cacheChoice = ImageRequest.CacheChoice.SMALL
-        }
-
-        return imageRequestBuilder.build()
-    }
+            .setResizeOptions(
+                if (isFullImage) {
+                    ResizeOptions(MAX_BITMAP_SIZE, MAX_BITMAP_SIZE, MAX_BITMAP_SIZE.toFloat())
+                } else {
+                    ResizeOptions.forDimensions(screenSize.width, screenSize.height)
+                }
+            )
+            .setCacheChoice(
+                if (isFullImage) {
+                    ImageRequest.CacheChoice.DEFAULT
+                } else {
+                    ImageRequest.CacheChoice.SMALL
+                }
+            )
+            .build()
 }

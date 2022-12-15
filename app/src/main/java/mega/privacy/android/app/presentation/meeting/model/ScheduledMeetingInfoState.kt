@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.model
 
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -17,7 +18,12 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property retentionTimeSeconds                       Retention time seconds.
  * @property meetingLink                                Meeting link.
  * @property chatTitle                                  Chat title.
- * @property openSendToChat                             True, open sent to chat screen. False, otherwise.
+ * @property openSendToChat                             True, open sent to chat screen. False, close it.
+ * @property openRemoveParticipantDialog                True, open remove participant dialog. False, close it.
+ * @property selected                                   [ChatParticipant] selected.
+ * @property openChatRoom                               Chat id of the chat room to send message.
+ * @property showChangePermissionsDialog                Show change permissions dialog.
+ * @property openChatCall                               Chat id of the chat room to send message.
  * @property isHost                                     If participant has host permissions.
  * @property isOpenInvite                               If open invite option is enabled.
  * @property isPublic                                   If chat room is public.
@@ -43,6 +49,11 @@ data class ScheduledMeetingInfoState(
     val meetingLink: String? = null,
     val chatTitle: String = "",
     val openSendToChat: Boolean = false,
+    val openRemoveParticipantDialog: Boolean = false,
+    val selected: ChatParticipant? = null,
+    val openChatRoom: Long? = null,
+    val showChangePermissionsDialog: ChatRoomPermission? = null,
+    val openChatCall: Long? = null,
     val isHost: Boolean = false,
     val isOpenInvite: Boolean = false,
     val isPublic: Boolean = false,

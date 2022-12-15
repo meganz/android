@@ -151,6 +151,7 @@ fun ScheduledMeetingInfoView(
             items(state.buttons) { button ->
                 ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
             }
+
             item(key = "Participants") { ParticipantsHeader(state = state) }
 
             item(key = "Add participants") {
@@ -185,7 +186,16 @@ fun ScheduledMeetingInfoView(
         }
 
         if (state.snackBar != null) {
-            val msg = stringResource(id = state.snackBar)
+            val msg =
+                if (state.snackBar == R.string.context_contact_request_sent && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else if (state.snackBar == R.string.invite_not_sent_already_sent && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else if (state.snackBar == R.string.context_contact_already_exists && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else {
+                    stringResource(id = state.snackBar)
+                }
 
             LaunchedEffect(scaffoldState.snackbarHostState) {
                 val s = scaffoldState.snackbarHostState.showSnackbar(message = msg,

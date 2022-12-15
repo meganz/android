@@ -225,4 +225,11 @@ interface FilesRepository {
      * @return success or failed
      */
     suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
+
+    /**
+     * Provides Unverified incoming shares count from SDK
+     *
+     * @return Integer count
+     */
+    suspend fun getUnVerifiedInComingShares(): Int
 }

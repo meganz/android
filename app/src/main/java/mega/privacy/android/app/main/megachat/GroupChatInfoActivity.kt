@@ -17,7 +17,6 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -59,9 +58,9 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatA
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
+import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -549,59 +548,18 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         val administratorLayout =
             dialogLayout.findViewById<LinearLayout>(R.id.change_permissions_dialog_administrator_layout)
-
         val administratorCheck =
             dialogLayout.findViewById<CheckedTextView>(R.id.change_permissions_dialog_administrator)
-        administratorCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
-
-        val administratorMLP = administratorCheck.layoutParams as ViewGroup.MarginLayoutParams
-        administratorMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0)
-
-        val administratorTextLayout =
-            dialogLayout.findViewById<LinearLayout>(R.id.administrator_text_layout)
-
-        val administratorSubtitleMLP =
-            administratorTextLayout.layoutParams as ViewGroup.MarginLayoutParams
-        administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics),
-            Util.scaleHeightPx(15, outMetrics),
-            0,
-            Util.scaleHeightPx(15, outMetrics))
 
         val memberLayout =
             dialogLayout.findViewById<LinearLayout>(R.id.change_permissions_dialog_member_layout)
-
         val memberCheck =
             dialogLayout.findViewById<CheckedTextView>(R.id.change_permissions_dialog_member)
-        memberCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
-
-        val memberMLP = memberCheck.layoutParams as ViewGroup.MarginLayoutParams
-        memberMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0)
-
-        val memberTextLayout = dialogLayout.findViewById<LinearLayout>(R.id.member_text_layout)
-
-        val memberSubtitleMLP = memberTextLayout.layoutParams as ViewGroup.MarginLayoutParams
-        memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics),
-            Util.scaleHeightPx(15, outMetrics),
-            0,
-            Util.scaleHeightPx(15, outMetrics))
 
         val observerLayout =
             dialogLayout.findViewById<LinearLayout>(R.id.change_permissions_dialog_observer_layout)
-
         val observerCheck =
             dialogLayout.findViewById<CheckedTextView>(R.id.change_permissions_dialog_observer)
-        observerCheck.compoundDrawablePadding = Util.scaleWidthPx(10, outMetrics)
-
-        val observerMLP = observerCheck.layoutParams as ViewGroup.MarginLayoutParams
-        observerMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0)
-
-        val observerTextLayout = dialogLayout.findViewById<LinearLayout>(R.id.observer_text_layout)
-
-        val observerSubtitleMLP = observerTextLayout.layoutParams as ViewGroup.MarginLayoutParams
-        observerSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics),
-            Util.scaleHeightPx(15, outMetrics),
-            0,
-            Util.scaleHeightPx(15, outMetrics))
 
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)

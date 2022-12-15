@@ -9,6 +9,7 @@ import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 
 /**
  * Get node module
@@ -50,5 +51,15 @@ abstract class GetNodeModule {
         @Provides
         fun provideGetNodeByHandle(filesRepository: FilesRepository): GetNodeByHandle =
             GetNodeByHandle(filesRepository::getNodeByHandle)
+
+        /**
+         * Provides [GetUnverifiedIncomingShares] implementation
+         *
+         * @param filesRepository [FilesRepository]
+         * @return [GetUnverifiedIncomingShares]
+         */
+        @Provides
+        fun provideGetUnVerifiedInComingShares(filesRepository: FilesRepository): GetUnverifiedIncomingShares =
+            GetUnverifiedIncomingShares(filesRepository::getUnVerifiedInComingShares)
     }
 }

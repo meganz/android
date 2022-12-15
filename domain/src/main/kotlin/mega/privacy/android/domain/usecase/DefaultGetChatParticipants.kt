@@ -23,6 +23,14 @@ import javax.inject.Inject
 
 /**
  * Default get chat participants use case implementation.
+ *
+ * @property chatRepository                 [ChatRepository]
+ * @property chatParticipantsRepository     [ChatParticipantsRepository]
+ * @property contactsRepository             [ContactsRepository]
+ * @property avatarRepository               [AvatarRepository]
+ * @property requestLastGreen               [RequestLastGreen]
+ * @property defaultDispatcher              [CoroutineDispatcher]
+
  */
 class DefaultGetChatParticipants @Inject constructor(
     private val chatRepository: ChatRepository,
@@ -52,9 +60,8 @@ class DefaultGetChatParticipants @Inject constructor(
         )
     }.flowOn(defaultDispatcher)
 
-    private suspend fun getParticipants(chatId: Long): List<ChatParticipant> {
-        return chatParticipantsRepository.getAllChatParticipants(chatId).toMutableList()
-    }
+    private suspend fun getParticipants(chatId: Long): List<ChatParticipant> =
+        chatParticipantsRepository.getAllChatParticipants(chatId).toMutableList()
 
     private suspend fun MutableList<ChatParticipant>.requestParticipantsInfo(): MutableList<ChatParticipant> {
         filter { !it.isMe }
