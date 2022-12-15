@@ -19,7 +19,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
@@ -198,8 +198,8 @@ class RubbishBinFragment : Fragment() {
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
-                colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
-                colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
+                colorPrimary = R.color.grey_900_grey_100,
+                colorSecondary = R.color.grey_300_grey_600
             )
 
             listBinding.root
@@ -247,8 +247,8 @@ class RubbishBinFragment : Fragment() {
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
-                colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
-                colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
+                colorPrimary = R.color.grey_900_grey_100,
+                colorSecondary = R.color.grey_300_grey_600
             )
             gridBinding.root
         }
@@ -291,8 +291,8 @@ class RubbishBinFragment : Fragment() {
     @Throws(Exception::class)
     private fun formatRequiredText(
         text: String,
-        @ColorInt colorResPrimary: Int,
-        @ColorInt colorResSecondary: Int,
+        @ColorRes colorResPrimary: Int,
+        @ColorRes colorResSecondary: Int,
     ): String {
         return runCatching {
             var textToShow = text
@@ -320,8 +320,8 @@ class RubbishBinFragment : Fragment() {
     private fun checkAndConfigureAdapter(
         textRubbishBinParentHandle: String,
         textGeneric: String,
-        @ColorInt colorPrimary: Int,
-        @ColorInt colorSecondary: Int,
+        @ColorRes colorPrimary: Int,
+        @ColorRes colorSecondary: Int,
     ) {
         if (adapter?.itemCount == 0) {
             recyclerView?.visibility = View.GONE
@@ -525,8 +525,8 @@ class RubbishBinFragment : Fragment() {
                 checkAndConfigureAdapter(
                     textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                     textGeneric = getString(R.string.file_browser_empty_folder_new),
-                    colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
-                    colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
+                    colorPrimary = R.color.grey_900_grey_100,
+                    colorSecondary = R.color.grey_300_grey_600
                 )
                 checkScroll()
             } else {
@@ -853,8 +853,8 @@ class RubbishBinFragment : Fragment() {
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
-                colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
-                colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
+                colorPrimary = R.color.grey_900_grey_100,
+                colorSecondary = R.color.grey_300_grey_600
             )
         }
     }
