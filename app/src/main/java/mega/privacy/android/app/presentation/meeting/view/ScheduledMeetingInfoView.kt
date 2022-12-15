@@ -59,7 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
+import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.ContactStatus
@@ -148,47 +148,39 @@ fun ScheduledMeetingInfoView(
             modifier = Modifier.padding(paddingValues)) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
 
-            state.apply {
-                items(buttons) { button ->
-                    ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
-                }
+            items(state.buttons) { button ->
+                ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
+            }
+            item(key = "Participants") { ParticipantsHeader(state = state) }
 
-                item(key = "Participants") { ParticipantsHeader(state = state) }
+            item(key = "Add participants") {
+                AddParticipantsButton(state = state,
+                    onAddParticipantsClicked = onAddParticipantsClicked)
+            }
 
-                item(key = "Add participants") {
-                    AddParticipantsButton(state = state,
-                        onAddParticipantsClicked = onAddParticipantsClicked)
-                }
-                val participantsList = state.participantItemList
+            item(key = "Participants list") {
+                state.participantItemList.indices.forEach { i ->
+                    if (i < 4 || !state.seeMoreVisible) {
+                        val isLastOne =
+                            (i < 4 && i == state.participantItemList.size - 1) || (i >= 4 && i == 3)
 
-                val numParticipantsToShow =
-                    if (state.seeMoreVisible && state.participantItemList.size > 4)
-                        4
-                    else
-                        state.participantItemList.size
-
-                for (i in 0 until numParticipantsToShow) {
-                    val isLastOne = i == numParticipantsToShow - 1
-                    item(key = participantsList[i].handle) {
-                        ParticipantItemView(participant = participantsList[i],
+                        ParticipantItemView(participant = state.participantItemList[i],
                             !isLastOne, onParticipantClicked = onParticipantClicked)
                     }
                 }
 
                 if (state.participantItemList.size > 4) {
-                    item(key = "See more or less participants") {
-                        SeeMoreOrLessParticipantsButton(state,
-                            onSeeMoreOrLessClicked = onSeeMoreOrLessClicked)
-                    }
+                    SeeMoreOrLessParticipantsButton(state,
+                        onSeeMoreOrLessClicked = onSeeMoreOrLessClicked)
                 }
+            }
 
-                item(key = "Scheduled meeting description") {
-                    ScheduledMeetingDescriptionView(state = state)
-                }
+            item(key = "Scheduled meeting description") {
+                ScheduledMeetingDescriptionView(state = state)
+            }
 
-                item(key = "Leave group") {
-                    LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
-                }
+            item(key = "Leave group") {
+                LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
             }
         }
 
@@ -394,8 +386,8 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     } else if (state.isSingleMeeting()) {
         OneParticipantAvatar(firstUser = state.firstParticipant ?: return)
     } else {
-        SeveralParticipantsAvatar(firstUser = state.lastParticipant ?: return,
-            lastUser = state.lastParticipant)
+        SeveralParticipantsAvatar(firstUser = state.firstParticipant ?: return,
+            lastUser = state.lastParticipant ?: return)
     }
 }
 
@@ -441,7 +433,9 @@ private fun DefaultAvatar(title: String) {
 fun OneParticipantAvatar(firstUser: ChatParticipant) {
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(color = Color(AvatarUtil.getColorAvatar(firstUser.handle)),
+            .fillMaxSize()
+            .clip(CircleShape)
+            .background(color = Color(firstUser.defaultAvatarColor),
                 shape = CircleShape)
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
@@ -454,13 +448,20 @@ fun OneParticipantAvatar(firstUser: ChatParticipant) {
                     placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
                 }
             }) {
-
-        Text(
-            text = AvatarUtil.getFirstLetter(firstUser.data.fullName),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            style = MaterialTheme.typography.h6
-        )
+        if (firstUser.data.avatarUri == null) {
+            Text(
+                text = firstUser.getAvatarFirstLetter(),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                style = MaterialTheme.typography.subtitle1
+            )
+        } else {
+            Image(modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape),
+                painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
+                contentDescription = "User avatar")
+        }
     }
 }
 
@@ -485,15 +486,23 @@ fun SeveralParticipantsAvatar(
                 .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.BottomEnd)
-                .background(color = Color(AvatarUtil.getSpecificAvatarColor(lastUser.defaultAvatarColor)),
+                .background(color = Color(lastUser.defaultAvatarColor),
                     shape = CircleShape)
         ) {
-            Text(
-                text = AvatarUtil.getFirstLetter(lastUser.data.fullName),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
+            if (lastUser.data.avatarUri == null) {
+                Text(
+                    text = lastUser.getAvatarFirstLetter(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1
+                )
+            } else {
+                Image(modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
+                    painter = rememberAsyncImagePainter(model = lastUser.data.avatarUri),
+                    contentDescription = "User avatar")
+            }
         }
 
         Box(contentAlignment = Alignment.Center,
@@ -502,17 +511,24 @@ fun SeveralParticipantsAvatar(
                 .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.TopStart)
-                .background(color = Color(AvatarUtil.getSpecificAvatarColor(firstUser.defaultAvatarColor)),
+                .background(color = Color(firstUser.defaultAvatarColor),
                     shape = CircleShape)
         ) {
-            Text(
-                text = AvatarUtil.getFirstLetter(firstUser.data.fullName),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
+            if (firstUser.data.avatarUri == null) {
+                Text(
+                    text = firstUser.getAvatarFirstLetter(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1
+                )
+            } else {
+                Image(modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
+                    painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
+                    contentDescription = "User avatar")
+            }
         }
-
     }
 }
 
@@ -1171,11 +1187,9 @@ private fun ParticipantAvatar(
     if (avatarUri != null) {
         UriAvatar(modifier = modifier, uri = avatarUri)
     } else {
-        participant.defaultAvatarColor?.let { color ->
-            DefaultContactAvatar(modifier = modifier,
-                color = Color(color.toColorInt()),
-                content = participant.getAvatarFirstLetter())
-        }
+        DefaultContactAvatar(modifier = modifier,
+            color = Color(participant.defaultAvatarColor),
+            content = participant.getAvatarFirstLetter())
     }
 }
 

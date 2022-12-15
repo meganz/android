@@ -153,4 +153,18 @@ interface ContactsRepository {
      * @return [AccountCredentials.ContactCredentials]
      */
     suspend fun getContactCredentials(userEmail: String): AccountCredentials.ContactCredentials?
+
+    /**
+     * Get the full name of the given user.
+     *
+     * @param emailOrHandle Email or user handle
+     */
+    suspend fun getUserFullName(emailOrHandle: String): String?
+
+    /**
+     * Get the email of the given user.
+     *
+     * @param handle User handle
+     */
+    suspend fun getUserEmail(handle: Long): String
 }

@@ -2,14 +2,9 @@ package mega.privacy.android.app.presentation.meeting.model
 
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
-import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
-import mega.privacy.android.domain.entity.user.UserVisibility
 
 /**
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
@@ -60,29 +55,9 @@ data class ScheduledMeetingInfoState(
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
-    val firstParticipant: ChatParticipant? = ChatParticipant(
-        handle = -1,
-        data = ContactData(fullName = "First", null, null),
-        email = "first@mega.nz",
-        privilege = ChatRoomPermission.Unknown,
-        defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
-        areCredentialsVerified = false,
-        isMe = false,
-        status = UserStatus.Invalid,
-        lastSeen = null),
-
-    val lastParticipant: ChatParticipant? = ChatParticipant(
-        handle = -1,
-        data = ContactData(fullName = "Last", null, null),
-        email = "last@mega.nz",
-        privilege = ChatRoomPermission.Unknown,
-        defaultAvatarColor = Constants.AVATAR_PRIMARY_COLOR,
-        areCredentialsVerified = false,
-        isMe = false,
-        status = UserStatus.Invalid,
-        lastSeen = null),
-
-    ) {
+    val firstParticipant: ChatParticipant? = null,
+    val lastParticipant: ChatParticipant? = null,
+) {
 
     /**
      * Check if the meeting does not contain participants

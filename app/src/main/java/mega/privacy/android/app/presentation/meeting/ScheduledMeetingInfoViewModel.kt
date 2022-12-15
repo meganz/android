@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.CreateChatLink
+import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContacts
@@ -77,6 +79,7 @@ import javax.inject.Inject
 class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getVisibleContacts: GetVisibleContacts,
     private val getChatRoom: GetChatRoom,
+    private val getChatParticipants:GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorConnectivity: MonitorConnectivity,
@@ -171,6 +174,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             )
                         }
 
+                        loadAllChatParticipants()
+
                         getScheduledMeeting()
                         updateDndSeconds(chatId)
                         updateRetentionTimeSeconds(retentionTime)
@@ -183,6 +188,51 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         Timber.d("Chat room is not active, finish")
                         finishActivity()
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Load all chat participants
+     */
+    private fun loadAllChatParticipants() = viewModelScope.launch {
+        runCatching {
+            getChatParticipants(state.value.chatId)
+                .catch { exception ->
+                    Timber.e(exception)
+                }
+                .collectLatest { list ->
+                    _state.update {
+                        it.copy(participantItemList = list)
+                    }
+                    updateFirstAndLastParticipants()
+                }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Update first and last participants
+     */
+    private fun updateFirstAndLastParticipants() {
+        _state.value.participantItemList.let { list ->
+            if (list.isEmpty()) {
+                _state.update {
+                    it.copy(firstParticipant = null,
+                        lastParticipant = null)
+                }
+            } else if (list.size == 1) {
+                _state.update {
+                    it.copy(firstParticipant = list.first(),
+                        lastParticipant = null)
+                }
+            } else {
+
+                _state.update {
+                    it.copy(firstParticipant = list.first(),
+                        lastParticipant = list.last())
                 }
             }
         }
