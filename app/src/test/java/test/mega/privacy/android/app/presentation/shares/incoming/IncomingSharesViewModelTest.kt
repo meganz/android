@@ -65,6 +65,10 @@ class IncomingSharesViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = IncomingSharesViewModel(
             getNodeByHandle,
             authorizeNode,
@@ -513,6 +517,7 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that unverified incoming shares are returned`() = runTest {
         whenever(getUnverifiedInComingShares()).thenReturn(3)
+        initViewModel()
         underTest.state.test {
             assertThat(awaitItem().unVerifiedInComingShares).isEqualTo(3)
         }

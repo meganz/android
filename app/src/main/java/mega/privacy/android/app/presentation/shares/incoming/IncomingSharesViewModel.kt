@@ -49,14 +49,6 @@ class IncomingSharesViewModel @Inject constructor(
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
-    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
-
-    /**
-     * State for [MandatoryFingerPrintVerification] feature flag value
-     */
-    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
-        _mandatoryFingerPrintVerificationState
-
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
@@ -77,6 +69,9 @@ class IncomingSharesViewModel @Inject constructor(
                     }
                 refreshNodes()?.let { setNodes(it) }
             }
+        }
+
+        viewModelScope.launch {
             isMandatoryFingerprintRequired()
             _state.update {
                 it.copy(unVerifiedInComingShares = getUnverifiedInComingShares())
@@ -211,8 +206,8 @@ class IncomingSharesViewModel @Inject constructor(
      */
     private fun isMandatoryFingerprintRequired() {
         viewModelScope.launch {
-            _mandatoryFingerPrintVerificationState.update {
-                getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification)
+            _state.update {
+                it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
             }
         }
     }
