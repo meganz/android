@@ -4194,7 +4194,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }).attach();
 
-            if(incomingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
                 //// TODO hardcoded number for now. This will get changed after SDK changes are available
                 TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
                 if(incomingSharesTab != null ) {
@@ -10500,7 +10500,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void setPendingActionsBadge() {
-        if(incomingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+        if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
             sharedItemsView.addView(pendingActionsBadge);
             TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
             tvPendingActionsCount.setText("5");
