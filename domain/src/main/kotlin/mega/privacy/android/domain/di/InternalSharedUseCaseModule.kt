@@ -9,12 +9,14 @@ import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.IsExtendedAccountDetailStale
+import mega.privacy.android.domain.usecase.impl.DefaultGetFullAccountInfo
 import mega.privacy.android.domain.usecase.impl.DefaultIsExtendedAccountDetailStale
 
 /**
@@ -35,6 +37,9 @@ internal abstract class InternalSharedUseCaseModule {
 
     @Binds
     abstract fun bindIsExtendedAccountDetailStale(implementation: DefaultIsExtendedAccountDetailStale): IsExtendedAccountDetailStale
+
+    @Binds
+    abstract fun bindGetFullAccountInfo(implementation: DefaultGetFullAccountInfo): GetFullAccountInfo
 
     /**
      * Bind get extended account detail

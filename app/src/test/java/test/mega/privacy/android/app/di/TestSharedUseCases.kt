@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.SharedUseCaseModule
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
@@ -42,4 +43,7 @@ object TestSharedUseCases {
 
     @Provides
     fun provideGetNumberOfSubscription() = mock<GetNumberOfSubscription>()
+
+    @Provides
+    fun provideGetFullAccountInfo() = mock<GetFullAccountInfo>()
 }
