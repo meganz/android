@@ -198,8 +198,8 @@ class RubbishBinFragment : Fragment() {
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
-                colorPrimary = R.color.grey_900_grey_100,
-                colorSecondary = R.color.grey_300_grey_600
+                colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
+                colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
             )
 
             listBinding.root
@@ -247,8 +247,8 @@ class RubbishBinFragment : Fragment() {
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
-                colorPrimary = R.color.grey_900_grey_100,
-                colorSecondary = R.color.grey_300_grey_600
+                colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
+                colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
             )
             gridBinding.root
         }
@@ -525,8 +525,8 @@ class RubbishBinFragment : Fragment() {
                 checkAndConfigureAdapter(
                     textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                     textGeneric = getString(R.string.file_browser_empty_folder_new),
-                    colorPrimary = R.color.grey_900_grey_100,
-                    colorSecondary = R.color.grey_300_grey_600
+                    colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
+                    colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
                 )
                 checkScroll()
             } else {
@@ -853,8 +853,8 @@ class RubbishBinFragment : Fragment() {
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
-                colorPrimary = R.color.grey_900_grey_100,
-                colorSecondary = R.color.grey_300_grey_600
+                colorPrimary = resources.getColor(R.color.grey_900_grey_100, null),
+                colorSecondary = resources.getColor(R.color.grey_300_grey_600, null)
             )
         }
     }
