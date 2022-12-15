@@ -219,6 +219,7 @@ class AlbumsViewModel @Inject constructor(
         if (albumIds.isEmpty()) return
 
         removeAlbumIds(albumIds)
+        clearAlbumSelection()
         updateInActiveAlbums(albumIds)
         loadUserAlbums()
     }
