@@ -204,11 +204,9 @@ class IncomingSharesViewModel @Inject constructor(
     /**
      * Gets the feature flag value & updates state
      */
-    private fun isMandatoryFingerprintRequired() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
-            }
+    private suspend fun isMandatoryFingerprintRequired() {
+        _state.update {
+            it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
         }
     }
 }
