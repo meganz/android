@@ -9,9 +9,17 @@ import javax.inject.Inject
  */
 internal class DefaultGetExtendedAccountDetail @Inject constructor(
     private val repository: AccountRepository,
+    private val isExtendedAccountDetailStale: IsExtendedAccountDetailStale,
 ) : GetExtendedAccountDetail {
-    override suspend fun invoke(sessions: Boolean, purchases: Boolean, transactions: Boolean) {
-        repository.resetExtendedAccountDetailsTimestamp()
-        repository.getExtendedAccountDetails(sessions, purchases, transactions)
+    override suspend fun invoke(
+        forceRefresh: Boolean,
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean
+    ) {
+        if (forceRefresh || isExtendedAccountDetailStale()) {
+            repository.resetExtendedAccountDetailsTimestamp()
+            repository.getExtendedAccountDetails(sessions, purchases, transactions)
+        }
     }
 }

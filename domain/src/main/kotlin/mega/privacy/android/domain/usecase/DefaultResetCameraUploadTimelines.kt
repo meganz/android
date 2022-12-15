@@ -4,7 +4,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
- * Get is charging required
+ * Check if local folder attribute changed and reset timelines
  *
  */
 class DefaultResetCameraUploadTimelines @Inject constructor(

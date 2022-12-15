@@ -1,7 +1,10 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
@@ -9,11 +12,15 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
+import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
@@ -51,6 +58,56 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
     }
+
+    override fun startUpload(
+        localPath: String,
+        parentNode: MegaNode,
+        fileName: String?,
+        modificationTime: Long,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        shouldStartFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+    ): Flow<GlobalTransfer> = callbackFlow {
+        val listener = uploadListener(channel)
+
+        megaApiGateway.startUpload(
+            localPath = localPath,
+            parentNode = parentNode,
+            fileName = fileName,
+            modificationTime = modificationTime,
+            appData = appData,
+            isSourceTemporary = isSourceTemporary,
+            shouldStartFirst = shouldStartFirst,
+            cancelToken = cancelToken,
+            listener = listener,
+        )
+
+        awaitClose {
+            cancelToken?.cancel()
+            megaApiGateway.removeTransferListener(listener)
+        }
+    }
+
+    private fun uploadListener(
+        channel: SendChannel<GlobalTransfer>,
+    ) = OptionalMegaTransferListenerInterface(
+        onTransferStart = { transfer ->
+            channel.trySend(GlobalTransfer.OnTransferStart(transfer))
+        },
+        onTransferFinish = { transfer, error ->
+            channel.trySend(GlobalTransfer.OnTransferFinish(transfer, error))
+        },
+        onTransferUpdate = { transfer ->
+            channel.trySend(GlobalTransfer.OnTransferUpdate(transfer))
+        },
+        onTransferTemporaryError = { transfer, error ->
+            channel.trySend(GlobalTransfer.OnTransferTemporaryError(transfer, error))
+        },
+        onTransferData = { transfer, buffer ->
+            channel.trySend(GlobalTransfer.OnTransferData(transfer, buffer))
+        },
+    )
 
     override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->

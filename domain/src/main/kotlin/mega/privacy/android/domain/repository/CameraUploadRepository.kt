@@ -358,6 +358,14 @@ interface CameraUploadRepository {
     suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
 
     /**
+     * Update camera upload folder destination in settings
+     *
+     * @param nodeHandle    updated node handle
+     * @param isSecondary   if updated node handle is secondary media
+     */
+    suspend fun sendUpdateFolderDestinationBroadcast(nodeHandle: Long, isSecondary: Boolean)
+
+    /**
      * Get the media queue for a given media type
      *
      * @param mediaStoreFileType different media store file type

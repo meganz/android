@@ -33,4 +33,12 @@ interface CameraUploadMediaGateway {
      * @param isSecondary   if updated node handle is secondary media
      */
     suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
+
+    /**
+     * Update camera upload folder destination in settings
+     *
+     * @param nodeHandle    updated node handle
+     * @param isSecondary   if updated node handle is secondary media
+     */
+    suspend fun sendUpdateFolderDestinationBroadcast(nodeHandle: Long, isSecondary: Boolean)
 }
