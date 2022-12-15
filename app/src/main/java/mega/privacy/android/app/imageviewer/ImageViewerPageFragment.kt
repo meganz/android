@@ -47,7 +47,7 @@ class ImageViewerPageFragment : Fragment() {
     companion object {
         private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
         private const val MAX_ZOOM_SCALE_FACTOR = 20f
-        private const val MAX_BITMAP_SIZE = 8192
+        private const val MAX_BITMAP_SIZE = 5000 // Android Canvas maximum bitmap size
         private const val PERF_TRACE_NAME = "full_image_loading"
 
         /**
