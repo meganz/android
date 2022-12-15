@@ -256,7 +256,11 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             getUserFirstName(emailOrHandle)
             getUserLastName(emailOrHandle)
-            val userHandle = megaApiGateway.getContact(emailOrHandle)?.handle ?: -1
+            val userHandle =
+                if (emailOrHandle == megaChatApiGateway.getMyEmail())
+                    megaChatApiGateway.getMyUserHandle()
+                else megaApiGateway.getContact(emailOrHandle)?.handle ?: -1
+
             val fullName = megaChatApiGateway.getUserFullNameFromCache(userHandle)
             if (fullName.isNullOrEmpty()) null else fullName
         }

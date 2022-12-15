@@ -1182,10 +1182,9 @@ private fun ParticipantAvatar(
         .clip(CircleShape),
     participant: ChatParticipant,
 ) {
-    val avatarUri = participant.data.avatarUri
 
-    if (avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = avatarUri)
+    if (participant.data.avatarUri != null) {
+        UriAvatar(modifier = modifier, uri = participant.data.avatarUri.toString())
     } else {
         DefaultContactAvatar(modifier = modifier,
             color = Color(participant.defaultAvatarColor),

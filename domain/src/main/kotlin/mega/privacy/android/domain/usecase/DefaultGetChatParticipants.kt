@@ -8,12 +8,14 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -26,6 +28,7 @@ class DefaultGetChatParticipants @Inject constructor(
     private val chatRepository: ChatRepository,
     private val chatParticipantsRepository: ChatParticipantsRepository,
     private val contactsRepository: ContactsRepository,
+    private val avatarRepository: AvatarRepository,
     private val requestLastGreen: RequestLastGreen,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetChatParticipants {
@@ -35,12 +38,16 @@ class DefaultGetChatParticipants @Inject constructor(
             addAll(getParticipants(chatId))
         }
         emit(participants)
+        emit(participants.requestParticipantsInfo())
         emitAll(
-            merge(participants.requestParticipantInfo(),
+            merge(
                 participants.monitorChatPresenceLastGreenUpdates(),
                 participants.monitorChatOnlineStatusUpdates(),
                 participants.monitorChatListItemUpdates(chatId),
-                participants.monitorContactUpdates()
+                participants.monitorContactUpdates(),
+                participants.monitorMyAvatarUpdates(),
+                participants.monitorMyNameUpdates(),
+                participants.monitorMyEmailUpdates()
             )
         )
     }.flowOn(defaultDispatcher)
@@ -49,74 +56,30 @@ class DefaultGetChatParticipants @Inject constructor(
         return chatParticipantsRepository.getAllChatParticipants(chatId).toMutableList()
     }
 
-    private fun MutableList<ChatParticipant>.requestParticipantInfo(): Flow<MutableList<ChatParticipant>> =
-        flow {
-            emitAll(
-                merge(
-                    requestStatus(),
-                    requestAvatarUri(),
-                    requestCredentials(),
-                    requestAlias()))
-        }.flowOn(defaultDispatcher)
-
-    private fun MutableList<ChatParticipant>.requestStatus(): Flow<MutableList<ChatParticipant>> =
-        flow<MutableList<ChatParticipant>> {
-            map { participant ->
-                val status = chatParticipantsRepository.getStatus(participant)
-                if (status != UserStatus.Online) {
-                    requestLastGreen(participant.handle)
-                }
-
-                apply {
-                    val currentItemIndex = indexOfFirst { it.handle == participant.handle }
-                    val currentItem = get(currentItemIndex)
-                    set(currentItemIndex, currentItem.copy(status = status))
-                }
-            }
-        }.flowOn(defaultDispatcher)
-
-    private fun MutableList<ChatParticipant>.requestCredentials(): Flow<MutableList<ChatParticipant>> =
-        flow<MutableList<ChatParticipant>> {
-            filter { !it.isMe }
-            map { participant ->
-                val verified = chatParticipantsRepository.areCredentialsVerified(participant)
-                apply {
-                    val currentItemIndex = indexOfFirst { it.handle == participant.handle }
-                    val currentItem = get(currentItemIndex)
-                    set(currentItemIndex, currentItem.copy(areCredentialsVerified = verified))
-                }
-                this
-            }
-        }.flowOn(defaultDispatcher)
-
-    private fun MutableList<ChatParticipant>.requestAlias(): Flow<MutableList<ChatParticipant>> =
-        flow<MutableList<ChatParticipant>> {
-            filter { !it.isMe }
-            map { participant ->
-                val alias = chatParticipantsRepository.getAlias(participant)
-                apply {
-                    val currentItemIndex = indexOfFirst { it.handle == participant.handle }
-                    val currentItem = get(currentItemIndex)
+    private suspend fun MutableList<ChatParticipant>.requestParticipantsInfo(): MutableList<ChatParticipant> {
+        filter { !it.isMe }
+        forEach { participant ->
+            apply {
+                val currentItemIndex = indexOfFirst { it.handle == participant.handle }
+                val currentItem = get(currentItemIndex)
+                withContext(defaultDispatcher) {
                     set(currentItemIndex,
-                        currentItem.copy(data = currentItem.data.copy(alias = alias)))
+                        currentItem.copy(status = chatParticipantsRepository.getStatus(
+                            currentItem),
+                            areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
+                                currentItem),
+                            defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
+                                currentItem),
+                            data = currentItem.data.copy(alias = chatParticipantsRepository.getAlias(
+                                currentItem),
+                                avatarUri = chatParticipantsRepository.getAvatarUri(currentItem)
+                                    ?.toString())))
                 }
-                this
             }
-        }.flowOn(defaultDispatcher)
+        }
 
-    private fun MutableList<ChatParticipant>.requestAvatarUri(): Flow<MutableList<ChatParticipant>> =
-        flow<MutableList<ChatParticipant>> {
-            map { participant ->
-                val avatarUri = chatParticipantsRepository.getAvatarUri(participant)
-                apply {
-                    val currentItemIndex = indexOfFirst { it.handle == participant.handle }
-                    val currentItem = get(currentItemIndex)
-                    set(currentItemIndex,
-                        currentItem.copy(data = currentItem.data.copy(avatarUri = avatarUri)))
-                }
-                this
-            }
-        }.flowOn(defaultDispatcher)
+        return this
+    }
 
     private fun MutableList<ChatParticipant>.monitorChatPresenceLastGreenUpdates(): Flow<MutableList<ChatParticipant>> =
         contactsRepository.monitorChatPresenceLastGreenUpdates()
@@ -137,12 +100,29 @@ class DefaultGetChatParticipants @Inject constructor(
                 apply {
                     val currentItemIndex = indexOfFirst { it.handle == update.userHandle }
                     val currentItem = get(currentItemIndex)
-                    if (update.status != UserStatus.Online) this@DefaultGetChatParticipants.requestLastGreen(
-                        update.userHandle)
-                    set(currentItemIndex, currentItem.copy(status = update.status))
+                    if (update.status != UserStatus.Online) {
+                        this@DefaultGetChatParticipants.requestLastGreen(update.userHandle)
+                        set(currentItemIndex, currentItem.copy(status = update.status))
+                    } else {
+                        set(currentItemIndex,
+                            currentItem.copy(status = update.status, lastSeen = null))
+                    }
                 }
                 this
             }
+
+    private suspend fun updateItem(chatParticipant: ChatParticipant): ChatParticipant =
+        withContext(defaultDispatcher) {
+            return@withContext chatParticipant.copy(
+                status = chatParticipantsRepository.getStatus(chatParticipant),
+                areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
+                    chatParticipant),
+                defaultAvatarColor = chatParticipantsRepository.getAvatarColor(chatParticipant),
+                data = chatParticipant.data.copy(alias = chatParticipantsRepository.getAlias(
+                    chatParticipant),
+                    avatarUri = chatParticipantsRepository.getAvatarUri(chatParticipant)
+                        ?.toString()))
+        }
 
     private suspend fun MutableList<ChatParticipant>.monitorChatListItemUpdates(
         chatId: Long,
@@ -162,25 +142,111 @@ class DefaultGetChatParticipants @Inject constructor(
                             set(currentItemIndex,
                                 currentItem.copy(privilege = item.ownPrivilege))
                         }
+                        return@map this
                     } else if (item.changes == ChatListItemChanges.LastMessage) {
                         if (item.lastMessageType == ChatRoomLastMessage.AlterParticipants) {
-                            val newList = chatParticipantsRepository.updateList(chatId, this)
-                            clear()
-                            addAll(newList)
-                        } else if (item.lastMessageType == ChatRoomLastMessage.PrivChange) {
-                            map { participant ->
-                                if (!participant.isMe) {
-                                    apply {
-                                        val currentItemIndex =
-                                            indexOfFirst { it.handle == participant.handle }
-                                        val currentItem = get(currentItemIndex)
-                                        val permissions = chatParticipantsRepository.getPermissions(
-                                            chatId,
-                                            participant)
-                                        set(currentItemIndex,
-                                            currentItem.copy(privilege = permissions))
+                            val newList = chatParticipantsRepository.getAllChatParticipants(chatId)
+                                .toMutableList()
+
+                            newList.forEach { newItem ->
+                                apply {
+                                    val newItemIndex = indexOfFirst { it.handle == newItem.handle }
+                                    if (newItemIndex == -1) {
+                                        apply {
+                                            add(updateItem(newItem))
+                                        }
                                     }
                                 }
+                            }
+
+                            val iterator = this.iterator()
+                            iterator.forEach { currentItem ->
+                                val currentItemIndex =
+                                    newList.indexOfFirst { it.handle == currentItem.handle }
+                                if (currentItemIndex == -1) {
+                                    apply {
+                                        remove(currentItem)
+                                    }
+                                    return@forEach
+                                }
+                            }
+
+                            return@map this
+                        } else if (item.lastMessageType == ChatRoomLastMessage.PrivChange) {
+                            apply {
+                                map { participant ->
+                                    val currentItemIndex =
+                                        this.indexOfFirst { it.handle == participant.handle }
+                                    if (currentItemIndex != -1) {
+                                        val currentItem = get(currentItemIndex)
+                                        set(currentItemIndex,
+                                            currentItem.copy(privilege = chatParticipantsRepository.getPermissions(
+                                                chatId,
+                                                currentItem)))
+                                    }
+                                }
+                            }
+                            return@map this
+                        }
+                    }
+                }
+            }
+
+
+    private fun MutableList<ChatParticipant>.monitorMyAvatarUpdates(): Flow<MutableList<ChatParticipant>> =
+        avatarRepository.monitorMyAvatarFile()
+            .map { file ->
+                apply {
+                    map { participant ->
+                        if (participant.isMe) {
+                            val currentItemIndex = indexOfFirst { it.handle == participant.handle }
+                            val currentItem = get(currentItemIndex)
+
+                            var avatarUri: String? = null
+                            file?.let {
+                                if (it.exists() && it.length() > 0) {
+                                    avatarUri = it.toString()
+                                }
+                            }
+                            set(currentItemIndex, currentItem.copy(
+                                data = currentItem.data.copy(
+                                    avatarUri = avatarUri,
+                                ), defaultAvatarColor = avatarRepository.getMyAvatarColor()
+                            ))
+                        }
+                    }
+                }
+                this
+            }
+
+    private fun MutableList<ChatParticipant>.monitorMyNameUpdates(): Flow<MutableList<ChatParticipant>> =
+        chatRepository.monitorMyName()
+            .map {
+                apply {
+                    map { participant ->
+                        if (participant.isMe) {
+                            val currentItemIndex = indexOfFirst { it.handle == participant.handle }
+                            val currentItem = get(currentItemIndex)
+                            set(currentItemIndex,
+                                currentItem.copy(data = currentItem.data.copy(fullName = contactsRepository.getUserFullName(
+                                    currentItem.email))))
+                        }
+                    }
+                }
+                this
+            }
+
+    private fun MutableList<ChatParticipant>.monitorMyEmailUpdates(): Flow<MutableList<ChatParticipant>> =
+        chatRepository.monitorMyEmail()
+            .map { update ->
+                apply {
+                    map { participant ->
+                        if (participant.isMe) {
+                            update?.let { newEmail ->
+                                val currentItemIndex =
+                                    indexOfFirst { it.handle == participant.handle }
+                                val currentItem = get(currentItemIndex)
+                                set(currentItemIndex, currentItem.copy(email = newEmail))
                             }
                         }
                     }
@@ -195,13 +261,16 @@ class DefaultGetChatParticipants @Inject constructor(
                     if (changes.contains(UserChanges.Alias)) {
                         map { participant ->
                             if (!participant.isMe) {
-                                val alias = chatParticipantsRepository.getAlias(participant)
                                 apply {
                                     val currentItemIndex =
                                         indexOfFirst { it.handle == participant.handle }
-                                    val currentItem = get(currentItemIndex)
-                                    set(currentItemIndex,
-                                        currentItem.copy(data = currentItem.data.copy(alias = alias)))
+                                    val currentItem = this[currentItemIndex]
+                                    this[currentItemIndex] =
+                                        currentItem.copy(
+                                            data = currentItem.data.copy(
+                                                alias = chatParticipantsRepository.getAlias(
+                                                    currentItem))
+                                        )
                                 }
                             }
                         }
@@ -209,14 +278,15 @@ class DefaultGetChatParticipants @Inject constructor(
                     if (changes.contains(UserChanges.AuthenticationInformation)) {
                         map { participant ->
                             if (!participant.isMe) {
-                                val verified =
-                                    chatParticipantsRepository.areCredentialsVerified(participant)
                                 apply {
                                     val currentItemIndex =
                                         indexOfFirst { it.handle == participant.handle }
-                                    val currentItem = get(currentItemIndex)
-                                    set(currentItemIndex,
-                                        currentItem.copy(areCredentialsVerified = verified))
+                                    val currentItem = this[currentItemIndex]
+                                    this[currentItemIndex] =
+                                        currentItem.copy(
+                                            areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
+                                                currentItem)
+                                        )
                                 }
                             }
                         }
@@ -225,39 +295,49 @@ class DefaultGetChatParticipants @Inject constructor(
                     filter { it.handle == userId.id }
                     map { participant ->
                         if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
-                            val newName = contactsRepository.getUserFullName(participant.email)
-                            apply {
-                                val currentItemIndex =
-                                    indexOfFirst { it.handle == participant.handle }
-                                val currentItem = get(currentItemIndex)
-                                set(currentItemIndex,
-                                    currentItem.copy(data = currentItem.data.copy(fullName = newName)))
+                            if (participant.handle == userId.id) {
+                                apply {
+                                    val currentItemIndex = indexOfFirst { it.handle == userId.id }
+                                    val currentItem = this[currentItemIndex]
+                                    this[currentItemIndex] =
+                                        currentItem.copy(
+                                            data = currentItem.data.copy(
+                                                fullName = contactsRepository.getUserFullName(
+                                                    currentItem.email)
+                                            )
+                                        )
+                                }
                             }
                         }
 
                         if (changes.contains(UserChanges.Email)) {
-                            val newEmail = contactsRepository.getUserEmail(participant.handle)
-                            apply {
-                                val currentItemIndex =
-                                    indexOfFirst { it.handle == participant.handle }
-                                val currentItem = get(currentItemIndex)
-                                set(currentItemIndex,
-                                    currentItem.copy(email = newEmail))
+                            if (participant.handle == userId.id) {
+                                apply {
+                                    val currentItemIndex = indexOfFirst { it.handle == userId.id }
+                                    val currentItem = this[currentItemIndex]
+                                    this[currentItemIndex] =
+                                        currentItem.copy(
+                                            email = contactsRepository.getUserEmail(currentItem.handle)
+                                        )
+                                }
                             }
                         }
 
                         if (changes.contains(UserChanges.Avatar)) {
-                            val newAvatarUri = chatParticipantsRepository.getAvatarUri(participant)
-                            apply {
-                                val currentItemIndex =
-                                    indexOfFirst { it.handle == participant.handle }
-                                val currentItem = get(currentItemIndex)
-                                set(currentItemIndex,
-                                    currentItem.copy(data = currentItem.data.copy(avatarUri = newAvatarUri)))
+                            if (participant.handle == userId.id) {
+                                apply {
+                                    val currentItemIndex = indexOfFirst { it.handle == userId.id }
+                                    val currentItem = this[currentItemIndex]
+                                    this[currentItemIndex] =
+                                        currentItem.copy(
+                                            data = currentItem.data.copy(
+                                                avatarUri = chatParticipantsRepository.getAvatarUri(
+                                                    currentItem)?.toString())
+                                        )
+                                }
                             }
                         }
                     }
-
                 }
                 this
             }

@@ -51,7 +51,6 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatMessage
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -79,7 +78,7 @@ import javax.inject.Inject
 class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getVisibleContacts: GetVisibleContacts,
     private val getChatRoom: GetChatRoom,
-    private val getChatParticipants:GetChatParticipants,
+    private val getChatParticipants: GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorConnectivity: MonitorConnectivity,

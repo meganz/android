@@ -2,24 +2,21 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.FileConstant
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.userPermission
 import mega.privacy.android.data.mapper.userStatus
-import mega.privacy.android.data.mapper.userVisibility
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserStatus
-import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.RequestLastGreen
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaUser
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -33,7 +30,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val avatarRepository: AvatarRepository,
     private val contactsRepository: ContactsRepository,
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val requestLastGreen: RequestLastGreen,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
@@ -42,9 +39,8 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             val list: MutableList<ChatParticipant> = mutableListOf()
             megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
                 val myEmail = getMyEmail()
-                val handle = getMyUserHandle()
                 val myParticipant = ChatParticipant(
-                    handle = handle,
+                    handle = getMyUserHandle(),
                     data = ContactData(
                         fullName = getMyFullName().ifEmpty { myEmail },
                         alias = null,
@@ -64,18 +60,19 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                         continue
                     }
 
-                    val handleP = chatRoom.getPeerHandle(i)
+                    val handle = chatRoom.getPeerHandle(i)
+                    val alias = megaChatApiGateway.getUserAliasFromCache(handle)
                     val participant = ChatParticipant(
-                        handle = handleP,
+                        handle = handle,
                         data = ContactData(
                             fullName = chatRoom.getPeerFullname(i),
-                            alias = null,
+                            alias = alias,
                             avatarUri = null),
                         email = chatRoom.getPeerEmail(i),
                         isMe = false,
                         privilege = userPermission[participantPrivilege]
                             ?: ChatRoomPermission.Unknown,
-                        defaultAvatarColor = avatarRepository.getAvatarColor(handleP))
+                        defaultAvatarColor = avatarRepository.getAvatarColor(handle))
 
                     list.add(participant)
                 }
@@ -87,17 +84,23 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     override suspend fun getStatus(participant: ChatParticipant): UserStatus =
         withContext(ioDispatcher) {
             if (participant.handle == getMyUserHandle()) {
-                return@withContext userStatus[megaChatApiGateway.getOnlineStatus()]
+                val status = userStatus[megaChatApiGateway.getOnlineStatus()]
                     ?: UserStatus.Invalid
+
+                if (status != UserStatus.Online) {
+                    requestLastGreen(participant.handle)
+                }
+                return@withContext status
             }
 
-            getMegaUser(participant.handle)?.let { megaUser ->
-                val visibility =
-                    userVisibility[megaUser.visibility] ?: UserVisibility.Unknown
-                if (visibility == UserVisibility.Visible) {
-                    return@withContext userStatus[megaChatApiGateway.getUserOnlineStatus(participant.handle)]
-                        ?: UserStatus.Invalid
+            megaApiGateway.getContact(participant.email)?.let {
+                val status = userStatus[megaChatApiGateway.getUserOnlineStatus(it.handle)]
+                    ?: UserStatus.Invalid
+                if (status != UserStatus.Online) {
+                    requestLastGreen(it.handle)
                 }
+
+                return@withContext status
             }
 
             return@withContext UserStatus.Invalid
@@ -109,45 +112,49 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             onFailure = { null }
         )
 
-    override suspend fun getAvatarUri(participant: ChatParticipant): String? =
-        withContext(ioDispatcher) {
-            if (participant.isMe) {
-                val myAvatarFile = avatarRepository.getMyAvatarFile()
-                myAvatarFile?.let {
-                    if (it.exists() && it.length() > 0) {
-                        return@withContext it.toString()
-                    }
-                }
-            } else {
-                runCatching { avatarRepository.getAvatarFile(participant.handle) }.fold(
-                    onSuccess = { contactAvatarFile ->
-                        contactAvatarFile?.let {
-                            if (it.exists() && it.length() > 0) {
-                                return@withContext it.toString()
-                            }
-                        }
-                    },
-                    onFailure = {
-                        cacheFolderGateway.buildAvatarFile(participant.email + FileConstant.JPG_EXTENSION)
-                            ?.let { contactAvatarFile ->
-                                if (contactAvatarFile.exists() && contactAvatarFile.length() > 0) {
-                                    return@withContext it.toString()
-                                }
-                            }
+    override suspend fun getAvatarColor(participant: ChatParticipant): Int {
+        if (participant.isMe) {
+            return avatarRepository.getMyAvatarColor()
+        }
 
-                    }
-                )
+        return avatarRepository.getAvatarColor(participant.handle)
+    }
+
+    override suspend fun getAvatarUri(participant: ChatParticipant): File? {
+        if (participant.isMe) {
+            avatarRepository.getMyAvatarFile()?.let {
+                if (it.exists() && it.length() > 0) {
+                    return it
+                }
             }
 
-            return@withContext null
+            return null
+        } else {
+            runCatching { avatarRepository.getAvatarFile(userHandle = participant.handle) }.fold(
+                onSuccess = { file ->
+                    file?.let {
+                        if (it.exists() && it.length() > 0) {
+                            return it
+                        }
+                    }
+                    return null
+                },
+                onFailure = {
+                    return null
+                }
+            )
         }
+    }
 
     override suspend fun getPermissions(
         chatId: Long,
         participant: ChatParticipant,
     ): ChatRoomPermission = withContext(ioDispatcher) {
+
         megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
-            val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(participant.handle)
+            val participantPrivilege =
+                if (participant.isMe) chatRoom.ownPrivilege else chatRoom.getPeerPrivilegeByHandle(
+                    participant.handle)
             return@withContext userPermission[participantPrivilege]
                 ?: ChatRoomPermission.Unknown
         }
@@ -156,31 +163,10 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     }
 
     override suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean =
-        withContext(ioDispatcher) {
-            getMegaUser(participant.handle)?.let { megaUser ->
-                val visibility =
-                    userVisibility[megaUser.visibility] ?: UserVisibility.Unknown
-                if (visibility == UserVisibility.Visible) {
-                    return@withContext megaApiGateway.areCredentialsVerified(megaUser)
-                }
-            }
-
-            return@withContext false
-        }
-
-    override suspend fun updateList(
-        chatId: Long,
-        currentList: List<ChatParticipant>,
-    ): MutableList<ChatParticipant> = withContext(ioDispatcher) {
-        val newList = getAllChatParticipants(chatId).toMutableList()
-        newList.forEach { participantNewList ->
-            val index = newList.indexOf(participantNewList)
-            currentList.filter { it.handle == participantNewList.handle }.map {
-                newList.set(index, it)
-            }
-        }
-        return@withContext newList
-    }
+        runCatching { contactsRepository.areCredentialsVerified(participant.email) }.fold(
+            onSuccess = { cred -> cred },
+            onFailure = { false }
+        )
 
     suspend fun getMyUserHandle(): Long =
         withContext(ioDispatcher) {
@@ -188,23 +174,10 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         }
 
     suspend fun getMyFullName(): String = withContext(ioDispatcher) {
-        megaChatApiGateway.getMyFullname()
+        return@withContext megaChatApiGateway.getMyFullname()
     }
 
     suspend fun getMyEmail(): String = withContext(ioDispatcher) {
         megaChatApiGateway.getMyEmail()
     }
-
-    private suspend fun getMegaUser(participantHandle: Long): MegaUser? =
-        withContext(ioDispatcher) {
-            if (participantHandle != megaApiGateway.getInvalidHandle()) {
-                megaApiGateway.userHandleToBase64(participantHandle).let { handleInBase64 ->
-                    if (handleInBase64.isNotEmpty()) {
-                        return@withContext megaApiGateway.getContact(handleInBase64)
-                    }
-                }
-            }
-
-            return@withContext null
-        }
 }
