@@ -2,6 +2,9 @@
  * This file is a common module that hosts methods that are called by different CI/CD scripts.
  */
 
+
+import groovy.json.JsonSlurperClassic
+
 /**
  * Check out mega chat SDK by commit ID
  *
@@ -127,6 +130,61 @@ void downloadJenkinsConsoleLog(String downloaded) {
     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
         sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
     }
+}
+
+
+/**
+ * Rread the prebuilt SDK version from project build.gradle
+ * @return version of prebuilt SDK
+ */
+String readPrebuiltSdkVersion() {
+    return sh(script: "grep megaSdkVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
+}
+
+/**
+ * Query prebuit SDK properties from Artifactory Maven repo <p>
+ *
+ * @param property the property to query. possible value: 'sdk-commit', 'chat-commit'
+ * @param version version of the pre-built SDK. It can be read at the value of megaSdkVersion in
+ * project build.gradle file.
+ * @return property value
+ */
+def queryPrebuiltSdkProperty(String property, String version) {
+    def commit = "N/A"
+    def cmd = "curl ${env.ARTIFACTORY_BASE_URL}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
+    def response = sh(script: cmd, returnStdout: true).trim()
+    def properties = new JsonSlurperClassic().parseText(response).properties
+    if (properties != null) {
+        commit = properties[property][0]
+    }
+    println("$property = $commit")
+    return commit
+}
+
+/**
+ * checkout SDK by branch
+ * @param sdkBranch the branch to checkout
+ */
+private void checkoutSdkByBranch(String sdkBranch) {
+    sh "echo checkoutSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
+}
+
+/**
+ * checkout MEGAchat SDK by branch
+ * @param megaChatBranch the branch to checkout
+ */
+private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
+    sh "echo checkoutMegaChatSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
 }
 
 return this
