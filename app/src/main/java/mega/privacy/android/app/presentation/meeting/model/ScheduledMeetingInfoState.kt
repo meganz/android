@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
  * @property addParticipantsNoContactsDialog            True if show add participants no contacts dialog, false if not.
  * @property addParticipantsNoContactsLeftToAddDialog   True if show add participants no contacts left to add dialog, false if not.
+ * @property isEditEnabled                              True if edit scheduled meeting is allowed, false otherwise.
  * @property buttons                                    List of available action buttons.
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
@@ -64,6 +65,7 @@ data class ScheduledMeetingInfoState(
     val leaveGroupDialog: Boolean = false,
     val addParticipantsNoContactsDialog: Boolean = false,
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
+    val isEditEnabled: Boolean = false,
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = null,

@@ -38,77 +38,78 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
-    override suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant> =
-        withContext(ioDispatcher) {
+    override suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant> {
+        megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
             val list: MutableList<ChatParticipant> = mutableListOf()
-            megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
-                val myEmail = getMyEmail()
-                val myParticipant = ChatParticipant(
-                    handle = getMyUserHandle(),
+
+            val myEmail = megaChatApiGateway.getMyEmail()
+            val myName = megaChatApiGateway.getMyFullname()
+            val myParticipant = ChatParticipant(
+                handle = megaChatApiGateway.getMyUserHandle(),
+                data = ContactData(
+                    fullName = myName.ifEmpty { myEmail },
+                    alias = null,
+                    avatarUri = null),
+                email = myEmail,
+                isMe = true,
+                defaultAvatarColor = avatarRepository.getMyAvatarColor(),
+                privilege = userPermission[chatRoom.ownPrivilege]
+                    ?: ChatRoomPermission.Unknown)
+
+            list.add(myParticipant)
+
+            val participantsCount = chatRoom.peerCount
+            for (i in 0 until participantsCount) {
+                val participantPrivilege = chatRoom.getPeerPrivilege(i)
+                if (participantPrivilege == MegaChatRoom.PRIV_RM) {
+                    continue
+                }
+
+                val handle = chatRoom.getPeerHandle(i)
+                val alias = megaChatApiGateway.getUserAliasFromCache(handle)
+                val participant = ChatParticipant(
+                    handle = handle,
                     data = ContactData(
-                        fullName = getMyFullName().ifEmpty { myEmail },
-                        alias = null,
+                        fullName = chatRoom.getPeerFullname(i),
+                        alias = alias,
                         avatarUri = null),
-                    email = myEmail,
-                    isMe = true,
-                    defaultAvatarColor = avatarRepository.getMyAvatarColor(),
-                    privilege = userPermission[chatRoom.ownPrivilege]
-                        ?: ChatRoomPermission.Unknown)
+                    email = chatRoom.getPeerEmail(i),
+                    isMe = false,
+                    privilege = userPermission[participantPrivilege]
+                        ?: ChatRoomPermission.Unknown,
+                    defaultAvatarColor = avatarRepository.getAvatarColor(handle))
 
-                list.add(myParticipant)
-
-                val participantsCount = chatRoom.peerCount
-                for (i in 0 until participantsCount) {
-                    val participantPrivilege = chatRoom.getPeerPrivilege(i)
-                    if (participantPrivilege == MegaChatRoom.PRIV_RM) {
-                        continue
-                    }
-
-                    val handle = chatRoom.getPeerHandle(i)
-                    val alias = megaChatApiGateway.getUserAliasFromCache(handle)
-                    val participant = ChatParticipant(
-                        handle = handle,
-                        data = ContactData(
-                            fullName = chatRoom.getPeerFullname(i),
-                            alias = alias,
-                            avatarUri = null),
-                        email = chatRoom.getPeerEmail(i),
-                        isMe = false,
-                        privilege = userPermission[participantPrivilege]
-                            ?: ChatRoomPermission.Unknown,
-                        defaultAvatarColor = avatarRepository.getAvatarColor(handle))
-
-                    list.add(participant)
-                }
-
+                list.add(participant)
             }
-            return@withContext list
+            return list
         }
 
-    override suspend fun getStatus(participant: ChatParticipant): UserStatus =
-        withContext(ioDispatcher) {
-            if (participant.handle == getMyUserHandle()) {
-                val status = userStatus[megaChatApiGateway.getOnlineStatus()]
-                    ?: UserStatus.Invalid
+        return mutableListOf()
+    }
 
-                if (status != UserStatus.Online) {
-                    requestLastGreen(participant.handle)
-                }
-                return@withContext status
+    override suspend fun getStatus(participant: ChatParticipant): UserStatus {
+        if (participant.isMe) {
+            val status = userStatus[megaChatApiGateway.getOnlineStatus()]
+                ?: UserStatus.Invalid
+
+            if (status != UserStatus.Online) {
+                requestLastGreen(participant.handle)
             }
-
-            megaApiGateway.getContact(participant.email)?.let {
-                val status = userStatus[megaChatApiGateway.getUserOnlineStatus(it.handle)]
-                    ?: UserStatus.Invalid
-                if (status != UserStatus.Online) {
-                    requestLastGreen(it.handle)
-                }
-
-                return@withContext status
-            }
-
-            return@withContext UserStatus.Invalid
+            return status
         }
+
+        megaApiGateway.getContact(participant.email)?.let {
+            val status = userStatus[megaChatApiGateway.getUserOnlineStatus(it.handle)]
+                ?: UserStatus.Invalid
+            if (status != UserStatus.Online) {
+                requestLastGreen(it.handle)
+            }
+
+            return status
+        }
+
+        return UserStatus.Invalid
+    }
 
     override suspend fun getAlias(participant: ChatParticipant): String? =
         runCatching { contactsRepository.getUserAlias(participant.handle) }.fold(
@@ -116,19 +117,15 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             onFailure = { null }
         )
 
-    override suspend fun getAvatarColor(participant: ChatParticipant): Int {
-        if (participant.isMe) {
-            return avatarRepository.getMyAvatarColor()
-        }
-
-        return avatarRepository.getAvatarColor(participant.handle)
-    }
+    override suspend fun getAvatarColor(participant: ChatParticipant): Int =
+        if (participant.isMe) avatarRepository.getMyAvatarColor() else avatarRepository.getAvatarColor(
+            participant.handle)
 
     override suspend fun getAvatarUri(participant: ChatParticipant): File? {
         if (participant.isMe) {
-            avatarRepository.getMyAvatarFile()?.let {
-                if (it.exists() && it.length() > 0) {
-                    return it
+            avatarRepository.getMyAvatarFile()?.let { file ->
+                if (file.exists() && file.length() > 0) {
+                    return file
                 }
             }
 
@@ -138,14 +135,12 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                 onSuccess = { file ->
                     file?.let {
                         if (it.exists() && it.length() > 0) {
-                            return it
+                            return file
                         }
                     }
                     return null
                 },
-                onFailure = {
-                    return null
-                }
+                onFailure = { return null }
             )
         }
     }
@@ -171,17 +166,4 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             onSuccess = { cred -> cred },
             onFailure = { false }
         )
-
-    suspend fun getMyUserHandle(): Long =
-        withContext(ioDispatcher) {
-            megaChatApiGateway.getMyUserHandle()
-        }
-
-    suspend fun getMyFullName(): String = withContext(ioDispatcher) {
-        return@withContext megaChatApiGateway.getMyFullname()
-    }
-
-    suspend fun getMyEmail(): String = withContext(ioDispatcher) {
-        megaChatApiGateway.getMyEmail()
-    }
 }

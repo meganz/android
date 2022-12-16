@@ -77,6 +77,7 @@ class DefaultGetChatParticipants @Inject constructor(
                                 currentItem),
                             defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
                                 currentItem),
+                            fileUpdated = !currentItem.fileUpdated,
                             data = currentItem.data.copy(alias = chatParticipantsRepository.getAlias(
                                 currentItem),
                                 avatarUri = chatParticipantsRepository.getAvatarUri(currentItem)
@@ -118,19 +119,6 @@ class DefaultGetChatParticipants @Inject constructor(
                 this
             }
 
-    private suspend fun updateItem(chatParticipant: ChatParticipant): ChatParticipant =
-        withContext(defaultDispatcher) {
-            return@withContext chatParticipant.copy(
-                status = chatParticipantsRepository.getStatus(chatParticipant),
-                areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
-                    chatParticipant),
-                defaultAvatarColor = chatParticipantsRepository.getAvatarColor(chatParticipant),
-                data = chatParticipant.data.copy(alias = chatParticipantsRepository.getAlias(
-                    chatParticipant),
-                    avatarUri = chatParticipantsRepository.getAvatarUri(chatParticipant)
-                        ?.toString()))
-        }
-
     private suspend fun MutableList<ChatParticipant>.monitorChatListItemUpdates(
         chatId: Long,
     ): Flow<MutableList<ChatParticipant>> =
@@ -149,7 +137,7 @@ class DefaultGetChatParticipants @Inject constructor(
                             set(currentItemIndex,
                                 currentItem.copy(privilege = item.ownPrivilege))
                         }
-                        return@map this
+
                     } else if (item.changes == ChatListItemChanges.LastMessage) {
                         if (item.lastMessageType == ChatRoomLastMessage.AlterParticipants) {
                             val newList = chatParticipantsRepository.getAllChatParticipants(chatId)
@@ -160,7 +148,19 @@ class DefaultGetChatParticipants @Inject constructor(
                                     val newItemIndex = indexOfFirst { it.handle == newItem.handle }
                                     if (newItemIndex == -1) {
                                         apply {
-                                            add(updateItem(newItem))
+
+                                            add(newItem.copy(
+                                                status = chatParticipantsRepository.getStatus(
+                                                    newItem),
+                                                areCredentialsVerified = chatParticipantsRepository.areCredentialsVerified(
+                                                    newItem),
+                                                defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
+                                                    newItem),
+                                                fileUpdated = !newItem.fileUpdated,
+                                                data = newItem.data.copy(alias = chatParticipantsRepository.getAlias(
+                                                    newItem),
+                                                    avatarUri = chatParticipantsRepository.getAvatarUri(
+                                                        newItem)?.toString())))
                                         }
                                     }
                                 }
@@ -168,41 +168,43 @@ class DefaultGetChatParticipants @Inject constructor(
 
                             val iterator = this.iterator()
                             iterator.forEach { currentItem ->
-                                val currentItemIndex =
-                                    newList.indexOfFirst { it.handle == currentItem.handle }
-                                if (currentItemIndex == -1) {
-                                    apply {
-                                        remove(currentItem)
+                                apply {
+                                    val currentItemIndex =
+                                        newList.indexOfFirst { it.handle == currentItem.handle }
+                                    if (currentItemIndex == -1) {
+                                        apply {
+                                            remove(currentItem)
+                                        }
                                     }
-                                    return@forEach
                                 }
+
                             }
 
-                            return@map this
                         } else if (item.lastMessageType == ChatRoomLastMessage.PrivChange) {
-                            map { participant ->
-                                if (!participant.isMe) {
-                                    apply {
-                                        val currentItemIndex = indexOf(participant)
-                                        val currentItem = this[currentItemIndex]
-                                        val newPermissions =
-                                            chatParticipantsRepository.getPermissions(
-                                                chatId,
-                                                currentItem)
-                                        if (currentItem.privilege != newPermissions) {
-                                            this[currentItemIndex] =
-                                                currentItem.copy(
-                                                    privilege = newPermissions
-                                                )
+                            apply {
+                                map { participant ->
+                                    if (!participant.isMe) {
+                                        apply {
+                                            val currentItemIndex = indexOf(participant)
+                                            val currentItem = this[currentItemIndex]
+                                            val newPermissions =
+                                                chatParticipantsRepository.getPermissions(
+                                                    chatId,
+                                                    currentItem)
+                                            if (currentItem.privilege != newPermissions) {
+                                                this[currentItemIndex] =
+                                                    currentItem.copy(
+                                                        privilege = newPermissions
+                                                    )
+                                            }
                                         }
                                     }
                                 }
                             }
-
-                            return@map this
                         }
                     }
                 }
+                this
             }
 
 
@@ -213,19 +215,19 @@ class DefaultGetChatParticipants @Inject constructor(
                     map { participant ->
                         if (participant.isMe) {
                             val currentItemIndex = indexOfFirst { it.handle == participant.handle }
-                            val currentItem = get(currentItemIndex)
-
+                            val currentItem = this[currentItemIndex]
                             var avatarUri: String? = null
                             file?.let {
                                 if (it.exists() && it.length() > 0) {
                                     avatarUri = it.toString()
                                 }
                             }
-                            set(currentItemIndex, currentItem.copy(
-                                data = currentItem.data.copy(
-                                    avatarUri = avatarUri,
-                                ), defaultAvatarColor = avatarRepository.getMyAvatarColor()
-                            ))
+                            this[currentItemIndex] =
+                                currentItem.copy(defaultAvatarColor = avatarRepository.getMyAvatarColor(),
+                                    fileUpdated = !currentItem.fileUpdated,
+                                    data = currentItem.data.copy(
+                                        avatarUri = avatarUri)
+                                )
                         }
                     }
                 }
@@ -287,6 +289,7 @@ class DefaultGetChatParticipants @Inject constructor(
                                 }
                             }
                         }
+                        return@map this
                     }
                     if (changes.contains(UserChanges.AuthenticationInformation)) {
                         map { participant ->
@@ -303,15 +306,29 @@ class DefaultGetChatParticipants @Inject constructor(
                                 }
                             }
                         }
+                        return@map this
                     }
 
-                    filter { it.handle == userId.id }
                     map { participant ->
-                        if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
-                            if (participant.handle == userId.id) {
-                                apply {
-                                    val currentItemIndex = indexOfFirst { it.handle == userId.id }
-                                    val currentItem = this[currentItemIndex]
+                        if (!participant.isMe && participant.handle == userId.id) {
+                            apply {
+                                val currentItemIndex =
+                                    indexOfFirst { it.handle == participant.handle }
+                                val currentItem = this[currentItemIndex]
+                                if (changes.contains(UserChanges.Avatar)) {
+                                    this[currentItemIndex] =
+                                        currentItem.copy(defaultAvatarColor = avatarRepository.getAvatarColor(
+                                            currentItem.handle),
+                                            fileUpdated = !currentItem.fileUpdated,
+                                            data = currentItem.data.copy(
+                                                avatarUri = chatParticipantsRepository.getAvatarUri(
+                                                    currentItem)?.toString())
+                                        )
+                                }
+
+                                if (changes.contains(UserChanges.Firstname) || changes.contains(
+                                        UserChanges.Lastname)
+                                ) {
                                     this[currentItemIndex] =
                                         currentItem.copy(
                                             data = currentItem.data.copy(
@@ -320,32 +337,11 @@ class DefaultGetChatParticipants @Inject constructor(
                                             )
                                         )
                                 }
-                            }
-                        }
 
-                        if (changes.contains(UserChanges.Email)) {
-                            if (participant.handle == userId.id) {
-                                apply {
-                                    val currentItemIndex = indexOfFirst { it.handle == userId.id }
-                                    val currentItem = this[currentItemIndex]
+                                if (changes.contains(UserChanges.Email)) {
                                     this[currentItemIndex] =
                                         currentItem.copy(
                                             email = contactsRepository.getUserEmail(currentItem.handle)
-                                        )
-                                }
-                            }
-                        }
-
-                        if (changes.contains(UserChanges.Avatar)) {
-                            if (participant.handle == userId.id) {
-                                apply {
-                                    val currentItemIndex = indexOfFirst { it.handle == userId.id }
-                                    val currentItem = this[currentItemIndex]
-                                    this[currentItemIndex] =
-                                        currentItem.copy(
-                                            data = currentItem.data.copy(
-                                                avatarUri = chatParticipantsRepository.getAvatarUri(
-                                                    currentItem)?.toString())
                                         )
                                 }
                             }
