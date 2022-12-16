@@ -133,7 +133,7 @@
     <!-- Login button -->
     <string name="login_text">Entra</string>
     <!-- email label -->
-    <string name="email_text">Email</string>
+    <string name="email_text">E-mail</string>
     <!-- password label -->
     <string name="password_text">Password</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -145,9 +145,9 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Crea account</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Inserisci il tuo indirizzo email</string>
+    <string name="error_enter_email">Inserisci il tuo indirizzo e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="error_invalid_email">Indirizzo email non valido</string>
+    <string name="error_invalid_email">Indirizzo e-mail non valido</string>
     <!-- when the user tries to log in MEGA without typing the password -->
     <string name="error_enter_password">Inserisci la tua password</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
@@ -738,7 +738,7 @@
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Vedi codice sorgente</string>
     <!-- title of the screen that shows the ZIP files -->
-    <string name="zip_browser_activity">ZIP Browser</string>
+    <string name="zip_browser_activity">ZIP browser</string>
     <!--  -->
     <string name="free_account">Gratis</string>
     <!-- category in sort by action -->
@@ -806,9 +806,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Cambia</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">SÌ</string>
+    <string name="general_positive_button">Sì</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NO</string>
+    <string name="general_negative_button">No</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Hai dimenticato la password?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -818,23 +818,23 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Questo è l’ultimo step prima di eliminare il tuo account. Perderai in modo permanente tutti i tuoi dati salvati nel cloud. Inserisci la tua password qui sotto.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Verifica dell’email</string>
+    <string name="email_verification_title">Verifica dell’e-mail</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Per favore, controlla la tua email per procedere.</string>
+    <string name="email_verification_text">Per favore, controlla la tua e-mail per procedere.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">È stato riscontrato un errore, per favore, riprova.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Devi effettuare l’accesso per portare a termine questa azione.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Hai bisogno di effettuare il login per completare il cambiamento della tua email. Per favore, effettua nuovamente il login con il tuo indirizzo email corrente e poi tocca di nuovo sul link di conferma.</string>
+    <string name="change_email_not_logged_in">Hai bisogno di effettuare il login per completare il cambiamento della tua e-mail. Per favore, effettua nuovamente il login con il tuo indirizzo e-mail corrente e poi tocca di nuovo sul link di conferma.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Congratulazioni, il tuo nuovo indirizzo email per questo account MEGA è: %1$s</string>
+    <string name="email_changed">Congratulazioni, il tuo nuovo indirizzo e-mail per questo account MEGA è: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Sbagliato</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Input non valido</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Indirizzo email non valido</string>
+    <string name="invalid_email_title">Indirizzo e-mail non valido</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Ti preghiamo di controllare l’indirizzo e-mail e riprovare.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
@@ -862,15 +862,15 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Fai crescere il tuo cloud.[A]Ottieni un aumento del tuo spazio di archiviazione e della tua banda di trasferimento con un account Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Questo indirizzo email è già utilizzato. Per favore, utilizza un altro indirizzo email.</string>
+    <string name="mail_already_used">Questo indirizzo e-mail è già utilizzato. Per favore, utilizza un altro indirizzo e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
-    <string name="mail_changed_confirm_requested">Hai già richiesto un link di conferma per quell’indirizzo email.</string>
+    <string name="mail_changed_confirm_requested">Hai già richiesto un link di conferma per quell’indirizzo e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">Questo è il tuo indirizzo email esistente.</string>
+    <string name="mail_same_as_old">Questo è il tuo indirizzo e-mail esistente.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Questo è l’ultimo passaggio per cambiare la tua email. Per favore, inserisci la tua password qui sotto.</string>
+    <string name="change_mail_text_last_step">Questo è l’ultimo passaggio per cambiare la tua e-mail. Per favore, inserisci la tua password qui sotto.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
-    <string name="change_mail_title_last_step">Cambia email</string>
+    <string name="change_mail_title_last_step">Cambia e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">Cattura</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -884,7 +884,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Acquisizione delle informazioni in corso&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">La tua nuova email deve essere validata. Per favore, controlla la tua email per procedere.</string>
+    <string name="email_verification_text_change_mail">La tua nuova e-mail deve essere validata. Per favore, controlla la tua e-mail per procedere.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Cancellare l’immagine del profilo?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Imposta la protezione della password</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(SOLO PRO)</string>
+    <string name="subtitle_set_expiry_date">(solo Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Imposta una password</string>
     <!-- Hint of the dialog to get link with password -->
@@ -914,13 +914,13 @@
         <item quantity="other">La cartella è condivisa con %1$d contatti. Rimuovere tutte le condivisioni?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Email o password non valide. Per favore, riprova.</string>
+    <string name="error_incorrect_email_or_password">E-mail o password non valide. Per favore, riprova.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Il tuo account è stato sospeso a causa di violazioni dei Termini di Servizio. Per favore, contatta support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Troppi tentativi falliti di effettuare il login, per favore aspetta un’ora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Il tuo account non è ancora stato validato. Per favore, controlla la tua email.</string>
+    <string name="account_not_validated_login">Il tuo account non è ancora stato validato. Per favore, controlla la tua e-mail.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link della cartella non disponibile</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -932,9 +932,9 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Questo URL è corrotto o deformato. Il link a cui stai cercando di accedere non esiste.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">In attesa della conferma dell’email</string>
+    <string name="confirm_email_text">In attesa della conferma dell’e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Per favore, controlla la tua email e poi tocca sul link per confermare il tuo account.</string>
+    <string name="confirm_email_explanation">Per favore, controlla la tua e-mail e poi tocca sul link per confermare il tuo account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 oggetto</item>
@@ -1343,17 +1343,17 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s è già stato invitato. Consulta le tue richieste in sospeso.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Se hai scritto male il tuo indirizzo email, correggilo e poi tocca su [A]Reinvia[A].</string>
+    <string name="confirm_email_misspelled">Se hai scritto male il tuo indirizzo e-mail, correggilo e poi tocca su [A]Reinvia[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reinvia</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email inviata</string>
+    <string name="confirm_email_misspelled_email_sent">E-mail inviata</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Avviso di copyright a tutti gli utenti</string>
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA rispetta il copyright degli altri e ha bisogno che gli utenti di MEGA Cloud drive accettino e rispettino le leggi riguardo il copyright.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Ti è severamente proibito utilizzare il servizio cloud di MEGA per infrangere il copyright. Non potresti caricare, scaricare, archiviare, condividere, mostrare, streammare, distribuire, inviare per email, linkare, trasmettere o in qualunque altro modo rendere disponibile qualsiasi file, dato o contenuto che infrange il copyright o altri diritti di proprietà di qualsiasi persona o ente.</string>
+    <string name="copyright_alert_second_paragraph">Ti è severamente proibito utilizzare il servizio cloud di MEGA per infrangere il copyright. Non potresti caricare, scaricare, archiviare, condividere, mostrare, streammare, distribuire, inviare per e-mail, linkare, trasmettere o in qualunque altro modo rendere disponibile qualsiasi file, dato o contenuto che infrange il copyright o altri diritti di proprietà di qualsiasi persona o ente.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Accetta</string>
     <!-- text of the Disagree button -->
@@ -1525,7 +1525,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Invito spedito</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">L’email è errata</string>
+    <string name="invalid_email_to_invite">L’e-mail è errata</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Quando installi l\’app per desktop di MEGA ottieni %1$s di spazio complementare di archiviazione, valido per 365 giorni. L\’app per desktop di MEGA è disponibile per Windows, macOS e la maggior parte delle distribuzioni Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1699,9 +1699,9 @@
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Nessun[/B] [A]contatto[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Nessuna[/A] [B]Conversazione[/B]</string>
+    <string name="recent_chat_empty">[A]Nessuna[/A] [B]conversazione[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A] Caricamento delle[/A] [B]Conversazioni&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[A] Caricamento delle[/A] [B]conversazioni&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Nessuna[/B] [A]cartella condivisa in entrata[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1974,7 +1974,7 @@
     <!--  -->
     <string name="two_factor_authentication_explain">L’autenticazione a due fattori è un secondo livello di sicurezza per il tuo account. Ciò significa che anche se qualcuno conosce la tua password non può accedervi, senza avere accesso anche al numero di sei cifre a cui hai accesso solo tu.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
-    <string name="button_setup_2fa">Inizia setup</string>
+    <string name="button_setup_2fa">Inizia la configurazione</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
     <string name="explain_qr_seed_2fa_1">Scansiona o copia il seed della tua app di autenticazione.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
@@ -2002,7 +2002,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
     <string name="verify_2fa_subtitle_change_password">Modifica password</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
-    <string name="verify_2fa_subtitle_change_email">Cambia email</string>
+    <string name="verify_2fa_subtitle_change_email">Cambia e-mail</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Elimina account</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
@@ -2026,11 +2026,11 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App autenticazione a due fattori</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un\’app per l\’autenticazione?</string>
+    <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un\’app di autenticazione?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’Autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
+    <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d file non sono stati condivisi</string>
     <!-- button’s text to open a full screen image -->
@@ -2146,7 +2146,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Attiva o disattiva le versioni dei file per il tuo account.\nDisabilitare le versioni dei file non esclude che i tuoi contatti creino nuove versioni nelle cartelle condivise.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tocca, inserisci nome o email</string>
+    <string name="type_mail">Tocca, inserisci nome o e-mail</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Aggiungere %s ai tuoi contatti?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2166,7 +2166,7 @@
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
     <string name="confirm_account">Si prega di inserire la password per confermare il tuo account</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
-    <string name="error_own_email_as_contact">Non c’è bisogno di aggiungere il tuo indirizzo email</string>
+    <string name="error_own_email_as_contact">Non c’è bisogno di aggiungere il tuo indirizzo e-mail</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Codice non valido</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
@@ -2874,17 +2874,17 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Errore. La cartella %1$s non è stata creata</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Verifica il tuo indirizzo email</string>
+    <string name="verify_email_label">Verifica il tuo indirizzo e-mail</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Il tuo account è stato temporaneamente bloccato per la tua sicurezza.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Per favore, segui i passi nella [A]email di verifica[/A] per sbloccare il tuo account.</string>
+    <string name="verify_email_and_follow_steps">Per favore, segui i passi nella [A]e-mail di verifica[/A] per sbloccare il tuo account.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Perché sto vedendo questo?</string>
     <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Reinvia email</string>
+    <string name="resend_email_label">Reinvia e-mail</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
-    <string name="resend_email_error">Email già inviata. Per favore, attendi un po’ di minuti prima di riprovare nuovamente.</string>
+    <string name="resend_email_error">E-mail già inviata. Per favore, attendi un po’ di minuti prima di riprovare nuovamente.</string>
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">Account bloccati</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
@@ -2892,15 +2892,15 @@
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">La tua password è stata rubata e adesso viene usata da persone non identificate per entrare nei tuoi account, incluso, ma non limitato, il tuo account MEGA.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Imposta un nickname</string>
+    <string name="add_nickname">Imposta un soprannome</string>
     <!-- Button to update a nickname for a user -->
-    <string name="edit_nickname">Modifica nickname</string>
+    <string name="edit_nickname">Modifica il soprannome</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_added">Nickname aggiunto</string>
+    <string name="snackbar_nickname_added">Soprannome aggiunto</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_removed">Nickname rimosso</string>
+    <string name="snackbar_nickname_removed">Soprannome rimosso</string>
     <!-- title of a dialog to edit or remove the nickname -->
-    <string name="nickname_title">Nickname</string>
+    <string name="nickname_title">Soprannome</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Numero di telefono</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
@@ -2955,12 +2955,12 @@
     <string name="over_disk_quota_paywall_title">I tuoi dati sono a rischio!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="one">Ti abbiamo contattato tramite email a %1$s il %2$s, ma hai ancora %3$s file che occupano %4$s nel tuo account MEGA, il che richede che tu abbia %5$s.</item>
-        <item quantity="many">Ti abbiamo contattato tramite email a %1$s il %2$s e il %3$s, ma hai ancora %4$s file che occupano %5$s nel tuo account MEGA, il che richede che tu abbia %6$s.</item>
-        <item quantity="other">Ti abbiamo contattato tramite email a %1$s il %2$s e il %3$s, ma hai ancora %4$s file che occupano %5$s nel tuo account MEGA, il che richede che tu abbia %6$s.</item>
+        <item quantity="one">Ti abbiamo contattato tramite e-mail a %1$s il %2$s, ma hai ancora %3$s file che occupano %4$s nel tuo account MEGA, il che richede che tu abbia %5$s.</item>
+        <item quantity="many">Ti abbiamo contattato tramite e-mail a %1$s il %2$s e il %3$s, ma hai ancora %4$s file che occupano %5$s nel tuo account MEGA, il che richede che tu abbia %6$s.</item>
+        <item quantity="other">Ti abbiamo contattato tramite e-mail a %1$s il %2$s e il %3$s, ma hai ancora %4$s file che occupano %5$s nel tuo account MEGA, il che richede che tu abbia %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Ti abbiamo contattato tramite email a %1$s, ma hai ancora %2$s che occupano %3$s nel tuo account MEGA, il che richede che tu abbia %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Ti abbiamo contattato tramite e-mail a %1$s, ma hai ancora %2$s che occupano %3$s nel tuo account MEGA, il che richede che tu abbia %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]Ti rimangono [M]%s[/M] per aggiornare[/B]. Dopodiché, i tuoi dati saranno soggetti ad eliminazione.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -2986,7 +2986,7 @@
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificato</string>
     <!-- ”Verify user” dialog title -->
-    <string name="authenticity_credentials_label">Credenziali di Autenticità</string>
+    <string name="authenticity_credentials_label">Credenziali di autenticità</string>
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Sarebbe meglio farlo faccia a faccia nella vita reale. Se hai un altro canale di comunicazione verificato come OTR o PGP, puoi utilizzarlo.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -4084,7 +4084,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Questo posto è dove vengono archiviati i backup di file e cartelle. I tuoi backup sono di “sola lettura” per proteggerli da modifiche accidentali nel tuo Cloud drive.\nPuoi effettuare il backup degli oggetti dal tuo computer su MEGA utilizzando la nostra app per desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Account sospeso a causa di violazioni del copyright. Ti abbiamo inviato un\’email con maggiori informazioni al riguardo.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Account sospeso a causa di violazioni del copyright. Ti abbiamo inviato un\’e-mail con maggiori informazioni al riguardo.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Account chiuso a causa di una violazione dei Termini di Servizio di MEGA, come abuso di diritti altrui, condivisione ed importazione di dati illegali, o abuso del sistema.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4242,5 +4242,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Le tue credenziali</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

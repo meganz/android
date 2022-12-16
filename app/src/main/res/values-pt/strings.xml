@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Estabelecer uma senha de acesso</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(SOMENTE PRO)</string>
+    <string name="subtitle_set_expiry_date">(somente Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Definir senha</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1697,15 +1697,15 @@
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Não há arquivos [/B][A]Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]Não há [/B][A]Contatos[/A]</string>
+    <string name="context_empty_contacts">[B]Não há [/B][A]contatos[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]Não há[/A] [B]chats[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
     <string name="recent_chat_loading_conversations">[A]Carregando[/A] [B]chats&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]Não há [/B][A]Pastas compartilhadas comigo[/A]</string>
+    <string name="context_empty_incoming">[B]Não há [/B][A]pastas compartilhadas comigo[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]Não há [/B][A]Pastas compartilhadas por mim[/A]</string>
+    <string name="context_empty_outgoing">[B]Não há [/B][A]pastas compartilhadas por mim[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B]Não há [/B][A]links públicos[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
@@ -2490,7 +2490,7 @@
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">Não foi possível conectar-se ao MEGA de forma segura via SSL. Você pode estar usando uma rede Wi-Fi pública com requisitos adicionais.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]Não há [/B][A]Notificações[/A]</string>
+    <string name="context_empty_notifications">[B]Não há [/B][A]notificações[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurar o MEGA</string>
     <!-- Permissions screen explanation -->
@@ -3416,7 +3416,7 @@
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Adicionado recentemente</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]Não há [/B][A]Grupos[/A]</string>
+    <string name="context_empty_groups">[B]Não há [/B][A]grupos[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Solicitações</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
@@ -3732,7 +3732,7 @@
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favoritos</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]Não há[/B] [A]Favoritos[/A]</string>
+    <string name="empty_hint_favourite_album">[B]Não há[/B] [A]favoritos[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remover favoritos</string>
     <!-- Message of notice that the zip file format is error -->
@@ -4242,5 +4242,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Suas credenciais</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

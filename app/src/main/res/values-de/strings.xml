@@ -794,9 +794,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Ändern</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">JA</string>
+    <string name="general_positive_button">Ja</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NEIN</string>
+    <string name="general_negative_button">Nein</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Passwort vergessen?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -882,7 +882,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Mit Passwortschutz</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(NUR PRO)</string>
+    <string name="subtitle_set_expiry_date">(nur Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Passwort setzen</string>
     <!-- Hint of the dialog to get link with password -->
@@ -4132,5 +4132,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Ihre Identitätsdaten</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Datei wird für Vorschau vorbereitet</string>
 </resources>
