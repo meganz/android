@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property status                     [UserStatus].
  * @property lastSeen                   User last seen.
  * @property fileUpdated                Check if avatar file is updated.
+ * @property privilegesUpdated                Check if privilege are updated.
  */
 data class ChatParticipant(
     val handle: Long,
@@ -29,4 +30,5 @@ data class ChatParticipant(
     val status: UserStatus = UserStatus.Invalid,
     val lastSeen: Int? = null,
     val fileUpdated: Boolean = false,
+    val privilegesUpdated: Boolean = false,
 )

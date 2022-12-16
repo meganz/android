@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.userPermission
@@ -148,17 +147,16 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     override suspend fun getPermissions(
         chatId: Long,
         participant: ChatParticipant,
-    ): ChatRoomPermission = withContext(ioDispatcher) {
-
+    ): ChatRoomPermission {
         megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
             val participantPrivilege =
                 if (participant.isMe) chatRoom.ownPrivilege else chatRoom.getPeerPrivilegeByHandle(
                     participant.handle)
-            return@withContext userPermission[participantPrivilege]
+            return userPermission[participantPrivilege]
                 ?: ChatRoomPermission.Unknown
         }
 
-        return@withContext ChatRoomPermission.Unknown
+        return ChatRoomPermission.Unknown
     }
 
     override suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean =

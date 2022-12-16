@@ -322,7 +322,7 @@ private fun ScheduledMeetingInfoAppBar(
                 }
             }
 
-            if (state.isHost) {
+            if (state.isHost && state.isEditEnabled) {
                 IconButton(onClick = { onEditClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
@@ -394,10 +394,28 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
         DefaultAvatar(title = state.chatTitle)
     } else if (state.isSingleMeeting()) {
-        OneParticipantAvatar(firstUser = state.firstParticipant ?: return)
+        state.firstParticipant?.let {
+            if (it.fileUpdated) {
+                OneParticipantAvatar(firstUser = it)
+            } else {
+                OneParticipantAvatar(firstUser = it)
+            }
+        }
     } else {
-        SeveralParticipantsAvatar(firstUser = state.firstParticipant ?: return,
-            lastUser = state.lastParticipant ?: return)
+        state.firstParticipant?.let { first ->
+            state.lastParticipant?.let { last ->
+                if (first.fileUpdated) {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                } else {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                }
+                if (last.fileUpdated) {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                } else {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                }
+            }
+        }
     }
 }
 
@@ -971,7 +989,12 @@ private fun ParticipantItemView(
                 .weight(1f)
                 .height(72.dp)) {
                 Box {
-                    ParticipantAvatar(participant = participant)
+                    if (participant.fileUpdated) {
+                        ParticipantAvatar(participant = participant)
+                    } else {
+                        ParticipantAvatar(participant = participant)
+                    }
+
                     if (participant.areCredentialsVerified) {
                         Image(
                             modifier = Modifier
@@ -1018,7 +1041,7 @@ private fun ParticipantItemView(
             Box(modifier = Modifier
                 .wrapContentSize(Alignment.CenterEnd)) {
                 Row(modifier = Modifier.align(Alignment.Center)) {
-                    participantsPermissionView(participant.privilege)
+                    participantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
                         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
@@ -1038,31 +1061,30 @@ private fun ParticipantItemView(
 /**
  * Participants permissions view
  *
- * @param privilege [ChatRoomPermission]
+ * @param participant [ChatParticipant]
  */
 @Composable
-private fun participantsPermissionView(privilege: ChatRoomPermission) {
-    if (privilege != ChatRoomPermission.Unknown && privilege != ChatRoomPermission.Removed) {
-        val iconId: Int? = when (privilege) {
-            ChatRoomPermission.Moderator -> {
-                R.drawable.ic_permissions_full_access
-            }
-            ChatRoomPermission.Standard -> {
-                R.drawable.ic_permissions_read_write
-            }
-            ChatRoomPermission.ReadOnly -> {
-                R.drawable.ic_permissions_read_only
-            }
-            else -> {
-                null
-            }
-        }
-        iconId?.apply {
+private fun participantsPermissionView(participant: ChatParticipant) {
+    when (participant.privilege) {
+        ChatRoomPermission.Moderator -> {
             Icon(
-                painter = painterResource(id = this),
+                painter = painterResource(id = R.drawable.ic_permissions_full_access),
                 contentDescription = "Permissions icon",
                 tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
         }
+        ChatRoomPermission.Standard -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_read_write),
+                contentDescription = "Permissions icon",
+                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+        }
+        ChatRoomPermission.ReadOnly -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_read_only),
+                contentDescription = "Permissions icon",
+                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+        }
+        else -> {}
     }
 }
 
@@ -1192,7 +1214,6 @@ private fun ParticipantAvatar(
         .clip(CircleShape),
     participant: ChatParticipant,
 ) {
-
     if (participant.data.avatarUri != null) {
         UriAvatar(modifier = modifier, uri = participant.data.avatarUri.toString())
     } else {
