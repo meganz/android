@@ -655,9 +655,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Como subir</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Activar subida multimedia secundaria</string>
+    <string name="settings_secondary_upload_on">Activar Subida multimedia secundaria</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Desactivar subida multimedia secundaria</string>
+    <string name="settings_secondary_upload_off">Desactivar Subida multimedia secundaria</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Elige carpeta</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -806,9 +806,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Cambiar</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">SÍ</string>
+    <string name="general_positive_button">Sí</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NO</string>
+    <string name="general_negative_button">No</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">¿Has olvidado tu contraseña?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Activa la protección por contraseña</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(SOLO PRO)</string>
+    <string name="subtitle_set_expiry_date">(solo Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Establecer contraseña</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1347,13 +1347,13 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reenviar</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email enviado</string>
+    <string name="confirm_email_misspelled_email_sent">Correo enviado</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Aviso de derechos de autor para todos los usuarios</string>
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA respeta los derechos de propiedad intelectual de terceros y exige a los usuarios de MEGA que respeten las leyes de propiedad intelectual.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Queda terminantemente prohibido utilizar el servicio en la nube de MEGA para infringir derechos de propiedad intelectual. No puedes subir, descargar, almacenar, compartir, mostrar, reproducir, distribuir, enviar por email, vincular o poner a disposición de ninguna forma archivos, datos o contenido que infrinjan derechos de propiedad intelectual de cualquier persona o entidad.</string>
+    <string name="copyright_alert_second_paragraph">Queda terminantemente prohibido utilizar el servicio en la nube de MEGA para infringir derechos de propiedad intelectual. No puedes subir, descargar, almacenar, compartir, mostrar, reproducir, distribuir, enviar por correo electrónico, vincular o poner a disposición de ninguna forma archivos, datos o contenido que infrinjan derechos de propiedad intelectual de cualquier persona o entidad.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Acepto</string>
     <!-- text of the Disagree button -->
@@ -1479,7 +1479,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivarán las Subidas de la cámara.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la subida multimedia secundaria.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">¿Confirmas que quieres mover esta carpeta a la Papelera? Se desactivará la Subida multimedia secundaria.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">¿Mover elemento a la Papelera?</string>
     <!-- confirmation message before removing a file -->
@@ -2778,7 +2778,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]No hay archivos [/B][A]recientes[/A]</string>
+    <string name="context_empty_recents">[B]No hay archivos [/B] en [A]Recientes[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s y %2$d más</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -2874,7 +2874,7 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Error. No se ha podido crear la carpeta %1$s</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Verifica tu dirección de email</string>
+    <string name="verify_email_label">Verifica tu dirección de e-mail</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Tu cuenta ha sido bloqueada temporalmente por seguridad.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
@@ -2955,12 +2955,12 @@
     <string name="over_disk_quota_paywall_title">¡Tus datos están en riesgo!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="one">Te hemos contactado por email a %1$s el %2$s pero sigues teniendo %3$s archivos que ocupan %4$s en tu cuenta de MEGA, lo cual requiere una cuenta %5$s.</item>
-        <item quantity="many">Te hemos contactado por email a %1$s el %2$s y el %3$s pero sigues teniendo %4$s de archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
-        <item quantity="other">Te hemos contactado por email a %1$s el %2$s y el %3$s pero sigues teniendo %4$s archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
+        <item quantity="one">Te hemos contactado por correo electrónico a %1$s el %2$s pero sigues teniendo %3$s archivos que ocupan %4$s en tu cuenta de MEGA, lo cual requiere una cuenta %5$s.</item>
+        <item quantity="many">Te hemos contactado por correo electrónico a %1$s el %2$s y el %3$s pero sigues teniendo %4$s de archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
+        <item quantity="other">Te hemos contactado por correo electrónico a %1$s el %2$s y el %3$s pero sigues teniendo %4$s archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Te hemos contactado por email a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Te hemos contactado por correo electrónico a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]Te quedan[M]%s[/M] para ampliar la cuenta[/B]. Después de eso, tus datos estarán sujetos a eliminación.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -4082,7 +4082,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]No hay [/B][A]backups[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
+    <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu Nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4242,5 +4242,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Tus credenciales</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

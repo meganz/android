@@ -806,7 +806,7 @@
     <!-- Button to change the password -->
     <string name="change_pass">Changer</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">OUI</string>
+    <string name="general_positive_button">Oui</string>
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">Non</string>
     <!-- Button in the Login screen to reset the password -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Définir une protection par mot de passe</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(PRO SEULEMENT)</string>
+    <string name="subtitle_set_expiry_date">(Pro seulement)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Définir un mot de passe</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1695,7 +1695,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre Disque nuagique[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Aucun fichier enregistré [/B][A]Hors&#160;ligne[/A]</string>
+    <string name="context_empty_offline">[B]Aucun fichier[/B][A]enregistré Hors&#160;ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Aucun [/B][A]contact[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -4242,5 +4242,5 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Votre numéro d’identification</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Préparation de l’aperçu du fichier</string>
 </resources>
