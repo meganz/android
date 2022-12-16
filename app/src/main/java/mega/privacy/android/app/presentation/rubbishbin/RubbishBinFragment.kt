@@ -136,15 +136,14 @@ class RubbishBinFragment : Fragment() {
         if (managerViewModel.state.value.rubbishBinParentHandle == -1L ||
             managerViewModel.state.value.rubbishBinParentHandle == megaApi.rubbishNode.handle
         ) {
-            Timber.d("Parent is the Rubbish: %s",
-                managerViewModel.state.value.rubbishBinParentHandle)
+            Timber.d("Parent is the Rubbish: ${managerViewModel.state.value.rubbishBinParentHandle}")
             nodes = megaApi.getChildren(megaApi.rubbishNode,
                 sortOrderToInt(managerViewModel.getOrder()))
         } else {
             val parentNode =
                 megaApi.getNodeByHandle(managerViewModel.state.value.rubbishBinParentHandle)
             parentNode?.let {
-                Timber.d("The parent node is: %s", parentNode.handle)
+                Timber.d("The parent node is: ${parentNode.handle}")
                 nodes = megaApi.getChildren(parentNode, sortOrderToInt(managerViewModel.getOrder()))
                 (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
             }
@@ -508,7 +507,7 @@ class RubbishBinFragment : Fragment() {
                     }
                     pos
                 }
-                Timber.d("Push to stack %d position", lastFirstVisiblePosition)
+                Timber.d("Push to stack $lastFirstVisiblePosition position")
                 lastPositionStack.push(lastFirstVisiblePosition)
                 managerViewModel.setRubbishBinParentHandle(n.handle)
 
@@ -806,7 +805,6 @@ class RubbishBinFragment : Fragment() {
                             sortOrderToInt(managerViewModel.getOrder()))
                         adapter?.setNodes(nodes)
                         val lastVisiblePosition = if (!lastPositionStack.empty()) {
-                            Timber.d("Pop of the stack ${lastPositionStack.pop()} position")
                             lastPositionStack.pop()
                         } else 0
 
