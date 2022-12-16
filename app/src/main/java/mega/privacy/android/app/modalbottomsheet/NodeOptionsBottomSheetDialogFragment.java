@@ -1048,7 +1048,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case SHARED_ITEMS:
-                ((ManagerActivity) requireActivity()).onNodesSharedUpdate();
+                ((ManagerActivity) requireActivity()).refreshSharesFragments();
                 break;
 
             case SEARCH:

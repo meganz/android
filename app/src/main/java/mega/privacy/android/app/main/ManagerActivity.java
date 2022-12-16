@@ -9796,13 +9796,15 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void onNodesSharedUpdate() {
-        Timber.d("onNodesSharedUpdate");
-
+    public void refreshSharesFragments() {
         refreshOutgoingShares();
         refreshIncomingShares();
         refreshLinks();
+    }
 
+    public void onNodesSharedUpdate() {
+        Timber.d("onNodesSharedUpdate");
+        refreshSharesFragments();
         refreshSharesPageAdapter();
     }
 
@@ -9992,7 +9994,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 onNodesCloudDriveUpdate();
                 onNodesInboxUpdate();
                 onNodesSearchUpdate();
-                onNodesSharedUpdate();
+                refreshSharesFragments();
+                sharesPageAdapter.notifyDataSetChanged();
                 LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
                 if (isTransfersInProgressAdded()) {
