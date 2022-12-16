@@ -237,7 +237,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
                 .collectLatest { list ->
                     _state.update {
-                        it.copy(participantItemList = list)
+                        it.copy(participantItemList = list, numOfParticipants = list.size)
                     }
                     updateFirstAndLastParticipants()
                 }

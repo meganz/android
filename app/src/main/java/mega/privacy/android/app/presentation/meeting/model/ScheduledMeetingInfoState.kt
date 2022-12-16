@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
  * @property lastParticipant                            Last participant in the chat room.
+ * @property numOfParticipants                          Number of participants.
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1,
@@ -70,6 +71,7 @@ data class ScheduledMeetingInfoState(
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = null,
     val lastParticipant: ChatParticipant? = null,
+    val numOfParticipants: Int = 0,
 ) {
 
     /**
