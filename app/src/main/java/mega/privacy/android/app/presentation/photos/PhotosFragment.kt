@@ -322,7 +322,7 @@ class PhotosFragment : Fragment() {
             photosViewModel.onTabSelected(PhotosTab.Albums)
         }
 
-        LaunchedEffect(pagerState) {
+        LaunchedEffect(pagerState.currentPage) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
                 pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
