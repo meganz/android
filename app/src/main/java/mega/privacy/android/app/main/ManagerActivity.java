@@ -9992,7 +9992,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 onNodesCloudDriveUpdate();
                 onNodesInboxUpdate();
                 onNodesSearchUpdate();
-                onNodesSharedUpdate();
+                sharesPageAdapter.notifyDataSetChanged();
                 LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
                 if (isTransfersInProgressAdded()) {
