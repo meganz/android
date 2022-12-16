@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.VerifyCredentials
  * Provides all contacts implementation.
  */
 @Module
-@InstallIn(SingletonComponent::class, ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 class ContactsModule {
 
     @Provides
