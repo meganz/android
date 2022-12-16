@@ -79,4 +79,19 @@ interface FileRepository {
      * @return offline files inbox path
      */
     suspend fun getOfflineInboxPath(): String
+
+    /**
+     * Create Folder
+     */
+    suspend fun createFolder(name: String, parent: Node): Long?
+
+    /**
+     * set camera upload folder
+     * @param primaryFolder handle
+     * @param secondaryFolder handle
+     */
+    suspend fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+    )
 }

@@ -676,4 +676,16 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun outgoingContactRequests(): ArrayList<MegaContactRequest> =
         megaApi.outgoingContactRequests
+
+    override fun createFolder(
+        name: String,
+        parent: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.createFolder(name, parent, listener)
+
+    override fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
 }
