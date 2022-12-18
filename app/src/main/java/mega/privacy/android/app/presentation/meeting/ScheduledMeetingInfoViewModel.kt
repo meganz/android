@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CreateChatLink
+
 import mega.privacy.android.domain.usecase.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -63,7 +64,6 @@ import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaError
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -72,6 +72,7 @@ import javax.inject.Inject
  * StartConversationFragment view model.
  *
  * @property getChatRoom                    [GetChatRoom]
+ * @property getChatParticipants            [GetChatParticipants]
  * @property getScheduledMeetingByChat      [GetScheduledMeetingByChat]
  * @property getChatCall                    [GetChatCall]
  * @property getVisibleContacts             [GetVisibleContacts]
@@ -83,10 +84,14 @@ import javax.inject.Inject
  * @property removeFromChat                 [RemoveFromChat]
  * @property inviteContact                  [InviteContact]
  * @property setOpenInvite                  [SetOpenInvite]
+ * @property updateChatPermissions          [UpdateChatPermissions]
  * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
- * @property getChatParticipants            [GetChatParticipants]
  * @property getChatRoomUseCase             [GetChatRoomUseCase]
  * @property startChatCall                  [StartChatCall]
+ * @property passcodeManagement             [PasscodeManagement]
+ * @property chatManagement                 [ChatManagement]
+ * @property startConversation              [StartConversation]
+ * @property openOrStartCall                [OpenOrStartCall]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
  * @property monitorConnectivity            [MonitorConnectivity]
@@ -97,6 +102,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getChatRoom: GetChatRoom,
+    private val getChatParticipants: GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
     private val getVisibleContacts: GetVisibleContacts,
@@ -110,7 +116,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val setOpenInvite: SetOpenInvite,
     private val updateChatPermissions: UpdateChatPermissions,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
-    private val getChatParticipants: GetChatParticipants,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
@@ -232,11 +237,37 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
                 .collectLatest { list ->
                     _state.update {
-                        it.copy(participantItemList = list)
+                        it.copy(participantItemList = list, numOfParticipants = list.size)
                     }
+                    updateFirstAndLastParticipants()
                 }
         }.onFailure { exception ->
             Timber.e(exception)
+        }
+    }
+
+    /**
+     * Update first and last participants
+     */
+    private fun updateFirstAndLastParticipants() {
+        _state.value.participantItemList.let { list ->
+            if (list.isEmpty()) {
+                _state.update {
+                    it.copy(firstParticipant = null,
+                        lastParticipant = null)
+                }
+            } else if (list.size == 1) {
+                _state.update {
+                    it.copy(firstParticipant = list.first(),
+                        lastParticipant = null)
+                }
+            } else {
+
+                _state.update {
+                    it.copy(firstParticipant = list.first(),
+                        lastParticipant = list.last())
+                }
+            }
         }
     }
 

@@ -1,13 +1,17 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
@@ -26,6 +30,7 @@ import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -37,6 +42,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatError
@@ -44,6 +50,8 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaUser
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -65,7 +73,6 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultChatRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiGateway: MegaApiGateway,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatRequestMapper: ChatRequestMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val chatRoomMapper: ChatRoomMapper,
@@ -74,6 +81,8 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val chatListItemMapper: ChatListItemMapper,
     private val chatCallMapper: ChatCallMapper,
+    @ApplicationScope private val sharingScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
 ) : ChatRepository {
 
@@ -404,4 +413,33 @@ internal class DefaultChatRepository @Inject constructor(
 
     override fun monitorMutedChats(): Flow<Boolean> =
         broadcastReceiverGateway.monitorMutedChats
+
+    override fun monitorMyEmail(): Flow<String?> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+        .mapNotNull {
+            it.users?.find { user ->
+                user.isOwnChange <= 0 && user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL) && user.email == megaApiGateway.accountEmail
+            }
+        }
+        .map {
+            megaChatApiGateway.getMyEmail()
+        }
+        .catch { Timber.e(it) }
+        .flowOn(ioDispatcher)
+        .shareIn(sharingScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    override fun monitorMyName(): Flow<String?> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+        .mapNotNull {
+            it.users?.find { user ->
+                user.isOwnChange <= 0 && (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) || user.hasChanged(
+                    MegaUser.CHANGE_TYPE_LASTNAME)) && user.email == megaApiGateway.accountEmail
+            }
+        }
+        .map {
+            megaChatApiGateway.getMyFullname()
+        }
+        .catch { Timber.e(it) }
+        .flowOn(ioDispatcher)
+        .shareIn(sharingScope, SharingStarted.WhileSubscribed(), replay = 1)
 }

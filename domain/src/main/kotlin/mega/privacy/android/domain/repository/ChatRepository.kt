@@ -277,4 +277,15 @@ interface ChatRepository {
      * @return  A flow of Booleans indicating some changes has been made
      */
     fun monitorMutedChats(): Flow<Boolean>
+
+    /**
+     * Get my email updated
+     */
+    fun monitorMyEmail(): Flow<String?>
+
+    /**
+     * Get my name updated
+     */
+    fun monitorMyName(): Flow<String?>
+
 }

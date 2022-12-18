@@ -2,14 +2,10 @@ package mega.privacy.android.app.presentation.meeting.model
 
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
-import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
-import mega.privacy.android.domain.entity.user.UserVisibility
 
 /**
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
@@ -38,10 +34,12 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  * @property leaveGroupDialog                           True if show leave group alert dialog, false if not.
  * @property addParticipantsNoContactsDialog            True if show add participants no contacts dialog, false if not.
  * @property addParticipantsNoContactsLeftToAddDialog   True if show add participants no contacts left to add dialog, false if not.
+ * @property isEditEnabled                              True if edit scheduled meeting is allowed, false otherwise.
  * @property buttons                                    List of available action buttons.
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
  * @property lastParticipant                            Last participant in the chat room.
+ * @property numOfParticipants                          Number of participants.
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1,
@@ -68,11 +66,14 @@ data class ScheduledMeetingInfoState(
     val leaveGroupDialog: Boolean = false,
     val addParticipantsNoContactsDialog: Boolean = false,
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
+    val isEditEnabled: Boolean = false,
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = null,
     val lastParticipant: ChatParticipant? = null,
+    val numOfParticipants: Int = 0,
 ) {
+
     /**
      * Check if the meeting does not contain participants
      *

@@ -94,19 +94,21 @@ internal class DefaultContactsRepository @Inject constructor(
         megaChatApiGateway.requestLastGreen(userHandle)
     }
 
-    override fun monitorContactUpdates() =
+    override fun monitorContactUpdates(): Flow<UserUpdate> =
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .mapNotNull { it.users }
             .map { usersList ->
                 userUpdateMapper(usersList.filter { user ->
-                    user.handle != megaApiGateway.myUserHandle
-                            && (user.changes == 0
-                            || (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS))
+                    (user.handle != megaApiGateway.myUserHandle &&
+                            (user.changes == 0 ||
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) ||
+                            (user.handle == megaApiGateway.myUserHandle &&
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ||
+                                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING))))
                 })
             }
             .filter { it.changes.isNotEmpty() }
@@ -250,13 +252,34 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    private suspend fun getUserFullName(emailOrHandle: String): String? =
+    override suspend fun getUserFullName(emailOrHandle: String): String? =
         withContext(ioDispatcher) {
             getUserFirstName(emailOrHandle)
             getUserLastName(emailOrHandle)
-            val userHandle = megaApiGateway.getContact(emailOrHandle)?.handle ?: -1
+            val userHandle =
+                if (emailOrHandle == megaChatApiGateway.getMyEmail())
+                    megaChatApiGateway.getMyUserHandle()
+                else megaApiGateway.getContact(emailOrHandle)?.handle ?: -1
+
             val fullName = megaChatApiGateway.getUserFullNameFromCache(userHandle)
             if (fullName.isNullOrEmpty()) null else fullName
+        }
+
+    override suspend fun getUserEmail(handle: Long): String =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserEmail(
+                    handle,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(request.email))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    ))
+            }
         }
 
     override suspend fun getUserFirstName(emailOrHandle: String) = withContext(ioDispatcher) {
@@ -459,7 +482,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
-
 
     override suspend fun verifyCredentials(userEmail: String) = withContext(ioDispatcher) {
         megaApiGateway.getContact(userEmail)?.let {
