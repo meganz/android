@@ -7310,6 +7310,8 @@ public class ManagerActivity extends TransfersManagementActivity
      * Refresh PhotosFragment's UI after CU is enabled.
      */
     public void refreshPhotosFragment() {
+        if (!isInPhotosPage())
+            return;
         drawerItem = DrawerItem.PHOTOS;
         setBottomNavigationMenuItemChecked(PHOTOS_BNV);
         setToolbarTitle();

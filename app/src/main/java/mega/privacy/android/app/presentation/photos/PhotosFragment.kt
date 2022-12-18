@@ -670,6 +670,7 @@ class PhotosFragment : Fragment() {
         albumsViewModel.setCurrentAlbum(album.id)
         albumsViewModel.setCurrentSort(Sort.DEFAULT)
         albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
+        albumsViewModel.setSnackBarMessage("")
     }
 
     private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
