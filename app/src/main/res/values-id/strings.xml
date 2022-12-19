@@ -129,7 +129,7 @@
     <!-- Login button -->
     <string name="login_text">Masuk</string>
     <!-- email label -->
-    <string name="email_text">Email</string>
+    <string name="email_text">E-mail</string>
     <!-- password label -->
     <string name="password_text">Kata Sandi</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -141,9 +141,9 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Buat akun</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Harap masukkan alamat email anda</string>
+    <string name="error_enter_email">Harap masukkan alamat e-mail anda</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="error_invalid_email">Alamat email anda salah</string>
+    <string name="error_invalid_email">Alamat e-mail anda salah</string>
     <!-- when the user tries to log in MEGA without typing the password -->
     <string name="error_enter_password">Harap masukkan password anda</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
@@ -171,9 +171,9 @@
     <!-- category in sort by action -->
     <string name="name_text">Nama</string>
     <!-- First Name of the user -->
-    <string name="first_name_text">Nama Depan</string>
+    <string name="first_name_text">Nama depan</string>
     <!-- Last name of the user -->
-    <string name="lastname_text">Nama Belakang</string>
+    <string name="lastname_text">Nama belakang</string>
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
     <string name="tos">Saya setuju dengan [A]Persyaratan Layanan[/A] MEGA</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
@@ -189,7 +189,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Kata sandi berbeda</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Alamat email ini telah memiliki akun terdaftar di MEGA</string>
+    <string name="error_email_registered">Alamat e-mail ini telah memiliki akun terdaftar di MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Sedang menghubungi server: Membuat akun</string>
     <!--  -->
@@ -255,7 +255,7 @@
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">Izin</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Izin Berbagi</string>
+    <string name="dialog_select_permissions">Izin berbagi</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Ganti izin</string>
     <!-- when listing all the contacts that shares a folder -->
@@ -664,7 +664,7 @@
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Folder Secondary lokal</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">Folder Sekunder MEGA</string>
+    <string name="settings_mega_secondary_folder">Folder sekunder MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Hanya foto</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -772,7 +772,7 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Mengekspor Kunci pemulihan dan menyimpan nya di tempat yang aman membolehkan anda mengatur password baru tanpa kehilangan data.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">Orang luar yang ingin merusak tidak dapat mendapatkan akses ke akun anda hanya  dengan kunci anda. Ubah sandi membutuhkan kunci dan akses ke email anda.</string>
+    <string name="backup_third_paragraph">Orang luar yang ingin merusak tidak dapat mendapatkan akses ke akun anda hanya  dengan kunci anda. Ubah sandi membutuhkan kunci dan akses ke e-mail anda.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
     <string name="backup_action">Salin Kunci pemulihan ke clipboard atau simpan sebagai file teks.</string>
     <!-- Action of a button to save something -->
@@ -782,9 +782,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Ganti</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">YA</string>
+    <string name="general_positive_button">Ya</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">TIDAK</string>
+    <string name="general_negative_button">Tidak</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Lupa password anda?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -794,25 +794,25 @@
     <!-- Text shown in the last alert dialog to confirm delete user account -->
     <string name="delete_account_text_last_step">Ini adalah langkah terakhir untuk menghapus akun anda. Anda akan  kehilangan semua data yang disimpan di cloud secara permanen. Silakan masukkan kata sandi anda di bawah ini.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_title">Verifikasi email</string>
+    <string name="email_verification_title">Verifikasi e-mail</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Harap cek email anda untuk melanjutkan.</string>
+    <string name="email_verification_text">Harap cek e-mail anda untuk melanjutkan.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Sebuah kesalahan terjadi, harap coba kembali.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Anda harus masuk untuk melakukan aksi ini.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Anda harus masuk untuk menyelesaikan perubahan email anda. Harap masuk kembali dengan alamat email anda saat ini, lalu ketuk lagi tautan konfirmasi anda.</string>
+    <string name="change_email_not_logged_in">Anda harus masuk untuk menyelesaikan perubahan e-mail anda. Harap masuk kembali dengan alamat e-mail anda saat ini, lalu ketuk lagi tautan konfirmasi anda.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Selamat, alamat email baru anda untuk akun MEGA ini adalah: %1$s</string>
+    <string name="email_changed">Selamat, alamat e-mail baru anda untuk akun MEGA ini adalah: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Tidak benar</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Input tidak valid</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Alamat email anda salah</string>
+    <string name="invalid_email_title">Alamat e-mail anda salah</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Harap cek alamat email dan coba kembali.</string>
+    <string name="invalid_email_text">Harap cek alamat e-mail dan coba kembali.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Ubah sandi</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -838,15 +838,15 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Kembangkan cloud Anda.[A]Dapatkan peningkatan penyimpanan dan kuota transfer dengan akun Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Alamat e-mail ini telah digunakan. Silakan gunakan alamat email lain.</string>
+    <string name="mail_already_used">Alamat e-mail ini telah digunakan. Silakan gunakan alamat e-mail lain.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
-    <string name="mail_changed_confirm_requested">Anda telah meminta link konfirmasi untuk alamat email tersebut.</string>
+    <string name="mail_changed_confirm_requested">Anda telah meminta link konfirmasi untuk alamat e-mail tersebut.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">Ini adalah alamat email anda yang sudah ada.</string>
+    <string name="mail_same_as_old">Ini adalah alamat e-mail anda yang sudah ada.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Ini adalah langkah terakhir untuk mengganti email anda. Harap masukan password anda di bawah ini.</string>
+    <string name="change_mail_text_last_step">Ini adalah langkah terakhir untuk mengganti e-mail anda. Harap masukan password anda di bawah ini.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
-    <string name="change_mail_title_last_step">Ganti email</string>
+    <string name="change_mail_title_last_step">Ganti e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">Tangkap</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -856,11 +856,11 @@
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK">Kunci yang anda berikan tidak sesuai dengan akun ini. Pastikan anda menggunakan Kunci pemulihan yang benar dan coba lagi.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Kunci pemulihan Salah</string>
+    <string name="incorrect_MK_title">Kunci pemulihan salah</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Mendapatkan info&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Alamat email baru anda perlu di validasi. Harap cek email anda untuk melanjutkan.</string>
+    <string name="email_verification_text_change_mail">Alamat e-mail baru anda perlu di validasi. Harap cek e-mail anda untuk melanjutkan.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Hapus gambar profile anda?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -870,7 +870,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Atur proteksi password</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(HANYA PRO)</string>
+    <string name="subtitle_set_expiry_date">(hanya Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Atur password</string>
     <!-- Hint of the dialog to get link with password -->
@@ -888,13 +888,13 @@
         <item quantity="other">Folder dibagikan dengan %1$d kontak. Hapus semua berbagi?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Email atau kata sandi tidak valid. Silakan coba lagi.</string>
+    <string name="error_incorrect_email_or_password">E-mail atau kata sandi tidak valid. Silakan coba lagi.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Akun anda telah di tangguhkan karena penyalahgunaan Kebijakan Pelayanan. Harap kontak support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Terlalu banyak coba masuk yang gagal, mohon tunggu selama satu jam.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Akun ini belum divalidasi. Tolong cek email anda.</string>
+    <string name="account_not_validated_login">Akun ini belum divalidasi. Tolong cek e-mail anda.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Tautan folder tidak tersedia</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -906,9 +906,9 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL ini rusak atau cacat. Tautan yang anda coba akses tidak ada.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Menunggu konfirmasi email</string>
+    <string name="confirm_email_text">Menunggu konfirmasi e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Silakan periksa email anda dan ketuk tautan untuk mengonfirmasi akun anda.</string>
+    <string name="confirm_email_explanation">Silakan periksa e-mail anda dan ketuk tautan untuk mengonfirmasi akun anda.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d barang</item>
@@ -1048,7 +1048,7 @@
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Ubah profile</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
-    <string name="title_properties_chat_leave_chat">Tinggalkan Grup</string>
+    <string name="title_properties_chat_leave_chat">Tinggalkan grup</string>
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Partisipan</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -1271,27 +1271,27 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Import</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Tambah ke Cloud Drive</string>
+    <string name="add_to_cloud_node_chat">Tambah ke Cloud drive</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Lihat kontak</string>
     <!-- Menu option -->
-    <string name="import_success_error">Kesalahan. Tidak ditambahkan ke Cloud Drive</string>
+    <string name="import_success_error">Kesalahan. Tidak ditambahkan ke Cloud drive</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Menghubungkan&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s sudah diundang. Konsultasikan permintaan anda yang tertunda.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Jika anda salah mengeja alamat email, perbaiki dan ketuk [A]Kirim Ulang[A].</string>
+    <string name="confirm_email_misspelled">Jika anda salah mengeja alamat e-mail, perbaiki dan ketuk [A]Kirim Ulang[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Kirim lagi</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email terkirim</string>
+    <string name="confirm_email_misspelled_email_sent">E-mail terkirim</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Peringatan hak cipta untuk semua pengguna</string>
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA menghargai hak cipta orang lain dan mengharuskan pengguna  layanan MEGA cloud menuruti hukum hak cipta.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Anda dilarang menggunakan layanan MEGA cloud untuk melanggar hak  cipta. Anda tidak boleh mengunggah, mengunduh, menyimpan, berbagi, menampilkan, mengalirkan, mendistribusikan,  mengirim email, menautkan, mengirimkan atau menyediakan file, data, atau konten yang melanggar hak cipta atau hak kepemilikan orang lain atau entitas lainnya.</string>
+    <string name="copyright_alert_second_paragraph">Anda dilarang menggunakan layanan MEGA cloud untuk melanggar hak  cipta. Anda tidak boleh mengunggah, mengunduh, menyimpan, berbagi, menampilkan, mengalirkan, mendistribusikan,  mengirim e-mail, menautkan, mengirimkan atau menyediakan file, data, atau konten yang melanggar hak cipta atau hak kepemilikan orang lain atau entitas lainnya.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Setuju</string>
     <!-- text of the Disagree button -->
@@ -1343,7 +1343,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Tidak ada file dipilih</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Dari Cloud Drive</string>
+    <string name="attachment_upload_panel_from_cloud">Dari Cloud drive</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Kontak</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1457,7 +1457,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Undangan terkirim</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email salah</string>
+    <string name="invalid_email_to_invite">E-mail salah</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Saat anda menginstal aplikasi desktop MEGA, anda mendapatkan %1$sruang penyimpanan gratis, berlaku selama 365 hari. Aplikasi desktop MEGA tersedia untuk Windows, macOS, dan sebagian besar distro Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1557,7 +1557,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Hapus kode QR</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">Ke Cloud Drive</string>
+    <string name="save_cloud_drive">Ke Cloud drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Ke sistem file</string>
     <!-- Title of QR code section -->
@@ -1619,21 +1619,21 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Kosongkan [/B][A]Sampah[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Tidak ada file di [/B][A]Cloud Drive[/A] anda</string>
+    <string name="context_empty_cloud_drive">[B]Tidak ada file di [/B][A]Cloud drive[/A] anda</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Tidak ada file [/B][A]Disimpan untuk Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]Tidak ada [/B][A]Kontak[/A]</string>
+    <string name="context_empty_contacts">[B]Tidak ada [/B][A]kontak[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Tidak ada[/A] [B]Percakapan[/B]</string>
+    <string name="recent_chat_empty">[A]Tidak ada[/A] [B]percakapan[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]Memuat[/A] [B]Percakapan&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[A]Memuat[/A] [B]percakapan&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]Tidak ada [/B][A]Folder Bersama Masuk[/A]</string>
+    <string name="context_empty_incoming">[B]Tidak ada [/B][A]folder bersama masuk[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]Tidak ada [/B][A]Folder Keluar Bersama[/A]</string>
+    <string name="context_empty_outgoing">[B]Tidak ada [/B][A]folder keluar bersama[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
-    <string name="context_empty_links">[B]Tidak ada [/B][A]Tautan Umum[/A][B][/B]</string>
+    <string name="context_empty_links">[B]Tidak ada [/B][A]tautan umum[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
     <string name="tab_sent_requests">Permintaan terkirim</string>
     <!-- Title of the received requests tab. Capital letters -->
@@ -1758,7 +1758,7 @@
         <item quantity="other">Kesalahan. Sumber daya tidak lagi tersedia</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
-    <string name="turn_on_notifications_title">Aktifkan Notifikasi</string>
+    <string name="turn_on_notifications_title">Aktifkan notifikasi</string>
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">Dengan cara ini, anda akan melihat pesan baru \ndi ponsel Android anda secara instan.</string>
     <!-- First step to turn on notifications -->
@@ -1880,13 +1880,13 @@
     <!--  -->
     <string name="two_factor_authentication_explain">Otentikasi dua faktor adalah lapisan keamanan kedua untuk akun anda. Yang berarti bahwa bahkan jika seseorang mengetahui kata sandi anda, mereka tidak dapat mengaksesnya, tanpa juga memiliki akses ke kode enam digit yang hanya anda miliki aksesnya.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
-    <string name="button_setup_2fa">Mulai Setup</string>
+    <string name="button_setup_2fa">Mulai setup</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Pindai atau salin benih ke Aplikasi Authenticator anda.</string>
+    <string name="explain_qr_seed_2fa_1">Pindai atau salin benih ke aplikasi otentikasi anda.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Pastikan untuk mencadangkan benih ini ke tempat yang aman jika anda kehilangan perangkat anda.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Masukkan kode 6-digit yang dihasilkan oleh aplikasi Otentikasi anda.</string>
+    <string name="explain_confirm_2fa">Masukkan kode 6-digit yang dihasilkan oleh aplikasi otentikasi anda.</string>
     <!-- Text button -->
     <string name="general_verify">Verifikasi</string>
     <!-- Text button -->
@@ -1896,7 +1896,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Otentikasi dua faktor diaktifkan</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh Aplikasi Otentikasi anda.</string>
+    <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh aplikasi otentikasi anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan otentikasi dua faktor.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -1908,7 +1908,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
     <string name="verify_2fa_subtitle_change_password">Ganti password</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
-    <string name="verify_2fa_subtitle_change_email">Ganti email</string>
+    <string name="verify_2fa_subtitle_change_email">Ganti e-mail</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Hapus akun</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
@@ -1932,11 +1932,11 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Aplikasi otentikasi dua faktor</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Apakah anda ingin membuka Google Play agar dapat memasang Aplikasi Authenticator?</string>
+    <string name="open_play_store_2fa">Apakah anda ingin membuka Google Play agar dapat memasang aplikasi otentikasi?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Anda memerlukan aplikasi authenticator untuk mengaktifkan 2FA di MEGA. Anda dapat mengunduh dan memasang aplikasi Google Authenticator, Duo Mobile, Authy, atau Microsoft Authenticator untuk ponsel atau tablet anda.</string>
+    <string name="text_2fa_help">Anda memerlukan aplikasi otentikasi untuk mengaktifkan 2FA di MEGA. Anda dapat mengunduh dan memasang aplikasi Google Authenticator, Duo Mobile, Authy, atau Microsoft Authenticator untuk ponsel atau tablet anda.</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d files tidak dibagikan</string>
     <!-- button’s text to open a full screen image -->
@@ -1982,7 +1982,7 @@
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">Terjadi kesalahan. Barang tidak dipulihkan.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Kirim Pesan</string>
+    <string name="context_send_message">Kirim pesan</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Tindakan ini tidak dapat diselesaikan karena akan membawa anda melebihi batas penyimpanan anda saat ini. Apakah anda ingin meningkatkan akun anda?</string>
     <!-- Title of the section Archived chats -->
@@ -2032,7 +2032,7 @@
         <item quantity="other">%1$dversi file, dengan total  %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
-    <string name="settings_file_management_category">Pengelolaan File</string>
+    <string name="settings_file_management_category">Pengelolaan file</string>
     <!-- Option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_delete_versions">Hapus semua versi lama dari file saya</string>
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
@@ -2048,7 +2048,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Aktifkan atau nonaktifkan versi file untuk seluruh akun anda.\nAnda masih dapat menerima versi file dari folder bersama jika kontak anda telah mengaktifkan ini.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Ketuk, masukkan nama atau email</string>
+    <string name="type_mail">Ketuk, masukkan nama atau e-mail</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Tambahkan %s ke kontak anda?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2068,21 +2068,21 @@
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
     <string name="confirm_account">Harap masukan password anda untuk mengkonfirmasi akun anda</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
-    <string name="error_own_email_as_contact">Tidak perlu menambahkan email anda sendiri.</string>
+    <string name="error_own_email_as_contact">Tidak perlu menambahkan e-mail anda sendiri.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Kode salah</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Cloud Drive hampir penuh. Tingkatkan ke Pro dan dapatkan hingga %1$s penyimpanan dan %2$s kuota transfer.</string>
+    <string name="text_almost_full_warning">Cloud drive hampir penuh. Tingkatkan ke Pro dan dapatkan hingga %1$s penyimpanan dan %2$s kuota transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Cloud Drive hampir penuh. Tingkatkan sekarang dan dapatkan penyimpanan hingga %1$s dan kuota transfer %2$s.</string>
+    <string name="text_almost_full_warning_pro_account">Cloud drive hampir penuh. Tingkatkan sekarang dan dapatkan penyimpanan hingga %1$s dan kuota transfer %2$s.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Cloud Drive hampir penuh. Jika anda membutuhkan lebih banyak penyimpanan, silakan hubungi dukungan MEGA untuk mendapatkan paket khusus.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud drive hampir penuh. Jika anda membutuhkan lebih banyak penyimpanan, silakan hubungi dukungan MEGA untuk mendapatkan paket khusus.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Cloud Drive penuh. Tingkatkan ke Pro dan dapatkan hingga %1$s penyimpanan dan %2$s kuota transfer.</string>
+    <string name="text_storage_full_warning">Cloud drive penuh. Tingkatkan ke Pro dan dapatkan hingga %1$s penyimpanan dan %2$s kuota transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Cloud Drive penuh. Tingkatkan sekarang dan dapatkan penyimpanan hingga %1$s dan kuota transfer %2$s.</string>
+    <string name="text_storage_full_warning_pro_account">Cloud drive penuh. Tingkatkan sekarang dan dapatkan penyimpanan hingga %1$s dan kuota transfer %2$s.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Cloud Drive penuh. Jika anda membutuhkan lebih banyak penyimpanan, silakan hubungi dukungan MEGA untuk mendapatkan paket khusus.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud drive penuh. Jika anda membutuhkan lebih banyak penyimpanan, silakan hubungi dukungan MEGA untuk mendapatkan paket khusus.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Lihat paket</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2250,7 +2250,7 @@
     <!-- Popup notification text on mouse-over taken down folder. -->
     <string name="message_folder_takedown_pop_out_notification">Folder ini telah menjadi subjek pencopotan.</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Penghapusan Perselisihan</string>
+    <string name="dispute_takendown_file">Penghapusan perselisihan</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Tidak dapat diakses karena melanggar Persyaratan Layanan kami</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
@@ -2324,7 +2324,7 @@
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s telah dikompresi</string>
     <!-- notification title when compressing video -->
-    <string name="title_compress_video">Mengkompresi Video %1$d/%2$d</string>
+    <string name="title_compress_video">Mengkompresi video %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Folder yang dipilih tidak valid</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
@@ -2374,7 +2374,7 @@
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">MEGA tidak dapat membuat koneksi aman menggunakan SSL. Anda mungkin berada di jaringan Wi-Fi publik dengan persyaratan tambahan.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]Tidak ada [/B][A]Notifikasi[/A]</string>
+    <string name="context_empty_notifications">[B]Tidak ada [/B][A]notifikasi[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Siapkan MEGA</string>
     <!-- Permissions screen explanation -->
@@ -2432,7 +2432,7 @@
     <!-- label tomorrow -->
     <string name="label_tomorrow">Besok</string>
     <!-- Text of the empty screen for the chat shared files -->
-    <string name="context_empty_shared_files">[B]Tidak ada [/B][A]File Bersama[/A]</string>
+    <string name="context_empty_shared_files">[B]Tidak ada [/B][A]file bersama[/A]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Panggilan tidak dapat disambungkan karena jumlah peserta telah terlampaui.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -2470,7 +2470,7 @@
         <item quantity="other">Pesan diteruskan</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
-    <string name="title_geolocation_message">Lokasi yang Disematkan</string>
+    <string name="title_geolocation_message">Lokasi yang disematkan</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="other">%d file tidak dikirim ke %d obrolan</item>
@@ -2532,7 +2532,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Obrolan terenkripsi</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Obrolan yang sepenuhnya terenkripsi dengan panggilan suara dan video, perpesanan grup, dan integrasi berbagi file dengan Cloud Drive anda.</string>
+    <string name="content_tour_two">Obrolan yang sepenuhnya terenkripsi dengan panggilan suara dan video, perpesanan grup, dan integrasi berbagi file dengan Cloud drive anda.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Buat jaringan anda</string>
     <!-- Content of third tour screen -->
@@ -2550,7 +2550,7 @@
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Memutar file media tidak dapat dilakukan saat ada panggilan yang sedang berlangsung.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
-    <string name="ongoing_call_messages">Panggilan Berlangsung</string>
+    <string name="ongoing_call_messages">Panggilan berlangsung</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
     <string name="join_call_layout_in_group_call">Ketuk untuk bergabung dengan panggilan grup saat ini.</string>
     <!-- Title of the layout to return to a call -->
@@ -2728,27 +2728,27 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Kesalahan. Folder %1$s tidak dibuat</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Verifikasi alamat email anda</string>
+    <string name="verify_email_label">Verifikasi alamat e-mail anda</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Akun anda telah dikunci sementara untuk keselamatan anda.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Silakan ikuti langkah-langkah di [A]email verifikasi[/A]untuk membuka kunci akun anda .</string>
+    <string name="verify_email_and_follow_steps">Silakan ikuti langkah-langkah di [A]e-mail verifikasi[/A]untuk membuka kunci akun anda .</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Mengapa saya melihat ini?</string>
     <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Kirim ulang email</string>
+    <string name="resend_email_label">Kirim ulang e-mail</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
-    <string name="resend_email_error">Email sudah terkirim. Harap tunggu beberapa menit sebelum mencoba lagi.</string>
+    <string name="resend_email_error">E-mail sudah terkirim. Harap tunggu beberapa menit sebelum mencoba lagi.</string>
     <!-- Title of a helping view about locked accounts -->
-    <string name="locked_accounts_label">Akun Terkunci</string>
+    <string name="locked_accounts_label">Akun terkunci</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
     <string name="locked_accounts_text_1">Ada kemungkinan bahwa anda menggunakan kata sandi yang sama untuk akun MEGA anda seperti untuk layanan lain, dan bahwa setidaknya salah satu dari layanan lain ini telah mengalami pelanggaran data.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">Kata sandi anda bocor dan sekarang digunakan oleh aktor jahat untuk masuk ke akun anda, termasuk, namun tidak  terbatas pada, akun MEGA anda.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Setel Nama Panggilan</string>
+    <string name="add_nickname">Setel nama panggilan</string>
     <!-- Button to update a nickname for a user -->
-    <string name="edit_nickname">Atur Nama Panggilan</string>
+    <string name="edit_nickname">Atur nama panggilan</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_added">Nama panggilan ditambahkan</string>
     <!-- Label showing that a nickname has been added -->
@@ -2800,17 +2800,17 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Folder tidak ada.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">File tidak dapat ditemukan di Cloud Drive anda.</string>
+    <string name="warning_node_not_exists_in_cloud">File tidak dapat ditemukan di Cloud drive anda.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">Penyimpanan Penuh</string>
+    <string name="over_disk_quota_paywall_header">Penyimpanan penuh</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Data anda berisiko!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="other">Kami telah menghubungi anda melalui email ke %1$s di %2$s dan %3$s, tetapi anda masih memiliki %4$s file yang menggunakan %5$s di akun MEGA anda, yang mengharuskan anda memiliki %6$s.</item>
+        <item quantity="other">Kami telah menghubungi anda melalui e-mail ke %1$s di %2$s dan %3$s, tetapi anda masih memiliki %4$s file yang menggunakan %5$s di akun MEGA anda, yang mengharuskan anda memiliki %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Kami telah menghubungi anda melalui email ke %1$s,  tetapi anda masih memiliki %2$s file yang menggunakan %3$s di akun MEGA anda, yang mengharuskan anda memiliki %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Kami telah menghubungi anda melalui e-mail ke %1$s,  tetapi anda masih memiliki %2$s file yang menggunakan %3$s di akun MEGA anda, yang mengharuskan anda memiliki %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]Anda memiliki [M]%s[/M] tersisa untuk ditingkatkan [/B]. Setelah itu, data anda akan dihapus.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -2834,11 +2834,11 @@
     <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Terverifikasi</string>
     <!-- ”Verify user” dialog title -->
-    <string name="authenticity_credentials_label">Kredensial Autentikasi</string>
+    <string name="authenticity_credentials_label">Kredensial autentikasi</string>
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Ini dapat dilakukan pada kehidupan nyata melalui bertemu langsung. Jika anda memiliki channel lain yang sudah terverifikasi seperti OTR atau PGP, anda mungkin mau menggunakan itu.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Kredensial Anda</string>
+    <string name="label_your_credentials">Kredensial anda</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Setel Ulang</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3226,7 +3226,7 @@
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Baru-baru ini ditambahkan</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]Tidak ada [/B][A]Grup[/A]</string>
+    <string name="context_empty_groups">[B]Tidak ada [/B][A]grup[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Permintaan</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
@@ -3536,7 +3536,7 @@
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favorit</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]Tidak ada[/B] [A]Favorit[/A]</string>
+    <string name="empty_hint_favourite_album">[B]Tidak ada[/B] [A]favorit[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Hapus favorit</string>
     <!-- Message of notice that the zip file format is error -->
@@ -3876,7 +3876,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Di sinilah file dan folder yang dicadangkan disimpan. Item yang dicadangkan “hanya-baca” untuk melindunginya agar tidak dimodifikasi secara tidak sengaja di drive cloud anda.Anda dapat mencadangkan item dari komputer anda ke MEGA menggunakan aplikasi desktop kami.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Akun ditangguhkan karena pelanggaran hak cipta. Kami mengirimi anda email dengan informasi lebih lanjut tentang ini.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Akun ditangguhkan karena pelanggaran hak cipta. Kami mengirimi anda e-mail dengan informasi lebih lanjut tentang ini.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Akun dihentikan karena pelanggaran Persyaratan Layanan MEGA, seperti penyalahgunaan hak orang lain, berbagi dan mengimpor data ilegal, atau penyalahgunaan sistem.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4021,7 +4021,7 @@
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
     <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <string name="shared_items_verify_credentials_my_credentials">Kredensial anda</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context"></string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>
