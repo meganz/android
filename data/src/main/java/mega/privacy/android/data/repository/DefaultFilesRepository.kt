@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -14,6 +13,7 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -368,6 +368,30 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getOfflineInboxPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
+
+    override suspend fun createFolder(name: String, parent: Node) = withContext(ioDispatcher) {
+        val megaNode = megaApiGateway.getMegaNodeByHandle(parent.id.id)
+        megaNode?.let { parentMegaNode ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener { it.nodeHandle }
+                megaApiGateway.createFolder(name, parentMegaNode, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+    }
+
+    override suspend fun setCameraUploadsFolders(primaryFolder: Long, secondaryFolder: Long) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener { return@getRequestListener }
+                megaApiGateway.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 
     override suspend fun getUnVerifiedInComingShares(): Int = 3
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available

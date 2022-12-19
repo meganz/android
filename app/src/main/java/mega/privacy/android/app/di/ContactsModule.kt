@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
@@ -26,7 +27,7 @@ import mega.privacy.android.domain.usecase.VerifyCredentials
  * Provides all contacts implementation.
  */
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 class ContactsModule {
 
     @Provides

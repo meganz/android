@@ -107,6 +107,7 @@ class AlbumsViewModel @Inject constructor(
                         state.copy(
                             albums = albums,
                             currentAlbum = currentAlbum,
+                            showAlbums = true
                         )
                     }
                 }

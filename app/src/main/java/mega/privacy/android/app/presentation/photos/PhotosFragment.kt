@@ -322,7 +322,7 @@ class PhotosFragment : Fragment() {
             photosViewModel.onTabSelected(PhotosTab.Albums)
         }
 
-        LaunchedEffect(pagerState) {
+        LaunchedEffect(pagerState.currentPage) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
                 pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
@@ -383,7 +383,10 @@ class PhotosFragment : Fragment() {
                     albumsViewModel.selectAlbum(album)
                 }
             },
-            closeDeleteAlbumsConfirmation = albumsViewModel::closeDeleteAlbumsConfirmation,
+            closeDeleteAlbumsConfirmation = {
+                albumsViewModel.closeDeleteAlbumsConfirmation()
+                albumsViewModel.clearAlbumSelection()
+            },
             deleteAlbums = ::deleteAlbums,
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
@@ -670,6 +673,7 @@ class PhotosFragment : Fragment() {
         albumsViewModel.setCurrentAlbum(album.id)
         albumsViewModel.setCurrentSort(Sort.DEFAULT)
         albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
+        albumsViewModel.setSnackBarMessage("")
     }
 
     private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()

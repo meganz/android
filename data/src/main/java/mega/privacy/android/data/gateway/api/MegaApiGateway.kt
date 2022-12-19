@@ -104,7 +104,7 @@ interface MegaApiGateway {
 
     /**
      * Removes [MegaTransferListenerInterface] to stop listening for Transfer events
-     * 
+     *
      * @param listener [MegaTransferListenerInterface]
      */
     fun removeTransferListener(listener: MegaTransferListenerInterface)
@@ -1173,4 +1173,60 @@ interface MegaApiGateway {
      * @param listener  MegaRequestListener to track this request
      */
     fun inviteContact(email: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get outgoing contact requests
+     *
+     * @return list of [MegaContactRequest]
+     */
+    fun outgoingContactRequests(): ArrayList<MegaContactRequest>
+
+    /**
+     * Create a folder in the MEGA account
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREATE_FOLDER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns the handle of the parent folder
+     * - MegaRequest::getName - Returns the name of the new folder
+     *
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNodeHandle - Handle of the new folder
+     * - MegaRequest::getFlag - True if target folder (\c parent) was overridden
+     *
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param name     Name of the new folder
+     * @param parent   Parent folder
+     * @param listener MegaRequestListener to track this request
+     */
+    fun createFolder(name: String, parent: MegaNode, listener: MegaRequestListenerInterface)
+
+    /**
+     * Set Camera Uploads for both primary and secondary target folder.
+     *
+     *
+     * If only one of the target folders wants to be set, simply pass a INVALID_HANDLE to
+     * as the other target folder and it will remain untouched.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_CAMERA_UPLOADS_FOLDER
+     * - MegaRequest::getNodehandle - Returns the provided node handle for primary folder
+     * - MegaRequest::getParentHandle - Returns the provided node handle for secondary folder
+     *
+     * @param primaryFolder   MegaHandle of the node to be used as primary target folder
+     * @param secondaryFolder MegaHandle of the node to be used as secondary target folder
+     * @param listener        MegaRequestListener to track this request
+     */
+    fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+        listener: MegaRequestListenerInterface,
+    )
 }

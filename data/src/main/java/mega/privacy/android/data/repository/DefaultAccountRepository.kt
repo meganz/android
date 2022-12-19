@@ -367,4 +367,7 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
+    override val accountEmail: String?
+        get() = megaApiGateway.accountEmail
+
 }

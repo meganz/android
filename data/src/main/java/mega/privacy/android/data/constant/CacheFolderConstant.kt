@@ -25,4 +25,9 @@ object CacheFolderConstant {
      * Avatar Folder
      */
     const val AVATAR_FOLDER = "avatarsMEGA"
+
+    /**
+     * QR code file folder
+     */
+    const val QR_FOLDER = "qrMEGA"
 }

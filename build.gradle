@@ -10,7 +10,7 @@ buildscript {
     ext.hiltVersion = "2.42"
     ext.huaweiServicesVersion = "1.6.3.300"
     ext.firebaseCrashlyticsVersion = "2.8.1"
-    ext.firebasePerformanceVersion = "1.4.1"
+    ext.firebasePerformanceVersion = "1.4.2"
     ext.firebaseAppDistribution = "3.0.1"
     ext.jacocoVersion = '0.8.8'
     ext.paparazziVersion = "1.0.0"
@@ -68,7 +68,6 @@ task clean(type: Delete) {
 ext {
     // App
     appVersion = "7.0"
-    versionCode = 489
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -103,7 +102,7 @@ ext {
     datastoreVersion = '1.0.0'
     espressoVersion = '3.4.0'
     exoPlayerVersion = '2.18.1'
-    firebaseBom = '29.0.4'
+    firebaseBom = '31.1.1'
     fragmentKtxVersion = '1.2.5'
     fragmentTestingVersion = '1.4.1'
     frescoVersion = '2.6.0'
@@ -138,6 +137,7 @@ ext {
     workVersion = '2.7.1'
     exifinterfaceVersion = '1.3.0'
     zxingVersion = '3.4.0'
+    billingVersion = '5.1.0'
 }
 
 ext.isCiBuild = { ->

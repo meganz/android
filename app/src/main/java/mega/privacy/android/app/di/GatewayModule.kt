@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
@@ -14,6 +13,7 @@ import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGatewa
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel
 import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import javax.inject.Singleton
 
 /**

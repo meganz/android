@@ -2,6 +2,8 @@ package mega.privacy.android.app.middlelayer.iab;
 
 import java.util.List;
 
+import mega.privacy.android.domain.entity.billing.MegaPurchase;
+
 /**
  * Listener to the updates that happen when purchases list was updated or consumption of the
  * item was finished

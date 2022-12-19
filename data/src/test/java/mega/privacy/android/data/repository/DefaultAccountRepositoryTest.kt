@@ -618,4 +618,11 @@ class DefaultAccountRepositoryTest {
 
         underTest.createContactLink(renew = true)
     }
+
+
+    @Test
+    fun `test that MegaApiGateway method is invoked when getting accountEmail`() {
+        underTest.accountEmail
+        verify(megaApiGateway).accountEmail
+    }
 }

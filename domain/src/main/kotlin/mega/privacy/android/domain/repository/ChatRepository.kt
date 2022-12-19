@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -224,7 +225,7 @@ interface ChatRepository {
      */
     suspend fun inviteContact(
         email: String,
-    ): Boolean
+    ): InviteContactRequest
 
     /**
      * Monitor updates on chat room item update
@@ -276,4 +277,15 @@ interface ChatRepository {
      * @return  A flow of Booleans indicating some changes has been made
      */
     fun monitorMutedChats(): Flow<Boolean>
+
+    /**
+     * Get my email updated
+     */
+    fun monitorMyEmail(): Flow<String?>
+
+    /**
+     * Get my name updated
+     */
+    fun monitorMyName(): Flow<String?>
+
 }

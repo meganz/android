@@ -155,110 +155,115 @@ fun AlbumsView(
             }
         },
     ) {
-        LazyVerticalGrid(
-            contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            columns = GridCells.Fixed(grids),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(
-                items = albumsViewState.albums,
-                key = { it.id.toString() + it.coverPhoto?.id.toString() }
-            ) { album ->
-                Box(
-                    modifier = Modifier
-                        .alpha(1f.takeIf {
-                            album.id is Album.UserAlbum || albumsViewState.selectedAlbumIds.isEmpty()
-                        } ?: 0.5f)
-                        .combinedClickable(
-                            onClick = {
-                                handleAlbumClicked(
-                                    album = album,
-                                    numSelectedAlbums = albumsViewState.selectedAlbumIds.size,
-                                    openAlbum = openAlbum,
-                                    onAlbumSelection = onAlbumSelection,
-                                )
-                            },
-                            onLongClick = {
-                                handleAlbumLongPressed(
-                                    album = album,
-                                    onAlbumSelection = onAlbumSelection,
-                                )
-                            }
-                        )
-                        .clip(RoundedCornerShape(10.dp))
-                        .fillMaxSize()
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        val imageState = produceState<String?>(initialValue = null) {
-                            album.coverPhoto?.let {
-                                downloadPhoto(
-                                    false,
-                                    it
-                                ) { downloadSuccess ->
-                                    if (downloadSuccess) {
-                                        value = it.thumbnailFilePath
+        //We need to wait system album load fist and then show the list of album
+        if (albumsViewState.showAlbums) {
+            LazyVerticalGrid(
+                contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                columns = GridCells.Fixed(grids),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(
+                    items = albumsViewState.albums,
+                    key = { it.id.toString() + it.coverPhoto?.id.toString() }
+                ) { album ->
+                    Box(
+                        modifier = Modifier
+                            .alpha(1f.takeIf {
+                                album.id is Album.UserAlbum || albumsViewState.selectedAlbumIds.isEmpty()
+                            } ?: 0.5f)
+                            .combinedClickable(
+                                onClick = {
+                                    handleAlbumClicked(
+                                        album = album,
+                                        numSelectedAlbums = albumsViewState.selectedAlbumIds.size,
+                                        openAlbum = openAlbum,
+                                        onAlbumSelection = onAlbumSelection,
+                                    )
+                                },
+                                onLongClick = {
+                                    handleAlbumLongPressed(
+                                        album = album,
+                                        onAlbumSelection = onAlbumSelection,
+                                    )
+                                }
+                            )
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxSize()
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            val imageState = produceState<String?>(initialValue = null) {
+                                album.coverPhoto?.let {
+                                    downloadPhoto(
+                                        false,
+                                        it
+                                    ) { downloadSuccess ->
+                                        if (downloadSuccess) {
+                                            value = it.thumbnailFilePath
+                                        }
                                     }
                                 }
                             }
-                        }
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(imageState.value)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = null,
-                            placeholder = if (!MaterialTheme.colors.isLight) {
-                                painterResource(id = R.drawable.ic_album_cover_d)
-                            } else {
-                                painterResource(id = R.drawable.ic_album_cover)
-                            },
-                            error = if (!MaterialTheme.colors.isLight) {
-                                painterResource(id = R.drawable.ic_album_cover_d)
-                            } else {
-                                painterResource(id = R.drawable.ic_album_cover)
-                            },
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(10.dp))
-                                .aspectRatio(1f)
-                                .then(
-                                    if (isAlbumSelected(album, albumsViewState.selectedAlbumIds))
-                                        Modifier.border(
-                                            BorderStroke(
-                                                width = 1.dp,
-                                                color = colorResource(id = R.color.teal_300),
-                                            ),
-                                            shape = RoundedCornerShape(10.dp),
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(imageState.value)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = null,
+                                placeholder = if (!MaterialTheme.colors.isLight) {
+                                    painterResource(id = R.drawable.ic_album_cover_d)
+                                } else {
+                                    painterResource(id = R.drawable.ic_album_cover)
+                                },
+                                error = if (!MaterialTheme.colors.isLight) {
+                                    painterResource(id = R.drawable.ic_album_cover_d)
+                                } else {
+                                    painterResource(id = R.drawable.ic_album_cover)
+                                },
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .aspectRatio(1f)
+                                    .then(
+                                        if (isAlbumSelected(album,
+                                                albumsViewState.selectedAlbumIds)
                                         )
-                                    else Modifier
-                                ),
-                        )
-                        MiddleEllipsisText(
-                            modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                            text = album.title,
-                            style = subtitle2,
-                            color = if (MaterialTheme.colors.isLight) black else white,
-                            fontWeight = FontWeight.Medium
-                        )
+                                            Modifier.border(
+                                                BorderStroke(
+                                                    width = 1.dp,
+                                                    color = colorResource(id = R.color.teal_300),
+                                                ),
+                                                shape = RoundedCornerShape(10.dp),
+                                            )
+                                        else Modifier
+                                    ),
+                            )
+                            MiddleEllipsisText(
+                                modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
+                                text = album.title,
+                                style = subtitle2,
+                                color = if (MaterialTheme.colors.isLight) black else white,
+                                fontWeight = FontWeight.Medium
+                            )
 
-                        Text(
-                            text = album.count.toString(),
-                            style = caption,
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                        )
-                    }
-                    if (isAlbumSelected(album, albumsViewState.selectedAlbumIds)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_select_folder),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                                .padding(8.dp),
-                            tint = Color.Unspecified,
-                        )
+                            Text(
+                                text = album.count.toString(),
+                                style = caption,
+                                color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                            )
+                        }
+                        if (isAlbumSelected(album, albumsViewState.selectedAlbumIds)) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_select_folder),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(8.dp),
+                                tint = Color.Unspecified,
+                            )
+                        }
                     }
                 }
             }

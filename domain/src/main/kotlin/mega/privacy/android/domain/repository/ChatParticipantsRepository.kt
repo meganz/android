@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.repository
 
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import java.io.File
 
 /**
  * The repository interface regarding Chat participants.
@@ -14,37 +16,51 @@ interface ChatParticipantsRepository {
     suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant>
 
     /**
-     * Get my user handle
+     * Get status
      *
-     * @return My user handle
+     * @param participant [ChatParticipant]
+     * @return [UserStatus]
      */
-    suspend fun getMyUserHandle(): Long
+    suspend fun getStatus(participant: ChatParticipant): UserStatus
 
     /**
-     * Get my full name
+     * Get alias
      *
-     * @return My full name
+     * @param participant [ChatParticipant].
+     * @return Participant alias.
      */
-    suspend fun getMyFullName(): String
+    suspend fun getAlias(participant: ChatParticipant): String?
 
     /**
-     * Get my email
+     * Check credentials
      *
-     * @return My email
+     * @param participant [ChatParticipant].
+     * @return  True, if credentials are verified. False, if not.
      */
-    suspend fun getMyEmail(): String
+    suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean
 
     /**
-     * Get my default Avatar Color
+     * Get avatar
      *
-     * @return My avatar color
+     * @param participant [ChatParticipant].
+     * @return Participant avatar.
      */
-    suspend fun getMyDefaultAvatarColor(): String
+    suspend fun getAvatarUri(participant: ChatParticipant): File?
 
     /**
-     * Get my status
+     * Get avatar color
      *
-     * @return My status
+     * @param participant [ChatParticipant].
+     * @return Participant avatar color.
      */
-    suspend fun getMyStatus(): UserStatus
+    suspend fun getAvatarColor(participant: ChatParticipant): Int
+
+    /**
+     * Get permission
+     *
+     * @param chatId        Chat Id.
+     * @param participant   [ChatParticipant].
+     * @return Participant permissions.
+     */
+    suspend fun getPermissions(chatId: Long, participant: ChatParticipant): ChatRoomPermission
 }

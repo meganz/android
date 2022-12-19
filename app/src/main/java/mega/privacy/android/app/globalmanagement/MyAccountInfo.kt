@@ -4,7 +4,6 @@ import android.util.Base64
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.middlelayer.iab.MegaPurchase
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate
 import mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate
@@ -14,6 +13,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava

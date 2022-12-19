@@ -59,7 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
+import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.ContactStatus
@@ -148,52 +148,54 @@ fun ScheduledMeetingInfoView(
             modifier = Modifier.padding(paddingValues)) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
 
-            state.apply {
-                items(buttons) { button ->
-                    ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
-                }
+            items(state.buttons) { button ->
+                ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
+            }
 
-                item(key = "Participants") { ParticipantsHeader(state = state) }
+            item(key = "Participants") { ParticipantsHeader(state = state) }
 
-                item(key = "Add participants") {
-                    AddParticipantsButton(state = state,
-                        onAddParticipantsClicked = onAddParticipantsClicked)
-                }
-                val participantsList = state.participantItemList
+            item(key = "Add participants") {
+                AddParticipantsButton(state = state,
+                    onAddParticipantsClicked = onAddParticipantsClicked)
+            }
 
-                val numParticipantsToShow =
-                    if (state.seeMoreVisible && state.participantItemList.size > 4)
-                        4
-                    else
-                        state.participantItemList.size
+            item(key = "Participants list") {
+                state.participantItemList.indices.forEach { i ->
+                    if (i < 4 || !state.seeMoreVisible) {
+                        val isLastOne =
+                            (i < 4 && i == state.participantItemList.size - 1) || (i >= 4 && i == 3)
 
-                for (i in 0 until numParticipantsToShow) {
-                    val isLastOne = i == numParticipantsToShow - 1
-                    item(key = participantsList[i].handle) {
-                        ParticipantItemView(participant = participantsList[i],
+                        ParticipantItemView(participant = state.participantItemList[i],
                             !isLastOne, onParticipantClicked = onParticipantClicked)
                     }
                 }
 
                 if (state.participantItemList.size > 4) {
-                    item(key = "See more or less participants") {
-                        SeeMoreOrLessParticipantsButton(state,
-                            onSeeMoreOrLessClicked = onSeeMoreOrLessClicked)
-                    }
+                    SeeMoreOrLessParticipantsButton(state,
+                        onSeeMoreOrLessClicked = onSeeMoreOrLessClicked)
                 }
+            }
 
-                item(key = "Scheduled meeting description") {
-                    ScheduledMeetingDescriptionView(state = state)
-                }
+            item(key = "Scheduled meeting description") {
+                ScheduledMeetingDescriptionView(state = state)
+            }
 
-                item(key = "Leave group") {
-                    LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
-                }
+            item(key = "Leave group") {
+                LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
             }
         }
 
         if (state.snackBar != null) {
-            val msg = stringResource(id = state.snackBar)
+            val msg =
+                if (state.snackBar == R.string.context_contact_request_sent && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else if (state.snackBar == R.string.invite_not_sent_already_sent && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else if (state.snackBar == R.string.context_contact_already_exists && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else {
+                    stringResource(id = state.snackBar)
+                }
 
             LaunchedEffect(scaffoldState.snackbarHostState) {
                 val s = scaffoldState.snackbarHostState.showSnackbar(message = msg,
@@ -320,7 +322,7 @@ private fun ScheduledMeetingInfoAppBar(
                 }
             }
 
-            if (state.isHost) {
+            if (state.isHost && state.isEditEnabled) {
                 IconButton(onClick = { onEditClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
@@ -392,10 +394,28 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
         DefaultAvatar(title = state.chatTitle)
     } else if (state.isSingleMeeting()) {
-        OneParticipantAvatar(firstUser = state.firstParticipant ?: return)
+        state.firstParticipant?.let {
+            if (it.fileUpdated) {
+                OneParticipantAvatar(firstUser = it)
+            } else {
+                OneParticipantAvatar(firstUser = it)
+            }
+        }
     } else {
-        SeveralParticipantsAvatar(firstUser = state.lastParticipant ?: return,
-            lastUser = state.lastParticipant)
+        state.firstParticipant?.let { first ->
+            state.lastParticipant?.let { last ->
+                if (first.fileUpdated) {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                } else {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                }
+                if (last.fileUpdated) {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                } else {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                }
+            }
+        }
     }
 }
 
@@ -441,7 +461,9 @@ private fun DefaultAvatar(title: String) {
 fun OneParticipantAvatar(firstUser: ChatParticipant) {
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(color = Color(AvatarUtil.getColorAvatar(firstUser.handle)),
+            .fillMaxSize()
+            .clip(CircleShape)
+            .background(color = Color(firstUser.defaultAvatarColor),
                 shape = CircleShape)
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
@@ -454,13 +476,20 @@ fun OneParticipantAvatar(firstUser: ChatParticipant) {
                     placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
                 }
             }) {
-
-        Text(
-            text = AvatarUtil.getFirstLetter(firstUser.data.fullName),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            style = MaterialTheme.typography.h6
-        )
+        if (firstUser.data.avatarUri == null) {
+            Text(
+                text = firstUser.getAvatarFirstLetter(),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                style = MaterialTheme.typography.subtitle1
+            )
+        } else {
+            Image(modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape),
+                painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
+                contentDescription = "User avatar")
+        }
     }
 }
 
@@ -485,15 +514,23 @@ fun SeveralParticipantsAvatar(
                 .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.BottomEnd)
-                .background(color = Color(AvatarUtil.getSpecificAvatarColor(lastUser.defaultAvatarColor)),
+                .background(color = Color(lastUser.defaultAvatarColor),
                     shape = CircleShape)
         ) {
-            Text(
-                text = AvatarUtil.getFirstLetter(lastUser.data.fullName),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
+            if (lastUser.data.avatarUri == null) {
+                Text(
+                    text = lastUser.getAvatarFirstLetter(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1
+                )
+            } else {
+                Image(modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
+                    painter = rememberAsyncImagePainter(model = lastUser.data.avatarUri),
+                    contentDescription = "User avatar")
+            }
         }
 
         Box(contentAlignment = Alignment.Center,
@@ -502,17 +539,24 @@ fun SeveralParticipantsAvatar(
                 .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.TopStart)
-                .background(color = Color(AvatarUtil.getSpecificAvatarColor(firstUser.defaultAvatarColor)),
+                .background(color = Color(firstUser.defaultAvatarColor),
                     shape = CircleShape)
         ) {
-            Text(
-                text = AvatarUtil.getFirstLetter(firstUser.data.fullName),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
+            if (firstUser.data.avatarUri == null) {
+                Text(
+                    text = firstUser.getAvatarFirstLetter(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    style = MaterialTheme.typography.subtitle1
+                )
+            } else {
+                Image(modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
+                    painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
+                    contentDescription = "User avatar")
+            }
         }
-
     }
 }
 
@@ -945,7 +989,12 @@ private fun ParticipantItemView(
                 .weight(1f)
                 .height(72.dp)) {
                 Box {
-                    ParticipantAvatar(participant = participant)
+                    if (participant.fileUpdated) {
+                        ParticipantAvatar(participant = participant)
+                    } else {
+                        ParticipantAvatar(participant = participant)
+                    }
+
                     if (participant.areCredentialsVerified) {
                         Image(
                             modifier = Modifier
@@ -992,7 +1041,7 @@ private fun ParticipantItemView(
             Box(modifier = Modifier
                 .wrapContentSize(Alignment.CenterEnd)) {
                 Row(modifier = Modifier.align(Alignment.Center)) {
-                    participantsPermissionView(participant.privilege)
+                    participantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
                         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
@@ -1012,31 +1061,30 @@ private fun ParticipantItemView(
 /**
  * Participants permissions view
  *
- * @param privilege [ChatRoomPermission]
+ * @param participant [ChatParticipant]
  */
 @Composable
-private fun participantsPermissionView(privilege: ChatRoomPermission) {
-    if (privilege != ChatRoomPermission.Unknown && privilege != ChatRoomPermission.Removed) {
-        val iconId: Int? = when (privilege) {
-            ChatRoomPermission.Moderator -> {
-                R.drawable.ic_permissions_full_access
-            }
-            ChatRoomPermission.Standard -> {
-                R.drawable.ic_permissions_read_write
-            }
-            ChatRoomPermission.ReadOnly -> {
-                R.drawable.ic_permissions_read_only
-            }
-            else -> {
-                null
-            }
-        }
-        iconId?.apply {
+private fun participantsPermissionView(participant: ChatParticipant) {
+    when (participant.privilege) {
+        ChatRoomPermission.Moderator -> {
             Icon(
-                painter = painterResource(id = this),
+                painter = painterResource(id = R.drawable.ic_permissions_full_access),
                 contentDescription = "Permissions icon",
                 tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
         }
+        ChatRoomPermission.Standard -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_read_write),
+                contentDescription = "Permissions icon",
+                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+        }
+        ChatRoomPermission.ReadOnly -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_read_only),
+                contentDescription = "Permissions icon",
+                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+        }
+        else -> {}
     }
 }
 
@@ -1166,16 +1214,12 @@ private fun ParticipantAvatar(
         .clip(CircleShape),
     participant: ChatParticipant,
 ) {
-    val avatarUri = participant.data.avatarUri
-
-    if (avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = avatarUri)
+    if (participant.data.avatarUri != null) {
+        UriAvatar(modifier = modifier, uri = participant.data.avatarUri.toString())
     } else {
-        participant.defaultAvatarColor?.let { color ->
-            DefaultContactAvatar(modifier = modifier,
-                color = Color(color.toColorInt()),
-                content = participant.getAvatarFirstLetter())
-        }
+        DefaultContactAvatar(modifier = modifier,
+            color = Color(participant.defaultAvatarColor),
+            content = participant.getAvatarFirstLetter())
     }
 }
 

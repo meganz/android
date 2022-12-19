@@ -68,7 +68,7 @@ pipeline {
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
 
-        APK_VERSION_NAME_FOR_CD = "_${new Date().format('MMddHHmm')}"
+        APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
 
         // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
         SDK_LOG_FILE_NAME = "sdk_build_log.txt"
@@ -232,7 +232,7 @@ pipeline {
         }
         stage('Download Google Map API Key') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -409,7 +409,7 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build QA APK(GMS)'
                     withEnv([
-                            "APK_VERSION_NAME_FOR_CD=${APK_VERSION_NAME_FOR_CD}_QA"
+                            "APK_VERSION_NAME_TAG_FOR_CD=_QA"
                     ]) {
                         sh './gradlew app:assembleGmsQa'
                     }
@@ -475,33 +475,6 @@ pipeline {
             }
         }
 
-        stage('Unit Test') {
-            when {
-                expression { triggerByPush() || triggerByUploadCoverage() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Unit Test"
-                }
-                gitlabCommitStatus(name: 'Unit Test') {
-                    // Compile and run unit tests for available modules
-                    sh "./gradlew testGmsDebugUnitTest"
-                    sh "./gradlew domain:test"
-                    sh "./gradlew :data:testGmsDebugUnitTest"
-                    // sh "./gradlew lint:test" we dont care about the percentage of lint
-
-                    script {
-                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
-                        // If UnitTest is failed, summary is collected at post.failure{} phase
-                        // We have to collect the report here, before they are cleaned in the last stage.
-                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                    }
-                }
-            }
-        }
-
         stage('Upload Code Coverage') {
             when {
                 expression { triggerByPush() || triggerByUploadCoverage() }
@@ -532,6 +505,9 @@ pipeline {
                             // restore failed test cases
                             sh "git checkout -- app/src/testDebug"
 
+                            APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                            DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                            DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
                             DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
                             DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
                             APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
@@ -708,7 +684,7 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
  */
 private String firebaseUploadSuccessMessage(String lineBreak) {
     return ":rocket: Android APK Build uploaded successfully to Firebase AppDistribution!(${env.BUILD_NUMBER})" +
-            "${lineBreak}Version:\t${readAppVersion()}${APK_VERSION_NAME_FOR_CD}" +
+            "${lineBreak}Version:\t${readAppVersion()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
@@ -926,8 +902,8 @@ private void checkSDKVersion() {
  * @return version name plus version code. Example: "6.6(433)"
  */
 private String readAppVersion() {
-    String versionCode = sh(script: "grep versionCode build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim()
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
+    String versionCode = env.APK_VERSION_CODE_FOR_CD
     return versionName + "(" + versionCode + ")"
 }
 

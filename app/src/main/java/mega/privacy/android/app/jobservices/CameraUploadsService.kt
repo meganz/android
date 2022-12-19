@@ -15,21 +15,17 @@ import android.os.StatFs
 import androidx.core.app.NotificationCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.VideoCompressor
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
@@ -48,7 +44,7 @@ import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
+import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
@@ -81,6 +77,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
@@ -119,7 +116,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferListenerInterface
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -131,7 +127,7 @@ import kotlin.math.roundToInt
  */
 @AndroidEntryPoint
 class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
-    MegaTransferListenerInterface, VideoCompressionCallback {
+    VideoCompressionCallback {
 
     companion object {
 
@@ -406,12 +402,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getDefaultNodeHandle: GetDefaultNodeHandle
 
     /**
-     * DatabaseHandler
-     */
-    @Inject
-    lateinit var tempDbHandler: LegacyDatabaseHandler
-
-    /**
      * AreAllUploadTransfersPaused
      */
     @Inject
@@ -503,6 +493,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var setOriginalFingerprint: SetOriginalFingerprint
 
     /**
+     * Start Upload
+     */
+    @Inject
+    lateinit var startUpload: StartUpload
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -589,8 +585,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         getAttrUserListener = null
         setAttrUserListener = null
         createFolderListener = null
-
-        megaApi.removeTransferListener(this)
 
         stopActiveHeartbeat()
         coroutineScope?.cancel()
@@ -1211,10 +1205,25 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     } else {
                         totalToUpload++
                         val lastModified = getLastModifiedTime(file)
-                        megaApi.startUpload(
-                            path, parent, file.fileName, lastModified / 1000,
-                            Constants.APP_DATA_CU, false, false, null, this
-                        )
+
+                        // If the local file path exists, call the Use Case to upload the file
+                        path?.let { nonNullFilePath ->
+                            coroutineScope?.launch {
+                                startUpload(
+                                    localPath = nonNullFilePath,
+                                    parentNode = parent,
+                                    fileName = file.fileName,
+                                    modificationTime = lastModified / 1000,
+                                    appData = Constants.APP_DATA_CU,
+                                    isSourceTemporary = false,
+                                    shouldStartFirst = false,
+                                    cancelToken = null,
+                                ).collect { globalTransfer ->
+                                    // Handle the GlobalTransfer emitted by the Use Case
+                                    onGlobalTransferUpdated(globalTransfer)
+                                }
+                            }
+                        }
                     }
                 } else {
                     Timber.d("Local file is unavailable, delete record from database.")
@@ -1233,6 +1242,91 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.d("No pending videos, finish.")
                 onQueueComplete()
             }
+        }
+    }
+
+    /**
+     * Handles the [GlobalTransfer] emitted by [StartUpload]
+     *
+     * @param globalTransfer The [GlobalTransfer] emitted from the Use Case
+     */
+    private fun onGlobalTransferUpdated(globalTransfer: GlobalTransfer) {
+        when (globalTransfer) {
+            is GlobalTransfer.OnTransferStart -> onTransferStarted(globalTransfer)
+            is GlobalTransfer.OnTransferFinish -> onTransferFinished(globalTransfer)
+            is GlobalTransfer.OnTransferUpdate -> onTransferUpdated(globalTransfer)
+            is GlobalTransfer.OnTransferTemporaryError -> onTransferTemporaryError(globalTransfer)
+            // No further action necessary for this scenario
+            is GlobalTransfer.OnTransferData -> Unit
+        }
+    }
+
+    /**
+     * Handle logic for when an upload begins
+     *
+     * @param globalTransfer [GlobalTransfer.OnTransferStart]
+     */
+    private fun onTransferStarted(globalTransfer: GlobalTransfer.OnTransferStart) {
+        cuTransfers.add(globalTransfer.transfer)
+    }
+
+    /**
+     * Handle logic for when an upload has finished
+     *
+     * @param globalTransfer [GlobalTransfer.OnTransferFinish]
+     */
+    private fun onTransferFinished(globalTransfer: GlobalTransfer.OnTransferFinish) {
+        val transfer = globalTransfer.transfer
+        val error = globalTransfer.error
+
+        Timber.d("Image Sync Finished, Error Code: ${error.errorCode}, " +
+                "Image Handle: ${transfer.nodeHandle}, " +
+                "Image Size: ${transfer.transferredBytes}"
+        )
+        try {
+            coroutineScope?.launch {
+                transferFinished(transfer, error)
+            }
+        } catch (th: Throwable) {
+            Timber.e(th)
+            th.printStackTrace()
+        }
+    }
+
+    /**
+     * Handle logic for when an upload has been updated
+     *
+     * @param globalTransfer [GlobalTransfer.OnTransferFinish]
+     */
+    @Synchronized
+    private fun onTransferUpdated(globalTransfer: GlobalTransfer.OnTransferUpdate) {
+        val transfer = globalTransfer.transfer
+        if (canceled) {
+            Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
+            coroutineScope?.launch { cancelPendingTransfer(transfer) }
+            endService()
+            return
+        }
+        if (isOverQuota) {
+            return
+        }
+        updateProgressNotification()
+    }
+
+    /**
+     * Handle logic for when a temporary error has occurred during uploading
+     *
+     * @param globalTransfer [GlobalTransfer.OnTransferTemporaryError]
+     */
+    private fun onTransferTemporaryError(globalTransfer: GlobalTransfer.OnTransferTemporaryError) {
+        val error = globalTransfer.error
+
+        Timber.w("onTransferTemporaryError: ${globalTransfer.transfer.nodeHandle}")
+        if (error.errorCode == MegaError.API_EOVERQUOTA) {
+            if (error.value != 0L) Timber.w("Transfer Over Quota Error: ${error.errorCode}")
+            else Timber.w("Storage Over Quota Error: ${error.errorCode}")
+            isOverQuota = true
+            endService()
         }
     }
 
@@ -1572,86 +1666,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    /**
-     * Start transfer
-     */
-    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
-        cuTransfers.add(transfer)
-        LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(MegaTransfer.TYPE_UPLOAD)
-    }
-
-    /**
-     * Update transfer
-     */
-    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
-        transferUpdated(transfer)
-    }
-
-    @Synchronized
-    private fun transferUpdated(transfer: MegaTransfer) {
-        if (canceled) {
-            Timber.d("Transfer cancel: %s", transfer.nodeHandle)
-            coroutineScope?.launch { cancelPendingTransfer(transfer) }
-            endService()
-            return
-        }
-        if (isOverQuota) {
-            return
-        }
-        updateProgressNotification()
-    }
-
-    /**
-     * Temporary error on transfer
-     */
-    override fun onTransferTemporaryError(
-        api: MegaApiJava,
-        transfer: MegaTransfer,
-        e: MegaError,
-    ) {
-        Timber.w("onTransferTemporaryError: %s", transfer.nodeHandle)
-        if (e.errorCode == MegaError.API_EOVERQUOTA) {
-            if (e.value != 0L) Timber.w("TRANSFER OVER QUOTA ERROR: %s", e.errorCode)
-            else Timber.w("STORAGE OVER QUOTA ERROR: %s", e.errorCode)
-            isOverQuota = true
-            endService()
-        }
-    }
-
-    /**
-     * Finish transfer
-     */
-    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        Timber.d(
-            "Image sync finished, error code: %d, handle: %d, size: %d",
-            e.errorCode,
-            transfer.nodeHandle,
-            transfer.transferredBytes
-        )
-        try {
-            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-                .post(MegaTransfer.TYPE_UPLOAD)
-            coroutineScope?.launch {
-                transferFinished(transfer, e)
-            }
-        } catch (th: Throwable) {
-            Timber.e(th)
-            th.printStackTrace()
-        }
-    }
-
     private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {
         val path = transfer.path
         if (isOverQuota) {
             return
-        }
-
-        if (transfer.state == MegaTransfer.STATE_COMPLETED) {
-            // TODO Remove in MegaApi refactoring (remove MegaTransferListenerInterface)
-            addCompletedTransfer(
-                AndroidCompletedTransfer(transfer, e),
-                tempDbHandler
-            )
         }
 
         if (e.errorCode == MegaError.API_OK) {
@@ -1776,12 +1794,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         }
     }
-
-    /**
-     * Transfer data
-     */
-    override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) =
-        true
 
     private fun isCompressorAvailable() = !(videoCompressor?.isRunning ?: false)
 
