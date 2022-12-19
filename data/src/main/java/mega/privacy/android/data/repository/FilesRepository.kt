@@ -238,5 +238,5 @@ interface FilesRepository {
      *
      * @return Integer count
      */
-    suspend fun getUnVerifiedOutGoingShares(): Int
+    suspend fun getUnverifiedOutgoingShares(): Int
 }

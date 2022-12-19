@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.GetUnverifiedOutGoingShares
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -58,7 +58,7 @@ class OutgoingSharesViewModelTest {
             }.thenReturn(true)
         }
 
-    private val getUnverifiedOutGoingShares = mock<GetUnverifiedOutGoingShares>() {
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>() {
         onBlocking { invoke() }.thenReturn(5)
     }
 
@@ -77,7 +77,7 @@ class OutgoingSharesViewModelTest {
             getOtherSortOrder,
             monitorNodeUpdates,
             getFeatureFlagValue,
-            getUnverifiedOutGoingShares,
+            getUnverifiedOutgoingShares,
         )
     }
 

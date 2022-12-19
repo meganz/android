@@ -372,6 +372,6 @@ internal class DefaultFilesRepository @Inject constructor(
     override suspend fun getUnVerifiedInComingShares(): Int = 3
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
 
-    override suspend fun getUnVerifiedOutGoingShares(): Int = 5
+    override suspend fun getUnverifiedOutgoingShares(): Int = 5
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
 }

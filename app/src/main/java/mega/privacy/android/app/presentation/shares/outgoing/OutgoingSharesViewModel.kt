@@ -16,7 +16,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.GetUnverifiedOutGoingShares
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -35,7 +35,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getFeatureFlagValue: GetFeatureFlagValue,
-    private val getUnverifiedOutGoingShares: GetUnverifiedOutGoingShares,
+    private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
 ) : ViewModel() {
 
     /** private UI state */
@@ -59,7 +59,7 @@ class OutgoingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
             _state.update {
-                it.copy(unVerifiedOutGoingShares = getUnverifiedOutGoingShares())
+                it.copy(unVerifiedOutGoingShares = getUnverifiedOutgoingShares())
             }
         }
 

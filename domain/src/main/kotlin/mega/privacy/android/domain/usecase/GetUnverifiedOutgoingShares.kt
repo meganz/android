@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * GetUnverifiedOutGoingShares Use case
+ * GetUnverifiedOutgoingShares Use case
  */
-fun interface GetUnverifiedOutGoingShares {
+fun interface GetUnverifiedOutgoingShares {
 
     /**
      * @return Flow of unverified outgoing shares
