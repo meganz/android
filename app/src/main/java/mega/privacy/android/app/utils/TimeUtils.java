@@ -98,7 +98,7 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String formatTime(MegaChatMessage lastMessage) {
-        java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, getUserLocale());
+        DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, getUserLocale());
         Calendar cal = calculateDateFromTimestamp(lastMessage.getTimestamp());
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
@@ -109,7 +109,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatDateAndTime(Context context, MegaChatMessage lastMessage, int format) {
 
-        java.text.DateFormat df;
+        DateFormat df;
         if (format == DATE_LONG_FORMAT) {
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, getUserLocale());
         } else {
@@ -247,7 +247,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatShortDateTime(long timestamp) {
 
-        java.text.DateFormat df;
+        DateFormat df;
 
         df = SimpleDateFormat.getDateTimeInstance(
                 SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, getUserLocale()
@@ -272,7 +272,7 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String formatTime(long ts) {
-        java.text.DateFormat df = SimpleDateFormat
+        DateFormat df = SimpleDateFormat
                 .getTimeInstance(SimpleDateFormat.SHORT, getUserLocale());
         Calendar cal = calculateDateFromTimestamp(ts);
         TimeZone tz = cal.getTimeZone();
@@ -298,7 +298,7 @@ public class TimeUtils implements Comparator<Calendar> {
         } else if (tc.compare(calGreen, calToday) == 0) {
             TimeZone tz = calGreen.getTimeZone();
 
-            java.text.DateFormat df = new SimpleDateFormat("HH:mm", getUserLocale());
+            DateFormat df = new SimpleDateFormat("HH:mm", getUserLocale());
             df.setTimeZone(tz);
 
             String time = df.format(calGreen.getTime());
@@ -309,7 +309,7 @@ public class TimeUtils implements Comparator<Calendar> {
         } else {
             TimeZone tz = calGreen.getTimeZone();
 
-            java.text.DateFormat df = new SimpleDateFormat("HH:mm", getUserLocale());
+            DateFormat df = new SimpleDateFormat("HH:mm", getUserLocale());
             df.setTimeZone(tz);
 
             String time = df.format(calGreen.getTime());
@@ -333,7 +333,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatDateAndTime(Context context, long ts, int format) {
 
-        java.text.DateFormat df;
+        DateFormat df;
         if (format == DATE_LONG_FORMAT) {
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, getUserLocale());
         } else {
@@ -440,7 +440,7 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calendar = getCalendarSpecificTime(option);
         TimeZone tz = calendar.getTimeZone();
 
-        java.text.DateFormat df = new SimpleDateFormat(
+        DateFormat df = new SimpleDateFormat(
                 getBestDateTimePattern(getUserLocale(), "HH:mm"),
                 getUserLocale()
         );
@@ -470,7 +470,7 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calTomorrow = Calendar.getInstance();
         calTomorrow.add(Calendar.DATE, +1);
 
-        java.text.DateFormat df;
+        DateFormat df;
         df = new SimpleDateFormat(getBestDateTimePattern(getUserLocale(), "HH:mm"), getUserLocale());
 
         TimeZone tz = cal.getTimeZone();
