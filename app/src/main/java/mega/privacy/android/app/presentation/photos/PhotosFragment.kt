@@ -334,6 +334,7 @@ class PhotosFragment : Fragment() {
             selectedTab = photosViewState.selectedTab,
             pagerState = pagerState,
             onTabSelected = this::onTabSelected,
+            lazyGridState = lazyGridState,
             timelineView = { timelineView(timelineViewState = timelineViewState) },
             albumsView = { albumsView(albumsViewState = albumsViewState) },
             timelineViewState = timelineViewState,

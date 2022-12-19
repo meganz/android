@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -36,6 +37,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
+import timber.log.Timber
 import kotlin.math.roundToInt
 
 /**
@@ -49,6 +51,7 @@ fun PhotosBodyView(
     onTabSelected: (PhotosTab) -> Unit = {},
     timelineView: @Composable () -> Unit = {},
     albumsView: @Composable () -> Unit = {},
+    lazyGridState: LazyGridState = LazyGridState(),
     timelineViewState: TimelineViewState = TimelineViewState(),
     albumsViewState: AlbumsViewState = AlbumsViewState(),
 ) {
@@ -61,11 +64,16 @@ fun PhotosBodyView(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                val newOffset = toolbarOffsetHeightPx.value + delta
-                toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
-                contentPadding.value =
-                    (toolbarOffsetHeightPx.value + toolbarHeightPx).coerceIn(0F, toolbarHeightPx)
+                if (lazyGridState.firstVisibleItemScrollOffset != 0) {
+                    val delta = available.y
+                    val newOffset = toolbarOffsetHeightPx.value + delta
+                    toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
+                    contentPadding.value =
+                        (toolbarOffsetHeightPx.value + toolbarHeightPx).coerceIn(
+                            0F,
+                            toolbarHeightPx
+                        )
+                }
                 return Offset.Zero
             }
         }
