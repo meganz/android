@@ -626,7 +626,6 @@ task createUnitTestCoverageReport(dependsOn: ['instrumentClasses', 'testGmsDebug
                 sourcefiles {
                     fileset(dir: 'src/main/java')
                     fileset(dir: 'src/test/java')
-//                    fileset(dir: 'src/testDebug/java')
                 }
             }
             html(destdir: "$buildDir.path/reports/jacoco/html")

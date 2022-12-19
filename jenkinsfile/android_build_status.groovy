@@ -306,44 +306,15 @@ pipeline {
                 }
             }
         }
-        stage('Unit Test') {
+        stage('Unit Test and Code Coverage') {
             when {
                 expression { (!shouldSkipBuild()) }
             }
             steps {
                 script {
-                    BUILD_STEP = "Unit Test"
+                    BUILD_STEP = "Unit Test and Code Coverage"
                 }
-                gitlabCommitStatus(name: 'Unit Test') {
-                    // Compile and run unit tests for available modules
-                    sh "./gradlew testGmsDebugUnitTest"
-                    sh "./gradlew domain:test"
-                    sh "./gradlew :data:testGmsDebugUnitTest"
-                    sh "./gradlew lint:test"
-
-                    script {
-                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
-                        // If UnitTest is failed, summary is collected at post.failure{} phase
-                        // We have to collect the report here, before they are cleaned in the last stage.
-                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
-                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
-                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
-                    }
-                }
-            }
-        }
-        stage('Code Coverage') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Code Coverage"
-                }
-                gitlabCommitStatus(name: 'Code Coverage') {
+                gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
                     script {
 
                         // domain coverage
@@ -368,6 +339,16 @@ pipeline {
 
                         APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                         println("APP_COVERAGE = ${APP_COVERAGE}")
+
+                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
+                        // If UnitTest is failed, summary is collected at post.failure{} phase
+                        // We have to collect the report here, before they are cleaned in the last stage.
+                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
                     }
                 }
             }

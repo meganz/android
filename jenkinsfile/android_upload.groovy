@@ -232,7 +232,7 @@ pipeline {
         }
         stage('Download Google Map API Key') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -475,33 +475,6 @@ pipeline {
             }
         }
 
-        stage('Unit Test') {
-            when {
-                expression { triggerByPush() || triggerByUploadCoverage() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Unit Test"
-                }
-                gitlabCommitStatus(name: 'Unit Test') {
-                    // Compile and run unit tests for available modules
-                    sh "./gradlew testGmsDebugUnitTest"
-                    sh "./gradlew domain:test"
-                    sh "./gradlew :data:testGmsDebugUnitTest"
-                    // sh "./gradlew lint:test" we dont care about the percentage of lint
-
-                    script {
-                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
-                        // If UnitTest is failed, summary is collected at post.failure{} phase
-                        // We have to collect the report here, before they are cleaned in the last stage.
-                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                    }
-                }
-            }
-        }
-
         stage('Upload Code Coverage') {
             when {
                 expression { triggerByPush() || triggerByUploadCoverage() }
@@ -532,6 +505,9 @@ pipeline {
                             // restore failed test cases
                             sh "git checkout -- app/src/testDebug"
 
+                            APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                            DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                            DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
                             DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
                             DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
                             APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
