@@ -533,7 +533,7 @@ class PhotosFragment : Fragment() {
             if (message.isNotEmpty()) {
                 albumsViewModel.setSnackBarMessage(snackBarMessage = message)
                 albumsViewModel.getCurrentUIAlbum()?.let { UIAlbum ->
-                    openAlbum(album = UIAlbum)
+                    openAlbum(album = UIAlbum, resetMessage = false)
                 }
             }
         }
@@ -656,8 +656,8 @@ class PhotosFragment : Fragment() {
 
     fun loadPhotos() {}
 
-    fun openAlbum(album: UIAlbum) {
-        resetAlbumContentState(album)
+    fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
+        resetAlbumContentState(album = album, resetMessage = resetMessage)
         activity?.lifecycleScope?.launch {
             val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
             if (dynamicAlbumEnabled) {
@@ -669,11 +669,11 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    private fun resetAlbumContentState(album: UIAlbum) {
+    private fun resetAlbumContentState(album: UIAlbum, resetMessage: Boolean = true) {
         albumsViewModel.setCurrentAlbum(album.id)
         albumsViewModel.setCurrentSort(Sort.DEFAULT)
         albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
-        albumsViewModel.setSnackBarMessage("")
+        if (resetMessage) albumsViewModel.setSnackBarMessage("")
     }
 
     private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
