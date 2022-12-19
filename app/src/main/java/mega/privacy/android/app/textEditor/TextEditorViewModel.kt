@@ -28,7 +28,7 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.app.domain.usecase.DownloadBackgroundFile
+import mega.privacy.android.domain.usecase.DownloadBackgroundFile
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.node.ViewerNode
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -262,12 +263,16 @@ class TextEditorViewModel @Inject constructor(
                     if (msgChat != null) {
                         textEditorData.value?.msgChat = msgChat
 
-                        textEditorData.value?.node = authorizeNodeIfPreview(
+                        val node = authorizeNodeIfPreview(
                             msgChat.megaNodeList.get(0),
                             megaChatApi,
                             megaApi,
                             chatId
                         )
+                        textEditorData.value?.let {
+                            it.node = node
+                            it.viewerNode = ViewerNode.ChatNode(node.handle, chatId, msgId)
+                        }
                     }
                 }
             }
@@ -280,26 +285,33 @@ class TextEditorViewModel @Inject constructor(
                 }
             }
             FILE_LINK_ADAPTER -> {
-                textEditorData.value?.node =
-                    MegaNode.unserialize(intent.getStringExtra(EXTRA_SERIALIZE_STRING))
+                intent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serializedNode ->
+                    val node = MegaNode.unserialize(serializedNode)
+                    textEditorData.value?.let {
+                        it.node = node
+                        it.viewerNode = ViewerNode.FileLinkNode(node.handle, serializedNode)
+                    }
+                }
             }
             FOLDER_LINK_ADAPTER -> {
-                val node = megaApiFolder.getNodeByHandle(
-                    intent.getLongExtra(
-                        INTENT_EXTRA_KEY_HANDLE,
-                        INVALID_HANDLE
-                    )
-                )
-
-                textEditorData.value?.node = megaApiFolder.authorizeNode(node)
+                megaApiFolder.getNodeByHandle(
+                    intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+                )?.let { node ->
+                    val authorizedNode = megaApiFolder.authorizeNode(node)
+                    textEditorData.value?.let {
+                        it.node = authorizedNode
+                        it.viewerNode = ViewerNode.FolderLinkNode(authorizedNode.handle)
+                    }
+                }
             }
             else -> {
-                textEditorData.value?.node = megaApi.getNodeByHandle(
-                    intent.getLongExtra(
-                        INTENT_EXTRA_KEY_HANDLE,
-                        INVALID_HANDLE
-                    )
+                val node = megaApi.getNodeByHandle(
+                    intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
                 )
+                textEditorData.value?.let {
+                    it.node = node
+                    it.viewerNode = ViewerNode.GeneralNode(node.handle)
+                }
             }
         }
 
@@ -419,7 +431,7 @@ class TextEditorViewModel @Inject constructor(
      */
     private suspend fun downloadFileForReading() {
         downloadBackgroundFileJob = viewModelScope.launch(ioDispatcher) {
-            localFileUri = downloadBackgroundFile(getNode() ?: return@launch)
+            localFileUri = downloadBackgroundFile(textEditorData.value?.viewerNode ?: return@launch)
 
             if (!readLocalFile()) {
                 fatalError.value = Unit

@@ -11,6 +11,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
@@ -397,4 +398,32 @@ interface MegaChatApiGateway {
         privilege: Int,
         listener: MegaChatRequestListenerInterface?,
     )
+
+    /**
+     * Gets the MegaChatMessage specified from the chat room.
+     *
+     * This function allows to retrieve only those messages that are been loaded, received and/or
+     * sent (confirmed and not yet confirmed). For any other message, this function
+     * will return NULL.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId    MegaChatHandle that identifies the chat room
+     * @param messageId MegaChatHandle that identifies the message
+     * @return The MegaChatMessage object, or NULL if not found.
+     */
+    fun getMessage(chatId: Long, messageId: Long): MegaChatMessage?
+
+    /**
+     * Gets the MegaChatMessage specified from the chat room stored in node history
+     *
+     * This function allows to retrieve only those messages that are in the node history
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId    MegaChatHandle that identifies the chat room
+     * @param messageId MegaChatHandle that identifies the message
+     * @return The MegaChatMessage object, or NULL if not found.
+     */
+    fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage?
 }

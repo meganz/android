@@ -1229,4 +1229,18 @@ interface MegaApiGateway {
         secondaryFolder: Long,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Gets a MegaNode that can be downloaded/copied with a chat-authorization
+     *
+     * During preview of chat-links, you need to call this method to authorize the MegaNode
+     * from a node-attachment message, so the API allows to access to it. The parameter to
+     * authorize the access can be retrieved from MegaChatRoom::getAuthorizationToken when
+     * the chatroom in in preview mode.
+     *
+     * @param node               MegaNode to authorize
+     * @param authorizationToken Authorization token (public handle of the chatroom in B64url encoding)
+     * @return Authorized node, or NULL if the node can't be authorized
+     */
+    fun authorizeChatNode(node: MegaNode, authorizationToken: String): MegaNode?
 }

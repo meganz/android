@@ -343,5 +343,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.updateChatPermissions(chatId, handle, privilege, listener)
 
+    override fun getMessage(chatId: Long, messageId: Long): MegaChatMessage? =
+        chatApi.getMessage(chatId, messageId)
+
+    override fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage? =
+        chatApi.getMessageFromNodeHistory(chatId, messageId)
+
     override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
 }
