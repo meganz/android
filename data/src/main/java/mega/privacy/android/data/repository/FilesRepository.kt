@@ -232,4 +232,11 @@ interface FilesRepository {
      * @return Integer count
      */
     suspend fun getUnVerifiedInComingShares(): Int
+
+    /**
+     * Provides Unverified outgoing shares count from SDK
+     *
+     * @return Integer count
+     */
+    suspend fun getUnverifiedOutgoingShares(): Int
 }

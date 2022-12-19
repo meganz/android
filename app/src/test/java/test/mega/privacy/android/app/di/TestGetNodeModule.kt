@@ -11,6 +11,7 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -39,6 +40,11 @@ object TestGetNodeModule {
 
     @Provides
     fun provideGetUnVerifiedInComingShares() = mock<GetUnverifiedIncomingShares>() {
+        onBlocking { invoke() }.thenReturn(3)
+    }
+
+    @Provides
+    fun provideGetUnverifiedOutGoingShares() = mock<GetUnverifiedOutgoingShares>() {
         onBlocking { invoke() }.thenReturn(3)
     }
 }

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -34,6 +35,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
 ) : ViewModel() {
 
     /** private UI state */
@@ -45,14 +47,6 @@ class OutgoingSharesViewModel @Inject constructor(
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
-    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
-
-    /**
-     * State for [MandatoryFingerPrintVerification] feature flag value
-     */
-    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
-        _mandatoryFingerPrintVerificationState
-
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
@@ -62,7 +56,13 @@ class OutgoingSharesViewModel @Inject constructor(
             }
         }
 
-        isMandatoryFingerprintRequired()
+        viewModelScope.launch {
+            isMandatoryFingerprintRequired()
+            _state.update {
+                it.copy(unVerifiedOutGoingShares = getUnverifiedOutgoingShares())
+            }
+        }
+
     }
 
     /**
@@ -189,11 +189,9 @@ class OutgoingSharesViewModel @Inject constructor(
     /**
      * Gets the feature flag value & updates state
      */
-    private fun isMandatoryFingerprintRequired() {
-        viewModelScope.launch {
-            _mandatoryFingerPrintVerificationState.update {
-                getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification)
-            }
+    private suspend fun isMandatoryFingerprintRequired() {
+        _state.update {
+            it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
         }
     }
 }

@@ -4202,7 +4202,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
 
-            if(outgoingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            if(outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
                 TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
                 if(outgoingSharesTab != null) {
                     outgoingSharesTab.getOrCreateBadge().setNumber(2);

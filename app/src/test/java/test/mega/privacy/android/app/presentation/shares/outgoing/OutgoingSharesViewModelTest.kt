@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -57,9 +58,17 @@ class OutgoingSharesViewModelTest {
             }.thenReturn(true)
         }
 
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>() {
+        onBlocking { invoke() }.thenReturn(5)
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = OutgoingSharesViewModel(
             getNodeByHandle,
             getParentNodeHandle,
@@ -68,6 +77,7 @@ class OutgoingSharesViewModelTest {
             getOtherSortOrder,
             monitorNodeUpdates,
             getFeatureFlagValue,
+            getUnverifiedOutgoingShares,
         )
     }
 
@@ -431,4 +441,11 @@ class OutgoingSharesViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that unverified incoming shares are returned`() = runTest {
+        initViewModel()
+        underTest.state.test {
+            assertThat(awaitItem().unVerifiedOutGoingShares).isEqualTo(5)
+        }
+    }
 }
