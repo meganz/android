@@ -51,9 +51,14 @@ internal class DefaultNetworkRepository @Inject constructor(
                 )
             } ?: ConnectivityState.Disconnected
 
-    private fun ConnectivityManager?.getActiveNetworkCapabilities() =
-        this?.activeNetwork?.let {
-            getNetworkCapabilities(it)
+    private fun ConnectivityManager?.getActiveNetworkCapabilities(): NetworkCapabilities? =
+        this?.activeNetwork?.let { network ->
+            try {
+                getNetworkCapabilities(network)
+            } catch (ignore: SecurityException) {
+                Timber.w(ignore)
+                null
+            }
         }
 
     override fun monitorConnectivityChanges(): Flow<ConnectivityState> = monitorConnectivity
