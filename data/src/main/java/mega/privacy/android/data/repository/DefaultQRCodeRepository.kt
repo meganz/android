@@ -2,10 +2,13 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.QRCodeGateway
 import mega.privacy.android.domain.entity.account.MegaBitmap
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.QRCodeRepository
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -13,6 +16,7 @@ import javax.inject.Inject
  */
 class DefaultQRCodeRepository @Inject constructor(
     private val qrCodeGateway: QRCodeGateway,
+    private val cacheFolderGateway: CacheFolderGateway,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : QRCodeRepository {
 
@@ -23,8 +27,7 @@ class DefaultQRCodeRepository @Inject constructor(
         color: Int,
         backgroundColor: Int,
     ): MegaBitmap? = withContext(defaultDispatcher) {
-        qrCodeGateway.createQRCode(text, width, height)
-            ?.takeIf { it.bits != null }
+        qrCodeGateway.createQRCode(text, width, height)?.takeIf { it.bits != null }
             ?.let { bitsetModel ->
                 val w = bitsetModel.width
                 val h = bitsetModel.height
@@ -39,5 +42,9 @@ class DefaultQRCodeRepository @Inject constructor(
             }
 
         return@withContext null
+    }
+
+    override suspend fun getQRFile(fileName: String): File? = withContext(defaultDispatcher) {
+        cacheFolderGateway.getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
     }
 }

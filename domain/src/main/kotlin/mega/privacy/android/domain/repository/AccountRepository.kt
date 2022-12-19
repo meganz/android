@@ -193,4 +193,10 @@ interface AccountRepository {
      *                 If the parameter is INVALID_HANDLE, the active contact link is deleted
      */
     suspend fun deleteContactLink(handle: Long)
+
+    /**
+     * Registered email of current account
+     */
+    val accountEmail: String?
+
 }

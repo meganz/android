@@ -6,12 +6,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.QRCodeGateway
 import mega.privacy.android.data.model.QRCodeBitSet
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.BitSet
 
@@ -21,6 +24,7 @@ class DefaultQRCodeRepositoryTest {
     private lateinit var underTest: DefaultQRCodeRepository
     private val qrCodeGateway = mock<QRCodeGateway>()
     private val testCoroutineDispatcher = StandardTestDispatcher()
+    private val cacheFolderGateway = mock<CacheFolderGateway>()
     private val penColor = 0x121212
     private val bgColor = 0xFFFFFF
     private val width = 100
@@ -29,7 +33,8 @@ class DefaultQRCodeRepositoryTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testCoroutineDispatcher)
-        underTest = DefaultQRCodeRepository(qrCodeGateway, testCoroutineDispatcher)
+        underTest =
+            DefaultQRCodeRepository(qrCodeGateway, cacheFolderGateway, testCoroutineDispatcher)
     }
 
     @Test
@@ -126,6 +131,14 @@ class DefaultQRCodeRepositoryTest {
                 val pixel = bitmap?.pixels?.get(index)
                 assertThat(pixel).isEqualTo(expectedPixel)
             }
+        }
+
+    @Test
+    fun `test that getCacheFile of CacheFolderGateway is invoked when getQRFile is invoked`() =
+        runTest {
+            val fileName = "fileName"
+            underTest.getQRFile(fileName)
+            verify(cacheFolderGateway).getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
         }
 
 }
