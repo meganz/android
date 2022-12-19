@@ -33,6 +33,7 @@ import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
+import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.PerformanceRequestListener
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import timber.log.Timber
@@ -367,7 +368,7 @@ class ImageViewerPageFragment : Fragment() {
                 }
             )
             .setResizeOptions(
-                if (isFullImage) {
+                if (isFullImage && !requireContext().isLowMemory()) {
                     ResizeOptions(MAX_BITMAP_SIZE, MAX_BITMAP_SIZE, MAX_BITMAP_SIZE.toFloat())
                 } else {
                     ResizeOptions.forDimensions(screenSize.width, screenSize.height)
