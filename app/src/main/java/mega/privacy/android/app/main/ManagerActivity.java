@@ -9997,7 +9997,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 onNodesInboxUpdate();
                 onNodesSearchUpdate();
                 refreshSharesFragments();
-                sharesPageAdapter.notifyDataSetChanged();
+                if (sharesPageAdapter != null) {
+                    sharesPageAdapter.notifyDataSetChanged();
+                }
                 LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
                 if (isTransfersInProgressAdded()) {
