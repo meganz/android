@@ -25,7 +25,7 @@ interface CacheFolderGateway {
     fun createCacheFolder(name: String)
 
     /**
-     * Returns cache folder as file if exists
+     * Returns cache file if exists
      *
      * @param folderName Name of the parent folder
      * @param fileName Name of the file
