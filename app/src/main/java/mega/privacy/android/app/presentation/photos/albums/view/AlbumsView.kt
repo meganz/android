@@ -156,7 +156,7 @@ fun AlbumsView(
         },
     ) {
         //We need to wait system album load fist and then show the list of album
-        if (albumsViewState.albums.any { it.id !is Album.UserAlbum }) {
+        if (albumsViewState.showAlbums) {
             LazyVerticalGrid(
                 contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
