@@ -1,4 +1,4 @@
-package mega.privacy.android.data.gateway
+package mega.privacy.android.app.meeting.gateway
 
 /**
  * Camera gateway

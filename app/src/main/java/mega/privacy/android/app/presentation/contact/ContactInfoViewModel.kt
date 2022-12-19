@@ -17,7 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
-import mega.privacy.android.data.gateway.CameraGateway
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.getState

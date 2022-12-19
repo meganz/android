@@ -1,6 +1,6 @@
-package mega.privacy.android.data.facade
+package mega.privacy.android.app.meeting.facade
 
-import mega.privacy.android.data.gateway.CameraGateway
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import org.webrtc.Camera1Enumerator
 import org.webrtc.CameraEnumerator

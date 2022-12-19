@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
@@ -96,6 +97,7 @@ import javax.inject.Inject
  * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
  * @property monitorConnectivity            [MonitorConnectivity]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
+ * @property cameraGateway                  [CameraGateway]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
 
  */
@@ -126,6 +128,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val cameraGateway: CameraGateway
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -606,6 +609,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param chatCallId chat id
      */
     fun openOrStartChatCall(chatCallId: Long) {
+        cameraGateway.setFrontCamera()
         viewModelScope.launch {
             runCatching {
                 openOrStartCall(chatCallId, video = false, audio = true)
