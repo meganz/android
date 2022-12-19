@@ -383,7 +383,10 @@ class PhotosFragment : Fragment() {
                     albumsViewModel.selectAlbum(album)
                 }
             },
-            closeDeleteAlbumsConfirmation = albumsViewModel::closeDeleteAlbumsConfirmation,
+            closeDeleteAlbumsConfirmation = {
+                albumsViewModel.closeDeleteAlbumsConfirmation()
+                albumsViewModel.clearAlbumSelection()
+            },
             deleteAlbums = ::deleteAlbums,
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
