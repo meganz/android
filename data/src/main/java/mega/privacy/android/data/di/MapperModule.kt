@@ -31,7 +31,9 @@ import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
+import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
+import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
@@ -93,6 +95,8 @@ import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
+import mega.privacy.android.data.mapper.toMegaPurchase
+import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
@@ -483,7 +487,12 @@ internal class MapperModule {
     @Provides
     fun provideVideoQualityIntMapper(): VideoQualityIntMapper = ::videoQualityToInt
 
-
     @Provides
     fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt
+
+    @Provides
+    fun provideMegaSkuMapper(): MegaSkuMapper = ::toMegaSku
+
+    @Provides
+    fun provideMegaPurchaseMapper(): MegaPurchaseMapper = ::toMegaPurchase
 }

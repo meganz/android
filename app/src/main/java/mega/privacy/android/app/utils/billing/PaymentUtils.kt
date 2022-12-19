@@ -2,15 +2,10 @@ package mega.privacy.android.app.utils.billing
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
 import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_MONTH
 import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR
@@ -28,6 +23,11 @@ import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
