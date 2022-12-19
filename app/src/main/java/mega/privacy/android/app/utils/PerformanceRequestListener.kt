@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import android.os.Build
 import com.facebook.imagepipeline.listener.RequestListener
 import com.facebook.imagepipeline.request.ImageRequest
 import com.google.firebase.perf.FirebasePerformance
@@ -194,7 +195,11 @@ class PerformanceRequestListener(
         try {
             requireNotNull(this)
             require(isFile)
-            Files.size(this.toPath()).toString()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Files.size(this.toPath()).toString()
+            } else {
+                File(this.path).length().toString()
+            }
         } catch (ignore: Exception) {
             "0"
         }
