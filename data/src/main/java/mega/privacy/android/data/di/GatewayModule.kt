@@ -10,6 +10,7 @@ import mega.privacy.android.data.facade.BroadcastReceiverFacade
 import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.CameraUploadMediaFacade
+import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.MegaApiFacade
@@ -27,6 +28,7 @@ import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
+import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -171,6 +173,12 @@ internal abstract class GatewayModule {
      */
     @Binds
     abstract fun bindQRCodeGateway(implementation: QRCodeFacade): QRCodeGateway
+
+    /**
+     * Provides [ClipboardGateway] implementation
+     */
+    @Binds
+    abstract fun bindClipboardGateway(implementation: ClipboardFacade): ClipboardGateway
 
     @Binds
     @Singleton
