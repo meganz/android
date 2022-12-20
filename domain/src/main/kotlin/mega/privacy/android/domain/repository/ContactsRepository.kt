@@ -107,30 +107,42 @@ interface ContactsRepository {
     suspend fun getUserAlias(handle: Long): String?
 
     /**
-     * Gets the name of the given user: The alias if any, the full name in other case.
-     * If not available then returns the email.
+     * Get the email of the given user.
      *
-     * @param handle User identifier.
-     * @return User first name.
+     * @param handle    User identifier.
+     * @param skipCache Skip cached result.
+     * @return User email
      */
-    suspend fun getUserFirstName(handle: Long): String?
+    suspend fun getUserEmail(handle: Long, skipCache: Boolean = false): String
 
     /**
      * Gets the name of the given user: The alias if any, the full name in other case.
      * If not available then returns the email.
      *
      * @param handle User identifier.
+     * @param skipCache Skip cached result.
+     * @return User first name.
+     */
+    suspend fun getUserFirstName(handle: Long, skipCache: Boolean = false): String
+
+    /**
+     * Gets the name of the given user: The alias if any, the full name in other case.
+     * If not available then returns the email.
+     *
+     * @param handle User identifier.
+     * @param skipCache Skip cached result.
      * @return User last name.
      */
-    suspend fun getUserLastName(handle: Long): String?
+    suspend fun getUserLastName(handle: Long, skipCache: Boolean = false): String
 
     /**
      * Get the full name of the given user.
      *
      * @param handle User identifier
+     * @param skipCache Skip cached result.
      * @return User full name.
      */
-    suspend fun getUserFullName(handle: Long): String?
+    suspend fun getUserFullName(handle: Long, skipCache: Boolean = false): String
 
     /**
      * Checks if the credentials of a given user are already verified.
@@ -161,11 +173,4 @@ interface ContactsRepository {
      * @return [AccountCredentials.ContactCredentials]
      */
     suspend fun getContactCredentials(userEmail: String): AccountCredentials.ContactCredentials?
-
-    /**
-     * Get the email of the given user.
-     *
-     * @param handle User handle
-     */
-    suspend fun getUserEmail(handle: Long): String
 }

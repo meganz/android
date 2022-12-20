@@ -259,72 +259,80 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    override suspend fun getUserEmail(handle: Long): String =
+    override suspend fun getUserEmail(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                val cachedEmail = megaChatApiGateway.getUserEmailFromCache(handle)
-                if (!cachedEmail.isNullOrBlank()) {
-                    continuation.resume(cachedEmail)
-                } else {
-                    megaApiGateway.getUserEmail(handle,
-                        OptionalMegaRequestListenerInterface(
-                            onRequestFinish = { request: MegaRequest, error: MegaError ->
-                                if (error.errorCode == MegaError.API_OK) {
-                                    continuation.resumeWith(Result.success(request.email))
-                                } else {
-                                    continuation.failWithError(error)
-                                }
+                if (!skipCache) {
+                    val cachedEmail = megaChatApiGateway.getUserEmailFromCache(handle)
+                    if (!cachedEmail.isNullOrBlank()) {
+                        continuation.resume(cachedEmail)
+                        return@suspendCoroutine
+                    }
+                }
+                megaApiGateway.getUserEmail(handle,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resume(request.email)
+                            } else {
+                                continuation.failWithError(error)
                             }
-                        ))
-                }
+                        }
+                    ))
             }
         }
 
-    override suspend fun getUserFirstName(handle: Long): String? =
+    override suspend fun getUserFirstName(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                val cachedName = megaChatApiGateway.getUserFirstnameFromCache(handle)
-                if (!cachedName.isNullOrBlank()) {
-                    continuation.resume(cachedName)
-                } else {
-                    megaApiGateway.getUserAttribute(handle.toBase64Handle(),
-                        MegaApiJava.USER_ATTR_FIRSTNAME,
-                        OptionalMegaRequestListenerInterface(
-                            onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                        ))
+                if (!skipCache) {
+                    val cachedName = megaChatApiGateway.getUserFirstnameFromCache(handle)
+                    if (!cachedName.isNullOrBlank()) {
+                        continuation.resume(cachedName)
+                        return@suspendCoroutine
+                    }
                 }
+                megaApiGateway.getUserAttribute(handle.toBase64Handle(),
+                    MegaApiJava.USER_ATTR_FIRSTNAME,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                    ))
             }
         }
 
-    override suspend fun getUserLastName(handle: Long): String? =
+    override suspend fun getUserLastName(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                val cachedName = megaChatApiGateway.getUserLastnameFromCache(handle)
+                if (!skipCache) {
+                    val cachedName = megaChatApiGateway.getUserLastnameFromCache(handle)
+                    if (!cachedName.isNullOrBlank()) {
+                        continuation.resume(cachedName)
+                        return@suspendCoroutine
+                    }
+                }
+                megaApiGateway.getUserAttribute(handle.toBase64Handle(),
+                    MegaApiJava.USER_ATTR_LASTNAME,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                    ))
+            }
+        }
+
+    override suspend fun getUserFullName(handle: Long, skipCache: Boolean): String =
+        withContext(ioDispatcher) {
+            if (!skipCache) {
+                val cachedName = megaChatApiGateway.getUserFullNameFromCache(handle)
                 if (!cachedName.isNullOrBlank()) {
-                    continuation.resume(cachedName)
-                } else {
-                    megaApiGateway.getUserAttribute(handle.toBase64Handle(),
-                        MegaApiJava.USER_ATTR_LASTNAME,
-                        OptionalMegaRequestListenerInterface(
-                            onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                        ))
+                    return@withContext cachedName
                 }
             }
+
+            getUserFirstName(handle)
+            getUserLastName(handle)
+            megaChatApiGateway.getUserFullNameFromCache(handle) ?: error("Can't retrieve full name")
         }
 
-    override suspend fun getUserFullName(handle: Long): String? =
-        withContext(ioDispatcher) {
-            val cachedFullName = megaChatApiGateway.getUserFullNameFromCache(handle)
-            if (!cachedFullName.isNullOrBlank()) {
-                cachedFullName
-            } else {
-                getUserFirstName(handle)
-                getUserLastName(handle)
-                megaChatApiGateway.getUserFullNameFromCache(handle)
-            }
-        }
-
-    private fun onRequestGetUserNameCompleted(continuation: Continuation<String?>) =
+    private fun onRequestGetUserNameCompleted(continuation: Continuation<String>) =
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.text))

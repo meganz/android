@@ -10,9 +10,9 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
-import mega.privacy.android.domain.repository.GetMeetingsRepository
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -25,7 +25,7 @@ class DefaultGetMeetings @Inject constructor(
     private val chatRepository: ChatRepository,
     private val contactsRepository: ContactsRepository,
     private val accountRepository: AccountRepository,
-    private val getMeetingRepository: GetMeetingsRepository,
+    private val chatParticipantsRepository: ChatParticipantsRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetMeetings {
 
@@ -45,21 +45,21 @@ class DefaultGetMeetings @Inject constructor(
                     var lastUserChar: Char? = null
                     when (chatRoom.peerCount) {
                         0L -> {
-                            val myHandle = accountRepository.getUserAccount().userId?.id
-                            firstUserChar = contactsRepository.getUserFirstName(myHandle.toString())?.firstOrNull()
+                            val myHandle = accountRepository.getUserAccount().userId?.id ?: -1
+                            firstUserChar = contactsRepository.getUserFirstName(myHandle)?.firstOrNull()
                         }
                         1L -> {
-                            val myHandle = accountRepository.getUserAccount().userId?.id
-                            val lastChatRoomPeer = getMeetingRepository.getGroupChatPeers(chatRoom.chatId)?.lastOrNull()?.userHandle
-                            firstUserChar = contactsRepository.getUserFirstName(myHandle.toString())?.firstOrNull()
-                            lastUserChar = contactsRepository.getUserFirstName(lastChatRoomPeer.toString())?.firstOrNull()
+                            val myHandle = accountRepository.getUserAccount().userId?.id ?: -1
+                            firstUserChar = contactsRepository.getUserFirstName(myHandle)?.firstOrNull()
+                            val lastChatRoomPeer = chatParticipantsRepository.getChatParticipantsHandles(chatRoom.chatId)?.lastOrNull() ?: -1
+                            lastUserChar = contactsRepository.getUserFirstName(lastChatRoomPeer)?.firstOrNull()
                         }
                         else -> {
-                            val chatRoomPeers = getMeetingRepository.getGroupChatPeers(chatRoom.chatId)
-                            chatRoomPeers.firstOrNull()?.userHandle?.toString()?.let { handle ->
+                            val chatRoomPeers = chatParticipantsRepository.getChatParticipantsHandles(chatRoom.chatId)
+                            chatRoomPeers.firstOrNull()?.let { handle ->
                                 firstUserChar = contactsRepository.getUserFirstName(handle)?.firstOrNull()
                             }
-                            chatRoomPeers.lastOrNull()?.userHandle?.toString()?.let { handle ->
+                            chatRoomPeers.lastOrNull()?.let { handle ->
                                 lastUserChar = contactsRepository.getUserFirstName(handle)?.firstOrNull()
                             }
                         }
