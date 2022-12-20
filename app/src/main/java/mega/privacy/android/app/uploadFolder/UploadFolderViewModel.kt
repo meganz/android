@@ -116,7 +116,7 @@ class UploadFolderViewModel @Inject constructor(
     private fun setFolderItems() {
         val items = folderContent[currentFolder.value]
         if (items != null) {
-            folderItems.value = items
+            folderItems.value = items.toMutableList()
             return
         }
 
@@ -152,7 +152,7 @@ class UploadFolderViewModel @Inject constructor(
         if (currentFolder.value?.parent == null) {
             true
         } else {
-            currentFolder.value = currentFolder.value?.parent
+            currentFolder.value = currentFolder.value?.parent!!
             setFolderItems()
             false
         }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -126,6 +127,9 @@ class TransfersManagementViewModel @Inject constructor(
      * Checks if transfers are paused.
      */
     fun checkTransfersState() {
-        viewModelScope.launch { areTransfersPaused.value = areAllTransfersPaused() }
+        viewModelScope.launch {
+            @SuppressLint("NullSafeMutableLiveData")
+            areTransfersPaused.value = areAllTransfersPaused()
+        }
     }
 }

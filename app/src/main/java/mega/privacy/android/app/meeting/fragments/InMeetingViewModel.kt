@@ -1128,7 +1128,7 @@ class InMeetingViewModel @Inject constructor(
                                 }
                             }
 
-                            chatIdResult.value = chatId
+                            chatIdResult.value = chatId.toLong()
                         }
                     }
                 }
