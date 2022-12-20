@@ -410,8 +410,8 @@ internal class DefaultFilesRepository @Inject constructor(
     override suspend fun getOfflineInboxPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
 
-    override suspend fun createFolder(name: String, parent: Node) = withContext(ioDispatcher) {
-        val megaNode = megaApiGateway.getMegaNodeByHandle(parent.id.id)
+    override suspend fun createFolder(name: String) = withContext(ioDispatcher) {
+        val megaNode = megaApiGateway.getRootNode()
         megaNode?.let { parentMegaNode ->
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener { it.nodeHandle }

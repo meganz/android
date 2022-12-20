@@ -84,7 +84,7 @@ interface FileRepository {
     /**
      * Create Folder
      */
-    suspend fun createFolder(name: String, parent: Node): Long?
+    suspend fun createFolder(name: String): Long?
 
     /**
      * set camera upload folder
