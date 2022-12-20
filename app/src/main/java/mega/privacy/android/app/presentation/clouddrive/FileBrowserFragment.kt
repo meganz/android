@@ -585,7 +585,7 @@ class FileBrowserFragment : RotatableFragment() {
             viewLifecycleOwner.lifecycle,
             Lifecycle.State.RESUMED
         ).onEach {
-            mediaDiscoveryViewSettings = it
+            mediaDiscoveryViewSettings = it.mediaDiscoveryViewSettings
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         return v

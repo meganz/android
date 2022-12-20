@@ -8,28 +8,33 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
-    private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView
+    private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(MediaDiscoveryViewSettings.INITIAL.ordinal)
+    private val _state = MutableStateFlow(FileBrowserState())
 
     /**
      * State flow
      */
-    val state: StateFlow<Int> = _state
+    val state: StateFlow<FileBrowserState> = _state
 
     init {
         viewModelScope.launch {
             monitorMediaDiscoveryView().collect { mediaDiscoveryViewSettings ->
                 _state.update {
-                    mediaDiscoveryViewSettings ?: MediaDiscoveryViewSettings.INITIAL.ordinal
+                    it.copy(
+                        mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
+                            ?: MediaDiscoveryViewSettings.INITIAL.ordinal
+                    )
                 }
             }
         }
