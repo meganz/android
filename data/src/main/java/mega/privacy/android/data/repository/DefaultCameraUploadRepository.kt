@@ -1,7 +1,9 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheGateway
@@ -384,5 +386,16 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override fun monitorBatteryInfo() = broadcastReceiverGateway.monitorBatteryInfo
 
     override fun monitorChargingStoppedInfo() = broadcastReceiverGateway.monitorChargingStoppedState
+
+    override suspend fun setCameraUploadsFolders(primaryFolder: Long, secondaryFolder: Long) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener { return@getRequestListener }
+                megaApiGateway.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 
 }

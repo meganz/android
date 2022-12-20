@@ -452,4 +452,14 @@ interface CameraUploadRepository {
      * monitor charging stopped info
      */
     fun monitorChargingStoppedInfo(): Flow<Boolean>
+
+    /**
+     * set camera upload folder
+     * @param primaryFolder handle
+     * @param secondaryFolder handle
+     */
+    suspend fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+    )
 }
