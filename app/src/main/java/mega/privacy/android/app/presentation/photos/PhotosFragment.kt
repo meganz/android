@@ -23,6 +23,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
@@ -336,7 +337,7 @@ class PhotosFragment : Fragment() {
             onTabSelected = this::onTabSelected,
             lazyGridState = lazyGridState,
             timelineView = { timelineView(timelineViewState = timelineViewState) },
-            albumsView = { albumsView(albumsViewState = albumsViewState) },
+            albumsView = { albumsView(albumsViewState = albumsViewState, timelineViewState) },
             timelineViewState = timelineViewState,
             albumsViewState = albumsViewState,
         )
@@ -365,7 +366,10 @@ class PhotosFragment : Fragment() {
 
 
     @Composable
-    private fun albumsView(albumsViewState: AlbumsViewState) =
+    private fun albumsView(
+        albumsViewState: AlbumsViewState,
+        timelineViewState: TimelineViewState,
+    ) =
         AlbumsView(
             albumsViewState = albumsViewState,
             openAlbum = this::openAlbum,
@@ -375,7 +379,7 @@ class PhotosFragment : Fragment() {
             setInputValidity = albumsViewModel::setNewAlbumNameValidity,
             openPhotosSelectionActivity = this::openAlbumPhotosSelection,
             setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
-            allPhotos = timelineViewModel.state.value.photos,
+            allPhotos = timelineViewState.photos,
             clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
             onAlbumSelection = { album ->
                 if (album.id in albumsViewState.selectedAlbumIds) {
