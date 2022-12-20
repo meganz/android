@@ -154,20 +154,42 @@ interface MegaChatApiGateway {
     fun getChatRoomByUser(userHandle: Long): MegaChatRoom?
 
     /**
-     * Returns the known alias given to the user.
-     * Returns NULL if data is not cached yet or it's not possible to get.
+     * Get user email from cache
      *
-     * @param userHandle Handle of the user whose alias is requested.
-     * @return The user alias.
+     * @param   userHandle User handle.
+     * @return  User email or null if it has not been cached yet.
+     */
+    fun getUserEmailFromCache(userHandle: Long): String?
+
+    /**
+     * Get the alias given to the user from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User alias or null if it has not been cached yet.
      */
     fun getUserAliasFromCache(userHandle: Long): String?
 
     /**
-     *  Returns the current full name of the user.
-     *  Returns NULL if data is not cached yet or it's not possible to get.
+     * Get user first name from cache.
      *
-     * @param userHandle Handle of the user whose full name is requested.
-     * @return The user full name.
+     * @param   userHandle User handle.
+     * @return  User firstname or null if it has not been cached yet.
+     */
+    fun getUserFirstnameFromCache(userHandle: Long): String?
+
+    /**
+     * Get user last name from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User lastname or null if it has not been cached yet.
+     */
+    fun getUserLastnameFromCache(userHandle: Long): String?
+
+    /**
+     *  Get user full name from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User full name or null if it has not been cached yet.
      */
     fun getUserFullNameFromCache(userHandle: Long): String?
 

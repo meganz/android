@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.userPermission
@@ -9,6 +10,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
@@ -69,10 +71,10 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                 val participant = ChatParticipant(
                     handle = handle,
                     data = ContactData(
-                        fullName = chatRoom.getPeerFullname(i),
+                        fullName = contactsRepository.getUserFullName(handle),
                         alias = alias,
                         avatarUri = null),
-                    email = chatRoom.getPeerEmail(i),
+                    email = contactsRepository.getUserEmail(handle),
                     isMe = false,
                     privilege = userPermission[participantPrivilege]
                         ?: ChatRoomPermission.Unknown,
@@ -85,6 +87,22 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
         return mutableListOf()
     }
+
+    override suspend fun getChatParticipantsHandles(chatId: Long): List<Long> =
+        withContext(ioDispatcher) {
+            val chatRoom = megaChatApiGateway.getChatRoom(chatId)
+                ?: throw ChatRoomDoesNotExistException()
+
+            if (!chatRoom.isGroup || chatRoom.peerCount == 0L) {
+                emptyList()
+            } else {
+                mutableListOf<Long>().apply {
+                    for (index in 0 until chatRoom.peerCount) {
+                        add(chatRoom.getPeerHandle(index))
+                    }
+                }
+            }
+        }
 
     override suspend fun getStatus(participant: ChatParticipant): UserStatus {
         if (participant.isMe) {

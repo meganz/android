@@ -32,6 +32,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultContactsRepositoryTest {
@@ -57,6 +58,7 @@ class DefaultContactsRepositoryTest {
         }
 
     private val userEmail = "test@mega.nz"
+    private val userHandle = Random.nextLong()
     private val user = mock<MegaUser> { on { email }.thenReturn(userEmail) }
     private val userName = "Test User Name"
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
@@ -205,7 +207,7 @@ class DefaultContactsRepositoryTest {
                 success
             )
         }
-        assertThat(underTest.getUserFirstName(userEmail)).isEqualTo(firstName)
+        assertThat(underTest.getUserFirstName(userHandle)).isEqualTo(firstName)
     }
 
     @Test(expected = MegaException::class)
@@ -217,7 +219,7 @@ class DefaultContactsRepositoryTest {
                 error
             )
         }
-        assertThat(underTest.getUserLastName(userEmail))
+        assertThat(underTest.getUserLastName(userHandle))
     }
 
     @Test
@@ -236,7 +238,7 @@ class DefaultContactsRepositoryTest {
                 success
             )
         }
-        assertThat(underTest.getUserLastName(userEmail)).isEqualTo(lastName)
+        assertThat(underTest.getUserLastName(userHandle)).isEqualTo(lastName)
     }
 
     @Test(expected = MegaException::class)
@@ -248,7 +250,7 @@ class DefaultContactsRepositoryTest {
                 error
             )
         }
-        assertThat(underTest.getUserLastName(userEmail))
+        assertThat(underTest.getUserLastName(userHandle))
     }
 
     @Test

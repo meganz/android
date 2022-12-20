@@ -217,8 +217,17 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
 
+    override fun getUserEmailFromCache(userHandle: Long): String? =
+        chatApi.getUserEmailFromCache(userHandle)
+
     override fun getUserAliasFromCache(userHandle: Long): String? =
         chatApi.getUserAliasFromCache(userHandle)
+
+    override fun getUserFirstnameFromCache(userHandle: Long): String? =
+        chatApi.getUserFirstnameFromCache(userHandle)
+
+    override fun getUserLastnameFromCache(userHandle: Long): String? =
+        chatApi.getUserLastnameFromCache(userHandle)
 
     override fun getUserFullNameFromCache(userHandle: Long): String? =
         chatApi.getUserFullnameFromCache(userHandle)

@@ -16,6 +16,11 @@ interface ChatParticipantsRepository {
     suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant>
 
     /**
+     * Get chat participants handles
+     */
+    suspend fun getChatParticipantsHandles(chatId: Long): List<Long>
+
+    /**
      * Get status
      *
      * @param participant [ChatParticipant]
