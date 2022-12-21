@@ -6,7 +6,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class ChatFilesFolderUserAttributeMapperTest {
+internal class ChatFilesFolderUserAttributeMapperTest {
 
     @Test
     fun `test that chat files user attribute is mapped correctly`() {
