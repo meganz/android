@@ -363,7 +363,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                                 style = MaterialTheme.typography.subtitle1,
                                 color = if (MaterialTheme.colors.isLight) black else white,
                                 fontWeight = FontWeight.Medium,
-                                maxLines = 1,
+                                maxLines = 2,
                                 overflow = TextOverflow.Ellipsis)
                         }
                     }
@@ -374,7 +374,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                             style = MaterialTheme.typography.subtitle2,
                             color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
                             fontWeight = FontWeight.Normal,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
                     }
                 }
