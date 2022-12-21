@@ -305,8 +305,7 @@ private fun ScheduledMeetingInfoAppBar(
     titleId: Int,
     elevation: Boolean,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-    val iconColor = white.takeIf { isLight } ?: black
+    val iconColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
 
     TopAppBar(
         title = {
