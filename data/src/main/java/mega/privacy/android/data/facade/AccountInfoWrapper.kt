@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade
 
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaRequest
 
 /**
@@ -44,5 +45,16 @@ interface AccountInfoWrapper {
     /**
      * Available skus
      */
-    val availableSkus: List<MegaSku>
+    var availableSkus: List<MegaSku>
+
+    /**
+     * Update active subscription
+     *
+     */
+    fun updateActiveSubscription(purchase: MegaPurchase?, levelInventory: Int)
+
+    /**
+     * Active subscription of the user
+     */
+    val activeSubscription: MegaPurchase?
 }

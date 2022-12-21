@@ -66,6 +66,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -128,7 +129,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
-    private val cameraGateway: CameraGateway
+    private val cameraGateway: CameraGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -918,9 +919,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      *
      * @return  String with the formatted date
      */
-    private fun ChatScheduledMeeting.getFormattedDate(): String =
-        DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").format(startDateTime) +
-                " - ${DateTimeFormatter.ofPattern("HH:mm").format(endDateTime)}"
+    private fun ChatScheduledMeeting.getFormattedDate(): String {
+        val dateFormatter =
+            DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").withZone(ZoneId.systemDefault())
+        val hourFormatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+        return "${dateFormatter.format(startDateTime)} - ${hourFormatter.format(endDateTime)}"
+    }
 
 
     /**

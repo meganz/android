@@ -2,6 +2,10 @@ package mega.privacy.android.app.presentation.photos.albums.view
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -14,6 +18,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,9 +35,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -72,7 +79,7 @@ import mega.privacy.android.presentation.theme.teal_300
 import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_054
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumsView(
@@ -89,6 +96,7 @@ fun AlbumsView(
     onAlbumSelection: (Album.UserAlbum) -> Unit = {},
     closeDeleteAlbumsConfirmation: () -> Unit = {},
     deleteAlbums: (albumIds: List<AlbumId>) -> Unit = {},
+    lazyGridState: LazyGridState = LazyGridState(),
     isUserAlbumsEnabled: suspend () -> Boolean,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -136,21 +144,30 @@ fun AlbumsView(
             if (displayFAB && albumsViewState.selectedAlbumIds.isEmpty()) {
                 val placeholderText =
                     stringResource(id = R.string.photos_album_creation_dialog_input_placeholder)
-                FloatingActionButton(
-                    onClick = {
-                        openDialog.value = true
-                        setDialogInputPlaceholder(placeholderText)
-                    },
+                val scrollNotInProgress by remember {
+                    derivedStateOf { !lazyGridState.isScrollInProgress }
+                }
+                AnimatedVisibility(
+                    visible = scrollNotInProgress,
+                    exit = scaleOut(),
+                    enter = scaleIn()
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Create new album",
-                        tint = if (!MaterialTheme.colors.isLight) {
-                            Color.Black
-                        } else {
-                            Color.White
-                        }
-                    )
+                    FloatingActionButton(
+                        onClick = {
+                            openDialog.value = true
+                            setDialogInputPlaceholder(placeholderText)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Create new album",
+                            tint = if (!MaterialTheme.colors.isLight) {
+                                Color.Black
+                            } else {
+                                Color.White
+                            }
+                        )
+                    }
                 }
             }
         },
@@ -158,11 +175,12 @@ fun AlbumsView(
         //We need to wait system album load fist and then show the list of album
         if (albumsViewState.showAlbums) {
             LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 8.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 columns = GridCells.Fixed(grids),
-                modifier = Modifier.fillMaxSize()
+                state = lazyGridState,
             ) {
                 items(
                     items = albumsViewState.albums,

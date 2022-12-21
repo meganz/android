@@ -8,10 +8,11 @@ import mega.privacy.android.data.repository.DefaultAccountRepository
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultBillingRepository
+import mega.privacy.android.data.repository.DefaultCallRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
-import mega.privacy.android.data.repository.DefaultCallRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
+import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.DefaultEnvironmentRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
@@ -27,6 +28,7 @@ import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
 import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
+import mega.privacy.android.data.repository.DefaultQRCodeRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
@@ -46,6 +48,7 @@ import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.ClipboardRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -60,6 +63,7 @@ import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
+import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
@@ -189,4 +193,10 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindCallRepository(repository: DefaultCallRepository): CallRepository
+
+    @Binds
+    abstract fun bindQRCodeRepository(repository: DefaultQRCodeRepository): QRCodeRepository
+
+    @Binds
+    abstract fun bindClipboardRepository(repository: DefaultClipboardRepository): ClipboardRepository
 }

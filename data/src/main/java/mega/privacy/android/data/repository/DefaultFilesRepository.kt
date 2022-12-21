@@ -410,8 +410,8 @@ internal class DefaultFilesRepository @Inject constructor(
     override suspend fun getOfflineInboxPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
 
-    override suspend fun createFolder(name: String, parent: Node) = withContext(ioDispatcher) {
-        val megaNode = megaApiGateway.getMegaNodeByHandle(parent.id.id)
+    override suspend fun createFolder(name: String) = withContext(ioDispatcher) {
+        val megaNode = megaApiGateway.getRootNode()
         megaNode?.let { parentMegaNode ->
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener { it.nodeHandle }
@@ -422,17 +422,6 @@ internal class DefaultFilesRepository @Inject constructor(
             }
         }
     }
-
-    override suspend fun setCameraUploadsFolders(primaryFolder: Long, secondaryFolder: Long) =
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener { return@getRequestListener }
-                megaApiGateway.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
 
     override suspend fun getUnVerifiedInComingShares(): Int = 3
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available

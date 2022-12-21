@@ -84,17 +84,7 @@ interface FileRepository {
     /**
      * Create Folder
      */
-    suspend fun createFolder(name: String, parent: Node): Long?
-
-    /**
-     * set camera upload folder
-     * @param primaryFolder handle
-     * @param secondaryFolder handle
-     */
-    suspend fun setCameraUploadsFolders(
-        primaryFolder: Long,
-        secondaryFolder: Long,
-    )
+    suspend fun createFolder(name: String): Long?
 
     /**
      * Downloads a file node in background.

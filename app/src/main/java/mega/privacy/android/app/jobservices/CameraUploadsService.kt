@@ -1503,8 +1503,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      *
      * @return the Secondary Folder handle
      */
-    private suspend fun getSecondaryFolderHandle(): Long =
-        getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads))
+    private suspend fun getSecondaryFolderHandle(): Long {
+        // get Secondary folder handle of user
+        val secondarySyncHandle = getSecondarySyncHandle()
+        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByHandle(secondarySyncHandle) == null) {
+            // if it's invalid or deleted then return the default value
+            return getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads))
+        }
+        return secondarySyncHandle
+    }
 
     /**
      * Sets up the Primary Folder if it is missing

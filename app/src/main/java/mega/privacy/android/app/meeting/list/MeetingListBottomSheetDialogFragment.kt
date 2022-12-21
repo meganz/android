@@ -10,12 +10,10 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.facebook.drawee.drawable.ScalingUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.internal.ViewUtils.dpToPx
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
@@ -115,20 +113,19 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.dividerArchive.isVisible = meeting.isActive
 
         binding.btnInfo.setOnClickListener {
-            activity?.lifecycleScope?.launch {
-                val intent = if (meeting.isScheduled()) {
-                    Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
-                        putExtra(CHAT_ID, chatId)
-                        putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
-                    }
-                } else {
-                    Intent(context, GroupChatInfoActivity::class.java).apply {
-                        putExtra(Constants.HANDLE, chatId)
-                        putExtra(Constants.ACTION_CHAT_OPEN, true)
-                    }
+            val intent = if (meeting.isScheduled() && meeting.isActive) {
+                Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
+                    putExtra(CHAT_ID, chatId)
+                    putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
                 }
-                activity?.startActivity(intent)
+            } else {
+                Intent(context, GroupChatInfoActivity::class.java).apply {
+                    putExtra(Constants.HANDLE, chatId)
+                    putExtra(Constants.ACTION_CHAT_OPEN, true)
+                }
             }
+            activity?.startActivity(intent)
+
 
             dismissAllowingStateLoss()
         }

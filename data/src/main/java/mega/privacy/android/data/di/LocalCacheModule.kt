@@ -1,5 +1,6 @@
 package mega.privacy.android.data.di
 
+import com.android.billingclient.api.ProductDetails
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +33,10 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     internal fun provideNumberOfSubscriptionCache(): Cache<Long> =
+        PermanentCache()
+
+    @Provides
+    @Singleton
+    internal fun provideProductDetailCache(): Cache<List<ProductDetails>> =
         PermanentCache()
 }
