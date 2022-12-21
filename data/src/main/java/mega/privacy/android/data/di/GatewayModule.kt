@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
+import mega.privacy.android.data.facade.BillingFacade
 import mega.privacy.android.data.facade.BroadcastReceiverFacade
 import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
@@ -24,6 +25,7 @@ import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
+import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
@@ -183,4 +185,7 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindVerifyPurchaseGateway(implementation: VerifyPurchaseFacade): VerifyPurchaseGateway
+
+    @Binds
+    abstract fun bindBillingFacade(implementation: BillingFacade): BillingGateway
 }

@@ -1243,4 +1243,61 @@ interface MegaApiGateway {
      * @return Authorized node, or NULL if the node can't be authorized
      */
     fun authorizeChatNode(node: MegaNode, authorizationToken: String): MegaNode?
+
+    /**
+     * Submit a purchase receipt for verification
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SUBMIT_PURCHASE_RECEIPT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the payment gateway
+     * - MegaRequest::getText - Returns the purchase receipt
+     *
+     * @param gateway  Payment gateway
+     *                 Currently supported payment gateways are:
+     *                 - MegaApi::PAYMENT_METHOD_ITUNES = 2
+     *                 - MegaApi::PAYMENT_METHOD_GOOGLE_WALLET = 3
+     *                 - MegaApi::PAYMENT_METHOD_WINDOWS_STORE = 13
+     * @param receipt  Purchase receipt
+     * @param listener MegaRequestListener to track this request
+     */
+    fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Submit a purchase receipt for verification
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SUBMIT_PURCHASE_RECEIPT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the payment gateway
+     * - MegaRequest::getText - Returns the purchase receipt
+     * - MegaRequest::getNodeHandle - Returns the last public node handle accessed
+     * - MegaRequest::getParamType - Returns the type of lastPublicHandle
+     * - MegaRequest::getTransferredBytes - Returns the timestamp of the last access
+     *
+     * @param gateway              Payment gateway
+     *                             Currently supported payment gateways are:
+     *                             - MegaApi::PAYMENT_METHOD_ITUNES = 2
+     *                             - MegaApi::PAYMENT_METHOD_GOOGLE_WALLET = 3
+     *                             - MegaApi::PAYMENT_METHOD_WINDOWS_STORE = 13
+     * @param receipt              Purchase receipt
+     * @param lastPublicHandle     Last public node handle accessed by the user in the last 24h
+     * @param lastPublicHandleType Indicates the type of lastPublicHandle, valid values are:
+     *                             - MegaApi::AFFILIATE_TYPE_ID = 1
+     *                             - MegaApi::AFFILIATE_TYPE_FILE_FOLDER = 2
+     *                             - MegaApi::AFFILIATE_TYPE_CHAT = 3
+     *                             - MegaApi::AFFILIATE_TYPE_CONTACT = 4
+     * @param lastAccessTimestamp  Timestamp of the last access
+     * @param listener             MegaRequestListener to track this request
+     */
+    fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        lastPublicHandle: Long,
+        lastPublicHandleType: Int,
+        lastAccessTimestamp: Long,
+        listener: MegaRequestListenerInterface,
+    )
 }
