@@ -119,7 +119,7 @@ class FileBrowserFragment : RotatableFragment() {
     lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     private val managerViewModel by activityViewModels<ManagerViewModel>()
-    private val fileBrowserViewModel by viewModels<FileBrowserViewModel>()
+    private val fileBrowserViewModel by activityViewModels<FileBrowserViewModel>()
 
     private var aB: ActionBar? = null
 
@@ -436,7 +436,7 @@ class FileBrowserFragment : RotatableFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
             EventObserver { showSortByPanel() })
 
-        managerViewModel.updateBrowserNodes.observe(viewLifecycleOwner,
+        fileBrowserViewModel.updateBrowserNodes.observe(viewLifecycleOwner,
             EventObserver { nodes: List<MegaNode> ->
                 hideMultipleSelect()
                 setNodes(nodes.toMutableList())
@@ -487,7 +487,7 @@ class FileBrowserFragment : RotatableFragment() {
                 adapter = MegaNodeAdapter(activity,
                     this,
                     _nodes,
-                    managerViewModel.getSafeBrowserParentHandle(),
+                    fileBrowserViewModel.getSafeBrowserParentHandle(),
                     recyclerView,
                     Constants.FILE_BROWSER_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
@@ -537,7 +537,7 @@ class FileBrowserFragment : RotatableFragment() {
                 adapter = MegaNodeAdapter(activity,
                     this,
                     _nodes,
-                    managerViewModel.getSafeBrowserParentHandle(),
+                    fileBrowserViewModel.getSafeBrowserParentHandle(),
                     recyclerView,
                     Constants.FILE_BROWSER_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -628,7 +628,7 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     private fun getNodes() {
-        val parentHandleBrowser = managerViewModel.getSafeBrowserParentHandle()
+        val parentHandleBrowser = fileBrowserViewModel.getSafeBrowserParentHandle()
         if (parentHandleBrowser == -1L || parentHandleBrowser == megaApi.rootNode.handle) {
             Timber.w("After consulting... the parent keeps -1 or ROOTNODE: %s", parentHandleBrowser)
             _nodes = megaApi.getChildren(megaApi.rootNode,
@@ -894,7 +894,7 @@ class FileBrowserFragment : RotatableFragment() {
             val clickedNode = _nodes.getOrNull(position)
             if (clickedNode?.isFolder == true) {
                 mediaHandle = clickedNode.handle
-                managerViewModel.setBrowserParentHandle(clickedNode.handle)
+                fileBrowserViewModel.setBrowserParentHandle(clickedNode.handle)
                 val childNodes: List<MegaNode> = megaApi.getChildren(clickedNode,
                     sortOrderIntMapper(managerViewModel.getOrder()))
                 if (fileBrowserViewModel.shouldEnterMDMode(childNodes,
@@ -939,7 +939,7 @@ class FileBrowserFragment : RotatableFragment() {
     fun setFolderInfoNavigation(n: MegaNode?) {
         (activity as? ManagerActivity)?.supportInvalidateOptionsMenu()
         (activity as? ManagerActivity)?.setToolbarTitle()
-        adapter?.parentHandle = managerViewModel.getSafeBrowserParentHandle()
+        adapter?.parentHandle = fileBrowserViewModel.getSafeBrowserParentHandle()
         _nodes = megaApi.getChildren(n, sortOrderIntMapper(managerViewModel.getOrder()))
         adapter?.setNodes(_nodes)
         recyclerView?.scrollToPosition(0)
@@ -1077,25 +1077,25 @@ class FileBrowserFragment : RotatableFragment() {
     fun onBackPressed(): Int {
         Timber.d("onBackPressed")
         if (adapter != null) {
-            Timber.d("Parent Handle is: %s", managerViewModel.getSafeBrowserParentHandle())
+            Timber.d("Parent Handle is: %s", fileBrowserViewModel.getSafeBrowserParentHandle())
             val managerActivity = activity as? ManagerActivity ?: return 0
-            return if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationHandle == managerViewModel.getSafeBrowserParentHandle()) {
+            return if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationHandle == fileBrowserViewModel.getSafeBrowserParentHandle()) {
                 managerActivity.comesFromNotifications = false
                 managerActivity.comesFromNotificationHandle = -1
                 managerActivity.selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                managerViewModel.setBrowserParentHandle(managerActivity.comesFromNotificationHandleSaved)
+                fileBrowserViewModel.setBrowserParentHandle(managerActivity.comesFromNotificationHandleSaved)
                 managerActivity.comesFromNotificationHandleSaved = -1
                 managerActivity.refreshCloudDrive()
                 2
             } else {
                 val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(
-                    managerViewModel.getSafeBrowserParentHandle()))
+                    fileBrowserViewModel.getSafeBrowserParentHandle()))
                 if (parentNode != null) {
                     mediaHandle = parentNode.handle
                     recyclerView?.visibility = View.VISIBLE
                     emptyImageView?.visibility = View.GONE
                     emptyTextView?.visibility = View.GONE
-                    managerViewModel.setBrowserParentHandle(parentNode.handle)
+                    fileBrowserViewModel.setBrowserParentHandle(parentNode.handle)
                     managerActivity.supportInvalidateOptionsMenu()
                     managerActivity.setToolbarTitle()
                     _nodes = megaApi.getChildren(parentNode,
@@ -1145,7 +1145,7 @@ class FileBrowserFragment : RotatableFragment() {
                 recyclerView?.visibility = View.GONE
                 emptyImageView?.visibility = View.VISIBLE
                 emptyTextView?.visibility = View.VISIBLE
-                if (megaApi.rootNode != null && megaApi.rootNode.handle == managerViewModel.getSafeBrowserParentHandle() || managerViewModel.getSafeBrowserParentHandle() == -1L) {
+                if (megaApi.rootNode != null && megaApi.rootNode.handle == fileBrowserViewModel.getSafeBrowserParentHandle() || fileBrowserViewModel.getSafeBrowserParentHandle() == -1L) {
                     if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         emptyImageView?.setImageResource(R.drawable.empty_cloud_drive_landscape)
                     } else {
