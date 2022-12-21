@@ -21,9 +21,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
@@ -118,7 +118,8 @@ class PhotosFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
     lateinit var pagerState: PagerState
-    lateinit var lazyGridState: LazyGridState
+    lateinit var timelineLazyGridState: LazyGridState
+    lateinit var albumsLazyGridState: LazyGridState
 
     @Inject
     lateinit var getFeatureFlag: GetFeatureFlagValue
@@ -306,7 +307,7 @@ class PhotosFragment : Fragment() {
                 else
                     rememberPagerState(initialPage = photosViewState.selectedTab.ordinal)
         }
-        lazyGridState =
+        timelineLazyGridState =
             rememberSaveable(
                 timelineViewState.scrollStartIndex,
                 timelineViewState.scrollStartOffset,
@@ -317,6 +318,8 @@ class PhotosFragment : Fragment() {
                     timelineViewState.scrollStartOffset
                 )
             }
+
+        albumsLazyGridState = rememberLazyGridState()
 
         if (managerActivity.fromAlbumContent) {
             managerActivity.fromAlbumContent = false
@@ -335,7 +338,8 @@ class PhotosFragment : Fragment() {
             selectedTab = photosViewState.selectedTab,
             pagerState = pagerState,
             onTabSelected = this::onTabSelected,
-            lazyGridState = lazyGridState,
+            timelineLazyGridState = timelineLazyGridState,
+            albumsLazyGridState = albumsLazyGridState,
             timelineView = { timelineView(timelineViewState = timelineViewState) },
             albumsView = { albumsView(albumsViewState = albumsViewState, timelineViewState) },
             timelineViewState = timelineViewState,
@@ -348,7 +352,7 @@ class PhotosFragment : Fragment() {
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
         photoDownload = photosViewModel::downloadPhoto,
-        lazyGridState = lazyGridState,
+        lazyGridState = timelineLazyGridState,
         onTextButtonClick = this::enableCameraUploadClick,
         onFABClick = this::openFilterFragment,
         onCardClick = timelineViewModel::onCardClick,
@@ -393,6 +397,7 @@ class PhotosFragment : Fragment() {
                 albumsViewModel.clearAlbumSelection()
             },
             deleteAlbums = ::deleteAlbums,
+            lazyGridState = albumsLazyGridState,
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
@@ -409,7 +414,7 @@ class PhotosFragment : Fragment() {
     private fun photosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
         timelineViewState = timelineViewState,
         downloadPhoto = photosViewModel::downloadPhoto,
-        lazyGridState = lazyGridState,
+        lazyGridState = timelineLazyGridState,
         onClick = timelineViewModel::onClick,
         onLongPress = timelineViewModel::onLongPress,
     )
@@ -512,8 +517,8 @@ class PhotosFragment : Fragment() {
     private fun openFilterFragment() {
         timelineViewModel.updateFilterState(
             showFilterDialog = true,
-            scrollStartIndex = lazyGridState.firstVisibleItemIndex,
-            scrollStartOffset = lazyGridState.firstVisibleItemScrollOffset
+            scrollStartIndex = timelineLazyGridState.firstVisibleItemIndex,
+            scrollStartOffset = timelineLazyGridState.firstVisibleItemScrollOffset
         )
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
     }
