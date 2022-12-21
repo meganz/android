@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaChatRoomListenerInterface
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
 import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaHandleList
 import javax.inject.Inject
 
 /**
@@ -216,6 +217,12 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
+
+    override fun loadUserAttributes(
+        chatId: Long,
+        userList: MegaHandleList,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.loadUserAttributes(chatId, userList, listener)
 
     override fun getUserEmailFromCache(userHandle: Long): String? =
         chatApi.getUserEmailFromCache(userHandle)

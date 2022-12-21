@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatScheduledMeeting
+import nz.mega.sdk.MegaHandleList
 
 /**
  * Mega chat api gateway
@@ -152,6 +153,26 @@ interface MegaChatApiGateway {
      * @return The chat conversation.
      */
     fun getChatRoomByUser(userHandle: Long): MegaChatRoom?
+
+    /**
+     * Request user attributes
+     *
+     * This function is useful to get the email address, first name, last name and full name
+     * from chat link participants that they are not loaded
+     *
+     * After request is finished, you can call to MegaChatApi::getUserFirstnameFromCache,
+     * MegaChatApi::getUserLastnameFromCache, MegaChatApi::getUserFullnameFromCache,
+     * MegaChatApi::getUserEmailFromCache (email will not available in anonymous mode)
+     * 
+     * @param chatId Handle of the chat whose member attributes requested
+     * @param userList List of user whose attributes has been requested
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun loadUserAttributes(
+        chatId: Long,
+        userList: MegaHandleList,
+        listener: MegaChatRequestListenerInterface,
+    )
 
     /**
      * Get user email from cache

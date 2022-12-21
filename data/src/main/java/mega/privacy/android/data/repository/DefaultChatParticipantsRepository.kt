@@ -2,8 +2,10 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.userPermission
 import mega.privacy.android.data.mapper.userStatus
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -16,9 +18,15 @@ import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.RequestLastGreen
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaHandleList
 import java.io.File
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [ChatParticipantsRepository]
@@ -42,6 +50,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     override suspend fun getAllChatParticipants(chatId: Long): List<ChatParticipant> {
         megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
             val list: MutableList<ChatParticipant> = mutableListOf()
+            val peerHandles = getChatParticipantsHandles(chatId)
 
             val myEmail = megaChatApiGateway.getMyEmail()
             val myName = megaChatApiGateway.getMyFullname()
@@ -59,28 +68,24 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
             list.add(myParticipant)
 
-            val participantsCount = chatRoom.peerCount
-            for (i in 0 until participantsCount) {
-                val participantPrivilege = chatRoom.getPeerPrivilege(i)
-                if (participantPrivilege == MegaChatRoom.PRIV_RM) {
-                    continue
+            peerHandles.forEach { handle ->
+                val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(handle)
+                if (participantPrivilege != MegaChatRoom.PRIV_RM) {
+                    val alias = megaChatApiGateway.getUserAliasFromCache(handle)
+                    val participant = ChatParticipant(
+                        handle = handle,
+                        data = ContactData(
+                            fullName = contactsRepository.getUserFullName(handle),
+                            alias = alias,
+                            avatarUri = null),
+                        email = contactsRepository.getUserEmail(handle),
+                        isMe = false,
+                        privilege = userPermission[participantPrivilege]
+                            ?: ChatRoomPermission.Unknown,
+                        defaultAvatarColor = avatarRepository.getAvatarColor(handle))
+
+                    list.add(participant)
                 }
-
-                val handle = chatRoom.getPeerHandle(i)
-                val alias = megaChatApiGateway.getUserAliasFromCache(handle)
-                val participant = ChatParticipant(
-                    handle = handle,
-                    data = ContactData(
-                        fullName = contactsRepository.getUserFullName(handle),
-                        alias = alias,
-                        avatarUri = null),
-                    email = contactsRepository.getUserEmail(handle),
-                    isMe = false,
-                    privilege = userPermission[participantPrivilege]
-                        ?: ChatRoomPermission.Unknown,
-                    defaultAvatarColor = avatarRepository.getAvatarColor(handle))
-
-                list.add(participant)
             }
             return list
         }
@@ -94,13 +99,31 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                 ?: throw ChatRoomDoesNotExistException()
 
             if (!chatRoom.isGroup || chatRoom.peerCount == 0L) {
-                emptyList()
-            } else {
-                mutableListOf<Long>().apply {
-                    for (index in 0 until chatRoom.peerCount) {
-                        add(chatRoom.getPeerHandle(index))
-                    }
+                return@withContext emptyList()
+            }
+
+            val megaHandleList = MegaHandleList.createInstance()
+            val peerList = mutableListOf<Long>().apply {
+                for (index in 0 until chatRoom.peerCount) {
+                    val peerHandle = chatRoom.getPeerHandle(index)
+                    add(peerHandle)
+                    megaHandleList.addMegaHandle(peerHandle)
                 }
+            }
+
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.loadUserAttributes(
+                    chatId,
+                    megaHandleList,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resume(peerList)
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    ))
             }
         }
 
