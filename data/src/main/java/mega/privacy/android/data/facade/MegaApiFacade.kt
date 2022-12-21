@@ -691,4 +691,26 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun authorizeChatNode(node: MegaNode, authorizationToken: String): MegaNode? =
         megaApi.authorizeChatNode(node, authorizationToken)
+
+    override fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.submitPurchaseReceipt(gateway, receipt, listener)
+
+    override fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        lastPublicHandle: Long,
+        lastPublicHandleType: Int,
+        lastAccessTimestamp: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.submitPurchaseReceipt(
+        gateway,
+        receipt,
+        lastPublicHandle,
+        lastPublicHandleType,
+        lastAccessTimestamp,
+        listener,
+    )
 }

@@ -2,10 +2,14 @@ package mega.privacy.android.data.facade
 
 import android.util.Base64
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
+import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 import java.security.InvalidKeyException
 import java.security.KeyFactory
+import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.Signature
@@ -14,7 +18,9 @@ import java.security.spec.InvalidKeySpecException
 import java.security.spec.X509EncodedKeySpec
 import javax.inject.Inject
 
-internal class VerifyPurchaseFacade @Inject constructor() : VerifyPurchaseGateway {
+internal class VerifyPurchaseFacade @Inject constructor(
+    @MegaApi private val megaApi: MegaApiAndroid,
+) : VerifyPurchaseGateway {
     /**
      * Verifies that the data was signed with the given signature, and returns the verified
      * purchase.
@@ -33,6 +39,17 @@ internal class VerifyPurchaseFacade @Inject constructor() : VerifyPurchaseGatewa
         val key = generatePublicKey()
         return verify(key, signedData, signature)
     }
+
+    override fun generateObfuscatedAccountId(): String? = runCatching {
+        val digest = MessageDigest.getInstance("SHA-256")
+        val encodeHash = digest.digest(
+            megaApi.myUserHandleBinary.toString().toByteArray(StandardCharsets.UTF_8)
+        )
+
+        return Base64.encodeToString(encodeHash, Base64.DEFAULT)
+    }.onFailure {
+        Timber.e(it, "Generate obfuscated account Id failed.")
+    }.getOrNull()
 
     /**
      * Generates a PublicKey instance from a string containing the Base64-encoded public key.
