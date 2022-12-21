@@ -501,6 +501,4 @@ internal class MapperModule {
     @Provides
     fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
         ::toChatFilesFolderUserAttribute
-
-
 }
