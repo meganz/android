@@ -37,7 +37,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import timber.log.Timber
 import kotlin.math.roundToInt
 
 /**
@@ -51,7 +50,8 @@ fun PhotosBodyView(
     onTabSelected: (PhotosTab) -> Unit = {},
     timelineView: @Composable () -> Unit = {},
     albumsView: @Composable () -> Unit = {},
-    lazyGridState: LazyGridState = LazyGridState(),
+    timelineLazyGridState: LazyGridState = LazyGridState(),
+    albumsLazyGridState: LazyGridState = LazyGridState(),
     timelineViewState: TimelineViewState = TimelineViewState(),
     albumsViewState: AlbumsViewState = AlbumsViewState(),
 ) {
@@ -64,7 +64,10 @@ fun PhotosBodyView(
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (lazyGridState.firstVisibleItemScrollOffset != 0) {
+                if (
+                    timelineLazyGridState.firstVisibleItemScrollOffset != 0 ||
+                    albumsLazyGridState.firstVisibleItemScrollOffset != 0
+                ) {
                     val delta = available.y
                     val newOffset = toolbarOffsetHeightPx.value + delta
                     toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
