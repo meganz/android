@@ -362,7 +362,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                             Text(text = title,
                                 style = MaterialTheme.typography.subtitle1,
                                 color = if (MaterialTheme.colors.isLight) black else white,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Medium,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis)
                         }
@@ -373,6 +373,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                         Text(text = date,
                             style = MaterialTheme.typography.subtitle2,
                             color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                            fontWeight = FontWeight.Normal,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis)
                     }
@@ -582,7 +583,7 @@ private fun ActionButton(
         }) {
         when (action) {
             ScheduledMeetingInfoAction.ShareMeetingLink -> {
-                if (state.isHost && state.isPublic && state.enabledMeetingLinkOption) {
+                if (state.isPublic && state.enabledMeetingLinkOption) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(modifier = Modifier.padding(start = 72.dp,
                             end = 16.dp,
