@@ -1,16 +1,22 @@
 package mega.privacy.android.data.repository
 
+import android.app.Activity
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.PricingMapper
+import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.BillingEvent
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -38,7 +44,8 @@ internal class DefaultBillingRepository @Inject constructor(
     private val numberOfSubscriptionCache: Cache<Long>,
     private val pricingMapper: PricingMapper,
     private val localPricingMapper: LocalPricingMapper,
-) : BillingRepository {
+    private val billingGateway: BillingGateway,
+) : BillingRepository, AndroidBillingRepository {
 
     override suspend fun getLocalPricing(sku: String) =
         accountInfoWrapper.availableSkus.firstOrNull { megaSku ->
@@ -101,4 +108,14 @@ internal class DefaultBillingRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun queryPurchase(): List<MegaPurchase> = billingGateway.queryPurchase()
+
+    override suspend fun querySkus(): List<MegaSku> = billingGateway.querySkus()
+
+    override suspend fun disconnect() = billingGateway.disconnect()
+
+    override fun monitorBillingEvent(): Flow<BillingEvent> = billingGateway.monitorBillingEvent()
+
+    override suspend fun launchPurchaseFlow(activity: Activity, productId: String) = billingGateway.launchPurchaseFlow(activity, productId)
 }
