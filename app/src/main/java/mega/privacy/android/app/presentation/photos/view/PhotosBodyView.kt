@@ -2,11 +2,13 @@
 
 package mega.privacy.android.app.presentation.photos.view
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
@@ -15,20 +17,16 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -37,7 +35,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import kotlin.math.roundToInt
 
 /**
  * Main Photos Body View
@@ -56,51 +53,39 @@ fun PhotosBodyView(
     albumsViewState: AlbumsViewState = AlbumsViewState(),
 ) {
 
-    val toolbarHeight = 50.dp
-    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
-    val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
-    val contentPadding = remember { mutableStateOf(toolbarOffsetHeightPx.value + toolbarHeightPx) }
-
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                if (
-                    timelineLazyGridState.firstVisibleItemScrollOffset != 0 ||
-                    albumsLazyGridState.firstVisibleItemScrollOffset != 0
-                ) {
-                    val delta = available.y
-                    val newOffset = toolbarOffsetHeightPx.value + delta
-                    toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
-                    contentPadding.value =
-                        (toolbarOffsetHeightPx.value + toolbarHeightPx).coerceIn(
-                            0F,
-                            toolbarHeightPx
-                        )
-                }
-                return Offset.Zero
-            }
+    val isBarVisibleTimeline by remember {
+        derivedStateOf {
+            timelineLazyGridState.firstVisibleItemIndex == 0
         }
     }
+    val isScrollingDownTimeline =
+        timelineLazyGridState.isScrollingDown()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(nestedScrollConnection)
-    ) {
+    val isBarVisibleAlbums by remember {
+        derivedStateOf {
+            albumsLazyGridState.firstVisibleItemIndex == 0
+        }
+    }
+    val isScrollingDownAlbums =
+        albumsLazyGridState.isScrollingDown()
+
+
+    Column(modifier = Modifier.fillMaxSize()) {
         if (timelineViewState.selectedPhotoCount == 0) {
             PhotosTabs(
-                modifier = Modifier
-                    .height(height = toolbarHeight)
-                    .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) },
                 tabs = tabs,
                 selectedTab = selectedTab,
                 isTabSelectionEnabled = albumsViewState.selectedAlbumIds.isEmpty(),
                 onTabSelected = onTabSelected,
-            )
+            ) {
+                when (selectedTab) {
+                    PhotosTab.Timeline -> isBarVisibleTimeline || !isScrollingDownTimeline
+                    else -> isBarVisibleAlbums || !isScrollingDownAlbums
+                }
+
+            }
         }
         PagerView(
-            modifier = Modifier
-                .padding(top = with(LocalDensity.current) { contentPadding.value.toDp() }),
             tabs = tabs,
             pagerState = pagerState,
             timelineView = timelineView,
@@ -121,36 +106,43 @@ fun PhotosTabs(
     selectedTab: PhotosTab,
     isTabSelectionEnabled: Boolean,
     onTabSelected: (PhotosTab) -> Unit,
+    isVisible: () -> Boolean = { true },
 ) {
     val selectedTabIndex = selectedTab.ordinal
-    TabRow(
-        modifier = modifier,
-        selectedTabIndex = selectedTabIndex,
-        indicator = { tabPositions: List<TabPosition> ->
-            TabRowDefaults.Indicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                color = colorResource(id = R.color.red_600_red_300)
-            )
-        },
-        backgroundColor = Color.Transparent,
+    AnimatedVisibility(
+        visible = isVisible(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
     ) {
-        tabs.forEachIndexed { index, tab ->
-            Tab(
-                selected = index == selectedTabIndex,
-                onClick = { onTabSelected(tab) },
-                enabled = isTabSelectionEnabled,
-                text = {
-                    Text(
-                        text = when (tab) {
-                            PhotosTab.Timeline -> stringResource(id = R.string.tab_title_timeline)
-                            PhotosTab.Albums -> stringResource(id = R.string.tab_title_album)
-                        },
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                selectedContentColor = colorResource(id = R.color.red_600_red_300),
-                unselectedContentColor = colorResource(id = R.color.grey_054_white_054)
-            )
+        TabRow(
+            modifier = modifier,
+            selectedTabIndex = selectedTabIndex,
+            indicator = { tabPositions: List<TabPosition> ->
+                TabRowDefaults.Indicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                    color = colorResource(id = R.color.red_600_red_300)
+                )
+            },
+            backgroundColor = Color.Transparent,
+        ) {
+            tabs.forEachIndexed { index, tab ->
+                Tab(
+                    selected = index == selectedTabIndex,
+                    onClick = { onTabSelected(tab) },
+                    enabled = isTabSelectionEnabled,
+                    text = {
+                        Text(
+                            text = when (tab) {
+                                PhotosTab.Timeline -> stringResource(id = R.string.tab_title_timeline)
+                                PhotosTab.Albums -> stringResource(id = R.string.tab_title_album)
+                            },
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
+                    selectedContentColor = colorResource(id = R.color.red_600_red_300),
+                    unselectedContentColor = colorResource(id = R.color.grey_054_white_054)
+                )
+            }
         }
     }
 }
@@ -180,4 +172,22 @@ fun PagerView(
         }
     }
 
+}
+
+@Composable
+internal fun LazyGridState.isScrollingDown(): Boolean {
+    var nextIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
+    var nextScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (nextIndex != firstVisibleItemIndex) {
+                nextIndex < firstVisibleItemIndex
+            } else {
+                nextScrollOffset <= firstVisibleItemScrollOffset
+            }.also {
+                nextIndex = firstVisibleItemIndex
+                nextScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }
