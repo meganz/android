@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.LocalPricingMapper
@@ -50,6 +51,7 @@ class DefaultBillingRepositoryTest {
         LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString)
     private val localPricingMapper = mock<LocalPricingMapper>()
     private val pricingMapper = mock<PricingMapper>()
+    private val billingGateway = mock<BillingGateway>()
 
     @Before
     fun setUp() {
@@ -62,6 +64,7 @@ class DefaultBillingRepositoryTest {
             localPricingMapper = localPricingMapper,
             pricingMapper = pricingMapper,
             numberOfSubscriptionCache = numberOfSubscriptionCache,
+            billingGateway = billingGateway
         )
     }
 
@@ -257,4 +260,22 @@ class DefaultBillingRepositoryTest {
             underTest.getNumberOfSubscription(true)
             verify(numberOfSubscriptionCache, times(1)).set(expectNumberOfSubscription)
         }
+
+    @Test
+    fun `test when queryPurchase billingGateway queryPurchase invoke`() = runTest {
+        underTest.queryPurchase()
+        verify(billingGateway, times(1)).queryPurchase()
+    }
+
+    @Test
+    fun `test when querySkus billingGateway querySkus invoke`() = runTest {
+        underTest.querySkus()
+        verify(billingGateway, times(1)).querySkus()
+    }
+
+    @Test
+    fun `test when disconnect billingGateway disconnect invoke`() = runTest {
+        underTest.disconnect()
+        verify(billingGateway, times(1)).disconnect()
+    }
 }
