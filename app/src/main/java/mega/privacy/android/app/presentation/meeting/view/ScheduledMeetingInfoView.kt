@@ -25,6 +25,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -114,14 +115,21 @@ fun ScheduledMeetingInfoView(
     onInviteParticipantsDialog: () -> Unit,
     onSnackbarShown: () -> Unit,
 ) {
+    val isLight = MaterialTheme.colors.isLight
+
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
         scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = it) { data ->
+                Snackbar(snackbarData = data,
+                    backgroundColor = black.takeIf { isLight } ?: white)
+            }
+        },
         topBar = {
             ScheduledMeetingInfoAppBar(
                 state = state,
@@ -297,7 +305,9 @@ private fun ScheduledMeetingInfoAppBar(
     titleId: Int,
     elevation: Boolean,
 ) {
-    val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+    val isLight = MaterialTheme.colors.isLight
+    val iconColor = white.takeIf { isLight } ?: black
+
     TopAppBar(
         title = {
             Text(text = stringResource(id = titleId),
@@ -344,6 +354,7 @@ private fun ScheduledMeetingInfoAppBar(
  */
 @Composable
 private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
+    val isLight = MaterialTheme.colors.isLight
     Column {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -361,7 +372,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                         it.title?.let { title ->
                             Text(text = title,
                                 style = MaterialTheme.typography.subtitle1,
-                                color = if (MaterialTheme.colors.isLight) black else white,
+                                color = black.takeIf { isLight } ?: white,
                                 fontWeight = FontWeight.Medium,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis)
@@ -372,7 +383,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                     it.date?.let { date ->
                         Text(text = date,
                             style = MaterialTheme.typography.subtitle2,
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             fontWeight = FontWeight.Normal,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
@@ -574,6 +585,7 @@ private fun ActionButton(
     action: ScheduledMeetingInfoAction,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
+    val isLight = MaterialTheme.colors.isLight
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
@@ -613,7 +625,7 @@ private fun ActionButton(
                             bottom = 8.dp),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
                     divider(withStartPadding = false)
@@ -627,7 +639,7 @@ private fun ActionButton(
                         top = 18.dp),
                         style = MaterialTheme.typography.subtitle1,
                         text = stringResource(id = action.title),
-                        color = if (MaterialTheme.colors.isLight) black else white)
+                        color = black.takeIf { isLight } ?: white)
 
                     action.description?.let { description ->
                         Text(modifier = Modifier.padding(start = 14.dp,
@@ -636,7 +648,7 @@ private fun ActionButton(
                             bottom = 8.dp),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
                     divider(withStartPadding = false)
@@ -712,7 +724,7 @@ private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
         text = stringResource(id = R.string.participants_number, state.participantItemList.size),
         style = MaterialTheme.typography.body2,
         fontWeight = FontWeight.Medium,
-        color = if (MaterialTheme.colors.isLight) black else white)
+        color = black.takeIf { MaterialTheme.colors.isLight } ?: white)
 }
 
 /**
@@ -801,7 +813,7 @@ private fun LeaveGroupButton(
         Text(textAlign = TextAlign.Center,
             style = MaterialTheme.typography.button,
             text = stringResource(id = R.string.meetings_scheduled_meeting_info_leave_group_label),
-            color = if (MaterialTheme.colors.isLight) red_600 else red_300)
+            color = red_600.takeIf { MaterialTheme.colors.isLight } ?: red_300)
     }
 }
 
@@ -812,6 +824,8 @@ private fun LeaveGroupButton(
  */
 @Composable
 private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
+    val isLight = MaterialTheme.colors.isLight
+
     state.scheduledMeeting?.let { schedMeet ->
         schedMeet.description?.let { description ->
             divider(withStartPadding = false)
@@ -830,7 +844,7 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
                     ) {
                         Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
                             contentDescription = "Scheduled meeting description icon",
-                            tint = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                            tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
                     Column(modifier = Modifier
@@ -839,7 +853,7 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
                             .padding(start = 32.dp, end = 23.dp),
                             style = MaterialTheme.typography.subtitle1,
                             text = description,
-                            color = if (MaterialTheme.colors.isLight) black else white)
+                            color = black.takeIf { isLight } ?: white)
                     }
                 }
             }
@@ -857,7 +871,7 @@ fun divider(withStartPadding: Boolean) {
     Divider(
         modifier = if (withStartPadding) Modifier.padding(start = 72.dp,
             end = 0.dp) else Modifier.padding(start = 0.dp, end = 0.dp),
-        color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
+        color = grey_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_012,
         thickness = 1.dp)
 }
 
@@ -889,7 +903,8 @@ private fun ActionOption(
                 action.icon?.let { icon ->
                     Icon(painter = painterResource(id = icon),
                         contentDescription = "${action.name} icon",
-                        tint = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                        tint = grey_alpha_054.takeIf { MaterialTheme.colors.isLight }
+                            ?: white_alpha_054)
                 }
             }
 
@@ -937,7 +952,7 @@ private fun ActionSubtitleText(text: String) {
         .padding(start = 32.dp, end = 23.dp),
         style = MaterialTheme.typography.subtitle2,
         text = text,
-        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+        color = grey_alpha_054.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_054)
 }
 
 /**
@@ -962,7 +977,7 @@ private fun ActionText(actionText: Int) {
         .padding(start = 32.dp, end = 23.dp),
         style = MaterialTheme.typography.subtitle1,
         text = stringResource(id = actionText),
-        color = if (MaterialTheme.colors.isLight) black else white)
+        color = black.takeIf { MaterialTheme.colors.isLight } ?: white)
 }
 
 /**
@@ -978,6 +993,7 @@ private fun ParticipantItemView(
     showDivider: Boolean,
     onParticipantClicked: (ChatParticipant) -> Unit = {},
 ) {
+    val isLight = MaterialTheme.colors.isLight
     Column {
         Row(modifier = Modifier
             .clickable {
@@ -1033,7 +1049,7 @@ private fun ParticipantItemView(
                             }
 
                         MarqueeText(text = secondLineText,
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             style = MaterialTheme.typography.subtitle2)
                     }
                 }
@@ -1046,14 +1062,14 @@ private fun ParticipantItemView(
                     Icon(modifier = Modifier.padding(start = 30.dp),
                         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
-                        tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+                        tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
                 }
             }
         }
 
         if (showDivider) {
             Divider(modifier = Modifier.padding(start = 72.dp),
-                color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
+                color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
                 thickness = 1.dp)
         }
     }
@@ -1066,24 +1082,25 @@ private fun ParticipantItemView(
  */
 @Composable
 private fun participantsPermissionView(participant: ChatParticipant) {
+    val isLight = MaterialTheme.colors.isLight
     when (participant.privilege) {
         ChatRoomPermission.Moderator -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_full_access),
                 contentDescription = "Permissions icon",
-                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
         }
         ChatRoomPermission.Standard -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_read_write),
                 contentDescription = "Permissions icon",
-                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
         }
         ChatRoomPermission.ReadOnly -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_read_only),
                 contentDescription = "Permissions icon",
-                tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
         }
         else -> {}
     }
