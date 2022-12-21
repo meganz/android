@@ -263,6 +263,7 @@ public class UploadService extends Service {
     }
 
     private void startForeground() {
+        Timber.d("StartForeground");
         try {
             startForeground(NOTIFICATION_UPLOAD,
                     createInitialNotification());
@@ -335,6 +336,8 @@ public class UploadService extends Service {
             }
         }
 
+        Timber.d("action = %s", intent.getAction());
+        startForeground();
         onHandleIntent(intent);
         return START_NOT_STICKY;
     }
