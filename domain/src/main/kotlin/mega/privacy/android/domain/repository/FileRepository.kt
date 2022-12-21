@@ -93,4 +93,10 @@ interface FileRepository {
      * @return The local path of the downloaded file.
      */
     suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
+
+    /**
+     * setMyChatFilesFolder
+     * @param nodeHandle
+     */
+    suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
 }

@@ -1300,4 +1300,19 @@ interface MegaApiGateway {
         lastAccessTimestamp: Long,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Set My Chat Files target folder.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_MY_CHAT_FILES_FOLDER
+     * - MegaRequest::getMegaStringMap - Returns a MegaStringMap.
+     * The key "h" in the map contains the nodehandle specified as parameter encoded in B64
+     *
+     * @param nodeHandle MegaHandle of the node to be used as target folder
+     * @param listener   MegaRequestListener to track this request
+     */
+    fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
 }

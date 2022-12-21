@@ -69,6 +69,9 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatScheduledMeetingMapper         [ChatScheduledMeetingMapper]
  * @property chatScheduledMeetingOccurrMapper   [ChatScheduledMeetingOccurrMapper]
  * @property chatListItemMapper                 [ChatListItemMapper]
+ * @property sharingScope                       [CoroutineScope]
+ * @property ioDispatcher                       [CoroutineDispatcher]
+ * @property broadcastReceiverGateway           [BroadcastReceiverGateway]
  */
 internal class DefaultChatRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
