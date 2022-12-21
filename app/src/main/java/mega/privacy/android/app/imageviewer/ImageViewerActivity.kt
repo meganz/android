@@ -66,6 +66,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
@@ -163,7 +164,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         fun getIntentForParentNode(
             context: Context,
             parentNodeHandle: Long,
-            childOrder: Int = ORDER_PHOTO_ASC,
+            childOrder: SortOrder = SortOrder.ORDER_PHOTO_ASC,
             currentNodeHandle: Long? = null,
             showSlideshow: Boolean = false,
         ): Intent =
@@ -294,7 +295,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val nodeFileLink by lazy { intent.getStringExtra(EXTRA_LINK) }
     private val childrenHandles by lazy { intent.getLongArrayExtra(NODE_HANDLES) }
     private val childrenOfflineHandles by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE) }
-    private val childOrder by lazy { intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_PHOTO_ASC) }
+    private val childOrder by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                SortOrder::class.java) ?: SortOrder.ORDER_PHOTO_ASC
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
+                ?: SortOrder.ORDER_PHOTO_ASC
+        }
+    }
     private val chatRoomId by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE) }
     private val chatMessagesId by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_MSG_ID) }
     private val imageFileUri by lazy {

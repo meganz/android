@@ -113,6 +113,8 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -2000,6 +2002,15 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     override fun onEvent(api: MegaApiJava, event: MegaEvent) {}
+
+    override fun onSetsUpdate(api: MegaApiJava?, sets: java.util.ArrayList<MegaSet>?) {
+    }
+
+    override fun onSetElementsUpdate(
+        api: MegaApiJava?,
+        elements: java.util.ArrayList<MegaSetElement>?
+    ) {
+    }
 
     override fun onNodesUpdate(api: MegaApiJava, updatedNodes: ArrayList<MegaNode>) {
         Timber.d("onNodesUpdate")

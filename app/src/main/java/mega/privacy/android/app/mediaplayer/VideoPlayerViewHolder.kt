@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -28,6 +29,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     private val unlockButton = binding.root.findViewById<ImageButton>(R.id.image_button_unlock)
     private val playerLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_player)
     private val unlockLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_unlock)
+    private val screenshotButton = binding.root.findViewById<ImageButton>(R.id.image_screenshot)
 
     /**
      * Setup playlist button.
@@ -36,12 +38,25 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      * @param openPlaylist the callback when playlist button is clicked
      */
     fun setupPlaylistButton(playlistItems: List<PlaylistItem>?, openPlaylist: () -> Unit) {
-        if (playlistItems != null) {
-            togglePlaylistEnabled(playlistItems)
-        }
+        togglePlaylistEnabled(playlistItems)
 
         playlist.setOnClickListener {
             openPlaylist()
+        }
+    }
+
+    /**
+     * Setup the screenshot button
+     *
+     * @param clickedCallback the callback of screenshot button clicked
+     */
+    fun setupScreenshotButton(clickedCallback: () -> Unit) {
+        // The screenshot feature is not available if the Android version is lower that API 26
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            screenshotButton.isVisible = false
+        }
+        screenshotButton.setOnClickListener {
+            clickedCallback()
         }
     }
 
@@ -54,7 +69,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     fun setupRepeatToggleButton(
         context: Context,
         defaultRepeatToggleMode: RepeatToggleMode,
-        clickedCallback: (repeatToggleButton: ImageButton) -> Unit
+        clickedCallback: (repeatToggleButton: ImageButton) -> Unit,
     ) {
         with(repeatToggleButton) {
             isVisible = true
@@ -97,8 +112,8 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      *
      * @param playlistItems the new playlist
      */
-    fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
-        if (playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE) {
+    fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>?) {
+        if (playlistItems != null && playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE) {
             playlist.visibility = View.VISIBLE
 
             binding.playerView.setShowNextButton(true)

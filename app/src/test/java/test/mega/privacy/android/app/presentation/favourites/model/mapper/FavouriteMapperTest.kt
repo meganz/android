@@ -7,9 +7,10 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
-import mega.privacy.android.domain.entity.NodeFile
-import mega.privacy.android.domain.entity.NodeFolder
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -20,7 +21,7 @@ class FavouriteMapperTest {
 
     @Test
     fun `test that values returned when FavouriteInfo is folder`() {
-        val expectedHandle = 1L
+        val expectedNodeId = NodeId(1L)
         val expectedName = "TestFolder"
         val expectedLabel = MegaNode.NODE_LBL_RED
         val expectedInfo = "Test folder info"
@@ -32,7 +33,7 @@ class FavouriteMapperTest {
         val expectedHasVersion = true
         val expectedIsAvailableOffline = false
         val expectedLabelColour = R.color.salmon_400_salmon_300
-        val expectedIsInRubbishBin = true
+        val expectedIsInRubbishBin = false
         val expectedIsIncomingShare = true
         val expectedIsShared = true
         val expectedIsPendingShare = true
@@ -41,24 +42,24 @@ class FavouriteMapperTest {
             on { isInShare }.thenReturn(expectedIsShared)
         }
 
-        val favouriteInfo = NodeFolder(
-            id = expectedHandle,
-            name = expectedName,
-            label = expectedLabel,
-            parentId = expectedHandle,
-            base64Id = "",
-            hasVersion = expectedHasVersion,
-            numChildFiles = 0,
-            numChildFolders = 0,
-            isFavourite = expectedIsFavourite,
-            isExported = expectedIsExported,
-            isTakenDown = expectedIsTakenDown,
-            isInRubbishBin = expectedIsInRubbishBin,
-            isIncomingShare = expectedIsIncomingShare,
-            isShared = expectedIsShared,
-            isPendingShare = expectedIsPendingShare,
-            device = null,
-        )
+        val favouriteInfo = mock<TypedFolderNode> {
+            on { id }.thenReturn(expectedNodeId)
+            on { name }.thenReturn(expectedName)
+            on { label }.thenReturn(expectedLabel)
+            on { parentId }.thenReturn(expectedNodeId)
+            on { base64Id }.thenReturn("")
+            on { hasVersion }.thenReturn(expectedHasVersion)
+            on { childFileCount }.thenReturn(0)
+            on { childFolderCount }.thenReturn(0)
+            on { isFavourite }.thenReturn(expectedIsFavourite)
+            on { isExported }.thenReturn(expectedIsExported)
+            on { isTakenDown }.thenReturn(expectedIsTakenDown)
+            on { isInRubbishBin }.thenReturn(expectedIsInRubbishBin)
+            on { isIncomingShare }.thenReturn(expectedIsIncomingShare)
+            on { isShared }.thenReturn(expectedIsShared)
+            on { isPendingShare }.thenReturn(expectedIsPendingShare)
+            on { device }.thenReturn(null)
+        }
 
 
         val stringUtil = mock<StringUtilWrapper> {
@@ -88,13 +89,13 @@ class FavouriteMapperTest {
             .isEqualTo(expectedLabelColour)
         assertWithMessage("Icon not mapped correctly").that(actual.icon).isEqualTo(expectedIcon)
         assertWithMessage("Node not mapped correctly").that(actual.node).isSameInstanceAs(testNode)
-        assertWithMessage("Handle not mapped correctly").that(actual.handle)
-            .isEqualTo(expectedHandle)
+        assertWithMessage("Handle not mapped correctly").that(actual.nodeId)
+            .isEqualTo(expectedNodeId)
     }
 
     @Test
     fun `test that values returned when FavouriteInfo is file`() {
-        val expectedHandle = 1L
+        val expectedNodeId = NodeId(1L)
         val expectedName = "TestFile.test"
         val expectedInfo = "Size · Modification"
         val expectedLabel = MegaNode.NODE_LBL_RED
@@ -110,7 +111,7 @@ class FavouriteMapperTest {
         val expectedModificationTime = 1000L
 
         val testNode = mock<MegaNode> {
-            on { handle }.thenReturn(expectedHandle)
+            on { handle }.thenReturn(expectedNodeId.id)
             on { name }.thenReturn(expectedName)
             on { label }.thenReturn(expectedLabel)
             on { isFavourite }.thenReturn(expectedIsFavourite)
@@ -125,20 +126,20 @@ class FavouriteMapperTest {
             on { isVideo() }.thenReturn(false)
         }
 
-        val favouriteInfo = NodeFile(
-            id = expectedHandle,
-            name = expectedName,
-            size = expectedSize,
-            label = expectedLabel,
-            parentId = expectedHandle,
-            base64Id = "",
-            modificationTime = expectedModificationTime,
-            hasVersion = expectedHasVersion,
-            isFavourite = expectedIsFavourite,
-            isExported = expectedIsExported,
-            isTakenDown = expectedIsTakenDown,
-            type = PdfFileTypeInfo
-        )
+        val favouriteInfo = mock<TypedFileNode> {
+            on { id }.thenReturn(expectedNodeId)
+            on { name }.thenReturn(expectedName)
+            on { size }.thenReturn(expectedSize)
+            on { label }.thenReturn(expectedLabel)
+            on { parentId }.thenReturn(expectedNodeId)
+            on { base64Id }.thenReturn("")
+            on { modificationTime }.thenReturn(expectedModificationTime)
+            on { hasVersion }.thenReturn(expectedHasVersion)
+            on { isFavourite }.thenReturn(expectedIsFavourite)
+            on { isExported }.thenReturn(expectedIsExported)
+            on { isTakenDown }.thenReturn(expectedIsTakenDown)
+            on { type }.thenReturn(PdfFileTypeInfo)
+        }
 
 
         val stringUtil = mock<StringUtilWrapper> {
@@ -151,7 +152,7 @@ class FavouriteMapperTest {
 
         val actual = toFavourite(testNode, favouriteInfo, false, stringUtil, getFileIcon)
 
-        assertThat(actual.handle).isEqualTo(expectedHandle)
+        assertThat(actual.nodeId).isEqualTo(expectedNodeId)
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.hasVersion).isEqualTo(expectedHasVersion)
         assertThat(actual.showLabel).isEqualTo(expectedShowLabel)

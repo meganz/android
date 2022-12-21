@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.favourites.FavouritesFragment
 import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
@@ -136,31 +137,15 @@ class FavouritesFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mega.privacy.android.domain.entity.NodeFolder(
-            id = 123,
-            name = node.name,
-            label = node.label,
-            parentId = 1234,
-            base64Id = "base64Handle",
-            hasVersion = false,
-            numChildFolders = 0,
-            numChildFiles = 0,
-            isFavourite = true,
-            isExported = false,
-            isTakenDown = false,
-            isInRubbishBin = false,
-            isIncomingShare = false,
-            isShared = false,
-            isPendingShare = false,
-            device = ""
-        )
+        val favouriteInfo = mock<TypedFolderNode>()
         val favourite = mock<Favourite>()
         whenever(favourite.labelColour).thenReturn(R.color.salmon_400_salmon_300)
         whenever(favourite.isFolder).thenReturn(true)
         val list = listOf(favouriteInfo)
         runBlocking {
             whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-            whenever(TestMapperModule.sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(MegaApiJava.ORDER_DEFAULT_ASC)
+            whenever(TestMapperModule.sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
+                MegaApiJava.ORDER_DEFAULT_ASC)
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
                 flowOf(list)
             )

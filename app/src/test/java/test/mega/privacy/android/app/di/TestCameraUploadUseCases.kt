@@ -24,9 +24,11 @@ import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
+import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
+import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -51,6 +53,7 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
+import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -201,6 +204,9 @@ object TestCameraUploadUseCases {
     fun provideGetPendingUploadList() = mock<GetPendingUploadList>()
 
     @Provides
+    fun provideProcessMediaForUpload() = mock<ProcessMediaForUpload>()
+
+    @Provides
     fun provideGetDefaultNodeHandle() = mock<GetDefaultNodeHandle>()
 
     @Provides
@@ -226,4 +232,10 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideRestoreSecondaryTimestamps() = mock<RestoreSecondaryTimestamps>()
+
+    @Provides
+    fun provideMonitorCameraUploadPauseState() = mock<MonitorCameraUploadPauseState>()
+
+    @Provides
+    fun provideBroadcastUploadPauseState() = mock<BroadcastUploadPauseState>()
 }

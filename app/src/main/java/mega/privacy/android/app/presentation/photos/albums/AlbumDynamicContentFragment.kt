@@ -2,11 +2,16 @@ package mega.privacy.android.app.presentation.photos.albums
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
@@ -21,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -29,7 +35,10 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumConte
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
+import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.presentation.theme.AndroidTheme
@@ -47,6 +56,7 @@ class AlbumDynamicContentFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
     internal lateinit var managerActivity: ManagerActivity
+    private var menu: Menu? = null
 
     // Action mode
     private var actionMode: ActionMode? = null
@@ -84,7 +94,18 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         setupFlow()
+        setupParentActivityUI()
+    }
+
+    /**
+     * Setup ManagerActivity UI
+     */
+    private fun setupParentActivityUI() {
+        managerActivity.setToolbarTitle()
+        managerActivity.invalidateOptionsMenu()
+        managerActivity.hideFabButton()
     }
 
     private fun setupFlow() {
@@ -101,6 +122,13 @@ class AlbumDynamicContentFragment : Fragment() {
                         }
                         actionMode?.title = state.selectedPhotoIds.size.toString()
                     }
+                    menu?.let { menu ->
+                        state.currentAlbum?.let { album ->
+                            val photos = state.albums.getAlbumPhotos(album)
+                            menu.findItem(R.id.action_menu_sort_by)?.isVisible =
+                                photos.isNotEmpty()
+                        }
+                    }
                 }
             }
         }
@@ -116,8 +144,15 @@ class AlbumDynamicContentFragment : Fragment() {
             (configuration.screenWidthDp.dp - 1.dp) / 3
         }
 
-        val photos = remember(uiState.albums) {
-            uiState.albums.getAlbumPhotos(uiState.currentAlbum!!)
+        val photos = remember(uiState.albums, uiState.currentSort) {
+            uiState.currentAlbum?.let { album ->
+                val sourcePhotos = uiState.albums.getAlbumPhotos(album)
+                if (uiState.currentSort == Sort.NEWEST) {
+                    sourcePhotos.sortedByDescending { it.modificationTime }
+                } else {
+                    sourcePhotos.sortedBy { it.modificationTime }
+                }
+            } ?: emptyList()
         }
 
         if (photos.isNotEmpty()) {
@@ -130,7 +165,22 @@ class AlbumDynamicContentFragment : Fragment() {
                 selectedPhotoIds = uiState.selectedPhotoIds
             )
         } else {
-            EmptyView()
+            when (uiState.currentAlbum) {
+                Album.FavouriteAlbum -> EmptyView()
+                Album.GifAlbum -> Back()
+                Album.RawAlbum -> Back()
+                is Album.UserAlbum -> Back()
+                null -> Back()
+            }
+        }
+    }
+
+    @Composable
+    private fun Back() {
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        LaunchedEffect(key1 = true) {
+            onBackPressedDispatcher?.onBackPressed()
         }
     }
 
@@ -140,7 +190,6 @@ class AlbumDynamicContentFragment : Fragment() {
                 albumsViewModel.state.value.albums.getAlbumPhotos(album).map { photo ->
                     photo.id
                 }
-
 
             val intent = ImageViewerActivity.getIntentForChildren(
                 requireContext(),
@@ -154,7 +203,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     fun onClick(photo: Photo) {
-        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
             openPhoto(photo)
         } else {
             if (actionMode != null) {
@@ -181,7 +230,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleActionMode(photo: Photo) {
-        if (albumsViewModel.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
             if (actionMode == null) {
                 enterActionMode()
             }
@@ -191,9 +240,46 @@ class AlbumDynamicContentFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        albumsViewModel.setCurrentAlbum(null)
-        super.onDestroy()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_album_content_toolbar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+        this.menu = menu
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        albumsViewModel.state.value.currentAlbum?.let { album ->
+            val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
+            menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_menu_sort_by -> {
+                showSortByDialog(
+                    context = managerActivity,
+                    checkedItem = albumsViewModel.state.value.currentSort.ordinal,
+                    onClickListener = { _, i ->
+                        albumsViewModel.setCurrentSort(Sort.values()[i])
+                    },
+                )
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    /**
+     * Get current page title
+     */
+    fun getCurrentAlbumTitle(): String {
+        val currentAlbum = albumsViewModel.state.value.currentAlbum
+        val currentUIAlbum =
+            albumsViewModel.state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+        return if (context != null && currentUIAlbum != null) {
+            currentUIAlbum.title(requireContext())
+        } else {
+            getString(R.string.tab_title_album)
+        }
+    }
 }

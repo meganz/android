@@ -15,14 +15,13 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.TwoLineCheckPreference
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityActivity
@@ -30,6 +29,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
@@ -73,7 +74,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         savedInstanceState: Bundle?,
     ): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
-        setOnlineOptions(Util.isOnline(context) && megaApi.rootNode != null)
+        setOnlineOptions(viewModel.isConnected && megaApi.rootNode != null)
         return v
     }
 
@@ -163,6 +164,10 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                         state.imageQuality?.title?.let { StringResourcesUtils.getString(it) }
                 }
             }
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.monitorConnectivityEvent) { isConnected ->
+            setOnlineOptions(isConnected)
         }
     }
 

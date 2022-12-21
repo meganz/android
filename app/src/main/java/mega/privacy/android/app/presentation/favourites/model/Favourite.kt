@@ -2,11 +2,13 @@ package mega.privacy.android.app.presentation.favourites.model
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
 
 /**
  * The favourite interface
- * @property handle handle
+ * @property nodeId handle
  * @property isFolder current item whether is folder
  * @property icon icon drawable resource id
  * @property name name
@@ -26,7 +28,7 @@ import nz.mega.sdk.MegaNode
  * @property thumbnailPath thumbnail file path
  */
 sealed interface Favourite {
-    val handle: Long
+    val nodeId: NodeId
     val isFolder: Boolean
 
     @get:DrawableRes
@@ -48,4 +50,12 @@ sealed interface Favourite {
     val isAvailableOffline: Boolean
     val isSelected: Boolean
     val thumbnailPath: String?
+
+    /**
+     * Get comparable field
+     *
+     * @param order
+     * @return the field used by the specific sort order
+     */
+    fun getComparableField(order: FavouriteSortOrder): Comparable<*>
 }

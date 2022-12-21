@@ -1072,7 +1072,7 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message">Acest mesaj a fost șters</string>
     <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message_by">[A]Acest mesaj a fost șters de către [/A][B]%1$s[/B]</string>
+    <string name="text_deleted_message_by">[A]Acest mesaj a fost șters de [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
     <string name="confirmation_delete_several_messages">Elimini mesajele?</string>
     <!-- Confirmation before deleting one message -->
@@ -1102,7 +1102,7 @@
     <!-- Option in menu to change title of a chat group. -->
     <string name="change_title_option">Schimbă titlul</string>
     <!-- confirmation message before leaving a group chat -->
-    <string name="confirmation_leave_group_chat">Dacă părăsești chatul de grup, nu vei mai avea acces de a citi sau a scrie mesaje.</string>
+    <string name="confirmation_leave_group_chat">Dacă părăsești chatul de grup, nu vei mai avea acces să citești sau să scrii mesaje.</string>
     <!-- title confirmation message before leaving a group chat -->
     <string name="title_confirmation_leave_group_chat">Părăsești chatul de grup?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1134,15 +1134,15 @@
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Sigur vrei să te deconectezi din contul actual?</string>
     <!-- Text shown when a message has been deleted in the chat -->
-    <string name="non_format_text_deleted_message_by">Acest mesaj a fost șters de către %1$s</string>
+    <string name="non_format_text_deleted_message_by">Acest mesaj a fost șters de %1$s</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
     <string name="history_cleared_message">Istoricul chatului a fost șters</string>
     <!-- Text shown when the chat history was cleared by someone -->
-    <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de către %1$s</string>
+    <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de %1$s</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%1$s a fost adăugat în acest chat de grup prin invitație de la %2$s</string>
     <!-- chat message when a participant was removed from a group chat -->
-    <string name="non_format_message_remove_participant">%1$s a fost eliminat din chatul de grup de către %2$s</string>
+    <string name="non_format_message_remove_participant">%1$s a fost eliminat din chatul de grup de %2$s</string>
     <!-- Message shown when a participant change the title of a group chat. -->
     <string name="non_format_change_title_messages">%1$s a schimbat numele chatului de grup în „%2$s”</string>
     <!-- chat message when a participant left a group chat -->
@@ -1214,7 +1214,7 @@
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_subtitle">Menține înfățișarea statusului meu ales chiar dacă nu am dispozitive conectate</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
-    <string name="title_dialog_set_autoaway_value">Setează limită de timp</string>
+    <string name="title_dialog_set_autoaway_value">Setează o limită de timp</string>
     <!-- Button to set a value -->
     <string name="button_set">Setează</string>
     <!-- Button to set a value -->
@@ -1742,8 +1742,6 @@
     <string name="pass_strong">Puternică</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Apel în desfășurare</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Atinge pentru a întoarce la apel</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Revino la apel</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2374,7 +2372,7 @@
     <!-- Subtitle of the historic notification for contact request accepted -->
     <string name="subtitle_outgoing_contact_request_accepted">[A]%s [/A][B]ți-a acceptat cererea de contact.[/B]</string>
     <!-- Subtitle of the historic notification for deleted shared folders (one or many) -->
-    <string name="notification_deleted_shared_folder">[B]Accesul la folderele partajate de către [/B][A]%s[/A][B] a fost eliminat.[/B]</string>
+    <string name="notification_deleted_shared_folder">[B]Accesul la folderele partajate de [/B][A]%s[/A][B] a fost eliminat.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
     <string name="notification_left_shared_folder">[A]%s[/A][B] a părăsit un folder partajat.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known -->
@@ -2414,7 +2412,7 @@
     <!-- Option in Settings section to enable the last active connection in chat -->
     <string name="option_enable_last_green_chat">Afișează văzut(ă) ultima dată&#8230;</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Permite contactelor tale să vadă ultima dată când ai activ pe MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Permite contactelor tale să vadă ultima dată când ai fost activ(ă) pe MEGA.</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Spațiu de stocare insuficient</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
@@ -2846,9 +2844,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">A apărut o problemă cu ultima plată. Te rugăm să accesezi MEGA folosind un browser desktop pentru mai multe informații.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">Cont dezactivat</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure. You won’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3505,8 +3503,6 @@
     <string name="change_meeting_name">Modifică numele întâlnirii</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link al întâlnirii</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Durată</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Alătură-te întâlnirii ca invitat</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3594,7 +3590,7 @@
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">Fingerprint ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
-    <string name="title_enable_fingerprint">Confirm your fingerprint to unlock</string>
+    <string name="title_enable_fingerprint">Confirmă amprenta pentru a debloca</string>
     <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
     <string name="title_unlock_fingerprint">Deblochează folosind amprenta</string>
     <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
@@ -3602,7 +3598,7 @@
     <!-- Message informing the fingerprint was enabled successfully -->
     <string name="confirmation_fingerprint_enabled">Amprenta ta este confirmată</string>
     <!-- Warning indicating an image (GIF) cannot be inserted in an input text. Same string than the one shown by the system when it detects this behaviour on its own. -->
-    <string name="image_insertion_not_allowed">MEGA does not support image insertion here</string>
+    <string name="image_insertion_not_allowed">MEGA nu suportă inserarea de imagini aici</string>
     <!-- The label under the button of viewing all images screen -->
     <string name="section_images">Imagini</string>
     <!-- Title of the dialog warning the user about disable file versioning. -->
@@ -3610,15 +3606,15 @@
     <!-- Warning of the dialog informing the user about disable file versioning. -->
     <string name="disable_versioning_warning">Funcția noastră de versionare a fișierelor ne asigură că păstrăm copiile mai vechi ale fișierelor tale dacă le înlocuiești cu versiuni mai noi. Dacă dezactivezi versionarea fișierelor, nu vei mai avea această protecție; copia veche se va pierde atunci când o înlocuiești.</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
-    <string name="location_not_exist">This location no longer exists.</string>
+    <string name="location_not_exist">Această locație nu mai există.</string>
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
-    <string name="contact_already_invited">You have already invited %1$s</string>
+    <string name="contact_already_invited">Ai invitat deja pe %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <string name="contact_invited">Invitație trimisă cu succes. Vezi cererile trimise.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Fișier disponibil offline</string>
     <!-- Message when file removed from offline. -->
-    <string name="file_removed_offline">File removed from Offline</string>
+    <string name="file_removed_offline">Fișier eliminat din Offline</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Deschide un link</string>
     <!-- error message shown when a chat link is not well formed. -->
@@ -3685,8 +3681,6 @@
     <string name="payment_methods">Metode de plată</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Continuă</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Îți mulțumim pentru abonamentul %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">lunar Pro&#160;Lite</string>
     <!-- Pro Lite yearly subscription -->
@@ -3952,7 +3946,7 @@
     <!-- Title of the scan option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_scan_option">Scanează</string>
     <!-- Title of the voice clip option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_voice_clip_option">Voice clip</string>
+    <string name="chat_room_toolbar_voice_clip_option">Clip vocal</string>
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
@@ -4000,7 +3994,7 @@
         <item quantity="other">%1$d de fișiere</item>
     </plurals>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
-    <string name="account_upgrade_storage_label">[A]%1$s[/A] storage</string>
+    <string name="account_upgrade_storage_label">[A]%1$s[/A] spațiu de stocare</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
     <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] transfer</string>
     <!-- Label of storage in My account section. -->
@@ -4020,21 +4014,21 @@
         <item quantity="other">Participanți: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
-    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] was changed to read-only by [/B][A]%2$s[/A]</string>
+    <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] a fost schimbat(ă) în numai citire de [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to standard -->
     <string name="chat_chat_room_message_permissions_changed_to_standard">[A]%1$s[/A][B] was changed to standard role by [/B][A]%2$s[/A]</string>
     <!-- Chat log message when the permissions for a user has been changed to host -->
     <string name="chat_chat_room_message_permissions_changed_to_host">[A]%1$s[/A][B] was changed to host role by [/B][A]%2$s[/A]</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to read-only -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s was changed to read-only by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_read_only">%1$s a fost schimbat(ă) în numai citire de %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to standard -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s was changed to standard role by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_standard">%1$s a fost schimbat(ă) într-un rol standard de %2$s</string>
     <!-- Last chat log message in chats list when the permissions for a user has been changed to host -->
-    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s was changed to host role by %2$s</string>
+    <string name="chat_chats_list_last_message_permissions_changed_to_host">%1$s a fost schimbat(ă) în rol de gazdă de %2$s</string>
     <!-- Label to indicate you have started a meeting or a group call and are waiting for others to join in -->
     <string name="calls_call_screen_waiting_for_participants">Se așteaptă ca alții să se alăture</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="homepage_empty_hint_favourites">[B]Niciun[/B] [A]favorit[/A] [B]găsit[/B]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
     <string name="meetings_list_empty_action">Începe o întâlnire</string>
     <!--Description text from Meeting screen empty view-->
@@ -4052,7 +4046,7 @@
     <!-- Label for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications">Notificări sonore</string>
     <!-- Text for the sound notifications option on calls settings -->
-    <string name="settings_calls_preferences_sound_notifications_text">Hear a sound when someone joins or leaves a call.</string>
+    <string name="settings_calls_preferences_sound_notifications_text">Auzi un sunet când cineva se alătură sau părăsește un apel.</string>
     <!-- Not now button for request contact access message box -->
     <string name="chat_recent_chat_not_now_btn">Nu acum</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
@@ -4082,13 +4076,13 @@
     <!-- Title of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_title">Primește notificări</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_description">MEGA will send you call, chat, and file transfer notifications.</string>
+    <string name="permissions_notifications_description">MEGA îți va trimite notificări cu privire la apeluri, chaturi și transferuri de fișiere.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
     <string name="home_side_menu_backups_title">Backupuri</string>
     <!-- Title of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_title">[B]No items in [/B][A]backups[/A]</string>
+    <string name="backups_empty_state_title">[B]Niciun felement în [/B][A]backupuri[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Aici sunt stocate fișierele și folderele păstrate ca backup. Elementele păstrate ca backup sunt de tip „numai citire” pentru a le proteja împotriva modificării accidentale în unitatea cloud.Poți face backupuri ale elementelor de pe calculator pe MEGA folosind aplicația noastră desktop.</string>
+    <string name="backups_empty_state_body">Aici sunt stocate fișierele și folderele pentru care s-a făcut backup. Elementele pentru care s-a făcut backup sunt de tip „numai citire” pentru a le proteja împotriva modificării accidentale în unitatea cloud.\nPoți face backupuri ale elementelor de pe calculator pe MEGA folosind aplicația noastră desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Account suspended due to copyright violations. We sent you an email with more information about this.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4136,5 +4130,62 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria dispozitivului</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Data reînnoirii:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Informații de plată</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Planul pentru calitatea de membru Pro expiră în curând</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Your payment for the %1$s plan was received.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Your payment for the %1$s plan was unsuccessful.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Your Pro membership plan will expire in 1 day.</item>
+        <item quantity="other">Your Pro membership plan will expire in %1$d days.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Your Pro membership plan expired 1 day ago.</item>
+        <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Întâlniri din trecut</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Întâlnire periodică</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

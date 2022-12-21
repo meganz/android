@@ -1,8 +1,12 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.CameraUploadMedia
+import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import java.util.Queue
 
 /**
  * Camera Upload Repository
@@ -333,6 +337,23 @@ interface CameraUploadRepository {
     suspend fun getChargingOnSize(): Int
 
     /**
+     * Get the media queue for a given media type
+     *
+     * @param mediaStoreFileType different media store file type
+     * @param parentPath local path of camera upload
+     * @param isVideo if media is video
+     * @param selectionQuery db query
+     *
+     * @return queue of camera upload media
+     */
+    suspend fun getMediaQueue(
+        mediaStoreFileType: MediaStoreFileType,
+        parentPath: String?,
+        isVideo: Boolean,
+        selectionQuery: String?,
+    ): Queue<CameraUploadMedia>
+
+    /**
      * Update sync record status by local path
      *
      * @return
@@ -382,4 +403,14 @@ interface CameraUploadRepository {
      * Delete all Secondary Sync Records
      */
     suspend fun deleteAllSecondarySyncRecords()
+
+    /**
+     * monitor upload service pause State
+     */
+    fun monitorCameraUploadPauseState(): Flow<Boolean>
+
+    /**
+     * Broadcast upload pause state
+     */
+    suspend fun broadcastUploadPauseState()
 }

@@ -2,15 +2,16 @@ package mega.privacy.android.app.di.recent
 
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.data.repository.RecentActionsRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
-import mega.privacy.android.app.domain.usecase.DefaultUpdateRecentAction
+import mega.privacy.android.app.domain.usecase.DefaultIsPendingShare
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
-import mega.privacy.android.app.domain.usecase.GetRecentActions
-import mega.privacy.android.app.domain.usecase.UpdateRecentAction
+import mega.privacy.android.app.domain.usecase.IsPendingShare
+import mega.privacy.android.domain.usecase.DefaultGetRecentActions
+import mega.privacy.android.domain.usecase.DefaultUpdateRecentAction
+import mega.privacy.android.domain.usecase.GetRecentActions
+import mega.privacy.android.domain.usecase.UpdateRecentAction
 
 /**
  * Recent use case module
@@ -37,12 +38,19 @@ abstract class RecentUseCase {
     @Binds
     abstract fun bindGetNodes(useCase: DefaultGetRecentActionNodes): GetRecentActionNodes
 
-    companion object {
-        /**
-         * Provide [GetRecentActions]
-         */
-        @Provides
-        fun provideRecentActions(recentActionsRepository: RecentActionsRepository): GetRecentActions =
-            GetRecentActions(recentActionsRepository::getRecentActions)
-    }
+    /**
+     * Provide [IsPendingShare] implementation
+     *
+     * @param useCase
+     */
+    @Binds
+    abstract fun bindIsPendingShare(useCase: DefaultIsPendingShare): IsPendingShare
+
+    /**
+     * Provide [GetRecentActions] implementation
+     *
+     * @param useCase
+     */
+    @Binds
+    abstract fun bindGetRecentActions(useCase: DefaultGetRecentActions): GetRecentActions
 }

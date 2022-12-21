@@ -6,13 +6,10 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
 import mega.privacy.android.app.listeners.GlobalListener
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -39,13 +36,6 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         fun megaApi(): MegaApiAndroid
 
         /**
-         * App scope
-         *
-         */
-        @ApplicationScope
-        fun appScope(): CoroutineScope
-
-        /**
          * Global listener
          *
          */
@@ -67,31 +57,29 @@ class SetupMegaApiInitializer : Initializer<Unit> {
             EntryPointAccessors.fromApplication(context,
                 SetupMegaApiInitializerEntryPoint::class.java)
         with(entryPoint) {
-            appScope().launch {
-                megaApi().apply {
-                    Timber.d("ADD REQUEST LISTENER")
-                    retrySSLerrors(true)
-                    downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-                    uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
-                    addRequestListener(entryPoint.requestListener())
-                    addGlobalListener(entryPoint.globalListener())
-                }
-                setSDKLanguage(megaApi())
+            megaApi().apply {
+                Timber.d("ADD REQUEST LISTENER")
+                retrySSLerrors(true)
+                downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
+                uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
+                addRequestListener(entryPoint.requestListener())
+                addGlobalListener(entryPoint.globalListener())
+            }
+            setSDKLanguage(megaApi())
 
-                // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
-                val desirableRLimit = 20000 // SDK team recommended value
-                val currentLimit = megaApi().platformGetRLimitNumFile()
-                Timber.d("Current resource limit is set to %s", currentLimit)
-                if (currentLimit < desirableRLimit) {
-                    Timber.d("Resource limit is under desirable value. Trying to increase the resource limit...")
-                    if (!megaApi().platformSetRLimitNumFile(desirableRLimit)) {
-                        Timber.w("Error setting resource limit.")
-                    }
-
-                    // Check new resource limit after set it in order to see if had been set successfully to the
-                    // desired value or maybe to a lower value limited by the system.
-                    Timber.d("Resource limit is set to ${megaApi().platformGetRLimitNumFile()}")
+            // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+            val desirableRLimit = 20000 // SDK team recommended value
+            val currentLimit = megaApi().platformGetRLimitNumFile()
+            Timber.d("Current resource limit is set to %s", currentLimit)
+            if (currentLimit < desirableRLimit) {
+                Timber.d("Resource limit is under desirable value. Trying to increase the resource limit...")
+                if (!megaApi().platformSetRLimitNumFile(desirableRLimit)) {
+                    Timber.w("Error setting resource limit.")
                 }
+
+                // Check new resource limit after set it in order to see if had been set successfully to the
+                // desired value or maybe to a lower value limited by the system.
+                Timber.d("Resource limit is set to ${megaApi().platformGetRLimitNumFile()}")
             }
         }
     }

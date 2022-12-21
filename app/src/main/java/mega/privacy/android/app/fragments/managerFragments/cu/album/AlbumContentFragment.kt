@@ -53,7 +53,6 @@ import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -70,11 +69,6 @@ class AlbumContentFragment : Fragment(), GestureScaleListener.GestureScaleCallba
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    /**
-     * Sort order Int Mapper
-     */
-    @Inject
-    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     private lateinit var mManagerActivity: ManagerActivity
 
@@ -427,7 +421,7 @@ class AlbumContentFragment : Fragment(), GestureScaleListener.GestureScaleCallba
                         ImageViewerActivity.getIntentForParentNode(
                             requireContext(),
                             parentNodeHandle,
-                            sortOrderIntMapper(getOrder()),
+                            getOrder(),
                             nodeHandle
                         )
                     }

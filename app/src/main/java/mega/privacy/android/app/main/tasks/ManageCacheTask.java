@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.utils.Util;
 import timber.log.Timber;
 
 /**
@@ -29,7 +30,7 @@ public class ManageCacheTask extends AsyncTask<String, Void, String> {
             clearCache(MegaApplication.getInstance());
         }
 
-        return getCacheSize(MegaApplication.getInstance());
+        return Util.getSizeString(getCacheSize());
     }
 
     @Override

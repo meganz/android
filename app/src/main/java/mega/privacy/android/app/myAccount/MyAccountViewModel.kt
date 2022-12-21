@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
+import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
@@ -294,7 +295,7 @@ class MyAccountViewModel @Inject constructor(
 
     fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
 
-    fun isBusinessAccount(): Boolean = megaApi.isBusinessAccount
+    fun isBusinessAccount(): Boolean = megaApi.isBusinessAccount && getAccountType() == BUSINESS
 
     fun getMasterKey(): String = megaApi.exportMasterKey()
 
@@ -480,7 +481,7 @@ class MyAccountViewModel @Inject constructor(
     private fun isBusinessPaymentAttentionNeeded(): Boolean {
         val status = megaApi.businessStatus
 
-        return megaApi.isBusinessAccount && megaApi.isMasterBusinessAccount
+        return isBusinessAccount() && megaApi.isMasterBusinessAccount
                 && (status == MegaApiJava.BUSINESS_STATUS_EXPIRED
                 || status == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD)
     }

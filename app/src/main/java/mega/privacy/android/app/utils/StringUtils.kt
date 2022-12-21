@@ -32,16 +32,6 @@ object StringUtils {
             .replace("[/$tag]", "</font>")
 
     /**
-     * Decode the Base64-encoded data into a new formatted String
-     */
-    fun String.decodeBase64(): String =
-        try {
-            Base64.decode(this.trim(), Base64.DEFAULT).toString(Charsets.UTF_8)
-        } catch (ignore: IllegalArgumentException) {
-            Base64.decode(this.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
-        }
-
-    /**
      * Encode String to Base64
      */
     fun String.encodeBase64(): String =

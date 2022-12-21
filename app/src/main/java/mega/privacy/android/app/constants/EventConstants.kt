@@ -7,7 +7,6 @@ object EventConstants {
     const val EVENT_USER_NAME_UPDATED = "EVENT_USER_NAME_UPDATED"
     const val EVENT_USER_EMAIL_UPDATED = "EVENT_USER_EMAIL_UPDATED"
 
-    const val EVENT_NETWORK_CHANGE = "network_change"
     const val EVENT_CHAT_TITLE_CHANGE = "chat_title_change"
     const val EVENT_CONTACT_NAME_CHANGE = "contact_name_change"
     const val EVENT_MEETING_AVATAR_CHANGE = "meeting_avatar_change"
@@ -53,8 +52,6 @@ object EventConstants {
     const val EVENT_UPDATE_SCROLL = "EVENT_UPDATE_SCROLL"
     const val EVENT_PERFORM_SCROLL = "EVENT_PERFORM_SCROLL"
     const val EVENT_REFRESH_PHONE_NUMBER = "EVENT_REFRESH_PHONE_NUMBER"
-    const val EVENT_2FA_UPDATED = "EVENT_2FA_UPDATED"
-    const val EVENT_UPDATE_START_SCREEN = "EVENT_UPDATE_START_SCREEN"
 
     const val EVENT_UPDATE_VIEW_MODE = "EVENT_UPDATE_VIEW_MODE"
     const val EVENT_SHOW_MEDIA_DISCOVERY = "EVENT_SHOW_MEDIA_DISCOVERY"

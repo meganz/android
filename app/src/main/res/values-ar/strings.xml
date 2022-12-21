@@ -1853,8 +1853,6 @@
     <string name="pass_strong">قوية</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">المكالمة قيد التنفيذ</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">انقر للعودة إلى المكالمة</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">الرجوع إلى المكالمة</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -3065,9 +3063,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">حدثت مشكلة في الدفعة الأخيرة. يرجى الوصول إلى ميغا MEGA باستخدام متصفح سطح المكتب لمزيد من المعلومات.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">الحساب غير مفعل</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">تم إلغاء تفعيل حساب الأعمال Business الخاص بك بسبب فشل الدفع. لن تتمكن من الوصول إلى البيانات المخزنة في حسابك. للقيام بالدفع وإعادة تفعيل اشتراكك، قم بتسجيل الدخول إلى ميغا MEGA من المتصفح.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">حسابك [B]معلق[/B] حالياً. يمكنك فقط تصفح بياناتك.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3799,8 +3797,6 @@
     <string name="change_meeting_name">تغيير اسم الاجتماع</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">رابط الاجتماع</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">مدة</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">انضم إلى الاجتماع كضيف</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3979,8 +3975,6 @@
     <string name="payment_methods">طرق الدفع</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">تابع</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">شكرا لاشتراكك في %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">برو لايت Pro&#160;Lite شهرياً</string>
     <!-- Pro Lite yearly subscription -->
@@ -4418,21 +4412,21 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">جدول اجتماع</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Thank you for your Pro&#160;Lite monthly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">شكراً لاشتراكك الشهري في برو لايت Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Thank you for your Pro&#160;Lite yearly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">شكراً لاشتراكك السنوي في برو لايت Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Thank you for your Pro&#160;I monthly subscription</string>
+    <string name="upgrade_account_successful_pro_1_monthly">شكراً لاشتراكك الشهري في برو Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Thank you for your Pro&#160;I yearly subscription</string>
+    <string name="upgrade_account_successful_pro_1_yearly">شكراً لاشتراكك السنوي في برو Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Thank you for your Pro&#160;II monthly subscription</string>
+    <string name="upgrade_account_successful_pro_2_monthly">شكراً لاشتراكك الشهري في برو Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Thank you for your Pro&#160;II yearly subscription</string>
+    <string name="upgrade_account_successful_pro_2_yearly">شكراً لاشتراكك السنوي في برو Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Thank you for your Pro&#160;III monthly subscription</string>
+    <string name="upgrade_account_successful_pro_3_monthly">شكراً لاشتراكك الشهري في برو Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
-    <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
+    <string name="upgrade_account_successful_pro_3_yearly">شكراً لاشتراكك السنوي في برو Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">السماح لغير المضيفين بإضافة مشاركين</string>
     <!-- Title of gif album. -->
@@ -4448,5 +4442,62 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">لقد أضفت بالفعل جميع جهات اتصالك إلى هذه المحادثة. إذا كنت ترغب في إضافة المزيد من المشاركين، قم أولاً بدعوتهم إلى قائمة جهات الاتصال الخاصة بك.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">تم حفظ الصورة في معرض جهازك</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]تاريخ التجديد:[/A][B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">أدخل اسم الألبوم</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">ألبوم جديد</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">مشاركة رابط الاجتماع</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">شاهد المزيد</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">مغادرة المجموعة</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">معلومات الدفع</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">ستنتهي صلاحية اشتراك برو Pro الخاص بك قريباً</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Your payment for the %1$s plan was received.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Your payment for the %1$s plan was unsuccessful.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Your Pro membership plan will expire in 1 day.</item>
+        <item quantity="other">Your Pro membership plan will expire in %1$d days.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Your Pro membership plan expired 1 day ago.</item>
+        <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">الاجتماعات السابقة</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">اجتماع متكرر</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

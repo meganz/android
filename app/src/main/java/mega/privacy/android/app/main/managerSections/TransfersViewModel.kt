@@ -78,19 +78,29 @@ class TransfersViewModel @Inject constructor(
      */
     fun setActiveTransfers(transfersInProgress: List<Int>) =
         viewModelScope.launch(ioDispatcher) {
-            activeTransfers.clear()
-            activeTransfers.addAll(
-                transfersInProgress.map { tag ->
-                    megaApiGateway.getTransfersByTag(tag)
-                }.filter { transfer ->
-                    transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
-                }.filterNotNull()
-            )
-            activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
-                t1.priority.compareTo(t2.priority)
-            }
-            _activeState.update {
-                ActiveTransfersState.TransfersUpdated(activeTransfers)
+            kotlin.runCatching {
+                activeTransfers.clear()
+                activeTransfers.addAll(
+                    transfersInProgress.map { tag ->
+                        megaApiGateway.getTransfersByTag(tag)
+                    }.filter { transfer ->
+                        transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
+                    }.filterNotNull()
+                )
+                activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
+                    t1.priority.compareTo(t2.priority)
+                }
+                _activeState.update {
+                    ActiveTransfersState.TransfersUpdated(activeTransfers)
+                }
+            }.onFailure { exception ->
+                if (exception is ConcurrentModificationException) {
+                    Timber.e("Exception setting transfers: ${exception.message}")
+                } else {
+                    Timber.e(exception.message)
+                }
+            }.onSuccess {
+                Timber.d("Active transfers correctly set.")
             }
         }
 
@@ -230,7 +240,7 @@ class TransfersViewModel @Inject constructor(
             transfer.tag == tag
         }
         if (index != INVALID_POSITION) {
-            megaApiGateway.getTransfersByTag(index)?.let { transfer ->
+            megaApiGateway.getTransfersByTag(tag)?.let { transfer ->
                 Timber.d("The transfer with index : $index has been paused/resumed, left: ${activeTransfers.size}")
                 _activeState.update {
                     ActiveTransfersState.TransferChangeStatusUpdated(index, transfer)
@@ -285,17 +295,27 @@ class TransfersViewModel @Inject constructor(
                 }
 
             }
-            val index = completedTransfers.indexOfFirst { completedTransfer ->
-                completedTransfer?.let {
-                    areTheSameTransfer(transfer, it)
-                } ?: false
-            }
-            if (index != INVALID_POSITION) {
-                completedTransfers.removeAt(index)
-                _completedState.update {
-                    CompletedTransfersState.TransferRemovedUpdated(index,
-                        completedTransfers.toList())
+            kotlin.runCatching {
+                val index = completedTransfers.indexOfFirst { completedTransfer ->
+                    completedTransfer?.let {
+                        areTheSameTransfer(transfer, it)
+                    } ?: false
                 }
+                if (index != INVALID_POSITION) {
+                    completedTransfers.removeAt(index)
+                    _completedState.update {
+                        CompletedTransfersState.TransferRemovedUpdated(index,
+                            completedTransfers.toList())
+                    }
+                }
+            }.onFailure { exception ->
+                if (exception is ConcurrentModificationException) {
+                    Timber.e("Exception removing completed transfer: ${exception.message}")
+                } else {
+                    Timber.e(exception.message)
+                }
+            }.onSuccess {
+                Timber.d("Completed transfer correctly removed.")
             }
         }
 

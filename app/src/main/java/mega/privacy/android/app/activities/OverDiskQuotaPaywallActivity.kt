@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.core.text.HtmlCompat
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -18,12 +19,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
+import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
@@ -37,6 +37,8 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
     @Inject
     lateinit var getUserDataUseCase: GetUserDataUseCase
+
+    private val viewModel: OverDiskQuotaPaywallViewModel by viewModels()
 
     private var timer: CountDownTimer? = null
 
@@ -59,10 +61,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         registerReceiver(updateUserDataReceiver,
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
 
-        // Request storage details only if is not already requested recently
-        if (callToAccountDetails()) {
-            megaApi.getSpecificAccountDetails(true, false, false)
-        }
+        viewModel.requestStorageDetailIfNeeded()
 
         getUserDataUseCase.get()
             .subscribeOn(Schedulers.io())

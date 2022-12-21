@@ -14,13 +14,13 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.timeline.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.photos.Photo

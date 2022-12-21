@@ -29,18 +29,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
-import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -49,7 +50,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity
-import mega.privacy.android.app.main.LoginFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.middlelayer.iab.BillingManager
@@ -83,6 +83,7 @@ import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
+import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -108,7 +109,6 @@ import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
-import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
@@ -125,8 +125,10 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
+import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -180,6 +182,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     @Inject
     lateinit var loggingSettings: LegacyLoggingSettings
 
+    @Inject
+    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
+
     @JvmField
     var composite = CompositeDisposable()
 
@@ -215,7 +220,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * True if is a business account and is expired.
      */
     protected val isBusinessExpired: Boolean
-        get() = megaApi.isBusinessAccount && megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
+        get() = megaApi.isBusinessAccount &&
+                myAccountInfo.accountType == BUSINESS &&
+                megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED
 
     /**
      * Get snackbar instance
@@ -910,9 +917,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
-        if (DBUtil.callToAccountDetails()) {
-            Timber.d("megaApi.getAccountDetails SEND")
-            app?.askForAccountDetails()
+        lifecycleScope.launch {
+            if (isDatabaseEntryStale()) {
+                Timber.d("megaApi.getAccountDetails SEND")
+                app?.askForAccountDetails()
+            }
         }
     }
 
@@ -1014,7 +1023,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 Timber.d("Show SMS verification activity.")
                 intent = Intent(applicationContext, SMSVerificationActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra(LoginFragment.NAME_USER_LOCKED, true)
+                intent.putExtra(NAME_USER_LOCKED, true)
                 startActivity(intent)
             }
             WEAK_PROTECTION_ACCOUNT_BLOCK -> {
@@ -1115,10 +1124,14 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     /**
      * Launches an intent to navigate to Login screen.
      */
-    protected fun navigateToLogin() {
+    protected fun navigateToLogin(isNewTask: Boolean = false) {
         val intent = Intent(this, LoginActivity::class.java)
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        if (isNewTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        } else {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
         startActivity(intent)
     }
 
@@ -1211,6 +1224,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         requestPermission(this, requestCode, *permissions)
     }
 
+    @SuppressWarnings("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
         if (requestCode == RequestCode.REQ_CODE_BUY) {
@@ -1514,6 +1528,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         private const val UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN"
         private const val EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED"
         private const val PURCHASE_TYPE = "PURCHASE_TYPE"
+
+        /**
+         * User account locked.
+         */
+        const val NAME_USER_LOCKED = "NAME_USER_LOCKED"
 
         /**
          * Method to display a simple Snackbar.

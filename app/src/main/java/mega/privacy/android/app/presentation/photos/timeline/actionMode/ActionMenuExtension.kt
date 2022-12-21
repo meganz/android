@@ -22,7 +22,7 @@ fun PhotosFragment.actionSaveToDevice() {
 
 fun PhotosFragment.actionShareLink() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
-        addAll(timelineViewModel.getSelectedId())
+        addAll(timelineViewModel.getSelectedIds())
     }
     try {
         LinksUtil.showGetLinkActivity(managerActivity, selectedPhotosIds.toLongArray())
@@ -57,7 +57,7 @@ fun PhotosFragment.actionClearSelection() {
 
 fun PhotosFragment.actionMove() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
-        addAll(timelineViewModel.getSelectedId())
+        addAll(timelineViewModel.getSelectedIds())
     }
     NodeController(managerActivity).chooseLocationToMoveNodes(selectedPhotosIds)
 }
@@ -65,7 +65,7 @@ fun PhotosFragment.actionMove() {
 
 fun PhotosFragment.actionCopy() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
-        addAll(timelineViewModel.getSelectedId())
+        addAll(timelineViewModel.getSelectedIds())
     }
     NodeController(managerActivity).chooseLocationToCopyNodes(selectedPhotosIds)
 }
@@ -73,7 +73,7 @@ fun PhotosFragment.actionCopy() {
 
 fun PhotosFragment.actionMoveToTrash() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
-        addAll(timelineViewModel.getSelectedId())
+        addAll(timelineViewModel.getSelectedIds())
     }
     managerActivity.askConfirmationMoveToRubbish(
         selectedPhotosIds

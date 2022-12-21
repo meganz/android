@@ -42,7 +42,7 @@ class ImageViewerPageFragment : Fragment() {
 
     companion object {
         private const val EXTRA_ENABLE_ZOOM = "EXTRA_ENABLE_ZOOM"
-        private const val ZOOM_MAX_SCALE_FACTOR = 6f
+        private const val ZOOM_MAX_SCALE_FACTOR = 20f
 
         /**
          * Main method to create a ImageViewerPageFragment.
@@ -87,6 +87,7 @@ class ImageViewerPageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+        viewModel.startSlideshow()
     }
 
     override fun onResume() {
@@ -169,6 +170,9 @@ class ImageViewerPageFragment : Fragment() {
                 }
             }
 
+            imageResult.getProgressPercentage()?.let {
+                binding.progress.progress = it
+            }
             if (imageResult.isFullyLoaded) binding.progress.hide()
         }
 

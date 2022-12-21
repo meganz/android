@@ -21,6 +21,7 @@ import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
 import android.provider.Settings.System.getUriFor
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
@@ -41,6 +42,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
+import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -53,7 +55,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -1327,6 +1328,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             throwable.message?.run {
                 showSnackbar(this)
             }
+        }
+    }
+
+    /**
+     * Show the customized snackbar for video player because video player always shows dark mode.
+     *
+     * @param message the message that will be shown
+     */
+    fun showSnackbarForVideoPlayer(message: String) {
+        Snackbar.make(binding.rootLayout, message, Snackbar.LENGTH_LONG).let { snackbar ->
+            with(snackbar.view as Snackbar.SnackbarLayout) {
+                setBackgroundColor(getColor(R.color.white))
+                findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    .setTextColor(getColor(R.color.dark_grey))
+            }
+            snackbar.show()
         }
     }
 

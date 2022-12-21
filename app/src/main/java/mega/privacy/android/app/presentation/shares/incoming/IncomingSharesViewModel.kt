@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -33,7 +32,6 @@ class IncomingSharesViewModel @Inject constructor(
     private val getIncomingSharesChildrenNode: GetIncomingSharesChildrenNode,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
@@ -55,10 +53,10 @@ class IncomingSharesViewModel @Inject constructor(
                 // check if the current user still has access to it,
                 // if not redirect to root incoming shares
                 list
-                    .filter { it.isInShare }
-                    .singleOrNull { it.handle == _state.value.incomingHandle }
+                    .filter { it.isIncomingShare }
+                    .singleOrNull { it.id.id == _state.value.incomingHandle }
                     ?.let { node ->
-                        (getNodeByHandle(node.handle) ?: authorizeNode(node.handle))
+                        (getNodeByHandle(node.id.id) ?: authorizeNode(node.id.id))
                             .takeIf { it == null }
                             .let {
                                 resetIncomingTreeDepth()
@@ -117,8 +115,8 @@ class IncomingSharesViewModel @Inject constructor(
                 incomingTreeDepth = depth,
                 incomingHandle = handle,
                 incomingParentHandle = getParentNodeHandle(handle),
-                sortOrder = if (depth == 0) sortOrderIntMapper(getOthersSortOrder()) else sortOrderIntMapper(
-                    getCloudSortOrder())
+                sortOrder = if (depth == 0) getOthersSortOrder() else
+                    getCloudSortOrder()
             )
         }
 
@@ -138,7 +136,7 @@ class IncomingSharesViewModel @Inject constructor(
                     isInvalidHandle = true,
                     isLoading = false,
                     incomingParentHandle = null,
-                    sortOrder = sortOrderIntMapper(getOthersSortOrder())
+                    sortOrder = getOthersSortOrder()
                 )
             }
         }

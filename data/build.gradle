@@ -8,6 +8,18 @@ plugins {
 apply plugin: 'jacoco'
 apply from: "$project.rootDir/tools/jacoco.gradle"
 
+/**
+ * Check whether we should use prebuilt SDK or local sdk module
+ *
+ * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
+ */
+boolean shouldUsePrebuiltSdk() {
+    return false
+    //FIXME uncomment this method once prebuilt sdk feature is ready
+    /*String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
+    return usePrebuiltSdk == null || usePrebuiltSdk != "false"*/
+}
+
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVerion
@@ -20,17 +32,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs += '../sdk/src/main/jni/mega/sdk/bindings/java'
-                srcDirs += '../sdk/src/main/jni/megachat/sdk/bindings/java'
-
-                exclude '**/MegaApiSwing.java'
-            }
-        }
     }
 
     compileOptions {
@@ -70,7 +71,14 @@ android {
 
 dependencies {
     implementation project(':domain')
-    implementation project(':sdk')
+
+    if (shouldUsePrebuiltSdk()) {
+        println("[data] use remote pre-built SDK")
+        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
+    } else {
+        println("[data] use local SDK")
+        implementation project(':sdk')
+    }
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "com.google.code.gson:gson:$gsonVersion"
@@ -78,7 +86,7 @@ dependencies {
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     implementation "com.google.dagger:hilt-android:$hiltVersion"
-    implementation 'androidx.exifinterface:exifinterface:1.3.0'
+    implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
     implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
@@ -111,3 +119,4 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
 }
+

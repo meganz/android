@@ -26,6 +26,10 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSet
+import nz.mega.sdk.MegaSetElement
+import nz.mega.sdk.MegaSetElementList
+import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -48,13 +52,9 @@ internal class MegaApiFacade @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
 
-    override fun getInvalidHandle(): Long {
-        return MegaApiAndroid.INVALID_HANDLE
-    }
+    override fun getInvalidHandle(): Long = MegaApiAndroid.INVALID_HANDLE
 
-    override fun multiFactorAuthAvailable(): Boolean {
-        return megaApi.multiFactorAuthAvailable()
-    }
+    override fun multiFactorAuthAvailable(): Boolean = megaApi.multiFactorAuthAvailable()
 
     override fun multiFactorAuthEnabled(email: String?, listener: MegaRequestListenerInterface?) {
         megaApi.multiFactorAuthCheck(email, listener)
@@ -146,6 +146,17 @@ internal class MegaApiFacade @Inject constructor(
 
             override fun onEvent(api: MegaApiJava?, event: MegaEvent?) {
                 trySend(GlobalUpdate.OnEvent(event))
+            }
+
+            override fun onSetsUpdate(api: MegaApiJava?, sets: java.util.ArrayList<MegaSet>?) {
+                trySend(GlobalUpdate.OnSetsUpdate(sets))
+            }
+
+            override fun onSetElementsUpdate(
+                api: MegaApiJava?,
+                elements: java.util.ArrayList<MegaSetElement>?,
+            ) {
+                trySend(GlobalUpdate.OnSetElementsUpdate(elements))
             }
         }
 
@@ -389,6 +400,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
 
+    override suspend fun getChildren(parent: MegaNode, order: Int): List<MegaNode> =
+        megaApi.getChildren(parent, order)
+
     override suspend fun moveTransferToLast(
         transfer: MegaTransfer,
         listener: MegaRequestListenerInterface,
@@ -440,8 +454,14 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getUserAttribute(user, type, listener)
 
-    override suspend fun getRecentActions(): List<MegaRecentActionBucket> =
-        megaApi.recentActions
+    override fun getRecentActionsAsync(
+        days: Long,
+        maxNodes: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getRecentActionsAsync(days, maxNodes, listener)
+
+    override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
+        megaApi.copyBucket(bucket)
 
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)
@@ -468,8 +488,49 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getUserAttribute(
         attributeIdentifier: Int,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
+
+    override suspend fun isAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
+
+    override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
+        megaApi.getAccountAchievements(listener)
+
+    override suspend fun authorizeNode(node: MegaNode): MegaNode? = megaApi.authorizeNode(node)
+
+    override suspend fun httpServerGetLocalLink(node: MegaNode): String? =
+        megaApi.httpServerGetLocalLink(node)
+
+    override suspend fun httpServerIsRunning() = megaApi.httpServerIsRunning()
+
+    override suspend fun httpServerStart() = megaApi.httpServerStart()
+
+    override suspend fun httpServerStop() = megaApi.httpServerStop()
+
+    override suspend fun httpServerSetMaxBufferSize(bufferSize: Int) =
+        megaApi.httpServerSetMaxBufferSize(bufferSize)
+
+    override suspend fun getPublicLinks(order: Int): List<MegaNode> = megaApi.getPublicLinks(order)
+
+    override suspend fun getInShares(order: Int): List<MegaNode> = megaApi.getInShares(order)
+
+    override suspend fun getInShares(user: MegaUser): List<MegaNode> = megaApi.getInShares(user)
+
+    override suspend fun getOutShares(order: Int): List<MegaShare> = megaApi.getOutShares(order)
+
+    override suspend fun getRubbishNode(): MegaNode = megaApi.rubbishNode
+
+    override fun createSet(name: String, listener: MegaRequestListenerInterface) =
+        megaApi.createSet(name, listener)
+
+    override suspend fun createSetElement(sid: Long, node: Long) =
+        megaApi.createSetElement(sid, node)
+
+    override suspend fun getSets(): MegaSetList = megaApi.sets
+
+    override suspend fun getSet(sid: Long): MegaSet? = megaApi.getSet(sid)
+
+    override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
 }

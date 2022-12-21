@@ -70,9 +70,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
@@ -89,8 +87,8 @@ import mega.privacy.android.app.main.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
+import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -100,6 +98,9 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -208,7 +209,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         private void bind() {
             binding.setSortByHeaderViewModel(sortByViewModel);
 
-            int orderType = sortByViewModel.getOrder().getFirst();
+            SortOrder orderType = sortByViewModel.getOrder().getFirst();
 
             // Root of incoming shares tab, display sort options OTHERS
             if (type == INCOMING_SHARES_ADAPTER
@@ -342,7 +343,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         } else {
             Timber.d("Adapter type is GRID");
-            MegaNode node = (MegaNode) getItem(pos);
+            MegaNode node = getItem(pos);
             boolean isFile = false;
             if (node != null) {
                 if (node.isFolder()) {
@@ -807,7 +808,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position) {
         Timber.d("Position: %s", position);
-        MegaNode node = (MegaNode) getItem(position);
+        MegaNode node = getItem(position);
         //Placeholder for folder when folder count is odd.
         if (node == null) {
             holder.folderLayout.setVisibility(View.INVISIBLE);
@@ -959,7 +960,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void onBindViewHolderList(ViewHolderBrowserList holder, int position) {
         Timber.d("Position: %s", position);
 
-        MegaNode node = (MegaNode) getItem(position);
+        MegaNode node = getItem(position);
         if (node == null) {
             return;
         }
@@ -1185,7 +1186,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 : adapterType;
     }
 
-    public Object getItem(int position) {
+    public MegaNode getItem(int position) {
         if (nodes != null) {
             return nodes.get(position);
         }
@@ -1220,7 +1221,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
 
-        final MegaNode n = (MegaNode) getItem(currentPosition);
+        final MegaNode n = getItem(currentPosition);
         if (n == null) {
             return;
         }
@@ -1260,7 +1261,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (type == RUBBISH_BIN_ADAPTER) {
             ((RubbishBinFragment) fragment).itemClick(currentPosition);
         } else if (type == INBOX_ADAPTER) {
-            ((InboxFragment) fragment).itemClick(currentPosition);
+            ((InboxFragment) fragment).onNodeSelected(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
             ((IncomingSharesFragment) fragment).itemClick(currentPosition);
         } else if (type == OUTGOING_SHARES_ADAPTER) {
@@ -1291,7 +1292,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             if (type == RUBBISH_BIN_ADAPTER) {
                 ((RubbishBinFragment) fragment).itemClick(currentPosition);
             } else if (type == INBOX_ADAPTER) {
-                ((InboxFragment) fragment).itemClick(currentPosition);
+                ((InboxFragment) fragment).onNodeSelected(currentPosition);
             } else if (type == INCOMING_SHARES_ADAPTER) {
                 ((IncomingSharesFragment) fragment).itemClick(currentPosition);
             } else if (type == OUTGOING_SHARES_ADAPTER) {
@@ -1338,7 +1339,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             ((RubbishBinFragment) fragment).itemClick(currentPosition);
         } else if (type == INBOX_ADAPTER) {
             ((InboxFragment) fragment).activateActionMode();
-            ((InboxFragment) fragment).itemClick(currentPosition);
+            ((InboxFragment) fragment).onNodeSelected(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
             ((IncomingSharesFragment) fragment).activateActionMode();
             ((IncomingSharesFragment) fragment).itemClick(currentPosition);

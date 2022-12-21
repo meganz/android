@@ -1,27 +1,13 @@
 package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
 import kotlinx.coroutines.flow.update
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 
 fun TimelineViewModel.updateZoomLevel(newZoomLevel: ZoomLevel) {
     _state.update {
         it.copy(currentZoomLevel = newZoomLevel)
-    }
-}
-
-fun TimelineViewModel.updateSelectedTimeBarState(
-    selectedTimeBarTab: TimeBarTab,
-    startIndex: Int = 0,
-    startOffset: Int = 0,
-) {
-    _state.update {
-        it.copy(
-            selectedTimeBarTab = selectedTimeBarTab,
-            scrollStartIndex = startIndex,
-            scrollStartOffset = startOffset
-        )
     }
 }
 

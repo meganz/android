@@ -45,7 +45,6 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
@@ -85,7 +84,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
@@ -94,9 +92,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
         const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
     }
-
-    @Inject
-    lateinit var sortOrderManagement: SortOrderManagement
 
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
@@ -194,7 +189,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         viewModel.setDisplayParam(
             args.rootFolderOnly, isList(),
             if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
-            sortOrderManagement.getOrderCloud()
+            sortByHeaderViewModel.cloudSortOrder.value
         )
     }
 

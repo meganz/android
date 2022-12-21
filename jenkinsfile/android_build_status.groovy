@@ -34,6 +34,11 @@ DATA_COVERAGE = ""
 COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
 
+/**
+ * common.groovy file with common methods
+ */
+def common
+
 HTML_INDENT = "-- "
 /**
  * Decide whether we should skip the current build. If MR title starts with "Draft:"
@@ -144,7 +149,7 @@ pipeline {
         ANDROID_HOME = "/opt/buildtools/android-sdk"
 
         // PATH for necessary commands
-        PATH = "/opt/buildtools/android-sdk/cmake/3.10.2.4988404/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:$PATH"
+        PATH = "/opt/buildtools/android-sdk/cmake/3.22.1/bin:/Applications/MEGAcmd.app/Contents/MacOS:/opt/buildtools/zulu11.52.13-ca-jdk11.0.13-macosx/bin:/opt/brew/bin:/opt/brew/opt/gnu-sed/libexec/gnubin:/opt/brew/opt/gnu-tar/libexec/gnubin:/opt/buildtools/android-sdk/platform-tools:/opt/buildtools/android-sdk/build-tools/30.0.3:$PATH"
 
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
@@ -179,21 +184,21 @@ pipeline {
                     if (BUILD_STEP == "Unit Test") {
                         def appUnitTestSummary = unitTestSummaryWithArchiveLink(
                                 "app/build/test-results/testGmsDebugUnitTest",
-                                "app/build/reports",
+                                "app/build/reports/tests/testGmsDebugUnitTest",
                                 APP_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>App Unit Test: ${appUnitTestSummary}"
 
                         def domainUnitTestSummary = unitTestSummaryWithArchiveLink(
                                 "domain/build/test-results/test",
-                                "domain/build/reports",
+                                "domain/build/reports/tests/test",
                                 DOMAIN_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
 
                         def dataUnitTestSummary = unitTestSummaryWithArchiveLink(
                                 "data/build/test-results/testDebugUnitTest",
-                                "data/build/reports",
+                                "data/build/reports/tests/testDebugUnitTest",
                                 DATA_UNIT_TEST_REPORT_ARCHIVE
                         )
                         unitTestResult += "<br>Data Unit Test: ${dataUnitTestSummary}"
@@ -270,6 +275,16 @@ pipeline {
         }
     }
     stages {
+        stage('Load Common Script') {
+            steps {
+                script {
+                    BUILD_STEP = 'Preparation'
+
+                    common = load('jenkinsfile/common.groovy')
+                    common.helloWorld()
+                }
+            }
+        }
         stage('Preparation') {
             when {
                 expression { (!shouldSkipBuild()) }
@@ -302,27 +317,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = "Fetch SDK Submodules"
-                }
 
-                gitlabCommitStatus(name: 'Fetch SDK Submodules') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            sh '''
-                            cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                            git submodule sync
-                            git submodule update --init --recursive --remote 
-                            cd sdk/src/main/jni/mega/sdk
-                            git fetch
-                            cd ../../megachat/sdk
-                            git fetch
-                            cd ${WORKSPACE}
-                        '''
-                        }
-                    }
+                    common.fetchSdkSubmodules()
                 }
             }
         }
@@ -472,9 +468,9 @@ pipeline {
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
                         DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports", "app_unit_test_result.zip")
-                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports", "domain_unit_test_result.zip")
-                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports", "data_unit_test_result.zip")
+                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
                     }
                 }
             }
@@ -526,6 +522,7 @@ pipeline {
                 }
 
                 gitlabCommitStatus(name: 'Lint Check') {
+                    sh "mv custom_lint.xml lint.xml"
                     sh "./gradlew lint"
 
                     script {
@@ -611,7 +608,7 @@ String getBuildWarnings() {
         String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("gmsBuildWarnings = $gmsBuildWarnings")
         if (!gmsBuildWarnings.isEmpty()) {
-            result = "<br/><b>:warning: GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(gmsBuildWarnings)
+            result = "<details><summary>:warning: GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(gmsBuildWarnings) + "</details>"
         }
     }
 
@@ -619,7 +616,7 @@ String getBuildWarnings() {
         String hmsBuildWarnings = sh(script: "cat ${HMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("hmsBuildWarnings = $hmsBuildWarnings")
         if (!hmsBuildWarnings.isEmpty()) {
-            result += "<br/><b>:warning: HMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(hmsBuildWarnings)
+            result += "<details><summary>:warning: HMS Build Warnings :warning:</summary>" + wrapBuildWarnings(hmsBuildWarnings) + "</details>"
         }
     }
 
@@ -627,7 +624,7 @@ String getBuildWarnings() {
         String qaBuildWarnings = sh(script: "cat ${QA_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
         println("qaGmsBuildWarnings = $qaBuildWarnings")
         if (!qaBuildWarnings.isEmpty()) {
-            result += "<br/><b>:warning: QA GMS Build Warnings :warning:</b><br/>" + wrapBuildWarnings(qaBuildWarnings)
+            result += "<details><summary>:warning: QA GMS Build Warnings :warning:</summary>" + wrapBuildWarnings(qaBuildWarnings) + "</details>"
         }
     }
 
@@ -722,7 +719,10 @@ def archiveUnitTestReport(String reportPath, String targetFileName) {
     if (fileExists(WORKSPACE + "/" + reportPath)) {
         sh """
             cd ${WORKSPACE}
-            zip -r ${targetFileName} ${reportPath}/* 
+            cd ${reportPath}
+            zip -r ${targetFileName} * 
+            cd ${WORKSPACE}
+            cp ${reportPath}/${targetFileName} ${targetFileName}
         """
         return true
     } else {

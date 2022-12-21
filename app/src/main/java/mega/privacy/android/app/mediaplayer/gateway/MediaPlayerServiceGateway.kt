@@ -2,7 +2,7 @@ package mega.privacy.android.app.mediaplayer.gateway
 
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -85,6 +85,13 @@ interface MediaPlayerServiceGateway {
     fun getCurrentMediaItem(): MediaItem?
 
     /**
+     * Get current playing position
+     *
+     * @return current playing position
+     */
+    fun getCurrentPlayingPosition(): Long
+
+    /**
      * Set repeat mode for video
      *
      * @param repeatToggleMode RepeatToggleMode
@@ -102,7 +109,7 @@ interface MediaPlayerServiceGateway {
      * @param showShuffleButton showShuffleButton
      */
     fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         useController: Boolean = true,
         controllerShowTimeoutMs: Int = 0,
         controllerHideOnTouch: Boolean = false,

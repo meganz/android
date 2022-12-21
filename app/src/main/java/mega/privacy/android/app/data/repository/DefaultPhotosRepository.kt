@@ -8,23 +8,33 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.app.presentation.favourites.facade.DateUtilWrapper
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.MegaNodeUtil.getPreviewFileName
 import mega.privacy.android.app.utils.MegaNodeUtil.getThumbnailFileName
+import mega.privacy.android.app.utils.MegaNodeUtil.isImage
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.domain.entity.GifFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -51,6 +61,7 @@ class DefaultPhotosRepository @Inject constructor(
     private val videoMapper: VideoMapper,
     private val nodeUpdateMapper: NodeUpdateMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PhotosRepository {
 
     private var thumbnailFolderPath: String? = null
@@ -85,10 +96,41 @@ class DefaultPhotosRepository @Inject constructor(
             }
 
     override suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
-        val images = async { mapMegaNodesToImages(searchImages()) }
-        val videos = async { mapMegaNodesToVideos(searchVideos()) }
+        val images = async { mapPhotoNodesToImages(searchImages()) }
+        val videos = async { mapPhotoNodesToVideos(searchVideos()) }
         images.await() + videos.await()
     }
+
+    override suspend fun getPhotoFromNodeID(nodeId: NodeId): Photo? = withContext(ioDispatcher) {
+        megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.id)
+            ?.let { megaNode ->
+                megaNode to fileTypeInfoMapper(megaNode)
+            }?.let { (megaNode, fileType) ->
+                when (fileType) {
+                    is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
+                        mapMegaNodeToImage(megaNode)
+                    }
+                    is VideoFileTypeInfo -> {
+                        mapMegaNodeToVideo(megaNode)
+                    }
+                    else -> {
+                        null
+                    }
+                }
+            }
+    }
+
+    override suspend fun getPhotosByFolderId(id: Long, order: SortOrder): List<Photo> =
+        withContext(ioDispatcher) {
+            val parent = megaApiFacade.getMegaNodeByHandle(id)
+            parent?.let { parentNode ->
+                val megaNodes = megaApiFacade.getChildren(
+                    parent = parentNode,
+                    order = sortOrderIntMapper(order),
+                )
+                mapMegaNodesToPhotos(megaNodes)
+            } ?: emptyList()
+        }
 
     private suspend fun searchImages(): List<MegaNode> = withContext(ioDispatcher) {
         val token = MegaCancelToken.createInstance()
@@ -123,11 +165,26 @@ class DefaultPhotosRepository @Inject constructor(
     }
 
     /**
-     * Convert the MegaNode list to Image list
-     * @param megaNodes List<MegaNode>
+     * Map megaNodes to Photos.
+     */
+    private suspend fun mapMegaNodesToPhotos(megaNodes: List<MegaNode>): List<Photo> {
+        return megaNodes.filter {
+            (it.isImage() || it.isVideo()) && !megaApiFacade.isInRubbish(it)
+        }.map { megaNode ->
+            if (megaNode.isImage()) {
+                mapMegaNodeToImage(megaNode)
+            } else {
+                mapMegaNodeToVideo(megaNode)
+            }
+        }
+    }
+
+    /**
+     * Convert the Photos MegaNode list to Image list
+     * @param megaNodes List<MegaNode> of Photo
      * @return List<Photo> / Images
      */
-    private suspend fun mapMegaNodesToImages(megaNodes: List<MegaNode>): List<Photo> {
+    private suspend fun mapPhotoNodesToImages(megaNodes: List<MegaNode>): List<Photo> {
         return megaNodes.filter {
             !megaApiFacade.isInRubbish(it)
         }.map { megaNode ->
@@ -136,11 +193,11 @@ class DefaultPhotosRepository @Inject constructor(
     }
 
     /**
-     * Convert the MegaNode list to Video list
-     * @param megaNodes List<MegaNode>
+     * Convert the Photos MegaNode list to Video list
+     * @param megaNodes List<MegaNode> of Photo
      * @return List<Photo> / Videos
      */
-    private suspend fun mapMegaNodesToVideos(megaNodes: List<MegaNode>): List<Photo> {
+    private suspend fun mapPhotoNodesToVideos(megaNodes: List<MegaNode>): List<Photo> {
         return megaNodes.filter {
             !megaApiFacade.isInRubbish(it)
         }.map { megaNode ->

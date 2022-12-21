@@ -18,14 +18,11 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -35,7 +32,6 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
@@ -45,8 +41,6 @@ import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
-import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,38 +53,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     MediaPlayerServiceGateway {
 
     /**
-     * MegaApiAndroid for megaApi
-     */
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    /**
-     * MegaApiAndroid for megaApiFolder
-     */
-    @MegaApiFolder
-    @Inject
-    lateinit var megaApiFolder: MegaApiAndroid
-
-    /**
-     * DatabaseHandler
-     */
-    @Inject
-    lateinit var dbHandler: DatabaseHandler
-
-    /**
-     * GetOfflineThumbnailFileWrapper
-     */
-    @Inject
-    lateinit var offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper
-
-    /**
-     * GetGlobalTransferUseCase
-     */
-    @Inject
-    lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
-
-    /**
      * MediaPlayerGateway
      */
     abstract var mediaPlayerGateway: MediaPlayerGateway
@@ -98,6 +60,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     /**
      * ServiceViewModelGateway
      */
+    @Inject
     lateinit var viewModelGateway: PlayerServiceViewModelGateway
 
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
@@ -135,27 +98,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
         }
 
-    private val positionUpdateHandler = Handler()
-    private val positionUpdateRunnable = object : Runnable {
-        override fun run() {
-            val currentPosition = mediaPlayerGateway.getCurrentPosition()
-            // Up the frequency of refresh, keeping in sync with Exoplayer.
-            positionUpdateHandler.postDelayed(this, 500)
-            viewModelGateway.setCurrentPosition(currentPosition)
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
-
-        viewModelGateway = MediaPlayerServiceViewModel(
-            context = this,
-            megaApi = megaApi,
-            megaApiFolder = megaApiFolder,
-            dbHandler = dbHandler,
-            offlineThumbnailFileWrapper = offlineThumbnailFileWrapper,
-            getGlobalTransferUseCase = getGlobalTransferUseCase
-        )
 
         viewModelGateway.setAudioPlayer(this is AudioPlayerService)
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
@@ -195,14 +139,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                     }
                 }
 
-                override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
-                    if (isPlaying) {
-                        positionUpdateHandler.post(positionUpdateRunnable)
-                    } else {
-                        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
-                    }
-                }
-
                 override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
                     setShuffleEnabled(shuffleModeEnabled)
 
@@ -220,23 +156,22 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 }
 
                 override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
-                    setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPosition())
+                    setPaused(!playWhenReady, mediaPlayerGateway.getCurrentPlayingPosition())
                 }
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
                     when {
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
-                            setPaused(true, mediaPlayerGateway.getCurrentPosition())
+                            setPaused(true, mediaPlayerGateway.getCurrentPlayingPosition())
                         }
                         state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
-                            setPaused(false, mediaPlayerGateway.getCurrentPosition())
+                            setPaused(false, mediaPlayerGateway.getCurrentPlayingPosition())
                         }
                     }
                 }
 
                 override fun onPlayerErrorCallback() {
                     onPlayerError()
-                    positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
                 }
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
@@ -317,10 +252,11 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 if (MediaPlayerActivity.isAudioPlayer(intent)) {
                     createPlayerControlNotification()
                 }
-
-                if (viewModelGateway.buildPlayerSource(intent)) {
-                    if (viewModelGateway.isAudioPlayer()) {
-                        MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                lifecycleScope.launch {
+                    if (viewModelGateway.buildPlayerSource(intent)) {
+                        if (viewModelGateway.isAudioPlayer()) {
+                            MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                        }
                     }
                 }
             }
@@ -390,7 +326,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         super.onDestroy()
         viewModelGateway.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
-        positionUpdateHandler.removeCallbacks(positionUpdateRunnable)
 
         if (audioManager != null) {
             abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
@@ -450,7 +385,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     /**
      * Service is moved to foreground
      */
-    fun onMoveToForeground() {
+    private fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
             setPlayWhenReady(true)
             needPlayWhenGoForeground = false
@@ -483,10 +418,12 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun getCurrentMediaItem() = mediaPlayerGateway.getCurrentMediaItem()
 
+    override fun getCurrentPlayingPosition() = mediaPlayerGateway.getCurrentPlayingPosition()
+
     override fun getPlaybackState() = mediaPlayerGateway.getPlaybackState()
 
     override fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,

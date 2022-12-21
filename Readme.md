@@ -95,6 +95,18 @@ Before running the SDK building script, install the required packages. For examp
 
 `sudo apt install build-essential swig automake libtool autoconf cmake ninja-build`
 
+**ATTENTION:** After upgrading ExoPlayer to 2.18.1, we need to use CMake version 3.22.1
+
+Then install CMake version 3.22.1 in `Android Studio > Tools > SDK Manager > SDK Tools > CMake`.
+
+After installation, add below line in `~/.bashrc`
+
+`export PATH="/home/$USER/Android/Sdk/cmake/3.22.1/bin:$PATH"`
+
+You will need to source your `~/.bashrc` or logout/login (or restart the terminal) for the changes to take effect. To source your `~/.bashrc`, simply type:
+
+`source ~/.bashrc`
+
 #### 7.2 MacOS
 
 Before running the SDK building script, install the required dependencies via HomeBrew:
@@ -103,7 +115,7 @@ Except below tools, please do not use HomeBrew to install other tools, according
 
 `brew install bash gnu-sed gnu-tar autoconf automake cmake coreutils libtool swig wget xz python3`
 
-Then reboot MacOS - to ensure newly installed latest bash(v5.x) overrides default v3.x in PATH
+Then reboot MacOS - to ensure newly installed latest bash (v5.x) overrides default v3.x in PATH
 
 Then edit PATH env (Please make sure the gnu paths are setup in front of $PATH):
 
@@ -119,17 +131,19 @@ Then edit PATH env (Please make sure the gnu paths are setup in front of $PATH):
 
 `ln -s /opt/homebrew/bin/python3 /opt/homebrew/bin/python`
 
-Then install CMake version 3.10.2 in `Android Studio > Tools > SDK Manager > SDK Tools > CMake.`
+**ATTENTION:** After upgrading ExoPlayer to 2.18.1, we need to use CMake version 3.22.1
+
+Then install CMake version 3.22.1 in `Android Studio > Tools > SDK Manager > SDK Tools > CMake`.
 
 You have to tick checkbox 'Show Package Details' to display this specific version. After installation, add below line in  `~/.zshrc`
 
-`export PATH="/Users/**<USER_NAME>**/Library/Android/sdk/cmake/3.10.2.4988404/bin:$PATH"`
-
-**ATTENTION: After upgrading ExoPlayer to 2.16, build will FAIL with the latest CMake version 3.22.x or version 3.18.1. So we rollback to an older version 3.10 as a workaround.**
+`export PATH="/Users/<USER_NAME>/Library/Android/sdk/cmake/3.22.1/bin:$PATH"`
 
 ### 8. Running the Build Script
 
-Build SDK by running `./build.sh all` at `sdk/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
+Build SDK by running `./build.sh all` at `sdk/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration.
+
+**IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
 
 In case of an error (seen in the log file mentioned) due to licenses not accepted, you can read and accept the licenses with the sdkmanager command-line tool (if you downloaded them)
 
@@ -151,10 +165,10 @@ Open the project with Android Studio, let it build the project and hit _*Run*_.
 2. Go to the SDK Tools tab
 3. Check the "Show package details" box
 4. Expand the CMake section in the list
-5. Select 3.10.2.4988404
+5. Select 3.22.1
 6. Click "OK"
 7. Add the following to your PATH:
-    `export PATH="/Users/{USERNAME}/Library/Android/sdk/cmake/3.10.2.4988404/bin:$PATH"`
+    `export PATH="/Users/{USERNAME}/Library/Android/sdk/cmake/3.22.1/bin:$PATH"`
 8. Retry the build
 
 ### Notice

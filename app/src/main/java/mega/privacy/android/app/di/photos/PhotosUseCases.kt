@@ -7,7 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.DefaultCreateAlbum
 import mega.privacy.android.domain.usecase.DefaultDownloadPreview
 import mega.privacy.android.domain.usecase.DefaultDownloadThumbnail
 import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
@@ -18,9 +21,11 @@ import mega.privacy.android.domain.usecase.DefaultFilterGIF
 import mega.privacy.android.domain.usecase.DefaultFilterRAW
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.DefaultGetPhotosByFolderId
 import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
+import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
@@ -32,9 +37,11 @@ import mega.privacy.android.domain.usecase.FilterGIF
 import mega.privacy.android.domain.usecase.FilterRAW
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 
@@ -86,6 +93,15 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetDefaultAlbumsMap(useCase: DefaultGetDefaultAlbumsMap): GetDefaultAlbumsMap
+
+    @Binds
+    abstract fun bindGetTypedNodesFromFolder(useCase: DefaultGetTypedNodesFromFolder): GetTypedNodesFromFolder
+
+    @Binds
+    abstract fun bindGetPhotosByFolderId(useCase: DefaultGetPhotosByFolderId): GetPhotosByFolderId
+
+    @Binds
+    abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
 
     companion object {
         @Provides

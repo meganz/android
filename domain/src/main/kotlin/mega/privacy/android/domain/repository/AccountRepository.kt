@@ -3,6 +3,8 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SubscriptionPlan
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -18,11 +20,10 @@ interface AccountRepository {
     suspend fun getUserAccount(): UserAccount
 
     /**
-     * Is account data stale
+     * Storage capacity used is blank
      *
-     * @return true if account data is stale. else false
      */
-    fun isAccountDataStale(): Boolean
+    fun storageCapacityUsedIsBlank(): Boolean
 
     /**
      * Request account
@@ -49,13 +50,6 @@ interface AccountRepository {
      */
     @Throws(MegaException::class)
     suspend fun isMultiFactorAuthEnabled(): Boolean
-
-    /**
-     * Monitor multi factor auth changes
-     *
-     * @return a flow that emits changes to the multi-factor auth enabled state
-     */
-    fun monitorMultiFactorAuthChanges(): Flow<Boolean>
 
     /**
      * Request delete account link
@@ -91,7 +85,7 @@ interface AccountRepository {
      *
      * @param disconnect True if should disconnect megaChatApi, false otherwise.
      */
-    fun retryPendingConnections(disconnect: Boolean)
+    suspend fun retryPendingConnections(disconnect: Boolean)
 
     /**
      * Checks whether the user's Business Account is currently active or not
@@ -107,4 +101,26 @@ interface AccountRepository {
      * @return List of SubscriptionPlans
      */
     suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+
+    /**
+     * Returns if accounts achievements enabled
+     */
+    suspend fun isAccountAchievementsEnabled(): Boolean
+
+    /**
+     * Get account achievements
+     *
+     * @return MegaAchievement
+     */
+    suspend fun getAccountAchievements(
+        achievementType: AchievementType,
+        awardIndex: Long,
+    ): MegaAchievement
+
+    /**
+     * Get account details time stamp
+     *
+     * @return the latest account detail time stamp
+     */
+    suspend fun getAccountDetailsTimeStampInSeconds(): String?
 }

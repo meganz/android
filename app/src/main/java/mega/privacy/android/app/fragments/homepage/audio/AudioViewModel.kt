@@ -11,7 +11,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
@@ -21,6 +20,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -32,15 +32,14 @@ import javax.inject.Inject
  *
  * @param repository
  * @param getCloudSortOrder
- * @param sortOrderIntMapper
  * @param monitorNodeUpdates
  */
 @HiltViewModel
 class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel(), SearchCallback.Data {
 
     private var _query = MutableLiveData<String>()
@@ -65,15 +64,23 @@ class AudioViewModel @Inject constructor(
      */
     private var sortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC
 
+    /**
+     * Is network connected
+     */
+    val isConnected: Boolean
+        get() = monitorConnectivity().value
+
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate || repository.fileNodeItems.value == null) {
             viewModelScope.launch {
                 cancelToken = initNewSearch()
-                repository.getFiles(
-                    cancelToken!!,
-                    MegaApiJava.FILE_TYPE_AUDIO,
-                    sortOrderIntMapper(sortOrder),
-                )
+                cancelToken?.let {
+                    repository.getFiles(
+                        it,
+                        MegaApiJava.FILE_TYPE_AUDIO,
+                        sortOrder,
+                    )
+                }
             }
         } else {
             repository.emitFiles()
@@ -121,7 +128,7 @@ class AudioViewModel @Inject constructor(
     }
 
     init {
-        fetchOrderAndLoadAudio(true)
+        fetchOrderAndLoadAudio()
 
         items.observeForever(loadFinishedObserver)
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
@@ -136,22 +143,17 @@ class AudioViewModel @Inject constructor(
     }
 
     /**
-     * Fetch latest order & load audio
-     * @param forceUpdate
+     * On SortOrder change
      */
-    private fun fetchOrderAndLoadAudio(forceUpdate: Boolean) {
-        viewModelScope.launch {
-            sortOrder = getCloudSortOrder()
-            loadAudio(forceUpdate)
-        }
+    fun onOrderChange() {
+        fetchOrderAndLoadAudio()
     }
 
-    /**
-     * On SortOrder change
-     * @param forceUpdate
-     */
-    fun onOrderChange(forceUpdate: Boolean) {
-        fetchOrderAndLoadAudio(forceUpdate)
+    private fun fetchOrderAndLoadAudio() {
+        viewModelScope.launch {
+            sortOrder = getCloudSortOrder()
+            loadAudio(true)
+        }
     }
 
     /**

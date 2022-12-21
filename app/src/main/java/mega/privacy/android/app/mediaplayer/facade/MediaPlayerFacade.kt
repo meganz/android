@@ -18,7 +18,7 @@ import com.google.android.exoplayer2.Player.STATE_IDLE
 import com.google.android.exoplayer2.source.ShuffleOrder
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
@@ -76,11 +76,6 @@ class MediaPlayerFacade @Inject constructor(
                             isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED)
                     }
 
-                    override fun onIsPlayingChanged(isPlaying: Boolean) {
-                        super.onIsPlayingChanged(isPlaying)
-                        mediaPlayerCallback.onIsPlayingChangedCallback(isPlaying)
-                    }
-
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                         mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleModeEnabled)
                     }
@@ -111,7 +106,7 @@ class MediaPlayerFacade @Inject constructor(
                     }
                 })
                 addAnalyticsListener(object :
-                    EventLogger(trackSelector, "MediaPlayer") {
+                    EventLogger("MediaPlayer") {
                     override fun logd(msg: String) {
                         Timber.d(msg)
                     }
@@ -209,7 +204,7 @@ class MediaPlayerFacade @Inject constructor(
         exoPlayer.setShuffleOrder(newShuffleOrder)
     }
 
-    override fun getCurrentPosition(): Long = exoPlayer.currentPosition
+    override fun getCurrentPlayingPosition(): Long = exoPlayer.currentPosition
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
         player.playWhenReady = playWhenReady
@@ -300,7 +295,7 @@ class MediaPlayerFacade @Inject constructor(
     override fun getPlaybackState() = player.playbackState
 
     override fun setupPlayerView(
-        playerView: PlayerView,
+        playerView: StyledPlayerView,
         useController: Boolean,
         controllerShowTimeoutMs: Int,
         controllerHideOnTouch: Boolean,

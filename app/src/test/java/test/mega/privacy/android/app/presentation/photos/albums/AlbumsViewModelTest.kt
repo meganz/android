@@ -8,21 +8,25 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
-import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.toUIAlbum
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
+import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import org.junit.After
 import org.junit.Before
@@ -32,41 +36,38 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
     private lateinit var underTest: AlbumsViewModel
 
     private val getDefaultAlbumPhotos = mock<GetDefaultAlbumPhotos>()
-    private val uiAlbumMapper = mock<UIAlbumMapper>()
+    private val uiAlbumMapper = ::toUIAlbum
+    private val getUserAlbums = mock<GetUserAlbums>()
+    private val getAlbumPhotos = mock<GetAlbumPhotos>()
     private val getFeatureFlag =
         mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
+    private val createAlbum = mock<CreateAlbum>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
 
-        whenever(uiAlbumMapper(any(), any())).thenAnswer {
-            val photos = it.arguments[0] as List<Photo>
-            UIAlbum(
-                id = it.arguments[1] as Album,
-                title = { _ -> "" },
-                count = photos.size,
-                coverPhoto = photos.maxByOrNull { it.modificationTime },
-                photos = photos
-            )
-        }
-
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
             getDefaultAlbumsMap = getDefaultAlbumsMap,
+            getUserAlbums = getUserAlbums,
+            getAlbumPhotos = getAlbumPhotos,
             uiAlbumMapper = uiAlbumMapper,
             getFeatureFlag = getFeatureFlag,
             removeFavourites = removeFavourites,
-            getNodeListByIds = getNodeListByIds
+            getNodeListByIds = getNodeListByIds,
+            createAlbum = createAlbum,
+            defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
@@ -186,6 +187,53 @@ class AlbumsViewModelTest {
         }
     }
 
+    @Test
+    fun `test that user albums collect is working and the sorting order is correct`() = runTest {
+        whenever(getUserAlbums()).thenReturn(flowOf(listOf(
+            createUserAlbum(id = AlbumId(1L), title = "Album 1", modificationTime = 100L),
+            createUserAlbum(id = AlbumId(2L), title = "Album 2", modificationTime = 200L),
+            createUserAlbum(id = AlbumId(3L), title = "Album 3", modificationTime = 300L),
+        )))
+        whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
+
+        val expectedUserAlbums = listOf(
+            createUserAlbum(id = AlbumId(3L), title = "Album 3", modificationTime = 300L),
+            createUserAlbum(id = AlbumId(2L), title = "Album 2", modificationTime = 200L),
+            createUserAlbum(id = AlbumId(1L), title = "Album 1", modificationTime = 100L),
+        )
+
+        underTest.state.drop(1).test {
+            val actualUserAlbums = (1..3).map { awaitItem() }.last().albums.map { it.id }
+            assertThat(expectedUserAlbums).isEqualTo(actualUserAlbums)
+        }
+    }
+
+    @Test
+    fun `test that create album returns an album with the right name`() = runTest {
+        val expectedAlbumName = "Album 1"
+
+        whenever(createAlbum(expectedAlbumName)).thenReturn(
+            createUserAlbum(title = expectedAlbumName)
+        )
+
+        underTest.createNewAlbum(expectedAlbumName)
+
+        underTest.state.drop(1).test {
+            val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
+            assertEquals(expectedAlbumName, actualAlbum.title)
+        }
+    }
+
+    @Test
+    fun `test that an error in creating an album would keep current album as null`() = runTest {
+        whenever(createAlbum(any())).thenAnswer { throw Exception() }
+
+        underTest.createNewAlbum("ABD")
+
+        underTest.state.test {
+            assertNull(awaitItem().currentAlbum)
+        }
+    }
 
     private fun createImage(
         id: Long = 2L,
@@ -206,4 +254,11 @@ class AlbumsViewModelTest {
             fileTypeInfo = fileTypeInfo
         )
     }
+
+    private fun createUserAlbum(
+        id: AlbumId = AlbumId(0L),
+        title: String = "",
+        cover: Photo? = null,
+        modificationTime: Long = 0L,
+    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
 }

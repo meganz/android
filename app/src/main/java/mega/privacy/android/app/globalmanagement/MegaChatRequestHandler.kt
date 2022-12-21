@@ -50,7 +50,6 @@ class MegaChatRequestHandler @Inject constructor(
     @ApplicationScope
     private val sharingScope: CoroutineScope,
     private val chatManagement: ChatManagement,
-    private val sortOrderManagement: SortOrderManagement,
     private val myAccountInfo: MyAccountInfo,
     private val passcodeManagement: PasscodeManagement,
     private val transfersManagement: TransfersManagement,
@@ -125,10 +124,8 @@ class MegaChatRequestHandler @Inject constructor(
                         }
                         action = Constants.ACTION_CONFIRM
                         MegaApplication.urlConfirmationLink = null
-                    } else if (activityLifecycleHandler.isActivityVisible) {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     } else {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
                 }
                 application.startActivity(loginIntent)
@@ -188,7 +185,6 @@ class MegaChatRequestHandler @Inject constructor(
      * Resets all SingleObjects to their default values.
      */
     private fun resetDefaults() {
-        sortOrderManagement.resetDefaults()
         passcodeManagement.resetDefaults()
         myAccountInfo.resetDefaults()
         transfersManagement.resetDefaults()

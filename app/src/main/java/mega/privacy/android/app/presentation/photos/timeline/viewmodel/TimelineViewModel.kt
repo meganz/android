@@ -14,17 +14,22 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
-import mega.privacy.android.app.presentation.photos.timeline.model.Sort
-import mega.privacy.android.app.presentation.photos.timeline.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.app.presentation.photos.timeline.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.util.createDaysCardList
+import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
+import mega.privacy.android.app.presentation.photos.util.createYearsCardList
+import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
@@ -89,16 +94,16 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun handleAndUpdatePhotosUIState(
+    internal fun handleAndUpdatePhotosUIState(
         sourcePhotos: List<Photo>,
         showingPhotos: List<Photo>,
     ) {
         sortPhotos(showingPhotos)
-        val photosListItems = handleAllPhotoItems(showingPhotos)
-        val dayPhotos = groupPhotosByDay(showingPhotos, _state.value.currentSort)
-        val yearCardList = createYearsCardList(dayPhotos)
-        val monthCardList = createMonthsCardList(dayPhotos)
-        val dayCardList = createDaysCardList(dayPhotos)
+        val photosListItems = handleAllPhotoItems(showingPhotos = showingPhotos)
+        val dayPhotos = groupPhotosByDay(sortedPhotos = showingPhotos)
+        val yearCardList = createYearsCardList(dayPhotos = dayPhotos)
+        val monthCardList = createMonthsCardList(dayPhotos = dayPhotos)
+        val dayCardList = createDaysCardList(dayPhotos = dayPhotos)
 
         _state.update {
             it.copy(
@@ -206,9 +211,7 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    fun getAllShowingPhotosIds() = _state.value.currentShowingPhotos.map { it.id }.toLongArray()
-
-    fun getSelectedId(): List<Long> =
+    fun getSelectedIds(): List<Long> =
         selectedPhotosIds.toList()
 
     suspend fun getSelectedNodes(): List<MegaNode> =
@@ -282,12 +285,64 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    companion object {
-        const val DATE_FORMAT_YEAR = "uuuu"
-        const val DATE_FORMAT_YEAR_WITH_MONTH = "yyyy"
-        const val DATE_FORMAT_MONTH = "LLLL"
-        const val DATE_FORMAT_DAY = "dd"
-        const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
+    fun onCardClick(dateCard: DateCard) {
+        when (dateCard) {
+            is DateCard.YearsCard -> {
+                val monthsCardList = _state.value.monthsCardPhotos
+                val photo = monthsCardList.find {
+                    it.photo.modificationTime == dateCard.photo.modificationTime
+                }
+                updateSelectedTimeBarState(TimeBarTab.Months, monthsCardList.indexOf(photo))
+            }
+            is DateCard.MonthsCard -> {
+                val daysCardList = _state.value.daysCardPhotos
+                val photo = daysCardList.find {
+                    it.photo.modificationTime == dateCard.photo.modificationTime
+                }
+                updateSelectedTimeBarState(TimeBarTab.Days, daysCardList.indexOf(photo))
+            }
+            is DateCard.DaysCard -> {
+                val photosList = _state.value.photosListItems
+                val photo = photosList.find {
+                    it.key == dateCard.photo.id.toString()
+                }
+                updateSelectedTimeBarState(
+                    TimeBarTab.All,
+                    photosList.indexOf(photo)
+                )
+            }
+        }
+    }
+
+    fun onTimeBarTabSelected(tab: TimeBarTab) {
+        when (tab) {
+            TimeBarTab.Years -> {
+                updateSelectedTimeBarState(TimeBarTab.Years)
+            }
+            TimeBarTab.Months -> {
+                updateSelectedTimeBarState(TimeBarTab.Months)
+            }
+            TimeBarTab.Days -> {
+                updateSelectedTimeBarState(TimeBarTab.Days)
+            }
+            TimeBarTab.All -> {
+                updateSelectedTimeBarState(TimeBarTab.All)
+            }
+        }
+    }
+
+    fun updateSelectedTimeBarState(
+        selectedTimeBarTab: TimeBarTab,
+        startIndex: Int = 0,
+        startOffset: Int = 0,
+    ) {
+        _state.update {
+            it.copy(
+                selectedTimeBarTab = selectedTimeBarTab,
+                scrollStartIndex = startIndex,
+                scrollStartOffset = startOffset
+            )
+        }
     }
 }
 

@@ -4,8 +4,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.GetAccountDetails
@@ -21,7 +24,7 @@ import mega.privacy.android.domain.usecase.RetryPendingConnections
  *
  */
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 abstract class AccountModule {
 
     @Binds
@@ -29,6 +32,9 @@ abstract class AccountModule {
 
     @Binds
     abstract fun bindGetAccountDetails(useCase: DefaultGetAccountDetails): GetAccountDetails
+
+    @Binds
+    abstract fun provideGetAccountAchievements(implementation: DefaultGetAccountAchievements): GetAccountAchievements
 
     companion object {
         @Provides

@@ -18,7 +18,7 @@
         android:layout_height="64dp"
         android:layout_gravity="center"
         android:background="@null"
-        android:src="@drawable/media_player_play"
+        android:src="@drawable/exo_controls_play"
         android:visibility="invisible"
         tools:visibility="visible" />
 
@@ -26,6 +26,9 @@
         android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true" />
+        android:padding="8dp"
+        android:layout_gravity="bottom|end"
+        android:indeterminate="false"
+        app:indicatorColor="?attr/colorSecondary"
+        app:trackColor="@color/grey_012_white_012"/>
 </FrameLayout>

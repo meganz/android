@@ -16,9 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
@@ -33,11 +31,14 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritesEventSta
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAllFavorites
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
+import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,10 +49,9 @@ import javax.inject.Inject
  * @param favouriteMapper FavouriteMapper
  * @param stringUtilWrapper StringUtilWrapper
  * @param removeFavourites RemoveFavourites
- * @param getCloudSortOrder GetCloudSortOrder
+ * @param getSortOrder GetCloudSortOrder
  * @param megaUtilWrapper MegaUtilWrapper
  * @param fetchNode FetchNodeWrapper
- * @param sortOrderIntMapper SortOrderIntMapper
  */
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
@@ -61,14 +61,14 @@ class FavouritesViewModel @Inject constructor(
     private val favouriteMapper: FavouriteMapper,
     private val stringUtilWrapper: StringUtilWrapper,
     private val removeFavourites: RemoveFavourites,
-    private val getCloudSortOrder: GetCloudSortOrder,
+    private val getSortOrder: GetFavouriteSortOrder,
     private val megaUtilWrapper: MegaUtilWrapper,
     private val fetchNode: FetchNodeWrapper,
-    private val sortOrderIntMapper: SortOrderIntMapper,
+    private val mapOrder: MapFavouriteSortOrder,
 ) :
     ViewModel() {
     private val _favouritesState =
-        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading)
+        MutableStateFlow<FavouriteLoadState>(FavouriteLoadState.Loading(false))
 
     /**
      * The favouritesState for observing the favourites state.
@@ -91,9 +91,24 @@ class FavouritesViewModel @Inject constructor(
     private val itemsSelected = mutableMapOf<Long, Favourite>()
 
     /**
-     * Determine whether is search mode. ture is search mode, otherwise false.
+     * Enable search
      */
-    var searchMode = false
+    fun enableSearch() {
+        searchMode = true
+    }
+
+    private var searchMode = false
+        set(value) {
+            field = value
+            _favouritesState.update { state ->
+                when (state) {
+                    is FavouriteLoadState.Empty -> state.copy(showSearch = value)
+                    is FavouriteLoadState.Error -> state.copy(showSearch = value)
+                    is FavouriteLoadState.Loading -> state.copy(showSearch = value)
+                    is FavouriteLoadState.Success -> state.copy(showSearch = value)
+                }
+            }
+        }
 
     private var searchQuery: String? = null
 
@@ -108,7 +123,7 @@ class FavouritesViewModel @Inject constructor(
      */
     fun getFavourites() {
         _favouritesState.update {
-            FavouriteLoadState.Loading
+            FavouriteLoadState.Loading(false)
         }
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
@@ -118,7 +133,7 @@ class FavouritesViewModel @Inject constructor(
                     _favouritesState.update {
                         when {
                             favouriteInfoList.isEmpty() -> {
-                                FavouriteLoadState.Empty
+                                FavouriteLoadState.Empty(false)
                             }
                             else -> {
                                 withContext(ioDispatcher) {
@@ -126,14 +141,15 @@ class FavouritesViewModel @Inject constructor(
                                     FavouriteLoadState.Success(
                                         favouriteListToFavouriteItemList(
                                             favouriteList = reorganizeFavouritesByConditions(
-                                                sortOrderIntMapper(getCloudSortOrder()),
+                                                getSortOrder(),
                                                 if (searchMode) {
                                                     searchQuery
                                                 } else {
                                                     null
                                                 }),
                                             isList = isList
-                                        )
+                                        ),
+                                        showSearch = searchMode
                                     )
                                 }
                             }
@@ -154,7 +170,7 @@ class FavouritesViewModel @Inject constructor(
         viewModelScope.launch {
             _favouritesEventState.emit(
                 if (favourite.isFolder) {
-                    FavouritesEventState.OpenFolder(favourite.handle)
+                    FavouritesEventState.OpenFolder(favourite.nodeId.id)
                 } else {
                     FavouritesEventState.OpenFile(favourite as FavouriteFile)
                 }
@@ -208,11 +224,11 @@ class FavouritesViewModel @Inject constructor(
      */
     fun itemSelected(item: Favourite) {
         val items = favouriteList.map { favourite ->
-            if (favourite.handle == item.handle) {
+            if (favourite.nodeId == item.nodeId) {
                 if (favourite.isSelected) {
-                    itemsSelected.remove(favourite.handle)
+                    itemsSelected.remove(favourite.nodeId.id)
                 } else {
-                    itemsSelected[favourite.handle] = favourite
+                    itemsSelected[favourite.nodeId.id] = favourite
                 }
                 (favourite as? FavouriteFile)?.copy(isSelected = !favourite.isSelected)
                     ?: (favourite as FavouriteFolder).copy(
@@ -237,7 +253,7 @@ class FavouritesViewModel @Inject constructor(
         }
         itemsSelected.putAll(
             items.map {
-                Pair(it.handle, it)
+                Pair(it.nodeId.id, it)
             }
         )
         updateFavouritesStateUnderActionMode(items)
@@ -279,7 +295,11 @@ class FavouritesViewModel @Inject constructor(
             favouriteList.addAll(items)
             _favouritesState.update {
                 FavouriteLoadState.Success(
-                    favouriteListToFavouriteItemList(items, isList)
+                    favourites = favouriteListToFavouriteItemList(
+                        favouriteList = items,
+                        isList = isList
+                    ),
+                    showSearch = searchMode
                 )
             }
         }
@@ -312,15 +332,15 @@ class FavouritesViewModel @Inject constructor(
         isList: Boolean,
         forceUpdate: Boolean = false,
         headerForceUpdate: Boolean = false,
-        order: Int? = null,
+        order: FavouriteSortOrder? = null,
     ): List<FavouriteItem> {
         val favouriteItemList = mutableListOf<FavouriteItem>()
         favouriteItemList.add(
             FavouriteHeaderItem(
                 favourite = null,
                 forceUpdate = headerForceUpdate,
-                orderStringId = SortByHeaderViewModel.orderNameMap[order
-                    ?: sortOrderIntMapper(getCloudSortOrder())]
+                orderStringId = getFavouriteSortHeaderStringIdentifier(order
+                    ?: getSortOrder())
             )
         )
         favouriteList.map { favourite ->
@@ -354,6 +374,13 @@ class FavouritesViewModel @Inject constructor(
         return favouriteItemList
     }
 
+    private fun getFavouriteSortHeaderStringIdentifier(order: FavouriteSortOrder) = when (order) {
+        FavouriteSortOrder.Label -> R.string.title_label
+        is FavouriteSortOrder.ModifiedDate -> R.string.sortby_date
+        is FavouriteSortOrder.Name -> R.string.sortby_name
+        is FavouriteSortOrder.Size -> R.string.sortby_size
+    }
+
     /**
      * Force update data when switch between list and gird
      * @param isList true is list, otherwise is grid
@@ -369,7 +396,8 @@ class FavouritesViewModel @Inject constructor(
                             isList = isList,
                             forceUpdate = true,
                             headerForceUpdate = true
-                        )
+                        ),
+                        showSearch = searchMode
                     )
                 }
             }
@@ -382,7 +410,7 @@ class FavouritesViewModel @Inject constructor(
      * @param query search query
      */
     fun getFavouritesByConditions(
-        order: Int? = null,
+        order: FavouriteSortOrder? = null,
         query: String? = null,
     ) {
         viewModelScope.launch {
@@ -390,14 +418,15 @@ class FavouritesViewModel @Inject constructor(
                 FavouriteLoadState.Success(
                     favouriteListToFavouriteItemList(
                         favouriteList = reorganizeFavouritesByConditions(
-                            order ?: sortOrderIntMapper(getCloudSortOrder()),
+                            order ?: getSortOrder(),
                             query ?: if (searchMode) {
                                 searchQuery
                             } else {
                                 null
                             }),
                         isList = isList
-                    )
+                    ),
+                    showSearch = searchMode
                 )
             }
         }
@@ -410,29 +439,24 @@ class FavouritesViewModel @Inject constructor(
      * @return List<Favourite>
      */
     private fun reorganizeFavouritesByConditions(
-        order: Int? = null,
+        order: FavouriteSortOrder,
         query: String? = null,
     ): List<Favourite> {
         if (favouriteList.isNotEmpty()) {
             favouriteList.clear()
         }
         favouriteList.addAll(
-            when {
-                order != null && query != null -> {
-                    getFavouritesByQuery(sortOrder(favouriteSourceList, order), query)
-                }
-                order != null -> {
-                    sortOrder(favouriteSourceList, order)
-                }
-                query != null -> {
-                    getFavouritesByQuery(favouriteSourceList, query)
-                }
-                else -> {
-                    favouriteSourceList
-                }
-            }
+            getFilteredAndSortedFavourites(order, query)
         )
         return favouriteList
+    }
+
+    private fun getFilteredAndSortedFavourites(
+        order: FavouriteSortOrder,
+        query: String?,
+    ): List<Favourite> {
+        val sortedList = sortOrder(favouriteSourceList, order)
+        return query?.let { getFavouritesByQuery(sortedList, it) } ?: sortedList
     }
 
 
@@ -440,19 +464,20 @@ class FavouritesViewModel @Inject constructor(
      * Build favourite source list
      * @param list List<FavouriteInfo>
      */
-    private suspend fun buildFavouriteSourceList(list: List<NodeInfo>) {
+    private suspend fun buildFavouriteSourceList(list: List<TypedNode>) {
         if (favouriteSourceList.isNotEmpty()) {
             favouriteSourceList.clear()
         }
         favouriteSourceList.addAll(
             list.mapNotNull { favouriteInfo ->
-                val node = fetchNode(favouriteInfo.id) ?: return@mapNotNull null
+                val nodeId = favouriteInfo.id
+                val node = fetchNode(nodeId.id) ?: return@mapNotNull null
                 favouriteMapper(
                     node,
                     favouriteInfo,
                     megaUtilWrapper.availableOffline(
                         context,
-                        favouriteInfo.id
+                        nodeId.id
                     ),
                     stringUtilWrapper
                 ) { name ->
@@ -468,29 +493,29 @@ class FavouritesViewModel @Inject constructor(
      * @param order sort order
      * @return List<FavouriteInfo>
      */
-    private fun sortOrder(list: List<Favourite>, order: Int): List<Favourite> =
+    private fun sortOrder(list: List<Favourite>, order: FavouriteSortOrder): List<Favourite> =
         mutableListOf<Favourite>().apply {
             addAll(list)
             sortWith { item1, item2 ->
                 sortOrderByType(
                     sortByType = {
-                        when (order) {
-                            MegaApiJava.ORDER_DEFAULT_ASC -> {
+                        when {
+                            order is FavouriteSortOrder.Name && !order.sortDescending -> {
                                 item1.name.compareTo(item2.name)
                             }
-                            MegaApiJava.ORDER_DEFAULT_DESC -> {
+                            order is FavouriteSortOrder.Name && order.sortDescending -> {
                                 item2.name.compareTo(item1.name)
                             }
-                            MegaApiJava.ORDER_SIZE_DESC -> {
+                            order is FavouriteSortOrder.Size && order.sortDescending -> {
                                 item2.size.compareTo(item1.size)
                             }
-                            MegaApiJava.ORDER_SIZE_ASC -> {
+                            order is FavouriteSortOrder.Size && !order.sortDescending -> {
                                 item1.size.compareTo(item2.size)
                             }
-                            MegaApiJava.ORDER_MODIFICATION_DESC -> {
+                            order is FavouriteSortOrder.ModifiedDate && order.sortDescending -> {
                                 item2.modificationTime.compareTo(item1.modificationTime)
                             }
-                            MegaApiJava.ORDER_MODIFICATION_ASC -> {
+                            order is FavouriteSortOrder.ModifiedDate && !order.sortDescending -> {
                                 item1.modificationTime.compareTo(item2.modificationTime)
                             }
                             else -> {
@@ -546,5 +571,14 @@ class FavouritesViewModel @Inject constructor(
         } else {
             sortByType()
         }
+    }
+
+    /**
+     * On order change
+     *
+     * @param order
+     */
+    fun onOrderChange(order: SortOrder) {
+        getFavouritesByConditions(order = mapOrder(order))
     }
 }

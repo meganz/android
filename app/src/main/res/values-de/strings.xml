@@ -282,7 +282,7 @@
     <!-- Error message -->
     <string name="error_not_enough_free_space">Nicht genügend Speicherplatz verfügbar</string>
     <!-- Alert Dialog to get link -->
-    <string name="option_decryption_key">Kryptoschlüssel</string>
+    <string name="option_decryption_key">Schlüssel</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Dateien werden vorbereitet</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
@@ -483,7 +483,7 @@
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Kontakt hinzufügen</string>
     <!-- Title of the alert to introduce the decryption key -->
-    <string name="alert_decryption_key">Entschlüsselungs-Code</string>
+    <string name="alert_decryption_key">Schlüssel</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">Bitte geben Sie den Schlüssel für den Link ein</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
@@ -840,7 +840,7 @@
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Neues Passwort</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
-    <string name="recovery_link_expired">Dieser Resetlink hat seinen Gültigkeitszeitrahmen überschritten - bitte versuchen Sie es erneut.</string>
+    <string name="recovery_link_expired">Dieser Resetlink ist abgelaufen – bitte versuchen Sie es erneut.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">Sie können Ihr Passwort nun dank Ihres Rettungsschlüssels ändern. Geben Sie bitte Ihr neues Passwort ein.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -930,7 +930,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">Der Benutzeraccount des Eigentümers wurde wegen wiederholter Verletzung unserer Nutzungsbedingungen gesperrt.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">Der Ordnerschlüssel ist ungültig.</string>
+    <string name="general_error_invalid_decryption_key">Der Schlüssel zur Entschlüsselung des Ordnerlinks ist ungültig.</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -1039,7 +1039,7 @@
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
     <string name="error_not_logged_with_correct_account">Der Link gehört nicht zu diesem Account. Bitte melden Sie sich mit dem korrekten Account an.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
-    <string name="cancel_link_expired">Der Link ist abgelaufen, bitte versuchen Sie es erneut.</string>
+    <string name="cancel_link_expired">Dieser Stornolink ist abgelaufen – bitte versuchen Sie es erneut.</string>
     <!-- Text shown after searching and no results found -->
     <string name="no_results_found">Keine Ergebnisse</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -1705,8 +1705,6 @@
     <string name="pass_strong">Stark</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Anruf aktiv</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Antippen, um zum Anruf zurückzukehren</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Zurück zum Anruf</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2773,9 +2771,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Bei Ihrer letzten Zahlung ist ein Problem aufgetreten. Bitte öffnen Sie MEGA in einem Desktop-Browser, um weitere Informationen zu erhalten.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">Account deaktiviert</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">Ihr Business-Account wurde aufgrund einer fehlenden Zahlung deaktiviert. Sie können auf die Daten in Ihrem Account nicht zugreifen. Um eine Zahlung vorzunehmen und Ihr Abonnement erneut zu aktivieren, melden Sie sich in einem Browser bei MEGA an.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Ihr Account ist [B]gesperrt[/B]. Sie können lediglich lesend auf Ihre Daten zugreifen.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2934,7 +2932,7 @@
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Dieser Account ist gesperrt. Ein Passwortreset ist daher nicht möglich.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Ihr Account wurde von Ihrem Administrator gesperrt. Bitte setzen Sie sich für weitere Informationen direkt mit ihm in Verbindung.</string>
+    <string name="error_business_disabled">Ihr Account wurde von Ihrem Administrator deaktiviert. Bitte setzen Sie sich für weitere Informationen direkt mit ihm in Verbindung.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">Ihr Account wurde von Ihrem Administrator entfernt. Bitte setzen Sie sich mit ihm in Verbindung.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -3407,8 +3405,6 @@
     <string name="change_meeting_name">Namen des Meetings ändern</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meetinglink</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Dauer</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Als Gast beitreten</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3587,8 +3583,6 @@
     <string name="payment_methods">Zahlungsmethoden</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Fortfahren</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Vielen Dank, dass Sie %1$s abonniert haben</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite (monatliche Abrechnung)</string>
     <!-- Pro Lite yearly subscription -->
@@ -4032,5 +4026,62 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Sie haben bereits alle Ihre Kontakte in diesen Chat aufgenommen. Wenn Sie weitere Teilnehmer hinzufügen möchten, laden Sie diese zunächst in Ihre Kontaktliste ein.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Das Bild wurde in der Galerie Ihres Geräts gespeichert</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Verlängerungsdatum:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Albumnamen eingeben</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">Neues Album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Meetinglink teilen</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Mehr sehen</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Gruppe verlassen</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Neues Album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Informationen zur Zahlung</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Ihr Pro-Abonnement läuft bald ab</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Wir haben Ihre Zahlung für das %1$s-Abonnement erhalten.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Ihre Zahlung für das %1$s-Abonnement ist fehlgeschlagen.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Ihr Pro-Abonnement läuft in einem Tag ab.</item>
+        <item quantity="other">Ihr Pro-Abonnement läuft in %1$d Tagen ab.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Ihr Pro-Abonnement ist vor einem Tag abgelaufen.</item>
+        <item quantity="other">Ihr Pro-Abonnement ist vor %1$d Tagen abgelaufen.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Vergangene Meetings</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Wiederkehrendes Meeting</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

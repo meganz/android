@@ -3,7 +3,9 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -17,16 +19,22 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
+import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileRepository
 import nz.mega.sdk.MegaApiJava
@@ -59,6 +67,8 @@ internal class DefaultFilesRepository @Inject constructor(
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val cacheFolderGateway: CacheFolderGateway,
+    private val nodeMapper: NodeMapper,
+    private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FilesRepository, FileRepository {
 
 
@@ -93,11 +103,6 @@ internal class DefaultFilesRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
-
-    override fun monitorNodeUpdates() =
-        megaApiGateway.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull { it.nodeList?.toList() }
 
     override suspend fun getRootNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()
@@ -249,4 +254,60 @@ internal class DefaultFilesRepository @Inject constructor(
                     ))
             }
         }
+
+    override suspend fun getNodeById(nodeId: NodeId) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.id)?.let {
+            nodeMapper(
+                it,
+                cacheFolderGateway::getThumbnailCacheFilePath,
+                megaApiGateway::hasVersion,
+                megaApiGateway::getNumChildFolders,
+                megaApiGateway::getNumChildFiles,
+                fileTypeInfoMapper,
+                megaApiGateway::isPendingShare,
+                megaApiGateway::isInRubbish,
+            )
+        }
+    }
+
+    override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
+        return withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(folderNode.id.id)?.let { parent ->
+                megaApiGateway.getChildrenByNode(parent)
+                    .map {
+                        nodeMapper(
+                            it,
+                            cacheFolderGateway::getThumbnailCacheFilePath,
+                            megaApiGateway::hasVersion,
+                            megaApiGateway::getNumChildFolders,
+                            megaApiGateway::getNumChildFiles,
+                            fileTypeInfoMapper,
+                            megaApiGateway::isPendingShare,
+                            megaApiGateway::isInRubbish,
+                        )
+                    }
+            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+        }
+    }
+
+    override fun monitorNodeUpdates(): Flow<List<Node>> {
+        return megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
+            .mapNotNull {
+                it.nodeList?.map { megaNode ->
+                    nodeMapper(
+                        megaNode,
+                        cacheFolderGateway::getThumbnailCacheFilePath,
+                        megaApiGateway::hasVersion,
+                        megaApiGateway::getNumChildFolders,
+                        megaApiGateway::getNumChildFiles,
+                        fileTypeInfoMapper,
+                        megaApiGateway::isPendingShare,
+                        megaApiGateway::isInRubbish,
+                    )
+                }
+            }
+            .flowOn(ioDispatcher)
+    }
+
 }

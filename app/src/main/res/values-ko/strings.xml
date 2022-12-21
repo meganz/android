@@ -1668,8 +1668,6 @@
     <string name="pass_strong">강함</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">진행중인 통화</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">통화로 돌아가려면 탭하세요</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">통화로 돌아옴</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2700,9 +2698,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">지난 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저를 이용하여 MEGA에 접속하세요.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">계정 비활성화됨</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">당신의 비즈니스 계정은 결제 실패로 인해 비활성화 되었습니다. 계정 안에 있는 데이터에 접근하지 못할 것입니다. 결제를 하고 구독을 재활성화 하려면, 브라우저에서 MEGA에 로그인 하세요.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3309,8 +3307,6 @@
     <string name="change_meeting_name">회의 이름 변경</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">회의 링크</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">시간</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">손님으로 회의에 참석</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3489,8 +3485,6 @@
     <string name="payment_methods">결제 수단</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">진행</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Thank you for your %1$s subscription</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
     <!-- Pro Lite yearly subscription -->
@@ -3538,7 +3532,7 @@
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">연표</string>
     <!-- Title of album tab in photos section. -->
-    <string name="tab_title_album">앨범</string>
+    <string name="tab_title_album">사진첩</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">즐겨찾기</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
@@ -3928,5 +3922,59 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">이미 이 대화에 모든 연락처를 추가하였습니다. 만약 더 많은 참여자를 원한다면, 먼저 당신의 연락처 목록에 초대하세요.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">기기 갤러리에 이미지 저장됨</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]갱신일:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">사진첩 이름 입력</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">새 사진첩</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">회의 링크 공유</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">더 보기</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">그룹 떠나기</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">이 사진첩 이름은 허용되지 않습니다. 다른 이름을 입력하세요.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">새 사진첩 (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">“%s”에 항목 추가</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="other">“%s”에 %d개의 항목 추가함</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">결제 정보</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Pro 회원권 요금제가 곧 만료됩니다</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">%1$s 요금제에 대한 결제가 수신되었습니다.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">%1$s 요금제에 대한 결제가 실패하였습니다.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="other">당신의 Pro 회원권 요금제가 %1$d일 내에 만료됩니다.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="other">당신의 Pro 회원권 요금제가 %1$d일 전에 만료되었습니다.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]빈[/B] [A]사진첩[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">내 사진첩</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">공유된 사진첩</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">지난 회의</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">다가오는 회의</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">반복 회의</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">매주 %s</string>
 </resources>

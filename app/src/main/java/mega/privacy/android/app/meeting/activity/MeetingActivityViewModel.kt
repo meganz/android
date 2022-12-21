@@ -16,27 +16,31 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
-import mega.privacy.android.app.usecase.call.AnswerCallUseCase
+import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetLocalAudioChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -46,6 +50,10 @@ import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_M
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.ChatRequestParamType
+import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequest
@@ -64,10 +72,14 @@ import javax.inject.Inject
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
-    private val answerCallUseCase: AnswerCallUseCase,
+    private val answerChatCall: AnswerChatCall,
     getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    private val chatManagement: ChatManagement,
+    private val cameraGateway: CameraGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
+    monitorConnectivity: MonitorConnectivity,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -103,15 +115,11 @@ class MeetingActivityViewModel @Inject constructor(
     private val _recordAudioPermissionCheck = MutableLiveData<Boolean>()
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
 
-    // Network State
-    private val _notificationNetworkState = MutableLiveData<Boolean>()
-
-    // Observe this property to get online/offline notification. true: online / false: offline
-    val notificationNetworkState: LiveData<Boolean> = _notificationNetworkState
-
-    private val notificationNetworkStateObserver = Observer<Boolean> {
-        _notificationNetworkState.value = it
-    }
+    /**
+     * Monitor connectivity event
+     */
+    val monitorConnectivityEvent =
+        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
 
     var isChatOpen: Boolean = false
 
@@ -182,10 +190,17 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
 
-    init {
-        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
-            .observeForever(notificationNetworkStateObserver)
+    /**
+     * Send event that in Meeting fragment is visible or not
+     *
+     * @param isVisible True if the fragment it visible, false otherwise.
+     */
+    fun sendEnterCallEvent(isVisible: Boolean) = LiveEventBus.get(
+        EventConstants.EVENT_ENTER_IN_MEETING,
+        Boolean::class.java
+    ).post(isVisible)
 
+    init {
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 
@@ -580,8 +595,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun setChatVideoInDevice(listener: MegaChatRequestListenerInterface?) {
         // Always try to start the video using the front camera
-        val cameraDevice = VideoCaptureUtils.getFrontCamera()
-        if (cameraDevice != null) {
+        VideoCaptureUtils.getFrontCamera()?.let { cameraDevice ->
             meetingActivityRepository.setChatVideoInDevice(cameraDevice, listener)
         }
     }
@@ -621,10 +635,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .removeObserver(audioOutputStateObserver)
-
-        // Remove observer on network state
-        LiveEventBus.get(EVENT_NETWORK_CHANGE, Boolean::class.java)
-            .removeObserver(notificationNetworkStateObserver)
 
         LiveEventBus.get(
             EVENT_CHAT_TITLE_CHANGE, MegaChatRoom::class.java
@@ -717,23 +727,57 @@ class MeetingActivityViewModel @Inject constructor(
         enableVideo: Boolean,
         enableAudio: Boolean,
         speakerAudio: Boolean,
-    ): LiveData<AnswerCallUseCase.AnswerCallResult> {
-        val result = MutableLiveData<AnswerCallUseCase.AnswerCallResult>()
-        _currentChatId.value?.let {
-            answerCallUseCase.answerCall(it, enableVideo, enableAudio, speakerAudio)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { resultAnswerCall ->
-                        result.value = resultAnswerCall
-                    },
-                    onError = { error ->
-                        _finishMeetingActivity.value = true
-                        Timber.e(error.stackTraceToString())
+    ): LiveData<AnswerCallResult> {
+        val result = MutableLiveData<AnswerCallResult>()
+        _currentChatId.value?.let { chatId ->
+            if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
+                Timber.d("Already participating in this call")
+                return result
+            }
+
+            if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
+                Timber.d("The call has been answered")
+                return result
+            }
+
+            chatManagement.addJoiningCallChatId(chatId)
+            cameraGateway.setFrontCamera()
+
+            viewModelScope.launch {
+                runCatching {
+                    answerChatCall(chatId, enableVideo, enableAudio, speakerAudio)
+                }.onFailure { exception ->
+                    chatManagement.removeJoiningCallChatId(chatId)
+                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                    megaChatApiGateway.getChatCall(chatId)?.let { call ->
+                        CallUtil.clearIncomingCallNotification(call.callId)
                     }
-                )
-                .addTo(composite)
+
+                    _finishMeetingActivity.value = true
+                    Timber.e(exception)
+                }.onSuccess { resultAnswerCall ->
+                    chatManagement.removeJoiningCallChatId(chatId)
+
+                    resultAnswerCall.chatHandle?.let { chatId ->
+                        val videoEnable = resultAnswerCall.flag
+                        val paramType = resultAnswerCall.paramType
+                        val audioEnable: Boolean = paramType == ChatRequestParamType.Video
+
+                        chatManagement.setSpeakerStatus(chatId, videoEnable)
+                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+
+                        megaChatApiGateway.getChatCall(chatId)?.let { call ->
+                            chatManagement.setRequestSentCall(call.callId, false)
+                            CallUtil.clearIncomingCallNotification(call.callId)
+                        }
+
+
+                        result.value = AnswerCallResult(chatId, videoEnable, audioEnable)
+                    }
+                }
+            }
         }
+
         return result
     }
 }

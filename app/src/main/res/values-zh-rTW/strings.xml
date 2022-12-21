@@ -355,7 +355,7 @@
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">資料夾名稱</string>
     <!-- status dialog when performing the action -->
-    <string name="context_creating_folder">建立資料夾中</string>
+    <string name="context_creating_folder">正在建立資料夾</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">清空垃圾筒</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
@@ -662,7 +662,7 @@
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">MEGA相機上傳資料夾</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">本機次要資料夾</string>
+    <string name="settings_local_secondary_folder">本地次要資料夾</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">MEGA次要資料夾</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -828,7 +828,7 @@
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">請輸入新密碼</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
-    <string name="recovery_link_expired">這個復原連結已失效，請再試一次。</string>
+    <string name="recovery_link_expired">這個復原連結已過期，請再試一次。</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">您的還原金鑰將用於重設您的密碼。請輸入您的新密碼。</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -866,7 +866,7 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">編輯</string>
     <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">設定有效日期</string>
+    <string name="title_set_expiry_date">設定到期日期</string>
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">設定密碼保護</string>
     <!-- Subtitle of the dialog to get link -->
@@ -1046,7 +1046,7 @@
     <!-- Label for the option of the sliding panel to start a one to one chat -->
     <string name="group_chat_start_conversation_label">開始對話</string>
     <!-- Label for the option of the sliding panel to edit the profile -->
-    <string name="group_chat_edit_profile_label">編輯檔案</string>
+    <string name="group_chat_edit_profile_label">編輯個人資料</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
     <string name="title_properties_chat_leave_chat">離開群組</string>
     <!-- Label for participants of a group chat -->
@@ -1255,7 +1255,7 @@
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">傳輸配額不足</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
-    <string name="current_text_depleted_transfer_overquota">您的排程下載已超出您IP位址目前可用的傳輸配額，因此傳輸已經中斷。請升級您的帳戶或等待%s再繼續。</string>
+    <string name="current_text_depleted_transfer_overquota">您的佇列下載已超出您IP位址目前可用的傳輸配額，因此傳輸已經中斷。請升級您的帳戶或等待%s再繼續。</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">此IP位址的傳輸配額已超過。請升級您的帳戶或等待%s才能繼續下載。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
@@ -1267,13 +1267,13 @@
         <item quantity="other">%1$d個檔案</item>
     </plurals>
     <!-- Menu option -->
-    <string name="general_view">檢視檔案</string>
+    <string name="general_view">查看檔案</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">匯入</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">新增至雲端硬碟</string>
     <!-- Menu option -->
-    <string name="general_view_contacts">檢視聯絡人</string>
+    <string name="general_view_contacts">查看聯絡人</string>
     <!-- Menu option -->
     <string name="import_success_error">發生錯誤，無法新增至雲端硬碟</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1443,7 +1443,7 @@
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
     <!-- State to indicate an achievement has expired -->
-    <string name="expired_label">過期</string>
+    <string name="expired_label">已過期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
@@ -1473,7 +1473,7 @@
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">獎勵將在%1$d天到期</string>
+    <string name="expiration_date_for_achievements">獎勵將在%1$d天過期</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">共享資料夾</item>
@@ -1668,8 +1668,6 @@
     <string name="pass_strong">強</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">正在通話中</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">點擊返回通話</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">返回通話</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2700,9 +2698,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您最近一次的付款發生問題。請使用電腦版瀏覽器登入MEGA以查看更多訊息。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">帳戶已停用</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">由於付款失敗，您的商業帳戶已被停用。您將無法存取儲存在您帳戶中的資料。若要付款並重新啟用您的訂閱，請透過網頁瀏覽器登入MEGA進行。</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">您的帳戶目前[B]暫停使用[/B]。您只能瀏覽您的資料。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2782,7 +2780,7 @@
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">總是儲存在此位置？</string>
     <!-- Action to show any file in its location -->
-    <string name="view_in_folder_label">在資料夾中檢視</string>
+    <string name="view_in_folder_label">在資料夾中查看</string>
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
@@ -3234,7 +3232,7 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">群組</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">“各別傳送解密金鑰”、“設定有效日期”或“設定密碼保護”等選項僅適用於單個項目。</string>
+    <string name="warning_get_links">「各別傳送解密金鑰」、「設定到期日期」或「設定密碼保護」等選項僅適用於單個項目。</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">複製全部</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
@@ -3309,8 +3307,6 @@
     <string name="change_meeting_name">更改會議名稱</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">會議連結</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">通話時間</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">以訪客身份加入</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3470,7 +3466,7 @@
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">因為這是一個備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本機資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
+    <string name="backup_add_item_text">此資料夾中的項目是備份設定中的一部份而且已同步至本地資料夾。執行此操作將中斷同步並停用備份。您可以在MEGA桌面應用程式重新啟用備份。您確定要繼續嗎？</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">因為這些是備份資料夾，所以只能以讀取權限進行共享，變更當中任何內容可能會停用備份。</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -3489,8 +3485,6 @@
     <string name="payment_methods">付款方式</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">繼續</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">感謝您訂閱%1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite月方案</string>
     <!-- Pro Lite yearly subscription -->
@@ -3610,7 +3604,7 @@
     <!-- Label to indicate the date when the current subscription renews. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
     <string name="account_info_renews_on">[B]%s[/B][A]更新[/A]</string>
     <!-- Label to indicate the date when the current Pro plan or subscription expires. The placeholder is to include the date, and the other formatting placeholders are to display the text in different colors. -->
-    <string name="account_info_expires_on">[B]%s[/B][A]到期[/A]</string>
+    <string name="account_info_expires_on">[A]到期日期[/A][B]%s[/B]</string>
     <!-- Title of favourite category. -->
     <string name="favourites_category_title">收藏</string>
     <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
@@ -3892,7 +3886,7 @@
     <!-- Used in chat screen to indicate last message sent by me -->
     <string name="chat_last_message_sender_me">我</string>
     <!-- Hint the screen is locked in video player page -->
-    <string name="video_player_locked_hint">螢幕被鎖定</string>
+    <string name="video_player_locked_hint">螢幕已被鎖定</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">點按即可解鎖</string>
     <!-- Label that schedule a meeting -->
@@ -3929,4 +3923,58 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">您已經將所有聯絡人加入此對話。如果您想加入更多與會者，請先邀請他們成為您的聯絡人。</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的相簿</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]續訂日期：[/A][B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">輸入相簿名稱</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">新相簿</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">分享會議連結</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">查看更多</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">離開群組</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新相簿（%d）</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">新增項目到「%s」</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="other">已新增%d個項目到「%s」</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">付款資訊</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Pro會員方案即將到期</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">已收到您%1$s方案的付款。</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">您%1$s方案的付款沒有成功。</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="other">您的Pro會員方案將在%1$d內到期。</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="other">您的Pro會員方案已在%1$d天前到期。</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]空[/B][A]相簿[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">我的相簿</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">共享相簿</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">過去的會議</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">即將到來的會議</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">定期會議</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">每周 %s</string>
 </resources>

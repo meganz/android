@@ -78,6 +78,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -97,29 +98,33 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
-import mega.privacy.android.app.namecollision.data.NameCollision;
-import mega.privacy.android.app.namecollision.data.NameCollisionType;
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
-import mega.privacy.android.app.usecase.data.CopyRequestResult;
-import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
+import mega.privacy.android.app.namecollision.data.NameCollision;
+import mega.privacy.android.app.namecollision.data.NameCollisionType;
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel;
+import mega.privacy.android.app.presentation.clouddrive.FolderLinkViewModel;
+import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
+import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.data.CopyRequestResult;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
+import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -182,7 +187,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     long toHandle = 0;
     long fragmentHandle = -1;
     AlertDialog statusDialog;
-    private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+    private SortOrder orderGetChildren = SortOrder.ORDER_DEFAULT_ASC;
 
 
     MegaPreferences prefs = null;
@@ -204,6 +209,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
     @Inject
     CookieDialogHandler cookieDialogHandler;
+    private FolderLinkViewModel viewModel;
 
     public void activateActionMode() {
         Timber.d("activateActionMode");
@@ -362,6 +368,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
+        viewModel = new ViewModelProvider(this).get(FolderLinkViewModel.class);
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -663,7 +670,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         }
 
         if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if (!isOnline(this)) {
+            if (!viewModel.isConnected()) {
                 try {
                     statusDialog.dismiss();
                 } catch (Exception ex) {
@@ -1228,7 +1235,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
                 parentHandle = nodes.get(position).getHandle();
                 adapterList.setParentHandle(parentHandle);
-                nodes = megaApiFolder.getChildren(nodes.get(position), orderGetChildren);
+                nodes = megaApiFolder.getChildren(nodes.get(position), SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
                 adapterList.setNodes(nodes);
                 listView.scrollToPosition(0);
 
@@ -1418,7 +1425,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                 supportInvalidateOptionsMenu();
 
                 parentHandle = parentNode.getHandle();
-                nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
+                nodes = megaApiFolder.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
                 adapterList.setNodes(nodes);
                 int lastVisiblePosition = 0;
                 if (!lastPositionStack.empty()) {
@@ -1455,7 +1462,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                 supportInvalidateOptionsMenu();
 
                 parentHandle = parentNode.getHandle();
-                nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
+                nodes = megaApiFolder.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
                 adapterList.setNodes(nodes);
                 int lastVisiblePosition = 0;
                 if (!lastPositionStack.empty()) {

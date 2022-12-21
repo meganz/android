@@ -680,42 +680,6 @@ object MegaNodeUtil {
     }
 
     /**
-     * Gets the parent outgoing or incoming MegaNode folder of a node.
-     *
-     * @param node  MegaNode to get its parent
-     * @return The outgoing or incoming parent folder.
-     */
-    @JvmStatic
-    fun getOutgoingOrIncomingParent(node: MegaNode): MegaNode? {
-        if (isOutgoingOrIncomingFolder(node)) {
-            return node
-        }
-
-        var parentNode = node
-        val megaApi: MegaApiJava = MegaApplication.getInstance().megaApi
-
-        while (megaApi.getParentNode(parentNode) != null) {
-            parentNode = megaApi.getParentNode(parentNode)
-
-            if (isOutgoingOrIncomingFolder(parentNode)) {
-                return parentNode
-            }
-        }
-
-        return null
-    }
-
-    /**
-     * Checks if a node is an outgoing or an incoming folder.
-     *
-     * @param node  MegaNode to check
-     * @return  True if the node is an outgoing or incoming folder, false otherwise.
-     */
-    private fun isOutgoingOrIncomingFolder(node: MegaNode): Boolean {
-        return node.isOutShare || node.isInShare
-    }
-
-    /**
      * Check if all nodes can be moved to rubbish bin.
      *
      * @param nodes nodes to check
@@ -1262,7 +1226,7 @@ object MegaNodeUtil {
 
             val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
                     || topAncestor.handle == megaApi.rubbishNode.handle
-                    || topAncestor.handle == megaApi.inboxNode.handle
+            val inBackups = topAncestor.handle == megaApi.inboxNode.handle
 
             val location = when {
                 fromIncomingShare -> {
@@ -1282,6 +1246,19 @@ object MegaNodeUtil {
                     if (topAncestor.handle == parent.handle) {
                         getTranslatedNameForParentNode(megaApi, topAncestor)
                     } else {
+                        getString(
+                            R.string.location_label, parent.name,
+                            getTranslatedNameForParentNode(megaApi, topAncestor)
+                        )
+                    }
+                }
+                inBackups -> {
+                    if (node.parentHandle == myBackupHandle) {
+                        // If the Node's parent handle is the same with the My Backups handle,
+                        // only display the name of the Root Node
+                        getTranslatedNameForParentNode(megaApi, topAncestor)
+                    } else {
+                        // Otherwise, include the names of both the Parent and Root Nodes
                         getString(
                             R.string.location_label, parent.name,
                             getTranslatedNameForParentNode(megaApi, topAncestor)

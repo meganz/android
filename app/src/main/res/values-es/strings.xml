@@ -1742,8 +1742,6 @@
     <string name="pass_strong">Fuerte</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Llamada en curso</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Toca para volver a la llamada</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Volver a la llamada</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -1805,7 +1803,7 @@
     <!-- Title of the notification shown when a file is uploading to a chat -->
     <string name="chat_upload_title_notification">Subiendo al chat</string>
     <!-- Label for the option on setting to set up the quality of multimedia files uploaded to the chat -->
-    <string name="settings_chat_upload_quality">Calidad de video</string>
+    <string name="settings_chat_upload_quality">Calidad de vídeo</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calidad de vídeo</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
@@ -2228,7 +2226,7 @@
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">¿Abrir cámara?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
-    <string name="confirmation_open_camera_on_chat">Si abres la cámara, la transmisión de video se pausará durante esta llamada.</string>
+    <string name="confirmation_open_camera_on_chat">Si abres la cámara, la transmisión de vídeo se pausará durante esta llamada.</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Podrías tener mensajes nuevos</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
@@ -2836,7 +2834,7 @@
     <!-- Business expired account Overdue payment page header. -->
     <string name="payment_overdue_label">Pago vencido</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
-    <string name="business_management_alert">La gestión de usuarios solo está disponible desde el navegador en tu ordenador.</string>
+    <string name="business_management_alert">La gestión de usuarios solo está disponible desde el navegador en tu pc.</string>
     <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Desglose del almacenamiento</string>
     <!-- Title of transfer section in Storage -->
@@ -2844,11 +2842,11 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">No puedes eliminar %1$s como contacto porque es parte de tu cuenta Business.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Ha habido un problema con tu último pago. Accede a MEGA utilizando el navegador del ordenador para obtener más información.</string>
+    <string name="grace_period_admin_alert">Ha habido un problema con tu último pago. Accede a MEGA utilizando el navegador de tu pc para obtener más información.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">Cuenta desactivada</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">Tu cuenta Business ha sido desactivada porque el pago ha fallado. No podrás acceder a los datos almacenados en tu cuenta. Para realizar el pago y reactivar tu suscripción, inicia sesión en MEGA a través de un navegador.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Tu cuenta está [B]suspendida[/B]. Solo puedes ver tus datos.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3290,7 +3288,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproducción en segundo plano</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Realiza una copia de seguridad automática de tus fotos y videos en tu Nube.</string>
+    <string name="enable_cu_subtitle">Realiza un backup automático de tus fotos y vídeos en tu Nube.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Todas</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3505,8 +3503,6 @@
     <string name="change_meeting_name">Cambiar el nombre de la reunión</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Enlace de la reunión</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Duración</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Únete como invitado</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3646,11 +3642,11 @@
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permite el uso de datos móviles para cargar imágenes de alta resolución al obtener una vista previa. Si está opción está desactivada, la imagen original solo se cargará cuando hagas zoom.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">Vas a eliminar tu carpeta de copias de seguridad. Se borrarán todas las copias de seguridad que hayas configurado. ¿Seguro que quieres hacer esto?</string>
+    <string name="backup_remove_root_folder">Vas a eliminar tu carpeta Backups. Se borrarán todos los backups que hayas configurado. ¿Seguro que quieres hacerlo?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mover “%1s” a la Papelera</string>
     <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">Desactivar copia de seguridad</string>
+    <string name="backup_disable_confirm">Desactivar backup</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">Escribe “%1s” para confirmar esta acción</string>
     <!-- when checking the input -->
@@ -3658,17 +3654,17 @@
     <!-- The title of confirm dialog for adding item to "My backup" -->
     <string name="backup_add_confirm_title">Añadir elemento a “%1s”</string>
     <!-- The title of warning dialog for adding item to "My backup" -->
-    <string name="backup_add_item_title">Copia de seguridad</string>
+    <string name="backup_add_item_title">Configurar backup</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_add_item_to_root_text">Para asegurarte de que estos elementos añadidos a tu carpeta de backup se sincronicen automáticamente con la Nube, configúralos en la aplicación de escritorio de MEGA.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Solo lectura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar la copia de seguridad.</string>
+    <string name="backup_share_permission_text">Esta carpeta se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de una carpeta de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">El contenido de esta carpeta forma parte de una copia de seguridad sincronizada con una carpeta local. Realizar esta acción parará la sincronización y desactivará la copia de seguridad. Podrás volver a reactivar la copia de seguridad a través de la aplicación de escritorio de MEGA. ¿Estás seguro de que quieres continuar?</string>
+    <string name="backup_add_item_text">El contenido de esta carpeta forma parte de un backup sincronizado con una carpeta local. Realizar esta acción parará la sincronización y desactivará el backup. Podrás volver a reactivar el backup a través de la aplicación de escritorio de MEGA. ¿Estás seguro de que quieres continuar?</string>
     <!-- Share multi backup folders, show below warning message -->
-    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar las copia de seguridad.</string>
+    <string name="backup_multi_share_permission_text">Estas carpetas se puede compartir exclusivamente en \“solo lectura\“. Al tratarse de carpetas de backup, cualquier cambio en su contenido podría desactivar el backup.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
     <string name="backup_share_with_root_permission_text">Algunas carpetas compartidas son carpetas de respaldo y de solo lectura. ¿Quieres continuar?</string>
     <!-- Title of the button when you want to answer a one to one call -->
@@ -3685,8 +3681,6 @@
     <string name="payment_methods">Métodos de pago</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Continuar</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Gracias por su suscripción %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite mensual</string>
     <!-- Pro Lite yearly subscription -->
@@ -3946,7 +3940,7 @@
     <!-- Button text for discard dialog option-->
     <string name="settings_help_report_issue_discard_button">Descartar</string>
     <!-- Text shown when editing a chatroom message -->
-    <string name="edit_chat_message">Modificar mensaje</string>
+    <string name="edit_chat_message">Editar mensaje</string>
     <!-- Title of the voice call option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_voice_call_option">Llamada</string>
     <!-- Title of the scan option displayed in the chat room toolbar -->
@@ -4084,11 +4078,11 @@
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA te enviará notificaciones de llamadas, chats y transferencias de archivos.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
-    <string name="home_side_menu_backups_title">Copias de seguridad</string>
+    <string name="home_side_menu_backups_title">Backups</string>
     <!-- Title of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_title">[B]No hay [/B][A]copias de seguridad[/A]</string>
+    <string name="backups_empty_state_title">[B]No hay [/B][A]backups[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Aquí es donde se almacenan las copias de seguridad de tus archivos y carpetas. Estas copias de seguridad son de “solo lectura” para protegerlas de modificaciones accidentales en tu nube.\nPuedes crear copias de seguridad en MEGA desde tu ordenador usando nuestra aplicación de escritorio.</string>
+    <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Cuenta suspendida por violar los derechos de autor. Te hemos enviado un correo electrónico con más información al respecto.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4136,5 +4130,65 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">Ya has añadido todos tus contactos a este chat. Si quieres añadir más participantes, primero invítalos a tu lista de contactos.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <string name="media_player_video_snackbar_screenshot_saved">Imagen guardada en la galería de tu dispositivo</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Fecha de renovación:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Escribe el nombre del álbum</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">Nuevo álbum</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Compartir enlace de la reunión</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Mostrar más</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Abandonar grupo</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">Este nombre no está permitido. Introduce un nombre diferente.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">Ya existe un álbum con este nombre. Introduce un nombre diferente.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nuevo álbum (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Añadir elementos a “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Se ha añadido %d elemento a “%s”</item>
+        <item quantity="many">Se han añadido %d elementos a “%s”</item>
+        <item quantity="other">Se han añadido %d elementos a “%s”</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Información de pago</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Tu plan Pro caducará en breve</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Tu pago para el plan %1$s ha sido recibido.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Tu pago para el plan %1$s no se ha completado.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Tu plan Pro caducará en 1 día.</item>
+        <item quantity="many">Tu plan Pro caducará en %1$d días.</item>
+        <item quantity="other">Tu plan Pro caducará en %1$d días.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Tu plan Pro ha caducado hace 1 día</item>
+        <item quantity="many">Tu plan Pro ha caducado hace %1$d días</item>
+        <item quantity="other">Tu plan Pro ha caducado hace %1$d días</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[A]Álbum[/A] [B]vacío[/B]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">Mis álbumes</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Álbumes compartidos</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Reuniones anteriores</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Próxima reunion</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Reunión periódica</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s semanalmente</string>
 </resources>

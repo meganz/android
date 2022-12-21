@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,19 +14,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -38,10 +34,13 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.presentation.theme.grey_alpha_032
 import mega.privacy.android.presentation.theme.white
+
+private val gap = 1.dp
 
 @Composable
 internal fun PhotosBig2SmallItems(
@@ -49,7 +48,7 @@ internal fun PhotosBig2SmallItems(
     photoDownload: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: MutableSet<Long>,
+    selectedPhotoIds: Set<Long>,
 ) {
     Column {
         Row(
@@ -61,7 +60,8 @@ internal fun PhotosBig2SmallItems(
                 onLongPress = onLongPress,
                 albumPhotoView = {
                     AlbumPhotoView(
-                        size = size * 2,
+                        width = size * 2,
+                        height = size * 2 + gap,
                         photo = photos[0],
                         photoDownload = photoDownload,
                     )
@@ -78,7 +78,8 @@ internal fun PhotosBig2SmallItems(
                         onLongPress = onLongPress,
                         albumPhotoView = {
                             AlbumPhotoView(
-                                size = size,
+                                width = size,
+                                height = size,
                                 photo = photos[1],
                                 photoDownload = photoDownload,
                             )
@@ -87,12 +88,16 @@ internal fun PhotosBig2SmallItems(
                         isSelected = photos[1].id in selectedPhotoIds
                     )
                     if (photos.size == 3) {
+                        Spacer(
+                            modifier = Modifier.height(1.dp)
+                        )
                         AlbumPhotoContainer(
                             onClick = onClick,
                             onLongPress = onLongPress,
                             albumPhotoView = {
                                 AlbumPhotoView(
-                                    size = size,
+                                    width = size,
+                                    height = size,
                                     photo = photos[2],
                                     photoDownload = photoDownload,
                                 )
@@ -117,7 +122,7 @@ internal fun Photos3SmallItems(
     downloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: MutableSet<Long>,
+    selectedPhotoIds: Set<Long>,
 ) {
     Column {
         Row(
@@ -129,7 +134,8 @@ internal fun Photos3SmallItems(
                 onLongPress = onLongPress,
                 albumPhotoView = {
                     AlbumPhotoView(
-                        size = size,
+                        width = size,
+                        height = size,
                         photo = photos[0],
                         photoDownload = downloadPhoto,
                     )
@@ -143,7 +149,8 @@ internal fun Photos3SmallItems(
                     onLongPress = onLongPress,
                     albumPhotoView = {
                         AlbumPhotoView(
-                            size = size,
+                            width = size,
+                            height = size,
                             photo = photos[1],
                             photoDownload = downloadPhoto,
                         )
@@ -161,7 +168,8 @@ internal fun Photos3SmallItems(
                     onLongPress = onLongPress,
                     albumPhotoView = {
                         AlbumPhotoView(
-                            size = size,
+                            width = size,
+                            height = size,
                             photo = photos[2],
                             photoDownload = downloadPhoto,
                         )
@@ -183,7 +191,7 @@ internal fun Photos2SmallBigItems(
     downloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: MutableSet<Long>,
+    selectedPhotoIds: Set<Long>,
 ) {
     Column {
         Row(
@@ -198,7 +206,8 @@ internal fun Photos2SmallBigItems(
                     onLongPress = onLongPress,
                     albumPhotoView = {
                         AlbumPhotoView(
-                            size = size,
+                            width = size,
+                            height = size,
                             photo = photos[0],
                             photoDownload = downloadPhoto,
                         )
@@ -208,12 +217,16 @@ internal fun Photos2SmallBigItems(
                 )
 
                 if (photos.size == 3) {
+                    Spacer(
+                        modifier = Modifier.height(1.dp)
+                    )
                     AlbumPhotoContainer(
                         onClick = onClick,
                         onLongPress = onLongPress,
                         albumPhotoView = {
                             AlbumPhotoView(
-                                size = size,
+                                width = size,
+                                height = size,
                                 photo = photos[2],
                                 photoDownload = downloadPhoto,
                             )
@@ -229,7 +242,8 @@ internal fun Photos2SmallBigItems(
                     onLongPress = onLongPress,
                     albumPhotoView = {
                         AlbumPhotoView(
-                            size = size * 2,
+                            width = size * 2,
+                            height = size * 2 + gap,
                             photo = photos[1],
                             photoDownload = downloadPhoto,
                         )
@@ -256,7 +270,8 @@ private fun AlbumPhotoContainer(
     isSelected: Boolean,
 ) {
     Box(
-        modifier = isSelected(isSelected)
+        modifier = Modifier
+            .isSelected(isSelected)
             .combinedClickable(
                 onClick = { onClick(photo) },
                 onLongClick = { onLongPress(photo) }
@@ -317,7 +332,8 @@ private fun AlbumPhotoContainer(
 @Composable
 private fun AlbumPhotoView(
     photo: Photo,
-    size: Dp,
+    width: Dp,
+    height: Dp,
     photoDownload: PhotoDownload,
 ) {
     val imageState = produceState<String?>(initialValue = null) {
@@ -342,17 +358,9 @@ private fun AlbumPhotoView(
         error = painterResource(id = R.drawable.ic_image_thumbnail),
         contentScale = ContentScale.Crop,
         modifier = Modifier
-            .size(size)
+            .width(width)
+            .height(height)
             .aspectRatio(1f)
     )
 }
-
-@Composable
-private fun isSelected(isSelected: Boolean) = if (isSelected) Modifier
-    .border(BorderStroke(
-        width = 2.dp,
-        color = colorResource(id = R.color.teal_300)),
-        shape = RoundedCornerShape(4.dp)
-    )
-    .clip(RoundedCornerShape(4.dp)) else Modifier
 

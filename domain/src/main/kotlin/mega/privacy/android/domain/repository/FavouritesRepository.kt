@@ -1,8 +1,6 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.NodeInfo
+import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
  * The repository interface regarding favourites
@@ -13,20 +11,7 @@ interface FavouritesRepository {
      * Get favourites
      * @return List<FavouriteInfo>
      */
-    suspend fun getAllFavorites(): List<NodeInfo>
-
-    /**
-     * Get children nodes by node
-     * @param parentHandle the parent node handle
-     * @return FavouriteFolderInfo
-     */
-    suspend fun getChildren(parentHandle: Long): FavouriteFolderInfo?
-
-    /**
-     * Monitor the node change
-     * @return Flow<Boolean>
-     */
-    fun monitorNodeChange(): Flow<Boolean>
+    suspend fun getAllFavorites(): List<UnTypedNode>
 
     /**
      * Removing favourites

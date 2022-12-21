@@ -600,6 +600,14 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.SetupMegaApiInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.MegaApiFolderInitializer"
+                android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.FrescoInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity
@@ -676,6 +684,16 @@
 
         <activity
             android:name="mega.privacy.android.app.presentation.startconversation.StartConversationActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 

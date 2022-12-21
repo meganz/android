@@ -9,10 +9,12 @@ import javax.inject.Inject
  *
  * @property accountsRepository
  */
-class DefaultGetAccountDetails @Inject constructor(private val accountsRepository: AccountRepository) :
-    GetAccountDetails {
+class DefaultGetAccountDetails @Inject constructor(
+    private val accountsRepository: AccountRepository,
+    private val isDatabaseEntryStale: IsDatabaseEntryStale,
+) : GetAccountDetails {
     override suspend fun invoke(forceRefresh: Boolean): UserAccount {
-        if (accountsRepository.isAccountDataStale() || forceRefresh) accountsRepository.requestAccount()
+        if (forceRefresh || accountsRepository.storageCapacityUsedIsBlank() || isDatabaseEntryStale()) accountsRepository.requestAccount()
         return accountsRepository.getUserAccount()
     }
 }

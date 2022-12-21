@@ -5,19 +5,17 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.data.facade.AccountInfoFacade
-import mega.privacy.android.app.data.facade.AccountInfoWrapper
-import mega.privacy.android.app.data.facade.CacheFolderFacade
-import mega.privacy.android.app.data.facade.MegaApiFolderFacade
+import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel
 import mega.privacy.android.app.meeting.facade.CameraFacade
 import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.data.gateway.CacheFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import javax.inject.Singleton
 
 /**
@@ -36,17 +34,6 @@ abstract class GatewayModule {
     @Binds
     abstract fun bindAccountInfoWrapper(implementation: AccountInfoFacade): AccountInfoWrapper
 
-    @Binds
-    abstract fun bindMegaApiFolderGateway(implementation: MegaApiFolderFacade): MegaApiFolderGateway
-
-    /**
-     * Provides @CacheFolderGateway
-     * @param implementation : @CacheFolderFacade
-     * @return CacheFolderGateway : @CacheFolderGateway
-     */
-    @Binds
-    abstract fun bindCacheFolderGateway(implementation: CacheFolderFacade): CacheFolderGateway
-
     /**
      * Provide MediaPlayerGateway implementation
      */
@@ -62,6 +49,12 @@ abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindsVideoPlayerGateway(@VideoPlayer mediaPlayerFacade: MediaPlayerFacade): MediaPlayerGateway
+
+    /**
+     * Provide PlayerServiceViewModelGateway implementation
+     */
+    @Binds
+    abstract fun bindsPlayerServiceViewModelGateway(implementation: MediaPlayerServiceViewModel): PlayerServiceViewModelGateway
 
     @Binds
     @Singleton

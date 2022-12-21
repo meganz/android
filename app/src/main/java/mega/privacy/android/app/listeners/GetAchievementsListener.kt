@@ -1,5 +1,6 @@
 package mega.privacy.android.app.listeners
 
+import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.main.megaachievements.ReferralBonus
 import mega.privacy.android.app.utils.Util
@@ -10,11 +11,13 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import java.util.Calendar
+import javax.inject.Inject
 
 /**
  * GetAchievementsListener
  */
-class GetAchievementsListener : MegaRequestListenerInterface {
+@ActivityScoped
+class GetAchievementsListener @Inject constructor() : MegaRequestListenerInterface {
 
     /**
      * isFetching: Boolean

@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
@@ -266,7 +267,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 tips.observe(viewLifecycleOwner) {
                     showToast(binding.fabTipLocation, it, Toast.LENGTH_SHORT)
                 }
-                notificationNetworkState.observe(viewLifecycleOwner) {
+                viewLifecycleOwner.collectFlow(monitorConnectivityEvent) {
                     Timber.d("Network state changed, Online :$it")
                 }
 

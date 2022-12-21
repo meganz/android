@@ -44,6 +44,11 @@ fun AlbumDynamicContentFragment.destroyActionMode() {
     albumsViewModel.clearSelectedPhotos()
 }
 
-fun AlbumDynamicContentFragment.actionRemoveFavourites(){
+fun AlbumDynamicContentFragment.actionRemoveFavourites() {
     albumsViewModel.removeFavourites()
 }
+
+fun AlbumDynamicContentFragment.checkSelectAll(): Boolean =
+    albumsViewModel.state.value.selectedPhotoIds.size == albumsViewModel.getAlbumPhotosCount()
+
+

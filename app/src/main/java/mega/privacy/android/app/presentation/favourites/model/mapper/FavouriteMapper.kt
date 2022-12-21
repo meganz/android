@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.favourites.model.mapper
 
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
@@ -9,11 +8,11 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.NodeFile
-import mega.privacy.android.domain.entity.NodeFolder
-import mega.privacy.android.domain.entity.NodeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import nz.mega.sdk.MegaNode
 
 /**
@@ -21,7 +20,7 @@ import nz.mega.sdk.MegaNode
  */
 typealias FavouriteMapper = (
     @JvmSuppressWildcards MegaNode,
-    @JvmSuppressWildcards NodeInfo,
+    @JvmSuppressWildcards TypedNode,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards StringUtilWrapper,
     @JvmSuppressWildcards (String) -> Int,
@@ -37,19 +36,19 @@ typealias FavouriteMapper = (
  */
 internal fun toFavourite(
     node: MegaNode,
-    nodeInfo: NodeInfo,
+    nodeInfo: TypedNode,
     isAvailableOffline: Boolean,
     stringUtil: StringUtilWrapper,
     getFileIcon: (String) -> Int = { 0 },
 ) = when (nodeInfo) {
-    is NodeFolder -> {
+    is TypedFolderNode -> {
         nodeInfo.createFolder(
             node,
             getFolderInfo(nodeInfo, stringUtil),
             isAvailableOffline,
         )
     }
-    is NodeFile -> {
+    is TypedFileNode -> {
         nodeInfo.createFile(
             node,
             getFileInfo(nodeInfo, stringUtil),
@@ -67,14 +66,13 @@ internal fun toFavourite(
  * @param isAvailableOffline whether is available for offline
  * @return FavouriteFolder
  */
-private fun NodeFolder.createFolder(
+private fun TypedFolderNode.createFolder(
     node: MegaNode,
     folderInfo: String,
     isAvailableOffline: Boolean,
 ) = FavouriteFolder(
-    handle = id,
-    icon = MegaNodeUtil.getFolderIcon(node,
-        DrawerItem.HOMEPAGE),
+    nodeId = id,
+    icon = getFolderIcon(this),
     name = name,
     label = label,
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
@@ -96,13 +94,13 @@ private fun NodeFolder.createFolder(
  * @param getFileIcon getFileIcon
  * @return FavouriteFile
  */
-private fun NodeFile.createFile(
+private fun TypedFileNode.createFile(
     node: MegaNode,
     fileInfo: String,
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
 ) = FavouriteFile(
-    handle = id,
+    nodeId = id,
     icon = getFileIcon(name),
     name = name,
     label = label,
@@ -135,7 +133,7 @@ private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
  * @param stringUtil StringUtilWrapper
  * @return file info
  */
-private fun getFileInfo(favouriteInfo: NodeFile, stringUtil: StringUtilWrapper) =
+private fun getFileInfo(favouriteInfo: TypedFileNode, stringUtil: StringUtilWrapper) =
     String.format(
         "%s · %s",
         stringUtil.getSizeString(favouriteInfo.size),
@@ -148,5 +146,5 @@ private fun getFileInfo(favouriteInfo: NodeFile, stringUtil: StringUtilWrapper) 
  * @param stringUtil StringUtilWrapper
  * @return folder info
  */
-private fun getFolderInfo(favouriteInfo: NodeFolder, stringUtil: StringUtilWrapper) =
-    stringUtil.getFolderInfo(favouriteInfo.numChildFolders, favouriteInfo.numChildFiles)
+private fun getFolderInfo(favouriteInfo: TypedFolderNode, stringUtil: StringUtilWrapper) =
+    stringUtil.getFolderInfo(favouriteInfo.childFolderCount, favouriteInfo.childFileCount)

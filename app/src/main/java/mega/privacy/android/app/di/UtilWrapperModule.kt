@@ -2,18 +2,14 @@ package mega.privacy.android.app.di
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
-import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
@@ -21,20 +17,17 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
-import mega.privacy.android.app.utils.wrapper.AvatarWrapper
-import mega.privacy.android.app.utils.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
-import mega.privacy.android.app.utils.wrapper.IsOnlineWrapper
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
-import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
-import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.wrapper.AvatarWrapper
 
 /**
  * Util wrapper module
@@ -43,14 +36,8 @@ import mega.privacy.android.domain.usecase.MonitorBackupFolder
  * need to be removed during the refactoring process.
  */
 @Module
-@InstallIn(FragmentComponent::class, SingletonComponent::class, ServiceComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class UtilWrapperModule {
-
-    /**
-     * Bind monitor backup folder
-     */
-    @Binds
-    abstract fun bindMonitorBackupFolder(implementation: DefaultMonitorBackupFolder): MonitorBackupFolder
 
     /**
      * Bind mega node util wrapper
@@ -58,15 +45,7 @@ abstract class UtilWrapperModule {
     @Binds
     abstract fun bindMegaNodeUtilWrapper(implementation: MegaNodeUtilFacade): MegaNodeUtilWrapper
 
-    companion object{
-        @Provides
-        fun provideIsOnlineWrapper(): IsOnlineWrapper {
-            return object : IsOnlineWrapper {
-                override fun isOnline(context: Context): Boolean {
-                    return Util.isOnline(context)
-                }
-            }
-        }
+    companion object {
 
         @Provides
         fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
@@ -148,15 +127,5 @@ abstract class UtilWrapperModule {
             override fun getSpecificAvatarColor(typeColor: String): Int =
                 AvatarUtil.getSpecificAvatarColor(typeColor)
         }
-
-        /**
-         * provide Bitmap Factory Wrapper
-         */
-        @Provides
-        fun provideBitmapFactoryWrapper() = object : BitmapFactoryWrapper {
-            override fun decodeFile(pathName: String?, opts: BitmapFactory.Options): Bitmap? =
-                BitmapFactory.decodeFile(pathName, opts)
-        }
-
     }
 }

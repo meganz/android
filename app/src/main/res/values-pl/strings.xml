@@ -244,9 +244,9 @@
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Linki</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="title_incoming_shares_explorer">Udostępnienia</string>
+    <string name="title_incoming_shares_explorer">Udostępnienia przychodzące</string>
     <!-- Title of the share with file explorer -->
-    <string name="title_incoming_shares_with_explorer">Udostępnione z</string>
+    <string name="title_incoming_shares_with_explorer">Udostępnienia przychodzące z</string>
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">Brak plików na dysku</string>
     <!-- Text that indicates that a folder is currently empty -->
@@ -321,10 +321,10 @@
     </plurals>
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
-        <item quantity="one">Folder jest pusty.</item>
-        <item quantity="few">Foldery są puste.</item>
-        <item quantity="many">Foldery są puste.</item>
-        <item quantity="other">Foldery są puste.</item>
+        <item quantity="one">Katalog jest pusty.</item>
+        <item quantity="few">Katalogi są puste.</item>
+        <item quantity="many">Katalogi są puste.</item>
+        <item quantity="other">Katalogi są puste.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_cancel">Kliknij aby anulować</string>
@@ -574,9 +574,9 @@
     <!-- title of the notification when camera upload is initializing -->
     <string name="settings_camera_notif_initializing_title">Inicjalizowanie przesyłania zdjęć z kamery</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój folder lokalny jest niedostępny.</string>
+    <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój katalog lokalny jest niedostępny.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Przesyłanie multimediów zostało wyłączone. Twój folder lokalny jest niedostępny.</string>
+    <string name="camera_notif_secondary_local_unavailable">Przesyłanie multimediów zostało wyłączone. Twój katalog lokalny jest niedostępny.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Wygląd</string>
     <!-- settings of the Features section -->
@@ -937,7 +937,7 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link do katalogu jest niedostępny</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Łącze do folderu zostało usunięte, ponieważ naruszało nasze warunki korzystania z usługi.</string>
+    <string name="folder_link_unavaible_ToS_violation">Łącze do katalogu zostało usunięte, ponieważ naruszało nasze warunki korzystania z usługi.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Link pliku jest niedostępny</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
@@ -1180,7 +1180,7 @@
         <item quantity="other">%1$d kontakty</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
-    <string name="error_sharing_folder">Błąd udostępniania folderu. Proszę spróbuj ponownie.</string>
+    <string name="error_sharing_folder">Błąd udostępniania katalogu. Proszę spróbuj ponownie.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Wszystkie dane powiązane w wybranym kontaktem zostaną usunięte.</item>
@@ -1511,9 +1511,9 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Przenieść do kosza?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Czy na pewno chcesz przenieść ten folder do Kosza na śmieci? Spowoduje to wyłączenie przesyłania z aparatu.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie przesyłania z aparatu.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Czy na pewno chcesz przenieść ten folder do kosza na śmieci? Spowoduje to wyłączenie dodatkowego przesyłania multimediów.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do kosza na śmieci? Spowoduje to wyłączenie dodatkowego przesyłania multimediów.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Przenieść do kosza?</string>
     <!-- confirmation message before removing a file -->
@@ -1585,10 +1585,10 @@
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
-        <item quantity="one">Jeśli opuścisz folder, nie będziesz go więcej widzieć.</item>
-        <item quantity="few">Jeśli opuścisz te foldery, nie będziesz mógł ich ponownie zobaczyć.</item>
-        <item quantity="many">Jeśli opuścisz te foldery, nie będziesz mógł ich ponownie zobaczyć.</item>
-        <item quantity="other">Jeśli opuścisz te foldery, nie będziesz mógł ich ponownie zobaczyć.</item>
+        <item quantity="one">Jeśli opuścisz katalog, nie będziesz go więcej widzieć.</item>
+        <item quantity="few">Jeśli opuścisz te katalogi, nie będziesz mógł ich ponownie zobaczyć.</item>
+        <item quantity="many">Jeśli opuścisz te katalogi, nie będziesz mógł ich ponownie zobaczyć.</item>
+        <item quantity="other">Jeśli opuścisz te katalogi, nie będziesz mógł ich ponownie zobaczyć.</item>
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Pomoc</string>
@@ -1779,8 +1779,6 @@
     <string name="pass_strong">Silne</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Rozmowa w trakcie</string>
-    <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Kliknij, aby powrócić do połączenia</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Powrót do rozmowy</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2481,7 +2479,7 @@
     <!-- notification title when compressing video -->
     <string name="title_compress_video">Kompresowanie filmów %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
-    <string name="error_invalid_folder_selected">Wybrano nieprawidłowy folder</string>
+    <string name="error_invalid_folder_selected">Wybrano nieprawidłowy katalog</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d plik</item>
@@ -2498,10 +2496,10 @@
     </plurals>
     <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="few">%1$d foldery&#160;·&#160;</item>
-        <item quantity="many">%1$d folderów&#160;·&#160;</item>
-        <item quantity="other">%1$d folderów&#160;·&#160;</item>
+        <item quantity="one">%1$d katalog&#160;·&#160;</item>
+        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] dodane %2$s i %3$s[/B]</string>
@@ -2919,9 +2917,9 @@
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Wystąpił problem z ostatnią płatnością. Aby uzyskać więcej informacji, skorzystaj z MEGA przeglądarki na komputerze.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deactivated</string>
+    <string name="expired_business_title">Konto dezaktywowane</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure or you\’ve cancelled your subscription. You won\’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log into MEGA through a browser on the web.</string>
+    <string name="expired_admin_business_text">Twoje konto Business zostało dezaktywowane z powodu braku płatności. Nie będziesz miał dostępu do danych przechowywanych na swoim koncie. Aby dokonać płatności i reaktywować subskrypcję, zaloguj się do MEGA przez przeglądarkę.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Twoje konto jest obecnie [B]zawieszone[/B]. Możesz tylko przeglądać swoje dane.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -2947,7 +2945,7 @@
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">Moje pliki czatu</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
-    <string name="error_creating_folder">Błąd. Folder %1$s nie został utworzony</string>
+    <string name="error_creating_folder">Błąd. Katalog %1$s nie został utworzony</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
     <string name="verify_email_label">Zweryfikuj swój adres email</string>
     <!-- Text informing user that their account has been suspended -->
@@ -3004,7 +3002,7 @@
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">Czy zawsze zapisywać w tej lokalizacji?</string>
     <!-- Action to show any file in its location -->
-    <string name="view_in_folder_label">Wyświetl w folderze</string>
+    <string name="view_in_folder_label">Wyświetl w katalogu</string>
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">Przeglądaj pliki</string>
     <!-- Title of the File Provider activity -->
@@ -3022,7 +3020,7 @@
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Zwiększ swój transfer</string>
     <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">Folder nie istnieje.</string>
+    <string name="warning_folder_not_exists">Katalog nie istnieje.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Plik nie może być znaleziony w Twoim dysku Cloud Drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -3255,7 +3253,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Użytkownicy MEGA Pro mają wyłączny dostęp do dodatkowych funkcji bezpieczeństwa linków, dzięki którym Twoje konto jest jeszcze bardziej bezpieczne.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nasz system szyfrowania typu end-to-end wymaga unikalnego klucza generowanego automatycznie dla tego pliku lub folderu. Łącze z tym kluczem jest tworzone domyślnie, ale można wyeksportować klucz deszyfrowania osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
+    <string name="decryption_key_explanation">Nasz system szyfrowania typu end-to-end wymaga unikalnego klucza generowanego automatycznie dla tego pliku lub katalogu. Łącze z tym kluczem jest tworzone domyślnie, ale można wyeksportować klucz deszyfrowania osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Zresetuj hasło</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3603,8 +3601,6 @@
     <string name="change_meeting_name">Zmień nazwę spotkania</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Link do spotkania</string>
-    <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">Czas trwania</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Dołącz do spotkania jako gość</string>
     <!-- The title of the paste meeting link dialog for guest-->
@@ -3728,9 +3724,9 @@
     <!-- Hint shown in the open link alert dialog. -->
     <string name="hint_paste_link">Wklej link</string>
     <!-- Error shown when it tries to open an invalid file or folder link .-->
-    <string name="invalid_file_folder_link">Nieprawidłowy link do pliku lub folderu</string>
+    <string name="invalid_file_folder_link">Nieprawidłowy link do pliku lub katalogu</string>
     <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty. -->
-    <string name="invalid_file_folder_link_empty">Wprowadź prawidłowy link do pliku lub folderu</string>
+    <string name="invalid_file_folder_link_empty">Wprowadź prawidłowy link do pliku lub katalogu</string>
     <!-- Error shown when it tries to open an invalid chat link and the text view is empty. -->
     <string name="invalid_chat_link_empty">Wprowadź prawidłowy link do czatu</string>
     <!-- Error shown when it tries to open a chat link from the Cloud Drive section. -->
@@ -3744,7 +3740,7 @@
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Zezwalaj na używanie danych mobilnych do ładowania obrazów o wysokiej rozdzielczości podczas podglądu. Jeśli wyłączone, oryginalny obraz zostanie załadowany tylko po powiększeniu.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">Usuwasz folder kopii zapasowych. Spowoduje to usunięcie wszystkich kopii zapasowych, które ustawiłeś. Czy na pewno chcesz to zrobić?</string>
+    <string name="backup_remove_root_folder">Usuwasz katalog kopii zapasowych. Spowoduje to usunięcie wszystkich kopii zapasowych, które ustawiłeś. Czy na pewno chcesz to zrobić?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Przenieś „%1s” do kosza</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -3758,13 +3754,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Skonfiguruj kopię zapasową</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Aby te elementy dodane do folderu kopii zapasowych były automatycznie synchronizowane z MEGA Cloud, należy je skonfigurować w aplikacji MEGA Desktop App.</string>
+    <string name="backup_add_item_to_root_text">Aby te elementy dodane do katalogu kopii zapasowych były automatycznie synchronizowane z MEGA Cloud, należy je skonfigurować w aplikacji MEGA Desktop App.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Tylko odczyt</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">Ten folder może być udostępniony tylko do odczytu, ponieważ jest to folder kopii zapasowej, wszelkie zmiany jego zawartości mogą uniemożliwić tworzenie kopii zapasowej.</string>
+    <string name="backup_share_permission_text">Ten katalog może być udostępniony tylko do odczytu, ponieważ jest to katalog kopii zapasowej, wszelkie zmiany jego zawartości mogą uniemożliwić tworzenie kopii zapasowej.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Elementy znajdujące się w tym folderze są częścią skonfigurowanej kopii zapasowej i są synchronizowane z folderem lokalnym. Podjęcie tego działania spowoduje przerwanie synchronizacji i wyłączenie kopii zapasowej. Kopia zapasowa może być ponownie włączona w aplikacji MEGA Desktop App. Czy na pewno chcesz kontynuować?</string>
+    <string name="backup_add_item_text">Elementy znajdujące się w tym katalogu są częścią skonfigurowanej kopii zapasowej i są synchronizowane z katalogiem lokalnym. Podjęcie tego działania spowoduje przerwanie synchronizacji i wyłączenie kopii zapasowej. Kopia zapasowa może być ponownie włączona w aplikacji MEGA Desktop App. Czy na pewno chcesz kontynuować?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Te foldery mogą być udostępniane tylko do odczytu, ponieważ są to foldery kopii zapasowych, wszelkie zmiany w ich zawartości mogą uniemożliwić tworzenie kopii zapasowych.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -3783,8 +3779,6 @@
     <string name="payment_methods">Metody płatności</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Kontynuuj</string>
-    <!-- Message informing the upgrade was processed correctly. Placeholder: type of subscription e.g: Pro Lite monthly -->
-    <string name="successful_upgrade">Dziękujemy za Twoją subskrypcję %1$s</string>
     <!-- Pro Lite monthly subscription -->
     <string name="pro_lite_monthly">Pro&#160;Lite miesięcznie</string>
     <!-- Pro Lite yearly subscription -->
@@ -3842,7 +3836,7 @@
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">Format pliku nie jest obsługiwany. Nie można otworzyć pliku.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
-    <string name="no_uploads_empty_folder">Wybrany folder jest pusty. Brak plików do przesłania.</string>
+    <string name="no_uploads_empty_folder">Wybrany katalog jest pusty. Brak plików do przesłania.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
     <string name="error_same_password">Wprowadziłeś swoje aktualne hasło</string>
     <!-- Title of pop-up error message for taken down file -->
@@ -3954,7 +3948,7 @@
     <!-- Upload and rename action button for a name collision. -->
     <string name="upload_and_rename">Wgraj i zmień nazwę</string>
     <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
-    <string name="warning_move_and_replace">Zamień plik w folderze docelowym na plik, który przenosisz.</string>
+    <string name="warning_move_and_replace">Zamień plik w katalogu docelowym na plik, który przenosisz.</string>
     <!-- Move and replace action button for a name collision. -->
     <string name="move_and_replace">Przenieś i podmień</string>
     <!-- Don’t move action button for a name collision. -->
@@ -3964,7 +3958,7 @@
     <!-- Move and rename action button for a name collision. -->
     <string name="move_and_rename">Przenieś i zmień&#160;nazwę</string>
     <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
-    <string name="warning_copy_and_replace">Zamień plik w folderze docelowym na plik, który chcesz skopiować.</string>
+    <string name="warning_copy_and_replace">Zamień plik w katalogu docelowym na plik, który chcesz skopiować.</string>
     <!-- Copy and replace action button for a name collision. -->
     <string name="copy_and_replace">Skopuj i podmień</string>
     <!-- Don’t copy action button for a name collision. -->
@@ -3976,21 +3970,21 @@
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <string name="file_apply_for_all">Zastosuj tę opcję przy następnych %1$d konfliktach</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
-    <string name="warning_copy_and_merge">Połącz folder w miejscu docelowym z folderem, który jest kopiowany.</string>
+    <string name="warning_copy_and_merge">Połącz katalog w miejscu docelowym z katalogiem, który jest kopiowany.</string>
     <!-- Copy and merge action button for a name collision. -->
     <string name="copy_and_merge">Skopiuj i połącz</string>
     <!-- Informs about what is expected after choose the option move and merge for a name collision. -->
-    <string name="warning_move_and_merge">Połącz folder w miejscu docelowym z folderem, który przenosisz.</string>
+    <string name="warning_move_and_merge">Połącz katalog w miejscu docelowym z katalogiem, który przenosisz.</string>
     <!-- Move and merge action button for a name collision. -->
     <string name="move_and_merge">Przenieś i połącz</string>
     <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
-    <string name="warning_upload_and_merge">Połącz folder w miejscu docelowym z folderem, który przesyłasz.</string>
+    <string name="warning_upload_and_merge">Połącz katalog w miejscu docelowym z katalogiem, który przesyłasz.</string>
     <!-- Upload and merge action button for a name collision. -->
     <string name="upload_and_merge">Wgraj i połącz</string>
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
     <string name="skip_file">Żaden z plików nie zostanie zmieniony. Plik zostanie zachowany jako:</string>
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for folder name collisions. -->
-    <string name="skip_folder">Pomiń ten folder</string>
+    <string name="skip_folder">Pomiń ten katalog</string>
     <!-- Informs about a name collision, the folder is trying to upload, move or copy already exists on the location. The placeholder is for the name of the folder. -->
     <string name="folder_already_exists_in_location">Katalog o nazwie [B]%1$s[/B] już&#160;istnieje w tej lokalizacji.</string>
     <!-- Banner text to indicate poor network quality -->
@@ -4241,4 +4235,61 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">Dodałeś już wszystkie swoje kontakty do tego czatu. Jeśli chcesz dodać więcej uczestników, najpierw zaproś ich do swojej listy kontaktów.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Zapisanie zdjęcia w galerii urządzenia</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Data odnowienia:[/A] [B]%s[/B]</string>
+    <!-- Album creation dialog title -->
+    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <!-- Album creation input name placeholder -->
+    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <!-- Title of option to show more participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <!-- Error message for creating an album with a system albums name -->
+    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message for creating an album with a duplicate name -->
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <!-- Title of album photos selection screen -->
+    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="photos_album_selection_added">
+        <item quantity="one">Added %d item to “%s“</item>
+        <item quantity="other">Added %d items to “%s”</item>
+    </plurals>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_payment_title">Informacje o płatności</string>
+    <!-- Title of a notification related to payments -->
+    <string name="notifications_pro_expiring_title">Plan Pro wkrótce wygaśnie</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
+    <string name="notifications_pro_payment_received">Your payment for the %1$s plan was received.</string>
+    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
+    <string name="notifications_pro_payment_failed">Your payment for the %1$s plan was unsuccessful.</string>
+    <!-- Text of a notification about an expiring pro plan -->
+    <plurals name="notifications_expiring_pro_plan_text">
+        <item quantity="one">Your Pro membership plan will expire in 1 day.</item>
+        <item quantity="other">Your Pro membership plan will expire in %1$d days.</item>
+    </plurals>
+    <!-- Text of a notification about an expired pro plan -->
+    <plurals name="notifications_expired_pro_plan_text">
+        <item quantity="one">Your Pro membership plan expired 1 day ago.</item>
+        <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
+    </plurals>
+    <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
+    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <!-- Albums sub-section for all system and user albums -->
+    <string name="photos_album_subsection_my_albums">My albums</string>
+    <!-- Albums sub-section for all shared albums -->
+    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <!-- Header title for meeting list past meetings -->
+    <string name="meetings_list_past_header">Dotychczasowe spotkania</string>
+    <!-- Label for upcoming meetings -->
+    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <!-- Label for recurring meetings -->
+    <string name="meetings_list_recurring_meeting_label">Spotkanie cykliczne</string>
+    <!-- Label for scheduled weekly meetings -->
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
 </resources>

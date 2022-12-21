@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider
@@ -38,7 +37,6 @@ import javax.inject.Inject
 class MediaViewModel @Inject constructor(
     private val repository: MediaItemRepository,
     private val getCameraSortOrder: GetCameraSortOrder,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle,
     monitorNodeUpdates: MonitorNodeUpdates,
@@ -62,7 +60,7 @@ class MediaViewModel @Inject constructor(
 
     var mZoom = ZoomUtil.MEDIA_ZOOM_LEVEL
 
-    fun getOrder() = runBlocking { sortOrderIntMapper(getCameraSortOrder()) }
+    fun getOrder() = runBlocking { getCameraSortOrder() }
 
     var currentHandle: Long? = null
 
@@ -117,7 +115,7 @@ class MediaViewModel @Inject constructor(
         liveData(viewModelScope.coroutineContext) {
             if (forceUpdate) {
                 repository.getFiles(
-                    order = sortOrderIntMapper(getCameraSortOrder()),
+                    order = getCameraSortOrder(),
                     zoom = mZoom,
                     handle = currentHandle ?: return@liveData)
             } else {
@@ -154,8 +152,9 @@ class MediaViewModel @Inject constructor(
             emit(
                 listOf(
                     days.sortDescending(),
-                    cardsProvider.getMonths().sortDescending(),
-                    cardsProvider.getYears().sortDescending())
+                    cardsProvider.latestSortedMonths,
+                    cardsProvider.latestSortedYears,
+                )
             )
 
             fetchMissingPreviews(days)

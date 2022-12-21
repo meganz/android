@@ -27,6 +27,7 @@ import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -161,7 +162,7 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     override val viewerFrom: Int = Constants.VIEWER_FROM_LINKS
     override val currentSharesTab: SharesTab = SharesTab.LINKS_TAB
-    override val sortOrder: Int
+    override val sortOrder: SortOrder
         get() = state().sortOrder
     override val parentHandle: Long
         get() = state().linksHandle

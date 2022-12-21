@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
@@ -49,14 +50,6 @@ class StartConversationActivity : ComponentActivity() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel by viewModels<StartConversationViewModel>()
-
-    private val transparentColor by lazy {
-        ContextCompat.getColor(this, android.R.color.transparent)
-    }
-
-    private val whiteColor by lazy {
-        ContextCompat.getColor(this, android.R.color.white)
-    }
 
     lateinit var resultLauncher: ActivityResultLauncher<Intent?>
 
@@ -116,13 +109,8 @@ class StartConversationActivity : ComponentActivity() {
         }
     }
 
-    private fun onScrollChange(scrolled: Boolean, isDark: Boolean) {
-        when {
-            scrolled && isDark -> ColorUtils.changeStatusBarColorForElevation(this, true)
-            isDark -> window?.statusBarColor = transparentColor
-            else -> window?.statusBarColor = whiteColor
-        }
-    }
+    private fun onScrollChange(scrolled: Boolean, isDark: Boolean) =
+        changeStatusBarColor(scrolled = scrolled, isDark = isDark)
 
     private fun onActionTap(action: StartConversationAction) {
         when (action) {
