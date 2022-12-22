@@ -88,6 +88,8 @@ class RubbishBinFragment : Fragment() {
 
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val rubbishBinViewModel: RubbishBinViewModel by viewModels()
+
     private var nodes: List<MegaNode> = mutableListOf()
 
     private var recyclerView: RecyclerView? = null
