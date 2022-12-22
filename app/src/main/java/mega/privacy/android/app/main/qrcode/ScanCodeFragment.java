@@ -136,15 +136,6 @@ public class ScanCodeFragment extends Fragment implements View.OnClickListener {
             success = savedInstanceState.getBoolean("success", true);
             printEmail = savedInstanceState.getBoolean(PRINT_EMAIL, false);
             handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
-
-            byte[] avatarByteArray = savedInstanceState.getByteArray("avatar");
-            if (avatarByteArray != null) {
-                avatarSave = BitmapFactory.decodeByteArray(avatarByteArray, 0, avatarByteArray.length);
-                contentAvatar = savedInstanceState.getBoolean("contentAvatar", false);
-                if (!contentAvatar) {
-                    initialLetterSave = savedInstanceState.getString("initialLetter");
-                }
-            }
         }
 
         if (megaApi == null) {
@@ -220,12 +211,12 @@ public class ScanCodeFragment extends Fragment implements View.OnClickListener {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (inviteShown) {
-            outState.putBoolean("inviteShown", inviteShown);
+            outState.putBoolean("inviteShown", true);
             outState.putString("contactNameContent", contactNameContent);
             outState.putBoolean("isContact", isContact);
         }
         if (dialogshown) {
-            outState.putBoolean("dialogshown", dialogshown);
+            outState.putBoolean("dialogshown", true);
             outState.putInt("dialogTitleContent", dialogTitleContent);
             outState.putInt("dialogTextContent", dialogTextContent);
         }
@@ -234,19 +225,6 @@ public class ScanCodeFragment extends Fragment implements View.OnClickListener {
             outState.putBoolean("success", success);
             outState.putBoolean(PRINT_EMAIL, printEmail);
             outState.putLong("handleContactLink", handleContactLink);
-            if (avatarImage != null) {
-                avatarImage.buildDrawingCache(true);
-                Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
-
-                ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
-                avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
-                byte[] avatarByteArray = avatarOutputStream.toByteArray();
-                outState.putByteArray("avatar", avatarByteArray);
-                outState.putBoolean("contentAvatar", contentAvatar);
-            }
-            if (!contentAvatar) {
-                outState.putString("initialLetter", initialLetter.getText().toString());
-            }
         }
     }
 
