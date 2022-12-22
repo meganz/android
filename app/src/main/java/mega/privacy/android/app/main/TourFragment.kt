@@ -1,364 +1,314 @@
-package mega.privacy.android.app.main;
+package mega.privacy.android.app.main
 
-import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
-import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
-import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
-import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE;
-import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import android.Manifest
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication.Companion.isLoggingOut
+import mega.privacy.android.app.R
+import mega.privacy.android.app.TourImageAdapter
+import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.databinding.DialogRecoveryKeyBinding
+import mega.privacy.android.app.databinding.FragmentTourBinding
+import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import nz.mega.sdk.MegaApiJava
+import timber.log.Timber
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ScrollView;
+/**
+ * Tour Fragment.
+ */
+class TourFragment : Fragment() {
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
+    private lateinit var binding: FragmentTourBinding
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputLayout;
+    private var tourAdapter: TourImageAdapter? = null
 
-import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.TourImageAdapter;
-import mega.privacy.android.app.components.LoopViewPager;
-import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
-import mega.privacy.android.app.utils.TextUtil;
-import timber.log.Timber;
+    private var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>? = null
 
-public class TourFragment extends Fragment implements View.OnClickListener {
-
-    private static final String EXTRA_RECOVERY_KEY_URL = "EXTRA_RECOVERY_KEY_URL";
-    private static final String EXTRA_PARK_ACCOUNT_URL = "EXTRA_PARK_ACCOUNT_URL";
-
-    private Context context;
-    private TourImageAdapter adapter;
-    private LoopViewPager viewPager;
-    private ImageView firstItem;
-    private ImageView secondItem;
-    private ImageView thirdItem;
-    private ImageView fourthItem;
-    private ImageView fifthItem;
-    private Button bRegister;
-    private Button bLogin;
-    private ScrollView baseContainer;
-    private ActivityResultLauncher<String> joinMeetingAsGuestLauncher = null;
-
-    public static TourFragment newInstance(@Nullable String recoveryKeyUrl, @Nullable String parkAccountUrl) {
-        TourFragment fragment = new TourFragment();
-        Bundle arguments = new Bundle();
-
-        if (!TextUtils.isEmpty(recoveryKeyUrl)) {
-            arguments.putString(EXTRA_RECOVERY_KEY_URL, recoveryKeyUrl);
-        }
-
-        if (!TextUtils.isEmpty(parkAccountUrl)) {
-            arguments.putString(EXTRA_PARK_ACCOUNT_URL, parkAccountUrl);
-        }
-
-        if (!arguments.isEmpty()) {
-            fragment.setArguments(arguments);
-        }
-
-        return fragment;
+    private val selectedCircle by lazy {
+        ContextCompat.getDrawable(requireContext(), R.drawable.selection_circle_page_adapter)
+    }
+    private val notSelectedCircle by lazy {
+        ContextCompat.getDrawable(requireContext(), R.drawable.not_selection_circle_page_adapter)
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Timber.d("onCreate");
-        super.onCreate(savedInstanceState);
-
-        if (context == null) {
-            Timber.e("Context is null");
-            return;
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        Timber.d("onCreateView")
+        binding = FragmentTourBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    override fun onResume() {
+        super.onResume()
 
         // For small screen like nexus one or bigger screen, this is to force the scroll view to bottom to show buttons
         // Meanwhile, tour image glide could also be shown
-        baseContainer.post(new Runnable() {
-            @Override
-            public void run() {
-                if (baseContainer != null) {
-                    baseContainer.fullScroll(View.FOCUS_DOWN);
-                }
-            }
-        });
+        with(binding.tourFragmentBaseContainer) {
+            post { fullScroll(View.FOCUS_DOWN) }
+        }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Timber.d("onCreateView");
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
+        setupView()
 
-        View v = inflater.inflate(R.layout.fragment_tour, container, false);
-        viewPager = (LoopViewPager) v.findViewById(R.id.pager);
-        firstItem = (ImageView) v.findViewById(R.id.first_item);
-        secondItem = (ImageView) v.findViewById(R.id.second_item);
-        thirdItem = (ImageView) v.findViewById(R.id.third_item);
-        fourthItem = (ImageView) v.findViewById(R.id.fourth_item);
-        fifthItem = (ImageView) v.findViewById(R.id.fifth_item);
+        arguments?.getString(EXTRA_RECOVERY_KEY_URL, null)?.let { recoveryKeyUrl ->
+            Timber.d("Link to resetPass: $recoveryKeyUrl")
+            showRecoveryKeyDialog(recoveryKeyUrl)
+        }
 
-        baseContainer = (ScrollView) v.findViewById(R.id.tour_fragment_base_container);
+        arguments?.getString(EXTRA_PARK_ACCOUNT_URL, null)?.let { parkAccountUrl ->
+            Timber.d("Link to parkAccount: $parkAccountUrl")
+            showParkAccountDialog(parkAccountUrl)
+        }
 
-        bLogin = (Button) v.findViewById(R.id.button_login_tour);
-        bRegister = (Button) v.findViewById(R.id.button_register_tour);
-
-        bLogin.setOnClickListener(this);
-        bRegister.setOnClickListener(this);
-        v.findViewById(R.id.join_meeting_as_guest).setOnClickListener(this);
-
-        adapter = new TourImageAdapter((LoginActivity) context);
-        viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(0);
-
-        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-
-        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int position) {
-                switch (position) {
-                    case 0: {
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        break;
-                    }
-                    case 1: {
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        break;
-                    }
-                    case 2: {
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        break;
-                    }
-                    case 3: {
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        break;
-                    }
-                    case 4: {
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        break;
-                    }
-                }
-            }
-        });
-
-        return v;
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _: View?, insets: WindowInsetsCompat ->
+            val insetsBottom =
+                insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()).top
+            view.setPadding(0, 0, 0, insetsBottom)
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (getArguments() != null) {
-            String recoveryKeyUrl = getArguments().getString(EXTRA_RECOVERY_KEY_URL, null);
-            String parkAccountUrl = getArguments().getString(EXTRA_PARK_ACCOUNT_URL, null);
-
-            if (!TextUtils.isEmpty(recoveryKeyUrl)) {
-                Timber.d("Link to resetPass: %s", recoveryKeyUrl);
-                showRecoveryKeyDialog(recoveryKeyUrl);
-            }
-
-            if (!TextUtils.isEmpty(parkAccountUrl)) {
-                Timber.d("Link to parkAccount: %s", parkAccountUrl);
-                showParkAccountDialog(parkAccountUrl);
+    private fun setupView() = with(binding) {
+        buttonLoginTour.setOnClickListener {
+            Timber.d("onLoginClick")
+            (requireActivity() as LoginActivity).showFragment(Constants.LOGIN_FRAGMENT)
+        }
+        buttonRegisterTour.setOnClickListener {
+            Timber.d("onRegisterClick")
+            (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
+        }
+        joinMeetingAsGuest.setOnClickListener {
+            Timber.d("onJoinMeetingAsGuestClick")
+            if (requestBluetoothPermission()) {
+                joinMeetingAsGuestLauncher?.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            } else {
+                isLoggingOut = false
+                PasteMeetingLinkGuestDialogFragment().show(childFragmentManager,
+                    PasteMeetingLinkGuestDialogFragment.TAG)
             }
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-            view.setPadding(0, 0, 0, insets.getStableInsetBottom());
-            return insets.consumeSystemWindowInsets();
-        });
-    }
+        setItemSelected(firstItem.id)
 
-    public void showRecoveryKeyDialog(String recoveryKeyUrl) {
-        Timber.d("link: %s", recoveryKeyUrl);
+        tourAdapter = TourImageAdapter(requireActivity())
 
-        AlertDialog dialog = new MaterialAlertDialogBuilder(context)
-                .setView(R.layout.dialog_recovery_key).setTitle(R.string.title_dialog_insert_MK)
-                .setMessage(R.string.text_dialog_insert_MK)
-                .setPositiveButton(android.R.string.ok, null)
-                .setNegativeButton(android.R.string.cancel, null)
-                .create();
-
-        dialog.show();
-
-        TextInputLayout editInputLayout = dialog.findViewById(R.id.input_recovery_key);
-        EditText editText = dialog.findViewById(R.id.edit_recovery_key);
-        editText.setOnEditorActionListener((view, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                String key = editText.getText().toString();
-                if (TextUtil.isTextEmpty(key)) {
-                    editInputLayout.setError(getString(R.string.invalid_string));
-                    view.requestFocus();
-                } else {
-                    startChangePasswordActivity(Uri.parse(recoveryKeyUrl), key.trim());
-                    dialog.dismiss();
+        with(pager) {
+            adapter = tourAdapter
+            currentItem = 0
+            setOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+                override fun onPageSelected(position: Int) {
+                    when (position) {
+                        0 -> setItemSelected(firstItem.id)
+                        1 -> setItemSelected(secondItem.id)
+                        2 -> setItemSelected(thirdItem.id)
+                        3 -> setItemSelected(fourthItem.id)
+                        4 -> setItemSelected(fifthItem.id)
+                    }
                 }
-            } else {
-                Timber.d("Other IME%s", actionId);
-            }
-            return false;
-        });
-
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(view -> {
-            String key = editText.getText().toString();
-            if (TextUtil.isTextEmpty(key)) {
-                editInputLayout.setError(getString(R.string.invalid_string));
-                editText.requestFocus();
-            } else {
-                startChangePasswordActivity(Uri.parse(recoveryKeyUrl), key.trim());
-                dialog.dismiss();
-            }
-        });
+            })
+        }
     }
 
-    public void showParkAccountDialog(String parkAccountUrl) {
-        new MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.park_account_dialog_title)
-                .setMessage(R.string.park_account_text_last_step)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.park_account_button, (dialog, which) ->
-                        startChangePasswordActivity(Uri.parse(parkAccountUrl), null)
-                )
-                .create()
-                .show();
+    /**
+     * Sets the current item of the tour as selected.
+     *
+     * @param itemId The id of the view to set as selected.
+     */
+    private fun setItemSelected(itemId: Int) = with(binding) {
+        firstItem.setSelected(itemId)
+        secondItem.setSelected(itemId)
+        thirdItem.setSelected(itemId)
+        fourthItem.setSelected(itemId)
+        fifthItem.setSelected(itemId)
     }
 
-    private void startChangePasswordActivity(Uri dataUri, @Nullable String key) {
-        Intent intent = new Intent(context, ChangePasswordActivity.class);
-        intent.setData(dataUri);
-        if (key != null) {
-            intent.putExtra(EXTRA_MASTER_KEY, key);
-            intent.setAction(ACTION_RESET_PASS_FROM_LINK);
+    /**
+     * Sets the an item of the tour as selected.
+     *
+     * @param itemId The id of the view to set as selected.
+     */
+    private fun ImageView.setSelected(itemId: Int) =
+        setImageDrawable(if (itemId == id) selectedCircle else notSelectedCircle)
+
+    /**
+     * Shows a dialog for reset password with a recovery key ur.
+     *
+     * @param recoveryKeyUrl Recovery key link.
+     */
+    private fun showRecoveryKeyDialog(recoveryKeyUrl: String?) {
+        Timber.d("link: %s", recoveryKeyUrl)
+
+        val dialogBinding = DialogRecoveryKeyBinding.inflate(layoutInflater)
+
+        val dialog = MaterialAlertDialogBuilder(
+            requireContext())
+            .setView(dialogBinding.root)
+            .setTitle(R.string.title_dialog_insert_MK)
+            .setMessage(R.string.text_dialog_insert_MK)
+            .setPositiveButton(android.R.string.ok, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+
+        with(dialog) {
+            setOnShowListener {
+                dialogBinding.editRecoveryKey.setOnEditorActionListener { _: TextView, actionId: Int, _: KeyEvent? ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        dialogBinding.performAction(recoveryKeyUrl)
+                        true
+                    } else {
+                        Timber.d("Other IME%s", actionId)
+                        false
+                    }
+                }
+
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                    dialogBinding.performAction(recoveryKeyUrl)
+                }
+            }
+            show()
+        }
+    }
+
+    /**
+     * Checks if the typed data is correct.
+     * If so, launches ChangePasswordActivity.
+     * If not, shows a warning.
+     *
+     * @param recoveryKeyUrl Recovery key link.
+     */
+    private fun DialogRecoveryKeyBinding.performAction(recoveryKeyUrl: String?) {
+        val key = editRecoveryKey.text.toString()
+
+        if (key.isEmpty()) {
+            inputRecoveryKey.error = getString(R.string.invalid_string)
+            editRecoveryKey.requestFocus()
         } else {
-            intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
-        }
-        startActivity(intent);
-    }
-
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-            case R.id.button_register_tour:
-                Timber.d("onRegisterClick");
-                ((LoginActivity) context).showFragment(CREATE_ACCOUNT_FRAGMENT);
-                break;
-            case R.id.button_login_tour:
-                Timber.d("onLoginClick");
-                ((LoginActivity) context).showFragment(LOGIN_FRAGMENT);
-                break;
-            case R.id.join_meeting_as_guest:
-                Timber.d("onJoinMeetingAsGuestClick");
-                if (requestBluetoothPermission()) {
-                    if (joinMeetingAsGuestLauncher != null) {
-                        joinMeetingAsGuestLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
-                    }
-                } else {
-                    MegaApplication.setLoggingOut(false);
-                    new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
-                            PasteMeetingLinkGuestDialogFragment.TAG);
-                }
-                break;
+            startChangePasswordActivity(Uri.parse(recoveryKeyUrl), key.trim { it <= ' ' })
         }
     }
+
+    /**
+     * Shows a dialog for parking account.
+     *
+     * @param parkAccountUrl Park account link.
+     */
+    private fun showParkAccountDialog(parkAccountUrl: String?) =
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.park_account_dialog_title)
+            .setMessage(R.string.park_account_text_last_step)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.park_account_button
+            ) { _: DialogInterface?, _: Int ->
+                startChangePasswordActivity(Uri.parse(parkAccountUrl), null)
+            }
+            .create()
+            .show()
+
+    /**
+     * Launches ChangePasswordActivity.
+     *
+     * @param dataUri Park account or recovery key links.
+     * @param key     Recovery key if required.
+     */
+    private fun startChangePasswordActivity(dataUri: Uri, key: String?) =
+        startActivity(Intent(requireContext(), ChangePasswordActivity::class.java).apply {
+            data = dataUri
+
+            action = if (key != null) {
+                putExtra(IntentConstants.EXTRA_MASTER_KEY, key)
+                Constants.ACTION_RESET_PASS_FROM_LINK
+            } else {
+                Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT
+            }
+        })
 
     /**
      * Request Bluetooth Connect Permission for Meeting and Call when SDK >= 31
      *
      * @return false : permission granted, needn't request / true: should request permission
      */
-    private boolean requestBluetoothPermission() {
+    private fun requestBluetoothPermission(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            boolean hasPermission = hasPermissions(this.requireContext(), Manifest.permission.BLUETOOTH_CONNECT);
+            val hasPermission =
+                hasPermissions(requireContext(), Manifest.permission.BLUETOOTH_CONNECT)
             if (!hasPermission) {
-                return true;
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    @Override
-    public void onAttach(Context context) {
-        Timber.d("onAttach");
-        super.onAttach(context);
-        this.context = context;
+    override fun onAttach(context: Context) {
+        Timber.d("onAttach")
+        super.onAttach(context)
 
-        joinMeetingAsGuestLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                result -> {
-                    if (result) {
-                        Timber.d("onActivityResult: PERMISSION GRANTED");
-                        MegaApplication.setLoggingOut(false);
-                        new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
-                                PasteMeetingLinkGuestDialogFragment.TAG);
-                    } else {
-                        Timber.d("onActivityResult: PERMISSION DENIED");
-                        ((BaseActivity) getActivity()).showSnackbar(PERMISSIONS_TYPE, getString(R.string.meeting_bluetooth_connect_required_permissions_warning), INVALID_HANDLE);
-                    }
-                });
+        joinMeetingAsGuestLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { result: Boolean ->
+                if (result) {
+                    Timber.d("onActivityResult: PERMISSION GRANTED")
+                    isLoggingOut = false
+                    PasteMeetingLinkGuestDialogFragment().show(childFragmentManager,
+                        PasteMeetingLinkGuestDialogFragment.TAG)
+                } else {
+                    Timber.d("onActivityResult: PERMISSION DENIED")
+                    (requireActivity() as BaseActivity).showSnackbar(Constants.PERMISSIONS_TYPE,
+                        getString(R.string.meeting_bluetooth_connect_required_permissions_warning),
+                        MegaApiJava.INVALID_HANDLE)
+                }
+            }
     }
 
-    @Override
-    public void onAttach(Activity context) {
-        Timber.d("onAttach Activity");
-        super.onAttach(context);
-        this.context = context;
+    companion object {
+        private const val EXTRA_RECOVERY_KEY_URL = "EXTRA_RECOVERY_KEY_URL"
+        private const val EXTRA_PARK_ACCOUNT_URL = "EXTRA_PARK_ACCOUNT_URL"
+
+        /**
+         * Creates a new instance of the fragments and adds arguments.
+         *
+         * @param recoveryKeyUrl Recovery key link.
+         * @param parkAccountUrl Park account link.
+         * @return new instance.
+         */
+        fun newInstance(recoveryKeyUrl: String?, parkAccountUrl: String?): TourFragment {
+            val fragment = TourFragment()
+            val arguments = Bundle()
+
+            recoveryKeyUrl?.let { arguments.putString(EXTRA_RECOVERY_KEY_URL, recoveryKeyUrl) }
+            parkAccountUrl?.let { arguments.putString(EXTRA_PARK_ACCOUNT_URL, parkAccountUrl) }
+
+            if (!arguments.isEmpty) {
+                fragment.arguments = arguments
+            }
+
+            return fragment
+        }
     }
 }
