@@ -39,6 +39,7 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.fileBrowserState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.inboxState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
@@ -1097,7 +1098,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-            MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserViewModel.getState().getValue().getFileBrowserHandle());
+            MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
 
             ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                             ? parentNode
@@ -3745,11 +3746,11 @@ public class ManagerActivity extends TransfersManagementActivity
             case CLOUD_DRIVE: {
                 aB.setSubtitle(null);
                 Timber.d("Cloud Drive SECTION");
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserViewModel.getState().getValue().getFileBrowserHandle());
+                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if ((parentNode.getHandle() == megaApi.getRootNode().getHandle()
-                                || fileBrowserViewModel.getState().getValue().getFileBrowserHandle() == -1)
+                                || fileBrowserState(ManagerActivity.this).getFileBrowserHandle() == -1)
                                 && !isInMDMode) {
                             aB.setTitle(getString(R.string.section_cloud_drive));
                             viewModel.setIsFirstNavigationLevel(true);
@@ -5248,7 +5249,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     } else {
                         searchViewModel.setSearchQuery(newText);
                         searchViewModel.performSearch(
-                                fileBrowserViewModel.getState().getValue().getFileBrowserHandle(),
+                                fileBrowserState(ManagerActivity.this).getFileBrowserHandle(),
                                 viewModel.getState().getValue().getRubbishBinParentHandle(),
                                 inboxState(ManagerActivity.this).getInboxHandle(),
                                 incomingSharesState(ManagerActivity.this).getIncomingHandle(),
@@ -6095,8 +6096,8 @@ public class ManagerActivity extends TransfersManagementActivity
                         Timber.e("Root node is null");
                     }
 
-                    if (fileBrowserViewModel.getState().getValue().getFileBrowserHandle() != INVALID_HANDLE
-                            && rootNode != null && fileBrowserViewModel.getState().getValue().getFileBrowserHandle() != rootNode.getHandle()) {
+                    if (fileBrowserState(ManagerActivity.this).getFileBrowserHandle() != INVALID_HANDLE
+                            && rootNode != null && fileBrowserState(ManagerActivity.this).getFileBrowserHandle() != rootNode.getHandle()) {
                         fileBrowserViewModel.setBrowserParentHandle(rootNode.getHandle());
                         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
                         if (isCloudAdded()) {
@@ -7595,10 +7596,10 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (isCloudAdded()) {
             ArrayList<MegaNode> nodes;
-            if (fileBrowserViewModel.getState().getValue().getFileBrowserHandle() == -1) {
+            if (fileBrowserState(ManagerActivity.this).getFileBrowserHandle() == -1) {
                 nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
             } else {
-                parentNode = megaApi.getNodeByHandle(fileBrowserViewModel.getState().getValue().getFileBrowserHandle());
+                parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
                 if (parentNode == null) return;
 
                 nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
@@ -8178,7 +8179,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                 fileBrowserViewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserViewModel.getState().getValue().getFileBrowserHandle());
+                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
 
                 ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
                                 ? parentNode
@@ -8230,7 +8231,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             int orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserViewModel.getState().getValue().getFileBrowserHandle());
+                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
                 if (parentNode != null) {
                     if (isCloudAdded()) {
                         ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
@@ -8409,7 +8410,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fileBrowserViewModel.getState().getValue().getFileBrowserHandle()),
+                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle()),
                         SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
                 fileBrowserFragment.setNodes(nodes);
                 fileBrowserFragment.getRecyclerView().invalidate();
@@ -9679,7 +9680,7 @@ public class ManagerActivity extends TransfersManagementActivity
             //Cloud Drive
             drawerItem = DrawerItem.CLOUD_DRIVE;
             openFolderRefresh = true;
-            comesFromNotificationHandleSaved = fileBrowserViewModel.getState().getValue().getFileBrowserHandle();
+            comesFromNotificationHandleSaved = fileBrowserState(ManagerActivity.this).getFileBrowserHandle();
             fileBrowserViewModel.setBrowserParentHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         } else if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {

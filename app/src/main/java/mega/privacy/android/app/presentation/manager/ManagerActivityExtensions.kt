@@ -11,6 +11,14 @@ import mega.privacy.android.app.main.ManagerActivity
 fun ManagerActivity.state() = viewModel.state.value
 
 /**
+ * Get the FileBrowserState in FileBrowserViewModel
+ * This function will be used until ManagerActivity is converted to Kotlin
+ *
+ * @return the FileBrowserState hold in FileBrowserViewModel
+ */
+fun ManagerActivity.fileBrowserState() = fileBrowserViewModel.state.value
+
+/**
  * Get the IncomingSharesState in IncomingSharesStateViewModel
  * This function will be used until ManagerActivity is converted to Kotlin
  *
