@@ -3,7 +3,7 @@ package mega.privacy.android.data.repository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.extensions.getCredentials
@@ -30,7 +30,6 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -61,10 +60,10 @@ class DefaultContactsRepositoryTest {
     private val userEmail = "test@mega.nz"
     private val userHandle = -1L
     private val user = mock<MegaUser> { on { email }.thenReturn(userEmail) }
-    private val userName = "Test User Name"
+    private val testName = "Test User Name"
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
     private val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setUp() {
@@ -195,64 +194,34 @@ class DefaultContactsRepositoryTest {
     }
 
     @Test
-    fun `test that get user first name returns the name if api returns the first name`() = runTest {
-        val request = mock<MegaRequest> {
-            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
-            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_FIRSTNAME)
-            on { text }.thenReturn(userName)
-        }
+    fun `test that get user first name returns the name if api returns the first name`() =
+        runTest {
+            whenever(megaChatApiGateway.getUserFirstnameFromCache(any())).thenReturn(testName)
 
-        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                request,
-                success
-            )
-        }
-        assertThat(underTest.getUserFirstName(userHandle, true)).isEqualTo(userName)
-    }
+            val result = underTest.getUserFirstName(userHandle, false)
 
-    @Test(expected = MegaException::class)
-    fun `test that get user first name throws a MegaException if api fails with error`() = runTest {
-        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                error
-            )
+            assertThat(result).isEqualTo(testName)
         }
-        assertThat(underTest.getUserLastName(userHandle))
-    }
 
     @Test
-    fun `test that get user last name returns the name if api returns the last name`() = runTest {
-        val request = mock<MegaRequest> {
-            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
-            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_LASTNAME)
-            on { text }.thenReturn(userName)
+    fun `test that get user last name returns the name if api returns the last name`() =
+        runTest {
+            whenever(megaChatApiGateway.getUserLastnameFromCache(any())).thenReturn(testName)
+
+            val result = underTest.getUserLastName(userHandle, false)
+
+            assertThat(result).isEqualTo(testName)
         }
 
-        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                request,
-                success
-            )
-        }
-        assertThat(underTest.getUserLastName(userHandle)).isEqualTo(userName)
-    }
+    @Test
+    fun `test that get user full name returns the name if api returns the full name`() =
+        runTest {
+            whenever(megaChatApiGateway.getUserFullNameFromCache(any())).thenReturn(testName)
 
-    @Test(expected = MegaException::class)
-    fun `test that get user last name throws a MegaException if api fails with error`() = runTest {
-        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                error
-            )
+            val result = underTest.getUserFullName(userHandle, false)
+
+            assertThat(result).isEqualTo(testName)
         }
-        assertThat(underTest.getUserLastName(userHandle))
-    }
 
     @Test
     fun `test that are credentials verified returns true if user exists and api returns true`() =
