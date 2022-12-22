@@ -12,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
@@ -26,10 +28,12 @@ import mega.privacy.android.presentation.theme.grey_900
 
 /**
  * Reusable EmptyView with Icon & Text
+ * Support for Icons in Vector (isVectorImage true) and Bitmap (isVectorImage false) formats
  */
 @Composable
 fun EmptyView(
     imageResId: Int,
+    isVectorImage: Boolean = true,
     textResId: Int,
 ) {
     Column(
@@ -39,16 +43,30 @@ fun EmptyView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = imageResId),
-            contentDescription = "Empty",
-            modifier = Modifier.padding(bottom = 30.dp),
-            tint = if (!MaterialTheme.colors.isLight) {
-                Color.Gray
-            } else {
-                Color.Unspecified
-            }
-        )
+        if (isVectorImage) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = imageResId),
+                contentDescription = "Empty",
+                modifier = Modifier.padding(bottom = 30.dp),
+                tint = if (!MaterialTheme.colors.isLight) {
+                    Color.Gray
+                } else {
+                    Color.Unspecified
+                }
+            )
+        } else {
+            Icon(
+                bitmap = ImageBitmap.imageResource(id = imageResId),
+                contentDescription = "Empty",
+                modifier = Modifier.padding(bottom = 30.dp),
+                tint = if (!MaterialTheme.colors.isLight) {
+                    Color.Gray
+                } else {
+                    Color.Unspecified
+                }
+            )
+        }
+
 
         val placeHolderStart = "[B]"
         val placeHolderEnd = "[/B]"
