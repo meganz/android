@@ -261,14 +261,13 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getUserEmail(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                if (!skipCache) {
-                    val cachedEmail = megaChatApiGateway.getUserEmailFromCache(handle)
-                    if (!cachedEmail.isNullOrBlank()) {
-                        continuation.resume(cachedEmail)
-                        return@suspendCoroutine
-                    }
+            if (!skipCache) {
+                val cachedEmail = megaChatApiGateway.getUserEmailFromCache(handle)
+                if (!cachedEmail.isNullOrBlank()) {
+                    return@withContext cachedEmail
                 }
+            }
+            suspendCoroutine { continuation ->
                 megaApiGateway.getUserEmail(handle,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { request: MegaRequest, error: MegaError ->
@@ -284,14 +283,13 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getUserFirstName(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                if (!skipCache) {
-                    val cachedName = megaChatApiGateway.getUserFirstnameFromCache(handle)
-                    if (!cachedName.isNullOrBlank()) {
-                        continuation.resume(cachedName)
-                        return@suspendCoroutine
-                    }
+            if (!skipCache) {
+                val cachedName = megaChatApiGateway.getUserFirstnameFromCache(handle)
+                if (!cachedName.isNullOrBlank()) {
+                    return@withContext cachedName
                 }
+            }
+            suspendCoroutine { continuation ->
                 megaApiGateway.getUserAttribute(handle.toBase64Handle(),
                     MegaApiJava.USER_ATTR_FIRSTNAME,
                     OptionalMegaRequestListenerInterface(
@@ -302,14 +300,13 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getUserLastName(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                if (!skipCache) {
-                    val cachedName = megaChatApiGateway.getUserLastnameFromCache(handle)
-                    if (!cachedName.isNullOrBlank()) {
-                        continuation.resume(cachedName)
-                        return@suspendCoroutine
-                    }
+            if (!skipCache) {
+                val cachedName = megaChatApiGateway.getUserLastnameFromCache(handle)
+                if (!cachedName.isNullOrBlank()) {
+                    return@withContext cachedName
                 }
+            }
+            suspendCoroutine { continuation ->
                 megaApiGateway.getUserAttribute(handle.toBase64Handle(),
                     MegaApiJava.USER_ATTR_LASTNAME,
                     OptionalMegaRequestListenerInterface(
