@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
@@ -49,17 +51,18 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [ContactsRepository]
  *
- * @property megaApiGateway         [MegaApiGateway]
- * @property megaChatApiGateway     [MegaChatApiGateway]
- * @property ioDispatcher           [CoroutineDispatcher]
- * @property cacheFolderGateway     [CacheFolderGateway]
- * @property contactRequestMapper   [ContactRequestMapper]
- * @property userLastGreenMapper    [UserLastGreenMapper]
- * @property userUpdateMapper       [UserUpdateMapper]
- * @property megaChatPeerListMapper [MegaChatPeerListMapper]
- * @property onlineStatusMapper     [OnlineStatusMapper]
- * @property contactItemMapper      [ContactItemMapper]
- * @property contactDataMapper      [ContactDataMapper]
+ * @property megaApiGateway           [MegaApiGateway]
+ * @property megaChatApiGateway       [MegaChatApiGateway]
+ * @property ioDispatcher             [CoroutineDispatcher]
+ * @property cacheFolderGateway       [CacheFolderGateway]
+ * @property contactRequestMapper     [ContactRequestMapper]
+ * @property userLastGreenMapper      [UserLastGreenMapper]
+ * @property userUpdateMapper         [UserUpdateMapper]
+ * @property megaChatPeerListMapper   [MegaChatPeerListMapper]
+ * @property onlineStatusMapper       [OnlineStatusMapper]
+ * @property contactItemMapper        [ContactItemMapper]
+ * @property contactDataMapper        [ContactDataMapper]
+ * @property contactCredentialsMapper [ContactCredentialsMapper]
  */
 internal class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -73,6 +76,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val onlineStatusMapper: OnlineStatusMapper,
     private val contactItemMapper: ContactItemMapper,
     private val contactDataMapper: ContactDataMapper,
+    private val contactCredentialsMapper: ContactCredentialsMapper,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -202,7 +206,7 @@ internal class DefaultContactsRepository @Inject constructor(
             onFailure = { null }
         )
 
-    private suspend fun getUserAlias(handle: Long): String? =
+    override suspend fun getUserAlias(handle: Long): String? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaApiGateway.getUserAlias(handle,
@@ -255,16 +259,15 @@ internal class DefaultContactsRepository @Inject constructor(
             if (fullName.isNullOrEmpty()) null else fullName
         }
 
-    private suspend fun getUserFirstName(emailOrHandle: String): String? =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(emailOrHandle,
-                    MegaApiJava.USER_ATTR_FIRSTNAME,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                    ))
-            }
+    override suspend fun getUserFirstName(emailOrHandle: String) = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.getUserAttribute(emailOrHandle,
+                MegaApiJava.USER_ATTR_FIRSTNAME,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                ))
         }
+    }
 
     private fun onRequestGetUserAvatarCompleted(continuation: Continuation<String?>) =
         { request: MegaRequest, error: MegaError ->
@@ -275,16 +278,15 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    private suspend fun getUserLastName(emailOrHandle: String): String? =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(emailOrHandle,
-                    MegaApiJava.USER_ATTR_LASTNAME,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                    ))
-            }
+    override suspend fun getUserLastName(emailOrHandle: String) = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.getUserAttribute(emailOrHandle,
+                MegaApiJava.USER_ATTR_LASTNAME,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                ))
         }
+    }
 
     private fun onRequestGetUserNameCompleted(continuation: Continuation<String?>) =
         { request: MegaRequest, error: MegaError ->
@@ -415,4 +417,80 @@ internal class DefaultContactsRepository @Inject constructor(
 
         return updatedList.sortList()
     }
+
+    private suspend fun getUserCredentials(user: MegaUser) = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.getUserCredentials(user, OptionalMegaRequestListenerInterface(
+                onRequestFinish = onGetUserCredentialsCompleted(continuation)
+            ))
+        }
+    }
+
+    private fun onGetUserCredentialsCompleted(continuation: Continuation<String?>) =
+        { request: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(request.password))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun areCredentialsVerified(userEmail: String) = withContext(ioDispatcher) {
+        megaApiGateway.getContact(userEmail)?.let {
+            megaApiGateway.areCredentialsVerified(it)
+        } ?: throw ContactDoesNotExistException()
+    }
+
+    override suspend fun resetCredentials(userEmail: String) = withContext(ioDispatcher) {
+        megaApiGateway.getContact(userEmail)?.let {
+            suspendCoroutine { continuation: Continuation<Unit> ->
+                megaApiGateway.resetCredentials(it, OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onResetCredentialsCompleted(continuation)
+                ))
+            }
+        } ?: throw ContactDoesNotExistException()
+    }
+
+    private fun onResetCredentialsCompleted(continuation: Continuation<Unit>) =
+        { _: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(Unit))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+
+    override suspend fun verifyCredentials(userEmail: String) = withContext(ioDispatcher) {
+        megaApiGateway.getContact(userEmail)?.let {
+            suspendCoroutine { continuation: Continuation<Unit> ->
+                megaApiGateway.verifyCredentials(it, OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onVerifyCredentialsCompleted(continuation)
+                ))
+            }
+        } ?: throw ContactDoesNotExistException()
+    }
+
+    private fun onVerifyCredentialsCompleted(continuation: Continuation<Unit>) =
+        { _: MegaRequest, error: MegaError ->
+            if (error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(Unit))
+            } else {
+                continuation.failWithError(error)
+            }
+        }
+
+    override suspend fun getContactCredentials(userEmail: String) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getContact(userEmail)?.let { user ->
+                val userCredentials = getUserCredentials(user)
+                val name = getAlias(user.handle) ?: getFullName(userEmail) ?: userEmail
+
+                contactCredentialsMapper(
+                    userCredentials,
+                    userEmail,
+                    name
+                )
+            }
+        }
 }

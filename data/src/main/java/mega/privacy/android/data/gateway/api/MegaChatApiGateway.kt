@@ -3,11 +3,14 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatScheduledMeeting
 
 /**
  * Mega chat api gateway
@@ -95,12 +98,23 @@ interface MegaChatApiGateway {
      * permissions and if the chat should be a group chat or not.
      *
      * @param isGroup  True if is should create a group chat, false otherwise.
-     * @param peers    MegaChatPeerList] including contacts and their privilege level.
+     * @param peers    [MegaChatPeerList] including contacts and their privilege level.
      * @param listener Listener.
      */
     fun createChat(
         isGroup: Boolean,
         peers: MegaChatPeerList,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     *  Leave a chat room
+     *
+     * @param chatId    Chat id
+     * @param listener  Listener
+     */
+    fun leaveChat(
+        chatId: Long,
         listener: MegaChatRequestListenerInterface,
     )
 
@@ -116,6 +130,13 @@ interface MegaChatApiGateway {
         enabled: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Get meeting chat rooms
+     *
+     * @return  The list of chat rooms
+     */
+    fun getMeetingChatRooms(): List<MegaChatRoom>?
 
     /**
      * Gets a 1to1 chat conversation if exists.
@@ -165,6 +186,14 @@ interface MegaChatApiGateway {
     fun getChatRoom(chatId: Long): MegaChatRoom?
 
     /**
+     * Get chat list item.
+     *
+     * @param chatId    Chat Id
+     * @return          Chat list item
+     */
+    fun getChatListItem(chatId: Long): MegaChatListItem?
+
+    /**
      * Gets the MegaChatCall
      *
      * @param chatId The chat id.
@@ -212,4 +241,88 @@ interface MegaChatApiGateway {
         device: String,
         listener: MegaChatRequestListenerInterface?,
     )
+
+    /**
+     * Scheduled meetings updates.
+     */
+    val scheduledMeetingUpdates: Flow<ScheduledMeetingUpdate>
+
+    /**
+     * Get all scheduled meetings
+     *
+     * @return  List of scheduled meetings
+     */
+    fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>?
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    fun getScheduledMeeting(chatId: Long, schedId: Long): MegaChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return List of scheduled meetings.
+     */
+    fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>?
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param listener MegaChatRequestListener to track this request
+     * @return The list of scheduled meetings occurrences.
+     */
+    fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Invite contact to a chat
+     *
+     * @param chatId        Chat id.
+     * @param userHandle    User handle.
+     * @param listener      Listener.
+     */
+    fun inviteToChat(chatId: Long, userHandle: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Get basic information about a public chat.
+     *
+     * @param link      Public chat link.
+     * @param listener  Listener.
+     */
+    fun checkChatLink(link: String, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Set the chat mode to private
+     * @param chatId    Chat id.
+     * @param listener  Listener.
+     */
+    fun setPublicChatToPrivate(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    )
+
+    /**
+     * Query chat link
+     *
+     * @param chatId        Chat id.
+     * @param listener      Listener.
+     */
+    fun queryChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Remove chat link
+     *
+     * @param chatId        Chat id.
+     * @param listener      Listener.
+     */
+    fun removeChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
 }

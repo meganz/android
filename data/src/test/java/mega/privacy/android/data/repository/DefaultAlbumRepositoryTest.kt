@@ -30,6 +30,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultAlbumRepositoryTest {
@@ -206,6 +207,7 @@ class DefaultAlbumRepositoryTest {
 
     @Test
     fun `test that monitorAlbumElementIds emits correct result`() = runTest {
+        val albumId = AlbumId(1L)
         val expectedElementIds = (1..3L).map {
             NodeId(it)
         }
@@ -213,13 +215,14 @@ class DefaultAlbumRepositoryTest {
         val megaSetElements = expectedElementIds.map { node ->
             mock<MegaSetElement> {
                 on { node() }.thenReturn(node.id)
+                on { setId() }.thenReturn(albumId.id)
             }
         }
 
         whenever(megaApiGateway.globalUpdates)
             .thenReturn(flowOf(OnSetElementsUpdate(ArrayList(megaSetElements))))
 
-        underTest.monitorAlbumElementIds().test {
+        underTest.monitorAlbumElementIds(albumId).test {
             val actualElementIds = awaitItem()
             assertThat(expectedElementIds).isEqualTo(actualElementIds)
             awaitComplete()
@@ -249,6 +252,31 @@ class DefaultAlbumRepositoryTest {
         assertThat(expectedUserSet).isEqualTo(actualUserSet)
     }
 
+    @Test
+    fun `test that remove albums returns correct result`() = runTest {
+        val albumIds = listOf(
+            AlbumId(1L),
+            AlbumId(2L),
+            AlbumId(3L),
+        )
+
+        whenever(megaApiGateway.removeSet(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                },
+            )
+        }
+
+        try {
+            underTest.removeAlbums(albumIds)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
+        }
+    }
+
     private fun createUserSet(
         id: Long,
         name: String,
@@ -264,11 +292,11 @@ class DefaultAlbumRepositoryTest {
         override val modificationTime: Long = modificationTime
 
         override fun equals(other: Any?): Boolean {
-            val other = other as? UserSet ?: return false
-            return id == other.id
-                    && name == other.name
-                    && cover == other.cover
-                    && modificationTime == other.modificationTime
+            val otherSet = other as? UserSet ?: return false
+            return id == otherSet.id
+                    && name == otherSet.name
+                    && cover == otherSet.cover
+                    && modificationTime == otherSet.modificationTime
         }
     }
 }

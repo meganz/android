@@ -1,14 +1,13 @@
 package mega.privacy.android.data.gateway
 
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
 import java.io.IOException
 
 /**
  * File gateway
  *
- * Refer to [mega.privacy.android.app.utils.FileUtil]
+ * @constructor Create empty File gateway
  */
 interface FileGateway {
     /**
@@ -23,7 +22,7 @@ interface FileGateway {
      *
      */
     @Throws(IOException::class)
-    suspend fun deleteFolderAndSubFolders(f: File?)
+    fun deleteFolderAndSubFolders(f: File?)
 
     /**
      * Is file available
@@ -46,4 +45,18 @@ interface FileGateway {
      * @return folder path or null
      */
     suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String?
+
+    /**
+     * Get offline files root path
+     *
+     * @return the root path of offline files
+     */
+    suspend fun getOfflineFilesRootPath(): String
+
+    /**
+     * Get offline files inbox root path
+     *
+     * @return the root path of inbox offline files
+     */
+    suspend fun getOfflineFilesInboxRootPath(): String
 }

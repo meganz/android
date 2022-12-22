@@ -1635,6 +1635,16 @@ class InMeetingViewModel @Inject constructor(
             }
         }?.toMutableList()
 
+        speakerParticipants.value = speakerParticipants.value?.map { participant ->
+            return@map when {
+                participant.peerId == session.peerid && participant.clientId == session.clientid && participant.isVideoOn != session.hasVideo() -> {
+                    hasChanged = true
+                    participant.copy(isVideoOn = session.hasVideo())
+                }
+                else -> participant
+            }
+        }?.toMutableList()
+
         return hasChanged
     }
 

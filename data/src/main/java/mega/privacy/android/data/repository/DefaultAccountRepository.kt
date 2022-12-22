@@ -19,13 +19,12 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.SkuMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
+import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.domain.entity.SubscriptionPlan
+import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -48,18 +47,19 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [AccountRepository]
  *
- * @property myAccountInfoFacade
- * @property megaApiGateway
- * @property megaChatApiGateway
- * @property ioDispatcher
- * @property userUpdateMapper
- * @property localStorageGateway
- * @property userAccountMapper
- * @property accountTypeMapper
- * @property subscriptionPlanMapper
- * @property currencyMapper
- * @property skuMapper
- * @property subscriptionPlanListMapper
+ * @property myAccountInfoFacade          [AccountInfoWrapper]
+ * @property megaApiGateway               [MegaApiGateway]
+ * @property megaChatApiGateway           [MegaChatApiGateway]
+ * @property dbHandler                    [DatabaseHandler]
+ * @property ioDispatcher                 [CoroutineDispatcher]
+ * @property userUpdateMapper             [UserUpdateMapper]
+ * @property localStorageGateway          [MegaLocalStorageGateway]
+ * @property userAccountMapper            [UserAccountMapper]
+ * @property accountTypeMapper            [AccountTypeMapper]
+ * @property currencyMapper               [CurrencyMapper]
+ * @property subscriptionOptionListMapper [SubscriptionOptionListMapper]
+ * @property megaAchievementMapper        [MegaAchievementMapper]
+ * @property myAccountCredentialsMapper   [MyAccountCredentialsMapper]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -72,11 +72,10 @@ internal class DefaultAccountRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val userAccountMapper: UserAccountMapper,
     private val accountTypeMapper: AccountTypeMapper,
-    private val subscriptionPlanMapper: SubscriptionPlanMapper,
     private val currencyMapper: CurrencyMapper,
-    private val skuMapper: SkuMapper,
-    private val subscriptionPlanListMapper: SubscriptionPlanListMapper,
+    private val subscriptionOptionListMapper: SubscriptionOptionListMapper,
     private val megaAchievementMapper: MegaAchievementMapper,
+    private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -93,7 +92,24 @@ internal class DefaultAccountRepository @Inject constructor(
     override fun storageCapacityUsedIsBlank() =
         myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
 
-    override fun requestAccount() = myAccountInfoFacade.requestAccountDetails()
+    override suspend fun requestAccount() = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
+            megaApiGateway.getAccountDetails(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        myAccountInfoFacade.handleAccountDetail(request)
+    }
 
     override suspend fun setUserHasLoggedIn() {
         localStorageGateway.setUserHasLoggedIn()
@@ -123,7 +139,7 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun requestDeleteAccountLink() = withContext<Unit>(ioDispatcher) {
+    override suspend fun requestDeleteAccountLink() = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.cancelAccount(
                 OptionalMegaRequestListenerInterface(
@@ -179,7 +195,8 @@ internal class DefaultAccountRepository @Inject constructor(
                         onRequestFinish = { request, error ->
                             if (request.type == MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS) {
                                 when (error.errorCode) {
-                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(Unit))
+                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(
+                                        Unit))
                                     MegaChatError.ERROR_ACCESS -> continuation.resumeWith(Result.failure(
                                         ChatNotInitializedException()))
                                     else -> continuation.failWithError(error)
@@ -195,17 +212,16 @@ internal class DefaultAccountRepository @Inject constructor(
         megaApiGateway.isBusinessAccountActive()
     }
 
-    override suspend fun getSubscriptionPlans(): List<SubscriptionPlan> =
+    override suspend fun getSubscriptionOptions(): List<SubscriptionOption> =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 megaApiGateway.getPricing(OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(subscriptionPlanListMapper(
+                            continuation.resumeWith(Result.success(subscriptionOptionListMapper(
                                 request,
-                                subscriptionPlanMapper,
                                 currencyMapper,
-                                skuMapper)))
+                            )))
                         } else {
                             continuation.failWithError(error)
                         }
@@ -243,4 +259,66 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             dbHandler.attributes?.accountDetailsTimeStamp
         }
+
+    override suspend fun getSpecificAccountDetail(
+        storage: Boolean,
+        transfer: Boolean,
+        pro: Boolean,
+    ) = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
+            megaApiGateway.getSpecificAccountDetails(storage, transfer, pro, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        myAccountInfoFacade.handleAccountDetail(request)
+    }
+
+    override suspend fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+    ) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
+            megaApiGateway.getExtendedAccountDetails(sessions, purchases, transactions, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        myAccountInfoFacade.handleAccountDetail(request)
+    }
+
+    override suspend fun getMyCredentials() = withContext(ioDispatcher) {
+        myAccountCredentialsMapper(megaApiGateway.myCredentials)
+    }
+
+    override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
+        dbHandler.resetAccountDetailsTimeStamp()
+    }
+
+    override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
+        dbHandler.resetExtendedAccountDetailsTimestamp()
+    }
+
+    override suspend fun areAchievementsEnabled() = withContext(ioDispatcher) {
+        megaApiGateway.isAchievementsEnabled()
+    }
 }

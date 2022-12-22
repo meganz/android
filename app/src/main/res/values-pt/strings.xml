@@ -367,7 +367,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Copiando</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Mover para a lixeira</string>
+    <string name="context_move_to_trash">Mover para a Lixeira</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Remover do MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -375,7 +375,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Criando pasta</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Esvaziar a lixeira</string>
+    <string name="context_clear_rubbish">Esvaziar a Lixeira</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Você vai remover permanentemente todos os itens da sua Lixeira.</string>
     <!-- send cancel subscriptions dialog -->
@@ -437,7 +437,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d itens não foram movidos</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Movido à lixeira</string>
+    <string name="context_correctly_moved_to_rubbish">Movido à Lixeira</string>
     <!-- error message -->
     <string name="context_no_moved">Erro. Não foi movido</string>
     <!-- success message when sharing a folder -->
@@ -682,7 +682,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Pasta local da câmera</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Pasta para os uploads da câmera no MEGA</string>
+    <string name="settings_mega_camera_upload_folder">Pasta para os Uploads da câmera no MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Pasta secundária local</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Estabelecer uma senha de acesso</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(SOMENTE PRO)</string>
+    <string name="subtitle_set_expiry_date">(somente Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Definir senha</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1475,13 +1475,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Removendo o contato da pasta compartilhada</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Mover para a lixeira?</string>
+    <string name="confirmation_move_to_rubbish">Mover para a Lixeira?</string>
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Você tem certeza de quera mover esta pasta para a Lixeira? Fazer isso desativará os Uploads da câmera.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Você tem certeza de que quer mover esta pasta para a Lixeira? Fazer isso desativará o upload secundário de mídia.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Mover para a lixeira?</string>
+    <string name="confirmation_move_to_rubbish_plural">Mover para a Lixeira?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Deletar do MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1537,7 +1537,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para dispositivos móveis.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Você recebeu %1$s de espaço de armazenamento por verificar o seu número de telefone.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Você recebeu %1$s de espaço de armazenamento por confirmar o seu número de telefone.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Você recebeu %1$s de espaço de armazenamento como bônus gratuito pelo seu registro.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1577,9 +1577,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL do link</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">ASSUNTO</string>
+    <string name="new_file_subject_when_uploading">Assunto</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-MAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Encaminhar</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1697,15 +1697,15 @@
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Não há arquivos [/B][A]Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]Não há [/B][A]Contatos[/A]</string>
+    <string name="context_empty_contacts">[B]Não há [/B][A]contatos[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]Não há[/A] [B]chats[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
     <string name="recent_chat_loading_conversations">[A]Carregando[/A] [B]chats&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]Não há [/B][A]Pastas compartilhadas comigo[/A]</string>
+    <string name="context_empty_incoming">[B]Não há [/B][A]pastas compartilhadas comigo[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]Não há [/B][A]Pastas compartilhadas por mim[/A]</string>
+    <string name="context_empty_outgoing">[B]Não há [/B][A]pastas compartilhadas por mim[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B]Não há [/B][A]links públicos[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
@@ -2230,7 +2230,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Você pode ter novas mensagens</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Planejador de limpeza da lixeira</string>
+    <string name="settings_rb_scheduler_enable_title">Planejador de limpeza da Lixeira</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">A sua Lixeira será esvaziada de forma automática.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2248,7 +2248,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Se os vídeos a comprimir forem maiores que</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Para desativar o Planejador de limpeza da lixeira ou definir um período de retenção mais longo, é necessário adquirir um plano Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Para desativar o Planejador de limpeza da Lixeira ou definir um período de retenção mais longo, é necessário adquirir um plano Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dias</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2490,7 +2490,7 @@
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">Não foi possível conectar-se ao MEGA de forma segura via SSL. Você pode estar usando uma rede Wi-Fi pública com requisitos adicionais.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]Não há [/B][A]Notificações[/A]</string>
+    <string name="context_empty_notifications">[B]Não há [/B][A]notificações[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurar o MEGA</string>
     <!-- Permissions screen explanation -->
@@ -3416,7 +3416,7 @@
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Adicionado recentemente</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]Não há [/B][A]Grupos[/A]</string>
+    <string name="context_empty_groups">[B]Não há [/B][A]grupos[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Solicitações</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
@@ -3454,7 +3454,7 @@
     <!-- Label that join a meeting -->
     <string name="join_meeting">Entrar em uma reunião</string>
     <!-- Button that create a meeting -->
-    <string name="btn_start_meeting">Fazer uma reunião</string>
+    <string name="btn_start_meeting">Começar a reunião</string>
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Entrar como convidado</string>
     <!-- Hint shown to guide user on meeting name -->
@@ -3732,7 +3732,7 @@
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favoritos</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]Não há[/B] [A]Favoritos[/A]</string>
+    <string name="empty_hint_favourite_album">[B]Não há[/B] [A]favoritos[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remover favoritos</string>
     <!-- Message of notice that the zip file format is error -->
@@ -4040,7 +4040,7 @@
     <!-- Title of the option on the meeting list to archive a meeting -->
     <string name="archive_meeting_option">Arquivar reunião</string>
     <!-- Action to indicate immediate meeting creation -->
-    <string name="action_start_meeting_now">Fazer uma reunião agora</string>
+    <string name="action_start_meeting_now">Começar a reunião agora</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_preferences">Chamadas</string>
     <!-- Label for the sound notifications option on calls settings -->
@@ -4191,4 +4191,56 @@
     <string name="meetings_list_recurring_meeting_label">Reunião periódica</string>
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s semanal</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">Visualização na Galeria multimídia</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">Abrir automaticamente pastas somente com imagens e vídeos na Galeria multimídia. Isso permite que você veja os arquivos na galeria e filtre por data.</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">Como esta pasta comente inclui imagens e vídeos, nós a abrimos automaticamente na Galeria multimídia, o que permite que você veja os arquivos na galeria e filtre por data. Você pode desativar esta opção nas Configurações.</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">Configurações</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">OK, entendido</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Qualquer pessoa com este link pode entrar na reunião e visualizar o chat correspondente.</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">Link copiado para a área de transferência</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="one">Álbum “%s” excluído</item>
+        <item quantity="many">%d álbuns excluídos</item>
+        <item quantity="other">%d álbuns excluídos</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="one">Excluir álbum?</item>
+        <item quantity="many">Excluir álbuns?</item>
+        <item quantity="other">Excluir álbuns?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="one">O álbum será deletado, mas o conteúdo dele permanecerá na sua linha do tempo.</item>
+        <item quantity="many">Os álbuns serão deletados, mas o conteúdo deles permanecerá na sua linha do tempo.</item>
+        <item quantity="other">Os álbuns serão deletados, mas o conteúdo deles permanecerá na sua linha do tempo.</item>
+    </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ver menos</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Verificação dos contatos</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">Protegemos os seus dados com criptografia de conhecimento zero. Para garantir uma segurança adicional, pedimos que você verifique os contatos com os quais compartilha informações antes que eles possam acessar as pastas compartilhadas.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">Protegemos os seus dados com criptografia de conhecimento zero. Para garantir uma segurança adicional, pedimos que você verifique os contatos dos quais você recebe informações antes de poder acessar as pastas compartilhadas.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Para verificar o seu contato, confirme que as credenciais que você vê acima correspondem às credenciais da conta dele. Você pode pedir que eles compartilhem as credenciais com você.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Pasta não criptografada]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Para acessar a pasta compartilhada, a pessoa que a compartilhou com você também deve verificar as suas credenciais.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verificar %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Suas credenciais</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

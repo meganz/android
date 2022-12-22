@@ -164,6 +164,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private AlertDialog cannotOpenFileDialog;
 
+    private boolean isPublicUserVerificationPending;
+
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
             mMode = mode;
@@ -252,6 +254,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionLeaveShares = contentView.findViewById(R.id.leave_share_option);
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
+        if(isPublicUserVerificationPending) {
+
+            ////TODO This flag for false for now. This will get manipulated after SDK changes
+            TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
+            optionVerifyUser.setVisibility(View.VISIBLE);
+            optionVerifyUser.setOnClickListener(this);
+            optionDownload.setOnClickListener(null);
+            optionOffline.setOnClickListener(null);
+            optionDownload.setVisibility(View.GONE);
+            optionOffline.setVisibility(View.GONE);
+        }
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);

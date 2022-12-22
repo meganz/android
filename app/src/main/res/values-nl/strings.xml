@@ -204,7 +204,7 @@
         <item quantity="other">De geselecteerde overdrachten worden geannuleerd.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Cloud Schijf</string>
+    <string name="section_cloud_drive">Cloud schijf</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recent</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -230,7 +230,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Mijn Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Camera Uploads</string>
+    <string name="section_photo_sync">Camera uploads</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Binnenkomende</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -242,7 +242,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Binnenkomende deling met</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Geen bestanden in uw Cloud Schijf</string>
+    <string name="file_browser_empty_cloud_drive">Geen bestanden in uw Cloud schijf</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Lege Map</string>
     <!-- Title of the fragment Choose Account -->
@@ -258,7 +258,7 @@
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">Toestemmingen</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Machtigingen Delen</string>
+    <string name="dialog_select_permissions">Machtigingen delen</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Machtigingen wijzigen</string>
     <!-- when listing all the contacts that shares a folder -->
@@ -366,7 +366,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Map creëren</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Prullenbak Wissen</string>
+    <string name="context_clear_rubbish">Prullenbak Leegmaken</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">U staat op het punt permanent alle items van uw Prullenbak te verwijderen.</string>
     <!-- send cancel subscriptions dialog -->
@@ -542,17 +542,17 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi of mobiele data</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Camera Uploads in behandeling</string>
+    <string name="cam_sync_syncing">Camera uploads in behandeling</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Wilt u Camera Uploads stoppen?</string>
+    <string name="cam_sync_cancel_sync">Wilt u Camera uploads stoppen?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Bestanden uploaden van media mappen</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Bezig met zoeken naar te uploaden bestanden</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Camera-uploads initialiseren</string>
+    <string name="settings_camera_notif_initializing_title">Camera uploads initialiseren</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Camera-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
+    <string name="camera_notif_primary_local_unavailable">Camera uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Media-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
     <!-- settings of the Appearance section -->
@@ -640,7 +640,7 @@
         <item>Importeren vanuit apparaat</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Camera Uploads Inschakelen</string>
+    <string name="settings_camera_upload_on">Camera uploads Inschakelen</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Hoe te uploaden</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -671,11 +671,11 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Lokale Camera map</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">MEGA Camera Uploads map</string>
+    <string name="settings_mega_camera_upload_folder">MEGA Camera uploads map</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Lokale Secundaire map</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">MEGA Secundaire map</string>
+    <string name="settings_mega_secondary_folder">MEGA secundaire map</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Alleen foto’s</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -726,7 +726,7 @@
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Broncode weergeven</string>
     <!-- title of the screen that shows the ZIP files -->
-    <string name="zip_browser_activity">ZIP Bestanden</string>
+    <string name="zip_browser_activity">ZIP bestanden</string>
     <!--  -->
     <string name="free_account">Gratis</string>
     <!-- category in sort by action -->
@@ -794,9 +794,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Wijzigen</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">JA</string>
+    <string name="general_positive_button">Ja</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NEE</string>
+    <string name="general_negative_button">Nee</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Uw wachtwoord vergeten?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -808,13 +808,13 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">E-mail verificatie</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Controleer uw email om door te gaan.</string>
+    <string name="email_verification_text">Controleer uw e-mail om door te gaan.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Er is een fout opgetreden, probeer nogmaals.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">U moet ingelogd zijn om deze actie uit te voeren.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">U moet ingelogd zijn om uw email wijziging te voltooien. Log opnieuw in met uw huidige e-mailadres en tik dan opnieuw op uw bevestigingslink.</string>
+    <string name="change_email_not_logged_in">U moet ingelogd zijn om uw e-mail wijziging te voltooien. Log opnieuw in met uw huidige e-mailadres en tik dan opnieuw op uw bevestigingslink.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Gefeliciteerd, uw nieuwe e-mailadres voor dit MEGA-account is: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -882,7 +882,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Wachtwoord bescherming instellen</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(ALLEEN VOOR PRO)</string>
+    <string name="subtitle_set_expiry_date">(allen voor Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Wachtwoord instellen</string>
     <!-- Hint of the dialog to get link with password -->
@@ -919,9 +919,9 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Deze URL is corrupt of misvormd. De link die u wilt bereiken bestaat niet.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">In afwachting op email bevestiging</string>
+    <string name="confirm_email_text">In afwachting op e-mail bevestiging</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Check uw email en tik op de link om uw account te bevestigen.</string>
+    <string name="confirm_email_explanation">Check uw e-mail en tik op de link om uw account te bevestigen.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 item</item>
@@ -1067,7 +1067,7 @@
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Profiel wijzigen</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
-    <string name="title_properties_chat_leave_chat">Groep Verlaten</string>
+    <string name="title_properties_chat_leave_chat">Groep verlaten</string>
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Deelnemers</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -1302,11 +1302,11 @@
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importeren</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Toevoegen aan Cloud Schijf</string>
+    <string name="add_to_cloud_node_chat">Toevoegen aan Cloud schijf</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Contacten weergeven</string>
     <!-- Menu option -->
-    <string name="import_success_error">Fout. Niet toegevoegd aan de Cloud Schijf</string>
+    <string name="import_success_error">Fout. Niet toegevoegd aan de Cloud schijf</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Verbinden&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1316,7 +1316,7 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Opnieuw verzenden</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email verstuurd</string>
+    <string name="confirm_email_misspelled_email_sent">E-mail verstuurd</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Waarschuwing over auteursrechten aan alle gebruikers</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -1351,7 +1351,7 @@
     <!--  -->
     <string name="camera_uploads_cellular_connection">Gebruik mobiele verbinding</string>
     <!--  -->
-    <string name="camera_uploads_upload_videos">Video’s Uploaden</string>
+    <string name="camera_uploads_upload_videos">Video’s uploaden</string>
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profielfoto bijgewerkt</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1377,7 +1377,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Geen bestanden geselecteerd</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Van Cloud Schijf</string>
+    <string name="attachment_upload_panel_from_cloud">Van Cloud schijf</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1443,7 +1443,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera Uploads uit.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera uploads uit.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Weet u zeker dat u deze map wilt verplaatsen naar de Prullenbak? Hierdoor worden Secundaire Media Uploads uitgeschakeld.</string>
     <!-- confirmation message before removing a file -->
@@ -1491,7 +1491,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Uitnodiging verstuurd</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email is misvormed</string>
+    <string name="invalid_email_to_invite">E-mail is misvormed</string>
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">Wanneer u de MEGA Desktop Applicatie installeert krijgt u %1$s aan extra opslag ruimte, geldig voor 365 dagen. De MEGA Desktop Applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
     <!-- info paragraph about the achievement install mobile app -->
@@ -1541,9 +1541,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">ONDERWERP</string>
+    <string name="new_file_subject_when_uploading">Onderwerp</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Doorversturen</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1566,7 +1566,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Gebruikers account</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Opslaan naar mijn \nCloud Schijf</string>
+    <string name="save_to_mega">Opslaan naar mijn \nCloud schijf</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">De chat bestaat al</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1594,7 +1594,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Verwijder QR code</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">Naar Cloud Schijf</string>
+    <string name="save_cloud_drive">Naar Cloud schijf</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Naar bestandssysteem</string>
     <!-- Title of QR code section -->
@@ -1654,23 +1654,23 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Delen via</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Lege[/B][A]Prullenbak[/A]</string>
+    <string name="context_empty_rubbish_bin">[B]Lege[/B] [A]Prullenbak[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Geen bestanden in uw [/B][A]Cloud Schijf[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Geen bestanden in uw [/B][A]Cloud schijf[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Geen bestanden[/B][A]Opgeslagen voor Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]Geen [/B][A]Contacten[/A]</string>
+    <string name="context_empty_contacts">[B]Geen [/B][A]contacten[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Geen[/A] [B]Gesprekken[/B]</string>
+    <string name="recent_chat_empty">[A]Geen[/A] [B]gesprekken[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]Gesprekken[/A] [B]Laden&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[B]Gesprekken[/B] [A]laden&#8230;[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]Geen [/B][A]Binnenkomende Gedeelde mappen[/A]</string>
+    <string name="context_empty_incoming">[B]Geen [/B][A]binnenkomende gedeelde mappen[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]Geen [/B][A]Uitgaande Gedeelde mappen[/A]</string>
+    <string name="context_empty_outgoing">[B]Geen [/B][A]uitgaande gedeelde mappen[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
-    <string name="context_empty_links">[B]Nee [/B][A]Openbare Links[/A][B][/B]</string>
+    <string name="context_empty_links">[B]Nee [/B][A]openbare links[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
     <string name="tab_sent_requests">Verstuurde verzoeken</string>
     <!-- Title of the received requests tab. Capital letters -->
@@ -1767,7 +1767,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Kwaliteit</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Camera Uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Ga naar de instellingen pagina en geef toestemming.</string>
+    <string name="on_refuse_storage_permission">Camera uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Ga naar de instellingen pagina en geef toestemming.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Laag</item>
@@ -1801,7 +1801,7 @@
         <item quantity="other">Fout. De middelen zijn niet langer beschikbaar</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
-    <string name="turn_on_notifications_title">Notificaties Inschakelen</string>
+    <string name="turn_on_notifications_title">Notificaties inschakelen</string>
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">Op deze manier kunt u nieuwe berichten zien \ngelijk op uw Android telefoon.</string>
     <!-- First step to turn on notifications -->
@@ -1929,11 +1929,11 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Begin het Instellen</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Scan of kopieer de seed naar uw Authenticator Applicatie.</string>
+    <string name="explain_qr_seed_2fa_1">Scan of kopieer de seed naar uw authenticatie applicatie.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Zorg ervoor dat u een backup maakt op een veilige plek voor het geval u uw apparaat verliest.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Voer de 6-cijferige code gegenereerd door uw Authenticatie Applicatie in.</string>
+    <string name="explain_confirm_2fa">Voer de 6-cijferige code gegenereerd door uw authenticatie applicatie in.</string>
     <!-- Text button -->
     <string name="general_verify">Verifiëren</string>
     <!-- Text button -->
@@ -1943,7 +1943,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Twee-staps authenticatie ingeschakeld</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
+    <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw authenticatie applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Bewaar uw <b>Herstelsleutel</b> op een veilige locatie om problemen te voorkomen als u de toegang tot uw applicatie verliest of als u twee-staps authenticatie wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -1979,7 +1979,7 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Twee-staps authenticatie applicatie</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een Authenticatie Applicatie kunt installeren?</string>
+    <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een authenticatie applicatie kunt installeren?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2030,7 +2030,7 @@
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">Er is een fout opgetreden. Item niet hersteld.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Bericht Versturen</string>
+    <string name="context_send_message">Bericht versturen</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Deze actie kon niet voltooid worden omdat het u over de huidige opslag limiet brengt. Wilt u uw account upgraden?</string>
     <!-- Title of the section Archived chats -->
@@ -2097,7 +2097,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Versionering inschakelen of uitschakelen voor uw gehele account. \nVersionering uischakelen zorgt er niet voor dat uw contacten nieuwe versies kunnen creëren in gedeelde mappen.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tik, naam of email invoeren</string>
+    <string name="type_mail">Tik, naam of e-mail invoeren</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Wilt u %s tot uw contacten toevoegen?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2125,13 +2125,13 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Cloud Drive is bijna vol. Upgrade nu en krijg tot %1$s opslag en %2$s overdrachtstegoed.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Cloud Schijf is bijna vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast plan te nemen.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud schijf is bijna vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast plan te nemen.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Cloud Drive is vol. Upgrade naar Pro en ontvang tot %1$s opslag en %2$s overdrachtstegoed.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Cloud Schijf is vol. Upgrade nu en krijg tot %1$s opslag en %2$s overdrachtstegoed.</string>
+    <string name="text_storage_full_warning_pro_account">Cloud schijf is vol. Upgrade nu en krijg tot %1$s opslag en %2$s overdrachtstegoed.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Cloud Schijf is vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast abonnement te nemen.</string>
+    <string name="text_storage_full_warning_pro3_account">Cloud schijf is vol. Als u meer ruimte nodig heeft neem contact op met MEGA ondersteuning om een aangepast abonnement te nemen.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Zie abonnementen</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2180,9 +2180,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">U kunt nieuwe berichten hebben</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Prullenbak Opruimplanner</string>
+    <string name="settings_rb_scheduler_enable_title">Planner voor het legen van vuilnisbakken</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">De Prulenbak wordt automatisch voor u gewist.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">De Prullenbak is voor uw automatisch leeggemaakt.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">De minimale periode is 7 dagen.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2198,7 +2198,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Als video’s die gecomprimeerd moeten worden groter zijn dan</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Om de planner voor het opruimen van de Vuilnisbak uit te schakelen of een langere bewaarperiode in te stellen, kunt u zich abonneren op een Pro-abonnement.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Als u de planning voor het legen van de vuilnisbak wilt uitschakelen of een langere bewaarperiode wilt instellen, abonneer dan op een Pro-abonnement.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dagen</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2250,7 +2250,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">De uitnodiging naar contact %s was al verzonden en kan gezien worden in de Verzonden Verzoeken tabblad.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Opslaan %s in Cloud Schijf&#8230;</string>
+    <string name="save_qr_cloud_drive">Opslaan %s in Cloud schijf&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Bestanden</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2371,11 +2371,11 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">De totale grootte van de te comprimeren video’s zijn groter dan %s. Geef uw apparaat op om door te gaan.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">Deze instelling gaat van kracht wanneer Camera Uploads de volgende keer wordt uitgevoerd</string>
+    <string name="message_keep_device_name">Deze instelling gaat van kracht wanneer Camera uploads de volgende keer wordt uitgevoerd</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s is gecomprimeerd</string>
     <!-- notification title when compressing video -->
-    <string name="title_compress_video">Video’s Comprimeren %1$d/%2$d</string>
+    <string name="title_compress_video">Video’s comprimeren %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Ongeldige map geselecteerd</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
@@ -2432,7 +2432,7 @@
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">MEGA kan geen beveiligde verbinding tot stand brengen via SSL. Mogelijk bevindt u zich op een openbaar WiFi-netwerk met aanvullende vereisten.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]Geen [/B][A]Meldingen[/A]</string>
+    <string name="context_empty_notifications">[B]Geen [/B][A]meldingen[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA Instellen</string>
     <!-- Permissions screen explanation -->
@@ -2493,7 +2493,7 @@
     <!-- label tomorrow -->
     <string name="label_tomorrow">Morgen</string>
     <!-- Text of the empty screen for the chat shared files -->
-    <string name="context_empty_shared_files">[B]Geen[/B] [A]Gedeelde Bestanden[/A]</string>
+    <string name="context_empty_shared_files">[B]Geen[/B] [A]gedeelde bestanden[/A]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Er kan niet worden deelgenomen aan de oproep omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -2600,7 +2600,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Gecodeerd gesprek</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Volledig gecodeerd gesprek met spraak en video oproepen, groepsgesprekken en bestandsdeling integratie met uw Cloud Schijf.</string>
+    <string name="content_tour_two">Volledig gecodeerd gesprek met spraak en video oproepen, groepsgesprekken en bestandsdeling integratie met uw Cloud schijf.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Creëer uw netwerk</string>
     <!-- Content of third tour screen -->
@@ -2777,7 +2777,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Uw account is momenteel [B]geschorst[/B]. U kunt alleen door uw gegevens bladeren.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens. Uw zakelijke accountbeheerder heeft echter wel toegang tot uw camera-uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens. Uw zakelijke accountbeheerder heeft echter wel toegang tot uw Camera uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Er is iets fout gegaan</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -2809,11 +2809,11 @@
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Waarom zie ik dit?</string>
     <!-- Label of a button which action is resend an email -->
-    <string name="resend_email_label">Email opnieuw verzenden</string>
+    <string name="resend_email_label">E-mail opnieuw verzenden</string>
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">E-mail al verzonden. Wacht een paar minuten voordat u het opnieuw probeert.</string>
     <!-- Title of a helping view about locked accounts -->
-    <string name="locked_accounts_label">Gesloten Accounts</string>
+    <string name="locked_accounts_label">Gesloten accounts</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
     <string name="locked_accounts_text_1">Het is mogelijk dat u hetzelfde wachtwoord gebruikt voor uw MEGA-account als voor andere diensten en dat ten minste één van deze andere diensten een gegevenslek heeft geleden.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
@@ -2874,9 +2874,9 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">De map bestaat niet.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Het bestand kon niet gevonden worden in uw Cloud Schijf.</string>
+    <string name="warning_node_not_exists_in_cloud">Het bestand kon niet gevonden worden in uw Cloud schijf.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">Opslagruimte Vol</string>
+    <string name="over_disk_quota_paywall_header">Opslagruimte vol</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Uw gegevens lopen gevaar!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
@@ -2914,7 +2914,7 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Uw Gegevens</string>
+    <string name="label_your_credentials">Uw gegevens</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Resetten</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3205,7 +3205,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Afspelen op de achtergrond</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud Schijf.</string>
+    <string name="enable_cu_subtitle">Automatisch een backup van uw foto\’s en video\’s maken naar uw Cloud schijf.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Alle</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3249,13 +3249,13 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item verplaatst naar de prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
-        <item quantity="other">1 item verplaasts naar de prullenbak maar %d items waren niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="one">1 item verplaatst naar de Prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="other">1 item verplaasts naar de Prullenbak maar %d items waren niet verplaatst. Probeer later nogmaals.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item verplaatst naar de prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
-        <item quantity="other">%d items verplaatst naar de prullenbak maar 1 item was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="one">1 item verplaatst naar de Prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="other">%d items verplaatst naar de Prullenbak maar 1 item was niet verplaatst. Probeer later nogmaals.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3321,7 +3321,7 @@
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Recent Toegevoegd</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]Geen [/B][A] Groepen[/A]</string>
+    <string name="context_empty_groups">[B]Geen [/B][A] groepen[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Verzoeken</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
@@ -3634,7 +3634,7 @@
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favorieten</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]Geen[/B] [A]Favorieten[/A]</string>
+    <string name="empty_hint_favourite_album">[B]Geen[/B] [A]favorieten[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Favorieten verwijderen</string>
     <!-- Message of notice that the zip file format is error -->
@@ -3980,7 +3980,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Dit is waar uw back-upbestanden en mappen worden opgeslagen. Uw back-upitems zijn “alleen-lezen” om te voorkomen dat ze per ongeluk worden gewijzigd in uw clouddrive.\nU kunt een back-up maken van items op uw computer naar MEGA met behulp van onze desktop-applicatie.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Account is geschorst vanwege copyright overtredingen. We hebben u een email gestuurd met meer informatie hierover.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Account is geschorst vanwege copyright overtredingen. We hebben u een e-mail gestuurd met meer informatie hierover.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4040,17 +4040,17 @@
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Groep verlaten</string>
     <!-- Error message for creating an album with a system albums name -->
-    <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
+    <string name="photos_create_album_error_message_systems_album">Deze album naam is niet toegestaan. Voer een andere naam in.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Een album met deze naam bestaat al. Voer een andere naam in.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nieuw album (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">Voeg items toe naar “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="one">%d item toegevoegd naar “%s“</item>
+        <item quantity="other">%d items toegevoegd naar “%s”</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">Betalingsinformatie</string>
@@ -4071,17 +4071,66 @@
         <item quantity="other">Uw Pro lidmaatschap abonnement verliep %1$d dagen geleden.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
-    <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>
+    <string name="photos_user_album_empty_album">[B]Leeg[/B] [A]album[/A]</string>
     <!-- Albums sub-section for all system and user albums -->
-    <string name="photos_album_subsection_my_albums">My albums</string>
+    <string name="photos_album_subsection_my_albums">Mijn albums</string>
     <!-- Albums sub-section for all shared albums -->
-    <string name="photos_album_subsection_shared_albums">Shared albums</string>
+    <string name="photos_album_subsection_shared_albums">Gedeelde albums</string>
     <!-- Header title for meeting list past meetings -->
     <string name="meetings_list_past_header">Eerdere vergaderingen</string>
     <!-- Label for upcoming meetings -->
-    <string name="meetings_list_upcoming_meeting_label">Upcoming meeting</string>
+    <string name="meetings_list_upcoming_meeting_label">Inkomende vergadering</string>
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Terugkerende vergadering</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s wekelijks</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">Media discovery weergave</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">Open automatisch mappen die alleen afbeeldingen en video\’s bevatten in de media discovery weergave. Hiermee kunt u media in galerijmodus bekijken en filteren op datum.</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">Aangezien deze map alleen afbeeldingen en video\’s bevat, hebben we deze automatisch geopend in de media discovery weergave. Hiermee kunt u media in galerijmodus bekijken en filteren op datum. U kunt dit uitschakelen in Instellingen.</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">Instellingen</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">Ok, ik snap het</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Iedereen met deze link kan aansluiten in de vergadering en het vergadergesprek weergeven.</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">Link gekopieerd naar klembord</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="one">“%s” album is verwijderd</item>
+        <item quantity="other">%d albums waren verwijderd</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="one">Album verwijderen?</item>
+        <item quantity="other">Albums verwijderen?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="one">Album wordt verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
+        <item quantity="other">Albums worden verwijderd maar de inhoud blijft in uw Tijdlijn.</item>
+    </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Minder weergeven</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verificatie</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten met wie u informatie deelt te verifiëren voordat ze toegang krijgen tot de gedeelde mappen.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten van wie u informatie ontvangt te verifiëren voordat u oegang krijgt tot de gedeelde mappen.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Om uw contactpersoon te verifiëren, moet u ervoor zorgen dat de inloggegevens die u hierboven ziet, overeenkomen met de inloggegevens van hun account. U kunt hen vragen om hun inloggegevens met u te delen.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Ongecodeerde map]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Om toegang te krijgen tot de gedeelde map, moet de persoon die deze met u heeft gedeeld, u ook verifiëren.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">%sverifiëren</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Uw gegevens</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

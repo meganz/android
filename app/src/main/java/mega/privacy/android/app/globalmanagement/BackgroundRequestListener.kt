@@ -3,6 +3,7 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Application
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
@@ -13,7 +14,6 @@ import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
@@ -21,15 +21,14 @@ import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
 import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
 import mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS
 import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
-import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
-import mega.privacy.android.app.utils.TimeUtils.formatDateAndTime
 import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
-import nz.mega.sdk.MegaAccountSession
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -65,6 +64,9 @@ class BackgroundRequestListener @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val getSpecificAccountDetail: GetSpecificAccountDetail,
+    private val getAccountDetails: GetAccountDetails,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -113,41 +115,7 @@ class BackgroundRequestListener @Inject constructor(
                 e,
                 request
             )
-            MegaRequest.TYPE_ACCOUNT_DETAILS -> handleAccountDetailRequest(e, request)
             MegaRequest.TYPE_PAUSE_TRANSFERS -> dbH.transferQueueStatus = request.flag
-        }
-    }
-
-    private fun handleAccountDetailRequest(e: MegaError, request: MegaRequest) {
-        Timber.d("Account details request")
-        if (e.errorCode == MegaError.API_OK) {
-            val storage = request.numDetails and MyAccountInfo.HAS_STORAGE_DETAILS != 0
-            if (storage && megaApi.rootNode != null) {
-                dbH.setAccountDetailsTimeStamp()
-            }
-            if (request.megaAccountDetails != null) {
-                myAccountInfo.setAccountInfo(request.megaAccountDetails)
-                myAccountInfo.setAccountDetails(request.numDetails)
-                val sessions =
-                    request.numDetails and MyAccountInfo.HAS_SESSIONS_DETAILS != 0
-                if (sessions) {
-                    val megaAccountSession: MegaAccountSession? =
-                        request.megaAccountDetails.getSession(0)
-                    if (megaAccountSession != null) {
-                        Timber.d("getMegaAccountSESSION not Null")
-                        dbH.setExtendedAccountDetailsTimestamp()
-                        val mostRecentSession: Long = megaAccountSession.mostRecentUsage
-                        val date: String = formatDateAndTime(application,
-                            mostRecentSession,
-                            DATE_LONG_FORMAT)
-                        myAccountInfo.lastSessionFormattedDate = date
-                        myAccountInfo.createSessionTimeStamp =
-                            megaAccountSession.creationTimestamp
-                    }
-                }
-                Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.usedPercentage)
-            }
-            sendBroadcastUpdateAccountDetails()
         }
     }
 
@@ -306,22 +274,17 @@ class BackgroundRequestListener @Inject constructor(
             request.requestString)
     }
 
-    private fun sendBroadcastUpdateAccountDetails() {
-        application.sendBroadcast(Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            .putExtra(ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS))
-    }
-
     private fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
-        megaApi.run {
-            getPaymentMethods(null)
+        applicationScope.launch {
+            megaApi.getPaymentMethods(null)
             if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
-                getAccountDetails()
+                getAccountDetails(true)
             } else {
-                getSpecificAccountDetails(false, true, true)
+                getSpecificAccountDetail(storage = false, transfer = true, pro = true)
             }
-            getPricing(null)
-            creditCardQuerySubscriptions(null)
+            megaApi.getPricing(null)
+            megaApi.creditCardQuerySubscriptions(null)
         }
     }
 }

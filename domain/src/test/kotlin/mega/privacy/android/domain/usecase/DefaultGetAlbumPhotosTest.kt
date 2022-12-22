@@ -3,10 +3,12 @@ package mega.privacy.android.domain.usecase
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -43,6 +45,8 @@ class DefaultGetAlbumPhotosTest {
         val expectedVideo = createVideo()
 
         whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(nodeIds)
+        whenever(albumRepository.monitorAlbumElementIds(albumId)).thenReturn(flowOf())
+
         whenever(photosRepository.getPhotoFromNodeID(nodeIds[0])).thenReturn(expectedImage)
         whenever(photosRepository.getPhotoFromNodeID(nodeIds[1])).thenReturn(expectedVideo)
 
@@ -89,7 +93,9 @@ class DefaultGetAlbumPhotosTest {
         thumbnailFilePath: String? = null,
         previewFilePath: String? = null,
         duration: Int = 0,
-        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(type = "", extension = ""),
+        fileTypeInfo: FileTypeInfo = VideoFileTypeInfo(type = "",
+            extension = "",
+            duration = duration),
     ): Photo = Photo.Video(
         id,
         parentId,
@@ -99,7 +105,6 @@ class DefaultGetAlbumPhotosTest {
         modificationTime,
         thumbnailFilePath,
         previewFilePath,
-        duration,
         fileTypeInfo,
     )
 }

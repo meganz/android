@@ -76,7 +76,7 @@ interface PlayerServiceViewModelGateway {
      *
      * @return List<PlaylistItem>
      */
-    fun getPlaylistItems(): List<PlaylistItem>?
+    fun getPlaylistItems(): List<PlaylistItem>
 
     /**
      * Is the audio player
@@ -145,7 +145,7 @@ interface PlayerServiceViewModelGateway {
     /**
      * Remove the selected items
      */
-    fun removeItems()
+    fun removeAllSelectedItems()
 
     /**
      * Clear the all selections
@@ -180,9 +180,9 @@ interface PlayerServiceViewModelGateway {
     /**
      * Get the index from playlistItems to keep the play order is correct after reordered
      * @param item clicked item
-     * @return the index of clicked item in playlistItems
+     * @return the index of clicked item in playlistItems or null
      */
-    fun getIndexFromPlaylistItems(item: PlaylistItem): Int
+    fun getIndexFromPlaylistItems(item: PlaylistItem): Int?
 
     /**
      * Get the position of playing item

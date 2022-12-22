@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.view.PhotosFilterView
-import mega.privacy.android.app.presentation.photos.timeline.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

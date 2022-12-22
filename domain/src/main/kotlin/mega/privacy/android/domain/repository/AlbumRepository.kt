@@ -58,7 +58,15 @@ interface AlbumRepository {
     /**
      * Monitor user set's element ids update
      *
+     * @param albumId the id of the album which we want to map the ids associated with
      * @return a flow of all new element ids update
      */
-    fun monitorAlbumElementIds(): Flow<List<NodeId>>
+    fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<NodeId>>
+
+    /**
+     * Remove user albums
+     * @param albumIds the album ids to be removed
+     * @return throw exception if the operation fails
+     */
+    suspend fun removeAlbums(albumIds: List<AlbumId>)
 }

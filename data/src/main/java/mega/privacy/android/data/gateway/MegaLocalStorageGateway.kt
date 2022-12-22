@@ -4,12 +4,13 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
+import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 
 /**
- * MegaDBHandlerGateway gateway
+ * Mega local storage gateway
  *
- * The gateway interface to the Mega DB handler functionality
+ * @constructor Create empty Mega local storage gateway
  */
 interface MegaLocalStorageGateway {
 
@@ -509,4 +510,20 @@ interface MegaLocalStorageGateway {
      * Get chat files folder handle
      */
     suspend fun getChatFilesFolderHandle(): Long?
+
+    /**
+     * Is offline information available
+     *
+     * @param nodeHandle
+     * @return true if available, else false
+     */
+    suspend fun isOfflineInformationAvailable(nodeHandle: Long): Boolean
+
+    /**
+     * Get offline information
+     *
+     * @param nodeHandle
+     * @return OfflineInformation if available, else null
+     */
+    suspend fun getOfflineInformation(nodeHandle: Long): OfflineInformation?
 }

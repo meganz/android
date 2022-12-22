@@ -14,6 +14,7 @@ import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -23,6 +24,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FolderVersionInfo
@@ -69,8 +71,32 @@ internal class DefaultFilesRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
+    private val fileGateway: FileGateway,
 ) : FilesRepository, FileRepository {
 
+    override suspend fun copyNode(
+        nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String,
+    ): NodeId = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.copyNode(
+                nodeToCopy = nodeToCopy,
+                newNodeParent = newNodeParent,
+                newNodeName = newNodeName,
+                listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_COPY) {
+                            continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
+                        } else {
+                            continuation.failWithError(error)
+                        }
+                    }
+                )
+            )
+        }
+    }
 
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
@@ -165,6 +191,26 @@ internal class DefaultFilesRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getNodeByFingerprint(fingerprint)
         }
+
+    override suspend fun setOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaApiGateway.setOriginalFingerprint(
+                    node = node,
+                    originalFingerprint = originalFingerprint,
+                    listener = OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_SET_ATTR_NODE) {
+                                continuation.resumeWith(Result.success(Unit))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    )
+                )
+            }
+        }
+    }
 
     override suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
@@ -309,5 +355,17 @@ internal class DefaultFilesRepository @Inject constructor(
             }
             .flowOn(ioDispatcher)
     }
+
+    override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
+        withContext(ioDispatcher) {
+            megaLocalStorageGateway.getOfflineInformation(nodeId.id)
+                ?.let { offlineNodeInformationMapper(it) }
+        }
+
+    override suspend fun getOfflinePath() =
+        withContext(ioDispatcher) { fileGateway.getOfflineFilesRootPath() }
+
+    override suspend fun getOfflineInboxPath() =
+        withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
 
 }

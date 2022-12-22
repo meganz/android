@@ -7,6 +7,8 @@ import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
+import mega.privacy.android.domain.usecase.AreCredentialsVerified
+import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -14,7 +16,9 @@ import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.StartConversation
+import mega.privacy.android.domain.usecase.VerifyCredentials
 
 /**
  * Contacts module.
@@ -64,4 +68,20 @@ class ContactsModule {
     @Provides
     fun provideAddNewContacts(contactsRepository: ContactsRepository): AddNewContacts =
         AddNewContacts(contactsRepository::addNewContacts)
+
+    @Provides
+    fun provideGetContactCredentials(contactsRepository: ContactsRepository): GetContactCredentials =
+        GetContactCredentials(contactsRepository::getContactCredentials)
+
+    @Provides
+    fun provideAreCredentialsVerified(contactsRepository: ContactsRepository): AreCredentialsVerified =
+        AreCredentialsVerified(contactsRepository::areCredentialsVerified)
+
+    @Provides
+    fun provideVerifyCredentials(contactsRepository: ContactsRepository): VerifyCredentials =
+        VerifyCredentials(contactsRepository::verifyCredentials)
+
+    @Provides
+    fun provideResetCredentials(contactsRepository: ContactsRepository): ResetCredentials =
+        ResetCredentials(contactsRepository::resetCredentials)
 }

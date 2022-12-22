@@ -1,13 +1,11 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment as NewMediaDiscoveryFragment
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -34,13 +32,17 @@ import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -51,10 +53,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.gallery.ui.MediaDiscoveryFragment
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -67,6 +67,8 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -90,7 +92,6 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -153,8 +154,7 @@ class FileBrowserFragment : RotatableFragment() {
     private var backupActionType = 0
     private var fileBackupManager: FileBackupManager? = null
 
-    @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    private var mediaDiscoveryViewSettings = MediaDiscoveryViewSettings.INITIAL.ordinal
 
     override fun activateActionMode() {
         Timber.d("activateActionMode")
@@ -580,6 +580,14 @@ class FileBrowserFragment : RotatableFragment() {
         if ((activity as? ManagerActivity)?.viewInFolderNode != null) {
             animateNode(_nodes)
         }
+
+        fileBrowserViewModel.state.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).onEach {
+            mediaDiscoveryViewSettings = it
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
         return v
     }
 
@@ -697,7 +705,7 @@ class FileBrowserFragment : RotatableFragment() {
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().path)) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
                     Timber.d("itemClick:FileProviderOption")
                     val mediaFileUri = FileProvider.getUriForFile(
                         requireContext(),
@@ -794,7 +802,7 @@ class FileBrowserFragment : RotatableFragment() {
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
                 val mediaFile = File(localPath)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().path)) {
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
                     pdfIntent.setDataAndType(FileProvider.getUriForFile(
                         requireContext(),
                         "mega.privacy.android.app.providers.fileprovider",
@@ -889,7 +897,9 @@ class FileBrowserFragment : RotatableFragment() {
                 managerViewModel.setBrowserParentHandle(clickedNode.handle)
                 val childNodes: List<MegaNode> = megaApi.getChildren(clickedNode,
                     sortOrderIntMapper(managerViewModel.getOrder()))
-                if (fileBrowserViewModel.shouldEnterMDMode(childNodes)) {
+                if (fileBrowserViewModel.shouldEnterMDMode(childNodes,
+                        mediaDiscoveryViewSettings)
+                ) {
                     showMediaDiscovery()
                 } else {
                     var lastFirstVisiblePosition: Int?
@@ -982,11 +992,7 @@ class FileBrowserFragment : RotatableFragment() {
                 } catch (e: Exception) {
                     Timber.e(e)
                 }
-                val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                } else {
-                    Html.fromHtml(textToShow)
-                }
+                val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
                 emptyTextViewFirst?.text = result
             }
         } else {
@@ -1160,11 +1166,7 @@ class FileBrowserFragment : RotatableFragment() {
                     } catch (e: Exception) {
                         Timber.e(e)
                     }
-                    val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        Html.fromHtml(textToShow)
-                    }
+                    val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
                     emptyTextViewFirst?.text = result
                 } else {
                     if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -1186,11 +1188,7 @@ class FileBrowserFragment : RotatableFragment() {
                     } catch (e: Exception) {
                         Timber.e(e)
                     }
-                    val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        Html.fromHtml(textToShow)
-                    }
+                    val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
                     emptyTextViewFirst?.text = result
                 }
             } else {
@@ -1341,14 +1339,8 @@ class FileBrowserFragment : RotatableFragment() {
 
     fun showMediaDiscovery() {
         activity?.lifecycleScope?.launch {
-            val newMediaDiscoveryEnable = getFeatureFlag(AppFeatures.NewMediaDiscovery)
-
-            val f = if (newMediaDiscoveryEnable) {
-                NewMediaDiscoveryFragment.getNewInstance(mediaHandle)
-            } else {
-                MediaDiscoveryFragment.getInstance(mediaHandle)
-            }
-            (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(f, mediaHandle)
+            (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(
+                MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle)
         }
     }
 

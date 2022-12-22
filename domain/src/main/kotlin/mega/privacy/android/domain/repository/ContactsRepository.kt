@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -95,4 +96,61 @@ interface ContactsRepository {
         outdatedContactList: List<ContactItem>,
         newContacts: List<ContactRequest>,
     ): List<ContactItem>
+
+    /**
+     * Gets the name of the given user: The alias if any, the full name in other case.
+     * If not available then returns the email.
+     *
+     * @param handle User identifier.
+     * @return Fingerprint of the signing key of the contact's account.
+     */
+    suspend fun getUserAlias(handle: Long): String?
+
+    /**
+     * Gets the name of the given user: The alias if any, the full name in other case.
+     * If not available then returns the email.
+     *
+     * @param emailOrHandle Email or user handle (Base64 encoded).
+     * @return Fingerprint of the signing key of the contact's account.
+     */
+    suspend fun getUserFirstName(emailOrHandle: String): String?
+
+    /**
+     * Gets the name of the given user: The alias if any, the full name in other case.
+     * If not available then returns the email.
+     *
+     * @param emailOrHandle Email or user handle (Base64 encoded).
+     * @return Fingerprint of the signing key of the contact's account.
+     */
+    suspend fun getUserLastName(emailOrHandle: String): String?
+
+    /**
+     * Checks if the credentials of a given user are already verified.
+     *
+     * @param userEmail The contact's email.
+     * @return True if credentials are verified, false otherwise.
+     */
+    suspend fun areCredentialsVerified(userEmail: String): Boolean
+
+    /**
+     * Resets the credentials of the given user.
+     *
+     * @param userEmail The contact's email.
+     */
+    suspend fun resetCredentials(userEmail: String)
+
+    /**
+     * Verifies the credentials of the given user.
+     *
+     * @param userEmail The contact's email.
+     */
+    suspend fun verifyCredentials(userEmail: String)
+
+    /**
+     * Gets contact's credentials.
+     *
+     * @param userEmail User's email.
+     * @return [AccountCredentials.ContactCredentials]
+     */
+    suspend fun getContactCredentials(userEmail: String): AccountCredentials.ContactCredentials?
 }

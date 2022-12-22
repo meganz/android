@@ -11,7 +11,10 @@ import com.android.tools.lint.detector.api.CURRENT_API
 @Suppress("UnstableApiUsage")
 class CustomLintRegistry : IssueRegistry() {
     override val issues =
-        listOf(CallIsSystemInDarkThemeIssue.ISSUE)
+        listOf(
+            CallIsSystemInDarkThemeDetector.ISSUE,
+            TranslatedStringTemplateDetector.ISSUE
+        )
 
     override val api: Int = CURRENT_API
 

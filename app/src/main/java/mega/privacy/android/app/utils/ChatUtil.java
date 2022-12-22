@@ -1476,7 +1476,7 @@ public class ChatUtil {
      */
     public static String transformSecondsInString(long seconds) {
         if (seconds == DISABLED_RETENTION_TIME)
-            return " ";
+            return "";
 
         long hours = seconds % SECONDS_IN_HOUR;
         long days = seconds % SECONDS_IN_DAY;
@@ -1508,7 +1508,7 @@ public class ChatUtil {
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
         }
 
-        return " ";
+        return "";
     }
 
     /**
@@ -1971,6 +1971,17 @@ public class ChatUtil {
                     break;
             }
         }
+    }
+
+    /**
+     * Method to check if all user's contacts are participants of the chat.
+     *
+     * @param chatId     Chat id
+     * @return True if all user's contacts are participants of the chat room or false otherwise.
+     */
+    public static boolean areAllMyContactsChatParticipants(Long chatId) {
+        var chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        return areAllMyContactsChatParticipants(chat);
     }
 
     /**

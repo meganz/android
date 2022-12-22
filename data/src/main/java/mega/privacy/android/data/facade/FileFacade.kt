@@ -52,7 +52,7 @@ class FileFacade @Inject constructor(
 
     @Suppress("DEPRECATION")
     @Throws(IOException::class)
-    override suspend fun deleteFolderAndSubFolders(f: File?) {
+    override fun deleteFolderAndSubFolders(f: File?) {
         f ?: return
         Timber.d("deleteFolderAndSubfolders: %s", f.absolutePath)
         val files = f.takeIf { it.isDirectory }?.listFiles().orEmpty()
@@ -71,7 +71,7 @@ class FileFacade @Inject constructor(
                         FileProvider.getUriForFile(context,
                             "mega.privacy.android.app.providers.fileprovider",
                             fileToDelete)
-                    } catch (e: IllegalArgumentException) {
+                    } catch (e: Exception) {
                         Uri.fromFile(fileToDelete)
                     }
                     data = contentUri
@@ -153,7 +153,14 @@ class FileFacade @Inject constructor(
         return null
     }
 
+    override suspend fun getOfflineFilesRootPath() =
+        context.filesDir.absolutePath + File.separator + OFFLINE_DIR
+
+    override suspend fun getOfflineFilesInboxRootPath() =
+        context.filesDir.absolutePath + File.separator + OFFLINE_DIR + File.separator + "in"
+
     companion object {
         private const val DOWNLOAD_DIR = "MEGA Downloads"
+        private const val OFFLINE_DIR = "MEGA Offline"
     }
 }

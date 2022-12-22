@@ -173,9 +173,9 @@
     <!-- category in sort by action -->
     <string name="name_text">Name</string>
     <!-- First Name of the user -->
-    <string name="first_name_text">First Name</string>
+    <string name="first_name_text">First name</string>
     <!-- Last name of the user -->
-    <string name="lastname_text">Last Name</string>
+    <string name="lastname_text">Last name</string>
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
     <string name="tos">I agree with MEGA’s [A]Terms of Service[/A]</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
@@ -216,7 +216,7 @@
     <!-- title of the screen that shows all the shared items -->
     <string name="title_shared_items">Shared items</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">Rubbish Bin</string>
+    <string name="section_rubbish_bin">Rubbish bin</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
     <string name="section_contacts">Contacts</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
@@ -230,7 +230,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">My Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Camera Uploads</string>
+    <string name="section_photo_sync">Camera uploads</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Incoming</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -258,7 +258,7 @@
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">Permissions</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Share Permissions</string>
+    <string name="dialog_select_permissions">Share permissions</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Change permissions</string>
     <!-- when listing all the contacts that shares a folder -->
@@ -358,7 +358,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Copying</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Move to Rubbish Bin</string>
+    <string name="context_move_to_trash">Move to the Rubbish bin</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Remove from MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -366,9 +366,9 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Creating folder</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Clear Rubbish Bin</string>
+    <string name="context_clear_rubbish">Empty Rubbish bin</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">You are about to permanently remove all items from your Rubbish Bin.</string>
+    <string name="clear_rubbish_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Send</string>
     <!-- Menu option to delete one or multiple selected items. -->
@@ -427,7 +427,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items were not moved successfully</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to the Rubbish Bin successfully</string>
+    <string name="context_correctly_moved_to_rubbish">Moved to the Rubbish bin successfully</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
@@ -455,9 +455,9 @@
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d items were not copied</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish Bin emptied successfully</string>
+    <string name="rubbish_bin_emptied">Rubbish bin emptied successfully</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
+    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish bin has not been emptied</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -542,17 +542,17 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi or mobile data</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Camera Uploads in progress</string>
+    <string name="cam_sync_syncing">Camera uploads in progress</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Do you want to stop Camera Uploads?</string>
+    <string name="cam_sync_cancel_sync">Do you want to stop Camera uploads?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Uploading files of media folders</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Checking for files to be uploaded</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Initialising Camera Uploads</string>
+    <string name="settings_camera_notif_initializing_title">Initialising Camera uploads</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Camera Uploads have been disabled. Your local folder is unavailable.</string>
+    <string name="camera_notif_primary_local_unavailable">Camera uploads have been disabled. Your local folder is unavailable.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Media Uploads have been disabled. Your local folder is unavailable.</string>
     <!-- settings of the Appearance section -->
@@ -640,13 +640,13 @@
         <item>Import from device</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Enable Camera Uploads</string>
+    <string name="settings_camera_upload_on">Enable Camera uploads</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">How to upload</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Enable Secondary Media uploads</string>
+    <string name="settings_secondary_upload_on">Enable Secondary media uploads</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Disable Secondary Media uploads</string>
+    <string name="settings_secondary_upload_off">Disable Secondary media uploads</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Choose folder</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -671,11 +671,11 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Local Camera folder</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">MEGA Camera Uploads folder</string>
+    <string name="settings_mega_camera_upload_folder">MEGA Camera uploads folder</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Local Secondary folder</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">MEGA Secondary folder</string>
+    <string name="settings_mega_secondary_folder">MEGA secondary folder</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Photos only</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -726,7 +726,7 @@
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">View source code</string>
     <!-- title of the screen that shows the ZIP files -->
-    <string name="zip_browser_activity">ZIP Browser</string>
+    <string name="zip_browser_activity">ZIP browser</string>
     <!--  -->
     <string name="free_account">Free</string>
     <!-- category in sort by action -->
@@ -794,9 +794,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Change</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">YES</string>
+    <string name="general_positive_button">Yes</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NO</string>
+    <string name="general_negative_button">No</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Forgot your password?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -814,7 +814,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">You must be logged in to perform this action.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">You need to be logged in to complete your email change. Please log in again with your current email address and then tap on your confirmation link again.</string>
+    <string name="change_email_not_logged_in">You need to be logged in to complete your email change. Please log in again with your current email address, then tap on your confirmation link again.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Congratulations, your new email address for this MEGA account is: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -882,7 +882,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Set password protection</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(PRO ONLY)</string>
+    <string name="subtitle_set_expiry_date">(Pro only)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Set password</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1067,7 +1067,7 @@
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Edit profile</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
-    <string name="title_properties_chat_leave_chat">Leave Group</string>
+    <string name="title_properties_chat_leave_chat">Leave group</string>
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Participants</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -1351,7 +1351,7 @@
     <!--  -->
     <string name="camera_uploads_cellular_connection">Use cellular connection</string>
     <!--  -->
-    <string name="camera_uploads_upload_videos">Upload Videos</string>
+    <string name="camera_uploads_upload_videos">Upload videos</string>
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profile picture updated</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1441,13 +1441,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Removing contact from shared folder</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Move to Rubbish Bin?</string>
+    <string name="confirmation_move_to_rubbish">Move to the Rubbish bin?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish Bin? This will disable Camera Uploads.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish bin? This will disable Camera uploads.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish Bin? This will disable Secondary Media Uploads.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Are you sure you want to move this folder to the Rubbish bin? This will disable Secondary media uploads.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Move to Rubbish Bin?</string>
+    <string name="confirmation_move_to_rubbish_plural">Move to Rubbish bin?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Delete from MEGA?</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1541,9 +1541,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">SUBJECT</string>
+    <string name="new_file_subject_when_uploading">Subject</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">EMAIL</string>
+    <string name="new_file_email_when_uploading">Email</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Forward</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1654,23 +1654,23 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Share using</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
+    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]No files in your [/B][A]Cloud drive[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]No [/B][A]Contacts[/A]</string>
+    <string name="context_empty_contacts">[B]No [/B][A]contacts[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]No[/A] [B]Conversations[/B]</string>
+    <string name="recent_chat_empty">[A]No[/A] [B]conversations[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]Loading[/A] [B]Conversations&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[A]Loading[/A] [B]conversations&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]No [/B][A]Incoming Shared folders[/A]</string>
+    <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]No [/B][A]Outgoing Shared folders[/A]</string>
+    <string name="context_empty_outgoing">[B]No [/B][A]outgoing shared folders[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
-    <string name="context_empty_links">[B]No [/B][A]Public Links[/A][B][/B]</string>
+    <string name="context_empty_links">[B]No [/B][A]public links[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
     <string name="tab_sent_requests">Sent requests</string>
     <!-- Title of the received requests tab. Capital letters -->
@@ -1767,7 +1767,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Quality</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
+    <string name="on_refuse_storage_permission">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Low</item>
@@ -1801,7 +1801,7 @@
         <item quantity="other">Error. The resources are no longer available</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
-    <string name="turn_on_notifications_title">Turn on Notifications</string>
+    <string name="turn_on_notifications_title">Turn on notifications</string>
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">This way, you will see new messages\non your Android phone instantly.</string>
     <!-- First step to turn on notifications -->
@@ -1844,7 +1844,7 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Recovery key</string>
     <!-- Option that permits user save on File System -->
-    <string name="option_save_on_filesystem">Save on File System</string>
+    <string name="option_save_on_filesystem">Save on file system</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
     <string name="notification_subtitle_incoming">Incoming call</string>
     <!-- Text asking to go to system setting to enable allow display over other apps (needed for calls in Android 10) -->
@@ -1884,7 +1884,7 @@
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
     <string name="save_MK_confirmation">The Recovery key has been successfully saved</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
-    <string name="pending_outshare_indicator">(Pending)</string>
+    <string name="pending_outshare_indicator">(pending)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="option_enable_chat_rich_preview">Rich URL Previews</string>
     <!-- Button to allow the rich links previews on chat -->
@@ -1927,13 +1927,13 @@
     <!--  -->
     <string name="two_factor_authentication_explain">Two-factor authentication is a second layer of security for your account. Which means that even if someone knows your password they cannot access it, without also having access to the 6-digit code only you have access to.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
-    <string name="button_setup_2fa">Begin Setup</string>
+    <string name="button_setup_2fa">Begin setup</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Scan or copy the seed to your Authenticator App.</string>
+    <string name="explain_qr_seed_2fa_1">Scan or copy the seed to your authenticator app.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Be sure to back up this seed to a safe place in case you lose your device.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Please enter the 6-digit code generated by your Authenticator App.</string>
+    <string name="explain_confirm_2fa">Please enter the 6-digit code generated by your authenticator app.</string>
     <!-- Text button -->
     <string name="general_verify">Verify</string>
     <!-- Text button -->
@@ -1943,7 +1943,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Two-factor authentication enabled</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
+    <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your authenticator app.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Please save your <b>Recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -1979,7 +1979,7 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Two-factor authentication app</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an authenticator app?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2030,7 +2030,7 @@
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Send Message</string>
+    <string name="context_send_message">Send message</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
     <!-- Title of the section Archived chats -->
@@ -2081,7 +2081,7 @@
         <item quantity="other">%1$d file versions, taking a total of %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
-    <string name="settings_file_management_category">File Management</string>
+    <string name="settings_file_management_category">File management</string>
     <!-- Option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_delete_versions">Delete all older versions of my files</string>
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
@@ -2125,7 +2125,7 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Cloud drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
+    <string name="text_almost_full_warning_pro3_account">Cloud drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Cloud drive is full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
@@ -2180,9 +2180,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">You may have new messages</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Rubbish Bin Clearing Scheduler</string>
+    <string name="settings_rb_scheduler_enable_title">Rubbish bin emptying scheduler</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">The Rubbish Bin is cleared for you automatically.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">The Rubbish bin is emptied for you automatically.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">The minimum period is 7 days.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2198,7 +2198,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">If videos to compress are larger than</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish bin emptying scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">days</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2300,7 +2300,7 @@
     <!-- Popup notification text on mouse-over taken down folder. -->
     <string name="message_folder_takedown_pop_out_notification">This folder has been the subject of a takedown notice.</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Dispute Takedown</string>
+    <string name="dispute_takendown_file">Dispute takedown</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
@@ -2371,11 +2371,11 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">This setting will take effect the next time Camera Uploads runs</string>
+    <string name="message_keep_device_name">This setting will take effect the next time Camera uploads runs</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s has been compressed</string>
     <!-- notification title when compressing video -->
-    <string name="title_compress_video">Compressing Videos %1$d/%2$d</string>
+    <string name="title_compress_video">Compressing videos %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Invalid folder selected</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
@@ -2432,7 +2432,7 @@
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]No [/B][A]Notifications[/A]</string>
+    <string name="context_empty_notifications">[B]No [/B][A]notifications[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Set up MEGA</string>
     <!-- Permissions screen explanation -->
@@ -2493,7 +2493,7 @@
     <!-- label tomorrow -->
     <string name="label_tomorrow">Tomorrow</string>
     <!-- Text of the empty screen for the chat shared files -->
-    <string name="context_empty_shared_files">[B]No [/B][A]Shared Files[/A]</string>
+    <string name="context_empty_shared_files">[B]No [/B][A]shared files[/A]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -2532,7 +2532,7 @@
         <item quantity="other">Messages forwarded</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
-    <string name="title_geolocation_message">Pinned Location</string>
+    <string name="title_geolocation_message">Pinned location</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d file was not sent to %d chats</item>
@@ -2608,7 +2608,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Your photos in the cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
+    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Enter your password</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2618,7 +2618,7 @@
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">It is not possible to play media files while there is a call in progress.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
-    <string name="ongoing_call_messages">Ongoing Call</string>
+    <string name="ongoing_call_messages">Ongoing call</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
     <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
     <!-- Title of the layout to return to a call -->
@@ -2777,7 +2777,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Something went wrong</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -2795,7 +2795,7 @@
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
     <string name="error_creating_group_and_attaching_file">Please select one or more contacts.</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
-    <string name="contacts_sent">Sent %s Contacts.</string>
+    <string name="contacts_sent">Sent %s contacts.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">My chat files</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
@@ -2813,15 +2813,15 @@
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">Email already sent. Please wait a few minutes before trying again.</string>
     <!-- Title of a helping view about locked accounts -->
-    <string name="locked_accounts_label">Locked Accounts</string>
+    <string name="locked_accounts_label">Locked accounts</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
     <string name="locked_accounts_text_1">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">Your password leaked and is now being used by bad actors to log in to your accounts, including, but not limited to, your MEGA account.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Set Nickname</string>
+    <string name="add_nickname">Set nickname</string>
     <!-- Button to update a nickname for a user -->
-    <string name="edit_nickname">Edit Nickname</string>
+    <string name="edit_nickname">Edit nickname</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_added">Nickname added</string>
     <!-- Label showing that a nickname has been added -->
@@ -2876,7 +2876,7 @@
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">Storage Full</string>
+    <string name="over_disk_quota_paywall_header">Storage full</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Your data is at risk!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
@@ -2914,7 +2914,7 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">This is best done in real life by meeting face to face. If you have another already-verified channel such as verified OTR or PGP, you may also use that.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Your Credentials</string>
+    <string name="label_your_credentials">Your credentials</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Reset</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3249,13 +3249,13 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">1 item moved to rubbish bin but %d items not moved. Try again later.</item>
+        <item quantity="one">1 item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
+        <item quantity="other">1 item moved to the Rubbish bin, but %d items not moved. Try again later.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to rubbish bin but the other one not moved. Try again later.</item>
-        <item quantity="other">%d items moved to rubbish bin but 1 item not moved. Try again later.</item>
+        <item quantity="one">1 item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
+        <item quantity="other">%d items moved to the Rubbish bin, but 1 item not moved. Try again later.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
@@ -3269,13 +3269,13 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items moved to the Rubbish Bin successfully</item>
+        <item quantity="one">1 item moved to the Rubbish bin successfully</item>
+        <item quantity="other">%d items moved to the Rubbish bin successfully</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbish Bin successfully</item>
+        <item quantity="one">1 item was not moved to the Rubbish bin successfully</item>
+        <item quantity="other">%d items were not moved to the Rubbish bin successfully</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3321,7 +3321,7 @@
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Recently Added</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <string name="context_empty_groups">[B]No [/B][A]groups[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Requests</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
@@ -3546,7 +3546,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Move “%1s” to Rubbish Bin</string>
+    <string name="backup_remove_folder_title">Move “%1s” to Rubbish bin</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">Disable backup</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -3634,7 +3634,7 @@
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favourites</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <string name="empty_hint_favourite_album">[B]No[/B] [A]favourites[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remove favourites</string>
     <!-- Message of notice that the zip file format is error -->
@@ -4084,4 +4084,53 @@
     <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">Media discovery view</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">Automatically open folders that contain only images and videos in media discovery view. This lets you see media in gallery mode and filter by date.</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">As this folder contains only images and videos, we’ve automatically opened it in media discovery view. This lets you see media in gallery mode and filter by date. You can disable this in Settings.</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">Settings</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">OK, got it</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Anyone with this link can join the meeting and view the meeting chat.</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">Copied link to clipboard</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="one">“%s” album deleted</item>
+        <item quantity="other">Deleted %d albums</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="one">Delete album?</item>
+        <item quantity="other">Delete albums?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
+        <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
+    </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
 </resources>

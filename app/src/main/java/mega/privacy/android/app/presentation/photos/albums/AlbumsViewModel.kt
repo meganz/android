@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -22,11 +23,12 @@ import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -57,6 +59,10 @@ class AlbumsViewModel @Inject constructor(
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
 
+    private val albumJobs: MutableMap<AlbumId, Job> = mutableMapOf()
+
+    private var createAlbumJob: Job? = null
+
     private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
         val albums = getDefaultAlbumsMap()
         return if (getFeatureFlag(AppFeatures.DynamicAlbum)) {
@@ -79,8 +85,13 @@ class AlbumsViewModel @Inject constructor(
                     includedSystemAlbums.values.toList()
                 ).mapLatest { photos ->
                     includedSystemAlbums.mapNotNull { (key, value) ->
-                        photos.filter { value(it) }.takeIf { shouldAddAlbum(it, key) }
-                            ?.let { uiAlbumMapper(it, key) }
+                        photos.filter {
+                            value(it)
+                        }.takeIf {
+                            shouldAddAlbum(it, key)
+                        }?.let {
+                            uiAlbumMapper(it, key)
+                        }
                     }
                 }.collectLatest { systemAlbums ->
                     _state.update { state ->
@@ -101,33 +112,67 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    private fun loadUserAlbums() {
-        viewModelScope.launch {
-            if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
+    /**
+     * User albums with real-time updates
+     */
+    private fun loadUserAlbums() = viewModelScope.launch {
+        if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
 
-            getUserAlbums()
-                .catch { exception ->
-                    Timber.e(exception)
-                }.collectLatest { albums ->
-                    albums.forEach(::fetchAlbumPhotos)
-                }
-        }
+        getUserAlbums()
+            .catch { exception -> Timber.e(exception) }
+            .collectLatest(::handleUserAlbums)
     }
 
-    private fun fetchAlbumPhotos(album: Album.UserAlbum) {
-        viewModelScope.launch {
-            getAlbumPhotos(album.id)
-                .catch { exception ->
-                    Timber.e(exception)
-                }.collectLatest { photos ->
-                    processUserAlbum(album, photos)
-                }
-        }
-    }
-
-    private suspend fun processUserAlbum(album: Album.UserAlbum, photos: List<Photo>) {
+    private suspend fun handleUserAlbums(userAlbums: List<Album.UserAlbum>) {
         _state.update { state ->
-            val albums = updateUIAlbums(state.albums, album, photos)
+            val albums = updateUserAlbums(state.albums, userAlbums)
+            val currentAlbumId = checkCurrentAlbumExists(albums = albums)
+
+            state.copy(
+                albums = albums,
+                currentAlbum = currentAlbumId,
+            )
+        }
+
+        for (album in userAlbums) {
+            val job = albumJobs[album.id] ?: loadAlbumPhotos(album)
+            albumJobs[album.id] = job
+        }
+
+        val activeAlbumIds = userAlbums.map { it.id }
+        for (albumId in albumJobs.keys - activeAlbumIds) {
+            albumJobs[albumId]?.cancel()
+            albumJobs.remove(albumId)
+        }
+    }
+
+    private suspend fun updateUserAlbums(
+        uiAlbums: List<UIAlbum>,
+        userAlbums: List<Album.UserAlbum>,
+    ): List<UIAlbum> = withContext(defaultDispatcher) {
+        val (systemUIAlbums, userUIAlbums) = uiAlbums.partition {
+            it.id !is Album.UserAlbum
+        }
+
+        val updatedUserUIAlbums = userAlbums.map { userAlbum ->
+            val uiAlbum = userUIAlbums.firstOrNull { uiAlbum ->
+                (uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id
+            }
+            uiAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum)
+        }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
+
+        systemUIAlbums + updatedUserUIAlbums
+    }
+
+    private fun loadAlbumPhotos(album: Album.UserAlbum): Job = viewModelScope.launch {
+        getAlbumPhotos(album.id)
+            .catch { exception -> Timber.e(exception) }
+            .collectLatest { photos -> handleAlbumPhotos(album, photos) }
+    }
+
+    private suspend fun handleAlbumPhotos(album: Album.UserAlbum, photos: List<Photo>) {
+        _state.update { state ->
+            val albums = updateAlbumPhotos(state.albums, album, photos)
             val currentAlbumId = checkCurrentAlbumExists(albums = albums)
 
             state.copy(
@@ -137,47 +182,54 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateUIAlbums(
-        albums: List<UIAlbum>,
+    private suspend fun updateAlbumPhotos(
+        uiAlbums: List<UIAlbum>,
         userAlbum: Album.UserAlbum,
         photos: List<Photo>,
     ): List<UIAlbum> = withContext(defaultDispatcher) {
-        val (systemAlbums, userAlbums) = albums.partition {
+        val (systemUIAlbums, userUIAlbums) = uiAlbums.partition {
             it.id !is Album.UserAlbum
         }
-        val isReplaceAlbum = userAlbums.any {
-            (it.id as? Album.UserAlbum)?.id == userAlbum.id
-        }
 
-        val updatedUserAlbums = if (isReplaceAlbum) {
-            userAlbums.map {
-                if ((it.id as? Album.UserAlbum)?.id == userAlbum.id) {
-                    uiAlbumMapper(photos, userAlbum)
-                } else {
-                    it
-                }
+        val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
+            if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
+                uiAlbumMapper(photos, uiAlbum.id)
+            } else {
+                uiAlbum
             }
-        } else {
-            userAlbums + uiAlbumMapper(photos, userAlbum)
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
 
-        systemAlbums + updatedUserAlbums
+        systemUIAlbums + updatedUserUIAlbums
     }
 
     /**
      * Create a new album
      *
-     * @param name the name of the album
+     * @param title the name of the album
      */
-    fun createNewAlbum(name: String) = viewModelScope.launch {
-        try {
-            val album = createAlbum(name)
-            _state.update {
-                it.copy(currentAlbum = album)
+    fun createNewAlbum(title: String, proscribedStrings: List<String>) {
+        if (createAlbumJob?.isActive == true) return
+        createAlbumJob = viewModelScope.launch {
+            try {
+                val finalTitle = title.ifEmpty {
+                    _state.value.createAlbumPlaceholderTitle
+                }.trim()
+                if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                    val album = createAlbum(finalTitle)
+                    _state.update {
+                        it.copy(
+                            currentAlbum = album,
+                            isAlbumCreatedSuccessfully = true,
+                        )
+                    }
+                    Timber.d("Current album: ${album.title}")
+                }
+            } catch (exception: Exception) {
+                Timber.e(exception)
+                _state.update {
+                    it.copy(isAlbumCreatedSuccessfully = false)
+                }
             }
-            Timber.d("Current album: ${album.title}")
-        } catch (exception: Exception) {
-            Timber.e(exception)
         }
     }
 
@@ -185,6 +237,64 @@ class AlbumsViewModel @Inject constructor(
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
         albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
 
+    internal fun getCurrentUIAlbum(): UIAlbum? {
+        val currentAlbum = _state.value.currentAlbum
+        return _state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+    }
+
+    /**
+     * Get the default album title
+     */
+    fun setPlaceholderAlbumTitle(placeholderTitle: String) {
+        val allUserAlbumsTitle: List<String> = getAllUserAlbumsNames()
+        var i = 0
+        var currentDefaultTitle = placeholderTitle
+
+        while (currentDefaultTitle in allUserAlbumsTitle) {
+            currentDefaultTitle = placeholderTitle + "(${++i})"
+        }
+
+        _state.update {
+            it.copy(createAlbumPlaceholderTitle = currentDefaultTitle)
+        }
+    }
+
+    private fun getAllUserAlbumsNames() = _state.value.albums.filter {
+        it.id is Album.UserAlbum
+    }.map { it.title }
+
+    private fun checkTitleValidity(title: String, proscribedStrings: List<String>): Boolean {
+        var errorMessage: Int? = null
+        var isTitleValid = true
+
+        if (title.isEmpty() || title.lowercase() in proscribedStrings.map { it.lowercase() }) {
+            isTitleValid = false
+            errorMessage = R.string.photos_create_album_error_message_systems_album
+        } else if (title in getAllUserAlbumsNames()) {
+            isTitleValid = false
+            errorMessage = R.string.photos_create_album_error_message_duplicate
+        } else if ("[*/:<>?\"|]".toRegex().containsMatchIn(title)) {
+            isTitleValid = false
+            errorMessage = R.string.invalid_characters_defined
+        }
+
+        _state.update {
+            it.copy(
+                isInputNameValid = isTitleValid,
+                createDialogErrorMessage = errorMessage,
+            )
+        }
+
+        return isTitleValid
+    }
+
+    fun setNewAlbumNameValidity(valid: Boolean) = _state.update {
+        it.copy(isInputNameValid = valid)
+    }
+
+    fun setIsAlbumCreatedSuccessfully(success: Boolean) = _state.update {
+        it.copy(isAlbumCreatedSuccessfully = success)
+    }
 
     private fun shouldAddAlbum(
         it: List<Photo>,
@@ -246,6 +356,12 @@ class AlbumsViewModel @Inject constructor(
     fun setCurrentSort(sort: Sort) {
         _state.update {
             it.copy(currentSort = sort)
+        }
+    }
+
+    fun setSnackBarMessage(snackBarMessage: String) {
+        _state.update {
+            it.copy(snackBarMessage = snackBarMessage)
         }
     }
 }

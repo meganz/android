@@ -57,14 +57,14 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -260,7 +260,7 @@ public class FileUtil {
                 Uri contentUri;
                 try {
                     contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     contentUri = Uri.fromFile(fileToDelete);
                 }
                 mediaScanIntent.setData(contentUri);
@@ -734,11 +734,7 @@ public class FileUtil {
      * @return The uri of the file.
      */
     public static Uri getUriForFile(Context context, File file) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file);
-        }
-
-        return Uri.fromFile(file);
+        return FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", file);
     }
 
     /**
@@ -826,7 +822,7 @@ public class FileUtil {
      * false by SAF
      */
     public static boolean isBasedOnFileStorage() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
     }
 
     /**
@@ -843,19 +839,15 @@ public class FileUtil {
         if (treeUri == null) return null;
 
         String volumePath;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            SDCardOperator operator;
-            try {
-                operator = new SDCardOperator(con);
-            } catch (SDCardOperator.SDCardException e) {
-                Timber.e(e);
-                return null;
-            }
-
-            volumePath = operator.getSDCardRoot();
-        } else {
-            volumePath = getVolumePath(getVolumeIdFromTreeUri(treeUri), con);
+        SDCardOperator operator;
+        try {
+            operator = new SDCardOperator(con);
+        } catch (SDCardOperator.SDCardException e) {
+            Timber.e(e);
+            return null;
         }
+
+        volumePath = operator.getSDCardRoot();
 
         if (volumePath == null) return File.separator;
         if (volumePath.endsWith(File.separator))
@@ -1056,9 +1048,7 @@ public class FileUtil {
         try {
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 
-            Uri finishedContentUri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                    ? FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file)
-                    : Uri.fromFile(file);
+            Uri finishedContentUri = FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file);
 
             mediaScanIntent.setData(finishedContentUri);
             mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

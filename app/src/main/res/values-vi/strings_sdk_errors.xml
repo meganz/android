@@ -55,11 +55,11 @@
     <!-- Label shown when current account does not have enough quota to complete the operation -->
     <string name="api_egoingoverquota">Không đủ băng thông</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-    <string name="api_emfarequired">Cần sử dụng Xác Thực 2-Bước.</string>
+    <string name="api_emfarequired">Cần sử dụng xác&#160;thực 2&#160;yếu&#160;tố.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
     <string name="api_emasteronly">Truy cập bị từ chối cho tất cả thành viên dưới hạng admin</string>
     <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="api_ebusinesspastdue">Tài khoản đã bất hoạt</string>
+    <string name="api_ebusinesspastdue">Tài khoản đã bị vô hiệu hóa</string>
     <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
     <string name="payment_ecard">Thẻ bị từ chối</string>
     <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->

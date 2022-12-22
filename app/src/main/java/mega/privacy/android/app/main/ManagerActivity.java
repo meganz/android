@@ -837,6 +837,7 @@ public class ManagerActivity extends TransfersManagementActivity
     int bottomNavigationCurrentItem = -1;
     View chatBadge;
     View callBadge;
+    View pendingActionsBadge;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -1800,6 +1801,13 @@ public class ManagerActivity extends TransfersManagementActivity
         chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
         itemView.addView(chatBadge);
         setChatBadge();
+
+        // Navi button Shared Items
+        BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+        pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
+        sharedItemsView.addView(pendingActionsBadge);
+        pendingActionsBadge.setVisibility(View.GONE);
+        setPendingActionsBadge();
 
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
         itemView.addView(callBadge);
@@ -6288,62 +6296,54 @@ public class ManagerActivity extends TransfersManagementActivity
     public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList) {
         Timber.d("askConfirmationMoveToRubbish");
 
-        if (handleList != null) {
-
-            if (!handleList.isEmpty()) {
-                Long handle = handleList.get(0);
-                MegaNode p = megaApi.getNodeByHandle(handle);
-                while (megaApi.getParentNode(p) != null) {
-                    p = megaApi.getParentNode(p);
-                }
-                if (p.getHandle() != megaApi.getRubbishNode().getHandle()) {
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-                    if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
-                        builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
-                    } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
-                        builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
-                    } else {
-                        builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
-                    }
-
-                    builder.setPositiveButton(R.string.general_move, (dialog, which) ->
-                            moveNodeUseCase.moveToRubbishBin(handleList)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe((result, throwable) -> {
-                                        if (throwable == null) {
-                                            showMovementResult(result, handleList.get(0));
-                                        }
-                                    }));
-
-                    builder.setNegativeButton(R.string.general_cancel, null);
-                    builder.show();
-                } else {
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-                    builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
-
-                    builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete, (dialog, which) ->
-                            removeNodeUseCase.remove(handleList)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe((result, throwable) -> {
-                                        if (throwable == null) {
-                                            boolean notValidView = result.isSingleAction()
-                                                    && result.isSuccess()
-                                                    && viewModel.getState().getValue().getRubbishBinParentHandle() == handleList.get(0);
-
-                                            showRestorationOrRemovalResult(notValidView, result.getResultText());
-                                        }
-                                    }));
-
-                    builder.setNegativeButton(R.string.general_cancel, null);
-                    builder.show();
-                }
-            }
-        } else {
-            Timber.w("handleList NULL");
+        if (handleList == null || handleList.isEmpty()) {
+            Timber.w("handleList NULL or empty");
             return;
         }
+
+        Long handle = handleList.get(0);
+        MegaNode node = megaApi.getNodeByHandle(handle);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+
+        if (!megaApi.isInRubbish(node)) {
+            if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
+                builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
+            } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
+                builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
+            } else {
+                builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+            }
+
+            builder.setPositiveButton(R.string.general_move, (dialog, which) ->
+                    moveNodeUseCase.moveToRubbishBin(handleList)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable == null) {
+                                    showMovementResult(result, handleList.get(0));
+                                }
+                            }));
+
+        } else {
+            builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+            builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete, (dialog, which) ->
+                    removeNodeUseCase.remove(handleList)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe((result, throwable) -> {
+                                if (throwable == null) {
+                                    boolean notValidView = result.isSingleAction()
+                                            && result.isSuccess()
+                                            && viewModel.getState().getValue().getRubbishBinParentHandle() == handleList.get(0);
+
+                                    showRestorationOrRemovalResult(notValidView, result.getResultText());
+                                }
+                            }));
+        }
+
+        builder.setNegativeButton(R.string.general_cancel, null);
+        builder.show();
     }
 
     public void showWarningDialogOfShare(final MegaNode p, int nodeType, int actionType) {
@@ -8161,7 +8161,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             ((MegaApplication) getApplication()).askForFullAccountInfo();
-            ((MegaApplication) getApplication()).askForExtendedAccountDetails();
+            viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                 viewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));
@@ -10447,12 +10447,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.e(e, "Formatted string: %s", textToShow);
         }
 
-        Spanned result = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         contactsSectionText.setText(result);
     }
 
@@ -10479,12 +10474,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.e(e, "Formatted string: %s", textToShow);
         }
 
-        Spanned result = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
+        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         notificationsSectionText.setText(result);
     }
 
@@ -10504,6 +10494,10 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             chatBadge.setVisibility(View.GONE);
         }
+    }
+
+    public void setPendingActionsBadge() {
+        //// TODO Get pending actions count from SDK api and add a badge on UI
     }
 
     private void setCallBadge() {

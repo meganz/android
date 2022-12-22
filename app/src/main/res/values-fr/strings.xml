@@ -553,9 +553,9 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi ou données mobiles</string>
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
-    <string name="cam_sync_syncing">Les téléversements de l’appareil photo sont en cours</string>
+    <string name="cam_sync_syncing">Les Téléversements de l’appareil photo sont en cours</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Voulez-vous arrêter les téléversements de l’appareil photo ?</string>
+    <string name="cam_sync_cancel_sync">Voulez-vous arrêter les Téléversements de l’appareil photo ?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Téléversement des fichiers des dossiers de médias</string>
     <!-- title of the notification when camera upload is checking files -->
@@ -806,7 +806,7 @@
     <!-- Button to change the password -->
     <string name="change_pass">Changer</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">OUI</string>
+    <string name="general_positive_button">Oui</string>
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">Non</string>
     <!-- Button in the Login screen to reset the password -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Définir une protection par mot de passe</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(PRO SEULEMENT)</string>
+    <string name="subtitle_set_expiry_date">(Pro seulement)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Définir un mot de passe</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1577,9 +1577,9 @@
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="context_new_link_name">URL du lien</string>
     <!-- Title of the field subject when a new file is created to upload -->
-    <string name="new_file_subject_when_uploading">OBJET</string>
+    <string name="new_file_subject_when_uploading">Objet</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">COURRIEL</string>
+    <string name="new_file_email_when_uploading">Adresse courriel</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Transférer</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -1695,7 +1695,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre Disque nuagique[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Aucun fichier enregistré [/B][A]Hors&#160;ligne[/A]</string>
+    <string name="context_empty_offline">[B]Aucun fichier[/B][A]enregistré Hors&#160;ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Aucun [/B][A]contact[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1807,7 +1807,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Qualité des vidéos</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Les téléversements de l’appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l’autorisation.</string>
+    <string name="on_refuse_storage_permission">Les Téléversements de l’appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l’autorisation.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Basse</item>
@@ -2422,7 +2422,7 @@
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
     <string name="message_compression_size_over_limit">La taille totale des vidéos à compresser dépasse %s, veuillez brancher votre appareil sur son chargeur afin de poursuivre.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
-    <string name="message_keep_device_name">Ce paramètre sera appliqué lors des prochains téléversements de l’appareil photo</string>
+    <string name="message_keep_device_name">Ce paramètre sera appliqué lors des prochains Téléversements de l’appareil photo</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s a été compressé</string>
     <!-- notification title when compressing video -->
@@ -4191,4 +4191,56 @@
     <string name="meetings_list_recurring_meeting_label">Réunion périodique</string>
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s hebdomadairement</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">Vue de découverte des médias</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">Ouvrir automatiquement la vue de découverte des médias pour les dossiers qui ne comprennent qu’images et vidéos. Ceci vous permet de visualiser les médias en mode galerie et de les filtrer par date.</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">Comme ce dossier ne comprend que des images et des vidéos, nous l’avons automatiquement ouvert dans la vue de découvertes des médias. Ceci vous permet de visualiser les médias en mode galerie et de les filtrer par date. Vous pouvez désactiver cette option dans Paramètres.</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">Paramètres</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">J’ai compris</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">Quiconque a ce lien peut se joindre à la réunion et lire la conversation de la réunion.</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">Le lien a été copié dans le presse-papiers</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="one">L’album «&#160;%s» a été supprimé</item>
+        <item quantity="many">%d d’albums ont été supprimés</item>
+        <item quantity="other">%d&#160;albums ont été supprimés</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="one">Supprimer l’album ?</item>
+        <item quantity="many">Supprimer les albums ?</item>
+        <item quantity="other">Supprimer les albums ?</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="one">L’album sera supprimé, mais son contenu restera dans votre Vue chronologique.</item>
+        <item quantity="many">Les albums seront supprimés, mais leur contenu restera dans votre Vue chronologique.</item>
+        <item quantity="other">Les albums seront supprimés, mais leur contenu restera dans votre Vue chronologique.</item>
+    </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Afficher moins</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">Confirmation du contact</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">Grâce au chiffrement à connaissance nulle, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts avec qui vous partagez des renseignements avant qu’ils n’accèdent aux dossiers partagés.</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">Grâce au chiffrement à connaissance nulle, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts dont vous recevez des renseignements avant que vous n’accédiez aux dossiers partagés.</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">Pour confirmer un contact, assurez-vous que le numéro d’identification que vous voyez ci-dessus correspond au numéro d’identification de leur compte. Vous pouvez demander à votre contact de partager son numéro d’identification avec vous.</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[dossier non déchiffré]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Pour accéder au dossier partagé, la personne qui l’a partagé avec vous devrait aussi vous confirmer.</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">Confirmer %s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">Votre numéro d’identification</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Préparation de l’aperçu du fichier</string>
 </resources>

@@ -21,6 +21,7 @@ import mega.privacy.android.data.repository.DefaultLoginRepository
 import mega.privacy.android.data.repository.DefaultMediaPlayerRepository
 import mega.privacy.android.data.repository.DefaultNetworkRepository
 import mega.privacy.android.data.repository.DefaultNotificationsRepository
+import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
 import mega.privacy.android.data.repository.DefaultSettingsRepository
@@ -29,8 +30,10 @@ import mega.privacy.android.data.repository.DefaultStatisticsRepository
 import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
+import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -47,6 +50,7 @@ import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -55,6 +59,7 @@ import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.repository.VerificationRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -108,6 +113,12 @@ internal abstract class RepositoryModule {
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
 
     /**
+     * Bind transfers repository
+     */
+    @Binds
+    abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
+
+    /**
      * Bind domain transfers repository
      */
     @Binds
@@ -152,4 +163,10 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindLoginRepository(repository: DefaultLoginRepository): LoginRepository
+
+    @Binds
+    abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
+
+    @Binds
+    abstract fun bindVerificationRepository(repository: DefaultVerificationRepository): VerificationRepository
 }

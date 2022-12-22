@@ -714,7 +714,7 @@
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">檢視來源碼</string>
     <!-- title of the screen that shows the ZIP files -->
-    <string name="zip_browser_activity">ZIP Browser</string>
+    <string name="zip_browser_activity">ZIP瀏覽器</string>
     <!--  -->
     <string name="free_account">免費</string>
     <!-- category in sort by action -->
@@ -1888,7 +1888,7 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <!-- Text button -->
-    <string name="general_verify">確認</string>
+    <string name="general_verify">驗證</string>
     <!-- Text button -->
     <string name="general_next">下一步</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -2130,9 +2130,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">您可能有新的訊息</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">垃圾筒清理時程</string>
+    <string name="settings_rb_scheduler_enable_title">垃圾筒清空排程</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">垃圾筒會自動幫您清空。</string>
+    <string name="settings_rb_scheduler_enable_subtitle">垃圾筒會自動為您清空。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">最短期間為7天。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2148,7 +2148,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">如果要壓縮的影片大於</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">欲停用垃圾筒定時清理排程或設定更長的保留期限，請訂閱Pro方案。</string>
+    <string name="settings_rb_scheduler_alert_disabling">若要停用垃圾筒自動清空排程或設定更長的保留期限，請訂閱Pro方案。</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">日</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2807,10 +2807,10 @@
     <string name="over_disk_quota_paywall_title">您的資料正面臨風險</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="other">我們已於%2$s與%3$s透過email至%1$s聯繫您，但您的MEGA帳戶仍然有%4$s個檔案共佔用%5$s，您需要升級至%6$s。</item>
+        <item quantity="other">我們已於%2$s與%3$s透過電子郵件寄信至%1$s聯繫您，但您的MEGA帳戶仍然有%4$s個檔案共佔用%5$s，您需要升級至%6$s。</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">我們已透過email至%1$s聯繫您，但您的MEGA帳戶仍然有%2$s個檔案共佔用%3$s，您需要升級至%4$s。</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">我們已透過電子郵件寄信至%1$s聯繫您，但您的MEGA帳戶仍然有%2$s個檔案共佔用%3$s，您需要升級至%4$s。</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]您剩下[M]%s[/M]可以升級[/B]。在這之後您的資料將被刪除。</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -3932,7 +3932,7 @@
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_share_meeting_link_label">分享會議連結</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_more_participants_label">查看更多</string>
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">顯示更多</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">離開群組</string>
     <!-- Error message for creating an album with a system albums name -->
@@ -3977,4 +3977,50 @@
     <string name="meetings_list_recurring_meeting_label">定期會議</string>
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">每周 %s</string>
+    <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_title">媒體探索檢視</string>
+    <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
+    <string name="settings_media_discovery_view_context">在媒體探索檢視中自動開啟僅含有圖片和影片的資料夾。這能讓你在相簿模式中看到媒體內容並且依日期進行篩選。</string>
+    <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
+    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾內僅包含圖片和影片，我們已經自動在媒體探索檢視中開啟它。這能讓你在相簿模式中看到媒體並且依日期進行篩選。您可以在設定中停用此功能。</string>
+    <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
+    <string name="cloud_drive_media_discovery_banner_settings">設定</string>
+    <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
+    <string name="cloud_drive_media_discovery_banner_ok">好的，明白了</string>
+    <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_share_meeting_link_panel_title">知道此連結的任何人都可以加入會議並查看會議對話。</string>
+    <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
+    <string name="scheduled_meetings_meeting_link_copied">連結已複製到剪貼簿</string>
+    <!-- Message after selected albums are deleted. -->
+    <plurals name="photos_album_deleted_message">
+        <item quantity="other">已刪除%d個相簿</item>
+    </plurals>
+    <!-- Delete albums confirmation title. -->
+    <plurals name="photos_album_delete_confirmation_title">
+        <item quantity="other">是否刪除相簿？</item>
+    </plurals>
+    <!-- Delete albums confirmation description. -->
+    <plurals name="photos_album_delete_confirmation_description">
+        <item quantity="other">相簿將會被刪除但裡面的內容將保留在您的時間軸中。</item>
+    </plurals>
+    <!-- Title of option to show less participants in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">顯示較少</string>
+    <!--Title of the fingerprint verification screen-->
+    <string name="shared_items_verify_credentials_contact_verification_title">聯絡人驗證</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
+    <string name="shared_items_verify_credentials_header_outgoing">我們使用零知識加密保護您的資料。為了進一步確保安全性，我們要求您驗證您與之共享資訊的聯絡人，然後他們才能存取共享資料夾。</string>
+    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
+    <string name="shared_items_verify_credentials_header_incoming">我們使用零知識加密保護您的資料。為確保額外的安全性，我們要求您驗證您從之接收資訊的聯絡人，然後您才能存取共享資料夾。</string>
+    <!--Header message located at the top of "My credentials" section-->
+    <string name="shared_items_verify_credentials_information">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相匹配。您可以要求對方分享他們的憑證給您。</string>
+    <!--Undecrypted folder label-->
+    <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
+    <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
+    <string name="shared_items_verify_credentials_verify_person_banner_label">若要存取共享資料夾，與您共享資料夾的人也會對您進行驗證。</string>
+    <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
+    <string name="shared_items_bottom_sheet_menu_verify_user">驗證：%s</string>
+    <!--My credentials header on contact verification screen-->
+    <string name="shared_items_verify_credentials_my_credentials">您的憑證</string>
+    <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
 </resources>

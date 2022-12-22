@@ -241,12 +241,7 @@ public class ChangePasswordActivity extends PasscodeActivity implements OnClickL
             Timber.e(e, "Exception formatting string");
         }
 
-        Spanned resultTOP;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultTOP = Html.fromHtml(textToShowTOP, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            resultTOP = Html.fromHtml(textToShowTOP);
-        }
+        Spanned resultTOP = Html.fromHtml(textToShowTOP, Html.FROM_HTML_MODE_LEGACY);
 
         top.setText(resultTOP);
 

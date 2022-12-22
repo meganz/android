@@ -6,11 +6,12 @@ import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.repository.TransferRepository
+import javax.inject.Inject
 
 /**
  * Default implementation of [MonitorTransfersSize]
  */
-class DefaultMonitorTransfersSize(
+class DefaultMonitorTransfersSize @Inject constructor(
     private val repository: TransferRepository,
 ) : MonitorTransfersSize {
     private val transferMap: MutableMap<Int, Transfer> = hashMapOf()

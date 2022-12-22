@@ -7,7 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.albums.model.mapper.DefaultUIAlbumMapper
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.DefaultCreateAlbum
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
+import mega.privacy.android.domain.usecase.DefaultRemoveAlbums
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 
 @Module
@@ -102,6 +105,9 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
+
+    @Binds
+    abstract fun bindRemoveAlbums(useCase: DefaultRemoveAlbums): RemoveAlbums
 
     companion object {
         @Provides

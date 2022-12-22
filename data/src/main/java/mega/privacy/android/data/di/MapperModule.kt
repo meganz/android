@@ -5,12 +5,20 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
+import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.mapper.ChatRoomMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.CombinedChatRoomMapper
+import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -23,20 +31,22 @@ import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
+import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodMapper
-import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.PricingMapper
+import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanListMapper
-import mega.privacy.android.data.mapper.SubscriptionPlanMapper
+import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
+import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
@@ -53,11 +63,19 @@ import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
+import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
+import mega.privacy.android.data.mapper.toChatRoom
+import mega.privacy.android.data.mapper.toChatScheduledMeeting
+import mega.privacy.android.data.mapper.toChatScheduledMeetingOccur
+import mega.privacy.android.data.mapper.toCombinedChatRoom
+import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
+import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toMediaStoreFileType
@@ -65,7 +83,9 @@ import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
+import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
+import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
@@ -74,8 +94,8 @@ import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
-import mega.privacy.android.data.mapper.toSubscriptionPlan
-import mega.privacy.android.data.mapper.toSubscriptionPlanList
+import mega.privacy.android.data.mapper.toSubscriptionOptionList
+import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toSyncRecordType
 import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
@@ -307,12 +327,6 @@ internal class MapperModule {
         ::UserAccount
 
     /**
-     * Provide subscription plan mapper
-     */
-    @Provides
-    fun provideSubscriptionPlanMapper(): SubscriptionPlanMapper = ::toSubscriptionPlan
-
-    /**
      * Provide pricing mapper
      */
     @Provides
@@ -334,8 +348,8 @@ internal class MapperModule {
      * Provide subscription plan list mapper
      */
     @Provides
-    fun provideSubscriptionPlanListMapper(): SubscriptionPlanListMapper =
-        ::toSubscriptionPlanList
+    fun provideSubscriptionOptionListMapper(): SubscriptionOptionListMapper =
+        ::toSubscriptionOptionList
 
     /**
      * Provide mega achievement mapper
@@ -354,10 +368,76 @@ internal class MapperModule {
      */
     @Provides
     fun provideUserSetMapper(): UserSetMapper = ::toUserSet
+
     /**
      * Provide [RecentActionBucketMapper] mapper
      */
     @Provides
     fun provideRecentActionBucketMapper(): RecentActionBucketMapper = ::toRecentActionBucket
+
+    /**
+     * Provide [SubscriptionStatusMapper] mapper
+     */
+    @Provides
+    fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
+
+    /**
+     * Provide [AccountDetailMapper] mapper
+     */
+    @Provides
+    fun provideAccountDetailMapper(): AccountDetailMapper = ::toAccountDetail
+
+    /**
+     * Provide chat room mapper
+     */
+    @Provides
+    fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
+
+    /**
+     * Provide combined chat room mapper
+     */
+    @Provides
+    fun provideCombinedChatRoomMapper(): CombinedChatRoomMapper = ::toCombinedChatRoom
+
+    /**
+     * Provide [MyAccountCredentialsMapper] mapper
+     */
+    @Provides
+    fun provideMyAccountCredentialsMapper(): MyAccountCredentialsMapper = ::toMyAccountCredentials
+
+    /**
+     * Provide [ContactCredentialsMapper] mapper
+     */
+    @Provides
+    fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
+
+    /**
+     * Provide chat scheduled meeting mapper
+     */
+    @Provides
+    fun provideChatScheduledMeetingMapper(): ChatScheduledMeetingMapper = ::toChatScheduledMeeting
+
+    /**
+     * Provide chat scheduled meeting occurr mapper
+     */
+    @Provides
+    fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
+        ::toChatScheduledMeetingOccur
+
+    @Provides
+    fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
+        ::toOfflineNodeInformation
+
+    /**
+     * Provide [CountryMapper] mapper
+     */
+    @Provides
+    fun provideCountryMapper(): CountryMapper = ::toCountry
+
+    /**
+     * Provide chat list item mapper
+     */
+    @Provides
+    fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
 
 }

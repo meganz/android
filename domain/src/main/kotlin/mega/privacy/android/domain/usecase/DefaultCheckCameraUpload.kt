@@ -23,7 +23,7 @@ class DefaultCheckCameraUpload @Inject constructor(
         primaryHandle: Long,
         secondaryHandle: Long,
     ): CameraUploadState {
-        var result = CameraUploadState(shouldStopProcess = true, shouldSendEvent = false)
+        var result = CameraUploadState(shouldStopProcess = false, shouldSendEvent = false)
         val isSecondaryEnabled = isSecondaryFolderEnabled()
         val isPrimaryFolderInRubbish = isNodeInRubbish(primaryHandle)
         val isSecondaryFolderInRubbish = isSecondaryEnabled && isNodeInRubbish(secondaryHandle)

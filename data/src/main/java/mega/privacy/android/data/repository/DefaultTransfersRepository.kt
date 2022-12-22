@@ -5,14 +5,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default [TransferRepository] implementation.
@@ -26,7 +31,42 @@ internal class DefaultTransfersRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val dbH: DatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
-) : TransferRepository {
+) : TransfersRepository, TransferRepository {
+
+    override suspend fun cancelTransfer(transfer: MegaTransfer) = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.cancelTransfer(
+                transfer = transfer,
+                listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(Unit))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    }
+                )
+            )
+        }
+    }
+
+    override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.cancelAllUploadTransfers(OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(Result.success(Unit))
+                        } else {
+                            continuation.failWithError(error)
+                        }
+                    }
+                }
+            ))
+        }
+    }
 
     private suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
         megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)

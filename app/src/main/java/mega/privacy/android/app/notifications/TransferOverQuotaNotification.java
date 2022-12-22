@@ -1,5 +1,15 @@
 package mega.privacy.android.app.notifications;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static mega.privacy.android.app.utils.Constants.ACTION_LOG_IN;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS;
+import static mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_DOWNLOAD_FINAL;
+import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
+import static mega.privacy.android.app.utils.Util.isAndroidOreoOrUpper;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,17 +20,12 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
+import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class TransferOverQuotaNotification {
 
@@ -93,9 +98,7 @@ public class TransferOverQuotaNotification {
                     .setOngoing(false)
                     .setAutoCancel(true);
 
-            if (isAndroidNougatOrUpper()) {
-                builder.setStyle(new Notification.DecoratedCustomViewStyle());
-            }
+            builder.setStyle(new Notification.DecoratedCustomViewStyle());
 
             notificationManager.notify(NOTIFICATION_DOWNLOAD_FINAL, builder.build());
         }

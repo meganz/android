@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import timber.log.Timber
@@ -58,6 +61,8 @@ class SettingsViewModel @Inject constructor(
     private val startScreen: MonitorStartScreenPreference,
     private val monitorHideRecentActivity: MonitorHideRecentActivity,
     private val setHideRecentActivity: SetHideRecentActivity,
+    private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
+    private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     private val fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
     monitorConnectivity: MonitorConnectivity,
@@ -101,6 +106,7 @@ class SettingsViewModel @Inject constructor(
             callsEnabled = true,
             startScreen = 0,
             hideRecentActivityChecked = false,
+            mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
             email = "",
             accountType = ""
         )
@@ -151,6 +157,13 @@ class SettingsViewModel @Inject constructor(
                 monitorHideRecentActivity()
                     .map { hide ->
                         { state: SettingsState -> state.copy(hideRecentActivityChecked = hide) }
+                    },
+                monitorMediaDiscoveryView()
+                    .map { viewState ->
+                        { state: SettingsState ->
+                            state.copy(mediaDiscoveryViewState = viewState
+                                ?: MediaDiscoveryViewSettings.INITIAL.ordinal)
+                        }
                     },
                 isChatLoggedIn()
                     .combine(online) { loggedIn, online -> loggedIn && online }
@@ -230,6 +243,15 @@ class SettingsViewModel @Inject constructor(
      */
     fun hideRecentActivity(hide: Boolean) = viewModelScope.launch {
         setHideRecentActivity(hide)
+    }
+
+    /**
+     * Set media discovery view setting
+     *
+     * @param state [MediaDiscoveryViewSettings]
+     */
+    fun mediaDiscoveryView(state: Int) = viewModelScope.launch {
+        setMediaDiscoveryView(state)
     }
 
     fun putString(key: String?, value: String?) {

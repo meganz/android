@@ -51,7 +51,7 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
-import mega.privacy.android.app.middlelayer.iab.MegaSku;
+import mega.privacy.android.domain.entity.account.MegaSku;
 import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.PaymentUtils;
 import mega.privacy.android.app.utils.billing.Security;

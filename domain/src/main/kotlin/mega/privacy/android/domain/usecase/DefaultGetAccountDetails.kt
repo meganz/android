@@ -14,7 +14,10 @@ class DefaultGetAccountDetails @Inject constructor(
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
 ) : GetAccountDetails {
     override suspend fun invoke(forceRefresh: Boolean): UserAccount {
-        if (forceRefresh || accountsRepository.storageCapacityUsedIsBlank() || isDatabaseEntryStale()) accountsRepository.requestAccount()
+        if (forceRefresh || accountsRepository.storageCapacityUsedIsBlank() || isDatabaseEntryStale()) {
+            accountsRepository.resetAccountDetailsTimeStamp()
+            accountsRepository.requestAccount()
+        }
         return accountsRepository.getUserAccount()
     }
 }

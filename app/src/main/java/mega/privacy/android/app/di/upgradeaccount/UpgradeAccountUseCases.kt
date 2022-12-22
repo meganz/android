@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
-import mega.privacy.android.domain.usecase.GetSubscriptionPlans
+import mega.privacy.android.domain.usecase.GetSubscriptionOptions
 
 /**
  * Upgrade account use cases
@@ -16,8 +16,8 @@ import mega.privacy.android.domain.usecase.GetSubscriptionPlans
 abstract class UpgradeAccountUseCases {
     companion object {
         @Provides
-        fun provideGetSubscriptionPlans(repository: AccountRepository): GetSubscriptionPlans =
-            GetSubscriptionPlans(repository::getSubscriptionPlans)
+        fun provideGetSubscriptionPlans(repository: AccountRepository): GetSubscriptionOptions =
+            GetSubscriptionOptions(repository::getSubscriptionOptions)
 
         @Provides
         fun provideGetCurrentSubscriptionPlan(repository: AccountRepository): GetCurrentSubscriptionPlan =

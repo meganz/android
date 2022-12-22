@@ -7,6 +7,7 @@ import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
+import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 
@@ -300,4 +301,12 @@ interface DatabaseHandler {
      * Is completed transfers empty
      */
     val isCompletedTransfersEmpty: Boolean
+
+    /**
+     * Get offline information
+     *
+     * @param handle
+     * @return Offline information if available
+     */
+    suspend fun getOfflineInformation(handle: Long): OfflineInformation?
 }

@@ -43,7 +43,7 @@ class MeetingListViewModel @Inject constructor(
     }
 
     private var queryString: String? = null
-    private val meetings: MutableLiveData<List<MeetingItem>> = MutableLiveData(emptyList())
+    private val meetings: MutableLiveData<List<MeetingItem.Data>> = MutableLiveData(emptyList())
 
     init {
         retrieveMeetings()
@@ -67,9 +67,9 @@ class MeetingListViewModel @Inject constructor(
     /**
      * Get meetings
      *
-     * @return  LiveData with a list of MeetingItem
+     * @return  LiveData with a list of MeetingItem.Data
      */
-    fun getMeetings(): LiveData<List<MeetingItem>> =
+    fun getMeetings(): LiveData<List<MeetingItem.Data>> =
         meetings.map { items ->
             val searchQuery = queryString
             if (!searchQuery.isNullOrBlank() && !items.isNullOrEmpty()) {
@@ -98,10 +98,10 @@ class MeetingListViewModel @Inject constructor(
      * Get specific meeting given its chat id
      *
      * @param chatId    Chat id to identify chat
-     * @return          LiveData with MeetingItem
+     * @return          LiveData with MeetingItem.Data
      */
-    fun getMeeting(chatId: Long): LiveData<MeetingItem?> =
-        meetings.map { meeting -> meeting.find { it.chatId == chatId } }
+    fun getMeeting(chatId: Long): LiveData<MeetingItem.Data?> =
+        meetings.map { meeting -> meeting.find { it.id == chatId } }
 
     /**
      * Set search query string

@@ -37,7 +37,7 @@ class FavouriteActionModeCallback(
             val nodeHandles = arrayListOf<Long>().apply {
                 addAll(
                     viewModel.getItemsSelected().values.map {
-                        it.nodeId.id
+                        it.typedNode.id.id
                     })
             }
             val selectedNodes = viewModel.getItemsSelected().values.map { it.node }

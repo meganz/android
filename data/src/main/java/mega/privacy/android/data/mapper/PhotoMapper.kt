@@ -17,7 +17,7 @@ typealias ImageMapper = (
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards FileTypeInfo,
-) -> @JvmSuppressWildcards Photo
+) -> @JvmSuppressWildcards Photo.Image
 
 internal fun toImage(
     id: Long,
@@ -53,9 +53,8 @@ typealias VideoMapper = (
     @JvmSuppressWildcards LocalDateTime,
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards Int,
     @JvmSuppressWildcards FileTypeInfo,
-) -> @JvmSuppressWildcards Photo
+) -> @JvmSuppressWildcards Photo.Video
 
 internal fun toVideo(
     id: Long,
@@ -66,7 +65,6 @@ internal fun toVideo(
     modificationTime: LocalDateTime,
     thumbnailFilePath: String?,
     previewFilePath: String?,
-    duration: Int,
     fileTypeInfo: FileTypeInfo,
 ) = Photo.Video(
     id = id,
@@ -77,7 +75,5 @@ internal fun toVideo(
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
     previewFilePath = previewFilePath,
-    duration = duration,
     fileTypeInfo = fileTypeInfo
 )
-

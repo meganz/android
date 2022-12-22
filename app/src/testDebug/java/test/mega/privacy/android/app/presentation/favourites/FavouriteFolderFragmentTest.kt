@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
-import mega.privacy.android.app.presentation.favourites.FavouritesViewHolder
-import mega.privacy.android.app.presentation.favourites.model.Favourite
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesViewHolder
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import nz.mega.sdk.MegaNode
@@ -126,9 +126,9 @@ class FavouriteFolderFragmentTest {
         whenever(node.name).thenReturn("testName.txt")
         whenever(node.label).thenReturn(MegaNode.NODE_LBL_RED)
         whenever(node.size).thenReturn(1000L)
-        val favouriteInfo = mock<TypedFolderNode>()
+        val typedFolderNode = mock<TypedFolderNode>()
         val favourites = listOf(
-            favouriteInfo
+            typedFolderNode
         )
         val favouriteFolderInfo = FavouriteFolderInfo(
             favourites,
@@ -136,9 +136,10 @@ class FavouriteFolderFragmentTest {
             1,
             1
         )
-        val favourite = mock<Favourite>()
+        val favourite = mock<FavouriteFolder> {
+            on { typedNode }.thenReturn(typedFolderNode)
+        }
         whenever(favourite.labelColour).thenReturn(R.color.salmon_400_salmon_300)
-        whenever(favourite.isFolder).thenReturn(true)
 
         runBlocking {
             whenever(TestWrapperModule.fetchNodeWrapper(anyOrNull())).thenReturn(node)

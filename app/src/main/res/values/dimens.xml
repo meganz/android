@@ -134,6 +134,7 @@
     <dimen name="bottom_sheet_item_padding_horizontal">18dp</dimen>
     <dimen name="bottom_sheet_item_drawable_padding">32dp</dimen>
     <dimen name="bottom_sheet_item_divider_margin_start">72dp</dimen>
+    <dimen name="bottom_sheet_item_divider_short_margin_start">16dp</dimen>
     <dimen name="bottom_sheet_landscape_width">360dp</dimen>
 
     <dimen name="card_margin_portrait">8dp</dimen>

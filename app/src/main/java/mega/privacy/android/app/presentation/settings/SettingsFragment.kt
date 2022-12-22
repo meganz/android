@@ -57,6 +57,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_SEND_FEEDBACK
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDE_RECENT_ACTIVITY
+import mega.privacy.android.app.constants.SettingsConstants.KEY_MEDIA_DISCOVERY_VIEW
 import mega.privacy.android.app.constants.SettingsConstants.KEY_PASSCODE_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.KEY_QR_CODE_AUTO_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RECOVERY_KEY
@@ -73,6 +74,7 @@ import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
+import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
 import javax.inject.Inject
@@ -177,6 +179,11 @@ class SettingsFragment :
 
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.takeIf { it.isChecked != state.hideRecentActivityChecked }
                         ?.let { it.isChecked = state.hideRecentActivityChecked }
+
+                    findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.let {
+                        it.isChecked =
+                            state.mediaDiscoveryViewState != MediaDiscoveryViewSettings.DISABLED.ordinal
+                    }
 
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
@@ -286,7 +293,8 @@ class SettingsFragment :
                 )
             )
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
-                twoFactorAuthenticationLauncher.launch(Intent(context, VerifyTwoFactorActivity::class.java).apply {
+                twoFactorAuthenticationLauncher.launch(Intent(context,
+                    VerifyTwoFactorActivity::class.java).apply {
                     putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
                 })
             } else {
@@ -373,6 +381,17 @@ class SettingsFragment :
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked
                 checked?.let {
                     viewModel.hideRecentActivity(checked)
+                }
+            }
+            KEY_MEDIA_DISCOVERY_VIEW -> {
+                val checked =
+                    findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isChecked
+                checked?.let {
+                    viewModel.mediaDiscoveryView(
+                        if (checked)
+                            MediaDiscoveryViewSettings.ENABLED.ordinal
+                        else
+                            MediaDiscoveryViewSettings.DISABLED.ordinal)
                 }
             }
         }

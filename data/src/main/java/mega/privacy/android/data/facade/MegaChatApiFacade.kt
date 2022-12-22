@@ -9,9 +9,12 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
+import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -20,8 +23,9 @@ import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRoomListenerInterface
+import nz.mega.sdk.MegaChatScheduledMeeting
+import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
 import javax.inject.Inject
 
 /**
@@ -61,7 +65,7 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun retryPendingConnections(
         disconnect: Boolean,
-        listener: MegaChatRequestListenerInterface?
+        listener: MegaChatRequestListenerInterface?,
     ) = chatApi.retryPendingConnections(disconnect, listener)
 
     override val chatUpdates: Flow<ChatUpdate>
@@ -155,7 +159,9 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
 
+        chatApi.closeChatRoom(chatId, listener)
         chatApi.openChatRoom(chatId, listener)
+
         awaitClose {
             chatApi.closeChatRoom(chatId, listener)
         }
@@ -170,11 +176,19 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.createChat(isGroup, peers, listener)
 
+    override fun leaveChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.leaveChat(chatId, listener)
+
     override fun setOpenInvite(
         chatId: Long,
         enabled: Boolean,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.setOpenInvite(chatId, enabled, listener)
+
+    override fun getMeetingChatRooms(): List<MegaChatRoom>? =
+        chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
 
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
@@ -191,6 +205,8 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatRoom(chatId: Long): MegaChatRoom? =
         chatApi.getChatRoom(chatId)
 
+    override fun getChatListItem(chatId: Long): MegaChatListItem? =
+        chatApi.getChatListItem(chatId)
 
     override fun getChatCall(chatId: Long): MegaChatCall? =
         chatApi.getChatCall(chatId)
@@ -213,6 +229,68 @@ internal class MegaChatApiFacade @Inject constructor(
         device: String,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.setChatVideoInDevice(device, listener)
+
+    override val scheduledMeetingUpdates: Flow<ScheduledMeetingUpdate>
+        get() = callbackFlow {
+            val listener = object : MegaChatScheduledMeetingListenerInterface {
+                override fun onChatSchedMeetingUpdate(
+                    api: MegaChatApiJava?,
+                    scheduledMeeting: MegaChatScheduledMeeting?,
+                ) {
+                    trySend(ScheduledMeetingUpdate.OnChatSchedMeetingUpdate(scheduledMeeting))
+                }
+
+                override fun onSchedMeetingOccurrencesUpdate(api: MegaChatApiJava?, chatId: Long) {
+                    trySend(ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate(chatId))
+                }
+            }
+
+            chatApi.addSchedMeetingListener(listener)
+            awaitClose { chatApi.removeSchedMeetingListener(listener) }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    override fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>? =
+        chatApi.allScheduledMeetings
+
+    override fun getScheduledMeeting(
+        chatId: Long,
+        schedId: Long,
+    ): MegaChatScheduledMeeting? =
+        chatApi.getScheduledMeeting(chatId, schedId)
+
+    override fun getScheduledMeetingsByChat(chatId: Long): List<MegaChatScheduledMeeting>? =
+        chatApi.getScheduledMeetingsByChat(chatId)
+
+    override fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.fetchScheduledMeetingOccurrencesByChat(chatId, listener)
+
+    override fun inviteToChat(
+        chatId: Long,
+        userHandle: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
+
+    override fun checkChatLink(
+        link: String,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.checkChatLink(link, listener)
+
+    override fun setPublicChatToPrivate(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.setPublicChatToPrivate(chatId, listener)
+
+    override fun queryChatLink(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.queryChatLink(chatId, listener)
+
+    override fun removeChatLink(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.removeChatLink(chatId, listener)
 
     companion object {
         const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE

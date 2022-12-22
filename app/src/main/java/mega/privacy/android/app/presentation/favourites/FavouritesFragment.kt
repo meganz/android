@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.MenuItem.SHOW_AS_ACTION_ALWAYS
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
@@ -40,10 +39,14 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesGridAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.SelectAnimator
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.utils.Constants
@@ -129,34 +132,18 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private fun setupAdapter() {
         listAdapter = FavouritesAdapter(
             sortByHeaderViewModel = sortByHeaderViewModel,
-            onItemClicked = { item, icon, position ->
-                itemClicked(item, icon, position)
-            },
-            onThreeDotsClicked = { item ->
-                viewModel.threeDotsClicked(item)
-            },
-            onLongClicked = { item, icon, position ->
-                itemLongClicked(item, icon, position)
-            },
-            getThumbnail = { handle, onFinished ->
-                thumbnailViewMode.getThumbnail(handle, onFinished)
-            }
+            onItemClicked = ::itemClicked,
+            onThreeDotsClicked = viewModel::threeDotsClicked,
+            onLongClicked = ::itemLongClicked,
+            getThumbnail = thumbnailViewMode::getThumbnail
         )
 
         gridAdapter = FavouritesGridAdapter(
             sortByHeaderViewModel = sortByHeaderViewModel,
-            onItemClicked = { item, icon, position ->
-                itemClicked(item, icon, position)
-            },
-            onThreeDotsClicked = { item ->
-                viewModel.threeDotsClicked(item)
-            },
-            onLongClicked = { item, icon, position ->
-                itemLongClicked(item, icon, position)
-            },
-            getThumbnail = { handle, onFinished ->
-                thumbnailViewMode.getThumbnail(handle, onFinished)
-            }
+            onItemClicked = ::itemClicked,
+            onThreeDotsClicked = viewModel::threeDotsClicked,
+            onLongClicked = ::itemLongClicked,
+            getThumbnail = thumbnailViewMode::getThumbnail
         )
         switchListGridView(sortByHeaderViewModel.isList)
     }
@@ -261,7 +248,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * @param favourite FavouriteFile
      */
     private fun openNode(favourite: FavouriteFile) {
-        MimeTypeList.typeForName(favourite.name).apply {
+        MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
                 isImage ||
                         (isVideoReproducible || isAudio) ||
@@ -279,7 +266,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                 isURL -> {
                     megaUtilWrapper.manageURLNode(requireContext(), favourite.node)
                 }
-                isOpenableTextFile(favourite.size) -> {
+                isOpenableTextFile(favourite.typedNode.size) -> {
                     MegaNodeUtil.manageTextFileIntent(
                         requireContext(),
                         favourite.node,
@@ -405,7 +392,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             showAsActionAndVisibility(findItem(R.id.cab_menu_share_link), true)
             showAsActionAndVisibility(
                 findItem(R.id.cab_menu_share_folder), !items.values.any {
-                    !it.isFolder
+                    it !is FavouriteFolder
                 }
             )
             showAsActionAndVisibility(findItem(R.id.cab_menu_share_out), true)
@@ -434,14 +421,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * Item clicked
      * @param item Favourite item
      */
-    private fun itemClicked(item: Favourite, icon: ImageView, position: Int) {
+    private fun itemClicked(item: Favourite) {
         if (isActionMode) {
             viewModel.itemSelected(item)
-            if (isList) {
-                listAdapter.startAnimation(requireActivity(), icon, position)
-            } else {
-                gridAdapter.startAnimation(requireActivity(), icon, position)
-            }
         } else {
             viewModel.openFile(item)
         }
@@ -452,14 +434,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * @param item Favourite item
      * @return true to make the view long clickable, false otherwise
      */
-    private fun itemLongClicked(item: Favourite, icon: ImageView, position: Int): Boolean {
+    private fun itemLongClicked(item: Favourite): Boolean {
         if (Util.isOnline(context)) {
             viewModel.itemSelected(item)
-            if (isList) {
-                listAdapter.startAnimation(requireActivity(), icon, position)
-            } else {
-                gridAdapter.startAnimation(requireActivity(), icon, position)
-            }
         } else {
             callManager {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
@@ -490,6 +467,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                     spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
                 }
             }
+            itemAnimator = SelectAnimator()
         }
         viewModel.forceUpdateData(isList)
     }

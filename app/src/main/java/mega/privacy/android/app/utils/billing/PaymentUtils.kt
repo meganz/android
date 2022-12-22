@@ -10,7 +10,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.app.middlelayer.iab.MegaSku
+import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
 import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_MONTH
 import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR

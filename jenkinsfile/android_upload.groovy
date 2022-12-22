@@ -63,16 +63,12 @@ pipeline {
         // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
         SDK_LOG_FILE_NAME = "sdk_build_log.txt"
         LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
-
-        // only build one architecture for SDK, to save build time. skipping "x86 armeabi-v7a x86_64"
-        BUILD_ARCHS = "arm64-v8a"
     }
     post {
         failure {
             script {
 
                 common = load('jenkinsfile/common.groovy')
-                common.helloWorld()
 
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
@@ -82,8 +78,7 @@ pipeline {
                         String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                         String message = firebaseUploadFailureMessage("<br/>") +
-                                "<br/>Build Log:\t${jsonJenkinsLog}" +
-                                sdkBuildMessage
+                                "<br/>Build Log:\t${jsonJenkinsLog}"
 
                         common.sendToMR(message)
                     } else {
@@ -97,9 +92,13 @@ pipeline {
 
                     // upload SDK build log if SDK build fails
                     String sdkBuildMessage = ""
-                    if (BUILD_STEP == "Build SDK For Publish") {
-                        def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
-                        sdkBuildMessage = "<br/>SDK BuildLog:\t${jsonSdkLog}"
+                    if (BUILD_STEP == "Build SDK") {
+                        if (fileExists(SDK_LOG_FILE_NAME)) {
+                            def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
+                            sdkBuildMessage = "<br/>SDK BuildLog:\t${jsonSdkLog}"
+                        } else {
+                            sdkBuildMessage = "<br/>SDK Build log not valid"
+                        }
                     }
 
                     String message = publishSdkFailureMessage("<br/>") +
@@ -116,7 +115,6 @@ pipeline {
         success {
             script {
                 common = load('jenkinsfile/common.groovy')
-                common.helloWorld()
 
                 if (triggerByDeliverQaCmd() || triggerByPush()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
@@ -137,10 +135,10 @@ pipeline {
         stage('Load Common Script') {
             steps {
                 script {
-                    BUILD_STEP = 'Preparation'
+                    BUILD_STEP = 'Load Common Script'
 
+                    // load the common library script
                     common = load('jenkinsfile/common.groovy')
-                    common.helloWorld()
                 }
             }
         }
@@ -163,7 +161,7 @@ pipeline {
         }
         stage('Fetch SDK Submodules') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPublishSdkCmd() }
             }
             steps {
                 script {
@@ -175,7 +173,7 @@ pipeline {
         }
         stage('Select SDK Version') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPublishSdkCmd() }
             }
             steps {
                 script {
@@ -184,34 +182,14 @@ pipeline {
                 gitlabCommitStatus(name: 'Select SDK Version') {
                     withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                         script {
+                            String sdkCommit = parseCommandParameter()["sdk-commit"]
+                            if (sdkCommit != null && sdkCommit.length() > 0) {
+                                common.checkoutSdkByCommit(sdkCommit)
+                            }
 
-                            if (triggerByDeliverQaCmd() || triggerByPush()) {
-                                if (isDefined(SDK_COMMIT)) {
-                                    common.checkoutSdkByCommit(SDK_COMMIT)
-                                } else if (isDefined(SDK_TAG)) {
-                                    checkoutSdkByTag(SDK_TAG)
-                                } else {
-                                    checkoutSdkByBranch(SDK_BRANCH)
-                                }
-
-                                if (isDefined(MEGACHAT_COMMIT)) {
-                                    common.checkoutMegaChatSdkByCommit(MEGACHAT_COMMIT)
-                                } else if (isDefined(MEGACHAT_TAG)) {
-                                    checkoutMegaChatSdkByTag(MEGACHAT_TAG)
-                                } else {
-                                    checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
-                                }
-                            } else if (triggerByPublishSdkCmd()) {
-                                // if building SDK lib, check out SDK versions if parameter is provided
-                                String sdkCommit = parseCommandParameter()["sdk-commit"]
-                                if (sdkCommit != null && sdkCommit.length() > 0) {
-                                    common.checkoutSdkByCommit(sdkCommit)
-                                }
-
-                                String chatCommit = parseCommandParameter()["chat-commit"]
-                                if (chatCommit != null && chatCommit.length() > 0) {
-                                    common.checkoutMegaChatSdkByCommit(chatCommit)
-                                }
+                            String chatCommit = parseCommandParameter()["chat-commit"]
+                            if (chatCommit != null && chatCommit.length() > 0) {
+                                common.checkoutMegaChatSdkByCommit(chatCommit)
                             }
                         }
                     }
@@ -221,7 +199,7 @@ pipeline {
 
         stage('Download Dependency Lib for SDK') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+                expression { triggerByPublishSdkCmd() }
             }
             steps {
                 script {
@@ -239,6 +217,18 @@ pipeline {
                             ls -lh
                         """
                     }
+                }
+            }
+        }
+        stage('Download Google Map API Key') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Download Google Map API Key'
+                }
+                gitlabCommitStatus(name: 'Download Google Map API Key') {
 
                     withCredentials([
                             file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_QA', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_QA')
@@ -254,41 +244,14 @@ pipeline {
                 }
             }
         }
-        stage('Build SDK') {
-            when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build SDK'
-                }
-                gitlabCommitStatus(name: 'Build SDK') {
-                    script {
-                        if (REBUILD_SDK != null && REBUILD_SDK.toLowerCase() == "yes") {
-                            sh """
-                                cd ${WORKSPACE}/sdk/src/main/jni
-                                echo CLEANING SDK
-                                bash build.sh clean
-                            """
-                        }
-                    }
 
-                    sh """
-                    cd ${WORKSPACE}/sdk/src/main/jni
-                    echo "=== START SDK BUILD===="
-                    bash build.sh all
-                    """
-                }
-            }
-        }
-
-        stage('Build SDK For Publish') {
+       stage('Build SDK') {
             when {
                 expression { triggerByPublishSdkCmd() }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Build SDK For Publish'
+                    BUILD_STEP = 'Build SDK'
                     String buildArchs = "x86 armeabi-v7a x86_64 arm64-v8a"
                     withEnv(["BUILD_ARCHS=${buildArchs}"]) {
                         sh """
@@ -414,74 +377,6 @@ pipeline {
                 }
             }
         }
-        stage('Build APK(HMS)') {
-            when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build APK(HMS)'
-                }
-                gitlabCommitStatus(name: 'Build APK(HMS)') {
-                    script {
-                        sh './gradlew app:assembleHmsRelease'
-                    }
-                }
-            }
-        }
-        stage('Sign APK(HMS)') {
-            when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Sign APK(HMS)'
-                }
-                gitlabCommitStatus(name: 'Sign APK(HMS)') {
-                    withCredentials([
-                            string(credentialsId: 'ANDROID_QA_SIGN_PASSWORD', variable: 'ANDROID_QA_SIGN_PASSWORD'),
-                            file(credentialsId: 'ANDROID_QA_KEYSTORE', variable: 'ANDROID_QA_KEYSTORE')
-                    ]) {
-                        script {
-                            sh '''
-                                cd app/build/outputs/apk/hms/release
-                                zipalign -v -p 4 app-*-unsigned.apk app-hms-release-unsigned-aligned.apk
-                                apksigner sign --ks "$ANDROID_QA_KEYSTORE" --ks-pass "pass:$ANDROID_QA_SIGN_PASSWORD" --out app-hms-release-signed.apk app-hms-release-unsigned-aligned.apk
-                                ls -lh
-                                rm -fv *unsigned*.apk
-                                pwd
-                                ls -lh
-                                cd -
-                            '''
-                        }
-                    }
-                }
-            }
-        }
-        stage('Upload HMS APK to Firebase') {
-            when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Upload HMS APK to Firebase'
-                }
-                withCredentials([
-                        file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
-                ]) {
-                    script {
-                        withEnv([
-                                "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
-                                "RELEASE_NOTES_FOR_CD=${readReleaseNotes()}",
-                                "TESTERS_FOR_CD=${parseCommandParameter()["tester"]}",
-                                "TESTER_GROUP_FOR_CD=${parseCommandParameter()["tester-group"]}"
-                        ]) {
-                            sh './gradlew appDistributionUploadHmsRelease'
-                        }
-                    }
-                }
-            }
-        }
         stage('Build QA APK(GMS)') {
             when {
                 expression { triggerByPush() || triggerByDeliverQaCmd() }
@@ -523,28 +418,34 @@ pipeline {
             }
         }
 
-        stage('Clean up') {
+        stage('Clean up Android') {
             when {
                 expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Clean Up'
+                    BUILD_STEP = 'Clean Up Android'
                 }
-                gitlabCommitStatus(name: 'Clean Up') {
+                gitlabCommitStatus(name: 'Clean Up Android') {
+                    sh """                    
+                        cd ${WORKSPACE}
+                        ./gradlew clean
+                    """
+                }
+            }
+        }
+        stage('Clean up SDK') {
+            when {
+                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Clean Up SDK'
+                }
+                gitlabCommitStatus(name: 'Clean Up SDK') {
                     sh """
-                    cd ${WORKSPACE}
-                    echo "workspace size before clean: "
-                    du -sh
-
-                    cd ${WORKSPACE}/sdk/src/main/jni
-                    bash build.sh clean
-                    
-                    cd ${WORKSPACE}
-                    ./gradlew clean
-                    
-                    echo "workspace size after clean: "
-                    du -sh
+                        cd ${WORKSPACE}/sdk/src/main/jni
+                        bash build.sh clean
                     """
                 }
             }
@@ -701,6 +602,7 @@ private String publishSdkSuccessMessage(String lineBreak) {
             "${lineBreak}SDK Commit:\t${getSdkGitHash()}" +
             "${lineBreak}Chat SDK Commit:\t${getMegaChatSdkGitHash()}" +
             "${lineBreak}Version:\tnz.mega.sdk:sdk:${getSdkVersionText()}" +
+            "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}" +
             "${lineBreak}AAR Artifactory Page: ${getSdkAarArtifactoryPage()}"
 }
 

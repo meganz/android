@@ -95,9 +95,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.HeaderItemDecoration;
@@ -115,6 +113,8 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaContactDB;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
@@ -1174,12 +1174,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
+            Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
             emptyTextView.setText(result);
         } else {
             setEmptyStateVisibility(false);
@@ -1854,7 +1849,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     private void setGetChatLinkVisibility() {
-        getChatLinkLayout.setVisibility(isEKREnabled? View.GONE:View.VISIBLE);
+        getChatLinkLayout.setVisibility(isEKREnabled ? View.GONE : View.VISIBLE);
     }
 
     private void queryIfHasReadContactsPermissions() {
@@ -1997,12 +1992,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
             } else {
                 setEmptyStateVisibility(false);
@@ -2050,12 +2040,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
             }
         }
@@ -2114,12 +2099,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
             }
         }

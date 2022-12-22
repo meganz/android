@@ -18,6 +18,7 @@ import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.EmptySearchException
+import mega.privacy.android.domain.exception.FolderNameNullException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -49,7 +50,7 @@ class GetFolderContentUseCase @Inject constructor(
     private fun get(currentFolder: FolderContent.Data): Single<List<FolderContent.Data>> =
         Single.create { emitter ->
             val listFiles = currentFolder.document.listFiles()
-            if (listFiles.isNullOrEmpty()) {
+            if (listFiles.isEmpty()) {
                 emitter.onError(EmptyFolderException())
             } else {
                 val folderContentList = mutableListOf<FolderContent.Data>()
@@ -105,8 +106,14 @@ class GetFolderContentUseCase @Inject constructor(
         renameName: String? = null,
     ): Single<ArrayList<UploadFolderResult>> =
         Single.create { emitter ->
+            val folderName = folderItem.name
+
+            if (folderName == null) {
+                emitter.onError(FolderNameNullException())
+                return@create
+            }
+
             if (folderItem.isFolder) {
-                val folderName = folderItem.name!!
                 var newParentNode = megaApi.getChildNode(parentNode, folderName)
 
                 if (newParentNode == null) {
@@ -114,6 +121,14 @@ class GetFolderContentUseCase @Inject constructor(
                         onError = { error -> emitter.onError(error) },
                         onSuccess = { resultNode -> newParentNode = resultNode }
                     )
+                }
+
+                if (newParentNode == null) {
+                    if (!emitter.isDisposed) {
+                        emitter.onError(MegaNodeException.ParentDoesNotExistException())
+                    }
+
+                    return@create
                 }
 
                 val results = ArrayList<UploadFolderResult>()
@@ -143,7 +158,7 @@ class GetFolderContentUseCase @Inject constructor(
                     arrayListOf(
                         UploadFolderResult(
                             absolutePath = info.fileAbsolutePath,
-                            name = folderItem.name!!,
+                            name = folderName,
                             size = folderItem.size,
                             lastModified = folderItem.lastModified,
                             parentHandle = parentNode.handle,

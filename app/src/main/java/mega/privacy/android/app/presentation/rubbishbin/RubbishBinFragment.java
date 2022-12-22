@@ -20,6 +20,7 @@ import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -27,7 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -146,6 +146,11 @@ public class RubbishBinFragment extends Fragment {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (!managerViewModel.isConnected()) {
+                ((ManagerActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+                return false;
+            }
+
             List<MegaNode> documents = adapter.getSelectedNodes();
 
             switch (item.getItemId()) {
@@ -389,12 +394,7 @@ public class RubbishBinFragment extends Fragment {
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 } else {
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -414,12 +414,7 @@ public class RubbishBinFragment extends Fragment {
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 }
             } else {
@@ -493,12 +488,7 @@ public class RubbishBinFragment extends Fragment {
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 } else {
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -518,12 +508,7 @@ public class RubbishBinFragment extends Fragment {
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 }
             } else {
@@ -613,12 +598,7 @@ public class RubbishBinFragment extends Fragment {
                             textToShow = textToShow.replace("[/B]", "</font>");
                         } catch (Exception e) {
                         }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
+                        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                         emptyTextViewFirst.setText(result);
 
                     } else {
@@ -639,12 +619,7 @@ public class RubbishBinFragment extends Fragment {
                             textToShow = textToShow.replace("[/B]", "</font>");
                         } catch (Exception e) {
                         }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
+                        Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                         emptyTextViewFirst.setText(result);
                     }
                 } else {
@@ -700,7 +675,7 @@ public class RubbishBinFragment extends Fragment {
 
                     if (localPath != null) {
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         } else {
                             mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -763,7 +738,7 @@ public class RubbishBinFragment extends Fragment {
 
                     if (localPath != null) {
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         } else {
                             pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -965,12 +940,7 @@ public class RubbishBinFragment extends Fragment {
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 } else {
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -990,12 +960,7 @@ public class RubbishBinFragment extends Fragment {
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
-                    Spanned result = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        result = Html.fromHtml(textToShow);
-                    }
+                    Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
                     emptyTextViewFirst.setText(result);
                 }
             } else {

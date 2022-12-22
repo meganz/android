@@ -1,10 +1,11 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.SubscriptionPlan
+import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -29,7 +30,7 @@ interface AccountRepository {
      * Request account
      * Sends a request to update account data asynchronously
      */
-    fun requestAccount()
+    suspend fun requestAccount()
 
     /**
      * Set that the user has logged in
@@ -96,11 +97,11 @@ interface AccountRepository {
     suspend fun isBusinessAccountActive(): Boolean
 
     /**
-     * Get the List of SubscriptionPlans
+     * Get the List of SubscriptionOptions
      *
-     * @return List of SubscriptionPlans
+     * @return List of SubscriptionOptions
      */
-    suspend fun getSubscriptionPlans(): List<SubscriptionPlan>
+    suspend fun getSubscriptionOptions(): List<SubscriptionOption>
 
     /**
      * Returns if accounts achievements enabled
@@ -123,4 +124,51 @@ interface AccountRepository {
      * @return the latest account detail time stamp
      */
     suspend fun getAccountDetailsTimeStampInSeconds(): String?
+
+    /**
+     * Get specific account detail
+     *
+     * @param storage
+     * @param transfer
+     * @param pro
+     */
+    suspend fun getSpecificAccountDetail(storage: Boolean, transfer: Boolean, pro: Boolean)
+
+    /**
+     * Get extended account details
+     *
+     * @param sessions
+     * @param purchases
+     * @param transactions
+     */
+    suspend fun getExtendedAccountDetails(
+        sessions: Boolean,
+        purchases: Boolean,
+        transactions: Boolean,
+    )
+
+    /**
+     * Gets the credentials of the currently open account.
+     *
+     * @return Fingerprint of the signing key of the current account.
+     */
+    suspend fun getMyCredentials(): AccountCredentials.MyAccountCredentials?
+
+    /**
+     * Reset account details time stamp
+     *
+     */
+    suspend fun resetAccountDetailsTimeStamp()
+
+    /**
+     * Reset extended account details timestamp
+     *
+     */
+    suspend fun resetExtendedAccountDetailsTimestamp()
+
+    /**
+     * Check Achievements are enabled or not
+     */
+    suspend fun areAchievementsEnabled(): Boolean
+
 }

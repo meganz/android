@@ -78,4 +78,9 @@ interface TransferRepository {
      * are individually paused, and False if otherwise.
      */
     suspend fun areAllUploadTransfersPaused(): Boolean
+
+    /**
+     * Cancels all upload transfers
+     */
+    suspend fun cancelAllUploadTransfers()
 }

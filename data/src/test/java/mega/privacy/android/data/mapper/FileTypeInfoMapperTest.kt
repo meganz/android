@@ -106,12 +106,17 @@ class FileTypeInfoMapperTest {
     fun `test that a file with audio type is mapped correctly`() {
         val expectedExtension = "mp3"
         val expectedMimeType = "audio/"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val expectedDuration = 120
+        val node = mock<MegaNode> {
+            on { name }.thenReturn("withExtension.$expectedExtension")
+            on { duration }.thenReturn(expectedDuration)
+        }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             AudioFileTypeInfo(
                 type = expectedMimeType,
-                extension = expectedExtension
+                extension = expectedExtension,
+                duration = expectedDuration
             )
         )
     }
@@ -120,12 +125,17 @@ class FileTypeInfoMapperTest {
     fun `test that a file with opus extension is mapped correctly`() {
         val expectedExtension = "opus"
         val expectedMimeType = "opus type"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val expectedDuration = 120
+        val node = mock<MegaNode> {
+            on { name }.thenReturn("withExtension.$expectedExtension")
+            on { duration }.thenReturn(expectedDuration)
+        }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             AudioFileTypeInfo(
                 type = expectedMimeType,
-                extension = expectedExtension
+                extension = expectedExtension,
+                duration = expectedDuration,
             )
         )
     }
@@ -134,12 +144,17 @@ class FileTypeInfoMapperTest {
     fun `test that a file with weba extension is mapped correctly`() {
         val expectedExtension = "weba"
         val expectedMimeType = "weba type"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val expectedDuration = 120
+        val node = mock<MegaNode> {
+            on { name }.thenReturn("withExtension.$expectedExtension")
+            on { duration }.thenReturn(expectedDuration)
+        }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             AudioFileTypeInfo(
                 type = expectedMimeType,
-                extension = expectedExtension
+                extension = expectedExtension,
+                duration = expectedDuration,
             )
         )
     }
@@ -328,12 +343,17 @@ class FileTypeInfoMapperTest {
     fun `test that video files are mapped to the correct type`() {
         val expectedExtension = "mp4"
         val expectedMimeType = "video/mp4"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val expectedDuration = 120
+        val node = mock<MegaNode> {
+            on { name }.thenReturn("withExtension.$expectedExtension")
+            on { duration }.thenReturn(expectedDuration)
+        }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             VideoFileTypeInfo(
                 type = expectedMimeType,
-                extension = expectedExtension
+                extension = expectedExtension,
+                duration = expectedDuration
             )
         )
     }
@@ -342,12 +362,17 @@ class FileTypeInfoMapperTest {
     fun `test that vob files are mapped to video type`() {
         val expectedExtension = "vob"
         val expectedMimeType = "unknown type"
-        val node = mock<MegaNode> { on { name }.thenReturn("withExtension.$expectedExtension") }
+        val expectedDuration = 120
+        val node = mock<MegaNode> {
+            on { name }.thenReturn("withExtension.$expectedExtension")
+            on { duration }.thenReturn(expectedDuration)
+        }
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             VideoFileTypeInfo(
                 type = expectedMimeType,
-                extension = expectedExtension
+                extension = expectedExtension,
+                duration = expectedDuration
             )
         )
     }
