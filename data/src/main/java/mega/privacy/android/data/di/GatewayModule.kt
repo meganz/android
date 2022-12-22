@@ -6,32 +6,40 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
+import mega.privacy.android.data.facade.BillingFacade
 import mega.privacy.android.data.facade.BroadcastReceiverFacade
 import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.CameraUploadMediaFacade
+import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
+import mega.privacy.android.data.facade.QRCodeFacade
 import mega.privacy.android.data.facade.TelephonyFacade
+import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
+import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
+import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.QRCodeGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
+import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -162,4 +170,22 @@ internal abstract class GatewayModule {
     @Singleton
     abstract fun bindTelephonyGateway(telephonyFacade: TelephonyFacade): TelephonyGateway
 
+    /**
+     * Provide implementation of [QRCodeGateway]
+     */
+    @Binds
+    abstract fun bindQRCodeGateway(implementation: QRCodeFacade): QRCodeGateway
+
+    /**
+     * Provides [ClipboardGateway] implementation
+     */
+    @Binds
+    abstract fun bindClipboardGateway(implementation: ClipboardFacade): ClipboardGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindVerifyPurchaseGateway(implementation: VerifyPurchaseFacade): VerifyPurchaseGateway
+
+    @Binds
+    abstract fun bindBillingFacade(implementation: BillingFacade): BillingGateway
 }

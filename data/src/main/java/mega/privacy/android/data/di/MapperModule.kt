@@ -8,6 +8,8 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
+import mega.privacy.android.data.mapper.ChatCallMapper
+import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
@@ -18,17 +20,21 @@ import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
+import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
+import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
@@ -49,6 +55,7 @@ import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
+import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
@@ -56,6 +63,8 @@ import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.VideoQualityIntMapper
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -63,8 +72,11 @@ import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
+import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toChatCall
+import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
@@ -76,13 +88,17 @@ import mega.privacy.android.data.mapper.toContactData
 import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
+import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
+import mega.privacy.android.data.mapper.toMegaPurchase
+import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
@@ -104,6 +120,8 @@ import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
+import mega.privacy.android.data.mapper.toVideoQuality
+import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -327,10 +345,10 @@ internal class MapperModule {
         ::UserAccount
 
     /**
-     * Provide pricing mapper
+     * Provide local pricing mapper
      */
     @Provides
-    fun providePricingMapper(): PricingMapper = ::toPricing
+    fun provideLocalPricingMapper(): LocalPricingMapper = ::toLocalPricing
 
     /**
      * Provide currency mapper
@@ -440,4 +458,47 @@ internal class MapperModule {
     @Provides
     fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
 
+    /**
+     * Provide chat call mapper
+     */
+    @Provides
+    fun provideChatCallMapper(): ChatCallMapper = ::toChatCall
+
+    /**
+     * Provide country calling codes mapper
+     */
+    @Provides
+    fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper = ::toCountryCallingCodes
+
+    /**
+     * Provide video quality mapper
+     */
+    @Provides
+    fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
+
+    /**
+     * Provide pricing mapper
+     *
+     */
+    @Provides
+    fun providePricingMapper(): PricingMapper = ::toPricing
+
+    /**
+     * Provide video quality int mapper
+     */
+    @Provides
+    fun provideVideoQualityIntMapper(): VideoQualityIntMapper = ::videoQualityToInt
+
+    @Provides
+    fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt
+
+    @Provides
+    fun provideMegaSkuMapper(): MegaSkuMapper = ::toMegaSku
+
+    @Provides
+    fun provideMegaPurchaseMapper(): MegaPurchaseMapper = ::toMegaPurchase
+
+    @Provides
+    fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
+        ::toChatFilesFolderUserAttribute
 }

@@ -71,6 +71,36 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.createSupportTicket(ticketContent, ANDROID_SUPPORT_ISSUE, listener)
     }
 
+    override fun startUpload(
+        localPath: String,
+        parentNode: MegaNode,
+        fileName: String?,
+        modificationTime: Long,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        shouldStartFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+        listener: MegaTransferListenerInterface,
+    ) {
+        megaApi.startUpload(
+            localPath,
+            parentNode,
+            fileName,
+            modificationTime,
+            appData,
+            isSourceTemporary,
+            shouldStartFirst,
+            cancelToken,
+            listener,
+        )
+    }
+
+    override fun addTransferListener(listener: MegaTransferListenerInterface) =
+        megaApi.addTransferListener(listener)
+
+    override fun removeTransferListener(listener: MegaTransferListenerInterface) =
+        megaApi.removeTransferListener(listener)
+
     override fun startUploadForSupport(
         path: String,
         listener: MegaTransferListenerInterface,
@@ -379,6 +409,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
+    override suspend fun getUserAvatarColor(userHandle: Long): String =
+        megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
+
     override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
@@ -531,7 +564,7 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
 
-    override suspend fun isAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
+    override suspend fun areAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
 
     override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
         megaApi.getAccountAchievements(listener)
@@ -590,9 +623,6 @@ internal class MegaApiFacade @Inject constructor(
     override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
         megaApi.getCountryCallingCodes(listener)
 
-    override fun isAchievementsEnabled() =
-        megaApi.isAchievementsEnabled
-
     override fun logout(listener: MegaRequestListenerInterface?) {
         if (listener == null) {
             megaApi.logout()
@@ -629,4 +659,64 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
+
+    override fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkCreate(renew, listener)
+    }
+
+    override fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkDelete(handle, listener)
+    }
+
+    override fun isChatNotifiable(chatId: Long): Boolean =
+        megaApi.isChatNotifiable(chatId)
+
+    override fun inviteContact(email: String, listener: MegaRequestListenerInterface) =
+        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, listener)
+
+    override fun outgoingContactRequests(): ArrayList<MegaContactRequest> =
+        megaApi.outgoingContactRequests
+
+    override fun createFolder(
+        name: String,
+        parent: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.createFolder(name, parent, listener)
+
+    override fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
+
+    override fun authorizeChatNode(node: MegaNode, authorizationToken: String): MegaNode? =
+        megaApi.authorizeChatNode(node, authorizationToken)
+
+    override fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.submitPurchaseReceipt(gateway, receipt, listener)
+
+    override fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        lastPublicHandle: Long,
+        lastPublicHandleType: Int,
+        lastAccessTimestamp: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.submitPurchaseReceipt(
+        gateway,
+        receipt,
+        lastPublicHandle,
+        lastPublicHandleType,
+        lastAccessTimestamp,
+        listener,
+    )
+
+    override fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface) =
+        megaApi.setMyChatFilesFolder(
+            nodeHandle,
+            listener,
+        )
 }

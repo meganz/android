@@ -11,14 +11,6 @@ class DefaultIsChargingRequired @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
 ) : IsChargingRequired {
 
-    override suspend fun invoke(queueSize: Long): Boolean {
-
-        if (cameraUploadRepository.convertOnCharging()) {
-            val queueSizeLimit = cameraUploadRepository.getChargingOnSize()
-            if (queueSize > queueSizeLimit) {
-                return true
-            }
-        }
-        return false
-    }
+    override suspend fun invoke(queueSize: Long) =
+        cameraUploadRepository.convertOnCharging() && queueSize > cameraUploadRepository.getChargingOnSize()
 }

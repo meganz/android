@@ -10,7 +10,7 @@ import javax.inject.Inject
  *
  * Chat log listener that prints all the chat output to file. See logback.xml for configuration
  */
-class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface {
+internal class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface {
     override fun log(loglevel: Int, message: String?) {
         when (loglevel) {
             MegaApiAndroid.LOG_LEVEL_MAX -> Timber.v(message)

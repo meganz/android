@@ -258,8 +258,8 @@ class InfoAchievementsFragment : Fragment(), GetAchievementsListener.DataCallbac
                 }
 
                 text = if (diffDays > 0) {
-                    StringResourcesUtils.getString(R.string.expiration_date_for_achievements,
-                        diffDays)
+                    StringResourcesUtils.getQuantityString(R.plurals.account_achievements_bonus_expiration_date,
+                        diffDays.toInt(), diffDays.toInt())
                 } else {
                     StringResourcesUtils.getString(R.string.expired_label)
                 }

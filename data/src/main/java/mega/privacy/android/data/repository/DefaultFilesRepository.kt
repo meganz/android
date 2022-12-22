@@ -13,13 +13,16 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
@@ -34,6 +37,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.exception.SynchronisationException
@@ -54,15 +58,24 @@ import kotlin.coroutines.suspendCoroutine
  * @property context
  * @property megaApiGateway
  * @property megaApiFolderGateway
+ * @property megaChatApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
  * @property megaShareMapper
  * @property megaExceptionMapper
+ * @property sortOrderIntMapper
+ * @property cacheFolderGateway
+ * @property nodeMapper
+ * @property fileTypeInfoMapper
+ * @property offlineNodeInformationMapper
+ * @property fileGateway
+ * @property chatFilesFolderUserAttributeMapper
  */
 internal class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val megaShareMapper: MegaShareMapper,
@@ -73,6 +86,7 @@ internal class DefaultFilesRepository @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
+    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
 ) : FilesRepository, FileRepository {
 
     override suspend fun copyNode(
@@ -244,36 +258,73 @@ internal class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
 
-    override suspend fun downloadBackgroundFile(node: MegaNode): String =
+    override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                val file = cacheFolderGateway.getCacheFile(CacheFolderConstant.TEMPORARY_FOLDER,
-                    node.getFileName())
-                if (file == null) {
-                    continuation.resumeWith(Result.failure(NullFileException()))
-                    return@suspendCoroutine
-                }
+            getMegaNode(viewerNode)?.let { node ->
+                suspendCoroutine { continuation ->
+                    val file = cacheFolderGateway.getCacheFile(CacheFolderConstant.TEMPORARY_FOLDER,
+                        node.getFileName())
+                    if (file == null) {
+                        continuation.resumeWith(Result.failure(NullFileException()))
+                        return@suspendCoroutine
+                    }
 
-                megaApiGateway.startDownload(
-                    node = node,
-                    localPath = file.absolutePath,
-                    fileName = file.name,
-                    appData = APP_DATA_BACKGROUND_TRANSFER,
-                    startFirst = true,
-                    cancelToken = null,
-                    listener = OptionalMegaTransferListenerInterface(
-                        onTransferTemporaryError = { _, error ->
-                            continuation.failWithError(error)
-                        },
-                        onTransferFinish = { _, error ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resumeWith(Result.success(file.absolutePath))
-                            } else {
+                    megaApiGateway.startDownload(
+                        node = node,
+                        localPath = file.absolutePath,
+                        fileName = file.name,
+                        appData = APP_DATA_BACKGROUND_TRANSFER,
+                        startFirst = true,
+                        cancelToken = null,
+                        listener = OptionalMegaTransferListenerInterface(
+                            onTransferTemporaryError = { _, error ->
                                 continuation.failWithError(error)
+                            },
+                            onTransferFinish = { _, error ->
+                                if (error.errorCode == MegaError.API_OK) {
+                                    continuation.resumeWith(Result.success(file.absolutePath))
+                                } else {
+                                    continuation.failWithError(error)
+                                }
                             }
-                        }
+                        )
                     )
-                )
+                }
+            } ?: throw NullPointerException()
+        }
+
+    suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
+        when (viewerNode) {
+            is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
+            is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
+            is ViewerNode.FolderLinkNode -> getMegaNodeFromFolderLink(viewerNode)
+            is ViewerNode.GeneralNode -> megaApiGateway.getMegaNodeByHandle(viewerNode.id)
+        }
+    }
+
+    private suspend fun getMegaNodeFromChat(chatNode: ViewerNode.ChatNode) =
+        withContext(ioDispatcher) {
+            with(chatNode) {
+                val messageChat = megaChatApiGateway.getMessage(chatId, messageId)
+                    ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
+
+                if (messageChat != null) {
+                    val node = messageChat.megaNodeList.get(0)
+                    val chat = megaChatApiGateway.getChatRoom(chatId)
+
+                    if (chat?.isPreview == true) {
+                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
+                    } else {
+                        node
+                    }
+                } else null
+            }
+        }
+
+    private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
+                megaApiFolderGateway.authorizeNode(it)
             }
         }
 
@@ -368,4 +419,37 @@ internal class DefaultFilesRepository @Inject constructor(
     override suspend fun getOfflineInboxPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
 
+    override suspend fun createFolder(name: String) = withContext(ioDispatcher) {
+        val megaNode = megaApiGateway.getRootNode()
+        megaNode?.let { parentMegaNode ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener { it.nodeHandle }
+                megaApiGateway.createFolder(name, parentMegaNode, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+    }
+
+    override suspend fun getUnVerifiedInComingShares(): Int = 3
+    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
+
+    override suspend fun getUnverifiedOutgoingShares(): Int = 5
+    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
+
+    override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
+                    megaApiGateway.base64ToHandle(value)
+                        .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
+                }
+            }
+            megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

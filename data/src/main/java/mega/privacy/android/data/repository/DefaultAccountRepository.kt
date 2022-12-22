@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -230,8 +231,8 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun isAccountAchievementsEnabled(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.isAccountAchievementsEnabled()
+    override suspend fun areAccountAchievementsEnabled(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.areAccountAchievementsEnabled()
     }
 
     override suspend fun getAccountAchievements(
@@ -258,6 +259,11 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
             dbHandler.attributes?.accountDetailsTimeStamp
+        }
+
+    override suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String? =
+        withContext(ioDispatcher) {
+            dbHandler.attributes?.extendedAccountDetailsTimeStamp
         }
 
     override suspend fun getSpecificAccountDetail(
@@ -318,7 +324,50 @@ internal class DefaultAccountRepository @Inject constructor(
         dbHandler.resetExtendedAccountDetailsTimestamp()
     }
 
-    override suspend fun areAchievementsEnabled() = withContext(ioDispatcher) {
-        megaApiGateway.isAchievementsEnabled()
+    override suspend fun logout() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            megaApiGateway.logout(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
     }
+
+    override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        val value = megaApiGateway.handleToBase64(request.nodeHandle)
+                        continuation.resumeWith(Result.success("https://mega.nz/C!$value"))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                }
+            )
+            megaApiGateway.contactLinkCreate(renew, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun deleteContactLink(handle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            megaApiGateway.contactLinkDelete(handle, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override val accountEmail: String?
+        get() = megaApiGateway.accountEmail
+
 }

@@ -13,13 +13,16 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -50,9 +53,22 @@ class IncomingSharesViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> {
+            onBlocking {
+                invoke(AppFeatures.MandatoryFingerprintVerification)
+            }.thenReturn(true)
+        }
+
+    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = IncomingSharesViewModel(
             getNodeByHandle,
             authorizeNode,
@@ -61,6 +77,8 @@ class IncomingSharesViewModelTest {
             getCloudSortOrder,
             getOtherSortOrder,
             monitorNodeUpdates,
+            getFeatureFlagValue,
+            getUnverifiedInComingShares,
         )
     }
 
@@ -74,6 +92,7 @@ class IncomingSharesViewModelTest {
             assertThat(initial.isInvalidHandle).isEqualTo(true)
             assertThat(initial.incomingParentHandle).isEqualTo(null)
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
+            assertThat(initial.unVerifiedInComingShares).isEqualTo(0)
         }
     }
 
@@ -493,5 +512,14 @@ class IncomingSharesViewModelTest {
             getIncomingSharesChildrenNode,
             times(2)
         ).invoke(underTest.state.value.incomingHandle)
+    }
+
+    @Test
+    fun `test that unverified incoming shares are returned`() = runTest {
+        whenever(getUnverifiedInComingShares()).thenReturn(3)
+        initViewModel()
+        underTest.state.test {
+            assertThat(awaitItem().unVerifiedInComingShares).isEqualTo(3)
+        }
     }
 }

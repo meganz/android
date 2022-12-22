@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -10,7 +11,9 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatScheduledMeeting
+import nz.mega.sdk.MegaHandleList
 
 /**
  * Mega chat api gateway
@@ -87,6 +90,11 @@ interface MegaChatApiGateway {
     val chatUpdates: Flow<ChatUpdate>
 
     /**
+     * Chat call updates
+     */
+    val chatCallUpdates: Flow<ChatCallUpdate>
+
+    /**
      * Request the number of minutes since the user was seen as green by last time.
      *
      * @param userHandle User handle from who the last green has been requested.
@@ -147,20 +155,62 @@ interface MegaChatApiGateway {
     fun getChatRoomByUser(userHandle: Long): MegaChatRoom?
 
     /**
-     * Returns the known alias given to the user.
-     * Returns NULL if data is not cached yet or it's not possible to get.
+     * Request user attributes
      *
-     * @param userHandle Handle of the user whose alias is requested.
-     * @return The user alias.
+     * This function is useful to get the email address, first name, last name and full name
+     * from chat link participants that they are not loaded
+     *
+     * After request is finished, you can call to MegaChatApi::getUserFirstnameFromCache,
+     * MegaChatApi::getUserLastnameFromCache, MegaChatApi::getUserFullnameFromCache,
+     * MegaChatApi::getUserEmailFromCache (email will not available in anonymous mode)
+     * 
+     * @param chatId Handle of the chat whose member attributes requested
+     * @param userList List of user whose attributes has been requested
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun loadUserAttributes(
+        chatId: Long,
+        userList: MegaHandleList,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Get user email from cache
+     *
+     * @param   userHandle User handle.
+     * @return  User email or null if it has not been cached yet.
+     */
+    fun getUserEmailFromCache(userHandle: Long): String?
+
+    /**
+     * Get the alias given to the user from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User alias or null if it has not been cached yet.
      */
     fun getUserAliasFromCache(userHandle: Long): String?
 
     /**
-     *  Returns the current full name of the user.
-     *  Returns NULL if data is not cached yet or it's not possible to get.
+     * Get user first name from cache.
      *
-     * @param userHandle Handle of the user whose full name is requested.
-     * @return The user full name.
+     * @param   userHandle User handle.
+     * @return  User firstname or null if it has not been cached yet.
+     */
+    fun getUserFirstnameFromCache(userHandle: Long): String?
+
+    /**
+     * Get user last name from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User lastname or null if it has not been cached yet.
+     */
+    fun getUserLastnameFromCache(userHandle: Long): String?
+
+    /**
+     *  Get user full name from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User full name or null if it has not been cached yet.
      */
     fun getUserFullNameFromCache(userHandle: Long): String?
 
@@ -325,4 +375,98 @@ interface MegaChatApiGateway {
      * @param listener      Listener.
      */
     fun removeChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Create chat link
+     *
+     * @param chatId        Chat id.
+     * @param listener      Listener.
+     */
+    fun createChatLink(chatId: Long, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Get my user handle
+     *
+     * @return My user handle
+     */
+    fun getMyUserHandle(): Long
+
+    /**
+     * Get my full name
+     *
+     * @return My full name
+     */
+    fun getMyFullname(): String
+
+    /**
+     * Get my email
+     *
+     * @return My full email
+     */
+    fun getMyEmail(): String
+
+    /**
+     * Get Chat Invalid Handle
+     */
+    fun getChatInvalidHandle(): Long
+
+    /**
+     * Get my chat status
+     */
+    fun getOnlineStatus(): Int
+
+    /**
+     *  Remove participant from chat
+     *
+     * @param chatId    Chat id
+     * @param handle    User handle
+     * @param listener  Listener
+     */
+    fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Update participant permissions
+     * @param chatId        Chat id.
+     * @param handle        User handle.
+     * @param privilege     User privilege.
+     * @param listener      Listener.
+     */
+    fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        privilege: Int,
+        listener: MegaChatRequestListenerInterface?,
+    )
+
+    /**
+     * Gets the MegaChatMessage specified from the chat room.
+     *
+     * This function allows to retrieve only those messages that are been loaded, received and/or
+     * sent (confirmed and not yet confirmed). For any other message, this function
+     * will return NULL.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId    MegaChatHandle that identifies the chat room
+     * @param messageId MegaChatHandle that identifies the message
+     * @return The MegaChatMessage object, or NULL if not found.
+     */
+    fun getMessage(chatId: Long, messageId: Long): MegaChatMessage?
+
+    /**
+     * Gets the MegaChatMessage specified from the chat room stored in node history
+     *
+     * This function allows to retrieve only those messages that are in the node history
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId    MegaChatHandle that identifies the chat room
+     * @param messageId MegaChatHandle that identifies the message
+     * @return The MegaChatMessage object, or NULL if not found.
+     */
+    fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage?
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -10,11 +11,38 @@ import android.provider.MediaStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.domain.entity.CameraUploadMedia
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.util.LinkedList
 import java.util.Queue
 import javax.inject.Inject
 import kotlin.math.max
+
+/**
+ * Intent action for broadcast on camera upload attributes change
+ */
+const val BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE = "INTENT_CU_ATTR_CHANGE"
+
+/**
+ * Intent extra data if camera upload folder is secondary
+ */
+const val INTENT_EXTRA_IS_CU_SECONDARY_FOLDER = "EXTRA_IS_CU_SECONDARY_FOLDER"
+
+/**
+ * Intent action for broadcast to update camera upload destination folder in settings
+ */
+const val BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING =
+    "ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING"
+
+/**
+ * Intent extra data if camera upload destination folder is secondary
+ */
+const val INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY = "SECONDARY_FOLDER"
+
+/**
+ * Intent extra data of camera upload destination folder handle to be changed
+ */
+const val INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE = "PRIMARY_HANDLE"
 
 /**
  * Camera Upload Media Facade implements [CameraUploadMediaGateway]
@@ -29,25 +57,47 @@ internal class CameraUploadMediaFacade @Inject constructor(
         isVideo: Boolean,
         selectionQuery: String?,
     ): Queue<CameraUploadMedia> =
-        createMediaCursor(parentPath, selectionQuery, getPageSize(isVideo), uri)?.let {
+        createMediaCursor(parentPath, selectionQuery, uri)?.let {
             Timber.d("Extract ${it.count} Media from Cursor")
             extractMedia(it, parentPath)
         } ?: LinkedList<CameraUploadMedia>().also {
             Timber.d("Extract 0 Media - Cursor is NULL")
         }
 
-    private fun getPageSize(isVideo: Boolean): Int = if (isVideo) 50 else 1000
+    override suspend fun sendUpdateFolderIconBroadcast(
+        nodeHandle: Long,
+        isSecondary: Boolean,
+    ) {
+        val intent = Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE).apply {
+            putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary)
+            putExtra(INTENT_EXTRA_NODE_HANDLE, nodeHandle)
+        }
+        context.sendBroadcast(intent)
+    }
+
+    override suspend fun sendUpdateFolderDestinationBroadcast(
+        nodeHandle: Long,
+        isSecondary: Boolean,
+    ) {
+        val destinationIntent =
+            Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).apply {
+                if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
+                    putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, isSecondary)
+                    putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, nodeHandle)
+                }
+            }
+        context.sendBroadcast(destinationIntent)
+    }
 
     private fun createMediaCursor(
         parentPath: String?,
         selectionQuery: String?,
-        pageSize: Int,
         uri: Uri,
     ): Cursor? {
         val projection = getProjection()
         val mediaOrder = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
         return if (shouldPageCursor(parentPath)) {
-            mediaOrder.getPagedMediaCursor(selectionQuery, pageSize, uri, projection)
+            mediaOrder.getPagedMediaCursor(selectionQuery, uri, projection)
         } else {
             context.contentResolver?.query(
                 uri,
@@ -75,7 +125,6 @@ internal class CameraUploadMediaFacade @Inject constructor(
 
     private fun String.getPagedMediaCursor(
         selectionQuery: String?,
-        pageSize: Int,
         uri: Uri,
         projection: Array<String>,
     ): Cursor? {
@@ -84,16 +133,14 @@ internal class CameraUploadMediaFacade @Inject constructor(
             args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, this)
             args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
             args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
-            args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
             context.contentResolver?.query(uri, projection, args, null)
         } else {
-            val mediaOrderPreR = "$this LIMIT 0,$pageSize"
             context.contentResolver?.query(
                 uri,
                 projection,
                 selectionQuery,
                 null,
-                mediaOrderPreR
+                this
             )
         }
     }

@@ -45,6 +45,7 @@ import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -516,5 +517,112 @@ class DefaultAccountRepositoryTest {
     fun `test resetExtendedAccountDetailsTimestamp invoke correct method`() = runTest {
         underTest.resetExtendedAccountDetailsTimestamp()
         verify(dbHandler).resetExtendedAccountDetailsTimestamp()
+    }
+
+    @Test(expected = MegaException::class)
+    fun `test that deleteContactLink throws MegaException when error happens`() = runTest {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_EACCESS)
+        }
+
+        val megaRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_CONTACT_LINK_DELETE)
+        }
+        val handle = 100L
+
+        whenever(megaApiGateway.contactLinkDelete(
+            handle = eq(handle),
+            listener = any())
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError,
+            )
+        }
+
+        underTest.deleteContactLink(handle)
+    }
+
+    @Test
+    fun `test that deleteContactLink is success when MegaApi returns API_OK`() = runTest {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        val megaRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_CONTACT_LINK_DELETE)
+        }
+        val handle = 100L
+
+        whenever(megaApiGateway.contactLinkDelete(
+            handle = eq(handle),
+            listener = any())
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError,
+            )
+        }
+
+        underTest.deleteContactLink(handle)
+    }
+
+    @Test
+    fun `test that createContactLink returns success`() = runTest {
+        val expectedHandle = 100L
+        val base64Value = "mycontactlink"
+        val renew = true
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val megaRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_CONTACT_LINK_CREATE)
+            on { nodeHandle }.thenReturn(expectedHandle)
+        }
+        whenever(megaApiGateway.contactLinkCreate(
+            renew = eq(renew),
+            listener = any()
+        )).thenAnswer {
+            ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError
+            ))
+        }
+
+        whenever(megaApiGateway.handleToBase64(expectedHandle)).thenReturn(base64Value)
+
+        assertThat(underTest.createContactLink(renew)).isEqualTo("https://mega.nz/C!$base64Value")
+    }
+
+    @Test(expected = MegaException::class)
+    fun `test that createContactLink throws exception when MegaApi returns failure`() = runTest {
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_EACCESS)
+        }
+        val megaRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_CONTACT_LINK_CREATE)
+        }
+        whenever(megaApiGateway.contactLinkCreate(
+            renew = any(),
+            listener = any()
+        )).thenAnswer {
+            ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError
+            ))
+        }
+
+        underTest.createContactLink(renew = true)
+    }
+
+
+    @Test
+    fun `test that MegaApiGateway method is invoked when getting accountEmail`() {
+        underTest.accountEmail
+        verify(megaApiGateway).accountEmail
     }
 }

@@ -68,7 +68,6 @@ public class Constants {
 
     public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
-    public static final String EXTRA_NODE_HANDLE = "NODE_HANDLE";
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
@@ -134,8 +133,6 @@ public class Constants {
     public static final int UPDATE_IMAGE_DRAG = 9001;
     public static final int UPDATE_GET_PRICING = 9002;
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
-    public static final int UPDATE_CREDIT_CARD_SUBSCRIPTION = 9004;
-    public static final int UPDATE_PAYMENT_METHODS = 9005;
 
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
@@ -406,7 +403,6 @@ public class Constants {
     public static final String NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING = "NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING";
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
     public static final int PRICING_MIN_DIFFERENCE = 720;
-    public static final int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
 
     public static final String HISTORY_RETENTION_DISABLED = "HISTORY_RETENTION_DISABLED";
     public static final String HISTORY_RETENTION_1_DAY = "HISTORY_RETENTION_1_DAY";
@@ -935,7 +931,6 @@ public class Constants {
     public static final int NAME_CHANGE = 0;
     public static final int AVATAR_CHANGE = 1;
 
-    public static final int CLICKS_ENABLE_DEBUG = 5;
     public static final int FIRST_NAVIGATION_LEVEL = 0;
     
     public static final long LONG_SNACKBAR_DURATION = 2750;

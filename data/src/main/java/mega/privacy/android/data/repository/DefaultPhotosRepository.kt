@@ -144,6 +144,8 @@ internal class DefaultPhotosRepository @Inject constructor(
                 token.cancel()
             }
         }
+        token.cancel()
+        imageNodes
     }
 
     private suspend fun searchVideos(): List<MegaNode> = withContext(ioDispatcher) {
@@ -160,6 +162,8 @@ internal class DefaultPhotosRepository @Inject constructor(
                 token.cancel()
             }
         }
+        token.cancel()
+        videosNodes
     }
 
     /**

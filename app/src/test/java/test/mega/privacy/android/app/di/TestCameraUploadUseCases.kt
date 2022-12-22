@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
@@ -74,6 +75,8 @@ import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
+import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -177,6 +180,9 @@ object TestCameraUploadUseCases {
     fun provideResetSecondaryTimeline() = mock<ResetSecondaryTimeline>()
 
     @Provides
+    fun provideResetCameraUploadTimelines() = mock<ResetCameraUploadTimelines>()
+
+    @Provides
     fun provideUpdateTimeStamp() = mock<UpdateCameraUploadTimeStamp>()
 
     @Provides
@@ -184,6 +190,12 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetCameraUploadLocalPathSecondary() = mock<GetCameraUploadLocalPathSecondary>()
+
+    @Provides
+    fun provideUpdateFolderIconBroadcast() = mock<UpdateFolderIconBroadcast>()
+
+    @Provides
+    fun provideUpdateFolderDestinationBroadcast() = mock<UpdateFolderDestinationBroadcast>()
 
     @Provides
     fun provideGetCameraUploadSelectionQuery() = mock<GetCameraUploadSelectionQuery>()

@@ -12,13 +12,16 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
@@ -48,16 +51,33 @@ class OutgoingSharesViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> {
+            onBlocking {
+                invoke(AppFeatures.MandatoryFingerprintVerification)
+            }.thenReturn(true)
+        }
+
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>() {
+        onBlocking { invoke() }.thenReturn(5)
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = OutgoingSharesViewModel(
             getNodeByHandle,
             getParentNodeHandle,
             getOutgoingSharesChildrenNode,
             getCloudSortOrder,
             getOtherSortOrder,
-            monitorNodeUpdates
+            monitorNodeUpdates,
+            getFeatureFlagValue,
+            getUnverifiedOutgoingShares,
         )
     }
 
@@ -421,4 +441,11 @@ class OutgoingSharesViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that unverified incoming shares are returned`() = runTest {
+        initViewModel()
+        underTest.state.test {
+            assertThat(awaitItem().unVerifiedOutGoingShares).isEqualTo(5)
+        }
+    }
 }

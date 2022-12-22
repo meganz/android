@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,13 +47,16 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
+import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
@@ -83,6 +87,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -100,7 +105,7 @@ class PhotosFragment : Fragment() {
 
     private val photosViewModel: PhotosViewModel by viewModels()
     internal val timelineViewModel: TimelineViewModel by activityViewModels()
-    private val albumsViewModel: AlbumsViewModel by activityViewModels()
+    internal val albumsViewModel: AlbumsViewModel by activityViewModels()
 
     internal lateinit var managerActivity: ManagerActivity
     private var menu: Menu? = null
@@ -108,11 +113,13 @@ class PhotosFragment : Fragment() {
     // Action mode
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: TimelineActionModeCallback
+    private lateinit var albumsActionModeCallback: AlbumsActionModeCallback
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
     lateinit var pagerState: PagerState
-    lateinit var lazyGridState: LazyGridState
+    lateinit var timelineLazyGridState: LazyGridState
+    lateinit var albumsLazyGridState: LazyGridState
 
     @Inject
     lateinit var getFeatureFlag: GetFeatureFlagValue
@@ -121,6 +128,7 @@ class PhotosFragment : Fragment() {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
         actionModeCallback = TimelineActionModeCallback(this)
+        albumsActionModeCallback = AlbumsActionModeCallback(this)
     }
 
     override fun onCreateView(
@@ -196,14 +204,22 @@ class PhotosFragment : Fragment() {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                timelineViewModel.state.collect { state ->
-                    state.selectedPhoto?.let {
-                        openPhoto(it).also {
-                            timelineViewModel.onNavigateToSelectedPhoto()
+                launch {
+                    timelineViewModel.state.collect { state ->
+                        state.selectedPhoto?.let {
+                            openPhoto(it).also {
+                                timelineViewModel.onNavigateToSelectedPhoto()
+                            }
                         }
+                        handleOptionsMenu(state)
+                        handleActionMode(state)
                     }
-                    handleOptionsMenu(state)
-                    handleActionMode(state)
+                }
+
+                launch {
+                    albumsViewModel.state.collect { state ->
+                        handleAlbumsActionMode(state)
+                    }
                 }
             }
         }
@@ -215,6 +231,20 @@ class PhotosFragment : Fragment() {
                 enterActionMode()
             }
             actionMode?.title = state.selectedPhotoCount.toString()
+            managerActivity.showHideBottomNavigationView(true)
+        } else {
+            actionMode?.finish()
+            actionMode = null
+            managerActivity.showHideBottomNavigationView(false)
+        }
+    }
+
+    private fun handleAlbumsActionMode(state: AlbumsViewState) {
+        if (state.selectedAlbumIds.isNotEmpty()) {
+            if (actionMode == null) {
+                enterAlbumsActionMode()
+            }
+            actionMode?.title = state.selectedAlbumIds.size.toString()
             managerActivity.showHideBottomNavigationView(true)
         } else {
             actionMode?.finish()
@@ -277,7 +307,7 @@ class PhotosFragment : Fragment() {
                 else
                     rememberPagerState(initialPage = photosViewState.selectedTab.ordinal)
         }
-        lazyGridState =
+        timelineLazyGridState =
             rememberSaveable(
                 timelineViewState.scrollStartIndex,
                 timelineViewState.scrollStartOffset,
@@ -289,12 +319,14 @@ class PhotosFragment : Fragment() {
                 )
             }
 
+        albumsLazyGridState = rememberLazyGridState()
+
         if (managerActivity.fromAlbumContent) {
             managerActivity.fromAlbumContent = false
             photosViewModel.onTabSelected(PhotosTab.Albums)
         }
 
-        LaunchedEffect(pagerState) {
+        LaunchedEffect(pagerState.currentPage) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
                 pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
@@ -306,9 +338,12 @@ class PhotosFragment : Fragment() {
             selectedTab = photosViewState.selectedTab,
             pagerState = pagerState,
             onTabSelected = this::onTabSelected,
+            timelineLazyGridState = timelineLazyGridState,
+            albumsLazyGridState = albumsLazyGridState,
             timelineView = { timelineView(timelineViewState = timelineViewState) },
-            albumsView = { albumsView(albumsViewState = albumsViewState) },
+            albumsView = { albumsView(albumsViewState = albumsViewState, timelineViewState) },
             timelineViewState = timelineViewState,
+            albumsViewState = albumsViewState,
         )
     }
 
@@ -317,7 +352,7 @@ class PhotosFragment : Fragment() {
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
         photoDownload = photosViewModel::downloadPhoto,
-        lazyGridState = lazyGridState,
+        lazyGridState = timelineLazyGridState,
         onTextButtonClick = this::enableCameraUploadClick,
         onFABClick = this::openFilterFragment,
         onCardClick = timelineViewModel::onCardClick,
@@ -335,7 +370,10 @@ class PhotosFragment : Fragment() {
 
 
     @Composable
-    private fun albumsView(albumsViewState: AlbumsViewState) =
+    private fun albumsView(
+        albumsViewState: AlbumsViewState,
+        timelineViewState: TimelineViewState,
+    ) =
         AlbumsView(
             albumsViewState = albumsViewState,
             openAlbum = this::openAlbum,
@@ -345,7 +383,21 @@ class PhotosFragment : Fragment() {
             setInputValidity = albumsViewModel::setNewAlbumNameValidity,
             openPhotosSelectionActivity = this::openAlbumPhotosSelection,
             setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
-            allPhotos = timelineViewModel.state.value.photos
+            allPhotos = timelineViewState.photos,
+            clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
+            onAlbumSelection = { album ->
+                if (album.id in albumsViewState.selectedAlbumIds) {
+                    albumsViewModel.unselectAlbum(album)
+                } else {
+                    albumsViewModel.selectAlbum(album)
+                }
+            },
+            closeDeleteAlbumsConfirmation = {
+                albumsViewModel.closeDeleteAlbumsConfirmation()
+                albumsViewModel.clearAlbumSelection()
+            },
+            deleteAlbums = ::deleteAlbums,
+            lazyGridState = albumsLazyGridState,
         ) {
             getFeatureFlag(AppFeatures.UserAlbums)
         }
@@ -362,7 +414,7 @@ class PhotosFragment : Fragment() {
     private fun photosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
         timelineViewState = timelineViewState,
         downloadPhoto = photosViewModel::downloadPhoto,
-        lazyGridState = lazyGridState,
+        lazyGridState = timelineLazyGridState,
         onClick = timelineViewModel::onClick,
         onLongPress = timelineViewModel::onLongPress,
     )
@@ -465,8 +517,8 @@ class PhotosFragment : Fragment() {
     private fun openFilterFragment() {
         timelineViewModel.updateFilterState(
             showFilterDialog = true,
-            scrollStartIndex = lazyGridState.firstVisibleItemIndex,
-            scrollStartOffset = lazyGridState.firstVisibleItemScrollOffset
+            scrollStartIndex = timelineLazyGridState.firstVisibleItemIndex,
+            scrollStartOffset = timelineLazyGridState.firstVisibleItemScrollOffset
         )
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
     }
@@ -491,7 +543,7 @@ class PhotosFragment : Fragment() {
             if (message.isNotEmpty()) {
                 albumsViewModel.setSnackBarMessage(snackBarMessage = message)
                 albumsViewModel.getCurrentUIAlbum()?.let { UIAlbum ->
-                    openAlbum(album = UIAlbum)
+                    openAlbum(album = UIAlbum, resetMessage = false)
                 }
             }
         }
@@ -501,6 +553,12 @@ class PhotosFragment : Fragment() {
     private fun enterActionMode() {
         actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
             actionModeCallback
+        )
+    }
+
+    private fun enterAlbumsActionMode() {
+        actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+            albumsActionModeCallback
         )
     }
 
@@ -608,8 +666,8 @@ class PhotosFragment : Fragment() {
 
     fun loadPhotos() {}
 
-    fun openAlbum(album: UIAlbum) {
-        albumsViewModel.setCurrentAlbum(album.id)
+    fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
+        resetAlbumContentState(album = album, resetMessage = resetMessage)
         activity?.lifecycleScope?.launch {
             val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
             if (dynamicAlbumEnabled) {
@@ -619,6 +677,13 @@ class PhotosFragment : Fragment() {
                 managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
             }
         }
+    }
+
+    private fun resetAlbumContentState(album: UIAlbum, resetMessage: Boolean = true) {
+        albumsViewModel.setCurrentAlbum(album.id)
+        albumsViewModel.setCurrentSort(Sort.DEFAULT)
+        albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
+        if (resetMessage) albumsViewModel.setSnackBarMessage("")
     }
 
     private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
@@ -655,6 +720,25 @@ class PhotosFragment : Fragment() {
 
             Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
         }
+    }
+
+    private fun deleteAlbums(albumIds: List<AlbumId>) {
+        albumsViewModel.deleteAlbums(albumIds)
+
+        val albums = albumsViewModel.state.value.albums
+        val message = context?.getQuantityStringOrDefault(
+            R.plurals.photos_album_deleted_message,
+            quantity = albumIds.size,
+            albumIds.size.takeIf { it > 1 } ?: albums.find {
+                it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
+            }?.title,
+        ).orEmpty()
+        albumsViewModel.updateAlbumDeletedMessage(message)
+    }
+
+    override fun onPause() {
+        albumsViewModel.updateAlbumDeletedMessage(message = "")
+        super.onPause()
     }
 
     override fun onDestroy() {

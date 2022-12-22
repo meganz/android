@@ -46,6 +46,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -94,19 +95,21 @@ internal class DefaultContactsRepository @Inject constructor(
         megaChatApiGateway.requestLastGreen(userHandle)
     }
 
-    override fun monitorContactUpdates() =
+    override fun monitorContactUpdates(): Flow<UserUpdate> =
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
             .mapNotNull { it.users }
             .map { usersList ->
                 userUpdateMapper(usersList.filter { user ->
-                    user.handle != megaApiGateway.myUserHandle
-                            && (user.changes == 0
-                            || (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)
-                            || user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS))
+                    (user.handle != megaApiGateway.myUserHandle &&
+                            (user.changes == 0 ||
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) ||
+                            (user.handle == megaApiGateway.myUserHandle &&
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ||
+                                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING))))
                 })
             }
             .filter { it.changes.isNotEmpty() }
@@ -187,15 +190,15 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getContactData(contactItem: ContactItem): ContactData =
         withContext(ioDispatcher) {
             val email = contactItem.email
-            val fullName = getFullName(email)
+            val fullName = getFullName(contactItem.handle)
             val alias = getAlias(contactItem.handle)
             val avatarUri = getAvatarUri(email, "${email}.jpg")
 
             contactDataMapper(fullName, alias, avatarUri)
         }
 
-    private suspend fun getFullName(email: String): String? =
-        runCatching { getUserFullName(email) }.fold(
+    private suspend fun getFullName(handle: Long): String? =
+        runCatching { getUserFullName(handle) }.fold(
             onSuccess = { fullName -> fullName },
             onFailure = { null }
         )
@@ -237,58 +240,96 @@ internal class DefaultContactsRepository @Inject constructor(
         )
 
     private suspend fun getContactAvatar(
-        emailOrHandle: String,
+        email: String,
         avatarFileName: String,
     ): String? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.getContactAvatar(emailOrHandle,
+                megaApiGateway.getContactAvatar(email,
                     avatarFileName,
                     OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onRequestGetUserAvatarCompleted(continuation)
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(request.file))
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
                     ))
             }
         }
 
-    private suspend fun getUserFullName(emailOrHandle: String): String? =
+    override suspend fun getUserEmail(handle: Long, skipCache: Boolean): String =
         withContext(ioDispatcher) {
-            getUserFirstName(emailOrHandle)
-            getUserLastName(emailOrHandle)
-            val userHandle = megaApiGateway.getContact(emailOrHandle)?.handle ?: -1
-            val fullName = megaChatApiGateway.getUserFullNameFromCache(userHandle)
-            if (fullName.isNullOrEmpty()) null else fullName
-        }
-
-    override suspend fun getUserFirstName(emailOrHandle: String) = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
-            megaApiGateway.getUserAttribute(emailOrHandle,
-                MegaApiJava.USER_ATTR_FIRSTNAME,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                ))
-        }
-    }
-
-    private fun onRequestGetUserAvatarCompleted(continuation: Continuation<String?>) =
-        { request: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaError.API_OK) {
-                continuation.resumeWith(Result.success(request.file))
-            } else {
-                continuation.failWithError(error)
+            if (!skipCache) {
+                val cachedEmail = megaChatApiGateway.getUserEmailFromCache(handle)
+                if (!cachedEmail.isNullOrBlank()) {
+                    return@withContext cachedEmail
+                }
+            }
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserEmail(handle,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resume(request.email)
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    ))
             }
         }
 
-    override suspend fun getUserLastName(emailOrHandle: String) = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
-            megaApiGateway.getUserAttribute(emailOrHandle,
-                MegaApiJava.USER_ATTR_LASTNAME,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                ))
+    override suspend fun getUserFirstName(handle: Long, skipCache: Boolean): String =
+        withContext(ioDispatcher) {
+            if (!skipCache) {
+                val cachedName = megaChatApiGateway.getUserFirstnameFromCache(handle)
+                if (!cachedName.isNullOrBlank()) {
+                    return@withContext cachedName
+                }
+            }
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserAttribute(handle.toBase64Handle(),
+                    MegaApiJava.USER_ATTR_FIRSTNAME,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                    ))
+            }
         }
-    }
 
-    private fun onRequestGetUserNameCompleted(continuation: Continuation<String?>) =
+    override suspend fun getUserLastName(handle: Long, skipCache: Boolean): String =
+        withContext(ioDispatcher) {
+            if (!skipCache) {
+                val cachedName = megaChatApiGateway.getUserLastnameFromCache(handle)
+                if (!cachedName.isNullOrBlank()) {
+                    return@withContext cachedName
+                }
+            }
+            suspendCoroutine { continuation ->
+                megaApiGateway.getUserAttribute(handle.toBase64Handle(),
+                    MegaApiJava.USER_ATTR_LASTNAME,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onRequestGetUserNameCompleted(continuation)
+                    ))
+            }
+        }
+
+    override suspend fun getUserFullName(handle: Long, skipCache: Boolean): String =
+        withContext(ioDispatcher) {
+            if (!skipCache) {
+                val cachedName = megaChatApiGateway.getUserFullNameFromCache(handle)
+                if (!cachedName.isNullOrBlank()) {
+                    return@withContext cachedName
+                }
+            }
+
+            getUserFirstName(handle)
+            getUserLastName(handle)
+            megaChatApiGateway.getUserFullNameFromCache(handle) ?: error("Can't retrieve full name")
+        }
+
+    private fun onRequestGetUserNameCompleted(continuation: Continuation<String>) =
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.text))
@@ -305,7 +346,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
         contactUpdates.changes.forEach { (userId, changes) ->
             var updatedContact = outdatedContactList.findItemByHandle(userId.id)
-            val megaUser = megaApiGateway.getContact(megaApiGateway.userHandleToBase64(userId.id))
+            val megaUser = megaApiGateway.getContact(userId.id.toBase64Handle())
 
             if (changes.isEmpty()
                 && (megaUser == null || megaUser.visibility != MegaUser.VISIBILITY_VISIBLE)
@@ -333,7 +374,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 }
 
                 if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
-                    val fullName = getFullName(megaUser.email)
+                    val fullName = getFullName(megaUser.handle)
                     updatedContact?.contactData?.copy(fullName = fullName)?.let { contactData ->
                         updatedContact = updatedContact?.copy(contactData = contactData)
                     }
@@ -358,7 +399,7 @@ internal class DefaultContactsRepository @Inject constructor(
     }
 
     private suspend fun getVisibleContact(megaUser: MegaUser): ContactItem {
-        val fullName = getFullName(megaUser.email)
+        val fullName = getFullName(megaUser.handle)
         val alias = getAlias(megaUser.handle)
         val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
         checkLastGreen(status, megaUser.handle)
@@ -460,7 +501,6 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-
     override suspend fun verifyCredentials(userEmail: String) = withContext(ioDispatcher) {
         megaApiGateway.getContact(userEmail)?.let {
             suspendCoroutine { continuation: Continuation<Unit> ->
@@ -484,7 +524,7 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getContact(userEmail)?.let { user ->
                 val userCredentials = getUserCredentials(user)
-                val name = getAlias(user.handle) ?: getFullName(userEmail) ?: userEmail
+                val name = getAlias(user.handle) ?: getFullName(user.handle) ?: userEmail
 
                 contactCredentialsMapper(
                     userCredentials,
@@ -493,4 +533,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 )
             }
         }
+
+    private fun Long.toBase64Handle(): String =
+        megaApiGateway.handleToBase64(this)
 }

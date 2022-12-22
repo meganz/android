@@ -50,7 +50,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
-import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.domain.entity.billing.MegaPurchase;
 import mega.privacy.android.domain.entity.account.MegaSku;
 import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.PaymentUtils;
@@ -520,12 +520,12 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
          * @return Generic MegaPurchase object.
          */
         public static MegaPurchase convert(Purchase purchase) {
-            MegaPurchase p = new MegaPurchase();
-            p.setSku(purchase.getProducts().get(0));
-            p.setReceipt(purchase.getOriginalJson());
-            p.setState(purchase.getPurchaseState());
-            p.setToken(purchase.getPurchaseToken());
-            return p;
+            return new MegaPurchase(
+                    purchase.getProducts().get(0),
+                    purchase.getOriginalJson(),
+                    purchase.getPurchaseState(),
+                    purchase.getPurchaseToken()
+            );
         }
 
         /**

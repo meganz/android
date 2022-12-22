@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.photos.view
 
 import android.app.Activity
 import android.content.DialogInterface
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

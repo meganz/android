@@ -11,29 +11,28 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -61,10 +60,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
-import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
+import mega.privacy.android.app.presentation.contact.ContactStatus
+import mega.privacy.android.app.presentation.contact.DefaultContactAvatar
+import mega.privacy.android.app.presentation.contact.UriAvatar
+import mega.privacy.android.app.presentation.contact.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
@@ -74,13 +76,12 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoA
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.presentation.controls.MarqueeText
 import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.Typography
 import mega.privacy.android.presentation.theme.black
 import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_038
@@ -91,7 +92,6 @@ import mega.privacy.android.presentation.theme.white
 import mega.privacy.android.presentation.theme.white_alpha_012
 import mega.privacy.android.presentation.theme.white_alpha_038
 import mega.privacy.android.presentation.theme.white_alpha_054
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -105,21 +105,31 @@ fun ScheduledMeetingInfoView(
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
-    onSeeMoreClicked: () -> Unit,
+    onSeeMoreOrLessClicked: () -> Unit,
     onLeaveGroupClicked: () -> Unit,
-    onParticipantClicked: (ChatParticipant) -> Unit,
+    onParticipantClicked: (ChatParticipant) -> Unit = {},
     onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
     onDismiss: () -> Unit,
     onLeaveGroupDialog: () -> Unit,
+    onInviteParticipantsDialog: () -> Unit,
+    onSnackbarShown: () -> Unit,
 ) {
+    val isLight = MaterialTheme.colors.isLight
+
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
         scaffoldState = scaffoldState,
+        snackbarHost = {
+            SnackbarHost(hostState = it) { data ->
+                Snackbar(snackbarData = data,
+                    backgroundColor = black.takeIf { isLight } ?: white)
+            }
+        },
         topBar = {
             ScheduledMeetingInfoAppBar(
                 state = state,
@@ -131,80 +141,82 @@ fun ScheduledMeetingInfoView(
             )
         }
     ) { paddingValues ->
+
+        LeaveGroupAlertDialog(
+            state = state,
+            onDismiss = { onDismiss() },
+            onLeave = { onLeaveGroupDialog() })
+
+        AddParticipantsAlertDialog(
+            state = state,
+            onDismiss = { onDismiss() },
+            onInvite = { onInviteParticipantsDialog() })
+
         LazyColumn(state = listState,
             modifier = Modifier.padding(paddingValues)) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
-            item(key = "Scheduled meeting dialog") {
-                ScheduledMeetingInfoAppBarAlertDialog(
-                    state = state,
-                    onDismiss = { onDismiss() },
-                    onLeave = { onLeaveGroupDialog() })
+
+            items(state.buttons) { button ->
+                ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
             }
 
-            state.apply {
-                items(buttons) { button ->
-                    ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
-                }
+            item(key = "Participants") { ParticipantsHeader(state = state) }
 
-                item(key = "Participants") { ParticipantsHeader(state = state) }
+            item(key = "Add participants") {
+                AddParticipantsButton(state = state,
+                    onAddParticipantsClicked = onAddParticipantsClicked)
+            }
 
-                item(key = "Add participants") {
-                    AddParticipantsButton(state = state,
-                        onAddParticipantsClicked = onAddParticipantsClicked)
-                }
-                val participantsList = state.participantItemList
+            item(key = "Participants list") {
+                state.participantItemList.indices.forEach { i ->
+                    if (i < 4 || !state.seeMoreVisible) {
+                        val isLastOne =
+                            (i < 4 && i == state.participantItemList.size - 1) || (i >= 4 && i == 3)
 
-                if (state.seeMoreVisible && state.participantItemList.size > 4) {
-                    item(key = participantsList[0].participantId) {
-                        ParticipantItemView(participant = participantsList[0]) {
-                            onParticipantClicked(participantsList[0])
-                        }
-                    }
-                    item(key = participantsList[1].participantId) {
-                        ParticipantItemView(participant = participantsList[1]) {
-                            onParticipantClicked(participantsList[1])
-                        }
-                    }
-                    item(key = participantsList[2].participantId) {
-                        ParticipantItemView(participant = participantsList[2]) {
-                            onParticipantClicked(participantsList[2])
-                        }
-                    }
-                    item(key = participantsList[3].participantId) {
-                        ParticipantItemView(participant = participantsList[3]) {
-                            onParticipantClicked(participantsList[3])
-                        }
-                    }
-
-                    item(key = "See more participants") {
-                        SeeMoreParticipantsButton(onSeeMoreClicked = onSeeMoreClicked)
-                    }
-                } else {
-                    participantsList.forEach { participant ->
-                        item(key = participant.participantId) {
-                            ParticipantItemView(participant) {
-                                onParticipantClicked(participant)
-                            }
-                        }
+                        ParticipantItemView(participant = state.participantItemList[i],
+                            !isLastOne, onParticipantClicked = onParticipantClicked)
                     }
                 }
 
-                item(key = "Leave group") {
-                    LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
+                if (state.participantItemList.size > 4) {
+                    SeeMoreOrLessParticipantsButton(state,
+                        onSeeMoreOrLessClicked = onSeeMoreOrLessClicked)
                 }
+            }
+
+            item(key = "Scheduled meeting description") {
+                ScheduledMeetingDescriptionView(state = state)
+            }
+
+            item(key = "Leave group") {
+                LeaveGroupButton(onLeaveGroupClicked = onLeaveGroupClicked)
             }
         }
 
-        state.snackBar?.let { id ->
-            val msg = stringResource(id = id)
+        if (state.snackBar != null) {
+            val msg =
+                if (state.snackBar == R.string.context_contact_request_sent && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else if (state.snackBar == R.string.invite_not_sent_already_sent && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else if (state.snackBar == R.string.context_contact_already_exists && state.selected != null) {
+                    stringResource(id = state.snackBar, state.selected.email)
+                } else {
+                    stringResource(id = state.snackBar)
+                }
+
             LaunchedEffect(scaffoldState.snackbarHostState) {
-                scaffoldState.snackbarHostState.showSnackbar(message = msg,
-                    duration = SnackbarDuration.Long)
+                val s = scaffoldState.snackbarHostState.showSnackbar(message = msg,
+                    duration = SnackbarDuration.Short)
+
+                if (s == SnackbarResult.Dismissed) {
+                    onSnackbarShown()
+                }
             }
         }
     }
 
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackBarHostState)
+    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     onScrollChange(!firstItemVisible)
 }
@@ -217,64 +229,60 @@ fun ScheduledMeetingInfoView(
  * @param onLeave                   When leave the group chat room
  */
 @Composable
-private fun ScheduledMeetingInfoAppBarAlertDialog(
+private fun LeaveGroupAlertDialog(
     state: ScheduledMeetingInfoState,
     onDismiss: () -> Unit,
     onLeave: () -> Unit,
 ) {
-
     if (state.leaveGroupDialog) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            properties = DialogProperties(
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true
-            ),
-            confirmButton = {
-                TextButton(onClick = { onLeave() })
-                {
-                    Text(
-                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.teal_300) else colorResource(
-                            id = R.color.teal_200),
-                        text = stringResource(R.string.general_leave))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onDismiss() })
-                {
-                    Text(
-                        color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.teal_300) else colorResource(
-                            id = R.color.teal_200),
-                        text = stringResource(R.string.general_cancel))
-                }
-            },
-            title = {
-                Text(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth()
-                        .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                    textAlign = TextAlign.Center,
-                    style = Typography.h6,
-                    color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_087) else colorResource(
-                        id = R.color.white),
-                    fontWeight = FontWeight.Bold,
-                    text = stringResource(R.string.title_confirmation_leave_group_chat))
-            },
-            text = {
-                Text(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .wrapContentWidth()
-                        .padding(start = 0.dp, top = 20.dp, bottom = 20.dp, end = 0.dp),
-                    text = stringResource(id = R.string.confirmation_leave_group_chat),
-                    style = Typography.subtitle1,
-                    color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_060) else colorResource(
-                        id = R.color.white_alpha_060))
-            },
-            backgroundColor = if (MaterialTheme.colors.isLight) colorResource(id = R.color.white) else colorResource(
-                id = R.color.dark_grey)
-        )
+        SimpleDialog(
+            title = R.string.title_confirmation_leave_group_chat,
+            description = R.string.confirmation_leave_group_chat,
+            confirmButton = R.string.general_leave,
+            dismissButton = R.string.general_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onLeave)
+    }
+}
+
+/**
+ * Scheduled meeting info Alert Dialog
+ *
+ * @param state                     [ScheduledMeetingInfoState]
+ * @param onDismiss                 When dismiss the alert dialog
+ * @param onInvite                  When invite participants to group chat room
+ */
+@Composable
+private fun AddParticipantsAlertDialog(
+    state: ScheduledMeetingInfoState,
+    onDismiss: () -> Unit,
+    onInvite: () -> Unit,
+) {
+
+    if (state.addParticipantsNoContactsDialog) {
+        SimpleDialog(
+            title = R.string.chat_add_participants_no_contacts_title,
+            description = R.string.chat_add_participants_no_contacts_message,
+            confirmButton = R.string.contact_invite,
+            dismissButton = R.string.button_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onInvite)
+    }
+
+    if (state.addParticipantsNoContactsLeftToAddDialog) {
+        SimpleDialog(
+            title = R.string.chat_add_participants_no_contacts_left_to_add_title,
+            description = R.string.chat_add_participants_no_contacts_left_to_add_message,
+            confirmButton = R.string.contact_invite,
+            dismissButton = R.string.button_cancel,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onDismiss,
+            onConfirmButton = onInvite)
     }
 }
 
@@ -297,7 +305,8 @@ private fun ScheduledMeetingInfoAppBar(
     titleId: Int,
     elevation: Boolean,
 ) {
-    val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+    val iconColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
+
     TopAppBar(
         title = {
             Text(text = stringResource(id = titleId),
@@ -322,7 +331,7 @@ private fun ScheduledMeetingInfoAppBar(
                 }
             }
 
-            if (state.isHost) {
+            if (state.isHost && state.isEditEnabled) {
                 IconButton(onClick = { onEditClicked() }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
@@ -344,6 +353,7 @@ private fun ScheduledMeetingInfoAppBar(
  */
 @Composable
 private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
+    val isLight = MaterialTheme.colors.isLight
     Column {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -361,9 +371,9 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                         it.title?.let { title ->
                             Text(text = title,
                                 style = MaterialTheme.typography.subtitle1,
-                                color = if (MaterialTheme.colors.isLight) black else white,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
+                                color = black.takeIf { isLight } ?: white,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 2,
                                 overflow = TextOverflow.Ellipsis)
                         }
                     }
@@ -372,8 +382,9 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                     it.date?.let { date ->
                         Text(text = date,
                             style = MaterialTheme.typography.subtitle2,
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                            maxLines = 1,
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            fontWeight = FontWeight.Normal,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
                     }
                 }
@@ -394,10 +405,28 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
         DefaultAvatar(title = state.chatTitle)
     } else if (state.isSingleMeeting()) {
-        OneParticipantAvatar(firstUser = state.firstParticipant ?: return)
+        state.firstParticipant?.let {
+            if (it.fileUpdated) {
+                OneParticipantAvatar(firstUser = it)
+            } else {
+                OneParticipantAvatar(firstUser = it)
+            }
+        }
     } else {
-        SeveralParticipantsAvatar(firstUser = state.lastParticipant ?: return,
-            lastUser = state.lastParticipant)
+        state.firstParticipant?.let { first ->
+            state.lastParticipant?.let { last ->
+                if (first.fileUpdated) {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                } else {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                }
+                if (last.fileUpdated) {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                } else {
+                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                }
+            }
+        }
     }
 }
 
@@ -443,7 +472,9 @@ private fun DefaultAvatar(title: String) {
 fun OneParticipantAvatar(firstUser: ChatParticipant) {
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier
-            .background(color = Color(AvatarUtil.getColorAvatar(firstUser.participantId)),
+            .fillMaxSize()
+            .clip(CircleShape)
+            .background(color = Color(firstUser.defaultAvatarColor),
                 shape = CircleShape)
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
@@ -456,15 +487,20 @@ fun OneParticipantAvatar(firstUser: ChatParticipant) {
                     placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
                 }
             }) {
-        firstUser.contact?.let { contact ->
+        if (firstUser.data.avatarUri == null) {
             Text(
-                text = AvatarUtil.getFirstLetter(contact.contactData.fullName),
+                text = firstUser.getAvatarFirstLetter(),
                 textAlign = TextAlign.Center,
                 color = Color.White,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.subtitle1
             )
+        } else {
+            Image(modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape),
+                painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
+                contentDescription = "User avatar")
         }
-
     }
 }
 
@@ -483,41 +519,53 @@ fun SeveralParticipantsAvatar(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        lastUser.contact?.let { lastUser ->
-            Box(contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(28.dp)
-                    .border(width = 1.dp, color = Color.White, shape = CircleShape)
-                    .clip(CircleShape)
-                    .align(Alignment.BottomEnd)
-                    .background(color = Color(AvatarUtil.getSpecificAvatarColor(lastUser.defaultAvatarColor)),
-                        shape = CircleShape)
-            ) {
+        Box(contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(28.dp)
+                .border(width = 1.dp, color = Color.White, shape = CircleShape)
+                .clip(CircleShape)
+                .align(Alignment.BottomEnd)
+                .background(color = Color(lastUser.defaultAvatarColor),
+                    shape = CircleShape)
+        ) {
+            if (lastUser.data.avatarUri == null) {
                 Text(
-                    text = AvatarUtil.getFirstLetter(lastUser.contactData.fullName),
+                    text = lastUser.getAvatarFirstLetter(),
                     textAlign = TextAlign.Center,
                     color = Color.White,
                     style = MaterialTheme.typography.subtitle1
                 )
+            } else {
+                Image(modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
+                    painter = rememberAsyncImagePainter(model = lastUser.data.avatarUri),
+                    contentDescription = "User avatar")
             }
         }
 
-        firstUser.contact?.let { firstUser ->
-            Box(contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(28.dp)
-                    .border(width = 1.dp, color = Color.White, shape = CircleShape)
-                    .clip(CircleShape)
-                    .align(Alignment.TopStart)
-                    .background(color = Color(AvatarUtil.getSpecificAvatarColor(firstUser.defaultAvatarColor)),
-                        shape = CircleShape)
-            ) {
+        Box(contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(28.dp)
+                .border(width = 1.dp, color = Color.White, shape = CircleShape)
+                .clip(CircleShape)
+                .align(Alignment.TopStart)
+                .background(color = Color(firstUser.defaultAvatarColor),
+                    shape = CircleShape)
+        ) {
+            if (firstUser.data.avatarUri == null) {
                 Text(
-                    text = AvatarUtil.getFirstLetter(firstUser.contactData.fullName),
+                    text = firstUser.getAvatarFirstLetter(),
                     textAlign = TextAlign.Center,
                     color = Color.White,
                     style = MaterialTheme.typography.subtitle1
                 )
+            } else {
+                Image(modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
+                    painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
+                    contentDescription = "User avatar")
             }
         }
     }
@@ -536,6 +584,7 @@ private fun ActionButton(
     action: ScheduledMeetingInfoAction,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
+    val isLight = MaterialTheme.colors.isLight
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
@@ -545,17 +594,19 @@ private fun ActionButton(
         }) {
         when (action) {
             ScheduledMeetingInfoAction.ShareMeetingLink -> {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(modifier = Modifier.padding(start = 72.dp,
-                        end = 16.dp,
-                        top = 16.dp,
-                        bottom = 16.dp),
-                        style = MaterialTheme.typography.button,
-                        text = stringResource(id = action.title),
-                        color = MaterialTheme.colors.secondary)
-                }
+                if (state.isPublic && state.enabledMeetingLinkOption) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(modifier = Modifier.padding(start = 72.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 16.dp),
+                            style = MaterialTheme.typography.button,
+                            text = stringResource(id = action.title),
+                            color = MaterialTheme.colors.secondary)
+                    }
 
-                divider(withStartPadding = true)
+                    divider(withStartPadding = true)
+                }
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
                 if (state.isHost && state.isPublic) {
@@ -573,7 +624,7 @@ private fun ActionButton(
                             bottom = 8.dp),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
                     divider(withStartPadding = false)
@@ -587,7 +638,7 @@ private fun ActionButton(
                         top = 18.dp),
                         style = MaterialTheme.typography.subtitle1,
                         text = stringResource(id = action.title),
-                        color = if (MaterialTheme.colors.isLight) black else white)
+                        color = black.takeIf { isLight } ?: white)
 
                     action.description?.let { description ->
                         Text(modifier = Modifier.padding(start = 14.dp,
@@ -596,7 +647,7 @@ private fun ActionButton(
                             bottom = 8.dp),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
-                            color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
                     divider(withStartPadding = false)
@@ -672,7 +723,7 @@ private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
         text = stringResource(id = R.string.participants_number, state.participantItemList.size),
         style = MaterialTheme.typography.body2,
         fontWeight = FontWeight.Medium,
-        color = if (MaterialTheme.colors.isLight) black else white)
+        color = black.takeIf { MaterialTheme.colors.isLight } ?: white)
 }
 
 /**
@@ -714,27 +765,29 @@ private fun AddParticipantsButton(
 /**
  * See more participants in the list button view
  *
- * @param onSeeMoreClicked
+ * @param state [ScheduledMeetingInfoState]
+ * @param onSeeMoreOrLessClicked
  */
 @Composable
-private fun SeeMoreParticipantsButton(
-    onSeeMoreClicked: () -> Unit,
+private fun SeeMoreOrLessParticipantsButton(
+    state: ScheduledMeetingInfoState,
+    onSeeMoreOrLessClicked: () -> Unit,
 ) {
     Row(modifier = Modifier
-        .clickable { onSeeMoreClicked() }
+        .clickable { onSeeMoreOrLessClicked() }
         .fillMaxWidth()) {
         Row(modifier = Modifier
             .padding(top = 16.dp, bottom = 24.dp)
             .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
             Icon(modifier = Modifier.padding(start = 24.dp, end = 24.dp),
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
+                imageVector = ImageVector.vectorResource(id = if (state.seeMoreVisible) R.drawable.ic_chevron_down else R.drawable.ic_chevron_up),
                 contentDescription = "See more Icon",
                 tint = MaterialTheme.colors.secondary)
 
             Text(modifier = Modifier.padding(end = 16.dp),
                 style = MaterialTheme.typography.button,
-                text = stringResource(id = R.string.meetings_scheduled_meeting_info_see_more_participants_label),
+                text = stringResource(id = if (state.seeMoreVisible) R.string.meetings_scheduled_meeting_info_see_more_participants_label else R.string.meetings_scheduled_meeting_info_see_less_participants_label),
                 color = MaterialTheme.colors.secondary)
         }
     }
@@ -759,7 +812,51 @@ private fun LeaveGroupButton(
         Text(textAlign = TextAlign.Center,
             style = MaterialTheme.typography.button,
             text = stringResource(id = R.string.meetings_scheduled_meeting_info_leave_group_label),
-            color = if (MaterialTheme.colors.isLight) red_600 else red_300)
+            color = red_600.takeIf { MaterialTheme.colors.isLight } ?: red_300)
+    }
+}
+
+/**
+ * Scheduled meeting info description view
+ *
+ * @param state [ScheduledMeetingInfoState]
+ */
+@Composable
+private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
+    val isLight = MaterialTheme.colors.isLight
+
+    state.scheduledMeeting?.let { schedMeet ->
+        schedMeet.description?.let { description ->
+            divider(withStartPadding = false)
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 16.dp)) {
+                Row(modifier = Modifier
+                    .weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RectangleShape)
+                            .wrapContentSize(Alignment.Center)
+
+                    ) {
+                        Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
+                            contentDescription = "Scheduled meeting description icon",
+                            tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
+                    }
+
+                    Column(modifier = Modifier
+                        .fillMaxSize()) {
+                        Text(modifier = Modifier
+                            .padding(start = 32.dp, end = 23.dp),
+                            style = MaterialTheme.typography.subtitle1,
+                            text = description,
+                            color = black.takeIf { isLight } ?: white)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -773,7 +870,7 @@ fun divider(withStartPadding: Boolean) {
     Divider(
         modifier = if (withStartPadding) Modifier.padding(start = 72.dp,
             end = 0.dp) else Modifier.padding(start = 0.dp, end = 0.dp),
-        color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
+        color = grey_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_012,
         thickness = 1.dp)
 }
 
@@ -805,7 +902,8 @@ private fun ActionOption(
                 action.icon?.let { icon ->
                     Icon(painter = painterResource(id = icon),
                         contentDescription = "${action.name} icon",
-                        tint = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+                        tint = grey_alpha_054.takeIf { MaterialTheme.colors.isLight }
+                            ?: white_alpha_054)
                 }
             }
 
@@ -853,7 +951,7 @@ private fun ActionSubtitleText(text: String) {
         .padding(start = 32.dp, end = 23.dp),
         style = MaterialTheme.typography.subtitle2,
         text = text,
-        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054)
+        color = grey_alpha_054.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_054)
 }
 
 /**
@@ -878,59 +976,80 @@ private fun ActionText(actionText: Int) {
         .padding(start = 32.dp, end = 23.dp),
         style = MaterialTheme.typography.subtitle1,
         text = stringResource(id = actionText),
-        color = if (MaterialTheme.colors.isLight) black else white)
+        color = black.takeIf { MaterialTheme.colors.isLight } ?: white)
 }
 
 /**
  * View of a participant in the list
  *
- * @param participant   [ContactItem]
- * @param onClick       Detect when a participant is clicked
+ * @param participant               [ChatParticipant]
+ * @param showDivider               True, if the divider should be shown. False, if it should be hidden.
+ * @param onParticipantClicked       Detect when a participant is clicked
  */
 @Composable
-private fun ParticipantItemView(participant: ChatParticipant, onClick: () -> Unit) {
+private fun ParticipantItemView(
+    participant: ChatParticipant,
+    showDivider: Boolean,
+    onParticipantClicked: (ChatParticipant) -> Unit = {},
+) {
+    val isLight = MaterialTheme.colors.isLight
     Column {
         Row(modifier = Modifier
-            .clickable { onClick() }
+            .clickable {
+                onParticipantClicked(participant)
+            }
             .fillMaxWidth()
             .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Row(modifier = Modifier
-                .weight(1f)) {
+                .weight(1f)
+                .height(72.dp)) {
                 Box {
-                    ParticipantAvatar(participant = participant)
+                    if (participant.fileUpdated) {
+                        ParticipantAvatar(participant = participant)
+                    } else {
+                        ParticipantAvatar(participant = participant)
+                    }
+
+                    if (participant.areCredentialsVerified) {
+                        Image(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(10.dp),
+                            painter = painterResource(id = R.drawable.ic_verified),
+                            contentDescription = "Verified user")
+                    }
                 }
-                participant.contact?.let { contact ->
-                    Column(modifier = Modifier
-                        .align(Alignment.CenterVertically)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            val contactName =
-                                contact.contactData.alias ?: contact.contactData.fullName
-                                ?: contact.email
+                Column(modifier = Modifier
+                    .align(Alignment.CenterVertically)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val contactName =
+                            participant.data.alias ?: participant.data.fullName
+                            ?: participant.email
 
-                            Text(text = contactName,
-                                style = MaterialTheme.typography.subtitle1,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis)
+                        Text(text = if (participant.isMe) stringResource(R.string.chat_me_text_bracket,
+                            contactName) else contactName,
+                            style = MaterialTheme.typography.subtitle1,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
 
-                            if (contact.status != UserStatus.Invalid) {
-                                ContactStatus(status = contact.status)
+                        if (participant.status != UserStatus.Invalid) {
+                            ContactStatus(status = participant.status)
+                        }
+                    }
+
+                    if (participant.lastSeen != null || participant.status != UserStatus.Invalid) {
+                        val statusText = stringResource(id = participant.status.text)
+                        val secondLineText =
+                            if (participant.status == UserStatus.Online) {
+                                statusText
+                            } else {
+                                getLastSeenString(participant.lastSeen) ?: statusText
                             }
-                        }
 
-                        if (contact.lastSeen != null || contact.status != UserStatus.Invalid) {
-                            val statusText = stringResource(id = contact.status.text)
-                            val secondLineText =
-                                if (contact.status == UserStatus.Online) {
-                                    statusText
-                                } else {
-                                    getLastSeenString(contact.lastSeen) ?: statusText
-                                }
-
-                            MarqueeText(text = secondLineText,
-                                color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                                style = MaterialTheme.typography.subtitle2)
-                        }
+                        MarqueeText(text = secondLineText,
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            style = MaterialTheme.typography.subtitle2)
                     }
                 }
             }
@@ -938,114 +1057,52 @@ private fun ParticipantItemView(participant: ChatParticipant, onClick: () -> Uni
             Box(modifier = Modifier
                 .wrapContentSize(Alignment.CenterEnd)) {
                 Row(modifier = Modifier.align(Alignment.Center)) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_permissions_full_access),
-                        contentDescription = "Permissions icon",
-                        tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
-
+                    participantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
                         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
-                        tint = if (MaterialTheme.colors.isLight) grey_alpha_038 else white_alpha_038)
+                        tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
                 }
             }
         }
 
-        Divider(modifier = Modifier.padding(start = 72.dp),
-            color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-            thickness = 1.dp)
+        if (showDivider) {
+            Divider(modifier = Modifier.padding(start = 72.dp),
+                color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
+                thickness = 1.dp)
+        }
     }
 }
 
 /**
- * Last seen text
+ * Participants permissions view
  *
- * @param lastGreen     User last seen.
- * @return              Text with the info of last seen of a participant
+ * @param participant [ChatParticipant]
  */
 @Composable
-private fun getLastSeenString(lastGreen: Int?): String? {
-    if (lastGreen == null) return null
-
-    val lastGreenCalendar = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }
-    val timeToConsiderAsLongTimeAgo = 65535
-
-    Timber.d("Ts last green: %s", lastGreenCalendar.timeInMillis)
-
-    return when {
-        lastGreen >= timeToConsiderAsLongTimeAgo -> {
-            stringResource(id = R.string.last_seen_long_time_ago)
+private fun participantsPermissionView(participant: ChatParticipant) {
+    val isLight = MaterialTheme.colors.isLight
+    when (participant.privilege) {
+        ChatRoomPermission.Moderator -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_full_access),
+                contentDescription = "Permissions icon",
+                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
         }
-        compareLastSeenWithToday(lastGreenCalendar) == 0 -> {
-            val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
-                timeZone = lastGreenCalendar.timeZone
-            }
-            val time = dateFormat.format(lastGreenCalendar.time)
-            stringResource(R.string.last_seen_today, time)
+        ChatRoomPermission.Standard -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_read_write),
+                contentDescription = "Permissions icon",
+                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
         }
-        else -> {
-            var dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
-                timeZone = lastGreenCalendar.timeZone
-            }
-            val time = dateFormat.format(lastGreenCalendar.time)
-            dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-            val day = dateFormat.format(lastGreenCalendar.time)
-            stringResource(R.string.last_seen_general, day, time)
+        ChatRoomPermission.ReadOnly -> {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_permissions_read_only),
+                contentDescription = "Permissions icon",
+                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
         }
-    }.replace("[A]", "").replace("[/A]", "")
-}
-
-/**
- * Compare last seen with today
- *
- * @param lastGreen     Calendar with last green
- * @return              User last seen.
- */
-private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
-    val today = Calendar.getInstance()
-
-    return when {
-        lastGreen.get(Calendar.YEAR) != today.get(Calendar.YEAR) -> {
-            lastGreen.get(Calendar.YEAR) - today.get(Calendar.YEAR)
-        }
-        lastGreen.get(Calendar.MONTH) != today.get(Calendar.MONTH) -> {
-            lastGreen.get(Calendar.MONTH) - today.get(Calendar.MONTH)
-        }
-        else -> {
-            lastGreen.get(Calendar.DAY_OF_MONTH) - today.get(Calendar.DAY_OF_MONTH)
-        }
+        else -> {}
     }
-}
-
-/**
- * Contact status view
- *
- * @param status [UserStatus]
- */
-@Composable
-private fun ContactStatus(
-    modifier: Modifier = Modifier.padding(start = 5.dp, top = 2.dp),
-    status: UserStatus,
-) {
-    val isLightTheme = MaterialTheme.colors.isLight
-    val statusIcon = when (status) {
-        UserStatus.Online ->
-            if (isLightTheme) R.drawable.ic_online_light
-            else R.drawable.ic_online_dark_standard
-        UserStatus.Away ->
-            if (isLightTheme) R.drawable.ic_away_light
-            else R.drawable.ic_away_dark_standard
-        UserStatus.Busy ->
-            if (isLightTheme) R.drawable.ic_busy_light
-            else R.drawable.ic_busy_dark_standard
-        else ->
-            if (isLightTheme) R.drawable.ic_offline_light
-            else R.drawable.ic_offline_dark_standard
-    }
-
-    Image(modifier = modifier,
-        painter = painterResource(id = statusIcon),
-        contentDescription = "Contact status")
 }
 
 
@@ -1174,63 +1231,12 @@ private fun ParticipantAvatar(
         .clip(CircleShape),
     participant: ChatParticipant,
 ) {
-    participant.contact?.let { contact ->
-        val avatarUri = contact.contactData.avatarUri
-
-        if (avatarUri != null) {
-            UriAvatar(modifier = modifier, uri = avatarUri)
-        } else {
-            DefaultParticipantAvatar(modifier = modifier,
-                color = Color(contact.defaultAvatarColor.toColorInt()),
-                content = contact.getAvatarFirstLetter())
-        }
-    }
-}
-
-/**
- * Show avatar image view
- *
- * @param uri Uri
- */
-@Composable
-private fun UriAvatar(modifier: Modifier, uri: String) {
-    Image(modifier = modifier,
-        painter = rememberAsyncImagePainter(model = uri),
-        contentDescription = "User avatar")
-}
-
-/**
- * Default participant avatar
- *
- * @param color     Avatar color
- * @param content   First letter
- */
-@Composable
-fun DefaultParticipantAvatar(
-    modifier: Modifier = Modifier.size(40.dp),
-    color: Color,
-    content: String,
-) {
-    Box(contentAlignment = Alignment.Center,
-        modifier = modifier
-            .background(color = color, shape = CircleShape)
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val currentHeight = placeable.height
-                var heightCircle = currentHeight
-                if (placeable.width > heightCircle)
-                    heightCircle = placeable.width
-
-                layout(heightCircle, heightCircle) {
-                    placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
-                }
-            }) {
-        Text(
-            text = content,
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            style = MaterialTheme.typography.h6
-        )
+    if (participant.data.avatarUri != null) {
+        UriAvatar(modifier = modifier, uri = participant.data.avatarUri.toString())
+    } else {
+        DefaultContactAvatar(modifier = modifier,
+            color = Color(participant.defaultAvatarColor),
+            content = participant.getAvatarFirstLetter())
     }
 }
 
@@ -1285,13 +1291,15 @@ fun PreviewScheduledMeetingInfoView() {
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},
-            onSeeMoreClicked = {},
+            onSeeMoreOrLessClicked = {},
             onLeaveGroupClicked = {},
             onParticipantClicked = {},
             onScrollChange = {},
             onBackPressed = {},
             onDismiss = {},
-            onLeaveGroupDialog = {}
+            onLeaveGroupDialog = {},
+            onInviteParticipantsDialog = {},
+            onSnackbarShown = {}
         )
     }
 }

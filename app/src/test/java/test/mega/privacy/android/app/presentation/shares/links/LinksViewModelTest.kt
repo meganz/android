@@ -12,11 +12,13 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaNode
@@ -48,6 +50,13 @@ class LinksViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> {
+            onBlocking {
+                invoke(AppFeatures.MandatoryFingerprintVerification)
+            }.thenReturn(true)
+        }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -58,6 +67,7 @@ class LinksViewModelTest {
             getCloudSortOrder,
             getLinksSortOrder,
             monitorNodeUpdates,
+            getFeatureFlagValue,
         )
     }
 

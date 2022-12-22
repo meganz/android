@@ -10,6 +10,21 @@ apply plugin: 'jacoco'
 apply from: "$project.rootDir/tools/util.gradle"
 
 /**
+ * For Continuous Delivery in Google Play Internal Channel <p/>
+ * For Android builds in CD pipeline, read the environment variable and assign to version code
+ * For local builds, compute string with formatted date and assign to version code
+ * @return app's version name
+ */
+def readVersionCode() {
+    def versionCode = System.getenv('APK_VERSION_CODE_FOR_CD')
+    if (versionCode != null && !versionCode.isEmpty()) {
+        return versionCode.toInteger()
+    } else {
+        return new Date().format("yyDDDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
+    }
+}
+
+/**
  * For Continuous Delivery with Firebase AppDistribution <p/>
  * For Android builds in CD pipeline, read the environment variable and
  * add to standard version name, in order to distinguish versions on Firebase.
@@ -17,11 +32,11 @@ apply from: "$project.rootDir/tools/util.gradle"
  * @return app's version name
  */
 def readVersionName() {
-    def versionNameTag = System.getenv('APK_VERSION_NAME_FOR_CD')
+    def versionNameTag = System.getenv('APK_VERSION_NAME_TAG_FOR_CD')
     if (versionNameTag != null && !versionNameTag.isEmpty()) {
-        return "$rootProject.appVersion (${rootProject.versionCode}${versionNameTag})"
+        return "$rootProject.appVersion (${readVersionCode()}${versionNameTag})"
     } else {
-        return "$rootProject.appVersion (${rootProject.versionCode})"
+        return "$rootProject.appVersion (${readVersionCode()})"
     }
 }
 
@@ -95,7 +110,7 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode rootProject.versionCode
+        versionCode readVersionCode()
         versionName readVersionName()
 
         multiDexEnabled true
@@ -398,7 +413,7 @@ dependencies {
     jacocoAnt 'org.jacoco:org.jacoco.ant:0.8.8:nodeps'
 
     //GMS
-    gmsImplementation 'com.android.billingclient:billing:5.0.0'
+    gmsImplementation "com.android.billingclient:billing:$billingVersion"
     gmsImplementation 'com.google.android.gms:play-services-location:19.0.1'
     gmsImplementation 'com.google.android.gms:play-services-maps:18.0.2'
     gmsImplementation 'com.google.maps.android:android-maps-utils:0.5'
@@ -611,7 +626,6 @@ task createUnitTestCoverageReport(dependsOn: ['instrumentClasses', 'testGmsDebug
                 sourcefiles {
                     fileset(dir: 'src/main/java')
                     fileset(dir: 'src/test/java')
-//                    fileset(dir: 'src/testDebug/java')
                 }
             }
             html(destdir: "$buildDir.path/reports/jacoco/html")

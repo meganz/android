@@ -135,6 +135,10 @@
             android:name="google_analytics_ssaid_collection_enabled"
             android:value="false" />
 
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="false" />
+
         <activity
             android:name=".main.LoginActivity"
             android:label="@string/login_text"
@@ -462,7 +466,7 @@
             android:label="@string/title_properties_manage_chat"
             android:launchMode="singleTop" />
         <activity
-            android:name=".AuthenticityCredentialsActivity"
+            android:name=".presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity"
             android:label="@string/authenticity_credentials_label"
             android:launchMode="singleTop" />
         <activity

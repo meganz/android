@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -9,76 +11,130 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
-import mega.privacy.android.app.presentation.meeting.model.InviteParticipantsAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
+import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
+import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
-import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.usecase.CreateChatLink
+
+import mega.privacy.android.domain.usecase.GetChatCall
+import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.OpenOrStartCall
+import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.RemoveChatLink
+import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
+import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.StartConversation
+import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**
  * StartConversationFragment view model.
  *
- * @property getVisibleContacts             [GetVisibleContacts]
  * @property getChatRoom                    [GetChatRoom]
+ * @property getChatParticipants            [GetChatParticipants]
  * @property getScheduledMeetingByChat      [GetScheduledMeetingByChat]
+ * @property getChatCall                    [GetChatCall]
+ * @property getVisibleContacts             [GetVisibleContacts]
+ * @property queryChatLink                  [QueryChatLink]
+ * @property removeChatLink                 [RemoveChatLink]
+ * @property createChatLink                 [CreateChatLink]
+ * @property inviteToChat                   [InviteToChat]
+ * @property leaveChat                      [LeaveChat]
+ * @property removeFromChat                 [RemoveFromChat]
+ * @property inviteContact                  [InviteContact]
+ * @property setOpenInvite                  [SetOpenInvite]
+ * @property updateChatPermissions          [UpdateChatPermissions]
+ * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
+ * @property getChatRoomUseCase             [GetChatRoomUseCase]
+ * @property startChatCall                  [StartChatCall]
+ * @property passcodeManagement             [PasscodeManagement]
+ * @property chatManagement                 [ChatManagement]
+ * @property startConversation              [StartConversation]
+ * @property openOrStartCall                [OpenOrStartCall]
+ * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
  * @property monitorConnectivity            [MonitorConnectivity]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
- * @property inviteToChat                   [InviteToChat]
- * @property leaveChat                      [LeaveChat]
- * @property setOpenInvite                  [SetOpenInvite]
- * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
+ * @property cameraGateway                  [CameraGateway]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
+
  */
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
-    private val getVisibleContacts: GetVisibleContacts,
     private val getChatRoom: GetChatRoom,
+    private val getChatParticipants: GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getChatCall: GetChatCall,
+    private val getVisibleContacts: GetVisibleContacts,
+    private val queryChatLink: QueryChatLink,
+    private val removeChatLink: RemoveChatLink,
+    private val createChatLink: CreateChatLink,
+    private val inviteToChat: InviteToChat,
+    private val leaveChat: LeaveChat,
+    private val removeFromChat: RemoveFromChat,
+    private val inviteContact: InviteContact,
+    private val setOpenInvite: SetOpenInvite,
+    private val updateChatPermissions: UpdateChatPermissions,
+    private val getPublicChatToPrivate: SetPublicChatToPrivate,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
+    private val startChatCall: StartChatCall,
+    private val passcodeManagement: PasscodeManagement,
+    private val chatManagement: ChatManagement,
+    private val startConversation: StartConversation,
+    private val openOrStartCall: OpenOrStartCall,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorConnectivity: MonitorConnectivity,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
-    private val inviteToChat: InviteToChat,
-    private val leaveChat: LeaveChat,
-    private val setOpenInvite: SetOpenInvite,
-    private val getPublicChatToPrivate: SetPublicChatToPrivate,
+    private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val cameraGateway: CameraGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
     val state: StateFlow<ScheduledMeetingInfoState> = _state
 
-    private var chatId: Long = MEGACHAT_INVALID_HANDLE
     private var scheduledMeetingId: Long = MEGACHAT_INVALID_HANDLE
 
     /**
@@ -97,7 +153,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Observe changes in Chat notifications
      */
     val chatNotificationsObserver = Observer<Any> {
-        updateDndSeconds(chatId)
+        updateDndSeconds(state.value.chatId)
     }
 
     init {
@@ -122,41 +178,98 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param newScheduledMeetingId     Scheduled meeting id.
      */
     fun setChatId(newChatId: Long, newScheduledMeetingId: Long) {
-        if (newChatId != MEGACHAT_INVALID_HANDLE && newChatId != chatId) {
-            chatId = newChatId
+        if (newChatId != MEGACHAT_INVALID_HANDLE && newChatId != state.value.chatId) {
             scheduledMeetingId = newScheduledMeetingId
-            getChatRoom()
-            getScheduledMeeting()
-            getChatRoomUpdates()
-            getScheduledMeetingUpdates()
+            getChat(newChatId)
         }
     }
 
     /**
      * Get chat room
+     *
+     * @param newChatId Chat id.
      */
-    private fun getChatRoom() {
+    private fun getChat(newChatId: Long) =
         viewModelScope.launch {
             runCatching {
-                getChatRoom(chatId)
+                getChatRoom(newChatId)
             }.onFailure { exception ->
-                Timber.e(exception)
-                _state.update { it.copy(snackBar = R.string.general_text_error) }
+                Timber.e("Chat room does not exist, finish $exception")
+                finishActivity()
             }.onSuccess { chat ->
-                Timber.d("Chat room obtained")
+                Timber.d("Chat room exists")
                 chat?.apply {
-                    _state.update {
-                        it.copy(
-                            chatId = chatId,
-                            chatTitle = title,
-                            isHost = ownPrivilege == ChatRoomPermission.Moderator,
-                            isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
-                            enabledAllowNonHostAddParticipantsOption = isOpenInvite,
-                            isPublic = isPublic
-                        )
+                    if (isActive) {
+                        Timber.d("Chat room is active")
+                        _state.update {
+                            it.copy(
+                                chatId = chatId,
+                                chatTitle = title,
+                                isHost = ownPrivilege == ChatRoomPermission.Moderator,
+                                isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
+                                enabledAllowNonHostAddParticipantsOption = isOpenInvite,
+                                isPublic = isPublic
+                            )
+                        }
+
+                        loadAllChatParticipants()
+
+                        getScheduledMeeting(chatId)
+                        updateDndSeconds(chatId)
+                        updateRetentionTimeSeconds(retentionTime)
+                        queryChatLink()
+
+                        getChatRoomUpdates(chatId)
+                        getScheduledMeetingUpdates()
+                        getChatListItemUpdates()
+                    } else {
+                        Timber.d("Chat room is not active, finish")
+                        finishActivity()
                     }
-                    updateDndSeconds(chatId)
-                    updateRetentionTimeSeconds(retentionTime)
+                }
+            }
+        }
+
+    /**
+     * Load all chat participants
+     */
+    private fun loadAllChatParticipants() = viewModelScope.launch {
+        runCatching {
+            getChatParticipants(state.value.chatId)
+                .catch { exception ->
+                    Timber.e(exception)
+                }
+                .collectLatest { list ->
+                    _state.update {
+                        it.copy(participantItemList = list, numOfParticipants = list.size)
+                    }
+                    updateFirstAndLastParticipants()
+                }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Update first and last participants
+     */
+    private fun updateFirstAndLastParticipants() {
+        _state.value.participantItemList.let { list ->
+            if (list.isEmpty()) {
+                _state.update {
+                    it.copy(firstParticipant = null,
+                        lastParticipant = null)
+                }
+            } else if (list.size == 1) {
+                _state.update {
+                    it.copy(firstParticipant = list.first(),
+                        lastParticipant = null)
+                }
+            } else {
+
+                _state.update {
+                    it.copy(firstParticipant = list.first(),
+                        lastParticipant = list.last())
                 }
             }
         }
@@ -164,19 +277,21 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
     /**
      * Get scheduled meeting
+     *
+     * @param chatId Chat id.
      */
-    private fun getScheduledMeeting() {
+    private fun getScheduledMeeting(chatId: Long) =
         viewModelScope.launch {
             runCatching {
                 getScheduledMeetingByChat(chatId)
             }.onFailure { exception ->
-                Timber.e(exception)
-                _state.update { it.copy(snackBar = R.string.general_text_error) }
+                Timber.e("Scheduled meeting does not exist, finish $exception")
+                finishActivity()
             }.onSuccess { scheduledMeetingList ->
-                Timber.d("Scheduled meeting obtained")
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
                         if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+                            Timber.d("Scheduled meeting exists")
                             _state.update {
                                 it.copy(scheduledMeeting = ScheduledMeetingItem(
                                     chatId = scheduledMeetReceived.chatId,
@@ -192,21 +307,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    /**
-     * Remove invite participants action
-     */
-    fun removeInviteParticipantsAction() {
-        _state.update {
-            it.copy(inviteParticipantAction = null)
-        }
-    }
 
     /**
      * Get chat room updates
+     *
+     * @param chatId Chat id.
      */
-    private fun getChatRoomUpdates() {
+    private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
                 when (chat.changes) {
@@ -244,12 +351,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
-    }
 
     /**
      * Get scheduled meeting updates
      */
-    private fun getScheduledMeetingUpdates() {
+    private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
                 when (scheduledMeetReceived.changes) {
@@ -300,7 +406,25 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
-    }
+
+    /**
+     * Get chat list item updates
+     */
+    private fun getChatListItemUpdates() =
+        viewModelScope.launch {
+            monitorChatListItemUpdates().collectLatest { item ->
+                when (item.changes) {
+                    ChatListItemChanges.LastMessage -> {
+                        if (item.lastMessageType == ChatRoomLastMessage.PublicHandleCreate ||
+                            item.lastMessageType == ChatRoomLastMessage.PublicHandleDelete
+                        ) {
+                            queryChatLink()
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
 
     /**
      * Update seconds of Do not disturb mode
@@ -341,87 +465,69 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Invite participants to the chat room
-     *
-     * @param contacts list of contacts
+     * Check if there is an existing chat-link for an public chat
      */
-    fun inviteToChat(contacts: ArrayList<String>) {
-        Timber.d("Invite participants")
+    private fun queryChatLink() =
         viewModelScope.launch {
-            inviteToChat(_state.value.chatId, contacts)
+            runCatching {
+                queryChatLink(state.value.chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { request ->
+                _state.update {
+                    it.copy(enabledMeetingLinkOption = request.text != null,
+                        meetingLink = request.text)
+                }
+            }
         }
 
-        _state.update { it.copy(snackBar = R.string.invite_sent) }
-    }
+    /**
+     * Remove chat link
+     */
+    private fun removeChatLink() =
+        viewModelScope.launch {
+            runCatching {
+                removeChatLink(state.value.chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                showSnackBar(R.string.general_text_error)
+            }.onSuccess { _ ->
+                _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
+            }
+        }
+
+    /**
+     * Create chat link
+     */
+    private fun createChatLink() =
+        viewModelScope.launch {
+            runCatching {
+                createChatLink(state.value.chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                showSnackBar(R.string.general_text_error)
+            }.onSuccess { request ->
+                _state.update {
+                    it.copy(enabledMeetingLinkOption = true,
+                        meetingLink = request.text)
+                }
+            }
+        }
 
     /**
      * Edit scheduled meeting if there is internet connection, shows an error if not.
      */
     fun onEditTap() {
-        if (isConnected) {
-            Timber.d("Edit scheduled meeting")
-        } else {
-            showError()
-        }
+        Timber.d("Edit scheduled meeting")
     }
 
     /**
-     * See more participants in the list.
+     * See more or less participants in the list.
      */
-    fun onSeeMoreTap() {
-    }
-
-    /**
-     * Leave group chat button clicked
-     */
-    fun onLeaveGroupTap() {
+    fun onSeeMoreOrLessTap() =
         _state.update { state ->
-            state.copy(leaveGroupDialog = !state.leaveGroupDialog)
+            state.copy(seeMoreVisible = !state.seeMoreVisible)
         }
-    }
-
-    /**
-     * Dismiss alert dialog
-     */
-    fun dismissDialog() {
-        _state.update { state ->
-            state.copy(leaveGroupDialog = false)
-        }
-    }
-
-    /**
-     * Finish activity
-     */
-    fun finishActivity() {
-        _state.update { state ->
-            state.copy(finish = true)
-        }
-    }
-
-    /**
-     * Leave chat
-     */
-    fun leaveChat() {
-        viewModelScope.launch {
-            runCatching {
-                leaveChat(chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-                dismissDialog()
-                _state.update { it.copy(snackBar = R.string.general_error) }
-            }.onSuccess { result ->
-                Timber.d("Chat left ")
-                if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
-                    result.chatHandle?.let { chatHandle ->
-                        MegaApplication.getChatManagement().removeLeavingChatId(chatHandle)
-                    }
-                }
-
-                dismissDialog()
-                finishActivity()
-            }
-        }
-    }
 
     /**
      * Add participants to the chat room if there is internet connection, shows an error if not.
@@ -434,52 +540,236 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 when {
                     contactList.isEmpty() -> {
                         _state.update {
-                            it.copy(inviteParticipantAction = InviteParticipantsAction.NO_CONTACTS_DIALOG)
+                            it.copy(addParticipantsNoContactsDialog = true, openAddContact = false)
                         }
                     }
-                    ChatUtil.areAllMyContactsChatParticipants(chatId) -> {
+                    ChatUtil.areAllMyContactsChatParticipants(state.value.chatId) -> {
                         _state.update {
-                            it.copy(inviteParticipantAction = InviteParticipantsAction.NO_MORE_CONTACTS_DIALOG)
+                            it.copy(addParticipantsNoContactsLeftToAddDialog = true,
+                                openAddContact = false)
                         }
                     }
                     else -> {
                         _state.update {
-                            it.copy(inviteParticipantAction = InviteParticipantsAction.ADD_CONTACTS)
+                            it.copy(openAddContact = true)
                         }
                     }
                 }
             }
         } else {
-            showError()
+            showSnackBar(R.string.check_internet_connection_error)
         }
     }
 
     /**
-     * Open bottom panel option of a participant.
+     * Send message to a participant
      */
-    fun onParticipantTap(contactItem: ContactItem) {
-        Timber.d("Participant ${contactItem.handle} clicked")
+    fun onSendMsgTap() =
+        state.value.selected?.let { participant ->
+            if (isConnected) {
+                viewModelScope.launch {
+                    runCatching {
+                        startConversation(false, listOf(participant.handle))
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                        showSnackBar(R.string.general_text_error)
+                    }.onSuccess { chatId ->
+                        openChatRoom(chatId)
+                    }
+                }
+            } else {
+                showSnackBar(R.string.check_internet_connection_error)
+            }
+        }
+
+
+    /**
+     * Start call with a participant
+     */
+    fun onStartCallTap() =
+        state.value.selected?.let { participant ->
+            if (isConnected) {
+                viewModelScope.launch {
+                    runCatching {
+                        startConversation(false, listOf(participant.handle))
+                    }.onFailure { exception ->
+                        Timber.d(exception)
+                        showSnackBar(R.string.general_text_error)
+                    }.onSuccess { chatCallId ->
+                        openOrStartChatCall(chatCallId)
+                    }
+                }
+            } else {
+                showSnackBar(R.string.check_internet_connection_error)
+            }
+        }
+
+    /**
+     * Open call or start a new call and open it
+     *
+     * @param chatCallId chat id
+     */
+    fun openOrStartChatCall(chatCallId: Long) {
+        cameraGateway.setFrontCamera()
+        viewModelScope.launch {
+            runCatching {
+                openOrStartCall(chatCallId, video = false, audio = true)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                showSnackBar(R.string.general_text_error)
+            }.onSuccess { call ->
+                call?.let {
+                    MegaApplication.isWaitingForCall = false
+                    CallUtil.addChecksForACall(it.chatId, false)
+                    if (it.isOutgoing) {
+                        chatManagement.setRequestSentCall(call.callId, true)
+                    }
+                    passcodeManagement.showPasscodeScreen = true
+                    getInstance().openCallService(chatCallId)
+
+                    openChatCall(it.chatId)
+                }
+            }
+        }
     }
+
+    /**
+     * Change permissions
+     */
+    fun onChangePermissionsTap() =
+        _state.value.selected?.let {
+            showChangePermissionsDialog(it.privilege)
+        }
+
+    /**
+     * Show or hide Remove participant dialog
+     *
+     * @param shouldShowDialog True,show dialog.
+     */
+    fun onRemoveParticipantTap(shouldShowDialog: Boolean) =
+        _state.update {
+            it.copy(openRemoveParticipantDialog = shouldShowDialog)
+        }
+
+    /**
+     * Leave group chat button clicked
+     */
+    fun onLeaveGroupTap() =
+        _state.update { state ->
+            state.copy(leaveGroupDialog = !state.leaveGroupDialog)
+        }
+
+    /**
+     * Invite contact
+     */
+    fun onInviteContactTap() =
+        _state.value.selected?.let { participant ->
+            viewModelScope.launch {
+                runCatching {
+                    inviteContact(participant.email)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    showSnackBar(R.string.general_error)
+                }.onSuccess { request ->
+                    when (request) {
+                        InviteContactRequest.Sent -> showSnackBar(R.string.context_contact_request_sent)
+                        InviteContactRequest.Resent -> showSnackBar(R.string.context_contact_invitation_resent)
+                        InviteContactRequest.Deleted -> showSnackBar(R.string.context_contact_invitation_deleted)
+                        InviteContactRequest.AlreadySent -> showSnackBar(R.string.invite_not_sent_already_sent)
+                        InviteContactRequest.AlreadyContact -> showSnackBar(R.string.context_contact_already_exists)
+                        InviteContactRequest.InvalidEmail -> showSnackBar(R.string.context_contact_already_exists)
+                        else -> showSnackBar(R.string.general_error)
+                    }
+                }
+            }
+        }
+
+    /**
+     * Remove open add contact screen
+     */
+    fun removeAddContact() =
+        _state.update {
+            it.copy(openAddContact = null)
+        }
+
+    /**
+     * Invite participants to the chat room
+     *
+     * @param contacts list of contacts
+     */
+    fun inviteToChat(contacts: ArrayList<String>) {
+        Timber.d("Invite participants")
+        viewModelScope.launch {
+            inviteToChat(_state.value.chatId, contacts)
+        }
+        showSnackBar(R.string.invite_sent)
+    }
+
+    /**
+     * Dismiss alert dialogs
+     */
+    fun dismissDialog() =
+        _state.update { state ->
+            state.copy(leaveGroupDialog = false,
+                addParticipantsNoContactsDialog = false,
+                addParticipantsNoContactsLeftToAddDialog = false)
+        }
+
+    /**
+     * Finish activity
+     */
+    fun finishActivity() =
+        _state.update { state ->
+            state.copy(finish = true)
+        }
+
+    /**
+     * Leave chat
+     */
+    fun leaveChat() =
+        viewModelScope.launch {
+            runCatching {
+                leaveChat(state.value.chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                dismissDialog()
+                showSnackBar(R.string.general_error)
+            }.onSuccess { result ->
+                Timber.d("Chat left ")
+                if (result.userHandle == MegaApiJava.INVALID_HANDLE) {
+                    result.chatHandle?.let { chatHandle ->
+                        chatManagement.removeLeavingChatId(chatHandle)
+                    }
+                }
+
+                dismissDialog()
+                finishActivity()
+            }
+        }
+
+    /**
+     * Open bottom panel option of a participant.
+     *
+     * @param participant [ChatParticipant]
+     */
+    fun onParticipantTap(participant: ChatParticipant) =
+        _state.update {
+            it.copy(selected = participant)
+        }
 
     /**
      * Create or removed meeting link if there is internet connection, shows an error if not.
      */
     fun onMeetingLinkTap() {
         if (isConnected) {
-            Timber.d("Add participants to the chat room")
+            Timber.d("Meeting link option")
+            if (_state.value.enabledMeetingLinkOption) {
+                removeChatLink()
+            } else {
+                createChatLink()
+            }
         } else {
-            showError()
-        }
-    }
-
-    /**
-     * Share meeting link if there is internet connection, shows an error if not.
-     */
-    fun onShareMeetingLinkTap() {
-        if (isConnected) {
-            Timber.d("Add participants to the chat room")
-        } else {
-            showError()
+            showSnackBar(R.string.check_internet_connection_error)
         }
     }
 
@@ -491,10 +781,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             Timber.d("Update option Allow non-host add participants to the chat room")
             viewModelScope.launch {
                 runCatching {
-                    setOpenInvite(chatId)
+                    setOpenInvite(state.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(snackBar = R.string.general_text_error) }
+                    showSnackBar(R.string.general_text_error)
                 }.onSuccess { result ->
                     _state.update {
                         it.copy(
@@ -504,7 +794,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         } else {
-            showError()
+            showSnackBar(R.string.check_internet_connection_error)
         }
     }
 
@@ -513,14 +803,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun enableEncryptedKeyRotation() {
         if (_state.value.participantItemList.size > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
-            _state.update { it.copy(snackBar = R.string.warning_make_chat_private) }
+            showSnackBar(R.string.warning_make_chat_private)
         } else {
             viewModelScope.launch {
                 runCatching {
-                    getPublicChatToPrivate(chatId)
+                    getPublicChatToPrivate(state.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(snackBar = R.string.general_error) }
+                    showSnackBar(R.string.general_error)
                 }.onSuccess { _ ->
                     _state.update { it.copy(isPublic = false) }
                 }
@@ -529,14 +819,99 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Add error when there is no internet connection
+     * Open change selected participant permission
+     *
+     * @param selectedParticipantPermission [ChatRoomPermission]
      */
-    private fun showError() {
-        _state.update { it.copy(snackBar = R.string.check_internet_connection_error) }
+    fun showChangePermissionsDialog(selectedParticipantPermission: ChatRoomPermission?) {
+        _state.update { it.copy(showChangePermissionsDialog = selectedParticipantPermission) }
     }
 
-    companion object {
-        private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
+    /**
+     * Open chat room
+     *
+     * @param chatId Chat id.
+     */
+    fun openChatRoom(chatId: Long?) =
+        _state.update { it.copy(openChatRoom = chatId) }
+
+    /**
+     * Open chat call
+     *
+     * @param chatCallId Chat id.
+     */
+    fun openChatCall(chatCallId: Long?) {
+        _state.update { it.copy(openChatCall = chatCallId) }
+    }
+
+    /**
+     * Shares the link to chat
+     *
+     * @param data       Intent containing the info to share the content to chats.
+     * @param action     Action to perform.
+     */
+    fun sendToChat(
+        data: Intent?,
+        action: (Intent?) -> Unit,
+    ) {
+        data?.putExtra(Constants.EXTRA_LINK, _state.value.meetingLink)
+        action.invoke(data)
+    }
+
+    /**
+     * Copy meeting link to clipboard
+     *
+     * @param clipboard [ClipboardManager]
+     */
+    fun copyMeetingLink(clipboard: ClipboardManager) {
+        _state.value.meetingLink?.let { meetingLink ->
+            val clip = ClipData.newPlainText(Constants.COPIED_TEXT_LABEL, meetingLink)
+            clipboard.setPrimaryClip(clip)
+            showSnackBar(R.string.scheduled_meetings_meeting_link_copied)
+        }
+    }
+
+    /**
+     * Update participant permissions
+     *
+     * @param permission [ChatRoomPermission]
+     */
+    fun updateParticipantPermissions(permission: ChatRoomPermission) =
+        _state.value.selected?.let { participant ->
+            viewModelScope.launch {
+                runCatching {
+                    updateChatPermissions(state.value.chatId, participant.handle, permission)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    showSnackBar(R.string.general_error)
+                }.onSuccess {}
+            }
+        }
+
+    /**
+     * Remove selected participant from chat
+     */
+    fun removeSelectedParticipant() =
+        _state.value.selected?.let { participant ->
+            viewModelScope.launch {
+                runCatching {
+                    removeFromChat(state.value.chatId, participant.handle)
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    showSnackBar(R.string.general_error)
+                }.onSuccess {
+                    showSnackBar(R.string.remove_participant_success)
+                }
+            }
+        }
+
+    /**
+     * Show snackBar with a text
+     *
+     * @param stringId String id.
+     */
+    private fun showSnackBar(stringId: Int) {
+        _state.update { it.copy(snackBar = stringId) }
     }
 
     /**
@@ -544,8 +919,27 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      *
      * @return  String with the formatted date
      */
-    private fun ChatScheduledMeeting.getFormattedDate(): String =
-        DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").format(startDateTime) +
-                " - ${DateTimeFormatter.ofPattern("HH:mm").format(endDateTime)}"
+    private fun ChatScheduledMeeting.getFormattedDate(): String {
+        val dateFormatter =
+            DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").withZone(ZoneId.systemDefault())
+        val hourFormatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+        return "${dateFormatter.format(startDateTime)} - ${hourFormatter.format(endDateTime)}"
+    }
 
+
+    /**
+     * Updates state after shown snackBar.
+     */
+    fun snackbarShown() = _state.update { it.copy(snackBar = null) }
+
+    /**
+     * Open send to screen
+     */
+    fun openSendToChat(shouldOpen: Boolean) {
+        _state.update { it.copy(openSendToChat = shouldOpen) }
+    }
+
+    companion object {
+        private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
+    }
 }

@@ -2,8 +2,6 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.app.AuthenticityCredentialsActivity
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -14,6 +12,7 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.data.database.DatabaseHandler
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -109,10 +108,6 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                     } else {
                         Timber.e("Error recovering the alias %s", e.errorCode)
                     }
-                    MegaApiJava.USER_ATTR_ED25519_PUBLIC_KEY ->
-                        (context as? AuthenticityCredentialsActivity)
-                            ?.setContactCredentials(this, e)
-
                     MegaApiJava.USER_ATTR_AVATAR -> if (e.errorCode == MegaError.API_OK) {
                         (context as? GroupChatInfoActivity)
                             ?.updateParticipantAvatar(holderPosition, email)

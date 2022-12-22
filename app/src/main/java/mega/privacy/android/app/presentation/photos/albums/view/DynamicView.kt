@@ -134,7 +134,7 @@ internal fun EmptyView(
         val boldPlaceHolderEnd = "[/A]"
 
         val text: String =
-            stringResource(id = textResId).uppercase()
+            stringResource(id = textResId)
 
         Text(
             color = if (MaterialTheme.colors.isLight) grey_600 else grey_300,

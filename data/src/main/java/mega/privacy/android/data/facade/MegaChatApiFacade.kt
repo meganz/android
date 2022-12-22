@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -15,6 +16,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -26,6 +28,8 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoomListenerInterface
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
+import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaHandleList
 import javax.inject.Inject
 
 /**
@@ -120,6 +124,27 @@ internal class MegaChatApiFacade @Inject constructor(
             awaitClose { chatApi.removeChatListener(listener) }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
+    override val chatCallUpdates: Flow<ChatCallUpdate>
+        get() = callbackFlow {
+            val listener = object : MegaChatCallListenerInterface {
+                override fun onChatCallUpdate(api: MegaChatApiJava?, chatCall: MegaChatCall?) {
+                    trySend(ChatCallUpdate.OnChatCallUpdate(chatCall))
+                }
+
+                override fun onChatSessionUpdate(
+                    api: MegaChatApiJava?,
+                    chatId: Long,
+                    callId: Long,
+                    session: MegaChatSession?,
+                ) {
+                    trySend(ChatCallUpdate.OnChatSessionUpdate(chatId, callId, session))
+                }
+            }
+
+            chatApi.addChatCallListener(listener)
+            awaitClose { chatApi.removeChatCallListener(listener) }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
     override fun getChatRoomUpdates(chatId: Long): Flow<ChatRoomUpdate> = callbackFlow {
         val listener = object : MegaChatRoomListenerInterface {
             override fun onChatRoomUpdate(api: MegaChatApiJava?, chat: MegaChatRoom?) {
@@ -193,8 +218,23 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
 
+    override fun loadUserAttributes(
+        chatId: Long,
+        userList: MegaHandleList,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.loadUserAttributes(chatId, userList, listener)
+
+    override fun getUserEmailFromCache(userHandle: Long): String? =
+        chatApi.getUserEmailFromCache(userHandle)
+
     override fun getUserAliasFromCache(userHandle: Long): String? =
         chatApi.getUserAliasFromCache(userHandle)
+
+    override fun getUserFirstnameFromCache(userHandle: Long): String? =
+        chatApi.getUserFirstnameFromCache(userHandle)
+
+    override fun getUserLastnameFromCache(userHandle: Long): String? =
+        chatApi.getUserLastnameFromCache(userHandle)
 
     override fun getUserFullNameFromCache(userHandle: Long): String? =
         chatApi.getUserFullnameFromCache(userHandle)
@@ -292,7 +332,38 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.removeChatLink(chatId, listener)
 
-    companion object {
-        const val CHAT_INVALID_HANDLE = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
-    }
+    override fun createChatLink(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.createChatLink(chatId, listener)
+
+    override fun getOnlineStatus(): Int =
+        chatApi.onlineStatus
+
+    override fun getMyUserHandle(): Long = chatApi.myUserHandle
+
+    override fun getMyFullname(): String = chatApi.myFullname
+
+    override fun getMyEmail(): String = chatApi.myEmail
+
+    override fun removeFromChat(
+        chatId: Long,
+        handle: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.removeFromChat(chatId, handle, listener)
+
+    override fun updateChatPermissions(
+        chatId: Long,
+        handle: Long,
+        privilege: Int,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.updateChatPermissions(chatId, handle, privilege, listener)
+
+    override fun getMessage(chatId: Long, messageId: Long): MegaChatMessage? =
+        chatApi.getMessage(chatId, messageId)
+
+    override fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage? =
+        chatApi.getMessageFromNodeHistory(chatId, messageId)
+
+    override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
 }

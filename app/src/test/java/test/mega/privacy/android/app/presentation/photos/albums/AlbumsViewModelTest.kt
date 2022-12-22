@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.photos.albums
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
@@ -13,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetUserAlbums
+import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import org.junit.After
 import org.junit.Before
@@ -56,6 +57,7 @@ class AlbumsViewModelTest {
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
+    private val removeAlbums = mock<RemoveAlbums>()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
 
@@ -73,6 +75,7 @@ class AlbumsViewModelTest {
             removeFavourites = removeFavourites,
             getNodeListByIds = getNodeListByIds,
             createAlbum = createAlbum,
+            removeAlbums = removeAlbums,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -598,6 +601,122 @@ class AlbumsViewModelTest {
 
             verifyNoInteractions(createAlbum)
         }
+
+    @Test
+    fun `test that albums are deleted properly`() = runTest {
+        whenever(removeAlbums(any())).thenReturn(Unit)
+
+        val expectedDeletedAlbumIds = setOf(
+            AlbumId(1L),
+            AlbumId(2L),
+            AlbumId(3L),
+        )
+        underTest.deleteAlbums(expectedDeletedAlbumIds.toList())
+
+        underTest.state.test {
+            val actualDeletedAlbumIds = awaitItem().deletedAlbumIds
+            assertEquals(expectedDeletedAlbumIds, actualDeletedAlbumIds)
+        }
+    }
+
+    @Test
+    fun `test that album deleted message is updated properly`() = runTest {
+        val expectedMessage = "Album deleted"
+        underTest.updateAlbumDeletedMessage(expectedMessage)
+
+        underTest.state.test {
+            val actualMessage = awaitItem().albumDeletedMessage
+            assertEquals(expectedMessage, actualMessage)
+        }
+    }
+
+    @Test
+    fun `test that delete album confirmation is shown properly`() = runTest {
+        underTest.showDeleteAlbumsConfirmation()
+        underTest.state.test {
+            val showDeleteAlbumsConfirmation = awaitItem().showDeleteAlbumsConfirmation
+            assertThat(showDeleteAlbumsConfirmation).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that delete album confirmation is closed properly`() = runTest {
+        underTest.closeDeleteAlbumsConfirmation()
+        underTest.state.test {
+            val showDeleteAlbumsConfirmation = awaitItem().showDeleteAlbumsConfirmation
+            assertThat(showDeleteAlbumsConfirmation).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that album is selected properly`() = runTest {
+        // given
+        val expectedAlbum = Album.UserAlbum(
+            id = AlbumId(1L),
+            title = "Album 1",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        // when
+        underTest.selectAlbum(expectedAlbum)
+
+        // then
+        underTest.state.drop(1).test {
+            val selectedAlbumIds = awaitItem().selectedAlbumIds
+            assertThat(expectedAlbum.id in selectedAlbumIds).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that album is unselected properly`() = runTest {
+        // given
+        val expectedAlbum = Album.UserAlbum(
+            id = AlbumId(1L),
+            title = "Album 1",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        // when
+        underTest.selectAlbum(expectedAlbum)
+        underTest.unselectAlbum(expectedAlbum)
+
+        // then
+        underTest.state.test {
+            val selectedAlbumIds = awaitItem().selectedAlbumIds
+            assertThat(expectedAlbum.id !in selectedAlbumIds).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that album is cleared properly`() = runTest {
+        // given
+        val expectedAlbum1 = Album.UserAlbum(
+            id = AlbumId(1L),
+            title = "Album 1",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        val expectedAlbum2 = Album.UserAlbum(
+            id = AlbumId(2L),
+            title = "Album 2",
+            cover = null,
+            modificationTime = 0L,
+        )
+
+        // when
+        underTest.selectAlbum(expectedAlbum1)
+        underTest.selectAlbum(expectedAlbum2)
+        underTest.clearAlbumSelection()
+
+        // then
+        underTest.state.test {
+            val selectedAlbumIds = awaitItem().selectedAlbumIds
+            assertThat(selectedAlbumIds.isEmpty()).isTrue()
+        }
+    }
 
     private fun createUserAlbum(
         id: AlbumId = AlbumId(0L),

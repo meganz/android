@@ -6,7 +6,9 @@ import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoQuality
 import java.util.Queue
 
 /**
@@ -59,7 +61,7 @@ interface CameraUploadRepository {
      *
      * @return sync timestamp
      */
-    suspend fun getSyncTimeStamp(type: SyncTimeStamp): String?
+    suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long?
 
     /**
      * Set camera upload sync timestamp
@@ -239,6 +241,16 @@ interface CameraUploadRepository {
     suspend fun setSecondaryFolderPath(secondaryFolderPath: String)
 
     /**
+     * Set primary folder handle
+     */
+    suspend fun setPrimaryFolderHandle(primaryHandle: Long)
+
+    /**
+     * Set secondary folder handle
+     */
+    suspend fun setSecondaryFolderHandle(secondaryHandle: Long)
+
+    /**
      * Get remove GPS preference
      * if not set (null), then remove GPS
      *
@@ -251,7 +263,7 @@ interface CameraUploadRepository {
      *
      * @return upload video quality
      */
-    suspend fun getUploadVideoQuality(): String?
+    suspend fun getUploadVideoQuality(): VideoQuality?
 
     /**
      * Get keep file names preference
@@ -307,7 +319,7 @@ interface CameraUploadRepository {
      *
      * @return list of video sync records
      */
-    suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord>
+    suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord>
 
     /**
      * Get uploaded video quality
@@ -336,6 +348,22 @@ interface CameraUploadRepository {
      * @return charging on size int
      */
     suspend fun getChargingOnSize(): Int
+
+    /**
+     * Update camera upload folder (node list) icon
+     *
+     * @param nodeHandle    updated node handle
+     * @param isSecondary   if updated node handle is secondary media
+     */
+    suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
+
+    /**
+     * Update camera upload folder destination in settings
+     *
+     * @param nodeHandle    updated node handle
+     * @param isSecondary   if updated node handle is secondary media
+     */
+    suspend fun sendUpdateFolderDestinationBroadcast(nodeHandle: Long, isSecondary: Boolean)
 
     /**
      * Get the media queue for a given media type
@@ -424,4 +452,14 @@ interface CameraUploadRepository {
      * monitor charging stopped info
      */
     fun monitorChargingStoppedInfo(): Flow<Boolean>
+
+    /**
+     * set camera upload folder
+     * @param primaryFolder handle
+     * @param secondaryFolder handle
+     */
+    suspend fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+    )
 }

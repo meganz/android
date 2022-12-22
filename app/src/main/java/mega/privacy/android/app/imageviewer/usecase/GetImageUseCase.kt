@@ -28,7 +28,6 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -53,7 +52,11 @@ import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNo
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.app.utils.RxUtil.tryOnComplete
+import mega.privacy.android.app.utils.RxUtil.tryOnNext
+import mega.privacy.android.app.utils.RxUtil.tryOnSuccess
 import mega.privacy.android.app.utils.StringUtils.encodeBase64
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -156,8 +159,8 @@ class GetImageUseCase @Inject constructor(
     ): Flowable<ImageResult> =
         Flowable.create({ emitter ->
             when {
-                node == null -> emitter.onError(IllegalArgumentException("Node is null"))
-                !node.isFile -> emitter.onError(IllegalArgumentException("Node is not a file"))
+                node == null -> emitter.tryOnError(IllegalArgumentException("Node is null"))
+                !node.isFile -> emitter.tryOnError(IllegalArgumentException("Node is not a file"))
                 else -> {
                     val fullSizeRequired = when {
                         node.isTakenDown || node.isVideo() -> false
@@ -197,18 +200,18 @@ class GetImageUseCase @Inject constructor(
                             fullFile)
                     ) {
                         image.isFullyLoaded = true
-                        emitter.onNext(image)
-                        emitter.onComplete()
+                        emitter.tryOnNext(image)
+                        emitter.tryOnComplete()
                         return@create
                     } else {
-                        emitter.onNext(image)
+                        emitter.tryOnNext(image)
                     }
 
                     if (thumbnailFile != null && !thumbnailFile.exists()) {
                         getThumbnailImage(node, thumbnailFile.absolutePath).subscribeBy(
                             onComplete = {
                                 image.thumbnailUri = thumbnailFile.toUri()
-                                emitter.onNext(image)
+                                emitter.tryOnNext(image)
                             },
                             onError = Timber::w
                         )
@@ -219,16 +222,16 @@ class GetImageUseCase @Inject constructor(
                             onComplete = {
                                 image.previewUri = previewFile.toUri()
                                 if (fullSizeRequired) {
-                                    emitter.onNext(image)
+                                    emitter.tryOnNext(image)
                                 } else {
                                     image.isFullyLoaded = true
-                                    emitter.onNext(image)
-                                    emitter.onComplete()
+                                    emitter.tryOnNext(image)
+                                    emitter.tryOnComplete()
                                 }
                             },
                             onError = { error ->
                                 if (!fullSizeRequired) {
-                                    emitter.onError(error)
+                                    emitter.tryOnError(error)
                                 } else {
                                     Timber.w(error)
                                 }
@@ -239,58 +242,53 @@ class GetImageUseCase @Inject constructor(
                     if (fullSizeRequired && !fullFile.exists()) {
                         val listener = OptionalMegaTransferListenerInterface(
                             onTransferStart = { transfer ->
-                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
-
                                 image.transferTag = transfer.tag
                                 image.totalBytes = transfer.totalBytes
-                                emitter.onNext(image)
+                                emitter.tryOnNext(image)
                             },
                             onTransferFinish = { _: MegaTransfer, error: MegaError ->
-                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
-
                                 image.transferTag = null
 
                                 when (val megaException = error.toMegaException()) {
                                     is SuccessMegaException -> {
                                         image.fullSizeUri = fullFile.toUri()
                                         image.isFullyLoaded = true
-                                        emitter.onNext(image)
-                                        emitter.onComplete()
+                                        emitter.tryOnNext(image)
+                                        emitter.tryOnComplete()
                                     }
                                     is ResourceAlreadyExistsMegaException -> {
                                         if (megaApi.checkValidNodeFile(node, fullFile)) {
                                             image.fullSizeUri = fullFile.toUri()
                                             image.isFullyLoaded = true
-                                            emitter.onNext(image)
-                                            emitter.onComplete()
+                                            emitter.tryOnNext(image)
+                                            emitter.tryOnComplete()
                                         } else {
                                             FileUtil.deleteFileSafely(fullFile)
-                                            emitter.onError(megaException)
+                                            emitter.tryOnError(megaException)
                                         }
                                     }
                                     is ResourceDoesNotExistMegaException -> {
                                         image.isFullyLoaded = true
-                                        emitter.onNext(image)
-                                        emitter.onComplete()
+                                        emitter.tryOnNext(image)
+                                        emitter.tryOnComplete()
                                     }
                                     else ->
-                                        emitter.onError(megaException)
+                                        emitter.tryOnError(megaException)
                                 }
                                 resetTotalDownloadsIfNeeded()
                             },
                             onTransferTemporaryError = { _, error ->
-                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
                                 val megaException = error.toMegaException()
 
                                 if (megaException is QuotaExceededMegaException) {
                                     image.isFullyLoaded = true
-                                    emitter.onNext(image)
-                                    emitter.onError(megaException)
+                                    emitter.tryOnNext(image)
+                                    emitter.tryOnError(megaException)
                                 }
                             },
                             onTransferUpdate = {
                                 image.transferredBytes = it.transferredBytes
-                                emitter.onNext(image)
+                                emitter.tryOnNext(image)
                             }
                         )
 
@@ -318,7 +316,7 @@ class GetImageUseCase @Inject constructor(
     fun getThumbnailImage(node: MegaNode, filePath: String): Completable =
         Completable.create { emitter ->
             if (!node.hasThumbnail()) {
-                emitter.onError(ResourceDoesNotExistMegaException("Node has no thumbnail"))
+                emitter.tryOnError(ResourceDoesNotExistMegaException("Node has no thumbnail"))
                 return@create
             }
 
@@ -327,13 +325,11 @@ class GetImageUseCase @Inject constructor(
                 filePath,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _: MegaRequest, error: MegaError ->
-                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
                         val megaException = error.toMegaException()
                         if (megaException is SuccessMegaException) {
-                            emitter.onComplete()
+                            emitter.tryOnComplete()
                         } else {
-                            emitter.onError(megaException)
+                            emitter.tryOnError(megaException)
                         }
                     }
                 ))
@@ -349,7 +345,7 @@ class GetImageUseCase @Inject constructor(
     fun getPreviewImage(node: MegaNode, filePath: String): Completable =
         Completable.create { emitter ->
             if (!node.hasPreview()) {
-                emitter.onError(ResourceDoesNotExistMegaException("Node has no preview"))
+                emitter.tryOnError(ResourceDoesNotExistMegaException("Node has no preview"))
                 return@create
             }
 
@@ -358,13 +354,11 @@ class GetImageUseCase @Inject constructor(
                 filePath,
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _: MegaRequest, error: MegaError ->
-                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
                         val megaException = error.toMegaException()
                         if (megaException is SuccessMegaException) {
-                            emitter.onComplete()
+                            emitter.tryOnComplete()
                         } else {
-                            emitter.onError(megaException)
+                            emitter.tryOnError(megaException)
                         }
                     }
                 ))
@@ -493,7 +487,7 @@ class GetImageUseCase @Inject constructor(
             requireNotNull(previewFile)
 
             if (previewFile.exists()) {
-                emitter.onSuccess(previewFile.toUri())
+                emitter.tryOnSuccess(previewFile.toUri())
                 return@create
             }
 
@@ -514,15 +508,15 @@ class GetImageUseCase @Inject constructor(
                                 this)
                             close()
                         }
-                        emitter.onSuccess(previewFile.toUri())
+                        emitter.tryOnSuccess(previewFile.toUri())
                     } else {
-                        emitter.onError(NullPointerException())
+                        emitter.tryOnError(NullPointerException())
                     }
                     dataSource.close()
                 }
 
                 override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-                    emitter.onError(dataSource.failureCause!!)
+                    emitter.tryOnError(dataSource.failureCause!!)
                     dataSource.close()
                 }
             }, CallerThreadExecutor.getInstance())

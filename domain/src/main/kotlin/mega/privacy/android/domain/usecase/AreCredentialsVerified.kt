@@ -11,5 +11,5 @@ fun interface AreCredentialsVerified {
      * @param userEmail User's email.
      * @return True if credentials are verified, false otherwise.
      */
-    suspend fun invoke(userEmail: String): Boolean
+    suspend operator fun invoke(userEmail: String): Boolean
 }

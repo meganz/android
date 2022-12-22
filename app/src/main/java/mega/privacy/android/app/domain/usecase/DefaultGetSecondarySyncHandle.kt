@@ -11,7 +11,6 @@ class DefaultGetSecondarySyncHandle
 @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
 ) : GetSecondarySyncHandle {
-    override suspend fun invoke(): Long {
-        return cameraUploadRepository.getSecondarySyncHandle() ?: MegaApiJava.INVALID_HANDLE
-    }
+    override suspend fun invoke(): Long =
+        cameraUploadRepository.getSecondarySyncHandle() ?: MegaApiJava.INVALID_HANDLE
 }

@@ -13,5 +13,5 @@ fun interface GetContactCredentials {
      * @param userEmail User's email.
      * @return [AccountCredentials.ContactCredentials]
      */
-    suspend fun invoke(userEmail: String): AccountCredentials.ContactCredentials?
+    suspend operator fun invoke(userEmail: String): AccountCredentials.ContactCredentials?
 }

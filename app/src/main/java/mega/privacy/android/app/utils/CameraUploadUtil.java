@@ -1,15 +1,15 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
-import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_IS_CU_SECONDARY_FOLDER;
 import static mega.privacy.android.app.jobservices.CameraUploadsService.CAMERA_UPLOADS_ENGLISH;
 import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS_ENGLISH;
-import static mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE;
 import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
+import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.INTENT_EXTRA_IS_CU_SECONDARY_FOLDER;
+import static mega.privacy.android.data.facade.FileFacadeKt.INTENT_EXTRA_NODE_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Context;
@@ -25,6 +25,11 @@ import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.domain.usecase.GetUploadFolderHandle;
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines;
+import mega.privacy.android.domain.usecase.ResetPrimaryTimeline;
+import mega.privacy.android.domain.usecase.ResetSecondaryTimeline;
+import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
@@ -33,6 +38,92 @@ public class CameraUploadUtil {
 
     private static final MegaApplication app = MegaApplication.getInstance();
     private static final DatabaseHandler dbH = app.getDbH();
+
+    /**
+     * TODO replace with use case
+     *
+     * @see ResetPrimaryTimeline
+     */
+    public static void resetPrimaryTimeline() {
+        Timber.d("Reset primary timeline");
+        dbH.setCamSyncTimeStamp(0);
+        dbH.setCamVideoSyncTimeStamp(0);
+        dbH.deleteAllPrimarySyncRecords();
+    }
+
+    /**
+     * TODO replace with use case
+     *
+     * @see ResetSecondaryTimeline
+     */
+    public static void resetSecondaryTimeline() {
+        Timber.d("Reset secondary timeline");
+        dbH.setSecSyncTimeStamp(0);
+        dbH.setSecVideoSyncTimeStamp(0);
+        dbH.deleteAllSecondarySyncRecords();
+    }
+
+    /**
+     * TODO replace with use case
+     *
+     * @see GetUploadFolderHandle
+     */
+    public static long getPrimaryFolderHandle() {
+        return getUploadFolderHandle(true);
+    }
+
+    /**
+     * TODO replace with use case
+     *
+     * @see GetUploadFolderHandle
+     */
+    public static long getSecondaryFolderHandle() {
+        return getUploadFolderHandle(false);
+    }
+
+    /**
+     * TODO replace with use case
+     *
+     * @see GetUploadFolderHandle
+     */
+    private static long getUploadFolderHandle(boolean isPrimary) {
+        MegaPreferences prefs = dbH.getPreferences();
+        if (prefs == null) {
+            return INVALID_HANDLE;
+        }
+
+        String handle = isPrimary ? prefs.getCamSyncHandle() : prefs.getMegaHandleSecondaryFolder();
+
+        return isTextEmpty(handle) ? INVALID_HANDLE : Long.parseLong(handle);
+    }
+
+    /**
+     * TODO replace with use case
+     *
+     * @see ResetCameraUploadTimelines
+     */
+    public static boolean compareAndUpdateLocalFolderAttribute(long handleInUserAttr, boolean isSecondary) {
+        if (handleInUserAttr == INVALID_HANDLE) {
+            return false;
+        }
+
+        boolean shouldCUStop = false;
+
+        long primaryHandle = getPrimaryFolderHandle();
+        long secondaryHandle = getSecondaryFolderHandle();
+
+        //save changes to local DB
+        if (isSecondary && handleInUserAttr != secondaryHandle) {
+            dbH.setSecondaryFolderHandle(handleInUserAttr);
+            resetSecondaryTimeline();
+            shouldCUStop = true;
+        } else if (!isSecondary && handleInUserAttr != primaryHandle) {
+            dbH.setCamSyncHandle(handleInUserAttr);
+            resetPrimaryTimeline();
+            shouldCUStop = true;
+        }
+        return shouldCUStop;
+    }
 
     /**
      * set all the time stamps to 0 for uploading, clean the cache directory for gps process
@@ -56,28 +147,6 @@ public class CameraUploadUtil {
         purgeDirectory(new File(app.getCacheDir().toString() + SEPARATOR));
     }
 
-    public static void resetPrimaryTimeline() {
-        Timber.d("Reset primary timeline");
-        dbH.setCamSyncTimeStamp(0);
-        dbH.setCamVideoSyncTimeStamp(0);
-        dbH.deleteAllPrimarySyncRecords();
-    }
-
-    public static void resetSecondaryTimeline() {
-        Timber.d("Reset secondary timeline");
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-        dbH.deleteAllSecondarySyncRecords();
-    }
-
-    public static long getPrimaryFolderHandle() {
-        return getUploadFolderHandle(true);
-    }
-
-    public static long getSecondaryFolderHandle() {
-        return getUploadFolderHandle(false);
-    }
-
     public static boolean isPrimaryEnabled() {
         MegaPreferences prefs = dbH.getPreferences();
         return prefs != null && Boolean.parseBoolean(prefs.getCamSyncEnabled());
@@ -86,21 +155,6 @@ public class CameraUploadUtil {
     public static boolean isSecondaryEnabled() {
         MegaPreferences prefs = dbH.getPreferences();
         return prefs != null && Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
-    }
-
-    /**
-     * @param isPrimary whether the primary upload's folder is returned
-     * @return the primary or secondary upload folder's handle
-     */
-    private static long getUploadFolderHandle(boolean isPrimary) {
-        MegaPreferences prefs = dbH.getPreferences();
-        if (prefs == null) {
-            return INVALID_HANDLE;
-        }
-
-        String handle = isPrimary ? prefs.getCamSyncHandle() : prefs.getMegaHandleSecondaryFolder();
-
-        return isTextEmpty(handle) ? INVALID_HANDLE : Long.parseLong(handle);
     }
 
     /**
@@ -123,7 +177,6 @@ public class CameraUploadUtil {
         fireStopCameraUploadJob(app);
     }
 
-
     public static void disableMediaUploadProcess() {
         resetMUTimestampsAndCache();
         dbH.setSecondaryUploadEnabled(false);
@@ -144,15 +197,14 @@ public class CameraUploadUtil {
     }
 
     /**
-     * Force update node list's icon
+     * TODO replace with use case
      *
-     * @param isSecondary whether the updated node is secondary folder
-     * @param handle      the updated node handle
+     * @see UpdateFolderIconBroadcast
      */
     public static void forceUpdateCameraUploadFolderIcon(boolean isSecondary, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE);
-        intent.putExtra(EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary);
-        intent.putExtra(EXTRA_NODE_HANDLE, handle);
+        intent.putExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, isSecondary);
+        intent.putExtra(INTENT_EXTRA_NODE_HANDLE, handle);
         MegaApplication.getInstance().sendBroadcast(intent);
     }
 
@@ -200,35 +252,5 @@ public class CameraUploadUtil {
                         new RenameListener());
             }
         }
-    }
-
-    /**
-     * The method is to update local cu attribute in database
-     *
-     * @param handleInUserAttr updated folder handle
-     * @param isSecondary      whether this is about primary or secondary upload
-     * @return whether camera upload services should stop since folder is changed
-     */
-    public static boolean compareAndUpdateLocalFolderAttribute(long handleInUserAttr, boolean isSecondary) {
-        if (handleInUserAttr == INVALID_HANDLE) {
-            return false;
-        }
-
-        boolean shouldCUStop = false;
-
-        long primaryHandle = getPrimaryFolderHandle();
-        long secondaryHandle = getSecondaryFolderHandle();
-
-        //save changes to local DB
-        if (isSecondary && handleInUserAttr != secondaryHandle) {
-            dbH.setSecondaryFolderHandle(handleInUserAttr);
-            resetSecondaryTimeline();
-            shouldCUStop = true;
-        } else if (!isSecondary && handleInUserAttr != primaryHandle) {
-            dbH.setCamSyncHandle(handleInUserAttr);
-            resetPrimaryTimeline();
-            shouldCUStop = true;
-        }
-        return shouldCUStop;
     }
 }

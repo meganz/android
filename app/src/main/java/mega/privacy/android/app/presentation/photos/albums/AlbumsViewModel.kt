@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetUserAlbums
+import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import timber.log.Timber
 import javax.inject.Inject
@@ -52,6 +54,7 @@ class AlbumsViewModel @Inject constructor(
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
     private val createAlbum: CreateAlbum,
+    private val removeAlbums: RemoveAlbums,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -59,6 +62,7 @@ class AlbumsViewModel @Inject constructor(
     val state = _state.asStateFlow()
     private var currentNodeJob: Job? = null
 
+    private var albumJob: Job? = null
     private val albumJobs: MutableMap<AlbumId, Job> = mutableMapOf()
 
     private var createAlbumJob: Job? = null
@@ -103,6 +107,7 @@ class AlbumsViewModel @Inject constructor(
                         state.copy(
                             albums = albums,
                             currentAlbum = currentAlbum,
+                            showAlbums = true
                         )
                     }
                 }
@@ -115,13 +120,22 @@ class AlbumsViewModel @Inject constructor(
     /**
      * User albums with real-time updates
      */
-    private fun loadUserAlbums() = viewModelScope.launch {
-        if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
+    private fun loadUserAlbums() {
+        albumJob?.cancel()
+        albumJob = viewModelScope.launch {
+            if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
 
-        getUserAlbums()
-            .catch { exception -> Timber.e(exception) }
-            .collectLatest(::handleUserAlbums)
+            getUserAlbums()
+                .catch { exception -> Timber.e(exception) }
+                .mapLatest(::filterActiveAlbums)
+                .collectLatest(::handleUserAlbums)
+        }
     }
+
+    private suspend fun filterActiveAlbums(albums: List<Album.UserAlbum>) =
+        withContext(defaultDispatcher) {
+            albums.filter { album -> album.id !in _state.value.deletedAlbumIds }
+        }
 
     private suspend fun handleUserAlbums(userAlbums: List<Album.UserAlbum>) {
         _state.update { state ->
@@ -200,6 +214,80 @@ class AlbumsViewModel @Inject constructor(
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
 
         systemUIAlbums + updatedUserUIAlbums
+    }
+
+    fun deleteAlbums(albumIds: List<AlbumId>) {
+        if (albumIds.isEmpty()) return
+
+        removeAlbumIds(albumIds)
+        clearAlbumSelection()
+        updateInActiveAlbums(albumIds)
+        loadUserAlbums()
+    }
+
+    private fun removeAlbumIds(albumIds: List<AlbumId>) = viewModelScope.launch {
+        try {
+            removeAlbums(albumIds)
+        } catch (exception: Exception) {
+            Timber.e(exception)
+        }
+    }
+
+    private fun updateInActiveAlbums(albumIds: List<AlbumId>) {
+        _state.update { state ->
+            state.copy(deletedAlbumIds = state.deletedAlbumIds + albumIds)
+        }
+    }
+
+    fun updateAlbumDeletedMessage(message: String) {
+        _state.update {
+            it.copy(albumDeletedMessage = message)
+        }
+    }
+
+    fun showDeleteAlbumsConfirmation() {
+        _state.update {
+            it.copy(showDeleteAlbumsConfirmation = true)
+        }
+    }
+
+    fun closeDeleteAlbumsConfirmation() {
+        _state.update {
+            it.copy(showDeleteAlbumsConfirmation = false)
+        }
+    }
+
+    fun selectAlbum(album: Album.UserAlbum) = viewModelScope.launch {
+        _state.update {
+            val selectedAlbumIds = withContext(defaultDispatcher) {
+                it.selectedAlbumIds + album.id
+            }
+            it.copy(selectedAlbumIds = selectedAlbumIds)
+        }
+    }
+
+    fun unselectAlbum(album: Album.UserAlbum) = viewModelScope.launch {
+        _state.update {
+            val selectedAlbumIds = withContext(defaultDispatcher) {
+                it.selectedAlbumIds - album.id
+            }
+            it.copy(selectedAlbumIds = selectedAlbumIds)
+        }
+    }
+
+    fun selectAllAlbums() = viewModelScope.launch {
+        _state.update {
+            val selectedAlbumIds = withContext(defaultDispatcher) {
+                it.albums.mapNotNull { album -> (album.id as? Album.UserAlbum)?.id }.toSet()
+            }
+            it.copy(selectedAlbumIds = selectedAlbumIds)
+        }
+    }
+
+    fun clearAlbumSelection() {
+        _state.update {
+            it.copy(selectedAlbumIds = setOf())
+        }
     }
 
     /**
@@ -328,10 +416,14 @@ class AlbumsViewModel @Inject constructor(
 
     fun selectAllPhotos() {
         _state.value.currentAlbum?.let { album ->
-            val albumPhotosHandles =
-                _state.value.albums.getAlbumPhotos(album).map { photo ->
-                    photo.id
-                }
+            val currentAlbumPhotos = _state.value.albums.getAlbumPhotos(album)
+            val albumPhotosHandles = when (_state.value.currentMediaType) {
+                FilterMediaType.ALL_MEDIA -> currentAlbumPhotos.map { it.id }
+                FilterMediaType.IMAGES -> currentAlbumPhotos.filterIsInstance<Photo.Image>()
+                    .map { it.id }
+                FilterMediaType.VIDEOS -> currentAlbumPhotos.filterIsInstance<Photo.Video>()
+                    .map { it.id }
+            }
             _state.update {
                 it.copy(selectedPhotoIds = albumPhotosHandles.toMutableSet())
             }
@@ -359,9 +451,27 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun setCurrentMediaType(mediaType: FilterMediaType) {
+        _state.update {
+            it.copy(currentMediaType = mediaType)
+        }
+    }
+
     fun setSnackBarMessage(snackBarMessage: String) {
         _state.update {
             it.copy(snackBarMessage = snackBarMessage)
+        }
+    }
+
+    fun showSortByDialog(showSortByDialog: Boolean) {
+        _state.update {
+            it.copy(showSortByDialog = showSortByDialog)
+        }
+    }
+
+    fun showFilterDialog(showFilterDialog: Boolean) {
+        _state.update {
+            it.copy(showFilterDialog = showFilterDialog)
         }
     }
 }

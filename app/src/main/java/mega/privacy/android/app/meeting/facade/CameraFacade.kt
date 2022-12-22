@@ -1,8 +1,10 @@
 package mega.privacy.android.app.meeting.facade
 
 import mega.privacy.android.app.meeting.gateway.CameraGateway
-import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import org.webrtc.Camera1Enumerator
+import org.webrtc.CameraEnumerator
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -26,9 +28,36 @@ class CameraFacade @Inject constructor(
         }
     }
 
-    override fun getFrontCamera(): String? = VideoCaptureUtils.getFrontCamera()
+    override fun getFrontCamera(): String? = getCameraDevice(true)
 
+    override fun getBackCamera(): String? = getCameraDevice(false)
 
-    override fun getBackCamera(): String? =
-        VideoCaptureUtils.getBackCamera()
+    /**
+     * Get the front camera device.
+     *
+     * @return Front camera device.
+     */
+    private fun getCameraDevice(front: Boolean): String? {
+        val enumerator: CameraEnumerator = Camera1Enumerator(true)
+        val deviceList: Array<String> = deviceList()
+        for (device in deviceList) {
+            if (front && enumerator.isFrontFacing(device) || !front && enumerator.isBackFacing(
+                    device)
+            ) {
+                return device
+            }
+        }
+        return null
+    }
+
+    /**
+     * Get the video capture devices list.
+     *
+     * @return The video capture devices list.
+     */
+    private fun deviceList(): Array<String> {
+        Timber.d("DeviceList")
+        val enumerator: CameraEnumerator = Camera1Enumerator(true)
+        return enumerator.deviceNames
+    }
 }

@@ -68,7 +68,13 @@ class FavouriteMapperTest {
             }.thenReturn(expectedInfo)
         }
 
-        val actual = toFavourite(testNode, typedFolderNode, false, stringUtil)
+        val actual = toFavourite(
+            node = testNode,
+            nodeInfo = typedFolderNode,
+            isAvailableOffline = false,
+            stringUtil = stringUtil,
+            isSelected = false
+        )
 
         assertWithMessage("ShowLabel not mapped correctly").that(actual.showLabel)
             .isEqualTo(expectedShowLabel)
@@ -139,7 +145,14 @@ class FavouriteMapperTest {
         val getFileIcon: (String) -> Int = mock()
         whenever(getFileIcon(expectedName)).thenReturn(expectedIcon)
 
-        val actual = toFavourite(testNode, typedFileNode, false, stringUtil, getFileIcon)
+        val actual = toFavourite(
+            node = testNode,
+            nodeInfo = typedFileNode,
+            isAvailableOffline = false,
+            stringUtil = stringUtil,
+            isSelected = false,
+            getFileIcon = getFileIcon,
+        )
 
         assertThat(actual.showLabel).isEqualTo(expectedShowLabel)
         assertThat(actual.info).isEqualTo(expectedInfo)

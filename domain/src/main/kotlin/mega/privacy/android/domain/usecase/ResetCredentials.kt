@@ -10,5 +10,5 @@ fun interface ResetCredentials {
      *
      * @param userEmail User's email
      */
-    suspend fun invoke(userEmail: String)
+    suspend operator fun invoke(userEmail: String)
 }

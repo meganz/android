@@ -25,6 +25,11 @@ import java.io.IOException
 import javax.inject.Inject
 
 /**
+ * Intent extra data for node handle
+ */
+const val INTENT_EXTRA_NODE_HANDLE = "NODE_HANDLE"
+
+/**
  * File facade
  *
  * Refer to [mega.privacy.android.app.utils.FileUtil]
@@ -68,10 +73,12 @@ class FileFacade @Inject constructor(
                 val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).apply {
                     val fileToDelete = File(f.absolutePath)
                     val contentUri = try {
-                        FileProvider.getUriForFile(context,
+                        FileProvider.getUriForFile(
+                            context,
                             "mega.privacy.android.app.providers.fileprovider",
-                            fileToDelete)
-                    } catch (e: Exception) {
+                            fileToDelete
+                        )
+                    } catch (e: IllegalArgumentException) {
                         Uri.fromFile(fileToDelete)
                     }
                     data = contentUri
@@ -106,7 +113,8 @@ class FileFacade @Inject constructor(
         val selectionArgs = arrayOf(
             typedFileNode.name,
             typedFileNode.size.toString(),
-            typedFileNode.modificationTime.toString())
+            typedFileNode.modificationTime.toString()
+        )
 
         try {
             var cursor = context.contentResolver.query(
@@ -114,7 +122,8 @@ class FileFacade @Inject constructor(
                 projection,
                 selection,
                 selectionArgs,
-                null)
+                null
+            )
             path = checkFileInStorage(cursor)
             if (path == null) {
                 cursor = context.contentResolver.query(
@@ -122,7 +131,8 @@ class FileFacade @Inject constructor(
                     projection,
                     selection,
                     selectionArgs,
-                    null)
+                    null
+                )
                 path = checkFileInStorage(cursor)
             }
         } catch (e: SecurityException) {

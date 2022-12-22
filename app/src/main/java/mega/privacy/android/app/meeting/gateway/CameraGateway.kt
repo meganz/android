@@ -2,9 +2,9 @@ package mega.privacy.android.app.meeting.gateway
 
 /**
  * Camera gateway
+ *
  */
 interface CameraGateway {
-
     /**
      * Set the front camera
      */

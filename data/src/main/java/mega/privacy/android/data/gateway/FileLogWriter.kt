@@ -11,7 +11,7 @@ import org.slf4j.Logger
  *
  * @property logger
  */
-class FileLogWriter(
+internal class FileLogWriter(
     private val logger: Logger,
 ) : LogWriterGateway {
     /**

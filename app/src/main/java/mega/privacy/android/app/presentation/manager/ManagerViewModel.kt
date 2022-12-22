@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
@@ -42,7 +43,9 @@ import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -99,6 +102,8 @@ class ManagerViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
+    private val getPricing: GetPricing,
+    private val getFullAccountInfo: GetFullAccountInfo,
 ) : ViewModel() {
 
     /**
@@ -423,7 +428,29 @@ class ManagerViewModel @Inject constructor(
     fun askForExtendedAccountDetails() {
         Timber.d("askForExtendedAccountDetails")
         viewModelScope.launch {
-            getExtendedAccountDetail(sessions = true, purchases = false, transactions = false)
+            getExtendedAccountDetail(
+                forceRefresh = true,
+                sessions = true,
+                purchases = false,
+                transactions = false,
+            )
+        }
+    }
+
+    /**
+     * Get product accounts
+     *
+     */
+    fun getProductAccounts(): List<Product> = runBlocking { getPricing(false).products }
+
+    /**
+     * Ask for full account info
+     *
+     */
+    fun askForFullAccountInfo() {
+        Timber.d("askForFullAccountInfo")
+        viewModelScope.launch {
+            getFullAccountInfo()
         }
     }
 }

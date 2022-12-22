@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 
 /**
@@ -79,4 +80,24 @@ interface FileRepository {
      * @return offline files inbox path
      */
     suspend fun getOfflineInboxPath(): String
+
+    /**
+     * Create Folder
+     */
+    suspend fun createFolder(name: String): Long?
+
+    /**
+     * Downloads a file node in background.
+     *
+     * @param viewerNode File node to download.
+     * @return The local path of the downloaded file.
+     */
+    suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
+
+    /**
+     * setMyChatFilesFolder
+     * @param nodeHandle
+     * @return node handle [Long]
+     */
+    suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
 }

@@ -2,10 +2,14 @@
 
 package mega.privacy.android.app.presentation.photos.view
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
@@ -13,6 +17,11 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -23,9 +32,13 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 
+/**
+ * Main Photos Body View
+ */
 @Composable
 fun PhotosBodyView(
     tabs: List<PhotosTab> = listOf(),
@@ -34,15 +47,43 @@ fun PhotosBodyView(
     onTabSelected: (PhotosTab) -> Unit = {},
     timelineView: @Composable () -> Unit = {},
     albumsView: @Composable () -> Unit = {},
+    timelineLazyGridState: LazyGridState = LazyGridState(),
+    albumsLazyGridState: LazyGridState = LazyGridState(),
     timelineViewState: TimelineViewState = TimelineViewState(),
+    albumsViewState: AlbumsViewState = AlbumsViewState(),
 ) {
-    Column {
+
+    val isBarVisibleTimeline by remember {
+        derivedStateOf {
+            timelineLazyGridState.firstVisibleItemIndex == 0
+        }
+    }
+    val isScrollingDownTimeline =
+        timelineLazyGridState.isScrollingDown()
+
+    val isBarVisibleAlbums by remember {
+        derivedStateOf {
+            albumsLazyGridState.firstVisibleItemIndex == 0
+        }
+    }
+    val isScrollingDownAlbums =
+        albumsLazyGridState.isScrollingDown()
+
+
+    Column(modifier = Modifier.fillMaxSize()) {
         if (timelineViewState.selectedPhotoCount == 0) {
             PhotosTabs(
                 tabs = tabs,
                 selectedTab = selectedTab,
-                onTabSelected = onTabSelected
-            )
+                isTabSelectionEnabled = albumsViewState.selectedAlbumIds.isEmpty(),
+                onTabSelected = onTabSelected,
+            ) {
+                when (selectedTab) {
+                    PhotosTab.Timeline -> isBarVisibleTimeline || !isScrollingDownTimeline
+                    else -> isBarVisibleAlbums || !isScrollingDownAlbums
+                }
+
+            }
         }
         PagerView(
             tabs = tabs,
@@ -50,49 +91,65 @@ fun PhotosBodyView(
             timelineView = timelineView,
             albumsView = albumsView,
             timelineViewState = timelineViewState,
+            albumsViewState = albumsViewState,
         )
     }
 }
 
+/**
+ * The main Tab Row for Timeline-Album
+ */
 @Composable
 fun PhotosTabs(
+    modifier: Modifier = Modifier,
     tabs: List<PhotosTab>,
     selectedTab: PhotosTab,
+    isTabSelectionEnabled: Boolean,
     onTabSelected: (PhotosTab) -> Unit,
-    modifier: Modifier = Modifier,
+    isVisible: () -> Boolean = { true },
 ) {
     val selectedTabIndex = selectedTab.ordinal
-    TabRow(
-        selectedTabIndex = selectedTabIndex,
-        indicator = { tabPositions: List<TabPosition> ->
-            TabRowDefaults.Indicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                color = colorResource(id = R.color.red_600_red_300)
-            )
-        },
-        modifier = modifier,
-        backgroundColor = Color.Transparent,
+    AnimatedVisibility(
+        visible = isVisible(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
     ) {
-        tabs.forEachIndexed { index, tab ->
-            Tab(
-                selected = index == selectedTabIndex,
-                onClick = { onTabSelected(tab) },
-                text = {
-                    Text(
-                        text = when (tab) {
-                            PhotosTab.Timeline -> stringResource(id = R.string.tab_title_timeline)
-                            PhotosTab.Albums -> stringResource(id = R.string.tab_title_album)
-                        },
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                selectedContentColor = colorResource(id = R.color.red_600_red_300),
-                unselectedContentColor = colorResource(id = R.color.grey_054_white_054)
-            )
+        TabRow(
+            modifier = modifier,
+            selectedTabIndex = selectedTabIndex,
+            indicator = { tabPositions: List<TabPosition> ->
+                TabRowDefaults.Indicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                    color = colorResource(id = R.color.red_600_red_300)
+                )
+            },
+            backgroundColor = Color.Transparent,
+        ) {
+            tabs.forEachIndexed { index, tab ->
+                Tab(
+                    selected = index == selectedTabIndex,
+                    onClick = { onTabSelected(tab) },
+                    enabled = isTabSelectionEnabled,
+                    text = {
+                        Text(
+                            text = when (tab) {
+                                PhotosTab.Timeline -> stringResource(id = R.string.tab_title_timeline)
+                                PhotosTab.Albums -> stringResource(id = R.string.tab_title_album)
+                            },
+                            fontWeight = FontWeight.Medium
+                        )
+                    },
+                    selectedContentColor = colorResource(id = R.color.red_600_red_300),
+                    unselectedContentColor = colorResource(id = R.color.grey_054_white_054)
+                )
+            }
         }
     }
 }
 
+/**
+ * Page content view for Timeline or Album, depending on the selected tab
+ */
 @Composable
 fun PagerView(
     tabs: List<PhotosTab>,
@@ -101,22 +158,36 @@ fun PagerView(
     albumsView: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     timelineViewState: TimelineViewState,
+    albumsViewState: AlbumsViewState,
 ) {
     HorizontalPager(
         count = tabs.size,
         state = pagerState,
         modifier = modifier,
-        userScrollEnabled = timelineViewState.selectedPhotoCount == 0,
+        userScrollEnabled = timelineViewState.selectedPhotoCount == 0 && albumsViewState.selectedAlbumIds.isEmpty(),
     ) { pageIndex ->
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ) {
-            when (tabs[pageIndex]) {
-                PhotosTab.Timeline -> timelineView()
-                PhotosTab.Albums -> albumsView()
-            }
+        when (tabs[pageIndex]) {
+            PhotosTab.Timeline -> timelineView()
+            PhotosTab.Albums -> albumsView()
         }
     }
+
+}
+
+@Composable
+internal fun LazyGridState.isScrollingDown(): Boolean {
+    var nextIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
+    var nextScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (nextIndex != firstVisibleItemIndex) {
+                nextIndex < firstVisibleItemIndex
+            } else {
+                nextScrollOffset <= firstVisibleItemScrollOffset
+            }.also {
+                nextIndex = firstVisibleItemIndex
+                nextScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }

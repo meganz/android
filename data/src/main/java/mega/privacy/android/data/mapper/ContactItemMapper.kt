@@ -37,7 +37,10 @@ internal fun toContactItem(
     lastSeen = lastSeen
 )
 
-private val userVisibility = mapOf(
+/**
+ * User visibility
+ */
+val userVisibility = mapOf(
     MegaUser.VISIBILITY_UNKNOWN to UserVisibility.Unknown,
     MegaUser.VISIBILITY_HIDDEN to UserVisibility.Hidden,
     MegaUser.VISIBILITY_VISIBLE to UserVisibility.Visible,

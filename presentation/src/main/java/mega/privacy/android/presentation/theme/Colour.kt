@@ -344,8 +344,14 @@ val orange_300 = Color(0xFFFFB640)
 @ShowkaseColor("orange_400", "orange")
 val orange_400 = Color(0xFFFFA500)
 
+@ShowkaseColor("orange_500", "orange")
+val orange_500 = Color(0xFFFF9600)
+
 @ShowkaseColor("orange_600", "orange")
 val orange_600 = Color(0xFFFC8A00)
+
+@ShowkaseColor("green_200", "green")
+val green_200 = Color(0xFFA1DA92)
 
 @ShowkaseColor("green_300", "green")
 val green_300 = Color(0xFF78CC64)

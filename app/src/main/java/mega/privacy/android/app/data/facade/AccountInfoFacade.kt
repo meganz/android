@@ -7,13 +7,19 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
@@ -70,8 +76,54 @@ class AccountInfoFacade @Inject constructor(
         accountDetail.emit(request.megaAccountDetails)
     }
 
-    override val availableSkus: List<MegaSku>
+    override var availableSkus: List<MegaSku>
         get() = myAccountInfo.availableSkus
+        set(value) {
+            myAccountInfo.availableSkus = value
+        }
+
+    override val activeSubscription: MegaPurchase?
+        get() = myAccountInfo.activeSubscription
+
+    override fun updateActiveSubscription(purchase: MegaPurchase?, levelInventory: Int) {
+        Timber.d("Set current max subscription: $purchase")
+        myAccountInfo.activeSubscription = purchase
+
+        myAccountInfo.levelInventory = levelInventory
+        myAccountInfo.isInventoryFinished = true
+        purchase?.let {
+            updateSubscriptionLevel(it)
+        }
+    }
+
+    private fun updateSubscriptionLevel(purchase: MegaPurchase) {
+        val json = purchase.receipt
+        Timber.d("ORIGINAL JSON:$json") //Print JSON in logs to help debug possible payments issues
+
+        val attributes: MegaAttributes? = db.attributes
+
+        val lastPublicHandle = attributes?.lastPublicHandle ?: megaApiGateway.getInvalidHandle()
+        val listener = OptionalMegaRequestListenerInterface(
+            onRequestFinish = { _, error ->
+                if (error.errorCode != MegaError.API_OK) {
+                    Timber.e("PURCHASE WRONG: ${error.errorString} (${error.errorCode})")
+                }
+            }
+        )
+
+        if (myAccountInfo.levelInventory > myAccountInfo.levelAccountDetails) {
+            Timber.d("megaApi.submitPurchaseReceipt is invoked")
+            if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
+                megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
+            } else {
+                attributes?.run {
+                    megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
+                        lastPublicHandleType, lastPublicHandleTimeStamp, listener
+                    )
+                }
+            }
+        }
+    }
 
     // we have to continue send broadcast receiver it will replace by accountDetail SharedFlow
     private fun sendBroadcastUpdateAccountDetails() {

@@ -28,6 +28,7 @@ import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
@@ -54,7 +55,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA
 import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS
-import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
 import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -114,7 +114,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
             when (actionType) {
                 UPDATE_ACCOUNT_DETAILS -> viewModel.updateAccountDetails()
-                UPDATE_CREDIT_CARD_SUBSCRIPTION -> refreshMenuOptionsVisibility()
             }
         }
     }
@@ -241,7 +240,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onResume() {
         super.onResume()
-        app?.refreshAccountInfo()
+        viewModel.refreshAccountInfo()
     }
 
     override fun onPostResume() {
@@ -398,7 +397,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      */
     private fun updateInfo() {
         viewModel.checkVersions()
-        app?.refreshAccountInfo()
+        viewModel.refreshAccountInfo()
     }
 
     private fun setupObservers() {
@@ -407,6 +406,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
             )
         )
+
+        collectFlow(viewModel.numberOfSubscription) {
+            refreshMenuOptionsVisibility()
+        }
 
         viewModel.checkElevation().observe(this, ::changeElevation)
 
@@ -458,7 +461,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             )
         )
 
-        app?.askForCCSubscriptions()
+        viewModel.refreshNumberOfSubscription(true)
     }
 
     /**

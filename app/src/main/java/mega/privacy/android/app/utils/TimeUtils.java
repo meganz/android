@@ -17,8 +17,12 @@ import androidx.appcompat.app.AlertDialog;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -75,7 +79,6 @@ public class TimeUtils implements Comparator<Calendar> {
                 long milliseconds2 = c2.getTimeInMillis();
 
                 long diff = milliseconds2 - milliseconds1;
-//                long diffSeconds = diff / 1000;
                 long diffMinutes = Math.abs(diff / (60 * 1000));
 
                 if (diffMinutes < 3) {
@@ -83,8 +86,6 @@ public class TimeUtils implements Comparator<Calendar> {
                 } else {
                     return 1;
                 }
-
-                //            return c1.get(Calendar.MINUTE) - c2.get(Calendar.MINUTE);
             }
         } else if (type == DATE) {
             if (c1.get(Calendar.YEAR) != c2.get(Calendar.YEAR))
@@ -97,7 +98,7 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String formatTime(MegaChatMessage lastMessage) {
-        java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
+        DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, getUserLocale());
         Calendar cal = calculateDateFromTimestamp(lastMessage.getTimestamp());
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
@@ -108,11 +109,11 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatDateAndTime(Context context, MegaChatMessage lastMessage, int format) {
 
-        java.text.DateFormat df;
+        DateFormat df;
         if (format == DATE_LONG_FORMAT) {
-            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, getUserLocale());
         } else {
-            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, getUserLocale());
         }
 
         Calendar cal = calculateDateFromTimestamp(lastMessage.getTimestamp());
@@ -133,7 +134,9 @@ public class TimeUtils implements Comparator<Calendar> {
         } else {
             if (tc.calculateDifferenceDays(cal, calToday) < 7) {
                 Date date = cal.getTime();
-                String dayWeek = new SimpleDateFormat("EEEE").format(date);
+                String dayWeek = new SimpleDateFormat(
+                        getBestDateTimePattern(getUserLocale(), "EEEE"), getUserLocale()
+                ).format(date);
                 String time = formatTime(lastMessage);
                 String formattedDate = dayWeek + " " + time;
                 return formattedDate;
@@ -177,77 +180,78 @@ public class TimeUtils implements Comparator<Calendar> {
      * @return The date formatted string.
      */
     public static String formatDate(long timestamp, int format, boolean humanized) {
+        ZonedDateTime timestampDateTime = ZonedDateTime.ofInstant(
+                Instant.ofEpochSecond(timestamp),
+                ZoneId.systemDefault()
+        );
 
-        Locale locale = Locale.getDefault();
-        DateFormat df;
-
+        DateTimeFormatter dateTimeFormatter;
         switch (format) {
             case DATE_SHORT_FORMAT:
-                df = new SimpleDateFormat("EEE d MMM", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "EEE d MMM")
+                );
                 break;
             case DATE_SHORT_SHORT_FORMAT:
-                df = new SimpleDateFormat("d MMM", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "d MMM")
+                );
                 break;
             case DATE_MM_DD_YYYY_FORMAT:
-                df = new SimpleDateFormat("MMM d, yyyy", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "MMM d, yyyy")
+                );
                 break;
             case DATE_WEEK_DAY_FORMAT:
-                df = new SimpleDateFormat("EEEE, d MMM", locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "EEEE, d MMM")
+                );
                 break;
             case DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT:
-                df = new SimpleDateFormat(getBestDateTimePattern(locale, "yyyy-MM-dd HH:mm"), locale);
+                dateTimeFormatter = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "yyyy-MM-dd HH:mm")
+                );
                 break;
             case DATE_LONG_FORMAT:
             default:
-                df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, locale);
+                dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT)
+                        .withLocale(getUserLocale())
+                        .withZone(ZoneId.systemDefault());
                 break;
         }
 
-        Calendar cal = calculateDateFromTimestamp(timestamp);
-
         if (humanized) {
-            // Check if date is today, yesterday, tomorrow or less of a week
-            Calendar calToday = Calendar.getInstance();
-            Calendar calYesterday = Calendar.getInstance();
-            calYesterday.add(Calendar.DATE, -1);
-            Calendar calTomorrow = Calendar.getInstance();
-            calTomorrow.add(Calendar.DATE, 1);
-            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+            LocalDate todayDate = LocalDate.now(ZoneId.systemDefault());
+            LocalDate timestampDate = timestampDateTime.toLocalDate();
 
-            if (tc.compare(cal, calToday) == 0) {
+            // Check if date is today, yesterday, tomorrow or less of a week
+            if (timestampDate.equals(todayDate)) {
                 return getString(R.string.label_today);
-            } else if (tc.compare(cal, calYesterday) == 0) {
+            } else if (timestampDate == todayDate.minusDays(1)) {
                 return getString(R.string.label_yesterday);
-            } else if (tc.compare(cal, calTomorrow) == 0) {
-                return getString(R.string.tomorrow_date, new SimpleDateFormat("d MMM yyyy", locale)
-                        .format(cal.getTime()));
-            } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
-                return new SimpleDateFormat("EEEE, d MMM yyyy", locale).format(cal.getTime());
+            } else if (timestampDate == todayDate.plusDays(1)) {
+                DateTimeFormatter tomorrowFormat = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "d MMM yyyy")
+                );
+                return getString(R.string.tomorrow_date, tomorrowFormat.format(timestampDateTime));
+            } else if (timestampDate.isBefore(todayDate.plusWeeks(1))) {
+                DateTimeFormatter futureFormat = DateTimeFormatter.ofPattern(
+                        getBestDateTimePattern(getUserLocale(), "EEEE, d MMM yyyy")
+                );
+                return futureFormat.format(timestampDateTime);
             }
         }
 
-        TimeZone tz = cal.getTimeZone();
-        df.setTimeZone(tz);
-        Date date = cal.getTime();
-        return df.format(date);
-    }
-
-    public static boolean isTodayOrYesterday(long timestamp) {
-        Calendar date = calculateDateFromTimestamp(timestamp);
-        Calendar today = Calendar.getInstance();
-        Calendar yesterday = Calendar.getInstance();
-        yesterday.add(Calendar.DATE, -1);
-
-        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
-
-        return tc.compare(date, today) == 0 || tc.compare(date, yesterday) == 0;
+        return dateTimeFormatter.format(timestampDateTime);
     }
 
     public static String formatShortDateTime(long timestamp) {
 
-        java.text.DateFormat df;
+        DateFormat df;
 
-        df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, Locale.getDefault());
+        df = SimpleDateFormat.getDateTimeInstance(
+                SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, getUserLocale()
+        );
 
         Calendar cal = calculateDateFromTimestamp(timestamp);
         Date date = cal.getTime();
@@ -256,9 +260,11 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String formatLongDateTime(long timestamp) {
-
-        java.text.DateFormat df = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault());
-
+        DateFormat df =
+                new SimpleDateFormat(getBestDateTimePattern(
+                        getUserLocale(), "d MMM yyyy HH:mm"),
+                        getUserLocale()
+                );
         Calendar cal = calculateDateFromTimestamp(timestamp);
         Date date = cal.getTime();
         String formattedDate = df.format(date);
@@ -266,7 +272,8 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String formatTime(long ts) {
-        java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
+        DateFormat df = SimpleDateFormat
+                .getTimeInstance(SimpleDateFormat.SHORT, getUserLocale());
         Calendar cal = calculateDateFromTimestamp(ts);
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
@@ -276,7 +283,6 @@ public class TimeUtils implements Comparator<Calendar> {
     }
 
     public static String lastGreenDate(Context context, int minutesAgo) {
-//        minutesAgo = 1442;
         Calendar calGreen = Calendar.getInstance();
         calGreen.add(Calendar.MINUTE, -minutesAgo);
 
@@ -292,7 +298,7 @@ public class TimeUtils implements Comparator<Calendar> {
         } else if (tc.compare(calGreen, calToday) == 0) {
             TimeZone tz = calGreen.getTimeZone();
 
-            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            DateFormat df = new SimpleDateFormat("HH:mm", getUserLocale());
             df.setTimeZone(tz);
 
             String time = df.format(calGreen.getTime());
@@ -300,29 +306,18 @@ public class TimeUtils implements Comparator<Calendar> {
             String formattedDate = context.getString(R.string.last_seen_today, time);
 
             return formattedDate;
-        }
-        //Impossible to fit yesterday
-//        else if(tc.compare(calGreen, calYesterday)==0){
-//            TimeZone tz = calGreen.getTimeZone();
-//
-//            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
-//            df.setTimeZone(tz);
-//
-//            String time = df.format(calGreen.getTime());
-//
-//            String formattedDate = "Last seen yesterday at" + " " + time;
-//
-//            return formattedDate;
-//        }
-        else {
+        } else {
             TimeZone tz = calGreen.getTimeZone();
 
-            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            DateFormat df = new SimpleDateFormat("HH:mm", getUserLocale());
             df.setTimeZone(tz);
 
             String time = df.format(calGreen.getTime());
 
-            df = new SimpleDateFormat("dd MMM", Locale.getDefault());
+            df = new SimpleDateFormat(
+                    getBestDateTimePattern(getUserLocale(), "dd MMM"),
+                    getUserLocale()
+            );
             String day = df.format(calGreen.getTime());
 
             String formattedDate = context.getString(R.string.last_seen_general, day, time);
@@ -338,11 +333,11 @@ public class TimeUtils implements Comparator<Calendar> {
 
     public static String formatDateAndTime(Context context, long ts, int format) {
 
-        java.text.DateFormat df;
+        DateFormat df;
         if (format == DATE_LONG_FORMAT) {
-            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+            df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, getUserLocale());
         } else {
-            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, getUserLocale());
         }
 
         Calendar cal = calculateDateFromTimestamp(ts);
@@ -363,7 +358,9 @@ public class TimeUtils implements Comparator<Calendar> {
         } else {
             if (tc.calculateDifferenceDays(cal, calToday) < 7) {
                 Date date = cal.getTime();
-                String dayWeek = new SimpleDateFormat("EEEE").format(date);
+                String dayWeek = new SimpleDateFormat(
+                        getBestDateTimePattern(getUserLocale(), "EEEE"),
+                        getUserLocale()).format(date);
                 String time = formatTime(ts);
                 String formattedDate = dayWeek + " " + time;
                 return formattedDate;
@@ -399,7 +396,10 @@ public class TimeUtils implements Comparator<Calendar> {
             return getString(R.string.label_yesterday);
         } else {
             Date date = cal.getTime();
-            return new SimpleDateFormat("EEEE, d MMM yyyy").format(date);
+            return new SimpleDateFormat(
+                    getBestDateTimePattern(getUserLocale(),
+                            "EEEE, d MMM yyyy"),
+                    getUserLocale()).format(date);
         }
     }
 
@@ -410,7 +410,8 @@ public class TimeUtils implements Comparator<Calendar> {
      * @return Time in minutes and seconds
      */
     public static String getMinutesAndSecondsFromMilliseconds(long milliseconds) {
-        return (new SimpleDateFormat("mm:ss")).format(new Date(milliseconds));
+        return (new SimpleDateFormat("mm:ss", getUserLocale()))
+                .format(new Date(milliseconds));
     }
 
     public static String getVideoDuration(int duration) {
@@ -420,9 +421,9 @@ public class TimeUtils implements Comparator<Calendar> {
             int seconds = duration % 60;
 
             if (hours > 0) {
-                return String.format("%d:%d:%02d", hours, minutes, seconds);
+                return String.format(getUserLocale(), "%d:%d:%02d", hours, minutes, seconds);
             } else {
-                return String.format("%d:%02d", minutes, seconds);
+                return String.format(getUserLocale(), "%d:%02d", minutes, seconds);
             }
         }
 
@@ -439,8 +440,10 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calendar = getCalendarSpecificTime(option);
         TimeZone tz = calendar.getTimeZone();
 
-        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
-        java.text.DateFormat df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+        DateFormat df = new SimpleDateFormat(
+                getBestDateTimePattern(getUserLocale(), "HH:mm"),
+                getUserLocale()
+        );
         df.setTimeZone(tz);
 
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -467,14 +470,17 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar calTomorrow = Calendar.getInstance();
         calTomorrow.add(Calendar.DATE, +1);
 
-        java.text.DateFormat df;
-        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
-        df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+        DateFormat df;
+        df = new SimpleDateFormat(getBestDateTimePattern(getUserLocale(), "HH:mm"), getUserLocale());
 
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
 
         return getQuantityString(R.plurals.chat_notifications_muted_until_specific_time, cal.get(Calendar.HOUR_OF_DAY), df.format(cal.getTime()));
+    }
+
+    private static Locale getUserLocale() {
+        return Locale.getDefault();
     }
 
     /**
@@ -633,10 +639,10 @@ public class TimeUtils implements Comparator<Calendar> {
 
     /**
      * Check if two timestamps are the same date
-     * 
-     * @param oneMillis     First timestamp in millis to copmare
-     * @param twoMillis     Second timestamp in millis to compare
-     * @return              True if it's the same date, false otherwise
+     *
+     * @param oneMillis First timestamp in millis to copmare
+     * @param twoMillis Second timestamp in millis to compare
+     * @return True if it's the same date, false otherwise
      */
     public static boolean isSameDate(long oneMillis, long twoMillis) {
         ZoneId zoneId = ZoneId.systemDefault();

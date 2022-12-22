@@ -81,12 +81,16 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
     implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
+    gmsImplementation "com.android.billingclient:billing-ktx:$billingVersion"
+
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     // Logging
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
     implementation "com.github.tony19:logback-android:$logbackVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
+
+    implementation "com.google.zxing:core:$zxingVersion"
 
     implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
     kapt "com.google.auto.value:auto-value:$autovalueVersion"

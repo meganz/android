@@ -8,18 +8,18 @@ import android.os.Bundle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
-import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_IS_CU_SECONDARY_FOLDER
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
-import mega.privacy.android.app.constants.BroadcastConstants.PRIMARY_HANDLE
-import mega.privacy.android.app.constants.BroadcastConstants.SECONDARY_FOLDER
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED
-import mega.privacy.android.app.utils.Constants.EXTRA_NODE_HANDLE
+import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
+import mega.privacy.android.data.facade.BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
+import mega.privacy.android.data.facade.INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE
+import mega.privacy.android.data.facade.INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY
+import mega.privacy.android.data.facade.INTENT_EXTRA_IS_CU_SECONDARY_FOLDER
+import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
@@ -80,11 +80,16 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                 return
             }
 
-            if (intent.action.equals(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING)) {
+            if (intent.action.equals(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING)) {
                 Timber.d("Update Camera Uploads Destination Folder Setting Event Received")
-                val isSecondaryFolder = intent.getBooleanExtra(SECONDARY_FOLDER, false)
-                val primaryHandle = intent.getLongExtra(PRIMARY_HANDLE, INVALID_HANDLE)
-                settingsFragment?.setCUDestinationFolder(isSecondaryFolder, primaryHandle)
+                val isSecondaryFolder = intent.getBooleanExtra(
+                    INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, false
+                )
+                val handleToChange = intent.getLongExtra(
+                    INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE,
+                    INVALID_HANDLE
+                )
+                settingsFragment?.setCUDestinationFolder(isSecondaryFolder, handleToChange)
             }
         }
     }
@@ -108,8 +113,8 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
      */
     @Synchronized
     private fun setCUDestinationFolderSynchronized(intent: Intent) {
-        val handleInUserAttr = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_HANDLE)
-        val isSecondaryFolder = intent.getBooleanExtra(EXTRA_IS_CU_SECONDARY_FOLDER, false)
+        val handleInUserAttr = intent.getLongExtra(INTENT_EXTRA_NODE_HANDLE, INVALID_HANDLE)
+        val isSecondaryFolder = intent.getBooleanExtra(INTENT_EXTRA_IS_CU_SECONDARY_FOLDER, false)
         settingsFragment?.setCUDestinationFolder(isSecondaryFolder, handleInUserAttr)
     }
 
@@ -119,8 +124,11 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                 settingsFragment != null
             ) {
                 Timber.d("Re-Enable Camera Uploads Preference Event Received")
-                settingsFragment?.reEnableCameraUploadsPreference(intent.getIntExtra(
-                    KEY_REENABLE_WHICH_PREFERENCE, 0))
+                settingsFragment?.reEnableCameraUploadsPreference(
+                    intent.getIntExtra(
+                        KEY_REENABLE_WHICH_PREFERENCE, 0
+                    )
+                )
             }
         }
     }
@@ -136,12 +144,19 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
             replaceFragment(it)
         }
 
-        registerReceiver(cameraUploadsDestinationReceiver,
-            IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING))
-        registerReceiver(receiverCameraUploadsAttrChanged,
-            IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE))
-        registerReceiver(reEnableCameraUploadsPreferenceReceiver, IntentFilter(
-            BROADCAST_ACTION_REENABLE_CU_PREFERENCE))
+        registerReceiver(
+            cameraUploadsDestinationReceiver,
+            IntentFilter(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING)
+        )
+        registerReceiver(
+            receiverCameraUploadsAttrChanged,
+            IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE)
+        )
+        registerReceiver(
+            reEnableCameraUploadsPreferenceReceiver, IntentFilter(
+                BROADCAST_ACTION_REENABLE_CU_PREFERENCE
+            )
+        )
 
         val filterCUMUSettings = IntentFilter(ACTION_UPDATE_DISABLE_CU_SETTING)
         filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_UI_SETTING)

@@ -13,7 +13,7 @@ import javax.inject.Inject
  *
  * See logback.xml for configuration.
  */
-class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
+internal class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     override fun log(time: String?, loglevel: Int, source: String?, message: String?) {
         Timber.tag("[sdk]")
         Timber.log(

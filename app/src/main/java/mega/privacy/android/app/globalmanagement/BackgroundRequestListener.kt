@@ -6,36 +6,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
-import mega.privacy.android.app.utils.Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION
-import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
-import mega.privacy.android.app.utils.Constants.UPDATE_PAYMENT_METHODS
 import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
-import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
@@ -63,10 +52,8 @@ class BackgroundRequestListener @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersManagement: TransfersManagement,
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getSpecificAccountDetail: GetSpecificAccountDetail,
-    private val getAccountDetails: GetAccountDetails,
+    private val getFullAccountInfo: GetFullAccountInfo,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -109,55 +96,7 @@ class BackgroundRequestListener @Inject constructor(
             MegaRequest.TYPE_FETCH_NODES -> handleFetchNodeRequest(e)
             MegaRequest.TYPE_GET_ATTR_USER -> handleGetAttrUserRequest(request, e)
             MegaRequest.TYPE_SET_ATTR_USER -> handleSetAttrUserRequest(request, e)
-            MegaRequest.TYPE_GET_PRICING -> handleGetPricingRequest(e, request)
-            MegaRequest.TYPE_GET_PAYMENT_METHODS -> handleGetPaymentMethodsRequest(e, request)
-            MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS -> handleCreditCardQuerySubscriptionsRequest(
-                e,
-                request
-            )
             MegaRequest.TYPE_PAUSE_TRANSFERS -> dbH.transferQueueStatus = request.flag
-        }
-    }
-
-    private fun handleCreditCardQuerySubscriptionsRequest(
-        e: MegaError,
-        request: MegaRequest,
-    ) {
-        if (e.errorCode == MegaError.API_OK) {
-            myAccountInfo.numberOfSubscriptions = request.number
-            Timber.d("NUMBER OF SUBS: %s", myAccountInfo.numberOfSubscriptions)
-            val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION)
-            application.sendBroadcast(intent)
-        }
-    }
-
-    private fun handleGetPaymentMethodsRequest(
-        e: MegaError,
-        request: MegaRequest,
-    ) {
-        Timber.d("Payment methods request")
-        myAccountInfo.getPaymentMethodsBoolean = true
-        if (e.errorCode == MegaError.API_OK) {
-            dbH.setPaymentMethodsTimeStamp()
-            myAccountInfo.paymentBitSet = convertToBitSet(request.number)
-            val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            intent.putExtra(ACTION_TYPE, UPDATE_PAYMENT_METHODS)
-            application.sendBroadcast(intent)
-        }
-    }
-
-    private fun handleGetPricingRequest(e: MegaError, request: MegaRequest) {
-        if (e.errorCode == MegaError.API_OK) {
-            val p: MegaPricing = request.pricing
-            dbH.setPricingTimestamp()
-            myAccountInfo.setProductAccounts(p, request.currency)
-            myAccountInfo.pricing = p
-            val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            intent.putExtra(ACTION_TYPE, UPDATE_GET_PRICING)
-            application.sendBroadcast(intent)
-        } else {
-            Timber.e("Error TYPE_GET_PRICING: %s", e.errorCode)
         }
     }
 
@@ -277,14 +216,7 @@ class BackgroundRequestListener @Inject constructor(
     private fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
-            megaApi.getPaymentMethods(null)
-            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
-                getAccountDetails(true)
-            } else {
-                getSpecificAccountDetail(storage = false, transfer = true, pro = true)
-            }
-            megaApi.getPricing(null)
-            megaApi.creditCardQuerySubscriptions(null)
+            getFullAccountInfo()
         }
     }
 }

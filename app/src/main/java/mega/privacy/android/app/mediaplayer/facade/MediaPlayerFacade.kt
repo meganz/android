@@ -76,6 +76,10 @@ class MediaPlayerFacade @Inject constructor(
                             isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED)
                     }
 
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        mediaPlayerCallback.onIsPlayingChangedCallback(isPlaying)
+                    }
+
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                         mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleModeEnabled)
                     }
@@ -191,6 +195,8 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun getCurrentMediaItem(): MediaItem? = player.currentMediaItem
 
+    override fun getCurrentItemDuration(): Long = player.duration
+
     override fun mediaPlayerIsPlaying(): Boolean =
         player.playWhenReady && player.playbackState != STATE_ENDED
 
@@ -223,21 +229,16 @@ class MediaPlayerFacade @Inject constructor(
         return null
     }
 
-    override fun playerPrepare() {
-        player.prepare()
-    }
+    override fun playerPrepare() = player.prepare()
 
-    override fun playerStop() {
-        player.stop()
-    }
+    override fun playerStop() = player.stop()
 
-    override fun playerRelease() {
-        player.release()
-    }
 
-    override fun playerSeekTo(index: Int) {
-        player.seekTo(index, 0)
-    }
+    override fun playerRelease() = player.release()
+
+    override fun playerSeekTo(index: Int) = player.seekTo(index, 0)
+
+    override fun playerSeekToPositionMs(positionMs: Long) = player.seekTo(positionMs)
 
     override fun buildPlaySources(mediaPlaySources: MediaPlaySources) {
         with(mediaPlaySources) {
@@ -265,9 +266,7 @@ class MediaPlayerFacade @Inject constructor(
         }
     }
 
-    override fun removeListener(listener: Player.Listener) {
-        player.removeListener(listener)
-    }
+    override fun removeListener(listener: Player.Listener) = player.removeListener(listener)
 
     override fun invalidatePlayerNotification() {
         playerNotificationManager?.invalidate()
@@ -288,9 +287,8 @@ class MediaPlayerFacade @Inject constructor(
     private fun convertToRepeatMode(repeatToggleMode: RepeatToggleMode) =
         repeatToggleModeMapper(repeatToggleMode)
 
-    override fun addPlayerListener(listener: Player.Listener) {
+    override fun addPlayerListener(listener: Player.Listener) =
         player.wrappedPlayer.addListener(listener)
-    }
 
     override fun getPlaybackState() = player.playbackState
 

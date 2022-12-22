@@ -506,8 +506,10 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void setPhoneAdapterContacts(ArrayList<InvitationContactInfo> contacts) {
         Timber.d("setPhoneAdapterContacts");
-        invitationContactsAdapter.setContactData(contacts);
-        invitationContactsAdapter.notifyDataSetChanged();
+        recyclerViewList.post(() -> {
+            invitationContactsAdapter.setContactData(contacts);
+            invitationContactsAdapter.notifyDataSetChanged();
+        });
     }
 
     private void showEmptyTextView() {

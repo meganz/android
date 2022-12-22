@@ -18,6 +18,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -74,6 +75,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetNumberOfSubscription
+import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -111,6 +114,8 @@ class MyAccountViewModel @Inject constructor(
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getAccountDetails: GetAccountDetails,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
+    private val getNumberOfSubscription: GetNumberOfSubscription,
+    private val getPaymentMethod: GetPaymentMethod,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -138,11 +143,34 @@ class MyAccountViewModel @Inject constructor(
     val cancelAccountDialogState: StateFlow<CancelAccountDialogState>
         get() = _cancelAccountDialogState
 
+    private val _numberOfSubscription = MutableStateFlow(INVALID_VALUE.toLong())
+
+    /**
+     * Number of subscription
+     */
+    val numberOfSubscription = _numberOfSubscription.asStateFlow()
+
     /**
      * On my avatar file changed flow
      */
     val onMyAvatarFileChanged: Flow<File?>
         get() = monitorMyAvatarFile()
+
+    init {
+        refreshNumberOfSubscription(false)
+    }
+
+    /**
+     * Refresh number of subscription
+     *
+     */
+    fun refreshNumberOfSubscription(clearCache: Boolean) {
+        viewModelScope.launch {
+            _numberOfSubscription.value =
+                runCatching { getNumberOfSubscription(clearCache) }
+                    .getOrDefault(INVALID_VALUE.toLong())
+        }
+    }
 
     /**
      * Check the subscription for current account
@@ -286,7 +314,7 @@ class MyAccountViewModel @Inject constructor(
 
     fun getLastSession(): String = myAccountInfo.lastSessionFormattedDate ?: ""
 
-    fun thereIsNoSubscription(): Boolean = myAccountInfo.numberOfSubscriptions <= 0
+    fun thereIsNoSubscription(): Boolean = _numberOfSubscription.value <= 0L
 
     fun getRegisteredPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
 
@@ -406,6 +434,7 @@ class MyAccountViewModel @Inject constructor(
                 viewModelScope.launch {
                     getAccountDetails(true)
                     getExtendedAccountDetail(
+                        forceRefresh = true,
                         sessions = true,
                         purchases = false,
                         transactions = false
@@ -953,5 +982,20 @@ class MyAccountViewModel @Inject constructor(
      */
     fun setOpenUpgradeFrom() {
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
+    }
+
+    /**
+     * Refresh account info
+     *
+     */
+    fun refreshAccountInfo() {
+        viewModelScope.launch {
+            getAccountDetails(forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty())
+            getExtendedAccountDetail(forceRefresh = false,
+                sessions = true,
+                purchases = false,
+                transactions = false)
+            getPaymentMethod(false)
+        }
     }
 }

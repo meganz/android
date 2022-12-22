@@ -261,6 +261,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
         adapter?.isMultipleSelect = false
         recyclerView?.adapter = adapter
+        adapter?.setMandatoryFingerprintVerificationValue(viewModel.state.value.isMandatoryFingerprintVerificationNeeded)
     }
 
     /**

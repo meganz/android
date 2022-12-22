@@ -13,6 +13,5 @@ class CountryMapperTest {
         assertThat(actual.name).isEqualTo(name)
         assertThat(actual.code).isEqualTo(code)
         assertThat(actual.callingCode).isEqualTo(callingCode)
-
     }
 }

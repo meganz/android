@@ -13,6 +13,6 @@ data class ScheduledMeetingItem constructor(
     val chatId: Long,
     val scheduledMeetingId: Long,
     val title: String? = "",
-    val description: String? = "",
+    val description: String? = null,
     val date: String? = "",
 )

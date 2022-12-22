@@ -2,6 +2,9 @@
  * This file is a common module that hosts methods that are called by different CI/CD scripts.
  */
 
+
+import groovy.json.JsonSlurperClassic
+
 /**
  * Check out mega chat SDK by commit ID
  *
@@ -41,14 +44,14 @@ void fetchSdkSubmodules() {
     gitlabCommitStatus(name: 'Fetch SDK Submodules') {
         withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
             script {
-                sh '''
+                sh """
                     cd ${WORKSPACE}
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
+                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git
                     git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
+                    git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git
                     git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
                     git submodule sync
-                    git submodule update --init --recursive --remote 
+                    git submodule update --init --recursive --remote
                     cd sdk/src/main/jni/mega/sdk
                     git fetch
                     git checkout develop
@@ -58,7 +61,7 @@ void fetchSdkSubmodules() {
                     git checkout develop
                     git pull
                     cd ${WORKSPACE}
-                '''
+                """
             }
         }
     }
@@ -114,7 +117,7 @@ void sendToMR(String message) {
     if (mrNumber != null && !mrNumber.isEmpty()) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
         }
     }
@@ -127,6 +130,61 @@ void downloadJenkinsConsoleLog(String downloaded) {
     withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
         sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
     }
+}
+
+
+/**
+ * Rread the prebuilt SDK version from project build.gradle
+ * @return version of prebuilt SDK
+ */
+String readPrebuiltSdkVersion() {
+    return sh(script: "grep megaSdkVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
+}
+
+/**
+ * Query prebuit SDK properties from Artifactory Maven repo <p>
+ *
+ * @param property the property to query. possible value: 'sdk-commit', 'chat-commit'
+ * @param version version of the pre-built SDK. It can be read at the value of megaSdkVersion in
+ * project build.gradle file.
+ * @return property value
+ */
+def queryPrebuiltSdkProperty(String property, String version) {
+    def commit = "N/A"
+    def cmd = "curl ${env.ARTIFACTORY_BASE_URL}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
+    def response = sh(script: cmd, returnStdout: true).trim()
+    def properties = new JsonSlurperClassic().parseText(response).properties
+    if (properties != null) {
+        commit = properties[property][0]
+    }
+    println("$property = $commit")
+    return commit
+}
+
+/**
+ * checkout SDK by branch
+ * @param sdkBranch the branch to checkout
+ */
+private void checkoutSdkByBranch(String sdkBranch) {
+    sh "echo checkoutSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
+}
+
+/**
+ * checkout MEGAchat SDK by branch
+ * @param megaChatBranch the branch to checkout
+ */
+private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
+    sh "echo checkoutMegaChatSdkByBranch"
+    sh "cd \"$WORKSPACE\""
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
+    sh 'git submodule sync'
+    sh 'git submodule update --init --recursive --remote'
 }
 
 return this

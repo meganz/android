@@ -203,14 +203,6 @@ interface FilesRepository {
     suspend fun hasInboxChildren(): Boolean
 
     /**
-     * Downloads a file node in background.
-     *
-     * @param node  File node to download.
-     * @return The local path of the downloaded file.
-     */
-    suspend fun downloadBackgroundFile(node: MegaNode): String
-
-    /**
      * Check access error extended
      *
      * @param node
@@ -225,4 +217,18 @@ interface FilesRepository {
      * @return success or failed
      */
     suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
+
+    /**
+     * Provides Unverified incoming shares count from SDK
+     *
+     * @return Integer count
+     */
+    suspend fun getUnVerifiedInComingShares(): Int
+
+    /**
+     * Provides Unverified outgoing shares count from SDK
+     *
+     * @return Integer count
+     */
+    suspend fun getUnverifiedOutgoingShares(): Int
 }

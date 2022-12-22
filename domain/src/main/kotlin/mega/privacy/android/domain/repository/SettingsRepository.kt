@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
@@ -88,7 +89,7 @@ interface SettingsRepository {
     /**
      * Set camera upload video quality
      */
-    suspend fun setCameraUploadVideoQuality(quality: Int)
+    suspend fun setCameraUploadVideoQuality(quality: VideoQuality)
 
     /**
      * Set if photos only or photos and videos
@@ -337,10 +338,10 @@ interface SettingsRepository {
     suspend fun backupTimestampsAndFolderHandle(
         primaryUploadFolderHandle: Long,
         secondaryUploadFolderHandle: Long,
-        camSyncTimeStamp: String?,
-        camVideoSyncTimeStamp: String?,
-        secSyncTimeStamp: String?,
-        secVideoSyncTimeStamp: String?,
+        camSyncTimeStamp: Long?,
+        camVideoSyncTimeStamp: Long?,
+        secSyncTimeStamp: Long?,
+        secVideoSyncTimeStamp: Long?,
     )
 
 

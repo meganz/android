@@ -66,6 +66,50 @@ interface MegaApiGateway {
     )
 
     /**
+     * Upload a file or folder
+     *
+     * @param localPath The local path of the file or folder
+     * @param parentNode The parent node for the file or folder
+     * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
+     * if there are no changes
+     * @param modificationTime The custom modification time for the file or folder, denoted in
+     * seconds since the epoch
+     * @param appData The custom app data to save, which can be nullable
+     * @param isSourceTemporary Whether the temporary file or folder that is created for upload
+     * should be deleted or not
+     * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
+     * queue or not
+     * @param cancelToken The token to cancel an ongoing file or folder upload, which can be
+     * nullable
+     * @param listener The [MegaTransferListenerInterface] to track the upload
+     */
+    fun startUpload(
+        localPath: String,
+        parentNode: MegaNode,
+        fileName: String?,
+        modificationTime: Long,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        shouldStartFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+        listener: MegaTransferListenerInterface,
+    )
+
+    /**
+     * Adds a [MegaTransferListenerInterface] to listen for Transfer events
+     *
+     * @param listener [MegaTransferListenerInterface]
+     */
+    fun addTransferListener(listener: MegaTransferListenerInterface)
+
+    /**
+     * Removes [MegaTransferListenerInterface] to stop listening for Transfer events
+     *
+     * @param listener [MegaTransferListenerInterface]
+     */
+    fun removeTransferListener(listener: MegaTransferListenerInterface)
+
+    /**
      * Start upload for support
      *
      * @param path of file to upload
@@ -574,11 +618,20 @@ interface MegaApiGateway {
     suspend fun getIncomingContactRequests(): ArrayList<MegaContactRequest>?
 
     /**
-     * get user avatar color
+     * Get the default color for the avatar
      *
      * @param megaUser
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
      */
     suspend fun getUserAvatarColor(megaUser: MegaUser): String
+
+    /**
+     * Get the default color for the avatar
+     *
+     * @param userHandle
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
+     */
+    suspend fun getUserAvatarColor(userHandle: Long): String
 
     /**
      * Get user avatar
@@ -851,7 +904,7 @@ interface MegaApiGateway {
     /**
      * Returns if accounts achievements enabled
      */
-    suspend fun isAccountAchievementsEnabled(): Boolean
+    suspend fun areAccountAchievementsEnabled(): Boolean
 
     /**
      * Get account achievements
@@ -1041,14 +1094,6 @@ interface MegaApiGateway {
     fun getCountryCallingCodes(listener: MegaRequestListenerInterface)
 
     /**
-     * Returns whether MEGA Achievements are enabled for the open account
-     *
-     * @return True if enabled, false otherwise.
-     */
-
-    fun isAchievementsEnabled(): Boolean
-
-    /**
      * Logout of the MEGA account invalidating the session
      *
      * @param listener [MegaRequestListenerInterface] to track this request
@@ -1094,4 +1139,180 @@ interface MegaApiGateway {
         transactions: Boolean,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Create a contact link
+     *
+     * @param renew – True to invalidate the previous contact link (if any).
+     * @param listener – MegaRequestListener to track this request
+     */
+    fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Delete a contact link
+     *
+     * @param handle   Handle of the contact link to delete
+     *                 If the parameter is INVALID_HANDLE, the active contact link is deleted
+     * @param listener MegaRequestListener to track this request
+     *
+     */
+    fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Returns whether notifications about a chat have to be generated.
+     *
+     * @param chatId    Chat id
+     * @return          True if notifications has to be created, false otherwise.
+     */
+    fun isChatNotifiable(chatId: Long): Boolean
+
+    /**
+     * Invite contact
+     *
+     * @param email     User email
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun inviteContact(email: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get outgoing contact requests
+     *
+     * @return list of [MegaContactRequest]
+     */
+    fun outgoingContactRequests(): ArrayList<MegaContactRequest>
+
+    /**
+     * Create a folder in the MEGA account
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREATE_FOLDER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns the handle of the parent folder
+     * - MegaRequest::getName - Returns the name of the new folder
+     *
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNodeHandle - Handle of the new folder
+     * - MegaRequest::getFlag - True if target folder (\c parent) was overridden
+     *
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param name     Name of the new folder
+     * @param parent   Parent folder
+     * @param listener MegaRequestListener to track this request
+     */
+    fun createFolder(name: String, parent: MegaNode, listener: MegaRequestListenerInterface)
+
+    /**
+     * Set Camera Uploads for both primary and secondary target folder.
+     *
+     *
+     * If only one of the target folders wants to be set, simply pass a INVALID_HANDLE to
+     * as the other target folder and it will remain untouched.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_CAMERA_UPLOADS_FOLDER
+     * - MegaRequest::getNodehandle - Returns the provided node handle for primary folder
+     * - MegaRequest::getParentHandle - Returns the provided node handle for secondary folder
+     *
+     * @param primaryFolder   MegaHandle of the node to be used as primary target folder
+     * @param secondaryFolder MegaHandle of the node to be used as secondary target folder
+     * @param listener        MegaRequestListener to track this request
+     */
+    fun setCameraUploadsFolders(
+        primaryFolder: Long,
+        secondaryFolder: Long,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Gets a MegaNode that can be downloaded/copied with a chat-authorization
+     *
+     * During preview of chat-links, you need to call this method to authorize the MegaNode
+     * from a node-attachment message, so the API allows to access to it. The parameter to
+     * authorize the access can be retrieved from MegaChatRoom::getAuthorizationToken when
+     * the chatroom in in preview mode.
+     *
+     * @param node               MegaNode to authorize
+     * @param authorizationToken Authorization token (public handle of the chatroom in B64url encoding)
+     * @return Authorized node, or NULL if the node can't be authorized
+     */
+    fun authorizeChatNode(node: MegaNode, authorizationToken: String): MegaNode?
+
+    /**
+     * Submit a purchase receipt for verification
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SUBMIT_PURCHASE_RECEIPT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the payment gateway
+     * - MegaRequest::getText - Returns the purchase receipt
+     *
+     * @param gateway  Payment gateway
+     *                 Currently supported payment gateways are:
+     *                 - MegaApi::PAYMENT_METHOD_ITUNES = 2
+     *                 - MegaApi::PAYMENT_METHOD_GOOGLE_WALLET = 3
+     *                 - MegaApi::PAYMENT_METHOD_WINDOWS_STORE = 13
+     * @param receipt  Purchase receipt
+     * @param listener MegaRequestListener to track this request
+     */
+    fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Submit a purchase receipt for verification
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SUBMIT_PURCHASE_RECEIPT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the payment gateway
+     * - MegaRequest::getText - Returns the purchase receipt
+     * - MegaRequest::getNodeHandle - Returns the last public node handle accessed
+     * - MegaRequest::getParamType - Returns the type of lastPublicHandle
+     * - MegaRequest::getTransferredBytes - Returns the timestamp of the last access
+     *
+     * @param gateway              Payment gateway
+     *                             Currently supported payment gateways are:
+     *                             - MegaApi::PAYMENT_METHOD_ITUNES = 2
+     *                             - MegaApi::PAYMENT_METHOD_GOOGLE_WALLET = 3
+     *                             - MegaApi::PAYMENT_METHOD_WINDOWS_STORE = 13
+     * @param receipt              Purchase receipt
+     * @param lastPublicHandle     Last public node handle accessed by the user in the last 24h
+     * @param lastPublicHandleType Indicates the type of lastPublicHandle, valid values are:
+     *                             - MegaApi::AFFILIATE_TYPE_ID = 1
+     *                             - MegaApi::AFFILIATE_TYPE_FILE_FOLDER = 2
+     *                             - MegaApi::AFFILIATE_TYPE_CHAT = 3
+     *                             - MegaApi::AFFILIATE_TYPE_CONTACT = 4
+     * @param lastAccessTimestamp  Timestamp of the last access
+     * @param listener             MegaRequestListener to track this request
+     */
+    fun submitPurchaseReceipt(
+        gateway: Int,
+        receipt: String?,
+        lastPublicHandle: Long,
+        lastPublicHandleType: Int,
+        lastAccessTimestamp: Long,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Set My Chat Files target folder.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_MY_CHAT_FILES_FOLDER
+     * - MegaRequest::getMegaStringMap - Returns a MegaStringMap.
+     * The key "h" in the map contains the nodehandle specified as parameter encoded in B64
+     *
+     * @param nodeHandle MegaHandle of the node to be used as target folder
+     * @param listener   MegaRequestListener to track this request
+     */
+    fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
 }

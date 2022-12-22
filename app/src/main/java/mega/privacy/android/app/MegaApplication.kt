@@ -16,9 +16,6 @@ import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
@@ -38,7 +35,6 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.GetCallSoundsUseCase
@@ -46,16 +42,8 @@ import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.ChangeApiServerUtil
 import mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -91,13 +79,7 @@ import javax.inject.Inject
  * @property globalChatListener
  * @property localIpAddress
  * @property isEsid
- * @property monitorStorageStateEvent
- * @property isDatabaseEntryStale
  * @property globalNetworkStateHandler
- * @property getSpecificAccountDetail
- * @property applicationScope
- * @property getAccountDetails
- * @property getExtendedAccountDetail
  */
 @HiltAndroidApp
 class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
@@ -170,26 +152,7 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     lateinit var globalChatListener: GlobalChatListener
 
     @Inject
-    lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
-
-    @Inject
-    lateinit var isDatabaseEntryStale: IsDatabaseEntryStale
-
-    @Inject
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
-
-    @Inject
-    lateinit var getSpecificAccountDetail: GetSpecificAccountDetail
-
-    @ApplicationScope
-    @Inject
-    lateinit var applicationScope: CoroutineScope
-
-    @Inject
-    lateinit var getAccountDetails: GetAccountDetails
-
-    @Inject
-    lateinit var getExtendedAccountDetail: GetExtendedAccountDetail
 
     var localIpAddress: String? = ""
 
@@ -309,88 +272,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     override fun getWorkManagerConfiguration(): Configuration = Configuration.Builder()
         .setWorkerFactory(workerFactory)
         .build()
-
-    /**
-     * Ask for full account info
-     *
-     */
-    fun askForFullAccountInfo() {
-        Timber.d("askForFullAccountInfo")
-        applicationScope.launch {
-            megaApi.getPaymentMethods(null)
-            if (monitorStorageStateEvent.getState() == StorageState.Unknown) {
-                getAccountDetails(true)
-            } else {
-                getSpecificAccountDetail(storage = false, transfer = true, pro = true)
-            }
-            megaApi.getPricing(null)
-            megaApi.creditCardQuerySubscriptions(null)
-        }
-    }
-
-    /**
-     * Ask for pricing
-     *
-     */
-    fun askForPricing() = megaApi.getPricing(null)
-
-    /**
-     * Ask for payment methods
-     *
-     */
-    fun askForPaymentMethods() {
-        Timber.d("askForPaymentMethods")
-        megaApi.getPaymentMethods(null)
-    }
-
-    /**
-     * Ask for account details
-     *
-     */
-    private fun askForAccountDetails() {
-        applicationScope.launch {
-            Timber.d("askForAccountDetails")
-            getAccountDetails(true)
-        }
-    }
-
-    /**
-     * Ask for credit card subscriptions
-     *
-     */
-    fun askForCCSubscriptions() = megaApi.creditCardQuerySubscriptions(null)
-
-    /**
-     * Ask for extended account details
-     *
-     */
-    private fun askForExtendedAccountDetails() {
-        Timber.d("askForExtendedAccountDetails")
-        applicationScope.launch {
-            getExtendedAccountDetail(sessions = true, purchases = false, transactions = false)
-        }
-    }
-
-    /**
-     * Refresh account info
-     *
-     */
-    fun refreshAccountInfo() {
-        //Check if the call is recently
-        if (runBlocking { isDatabaseEntryStale() }
-            || myAccountInfo.usedFormatted.trim().isEmpty()) {
-            Timber.d("megaApi.getAccountDetails SEND")
-            askForAccountDetails()
-        }
-        if (DBUtil.callToExtendedAccountDetails()) {
-            Timber.d("megaApi.getExtendedAccountDetails SEND")
-            askForExtendedAccountDetails()
-        }
-        if (DBUtil.callToPaymentMethods()) {
-            Timber.d("megaApi.getPaymentMethods SEND")
-            askForPaymentMethods()
-        }
-    }
 
     /**
      * Disable mega chat api

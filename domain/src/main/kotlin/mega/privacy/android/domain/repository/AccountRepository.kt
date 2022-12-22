@@ -106,7 +106,7 @@ interface AccountRepository {
     /**
      * Returns if accounts achievements enabled
      */
-    suspend fun isAccountAchievementsEnabled(): Boolean
+    suspend fun areAccountAchievementsEnabled(): Boolean
 
     /**
      * Get account achievements
@@ -124,6 +124,13 @@ interface AccountRepository {
      * @return the latest account detail time stamp
      */
     suspend fun getAccountDetailsTimeStampInSeconds(): String?
+
+    /**
+     * Get extended account details time stamp
+     *
+     * @return the latest account detail time stamp
+     */
+    suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String?
 
     /**
      * Get specific account detail
@@ -167,8 +174,29 @@ interface AccountRepository {
     suspend fun resetExtendedAccountDetailsTimestamp()
 
     /**
-     * Check Achievements are enabled or not
+     * logout
      */
-    suspend fun areAchievementsEnabled(): Boolean
+    suspend fun logout()
+
+    /**
+     * Create a contact link
+     *
+     * @param renew – True to invalidate the previous contact link (if any).
+     * @return string of contact link.
+     */
+    suspend fun createContactLink(renew: Boolean): String
+
+    /**
+     * Delete a contact link
+     *
+     * @param handle   Handle of the contact link to delete
+     *                 If the parameter is INVALID_HANDLE, the active contact link is deleted
+     */
+    suspend fun deleteContactLink(handle: Long)
+
+    /**
+     * Registered email of current account
+     */
+    val accountEmail: String?
 
 }

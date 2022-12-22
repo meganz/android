@@ -10,7 +10,7 @@ import javax.inject.Inject
  * @property accountRepository
  * @property timeSystemRepository
  */
-class DefaultIsDatabaseEntryStale @Inject constructor(
+internal class DefaultIsDatabaseEntryStale @Inject constructor(
     private val accountRepository: AccountRepository,
     private val timeSystemRepository: TimeSystemRepository,
 ) : IsDatabaseEntryStale {

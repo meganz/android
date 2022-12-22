@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import mega.privacy.android.data.constant.BroadcastConstant.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.data.extensions.registerReceiverAsFlow
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.domain.entity.BatteryInfo
@@ -33,6 +34,11 @@ internal class BroadcastReceiverFacade @Inject constructor(
         context.registerReceiverAsFlow(Intent.ACTION_POWER_DISCONNECTED).map {
             true
         }.toSharedFlow(appScope)
+
+    override val monitorMutedChats: Flow<Boolean> =
+        context.registerReceiverAsFlow(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
+            .map { true }
+            .toSharedFlow(appScope)
 }
 
 private fun <T> Flow<T>.toSharedFlow(
