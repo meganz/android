@@ -48,7 +48,7 @@ class GetLinkViewModel @Inject constructor(
 ) : BaseRxViewModel() {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
-    private val password: MutableLiveData<String> = MutableLiveData()
+    private val password: MutableLiveData<String?> = MutableLiveData()
     private val expiryDate: MutableLiveData<String> = MutableLiveData()
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -62,7 +62,7 @@ class GetLinkViewModel @Inject constructor(
     fun getLink(): LiveData<String> = linkText
     fun getLinkText(): String = linkText.value ?: ""
 
-    fun getPassword(): LiveData<String> = password
+    fun getPassword(): LiveData<String?> = password
     fun getPasswordText(): String? = password.value
 
     fun getExpiryDate(): LiveData<String> = expiryDate
