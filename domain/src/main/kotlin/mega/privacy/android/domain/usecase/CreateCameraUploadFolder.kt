@@ -8,6 +8,7 @@ fun interface CreateCameraUploadFolder {
     /**
      * invoke
      * @param name
+     * @return handle [Long]
      */
     suspend operator fun invoke(name: String): Long?
 }
