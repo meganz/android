@@ -22,6 +22,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
@@ -62,6 +63,13 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaLocalStorageGateway
  * @property megaShareMapper
  * @property megaExceptionMapper
+ * @property sortOrderIntMapper
+ * @property cacheFolderGateway
+ * @property nodeMapper
+ * @property fileTypeInfoMapper
+ * @property offlineNodeInformationMapper
+ * @property fileGateway
+ * @property chatFilesFolderUserAttributeMapper
  */
 internal class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -78,6 +86,7 @@ internal class DefaultFilesRepository @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
+    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
 ) : FilesRepository, FileRepository {
 
     override suspend fun copyNode(
@@ -428,4 +437,19 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getUnverifiedOutgoingShares(): Int = 5
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
+
+    override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
+                    megaApiGateway.base64ToHandle(value)
+                        .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
+                }
+            }
+            megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

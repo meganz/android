@@ -713,4 +713,10 @@ internal class MegaApiFacade @Inject constructor(
         lastAccessTimestamp,
         listener,
     )
+
+    override fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface) =
+        megaApi.setMyChatFilesFolder(
+            nodeHandle,
+            listener,
+        )
 }

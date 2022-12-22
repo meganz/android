@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.usecase.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
+import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
@@ -193,5 +195,12 @@ abstract class ChatModule {
         @Provides
         fun provideInviteContact(chatRepository: ChatRepository): InviteContact =
             InviteContact(chatRepository::inviteContact)
+
+        /**
+         * Provides the Use Case [SetMyChatFilesFolder]
+         */
+        @Provides
+        fun provideSetMyChatFilesFolder(fileRepository: FileRepository): SetMyChatFilesFolder =
+            SetMyChatFilesFolder(fileRepository::setMyChatFilesFolder)
     }
 }
