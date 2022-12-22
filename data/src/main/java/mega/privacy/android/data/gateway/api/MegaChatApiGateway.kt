@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatScheduledMeeting
+import nz.mega.sdk.MegaHandleList
 
 /**
  * Mega chat api gateway
@@ -154,20 +155,62 @@ interface MegaChatApiGateway {
     fun getChatRoomByUser(userHandle: Long): MegaChatRoom?
 
     /**
-     * Returns the known alias given to the user.
-     * Returns NULL if data is not cached yet or it's not possible to get.
+     * Request user attributes
      *
-     * @param userHandle Handle of the user whose alias is requested.
-     * @return The user alias.
+     * This function is useful to get the email address, first name, last name and full name
+     * from chat link participants that they are not loaded
+     *
+     * After request is finished, you can call to MegaChatApi::getUserFirstnameFromCache,
+     * MegaChatApi::getUserLastnameFromCache, MegaChatApi::getUserFullnameFromCache,
+     * MegaChatApi::getUserEmailFromCache (email will not available in anonymous mode)
+     * 
+     * @param chatId Handle of the chat whose member attributes requested
+     * @param userList List of user whose attributes has been requested
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun loadUserAttributes(
+        chatId: Long,
+        userList: MegaHandleList,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Get user email from cache
+     *
+     * @param   userHandle User handle.
+     * @return  User email or null if it has not been cached yet.
+     */
+    fun getUserEmailFromCache(userHandle: Long): String?
+
+    /**
+     * Get the alias given to the user from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User alias or null if it has not been cached yet.
      */
     fun getUserAliasFromCache(userHandle: Long): String?
 
     /**
-     *  Returns the current full name of the user.
-     *  Returns NULL if data is not cached yet or it's not possible to get.
+     * Get user first name from cache.
      *
-     * @param userHandle Handle of the user whose full name is requested.
-     * @return The user full name.
+     * @param   userHandle User handle.
+     * @return  User firstname or null if it has not been cached yet.
+     */
+    fun getUserFirstnameFromCache(userHandle: Long): String?
+
+    /**
+     * Get user last name from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User lastname or null if it has not been cached yet.
+     */
+    fun getUserLastnameFromCache(userHandle: Long): String?
+
+    /**
+     *  Get user full name from cache.
+     *
+     * @param   userHandle User handle.
+     * @return  User full name or null if it has not been cached yet.
      */
     fun getUserFullNameFromCache(userHandle: Long): String?
 

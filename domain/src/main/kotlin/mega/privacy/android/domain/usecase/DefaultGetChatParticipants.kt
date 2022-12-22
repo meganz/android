@@ -258,7 +258,7 @@ class DefaultGetChatParticipants @Inject constructor(
                             val currentItem = get(currentItemIndex)
                             set(currentItemIndex,
                                 currentItem.copy(data = currentItem.data.copy(fullName = contactsRepository.getUserFullName(
-                                    currentItem.email))))
+                                    currentItem.handle))))
                         }
                     }
                 }
@@ -347,7 +347,7 @@ class DefaultGetChatParticipants @Inject constructor(
                                         currentItem.copy(
                                             data = currentItem.data.copy(
                                                 fullName = contactsRepository.getUserFullName(
-                                                    currentItem.email)
+                                                    currentItem.handle)
                                             )
                                         )
                                 }
