@@ -7,6 +7,7 @@ fun interface SetMyChatFilesFolder {
     /**
      * invoke
      * @param handle
+     * @return [Long]
      */
-    suspend operator fun invoke(handle: Long)
+    suspend operator fun invoke(handle: Long): Long?
 }

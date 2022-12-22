@@ -9,6 +9,7 @@ typealias ChatFilesFolderUserAttributeMapper = (@JvmSuppressWildcards MegaString
 
 /**
  * Map [MegaStringMap] to [String]
+ * [MegaStringMap] where one of the entries will contain a key "h" and its value, the handle in base64.
  */
 internal fun toChatFilesFolderUserAttribute(map: MegaStringMap?): String? {
     return map?.takeIf { it.size() > 0 && map["h"].isNullOrEmpty().not() }?.let {

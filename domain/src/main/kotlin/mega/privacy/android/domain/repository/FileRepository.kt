@@ -97,6 +97,7 @@ interface FileRepository {
     /**
      * setMyChatFilesFolder
      * @param nodeHandle
+     * @return node handle [Long]
      */
     suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
 }
