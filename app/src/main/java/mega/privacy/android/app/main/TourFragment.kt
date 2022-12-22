@@ -42,9 +42,7 @@ class TourFragment : Fragment() {
 
     private lateinit var binding: FragmentTourBinding
 
-    private var tourAdapter: TourImageAdapter? = null
-
-    private var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>? = null
+    private lateinit var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>
 
     private val selectedCircle by lazy {
         ContextCompat.getDrawable(requireContext(), R.drawable.selection_circle_page_adapter)
@@ -108,7 +106,7 @@ class TourFragment : Fragment() {
         joinMeetingAsGuest.setOnClickListener {
             Timber.d("onJoinMeetingAsGuestClick")
             if (requestBluetoothPermission()) {
-                joinMeetingAsGuestLauncher?.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                joinMeetingAsGuestLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
             } else {
                 isLoggingOut = false
                 PasteMeetingLinkGuestDialogFragment().show(childFragmentManager,
@@ -118,10 +116,8 @@ class TourFragment : Fragment() {
 
         setItemSelected(firstItem.id)
 
-        tourAdapter = TourImageAdapter(requireActivity())
-
         with(pager) {
-            adapter = tourAdapter
+            adapter = TourImageAdapter(requireActivity())
             currentItem = 0
             setOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
                 override fun onPageSelected(position: Int) {
