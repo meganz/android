@@ -25,11 +25,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -76,7 +78,6 @@ import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -442,6 +443,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
                     menu.findItem(R.id.chat_action_remove).isVisible = false
                     menu.findItem(R.id.action_save).isVisible = false
+                    lifecycleScope.launch {
+                        val showLinks = viewModel.canShowLinks(viewModel.getNode())
+                        menu.findItem(R.id.action_get_link).isVisible = showLinks
+                        menu.findItem(R.id.action_remove_link).isVisible = showLinks
+                    }
                 }
             }
         } else {

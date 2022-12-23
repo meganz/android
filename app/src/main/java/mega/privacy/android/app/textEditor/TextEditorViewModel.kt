@@ -25,6 +25,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.domain.usecase.GetParentMegaNode
+import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -81,6 +83,8 @@ class TextEditorViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val downloadBackgroundFile: DownloadBackgroundFile,
+    private val getParentMegaNode: GetParentMegaNode,
+    private val isPendingShare: IsPendingShare,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
@@ -781,5 +785,18 @@ class TextEditorViewModel @Inject constructor(
     fun nextClicked() {
         pagination.value?.nextPage()
         pagination.notifyObserver()
+    }
+
+    suspend fun canShowLinks(node: MegaNode?): Boolean {
+        return when {
+            node == null -> true
+            node.isInShare -> false
+            node.isOutShare -> true
+            isPendingShare(node.handle) -> true
+            else -> {
+                val parentNode = getParentMegaNode(node)
+                canShowLinks(parentNode)
+            }
+        }
     }
 }
