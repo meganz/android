@@ -42,7 +42,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
-import mega.privacy.android.data.mapper.PaymentMethodMapper
+import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
@@ -52,6 +52,7 @@ import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
+import mega.privacy.android.data.mapper.PaymentPlatformTypeMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
@@ -111,6 +112,7 @@ import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
+import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toSyncRecordType
 import mega.privacy.android.data.mapper.toSyncRecordTypeInt
@@ -360,7 +362,7 @@ internal class MapperModule {
      * Provide paymentMethod type mapper
      */
     @Provides
-    fun providePaymentMethodTypeMapper(): PaymentMethodMapper = ::toPaymentMethodType
+    fun providePaymentMethodTypeMapper(): PaymentMethodTypeMapper = ::toPaymentMethodType
 
     /**
      * Provide subscription plan list mapper
@@ -501,4 +503,11 @@ internal class MapperModule {
     @Provides
     fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
         ::toChatFilesFolderUserAttribute
+
+    /**
+     * Provide subscription platform type mapper
+     */
+    @Provides
+    fun provideSubscriptionPlatformTypeMapper(): PaymentPlatformTypeMapper =
+        ::toPaymentPlatformType
 }
