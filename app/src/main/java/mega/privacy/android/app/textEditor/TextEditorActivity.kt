@@ -76,7 +76,6 @@ import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -427,10 +426,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                                 menu.findItem(R.id.action_remove_link).isVisible = false
                             }
                         }
+                        MegaShare.ACCESS_FULL -> {
+                            menu.findItem(R.id.action_get_link).isVisible = false
+                            menu.findItem(R.id.action_remove_link).isVisible = false
+                        }
                         MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
                             menu.findItem(R.id.action_remove).isVisible = false
                             menu.findItem(R.id.action_move).isVisible = false
                             menu.findItem(R.id.action_move_to_trash).isVisible = false
+                            menu.findItem(R.id.action_get_link).isVisible = false
+                            menu.findItem(R.id.action_remove_link).isVisible = false
                         }
                     }
 
