@@ -31,6 +31,11 @@ enum class ScheduledMeetingInfoAction {
     ShareFiles,
 
     /**
+     * Share meeting link option for non-hosts.
+     */
+    ShareMeetingLinkNonHosts,
+
+    /**
      * Manage Chat history.
      */
     ManageChatHistory,

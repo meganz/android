@@ -426,7 +426,9 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
         when (action) {
             ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
-            ScheduledMeetingInfoAction.ShareMeetingLink -> showGetChatLinkPanel()
+            ScheduledMeetingInfoAction.ShareMeetingLink,
+            ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
+            -> showGetChatLinkPanel()
             ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()

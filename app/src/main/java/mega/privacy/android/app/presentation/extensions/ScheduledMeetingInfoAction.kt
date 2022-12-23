@@ -10,6 +10,7 @@ internal val ScheduledMeetingInfoAction.title: Int
         ScheduledMeetingInfoAction.ChatNotifications -> R.string.title_properties_contact_notifications_for_chat
         ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> R.string.chat_group_chat_info_allow_non_host_participants_option
         ScheduledMeetingInfoAction.ShareFiles -> R.string.title_chat_shared_files_info
+        ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts -> R.string.meetings_scheduled_meeting_info_share_meeting_link_label
         ScheduledMeetingInfoAction.ManageChatHistory -> R.string.title_properties_manage_chat
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> R.string.make_chat_private_option
         ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> R.string.private_chat
@@ -22,6 +23,7 @@ internal val ScheduledMeetingInfoAction.description: Int?
         ScheduledMeetingInfoAction.ChatNotifications -> null
         ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> null
         ScheduledMeetingInfoAction.ShareFiles -> null
+        ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts -> null
         ScheduledMeetingInfoAction.ManageChatHistory -> null
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> R.string.make_chat_private_option_text
         ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> R.string.make_chat_private_option_text
@@ -34,6 +36,7 @@ internal val ScheduledMeetingInfoAction.icon: Int?
         ScheduledMeetingInfoAction.ChatNotifications -> R.drawable.ic_bell
         ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> R.drawable.ic_users
         ScheduledMeetingInfoAction.ShareFiles -> R.drawable.ic_share_files
+        ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts -> R.drawable.link_ic
         ScheduledMeetingInfoAction.ManageChatHistory -> R.drawable.ic_manage_history
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> null
         ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> null

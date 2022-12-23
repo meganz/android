@@ -593,16 +593,27 @@ private fun ActionButton(
             }
         }) {
         when (action) {
-            ScheduledMeetingInfoAction.ShareMeetingLink -> {
+            ScheduledMeetingInfoAction.ShareMeetingLink,
+            ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
+            -> {
                 if (state.isPublic && state.enabledMeetingLinkOption) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(modifier = Modifier.padding(start = 72.dp,
-                            end = 16.dp,
-                            top = 16.dp,
-                            bottom = 16.dp),
-                            style = MaterialTheme.typography.button,
-                            text = stringResource(id = action.title),
-                            color = MaterialTheme.colors.secondary)
+
+                        if (action == ScheduledMeetingInfoAction.ShareMeetingLink && state.isHost) {
+                            Text(modifier = Modifier.padding(start = 72.dp,
+                                end = 16.dp,
+                                top = 16.dp,
+                                bottom = 16.dp),
+                                style = MaterialTheme.typography.button,
+                                text = stringResource(id = action.title),
+                                color = MaterialTheme.colors.secondary)
+                        } else if (action == ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts && !state.isHost) {
+                            ActionOption(
+                                state = state,
+                                action = action,
+                                isEnabled = true,
+                                hasSwitch = false)
+                        }
                     }
 
                     divider(withStartPadding = true)
