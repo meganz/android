@@ -472,4 +472,12 @@ interface CameraUploadRepository {
         primaryFolder: Long,
         secondaryFolder: Long,
     )
+
+    /**
+     * rename camera uploads folder name
+     *
+     * @param nodeHandle handle for node to change name
+     * @param newName new name for camera upload folder
+     */
+    suspend fun renameNode(nodeHandle: Long, newName: String)
 }

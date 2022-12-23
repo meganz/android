@@ -1231,6 +1231,15 @@ interface MegaApiGateway {
     )
 
     /**
+     * Rename a node in the MEGA account
+     *
+     * @param node     Node to modify
+     * @param newName  New name for the node
+     * @param listener MegaRequestListener to track this request
+     */
+    fun renameNode(node: MegaNode, newName: String, listener: MegaRequestListenerInterface)
+
+    /**
      * Gets a MegaNode that can be downloaded/copied with a chat-authorization
      *
      * During preview of chat-links, you need to call this method to authorize the MegaNode
