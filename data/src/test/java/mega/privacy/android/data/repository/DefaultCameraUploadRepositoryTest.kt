@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.syncStatusToInt
@@ -18,7 +20,10 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -34,6 +39,7 @@ class DefaultCameraUploadRepositoryTest {
     private lateinit var underTest: CameraUploadRepository
 
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
+    private val megaApiGateway = mock<MegaApiGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
     private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
@@ -60,7 +66,7 @@ class DefaultCameraUploadRepositoryTest {
     fun setUp() {
         underTest = DefaultCameraUploadRepository(
             localStorageGateway = localStorageGateway,
-            megaApiGateway = mock(),
+            megaApiGateway = megaApiGateway,
             cacheGateway = mock(),
             fileAttributeGateway = fileAttributeGateway,
             cameraUploadMediaGateway = cameraUploadMediaGateway,
@@ -262,6 +268,108 @@ class DefaultCameraUploadRepositoryTest {
         whenever(localStorageGateway.convertOnCharging()).thenReturn(false)
         assertThat(underTest.convertOnCharging()).isEqualTo(false)
     }
+
+    @Test
+    fun `test that setup primary folder returns success when api set camera upload folders returns API_OK`() =
+        runTest {
+            val result = 69L
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { nodeHandle }.thenReturn(result)
+            }
+            whenever(
+                megaApiGateway.setCameraUploadsFolders(
+                    any(),
+                    any(),
+                    listener = any()
+                )
+            ).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                )
+            }
+
+            assertThat(underTest.setupPrimaryFolder(1L)).isEqualTo(result)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that setup primary folder returns an exception when api set camera upload folders does not return API_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+            val megaRequest = mock<MegaRequest> {}
+            whenever(
+                megaApiGateway.setCameraUploadsFolders(
+                    any(),
+                    any(),
+                    listener = any()
+                )
+            ).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                )
+            }
+
+            underTest.setupPrimaryFolder(1L)
+        }
+
+    @Test
+    fun `test that setup secondary folder returns success when api set camera upload folders returns API_OK`() =
+        runTest {
+            val result = 69L
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { parentHandle }.thenReturn(result)
+            }
+            whenever(
+                megaApiGateway.setCameraUploadsFolders(
+                    any(),
+                    any(),
+                    listener = any()
+                )
+            ).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                )
+            }
+
+            assertThat(underTest.setupSecondaryFolder(1L)).isEqualTo(result)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that setup secondary folder returns an exception when api set camera upload folders does not return API_OK`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+            val megaRequest = mock<MegaRequest> {}
+            whenever(
+                megaApiGateway.setCameraUploadsFolders(
+                    any(),
+                    any(),
+                    listener = any()
+                )
+            ).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                )
+            }
+
+            underTest.setupSecondaryFolder(1L)
+        }
 
     @Test
     fun `test camera upload get the correct media queues by media store file type`() = runTest {
