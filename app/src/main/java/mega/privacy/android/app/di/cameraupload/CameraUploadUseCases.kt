@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.R
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
@@ -87,6 +88,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
+import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
@@ -218,6 +220,16 @@ abstract class CameraUploadUseCases {
                 shouldIgnoreAttributes
             )
         }
+
+        /**
+         * Provide the [GetCameraUploadFolderName]
+         */
+        @Provides
+        fun provideGetCameraUploadFolderName(@ApplicationContext context: Context): GetCameraUploadFolderName =
+            GetCameraUploadFolderName { isSecondary ->
+                if (!isSecondary) context.getString(R.string.section_photo_sync)
+                else context.getString(R.string.section_secondary_media_uploads)
+            }
 
         /**
          * Provide the [MediaLocalPathExists] implementation
