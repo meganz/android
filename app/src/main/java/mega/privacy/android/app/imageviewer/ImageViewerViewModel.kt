@@ -209,7 +209,7 @@ class ImageViewerViewModel @Inject constructor(
 
     fun retrieveSingleImage(nodeHandle: Long, isOffline: Boolean = false) {
         getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = isOffline)
-            .subscribeAndUpdateImages()
+            .subscribeAndUpdateImages(nodeHandle)
     }
 
     fun retrieveSingleImage(nodeFileLink: String) {
