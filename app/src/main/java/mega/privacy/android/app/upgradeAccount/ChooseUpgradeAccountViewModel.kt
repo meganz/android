@@ -28,6 +28,9 @@ import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
+import mega.privacy.android.domain.entity.PaymentMethod
+import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
@@ -42,6 +45,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
+    private val paymentMethodTypeMapper: PaymentMethodTypeMapper,
 ) : ViewModel() {
 
     companion object {
@@ -55,7 +59,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
 
     private val upgradeClick = SingleLiveEvent<Int>()
     private val currentUpgradeClickedAndSubscription =
-        MutableLiveData<Pair<Int, SubscriptionMethod>?>()
+        MutableLiveData<Pair<Int, PaymentMethod>?>()
 
     private val _state = MutableStateFlow(ChooseUpgradeAccountState())
 
@@ -65,7 +69,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     fun onUpgradeClick(): LiveData<Int> = upgradeClick
-    fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, SubscriptionMethod>?> =
+    fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, PaymentMethod>?> =
         currentUpgradeClickedAndSubscription
 
     init {
@@ -91,15 +95,15 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      * @param upgradeType upgrade type
      */
     fun subscriptionCheck(upgradeType: Int) {
-        SubscriptionMethod.values().firstOrNull {
+        PaymentMethod.values().firstOrNull {
             // Determines the current account if has the subscription and the current subscription
             // platform if is same as current payment platform.
             if (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) {
-                it.methodId != MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
-                        && it.methodId == myAccountInfo.subscriptionMethodId
+                it.methodId != PaymentMethodType.GOOGLE_WALLET
+                        && it.methodId == paymentMethodTypeMapper(myAccountInfo.subscriptionMethodId)
             } else {
-                it.methodId != MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET
-                        && it.methodId == myAccountInfo.subscriptionMethodId
+                it.methodId != PaymentMethodType.HUAWEI_WALLET
+                        && it.methodId == paymentMethodTypeMapper(myAccountInfo.subscriptionMethodId)
             }
         }.run {
             if (this == null) {

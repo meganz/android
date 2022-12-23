@@ -57,4 +57,9 @@ interface AccountInfoWrapper {
      * Active subscription of the user
      */
     val activeSubscription: MegaPurchase?
+
+    /**
+     * Subscription payment method
+     */
+    val subscriptionMethodId: Int
 }

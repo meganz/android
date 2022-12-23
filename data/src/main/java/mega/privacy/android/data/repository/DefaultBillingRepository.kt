@@ -13,10 +13,12 @@ import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.LocalPricingMapper
+import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -45,6 +47,7 @@ internal class DefaultBillingRepository @Inject constructor(
     private val pricingMapper: PricingMapper,
     private val localPricingMapper: LocalPricingMapper,
     private val billingGateway: BillingGateway,
+    private val paymentMethodTypeMapper: PaymentMethodTypeMapper,
 ) : BillingRepository, AndroidBillingRepository {
 
     override suspend fun getLocalPricing(sku: String) =
@@ -117,5 +120,14 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override fun monitorBillingEvent(): Flow<BillingEvent> = billingGateway.monitorBillingEvent()
 
-    override suspend fun launchPurchaseFlow(activity: Activity, productId: String) = billingGateway.launchPurchaseFlow(activity, productId)
+    override suspend fun launchPurchaseFlow(activity: Activity, productId: String) =
+        billingGateway.launchPurchaseFlow(activity, productId)
+
+    override suspend fun getCurrentPaymentMethod(): PaymentMethod? =
+        PaymentMethod.values().firstOrNull {
+            it.methodId == paymentMethodTypeMapper(accountInfoWrapper.subscriptionMethodId)
+        }
+
+    override suspend fun isBillingAvailable(): Boolean =
+        accountInfoWrapper.availableSkus.isNotEmpty()
 }

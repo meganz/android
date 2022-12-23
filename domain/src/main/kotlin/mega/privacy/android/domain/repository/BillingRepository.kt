@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.LocalPricing
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 
@@ -62,4 +63,14 @@ interface BillingRepository {
      *
      */
     fun monitorBillingEvent(): Flow<BillingEvent>
+
+    /**
+     * Get current payment method, if current account has paid subscription, or null
+     */
+    suspend fun getCurrentPaymentMethod(): PaymentMethod?
+
+    /**
+     * Check if user can pay through the app
+     */
+    suspend fun isBillingAvailable(): Boolean
 }
