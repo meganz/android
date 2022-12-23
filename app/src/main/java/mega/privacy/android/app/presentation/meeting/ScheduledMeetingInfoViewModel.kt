@@ -18,29 +18,28 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
+import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatListItemChanges
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
-import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CreateChatLink
-
 import mega.privacy.android.domain.usecase.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -65,6 +64,8 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /**
@@ -214,6 +215,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         getScheduledMeeting(chatId)
                         updateDndSeconds(chatId)
                         updateRetentionTimeSeconds(retentionTime)
+
                         queryChatLink()
 
                         getChatRoomUpdates(chatId)
@@ -237,6 +239,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     Timber.e(exception)
                 }
                 .collectLatest { list ->
+                    Timber.d("Updated list of participants")
                     _state.update {
                         it.copy(participantItemList = list, numOfParticipants = list.size)
                     }
@@ -263,7 +266,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         lastParticipant = null)
                 }
             } else {
-
                 _state.update {
                     it.copy(firstParticipant = list.first(),
                         lastParticipant = list.last())
@@ -296,7 +298,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     title = scheduledMeetReceived.title,
                                     description = scheduledMeetReceived.description,
                                     startDate = scheduledMeetReceived.startDateTime,
-                                    endDate = scheduledMeetReceived.endDateTime)
+                                    endDate = scheduledMeetReceived.endDateTime,
+                                    isPast = ZonedDateTime.now()
+                                        .withZoneSameInstant(ZoneId.of("UTC"))
+                                        .isAfter(scheduledMeetReceived.endDateTime))
                                 )
                             }
                             return@forEach
@@ -315,28 +320,34 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
                 when (chat.changes) {
-                    ChatRoomChanges.OwnPrivilege ->
+                    ChatRoomChanges.OwnPrivilege -> {
+                        Timber.d("Changes in own privilege")
                         _state.update {
                             it.copy(isHost = chat.ownPrivilege == ChatRoomPermission.Moderator)
                         }
-
-                    ChatRoomChanges.OpenInvite ->
+                    }
+                    ChatRoomChanges.OpenInvite -> {
+                        Timber.d("Changes in open invite")
                         _state.update {
                             it.copy(
                                 isOpenInvite = chat.isOpenInvite || chat.ownPrivilege == ChatRoomPermission.Moderator,
                                 enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite)
                         }
-
-                    ChatRoomChanges.Title ->
+                    }
+                    ChatRoomChanges.Title -> {
+                        Timber.d("Changes in chat title")
                         _state.update {
                             it.copy(chatTitle = chat.title)
                         }
-
-                    ChatRoomChanges.ChatMode ->
+                    }
+                    ChatRoomChanges.ChatMode -> {
+                        Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
                         _state.update {
                             it.copy(isPublic = chat.isPublic)
                         }
+                    }
                     ChatRoomChanges.RetentionTime -> {
+                        Timber.d("Changes in retention time")
                         updateRetentionTimeSeconds(chat.retentionTime)
 
                         val intentRetentionTime =
@@ -356,6 +367,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
                 when (scheduledMeetReceived.changes) {
                     ScheduledMeetingChanges.NewScheduledMeeting -> {
                         if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
@@ -366,7 +378,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     title = scheduledMeetReceived.title,
                                     description = scheduledMeetReceived.description,
                                     startDate = scheduledMeetReceived.startDateTime,
-                                    endDate = scheduledMeetReceived.endDateTime)
+                                    endDate = scheduledMeetReceived.endDateTime,
+                                    isPast = ZonedDateTime.now()
+                                        .withZoneSameInstant(ZoneId.of("UTC"))
+                                        .isAfter(scheduledMeetReceived.endDateTime))
                                 )
                             }
                         }
@@ -396,8 +411,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 _state.update { state ->
                                     state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
                                         startDate = scheduledMeetReceived.startDateTime,
-                                        endDate = scheduledMeetReceived.endDateTime
-                                    ))
+                                        endDate = scheduledMeetReceived.endDateTime,
+                                        isPast = ZonedDateTime.now()
+                                            .withZoneSameInstant(ZoneId.of("UTC"))
+                                            .isAfter(scheduledMeetReceived.endDateTime))
+                                    )
                                 }
                             }
                         }
@@ -474,6 +492,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess { request ->
+                Timber.d("Query chat link successfully")
                 _state.update {
                     it.copy(enabledMeetingLinkOption = request.text != null,
                         meetingLink = request.text)
@@ -492,6 +511,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 Timber.e(exception)
                 showSnackBar(R.string.general_text_error)
             }.onSuccess { _ ->
+                Timber.d("Remove chat link successfully")
                 _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
             }
         }
@@ -574,6 +594,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         Timber.e(exception)
                         showSnackBar(R.string.general_text_error)
                     }.onSuccess { chatId ->
+                        Timber.d("Open chat room")
                         openChatRoom(chatId)
                     }
                 }
@@ -619,6 +640,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 showSnackBar(R.string.general_text_error)
             }.onSuccess { call ->
                 call?.let {
+                    Timber.d("Call started")
                     MegaApplication.isWaitingForCall = false
                     CallUtil.addChecksForACall(it.chatId, false)
                     if (it.isOutgoing) {

@@ -351,6 +351,7 @@ private fun ScheduledMeetingInfoAppBar(
  *
  * @param state [ScheduledMeetingInfoState]
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
     val isLight = MaterialTheme.colors.isLight
@@ -379,13 +380,24 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                     }
                 }
                 state.scheduledMeeting?.let {
-                    it.date?.let { date ->
-                        Text(text = date,
+                    if (it.isPast) {
+                        Text(text = pluralStringResource(R.plurals.subtitle_of_group_chat,
+                            state.numOfParticipants,
+                            state.numOfParticipants),
                             style = MaterialTheme.typography.subtitle2,
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             fontWeight = FontWeight.Normal,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
+                    } else {
+                        it.date?.let { date ->
+                            Text(text = date,
+                                style = MaterialTheme.typography.subtitle2,
+                                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                                fontWeight = FontWeight.Normal,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis)
+                        }
                     }
                 }
             }
