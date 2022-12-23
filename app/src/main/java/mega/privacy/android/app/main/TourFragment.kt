@@ -40,7 +40,9 @@ import timber.log.Timber
  */
 class TourFragment : Fragment() {
 
-    private lateinit var binding: FragmentTourBinding
+    private var _binding: FragmentTourBinding? = null
+
+    private val binding get() = _binding!!
 
     private lateinit var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>
 
@@ -57,8 +59,13 @@ class TourFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         Timber.d("onCreateView")
-        binding = FragmentTourBinding.inflate(inflater, container, false)
+        _binding = FragmentTourBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onResume() {
