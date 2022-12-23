@@ -18,10 +18,8 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
@@ -52,7 +50,6 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -66,10 +63,8 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
  * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
- * @param getBrowserChildrenNode Fetch the browser nodes
  * @param monitorContactRequestUpdates
  * @param getInboxNode
- * @param getRootFolder Fetch the root node
  * @param getNumUnreadUserAlerts
  * @param hasInboxChildren
  * @param sendStatisticsMediaDiscovery
@@ -84,10 +79,8 @@ class ManagerViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
     private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
-    private val getBrowserChildrenNode: GetBrowserChildrenNode,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getInboxNode: GetInboxNode,
-    private val getRootFolder: GetRootFolder,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
     private val hasInboxChildren: HasInboxChildren,
     private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
@@ -227,42 +220,10 @@ class ManagerViewModel @Inject constructor(
             .asLiveData()
 
     /**
-     * Update Browser Nodes when a node update callback happens
-     */
-    val updateBrowserNodes: LiveData<Event<List<MegaNode>>> =
-        _updateNodes
-            .also { Timber.d("onBrowserNodesUpdate") }
-            .mapNotNull { getBrowserChildrenNode(_state.value.browserParentHandle) }
-            .map { Event(it) }
-            .asLiveData()
-
-    /**
      * On my avatar file changed
      */
     val onMyAvatarFileChanged: Flow<File?>
         get() = monitorMyAvatarFile()
-
-    /**
-     * Get the browser parent handle
-     * If not previously set, set the browser parent handle to root handle
-     *
-     * @return the handle of the browser section
-     */
-    fun getSafeBrowserParentHandle(): Long = runBlocking {
-        if (_state.value.browserParentHandle == -1L) {
-            setBrowserParentHandle(getRootFolder()?.handle ?: INVALID_HANDLE)
-        }
-        return@runBlocking _state.value.browserParentHandle
-    }
-
-    /**
-     * Set the current browser parent handle to the UI state
-     *
-     * @param handle the id of the current browser parent handle to set
-     */
-    fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(browserParentHandle = handle) }
-    }
 
     /**
      * Set the current rubbish bin parent handle to the UI state

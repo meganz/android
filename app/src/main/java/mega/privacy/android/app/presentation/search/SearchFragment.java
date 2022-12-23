@@ -89,6 +89,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
+import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
@@ -110,6 +111,7 @@ public class SearchFragment extends RotatableFragment {
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     private ManagerViewModel managerViewModel;
+    private FileBrowserViewModel fileBrowserViewModel;
     private IncomingSharesViewModel incomingSharesViewModel;
     private OutgoingSharesViewModel outgoingSharesViewModel;
     private InboxViewModel inboxViewModel;
@@ -521,6 +523,7 @@ public class SearchFragment extends RotatableFragment {
                 new EventObserver<>(this::showSortByPanel));
 
         managerViewModel = new ViewModelProvider(requireActivity()).get(ManagerViewModel.class);
+        fileBrowserViewModel = new ViewModelProvider(requireActivity()).get(FileBrowserViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
         outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
         inboxViewModel = new ViewModelProvider(requireActivity()).get(InboxViewModel.class);
@@ -657,7 +660,7 @@ public class SearchFragment extends RotatableFragment {
      */
     private void newSearchNodesTask() {
         viewModel.performSearch(
-                managerViewModel.getState().getValue().getBrowserParentHandle(),
+                fileBrowserViewModel.getState().getValue().getFileBrowserHandle(),
                 managerViewModel.getState().getValue().getRubbishBinParentHandle(),
                 inboxViewModel.getState().getValue().getInboxHandle(),
                 incomingSharesViewModel.getState().getValue().getIncomingHandle(),
