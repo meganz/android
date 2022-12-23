@@ -36,7 +36,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -66,8 +65,6 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**
@@ -298,7 +295,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     scheduledMeetingId = scheduledMeetReceived.schedId,
                                     title = scheduledMeetReceived.title,
                                     description = scheduledMeetReceived.description,
-                                    date = scheduledMeetReceived.getFormattedDate())
+                                    startDate = scheduledMeetReceived.startDateTime,
+                                    endDate = scheduledMeetReceived.endDateTime)
                                 )
                             }
                             return@forEach
@@ -363,11 +361,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
                                 it.copy(scheduledMeeting = ScheduledMeetingItem(
-                                    scheduledMeetReceived.chatId,
-                                    scheduledMeetReceived.schedId,
-                                    scheduledMeetReceived.title,
-                                    scheduledMeetReceived.description,
-                                    scheduledMeetReceived.getFormattedDate())
+                                    chatId = scheduledMeetReceived.chatId,
+                                    scheduledMeetingId = scheduledMeetReceived.schedId,
+                                    title = scheduledMeetReceived.title,
+                                    description = scheduledMeetReceived.description,
+                                    startDate = scheduledMeetReceived.startDateTime,
+                                    endDate = scheduledMeetReceived.endDateTime)
                                 )
                             }
                         }
@@ -396,7 +395,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
                                     state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                                        date = scheduledMeetReceived.getFormattedDate()
+                                        startDate = scheduledMeetReceived.startDateTime,
+                                        endDate = scheduledMeetReceived.endDateTime
                                     ))
                                 }
                             }
@@ -915,19 +915,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Format ZonedDateTime to a readable date
-     *
-     * @return  String with the formatted date
-     */
-    private fun ChatScheduledMeeting.getFormattedDate(): String {
-        val dateFormatter =
-            DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").withZone(ZoneId.systemDefault())
-        val hourFormatter = DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
-        return "${dateFormatter.format(startDateTime)} - ${hourFormatter.format(endDateTime)}"
-    }
-
-
-    /**
      * Updates state after shown snackBar.
      */
     fun snackbarShown() = _state.update { it.copy(snackBar = null) }
@@ -937,6 +924,19 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun openSendToChat(shouldOpen: Boolean) {
         _state.update { it.copy(openSendToChat = shouldOpen) }
+    }
+
+    /**
+     * Set the scheduled date of the meeting
+     *
+     * @param date
+     */
+    fun setScheduledMeetingDate(date: String) {
+        _state.update { state ->
+            state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
+                date = date
+            ))
+        }
     }
 
     companion object {
