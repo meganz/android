@@ -32,6 +32,7 @@ import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaShareList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -871,4 +872,19 @@ internal class MegaApiFacade @Inject constructor(
     ) = megaApi.getPublicNode(nodeFileLink, listener)
 
     override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
+
+    override suspend fun getUnverifiedIncomingShares(order: Int): MegaShareList =
+        megaApi.getUnverifiedIncomingShares(order)
+
+    override suspend fun getUnverifiedOutgoingShares(order: Int): MegaShareList =
+        megaApi.getUnverifiedIncomingShares(order)
+
+    override fun openShareDialog(
+        megaNode: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.openShareDialog(megaNode, listener)
+
+    override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
+        megaApi.upgradeSecurity(listener)
+
 }
