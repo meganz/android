@@ -63,6 +63,8 @@ import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.RenamePrimaryFolder
+import mega.privacy.android.domain.usecase.RenameSecondaryFolder
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -291,6 +293,12 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetCameraUploadFolderName() = mock<GetCameraUploadFolderName>()
+
+    @Provides
+    fun provideRenamePrimaryFolder() = mock<RenamePrimaryFolder>()
+
+    @Provides
+    fun provideRenameSecondaryFolder() = mock<RenameSecondaryFolder>()
 
     @Provides
     fun provideDisableCameraUploadSettings() = mock<DisableCameraUploadSettings>()

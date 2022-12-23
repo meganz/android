@@ -1,7 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.jobservices.CameraUploadsService.CAMERA_UPLOADS_ENGLISH;
-import static mega.privacy.android.app.jobservices.CameraUploadsService.SECONDARY_UPLOADS_ENGLISH;
 import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
@@ -10,6 +8,8 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.INTENT_EXTRA_IS_CU_SECONDARY_FOLDER;
 import static mega.privacy.android.data.facade.FileFacadeKt.INTENT_EXTRA_NODE_HANDLE;
+import static mega.privacy.android.domain.usecase.DefaultRenamePrimaryFolderKt.CAMERA_UPLOADS_ENGLISH;
+import static mega.privacy.android.domain.usecase.DefaultRenameSecondaryFolderKt.SECONDARY_UPLOADS_ENGLISH;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Context;
