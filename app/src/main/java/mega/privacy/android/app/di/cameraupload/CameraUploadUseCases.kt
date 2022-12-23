@@ -8,8 +8,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.GetNodeModule
+import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
@@ -220,16 +220,6 @@ abstract class CameraUploadUseCases {
                 shouldIgnoreAttributes
             )
         }
-
-        /**
-         * Provide the [GetCameraUploadFolderName]
-         */
-        @Provides
-        fun provideGetCameraUploadFolderName(@ApplicationContext context: Context): GetCameraUploadFolderName =
-            GetCameraUploadFolderName { isSecondary ->
-                if (!isSecondary) context.getString(R.string.section_photo_sync)
-                else context.getString(R.string.section_secondary_media_uploads)
-            }
 
         /**
          * Provide the [MediaLocalPathExists] implementation
@@ -510,6 +500,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSetupSecondaryFolder(setupSecondaryFolder: DefaultSetupSecondaryFolder): SetupSecondaryFolder
+
+    /**
+     * Provide the [GetCameraUploadFolderName] implementation
+     */
+    @Binds
+    abstract fun bindGetCameraUploadFolderName(getCameraUploadFolderName: DefaultGetCameraUploadFolderName): GetCameraUploadFolderName
 
     /**
      * Provide the [GetPrimarySyncHandle] implementation
