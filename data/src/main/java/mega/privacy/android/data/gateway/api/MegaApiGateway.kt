@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.ShareData
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -15,7 +16,6 @@ import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaShareList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -1323,7 +1323,7 @@ interface MegaApiGateway {
      * @param order : Sort order
      * @return List of [MegaShare]
      */
-    suspend fun getUnverifiedIncomingShares(order: Int): MegaShareList
+    suspend fun getUnverifiedIncomingShares(order: Int): List<ShareData>
 
     /**
      * Function to get unverified outgoing shares from [MegaApi]
@@ -1331,7 +1331,7 @@ interface MegaApiGateway {
      * @param order : Sort order
      * @return List of [MegaShare]
      */
-    suspend fun getUnverifiedOutgoingShares(order: Int): MegaShareList
+    suspend fun getUnverifiedOutgoingShares(order: Int): List<ShareData>
 
     /**
      * Creates a new share key for the node if there is no share key already created.
