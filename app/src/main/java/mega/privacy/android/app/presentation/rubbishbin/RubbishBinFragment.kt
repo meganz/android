@@ -737,8 +737,8 @@ class RubbishBinFragment : Fragment() {
 
     private fun updateActionModeTitle() {
         actionMode?.let {
-            val files = adapter?.selectedNodes?.filter { it.isFile }?.size ?: 0
-            val folders = adapter?.selectedNodes?.filter { it.isFolder }?.size ?: 0
+            val files = adapter?.selectedNodes?.count { it.isFile } ?: 0
+            val folders = adapter?.selectedNodes?.count { it.isFolder } ?: 0
 
             actionMode?.title = when {
                 (files == 0 && folders == 0) -> 0.toString()
