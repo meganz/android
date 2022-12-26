@@ -737,19 +737,15 @@ class RubbishBinFragment : Fragment() {
 
     private fun updateActionModeTitle() {
         actionMode?.let {
-            val documents = adapter?.selectedNodes
-            var files = 0
-            var folders = 0
-            documents?.forEach {
-                if (it.isFile) files++
-                else if (it.isFolder) folders++
+            val files = adapter?.selectedNodes?.filter { it.isFile }?.size ?: 0
+            val folders = adapter?.selectedNodes?.filter { it.isFolder }?.size ?: 0
+
+            actionMode?.title = when {
+                (files == 0 && folders == 0) -> 0.toString()
+                files == 0 -> folders.toString()
+                folders == 0 -> files.toString()
+                else -> (files + folders).toString()
             }
-            val sum = files + folders
-            val title = if (sum == 0) "0"
-            else if (files == 0) "0"
-            else if (folders == 0) "0"
-            else "$sum"
-            actionMode?.title = title
 
             runCatching {
                 actionMode?.invalidate()
