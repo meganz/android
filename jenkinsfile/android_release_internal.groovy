@@ -364,7 +364,7 @@ pipeline {
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'internal',
                             rolloutPercentage: '0',
-                            additionalVersionCodes: '476,485',
+                            additionalVersionCodes: '476,487',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
                             recentChangeList: getRecentChangeList(release_notes),
                             releaseName: readAppVersion1()

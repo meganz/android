@@ -6,7 +6,7 @@ import nz.mega.sdk.MegaApiJava
 /**
  * Map [Int] to [PaymentMethodType]
  */
-typealias PaymentMethodMapper = (@JvmSuppressWildcards Int) -> @JvmSuppressWildcards PaymentMethodType?
+typealias PaymentMethodTypeMapper = (@JvmSuppressWildcards Int) -> @JvmSuppressWildcards PaymentMethodType?
 
 /**
  * Map [Int] to [PaymentMethodType]. Return value can be subclass of [PaymentMethodType]

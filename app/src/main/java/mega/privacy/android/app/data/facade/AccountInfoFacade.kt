@@ -85,6 +85,9 @@ class AccountInfoFacade @Inject constructor(
     override val activeSubscription: MegaPurchase?
         get() = myAccountInfo.activeSubscription
 
+    override val subscriptionMethodId: Int
+        get() = myAccountInfo.subscriptionMethodId
+
     override fun updateActiveSubscription(purchase: MegaPurchase?, levelInventory: Int) {
         Timber.d("Set current max subscription: $purchase")
         myAccountInfo.activeSubscription = purchase

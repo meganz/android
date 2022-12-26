@@ -60,6 +60,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
@@ -455,6 +456,15 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideMonitorChargingStoppedState(cameraUploadRepository: CameraUploadRepository): MonitorChargingStoppedState =
             MonitorChargingStoppedState(cameraUploadRepository::monitorChargingStoppedInfo)
+
+        /**
+         * Provide the [CreateCameraUploadFolder] implementation
+         */
+        @Provides
+        fun provideCreateCameraUploadFolder(fileRepository: FileRepository): CreateCameraUploadFolder =
+            CreateCameraUploadFolder(fileRepository::createFolder)
+
+
     }
 
     /**

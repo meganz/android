@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.manager.model
 /**
  * Manager UI state
  *
- * @param rubbishBinParentHandle current rubbish bin parent handle
  * @param isFirstNavigationLevel true if the navigation level is the first level
  * @param sharesTab current tab in shares screen
  * @param transfersTab current tab in transfers screen
@@ -14,7 +13,6 @@ package mega.privacy.android.app.presentation.manager.model
  * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
  */
 data class ManagerState(
-    val rubbishBinParentHandle: Long = -1L,
     val isFirstNavigationLevel: Boolean = true,
     val sharesTab: SharesTab = SharesTab.INCOMING_TAB,
     val transfersTab: TransfersTab = TransfersTab.NONE,
