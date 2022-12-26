@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
+import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
@@ -287,6 +288,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSetupSecondaryFolder() = mock<SetupSecondaryFolder>()
+
+    @Provides
+    fun provideGetCameraUploadFolderName() = mock<GetCameraUploadFolderName>()
 
     @Provides
     fun provideDisableCameraUploadSettings() = mock<DisableCameraUploadSettings>()
