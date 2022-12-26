@@ -14,6 +14,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -32,7 +33,6 @@ import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaShareList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -873,10 +873,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
 
-    override suspend fun getUnverifiedIncomingShares(order: Int): MegaShareList =
+    override suspend fun getUnverifiedIncomingShares(order: Int): List<ShareData> =
         megaApi.getUnverifiedIncomingShares(order)
 
-    override suspend fun getUnverifiedOutgoingShares(order: Int): MegaShareList =
+    override suspend fun getUnverifiedOutgoingShares(order: Int): List<ShareData> =
         megaApi.getUnverifiedIncomingShares(order)
 
     override fun openShareDialog(
