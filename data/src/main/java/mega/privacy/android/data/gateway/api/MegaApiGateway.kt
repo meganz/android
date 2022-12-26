@@ -15,7 +15,6 @@ import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaShareList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -1316,38 +1315,4 @@ interface MegaApiGateway {
      * @param listener   MegaRequestListener to track this request
      */
     fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
-
-    /**
-     * Function to get unverified incoming shares from [MegaApi]
-     *
-     * @param order : Sort order
-     * @return List of [MegaShare]
-     */
-    suspend fun getUnverifiedIncomingShares(order: Int): MegaShareList
-
-    /**
-     * Function to get unverified outgoing shares from [MegaApi]
-     *
-     * @param order : Sort order
-     * @return List of [MegaShare]
-     */
-    suspend fun getUnverifiedOutgoingShares(order: Int): MegaShareList
-
-    /**
-     * Creates a new share key for the node if there is no share key already created.
-     *
-     * @param megaNode : [MegaNode] object which needs to be shared
-     * @param listener : Listener to track this request
-     */
-    fun openShareDialog(
-        megaNode: MegaNode,
-        listener: MegaRequestListenerInterface,
-    )
-
-    /**
-     * Update cryptographic security
-     *
-     * @param listener : Listener to track this request
-     */
-    fun upgradeSecurity(listener: MegaRequestListenerInterface)
 }
