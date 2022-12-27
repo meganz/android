@@ -54,7 +54,7 @@ data class SMSVerificationUIState(
     val isAchievementsEnabled: Boolean = false,
 
     /**
-     * granted bonus storage is phone number is SMS verified
+     * granted bonus storage if phone number is SMS verified
      */
     val bonusStorageSMS: String? = null,
 )
