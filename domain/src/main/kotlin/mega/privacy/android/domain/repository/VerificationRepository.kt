@@ -29,4 +29,16 @@ interface VerificationRepository {
      * reset sms verified phone number
      */
     suspend fun resetSMSVerifiedPhoneNumber()
+
+    /**
+     * check whether device is in roaming state
+     */
+    suspend fun isRoaming(): Boolean
+
+    /**
+     * format phone number
+     * @param number
+     * @param countryCode
+     */
+    suspend fun formatPhoneNumber(number: String, countryCode: String): String?
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
@@ -19,6 +20,7 @@ internal class DefaultVerificationRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
+    private val telephonyGateway: TelephonyGateway,
     private val countryCallingCodeMapper: CountryCallingCodeMapper,
 ) : VerificationRepository {
     override suspend fun setSMSVerificationShown(isShown: Boolean) =
@@ -97,4 +99,9 @@ internal class DefaultVerificationRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun isRoaming() = telephonyGateway.isRoaming()
+
+    override suspend fun formatPhoneNumber(number: String, countryCode: String) =
+        telephonyGateway.formatPhoneNumber(number, countryCode)
 }
