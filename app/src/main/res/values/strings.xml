@@ -790,7 +790,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Save</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Recovery key copied to clipboard. Save it to a safe place where you can easily access later.</string>
+    <string name="copy_MK_confirmation">The Recovery key has been successfully copied</string>
     <!-- Button to change the password -->
     <string name="change_pass">Change</string>
     <!-- Positive button to perform a general action -->
@@ -1506,6 +1506,8 @@
     <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free registration bonus.</string>
+    <!-- info paragraph about the completed achievement registration -->
+    <string name="expiration_date_for_achievements">Bonus expires in %1$d days</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Share folder</item>
@@ -3581,6 +3583,22 @@
     <string name="payment_methods">Payment methods</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
+    <!-- Pro Lite monthly subscription -->
+    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
+    <!-- Pro Lite yearly subscription -->
+    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
+    <!-- Pro I monthly subscription -->
+    <string name="pro_i_monthly">Pro&#160;I monthly</string>
+    <!-- Pro I yearly subscription -->
+    <string name="pro_i_yearly">Pro&#160;I yearly</string>
+    <!-- Pro II monthly subscription -->
+    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
+    <!-- Pro II yearly subscription -->
+    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
+    <!-- Pro III monthly subscription -->
+    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
+    <!-- Pro III yearly subscription -->
+    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Remove as host</string>
     <!-- Title message of existing subscription dialog -->
@@ -3915,6 +3933,8 @@
     <string name="chat_recent_list_empty_action">Start chatting now</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
+    <!-- Title of the option on the meeting list to archive a meeting -->
+    <string name="archive_meeting_option">Archive meeting</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Start meeting now</string>
     <!-- Label for call option on settings -->
@@ -4007,6 +4027,8 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
+    <!-- Title of renewal date for my account usage page. -->
+    <string name="account_info_renewal_date">[A]Renewal date:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Enter album name</string>
     <!-- Album creation input name placeholder -->
@@ -4061,7 +4083,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s Weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Media discovery view</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4116,85 +4138,7 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
-    <!-- Dialog confirmation text for removing photos in an album -->
-    <string name="photos_album_remove_from_album_confirmation_text">Remove from album?</string>
-    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, grant MEGA access to your photos and other media on your device.</string>
-    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Grant access</string>
-    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
-    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don’t grant</string>
-    <!--  -->
-    <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %d item from “%s”</item>
-        <item quantity="other">Removed %d items from “%s”</item>
-    </plurals>
-    <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
-    <!--Title of playback position dialog that is displayed when video has playback position history. -->
-    <string name="video_playback_position_dialog_title">Resume video?</string>
-    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
-    <!--Resume of playback position dialog for playing video from the playback position history. -->
-    <string name="video_playback_position_dialog_resume_button">Resume</string>
-    <!--Resume of playback position dialog for playing video from beginning. -->
-    <string name="video_playback_position_dialog_restart_button">Restart</string>
-    <!-- User Alert notification for new scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
-    <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
-    <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated the meeting name[/A][B] from “%s” to [/B]“[A]%s[/A]“</string>
-    <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
-    <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s updated[/A][B] the meeting time[/B]</string>
-    <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
-    <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the meeting details scheduled for:[/B]</string>
-    <!-- Title of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_title_media_permissions_denied">Access denied</string>
-    <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
-    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Allow permission</string>
-    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
-    <!-- Option of a recurring meeting in meeting list to view occurrences -->
-    <string name="meetings_list_recurring_meeting_occurrences_option">Occurrences</string>
-    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Occurs daily</string>
-    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">Occurs weekly</string>
-    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Occurs monthly</string>
-    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
-    <string name="meetings_recurring_meeting_info_see_more_occurrences_button">See more occurrences</string>
-    <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label">%s Monthly</string>
-    <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label">%s Daily</string>
-    <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]invited you to a recurring meeting scheduled for:[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s updated[/A][B] the recurring meeting description[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the recurring meeting details scheduled for:[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s updated[/A][B] the recurring meeting time[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency">[A]%s updated[/A][B] the recurring meeting frequency[/B]</string>
-    <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
-    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
-    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
-    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
+    <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you have seen this message for this account before, press Cancel.</string>
+    <string name="shared_items_security_upgrade_dialog_node_sharing_info">You are currently sharing the following folders: %s</string>
 </resources>
