@@ -4138,4 +4138,7 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
+    <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
+    <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you have seen this message for this account before, press Cancel.</string>
+    <string name="shared_items_security_upgrade_dialog_node_sharing_info">You are currently sharing the following folders: %s</string>
 </resources>
