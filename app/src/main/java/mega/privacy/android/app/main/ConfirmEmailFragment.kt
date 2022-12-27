@@ -1,255 +1,187 @@
-package mega.privacy.android.app.main;
+package mega.privacy.android.app.main
 
-import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
-import static mega.privacy.android.app.utils.Util.isOnline;
+import android.content.Context
+import android.os.Bundle
+import android.text.Html
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.Fragment
+import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.qualifier.MegaApi
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
+import timber.log.Timber
+import javax.inject.Inject
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.Html;
-import android.text.Spanned;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+/**
+ * Confirm email fragment.
+ *
+ * @property megaApi       [MegaApiAndroid].
+ * @property emailTemp     Temporary email.
+ * @property firstNameTemp Temporary first name.
+ */
+@AndroidEntryPoint
+class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
 
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.fragment.app.Fragment;
+    @MegaApi
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
-import com.google.android.material.textfield.TextInputLayout;
+    private var _binding: FragmentConfirmEmailBinding? = null
 
-import java.util.Locale;
+    private val binding get() = _binding!!
 
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import timber.log.Timber;
+    var emailTemp: String? = null
+    var firstNameTemp: String? = null
 
-public class ConfirmEmailFragment extends Fragment implements MegaRequestListenerInterface, View.OnClickListener {
-
-    private Context context;
-
-    private MegaApiAndroid megaApi;
-
-    private String emailTemp = null;
-    private String passwdTemp = null;
-    private String firstNameTemp = null;
-
-    private TextInputLayout newEmailLayout;
-    private AppCompatEditText newEmail;
-    private ImageView errorNewEmail;
-    private TextView misspelt;
-    private Button resendButton;
-    private Button cancelButton;
-
-    @Override
-    public void onAttach(Activity context) {
-        Timber.d("onAttach Activity");
-        super.onAttach(context);
-        this.context = context;
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        Timber.d("onCreateView")
+        _binding = FragmentConfirmEmailBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Timber.d("onCreate");
-        super.onCreate(savedInstanceState);
-
-        if (context == null) {
-            Timber.d("Context is null");
-            return;
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupView()
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Timber.d("onCreateView");
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+    private fun setupView() = with(binding) {
+        confirmEmailNewEmail.apply {
+            doAfterTextChanged { quitEmailError() }
+            isCursorVisible = true
+            setText(emailTemp)
+            requestFocus()
         }
 
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
+        confirmEmailNewEmailErrorIcon.isVisible = false
 
-        View v = inflater.inflate(R.layout.fragment_confirm_email, container, false);
-
-        newEmailLayout = v.findViewById(R.id.confirm_email_new_email_layout);
-        newEmail = v.findViewById(R.id.confirm_email_new_email);
-        newEmail.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                quitEmailError();
-            }
-        });
-        errorNewEmail = v.findViewById(R.id.confirm_email_new_email_error_icon);
-        errorNewEmail.setVisibility(View.GONE);
-        misspelt = v.findViewById(R.id.confirm_email_misspelled);
-        resendButton = v.findViewById(R.id.confirm_email_new_email_resend);
-        cancelButton = v.findViewById(R.id.confirm_email_cancel);
-
-        String textMispelled = String.format(getString(R.string.confirm_email_misspelled));
+        var textMisspelled =
+            String.format(requireContext().getFormattedStringOrDefault(R.string.confirm_email_misspelled))
         try {
-            textMispelled = textMispelled.replace("[A]", "<b>");
-            textMispelled = textMispelled.replace("[/A]", "</b>");
-        } catch (Exception e) {
+            textMisspelled = textMisspelled.replace("[A]", "<b>")
+            textMisspelled = textMisspelled.replace("[/A]", "</b>")
+        } catch (e: Exception) {
+            Timber.w("Exception formatting string ${e.message}")
         }
 
-        Spanned result = Html.fromHtml(textMispelled, Html.FROM_HTML_MODE_LEGACY);
-        misspelt.setText(result);
-
-        newEmail.setCursorVisible(true);
-        newEmail.setText(emailTemp);
-        newEmail.requestFocus();
-
-        resendButton.setOnClickListener(this);
-        cancelButton.setOnClickListener(this);
-
-        return v;
+        confirmEmailMisspelled.text = Html.fromHtml(textMisspelled, Html.FROM_HTML_MODE_LEGACY)
+        confirmEmailNewEmailResend.setOnClickListener { submitForm() }
+        confirmEmailCancel.setOnClickListener {
+            megaApi.cancelCreateAccount(this@ConfirmEmailFragment)
+            (requireActivity() as LoginActivity).cancelConfirmationAccount()
+        }
     }
 
-    public void setPasswdTemp(String passwdTemp) {
-        this.passwdTemp = passwdTemp;
+    /**
+     * Launches the request if the typed email is correct.
+     */
+    private fun submitForm() {
+        if (!validateForm()) {
+            return
+        }
+
+        with(requireActivity() as LoginActivity) {
+            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                .hideSoftInputFromWindow(binding.confirmEmailNewEmail.windowToken, 0)
+
+            if (!Util.isOnline(requireContext())) {
+                showSnackbar(requireContext().getFormattedStringOrDefault(R.string.error_server_connection_problem))
+                return
+            }
+
+            binding.confirmEmailNewEmail.text.toString().lowercase().trim { it <= ' ' }.let {
+                setTemporalEmail(it)
+                megaApi.resendSignupLink(it, firstNameTemp, this)
+            }
+        }
     }
 
-    public String getPasswdTemp() {
-        return this.passwdTemp;
+    /**
+     * Checks if the typed email is correct.
+     *
+     * @return True if the email is correct, false otherwise.
+     */
+    private fun validateForm(): Boolean =
+        if (!emailError.isNullOrEmpty()) {
+            with(binding) {
+                confirmEmailNewEmailLayout.apply {
+                    error = emailError
+                    setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                }
+                confirmEmailNewEmailErrorIcon.isVisible = true
+            }
+
+            false
+        } else true
+
+    /**
+     * Error to show if the typed email is not correct.
+     */
+    private val emailError: String?
+        get() {
+            binding.confirmEmailNewEmail.text.toString().let {
+                return when {
+                    it.isEmpty() -> requireContext().getFormattedStringOrDefault(R.string.error_enter_email)
+                    !EMAIL_ADDRESS.matcher(it).matches() ->
+                        requireContext().getFormattedStringOrDefault(R.string.error_invalid_email)
+                    else -> null
+                }
+            }
+        }
+
+    /**
+     * Hides the email error.
+     */
+    private fun quitEmailError() = with(binding) {
+        confirmEmailNewEmailLayout.apply {
+            error = null
+            setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+        }
+        confirmEmailNewEmailErrorIcon.isVisible = false
     }
 
-    public void setEmailTemp(String emailTemp) {
-        this.emailTemp = emailTemp;
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+        Timber.d("onRequestStart - %s", request.requestString)
     }
 
-    public String getEmailTemp() {
-        return this.emailTemp;
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
+        Timber.d("onRequestUpdate - %s", request.requestString)
     }
 
-    public void setFirstNameTemp(String firstNameTemp) {
-        this.firstNameTemp = firstNameTemp;
-    }
-
-    public String getFirstNameTemp() {
-        return this.firstNameTemp;
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        Timber.d("onRequestStart - %s", request.getRequestString());
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        Timber.d("onRequestUpdate - %s", request.getRequestString());
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        Timber.d("onRequestFinish - %s_%d", request.getRequestString(), e.getErrorCode());
-
-        if (isAdded()) {
-            Timber.d("isAdded true");
-            if (e.getErrorCode() == MegaError.API_OK) {
-                ((LoginActivity) context).showSnackbar(getString(R.string.confirm_email_misspelled_email_sent));
-            } else {
-                ((LoginActivity) context).showSnackbar(e.getErrorString());
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        Timber.d("onRequestFinish - %s_%d", request.requestString, e.errorCode)
+        if (isAdded) {
+            Timber.d("isAdded true")
+            with(requireActivity() as LoginActivity) {
+                showSnackbar(
+                    if (e.errorCode == MegaError.API_OK) {
+                        requireContext().getFormattedStringOrDefault(R.string.confirm_email_misspelled_email_sent)
+                    } else {
+                        e.errorString
+                    })
             }
         } else {
-            Timber.d("isAdded false");
+            Timber.d("isAdded false")
         }
     }
 
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        Timber.w("onRequestTemporaryError - %s", request.getRequestString());
-    }
-
-    @Override
-    public void onClick(View v) {
-        Timber.d("onClick");
-
-        switch (v.getId()) {
-            case R.id.confirm_email_new_email_resend: {
-                submitForm();
-                break;
-            }
-            case R.id.confirm_email_cancel: {
-                megaApi.cancelCreateAccount(this);
-                ((LoginActivity) context).cancelConfirmationAccount();
-                break;
-            }
-        }
-    }
-
-    private void submitForm() {
-        if (!validateForm()) {
-            return;
-        }
-
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(newEmail.getWindowToken(), 0);
-
-        if (!isOnline(context)) {
-            ((LoginActivity) context).showSnackbar(getString(R.string.error_server_connection_problem));
-            return;
-        }
-
-        String email = newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim();
-        ((LoginActivity) context).setTemporalEmail(email);
-        megaApi.resendSignupLink(email, firstNameTemp, this);
-    }
-
-    private boolean validateForm() {
-        String emailError = getEmailError();
-
-        if (emailError != null && !emailError.isEmpty()) {
-            newEmailLayout.setError(emailError);
-            newEmailLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
-            errorNewEmail.setVisibility(View.VISIBLE);
-            return false;
-        }
-
-        return true;
-    }
-
-    private String getEmailError() {
-        String value = newEmail.getText().toString();
-        if (value.length() == 0) {
-            return getString(R.string.error_enter_email);
-        }
-        if (!EMAIL_ADDRESS.matcher(value).matches()) {
-            return getString(R.string.error_invalid_email);
-        }
-        return null;
-    }
-
-    private void quitEmailError() {
-        newEmailLayout.setError(null);
-        newEmailLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
-        errorNewEmail.setVisibility(View.GONE);
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        Timber.w("onRequestTemporaryError - %s", request.requestString)
     }
 }
