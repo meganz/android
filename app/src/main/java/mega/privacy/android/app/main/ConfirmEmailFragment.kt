@@ -107,7 +107,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
 
             binding.confirmEmailNewEmail.text.toString().lowercase().trim { it <= ' ' }.let {
                 setTemporalEmail(it)
-                megaApi.resendSignupLink(it, firstNameTemp, this)
+                megaApi.resendSignupLink(it, firstNameTemp, this@ConfirmEmailFragment)
             }
         }
     }
