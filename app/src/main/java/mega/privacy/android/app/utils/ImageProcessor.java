@@ -15,12 +15,16 @@ import androidx.annotation.Nullable;
 
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
+import com.facebook.common.util.UriUtil;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.ImageDecodeOptions;
+import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -38,7 +42,7 @@ public class ImageProcessor {
      * The process is load the file as Bitmap in memory then resize and crop it, finally store it.
      * The thumbnail size should be {@link #THUMBNAIL_SIZE} * {@link #THUMBNAIL_SIZE}.
      *
-     * @param origin The local image file.
+     * @param origin    The local image file.
      * @param thumbnail Target location where the created thumbnail will be stored.
      */
     public static void createThumbnail(File origin, File thumbnail) {
@@ -46,7 +50,10 @@ public class ImageProcessor {
         if (thumbnail.exists()) thumbnail.delete();
 
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        ImageRequest imageRequest = ImageRequest.fromFile(origin);
+        ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(UriUtil.getUriForFile(origin))
+                .setResizeOptions(ResizeOptions.forSquareSize(THUMBNAIL_SIZE))
+                .setImageDecodeOptions(ImageDecodeOptions.newBuilder().setBitmapConfig(Bitmap.Config.ARGB_8888).build())
+                .build();
 
         DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
 
@@ -54,33 +61,7 @@ public class ImageProcessor {
 
             @Override
             public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                if(bitmap != null) {
-                    String path = origin.getAbsolutePath();
-
-                    int orientation = AndroidGfxProcessor.getExifOrientation(path);
-                    Rect rect = AndroidGfxProcessor.getImageDimensions(path, orientation);
-                    if (rect.isEmpty()) return;
-
-                    int w = rect.right;
-                    int h = rect.bottom;
-
-                    if ((w == 0) || (h == 0)) return;
-
-                    if (w < h) {
-                        h = h * THUMBNAIL_SIZE / w;
-                        w = THUMBNAIL_SIZE;
-                    } else {
-                        w = w * THUMBNAIL_SIZE / h;
-                        h = THUMBNAIL_SIZE;
-                    }
-
-                    if ((w == 0) || (h == 0)) return;
-
-                    int px = (w - THUMBNAIL_SIZE) / 2;
-                    int py = (h - THUMBNAIL_SIZE) / 3;
-
-                    bitmap =  Bitmap.createScaledBitmap(bitmap, w, h, true);
-                    bitmap = AndroidGfxProcessor.extractRect(bitmap, px, py, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+                if (bitmap != null) {
                     AndroidGfxProcessor.saveBitmap(bitmap, thumbnail);
                 }
             }
@@ -98,7 +79,7 @@ public class ImageProcessor {
      * The process is load the file as Bitmap in memory then resize it, finally store it.
      * The preview's longest side size should be {@link #PREVIEW_SIZE}.
      *
-     * @param origin The local image file.
+     * @param origin  The local image file.
      * @param preview Target location where the created preview will be stored.
      */
     public static void createImagePreview(File origin, File preview) {
@@ -109,15 +90,16 @@ public class ImageProcessor {
         if (w == 0 || h == 0) return;
 
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        ImageRequest imageRequest = ImageRequest.fromFile(origin);
+        ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(UriUtil.getUriForFile(origin))
+                .setResizeOptions(ResizeOptions.forDimensions(w, h))
+                .build();
 
         DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, null);
 
         dataSource.subscribe(new BaseBitmapDataSubscriber() {
             @Override
             public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                if(bitmap != null) {
-                    bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+                if (bitmap != null) {
                     AndroidGfxProcessor.saveBitmap(bitmap, preview);
                 }
             }
