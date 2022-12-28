@@ -3,7 +3,6 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.domain.entity.ShareData
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -1699,7 +1698,7 @@ interface MegaApiGateway {
      * @param megaNode : [MegaNode] object which needs to be shared
      * @param listener : Listener to track this request
      */
-    suspend fun openShareDialog(
+    fun openShareDialog(
         megaNode: MegaNode,
         listener: MegaRequestListenerInterface,
     )
@@ -1709,5 +1708,5 @@ interface MegaApiGateway {
      *
      * @param listener : Listener to track this request
      */
-    suspend fun upgradeSecurity(listener: MegaRequestListenerInterface)
+    fun upgradeSecurity(listener: MegaRequestListenerInterface)
 }
