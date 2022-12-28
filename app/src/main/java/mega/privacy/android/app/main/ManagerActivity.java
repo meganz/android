@@ -10270,8 +10270,11 @@ public class ManagerActivity extends TransfersManagementActivity
     public void setPendingActionsBadge() {
         if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
             sharedItemsView.addView(pendingActionsBadge);
-            TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
-            tvPendingActionsCount.setText("5");
+            ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
+                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
+                tvPendingActionsCount.setText(managerState.getPendingActionsCount());
+                return Unit.INSTANCE;
+            });
         }
     }
 

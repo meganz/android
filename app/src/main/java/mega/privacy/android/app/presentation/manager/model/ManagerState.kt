@@ -11,6 +11,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param shouldStopCameraUpload camera upload should be stopped or not
  * @param shouldSendCameraBroadcastEvent broadcast event should be sent or not
  * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
+ * @param pendingActionsCount Pending actions count
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -21,4 +22,5 @@ data class ManagerState(
     val shouldStopCameraUpload: Boolean = false,
     val shouldSendCameraBroadcastEvent: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
+    val pendingActionsCount: Int = 0
 )
