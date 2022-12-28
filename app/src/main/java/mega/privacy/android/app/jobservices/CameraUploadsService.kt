@@ -18,6 +18,7 @@ import androidx.lifecycle.LifecycleService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -87,6 +88,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -110,6 +112,8 @@ import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
+import mega.privacy.android.domain.usecase.SetupPrimaryFolder
+import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -489,9 +493,30 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var startUpload: StartUpload
 
     /**
+     * Create Camera Upload Folder
+     */
+    @Inject
+    lateinit var createCameraUploadFolder: CreateCameraUploadFolder
+
+    /**
+     * Setup Primary Folder
+     */
+    @Inject
+    lateinit var setupPrimaryFolder: SetupPrimaryFolder
+
+    /**
+     * Setup Secondary Folder
+     */
+    @Inject
+    lateinit var setupSecondaryFolder: SetupSecondaryFolder
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
+
+    private var primaryFolderCreationJob: Job? = null
+    private var secondaryFolderCreationJob: Job? = null
 
     private var receiver: NetworkTypeChangeReceiver? = null
     private var wifiLock: WifiLock? = null
@@ -1511,15 +1536,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             setPrimarySyncHandle(it)
         }
         // isCreatingPrimary is a flag that prevents creating a duplicate Primary Folder
-        if (primaryHandle == MegaApiJava.INVALID_HANDLE && !isCreatingPrimary) {
-            Timber.d("isCreatingPrimary is false. Proceed to create the Primary Folder")
-            isCreatingPrimary = true
-            // Create a folder with name "Camera Uploads" in the root node
-            megaApi.createFolder(
-                getString(R.string.section_photo_sync),
-                megaApi.rootNode,
-                createFolderListener
-            )
+        if (primaryHandle == MegaApiJava.INVALID_HANDLE && primaryFolderCreationJob?.isActive != true) {
+            Timber.d("Proceed to create the Primary Folder")
+            createAndSetupPrimaryUploadFolder()
         }
     }
 
@@ -1531,15 +1550,25 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             setSecondarySyncHandle(it)
         }
         // isCreatingSecondary is a flag that prevents creating a duplicate Primary Folder
-        if (secondaryHandle == MegaApiJava.INVALID_HANDLE && !isCreatingSecondary) {
-            Timber.d("isCreatingSecondary is false. Proceed to create the Secondary Folder")
-            isCreatingSecondary = true
-            // Create a folder with name "Media Uploads" in the root node
-            megaApi.createFolder(
-                getString(R.string.section_secondary_media_uploads),
-                megaApi.rootNode,
-                createFolderListener
-            )
+        if (secondaryHandle == MegaApiJava.INVALID_HANDLE && secondaryFolderCreationJob?.isActive != true) {
+            Timber.d("Proceed to create the Secondary Folder")
+            createAndSetupSecondaryUploadFolder()
+        }
+    }
+
+    private fun createAndSetupPrimaryUploadFolder() {
+        primaryFolderCreationJob = coroutineScope?.launch {
+            createCameraUploadFolder(getString(R.string.section_photo_sync))?.let {
+                setupPrimaryFolder(it)
+            } ?: endService()
+        }
+    }
+
+    private fun createAndSetupSecondaryUploadFolder() {
+        secondaryFolderCreationJob = coroutineScope?.launch {
+            createCameraUploadFolder(getString(R.string.section_secondary_media_uploads))?.let {
+                setupSecondaryFolder(it)
+            } ?: endService()
         }
     }
 
