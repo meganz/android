@@ -18,12 +18,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
+import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -31,6 +33,8 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -41,6 +45,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
@@ -52,6 +57,7 @@ class ManagerViewModelTest {
 
     private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
@@ -66,6 +72,14 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
+    }
+    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares> {
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -83,6 +97,7 @@ class ManagerViewModelTest {
         underTest = ManagerViewModel(
             monitorNodeUpdates = monitorNodeUpdates,
             monitorGlobalUpdates = monitorGlobalUpdates,
+            getRubbishBinChildrenNode = getRubbishBinNodeByHandle,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,
@@ -103,6 +118,8 @@ class ManagerViewModelTest {
             getPricing = mock(),
             getFullAccountInfo = mock(),
             getActiveSubscription = mock(),
+            getUnverifiedInComingShares = getUnverifiedInComingShares,
+            getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
         )
     }
 
@@ -128,6 +145,7 @@ class ManagerViewModelTest {
         setUnderTest()
         underTest.state.test {
             val initial = awaitItem()
+            assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
@@ -136,6 +154,19 @@ class ManagerViewModelTest {
             assertThat(initial.shouldStopCameraUpload).isFalse()
             assertThat(initial.nodeUpdateReceived).isFalse()
         }
+    }
+
+    @Test
+    fun `test that rubbish bin parent handle is updated if new value provided`() = runTest {
+        setUnderTest()
+
+        underTest.state.map { it.rubbishBinParentHandle }.distinctUntilChanged()
+            .test {
+                val newValue = 123456789L
+                assertThat(awaitItem()).isEqualTo(-1L)
+                underTest.setRubbishBinParentHandle(newValue)
+                assertThat(awaitItem()).isEqualTo(newValue)
+            }
     }
 
     @Test
@@ -199,6 +230,37 @@ class ManagerViewModelTest {
             setUnderTest()
 
             underTest.updateContactsRequests.test().assertNoValue()
+        }
+
+    @Test
+    fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() =
+        runTest {
+            whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
+
+            setUnderTest()
+
+            runCatching {
+                val result =
+                    underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+                monitorNodeUpdates.emit(listOf(mock()))
+                result
+            }.onSuccess { result ->
+                result.assertValue { it.getContentIfNotHandled()?.size == 2 }
+            }
+        }
+
+    @Test
+    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() =
+        runTest {
+            whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
+
+            setUnderTest()
+
+            runCatching {
+                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
+            }.onSuccess { result ->
+                result.assertNoValue()
+            }
         }
 
     @Test
@@ -343,6 +405,14 @@ class ManagerViewModelTest {
             assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
             assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that pending actions count is not null`() = runTest {
+        setUnderTest()
+        underTest.state.map { it.pendingActionsCount }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isEqualTo(2)
         }
     }
 }
