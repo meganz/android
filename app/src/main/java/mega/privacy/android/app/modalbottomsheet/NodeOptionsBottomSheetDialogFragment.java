@@ -324,7 +324,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         if (isOnline(requireContext())) {
-            if(!searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            if(searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
                 ////TODO This flag for false for now. This will get manipulated after SDK changes
                 showOwnerSharedFolder();
                 TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
