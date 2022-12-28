@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -22,6 +23,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.FragmentUpgradeAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
@@ -43,6 +45,9 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
     }
 
     private val viewModel: ChooseUpgradeAccountViewModel by viewModels()
+
+    // define activity view model here, we don't need to create new every time fragment recreate
+    private val billingViewModel by activityViewModels<BillingViewModel>()
     private lateinit var binding: FragmentUpgradeAccountBinding
 
     private var subscriptionWarningDialog: VerticalLayoutButtonDialog? = null
@@ -61,7 +66,6 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
 
         when (action) {
             Constants.UPDATE_ACCOUNT_DETAILS -> showAvailableAccount()
-            Constants.UPDATE_GET_PRICING -> setPricingInfo(viewModel.getProductAccounts())
         }
     }
 
@@ -89,6 +93,7 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.refreshPricing()
+        billingViewModel.loadSkus()
         setupView()
         setupObservers()
 
@@ -169,6 +174,9 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
         )
         viewLifecycleOwner.collectFlow(viewModel.state) {
             setPricingInfo(it.product)
+        }
+        viewLifecycleOwner.collectFlow(billingViewModel.skus) {
+            setPricingInfo(viewModel.getProductAccounts())
         }
         viewModel.onUpgradeClick().observe(viewLifecycleOwner) { upgradeType ->
             startActivity(

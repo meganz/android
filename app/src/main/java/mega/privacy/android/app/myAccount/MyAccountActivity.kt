@@ -38,7 +38,7 @@ import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ChangePasswordActivity
-import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -590,15 +590,15 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                         platformInfo.platformStoreAbbrName
                     )
                 ) { dialog, _ ->
-                    if (BillingManagerImpl.PAYMENT_GATEWAY ==
+                    if (BillingConstant.PAYMENT_GATEWAY ==
                         MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET && isAppStoreAvailable()
                     ) {
-                        startActivity(Intent(BillingManagerImpl.SUBSCRIPTION_LINK_FOR_APP_STORE))
+                        startActivity(Intent(BillingConstant.SUBSCRIPTION_LINK_FOR_APP_STORE))
                     } else {
                         startActivity(
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse(BillingManagerImpl.SUBSCRIPTION_LINK_FOR_BROWSER)
+                                Uri.parse(BillingConstant.SUBSCRIPTION_LINK_FOR_BROWSER)
                             )
                         )
                     }
@@ -775,11 +775,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private fun isAppStoreAvailable(): Boolean {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getPackageInfo(BillingManagerImpl.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                packageManager.getPackageInfo(BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
                     PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong()))
             } else {
                 @Suppress("DEPRECATION")
-                packageManager.getPackageInfo(BillingManagerImpl.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                packageManager.getPackageInfo(BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
                     PackageManager.GET_ACTIVITIES)
             }
             true

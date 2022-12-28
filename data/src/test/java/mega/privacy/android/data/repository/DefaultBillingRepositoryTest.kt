@@ -279,12 +279,6 @@ class DefaultBillingRepositoryTest {
     }
 
     @Test
-    fun `test when disconnect billingGateway disconnect invoke`() = runTest {
-        underTest.disconnect()
-        verify(billingGateway, times(1)).disconnect()
-    }
-
-    @Test
     fun `test that getCurrentPaymentMethod returns PaymentMethod correctly`() {
         runTest {
             val paymentMethod = PaymentMethod.GOOGLE_WALLET

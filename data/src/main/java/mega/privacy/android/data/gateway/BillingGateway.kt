@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.exception.ProductNotFoundException
 
 /**
- * Billing gateway
+ * Billing gateway interface
  *
  */
 internal interface BillingGateway {
@@ -23,12 +23,6 @@ internal interface BillingGateway {
      *
      */
     suspend fun querySkus(): List<MegaSku>
-
-    /**
-     * Disconnect
-     *
-     */
-    suspend fun disconnect()
 
     /**
      * Monitor billing event

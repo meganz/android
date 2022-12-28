@@ -187,5 +187,6 @@ internal abstract class GatewayModule {
     abstract fun bindVerifyPurchaseGateway(implementation: VerifyPurchaseFacade): VerifyPurchaseGateway
 
     @Binds
+    @Singleton
     abstract fun bindBillingFacade(implementation: BillingFacade): BillingGateway
 }
