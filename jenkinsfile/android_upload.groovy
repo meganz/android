@@ -642,36 +642,8 @@ String getValueInMRDescriptionBy(String key) {
  * @param value value of tag
  * @return true if tag has a value. false if tag is null or zero length
  */
-static boolean isDefined(String value) {
+private boolean isDefined(String value) {
     return value != null && !value.isEmpty()
-}
-
-/**
- * checkout SDK by git tag
- * @param sdkTag the tag to checkout
- */
-private void checkoutSdkByTag(String sdkTag) {
-    sh """
-    echo checkoutSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout tags/$sdkTag
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by git tag
- * @param megaChatTag the tag to checkout
- */
-private void checkoutMegaChatSdkByTag(String megaChatTag) {
-    sh """
-    echo checkoutMegaChatSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout tags/$megaChatTag
-    cd $WORKSPACE
-    """
 }
 
 /**
