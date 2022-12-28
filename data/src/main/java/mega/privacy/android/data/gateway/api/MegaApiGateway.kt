@@ -1315,4 +1315,38 @@ interface MegaApiGateway {
      * @param listener   MegaRequestListener to track this request
      */
     fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Function to get unverified incoming shares from [MegaApi]
+     *
+     * @param order : Sort order
+     * @return List of [MegaShare]
+     */
+    suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare>
+
+    /**
+     * Function to get unverified outgoing shares from [MegaApi]
+     *
+     * @param order : Sort order
+     * @return List of [MegaShare]
+     */
+    suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare>
+
+    /**
+     * Creates a new share key for the node if there is no share key already created.
+     *
+     * @param megaNode : [MegaNode] object which needs to be shared
+     * @param listener : Listener to track this request
+     */
+    fun openShareDialog(
+        megaNode: MegaNode,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Update cryptographic security
+     *
+     * @param listener : Listener to track this request
+     */
+    fun upgradeSecurity(listener: MegaRequestListenerInterface)
 }
