@@ -214,7 +214,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Niedawne</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Wgrywanie plików</string>
+    <string name="section_secondary_media_uploads">Przesyłanie plików</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Niedostępny</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -236,7 +236,7 @@
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Moje konto</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">Przesyłanie zdjęć z kamery</string>
+    <string name="section_photo_sync">Przesyłanie z kamery</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Nadchodzące</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
@@ -566,13 +566,13 @@
     <!-- The upload of the user’s photos or videos from their specified album is in progress. -->
     <string name="cam_sync_syncing">Przesyłanie z kamery w toku</string>
     <!-- confirmation question for cancelling the camera uploads -->
-    <string name="cam_sync_cancel_sync">Czy chcesz zatrzymać wysyłanie z aparatu?</string>
+    <string name="cam_sync_cancel_sync">Czy chcesz wstrzymać Przesyłanie z kamery?</string>
     <!-- title of the notification when camera upload is enabled -->
     <string name="settings_camera_notif_title">Wgrywanie plików</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inicjalizowanie Przesyłania zdjęć z kamery</string>
+    <string name="settings_camera_notif_initializing_title">Inicjalizowanie przesyłania z kamery</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój katalog lokalny jest niedostępny.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -662,13 +662,13 @@
         <item>Importuj z urządzenia</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Włącz Przesyłanie zdjęć z kamery</string>
+    <string name="settings_camera_upload_on">Włącz Przesyłanie z kamery</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Jak wgrywać zdjęcia</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Włącz kopię zapasową zdjęc i filmów</string>
+    <string name="settings_secondary_upload_on">Włącz kopię przesyłanych zdjęć i filmów</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Wyłącz kopię zapasową zdjęc i filmów</string>
+    <string name="settings_secondary_upload_off">Wyłącz kopię przesyłanych zdjęć i filmów</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Wybierz katalog</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -691,13 +691,13 @@
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
     <string name="settings_keep_file_names">Zachowaj nazwy plików tak jak na urządzeniu</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
-    <string name="settings_local_camera_upload_folder">Lokalny katalog zdjęć</string>
+    <string name="settings_local_camera_upload_folder">Lokalny katalog kamery</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Katalog na pliki z kamery</string>
+    <string name="settings_mega_camera_upload_folder">Katalog na pliki Przesłane z kamery</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Lokalny katalog zapasowy</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">Katalog na kopię zapasową plików z kamery</string>
+    <string name="settings_mega_secondary_folder">Katalog dodatkowy MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Tylko zdjęcia</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -818,9 +818,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Zmień</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">TAK</string>
+    <string name="general_positive_button">Tak</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NIE</string>
+    <string name="general_negative_button">Nie</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Zapomniałeś hasła?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -906,7 +906,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Dodaj zabezpieczenie hasłem</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(TYLKO PRO)</string>
+    <string name="subtitle_set_expiry_date">(tylko Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Ustaw hasło</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1511,7 +1511,7 @@
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish">Przenieść do Kosza?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie Przesyłania z aparatu.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie Przesyłanie z kamery.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Czy na pewno chcesz przenieść ten katalog do Kosza na śmieci? Spowoduje to wyłączenie dodatkowego przesyłania multimediów.</string>
     <!-- confirmation message before removing a file -->
@@ -1730,19 +1730,19 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Pusty [/B][A]Kosz na śmieci[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Cloud drive[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Dysku w chmurze[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Brak plików [/B][A]Zapisane dla Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Brak [/B][A]kontaktów[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Brak[/A] [B]Rozmów[/B]</string>
+    <string name="recent_chat_empty">[A]Brak[/A] [B]rozmów[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]Trwa ładowanie[/A] [B]Rozmowy&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[A]Trwa ładowanie[/A] [B]rozmowy&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]Brak plików [/B][A]Zapisane dla Offline[/A]</string>
+    <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]Nie [/B][A]Wychodzące foldery współdzielone[/A]</string>
+    <string name="context_empty_outgoing">[B]Nie [/B][A]wychodzące foldery współdzielone[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B]Brak [/B][A]linków[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
@@ -1847,7 +1847,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Jakość wideo</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Przesyłanie z aparatu musi mieć dostęp do zdjęć i innych multimediów w urządzeniu. Przejdź do strony ustawień i udziel pozwolenia.</string>
+    <string name="on_refuse_storage_permission">Przesyłanie z kamery musi mieć dostęp do zdjęć i innych multimediów w urządzeniu. Przejdź do strony ustawień i udziel pozwolenia.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Niska</item>
@@ -2274,7 +2274,7 @@
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
     <string name="staging_api_url_text">Czy na pewno chcesz przejść na serwer testowy? Twoje konto może mieć nieodwracalne problemy.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
-    <string name="title_confirmation_open_camera_on_chat">Otwarta kamera?</string>
+    <string name="title_confirmation_open_camera_on_chat">Otworzyć kamerę?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="confirmation_open_camera_on_chat">Jeśli otworzysz kamerę, transmisja wideo zostanie wstrzymana w bieżącym połączeniu.</string>
     <!-- Content of the notification when there is unknown activity on the Chat -->
@@ -2560,7 +2560,7 @@
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Włącz kamerę</string>
     <!-- Subtitle of the screen asking permissions for camera -->
-    <string name="allow_acces_camera_subtitle">Umożliwia dostęp do aparatu w celu skanowania dokumentów, robienia zdjęć i wykonywania połączeń wideo.</string>
+    <string name="allow_acces_camera_subtitle">Umożliwia dostęp do kamery w celu skanowania dokumentów, robienia zdjęć i wykonywania połączeń wideo.</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Włącz połączenia</string>
     <!-- Title of the screen asking permissions for contacts -->
@@ -2744,7 +2744,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Twoje zdjęcia w chmurze</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Przesyłanie z kamer to podstawowa funkcja każdego urządzenia mobilnego, a my jesteśmy objęci. Utwórz teraz swoje konto.</string>
+    <string name="content_tour_four">Przesyłanie z kamery to podstawowa funkcja każdego urządzenia mobilnego, a my jesteśmy objęci. Utwórz teraz swoje konto.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Wprowadz swoje hasło</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2848,7 +2848,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Czaty</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Brak plików w [/B][A]Recents[/A]</string>
+    <string name="context_empty_recents">[B]Brak plików w [/B][A]Niedawne[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s i %2$d więcej</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -2923,7 +2923,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Twoje konto jest obecnie [B]zawieszone[/B]. Możesz tylko przeglądać swoje dane.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA nie ma dostępu do Państwa danych. Administrator konta biznesowego ma jednak dostęp do danych Camera Uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA nie ma dostępu do Państwa danych. Administrator konta biznesowego ma jednak dostęp do danych Przesyłane  z kamery.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Wystąpiły problemy</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3566,9 +3566,9 @@
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Mikrofon jest włączony</string>
     <!-- Label for camera. Used only in meetings/calls to label the button to turn the video call on/off. -->
-    <string name="general_camera">Aparat</string>
+    <string name="general_camera">Kamera</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">Aparat jest włączony.</string>
+    <string name="general_camera_enable">Kamera jest włączona.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Kamera jest wyłączona.</string>
     <!-- Label for hold meeting -->
@@ -4353,4 +4353,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Twoje uprawnienia</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Opis</string>
 </resources>

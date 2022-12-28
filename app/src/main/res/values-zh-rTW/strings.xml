@@ -714,7 +714,7 @@
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">檢視來源碼</string>
     <!-- title of the screen that shows the ZIP files -->
-    <string name="zip_browser_activity">ZIP Browser</string>
+    <string name="zip_browser_activity">ZIP瀏覽器</string>
     <!--  -->
     <string name="free_account">免費</string>
     <!-- category in sort by action -->
@@ -2807,10 +2807,10 @@
     <string name="over_disk_quota_paywall_title">您的資料正面臨風險</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="other">我們已於%2$s與%3$s透過email至%1$s聯繫您，但您的MEGA帳戶仍然有%4$s個檔案共佔用%5$s，您需要升級至%6$s。</item>
+        <item quantity="other">我們已在%2$s及%3$s透過電子郵件寄信至%1$s聯繫您，但您的MEGA帳戶仍然有%4$s個檔案共佔用%5$s，您需要升級至%6$s。</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">我們已透過email至%1$s聯繫您，但您的MEGA帳戶仍然有%2$s個檔案共佔用%3$s，您需要升級至%4$s。</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">我們已透過電子郵件寄信至%1$s聯繫您，但您的MEGA帳戶仍然有%2$s個檔案共佔用%3$s，您需要升級至%4$s。</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]您剩下[M]%s[/M]可以升級[/B]。在這之後您的資料將被刪除。</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -4022,5 +4022,12 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">您的憑證</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">說明</string>
 </resources>

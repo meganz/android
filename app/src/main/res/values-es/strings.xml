@@ -217,7 +217,7 @@
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
-    <string name="title_shared_items">Carpetas compartidas</string>
+    <string name="title_shared_items">Elementos compartidos</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
     <string name="section_rubbish_bin">Papelera</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
@@ -806,9 +806,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Cambiar</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">SÍ</string>
+    <string name="general_positive_button">Sí</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NO</string>
+    <string name="general_negative_button">No</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">¿Has olvidado tu contraseña?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Activa la protección por contraseña</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(SOLO PRO)</string>
+    <string name="subtitle_set_expiry_date">(solo Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Establecer contraseña</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1347,13 +1347,13 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Reenviar</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">Email enviado</string>
+    <string name="confirm_email_misspelled_email_sent">Correo enviado</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Aviso de derechos de autor para todos los usuarios</string>
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA respeta los derechos de propiedad intelectual de terceros y exige a los usuarios de MEGA que respeten las leyes de propiedad intelectual.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Queda terminantemente prohibido utilizar el servicio en la nube de MEGA para infringir derechos de propiedad intelectual. No puedes subir, descargar, almacenar, compartir, mostrar, reproducir, distribuir, enviar por email, vincular o poner a disposición de ninguna forma archivos, datos o contenido que infrinjan derechos de propiedad intelectual de cualquier persona o entidad.</string>
+    <string name="copyright_alert_second_paragraph">Queda terminantemente prohibido utilizar el servicio en la nube de MEGA para infringir derechos de propiedad intelectual. No puedes subir, descargar, almacenar, compartir, mostrar, reproducir, distribuir, enviar por correo electrónico, vincular o poner a disposición de ninguna forma archivos, datos o contenido que infrinjan derechos de propiedad intelectual de cualquier persona o entidad.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Acepto</string>
     <!-- text of the Disagree button -->
@@ -2778,7 +2778,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]No hay archivos [/B][A]recientes[/A]</string>
+    <string name="context_empty_recents">[B]No hay archivos [/B] en [A]Recientes[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s y %2$d más</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -2874,7 +2874,7 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Error. No se ha podido crear la carpeta %1$s</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Verifica tu dirección de email</string>
+    <string name="verify_email_label">Verifica tu dirección de e-mail</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Tu cuenta ha sido bloqueada temporalmente por seguridad.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
@@ -2955,12 +2955,12 @@
     <string name="over_disk_quota_paywall_title">¡Tus datos están en riesgo!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
-        <item quantity="one">Te hemos contactado por email a %1$s el %2$s pero sigues teniendo %3$s archivos que ocupan %4$s en tu cuenta de MEGA, lo cual requiere una cuenta %5$s.</item>
-        <item quantity="many">Te hemos contactado por email a %1$s el %2$s y el %3$s pero sigues teniendo %4$s de archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
-        <item quantity="other">Te hemos contactado por email a %1$s el %2$s y el %3$s pero sigues teniendo %4$s archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
+        <item quantity="one">Te hemos contactado por correo electrónico a %1$s el %2$s pero sigues teniendo %3$s archivos que ocupan %4$s en tu cuenta de MEGA, lo cual requiere una cuenta %5$s.</item>
+        <item quantity="many">Te hemos contactado por correo electrónico a %1$s el %2$s y el %3$s pero sigues teniendo %4$s de archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
+        <item quantity="other">Te hemos contactado por correo electrónico a %1$s el %2$s y el %3$s pero sigues teniendo %4$s archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Te hemos contactado por email a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info">Te hemos contactado por correo electrónico a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]Te quedan[M]%s[/M] para ampliar la cuenta[/B]. Después de eso, tus datos estarán sujetos a eliminación.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
@@ -4242,5 +4242,12 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Tus credenciales</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando archivo para vista previa</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descripción</string>
 </resources>

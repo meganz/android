@@ -818,9 +818,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Изменить</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">ДА</string>
+    <string name="general_positive_button">Да</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">НЕТ</string>
+    <string name="general_negative_button">Нет</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Забыли пароль?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -906,7 +906,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Установить защиту паролем</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(ТОЛЬКО PRO)</string>
+    <string name="subtitle_set_expiry_date">(только Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Задайте пароль</string>
     <!-- Hint of the dialog to get link with password -->
@@ -927,7 +927,7 @@
         <item quantity="other">К папке открыт доступ %1$d контактам. Закрыть доступ всем?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">Неверный e-mail или пароль. Пожалуйста, попробуйте ещё раз.</string>
+    <string name="error_incorrect_email_or_password">Неверная почта или пароль. Пожалуйста, попробуйте ещё раз.</string>
     <!-- Error message when trying to login and the account is suspended. -->
     <string name="error_account_suspended">Ваш аккаунт был заблокирован из-за нарушений условий использования. Пожалуйста, свяжитесь с support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
@@ -1374,7 +1374,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s уже приглашён. Посмотрите отправленные запросы.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Если вы ввели неправильный e-mail, исправьте его и нажмите [A]«Отправить повторно»[A].</string>
+    <string name="confirm_email_misspelled">Если вы ввели неправильный адрес электронной почты, исправьте его и нажмите [A]«Отправить повторно»[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Выслать повторно</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -2195,7 +2195,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Включите или отключите управление версиями файлов для всего аккаунта.\nОтключение версий файлов не запретит вашим контактам создавать новые версии в общих папках.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Коснитесь, введите имя или e-mail</string>
+    <string name="type_mail">Коснитесь, введите имя или эл. почту</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Добавить пользователя %s в контакты?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2215,7 +2215,7 @@
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
     <string name="confirm_account">Пожалуйста, введите пароль, чтобы подтвердить свой аккаунт</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
-    <string name="error_own_email_as_contact">Не обязательно добавлять свой собственный email адрес</string>
+    <string name="error_own_email_as_contact">Не нужно добавлять свой собственный адрес электронной почты.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Недействительный код</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
@@ -4334,9 +4334,9 @@
         <item quantity="other">Альбомы будут удалены, но их содержимое останется на «Временной шкале».</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Показать меньше</string>
     <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <string name="shared_items_verify_credentials_contact_verification_title">Подтверждение контакта</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, с которыми вы делитесь информацией, прежде чем они смогут получить доступ к общим папкам.</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
@@ -4344,13 +4344,20 @@
     <!--Header message located at the top of "My credentials" section-->
     <string name="shared_items_verify_credentials_information">Чтобы подтвердить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
     <!--Undecrypted folder label-->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Нерасшифрованная папка]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Чтобы общая папка стала доступной, человек, который поделился ею с вами, также должен подтвердить вас.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Подтвердить %s</string>
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Ваши учётные данные</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Подготовка файла к превью</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Описание</string>
 </resources>

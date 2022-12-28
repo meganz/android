@@ -870,7 +870,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">パスワード保護を設定</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">（PROのみ）</string>
+    <string name="subtitle_set_expiry_date">（Proのみ）</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">パスワードを設定</string>
     <!-- Hint of the dialog to get link with password -->
@@ -4022,5 +4022,12 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">あなたの資格情報</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">説明</string>
 </resources>

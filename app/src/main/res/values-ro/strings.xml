@@ -375,7 +375,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Se creează folderul</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Empty Rubbish bin</string>
+    <string name="context_clear_rubbish">Golește Coșul de gunoi</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Ești pe cale să elimini definitiv toate elementele din Coșul de gunoi.</string>
     <!-- send cancel subscriptions dialog -->
@@ -806,9 +806,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Schimbă</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">DA</string>
+    <string name="general_positive_button">Da</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NU</string>
+    <string name="general_negative_button">Nu</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Ți-ai uitat parola?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -894,7 +894,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Setează protecție prin parolă</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(NUMAI PRO)</string>
+    <string name="subtitle_set_expiry_date">(numai Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Setează o parolă</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1691,7 +1691,7 @@
     <!-- to share a file using Facebook, Whatsapp, etc -->
     <string name="context_share">Partajează folosind</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <string name="context_empty_rubbish_bin">[A]Coș de gunoi[/A] [B]gol[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Niciun fișier în [/B][A]Unitatea cloud[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
@@ -4138,11 +4138,11 @@
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">New album</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Partajează linkul întâlnirii</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Părăsește grupul</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -4153,26 +4153,29 @@
     <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="one">%d element a fost adăugat în „%s”</item>
+        <item quantity="few">%d elemente au fost adăugate în „%s”</item>
+        <item quantity="other">%d de elemente au fost adăugate în „%s”</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">Informații de plată</string>
     <!-- Title of a notification related to payments -->
     <string name="notifications_pro_expiring_title">Planul pentru calitatea de membru Pro expiră în curând</string>
     <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Your payment for the %1$s plan was received.</string>
+    <string name="notifications_pro_payment_received">Plata pentru planul %1$s a fost primită.</string>
     <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
     <string name="notifications_pro_payment_failed">Your payment for the %1$s plan was unsuccessful.</string>
     <!-- Text of a notification about an expiring pro plan -->
     <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">Your Pro membership plan will expire in 1 day.</item>
-        <item quantity="other">Your Pro membership plan will expire in %1$d days.</item>
+        <item quantity="one">Planul tău pentru calitatea de membru Pro va expira în 1 zi.</item>
+        <item quantity="few">Planul tău pentru calitatea de membru Pro va expira în %1$d zile.</item>
+        <item quantity="other">Planul tău pentru calitatea de membru Pro va expira în %1$d de zile.</item>
     </plurals>
     <!-- Text of a notification about an expired pro plan -->
     <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">Your Pro membership plan expired 1 day ago.</item>
-        <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
+        <item quantity="one">Planul tău pentru calitatea de membru Pro a expirat acum 1 zi.</item>
+        <item quantity="few">Planul tău pentru calitatea de membru Pro a expirat acum %1$d zile.</item>
+        <item quantity="other">Planul tău pentru calitatea de membru Pro a expirat acum %1$d de zile.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Album[/A] [B]gol[/B]</string>
@@ -4240,4 +4243,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Acreditările tale</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descriere</string>
 </resources>

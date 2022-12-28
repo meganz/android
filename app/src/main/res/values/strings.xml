@@ -258,7 +258,7 @@
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
     <string name="file_properties_shared_folder_permissions">Permissions</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">Share Permissions</string>
+    <string name="dialog_select_permissions">Share permissions</string>
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">Change permissions</string>
     <!-- when listing all the contacts that shares a folder -->
@@ -675,7 +675,7 @@
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Local Secondary folder</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">MEGA Secondary folder</string>
+    <string name="settings_mega_secondary_folder">MEGA secondary folder</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Photos only</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -726,7 +726,7 @@
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">View source code</string>
     <!-- title of the screen that shows the ZIP files -->
-    <string name="zip_browser_activity">ZIP Browser</string>
+    <string name="zip_browser_activity">ZIP browser</string>
     <!--  -->
     <string name="free_account">Free</string>
     <!-- category in sort by action -->
@@ -794,9 +794,9 @@
     <!-- Button to change the password -->
     <string name="change_pass">Change</string>
     <!-- Positive button to perform a general action -->
-    <string name="general_positive_button">YES</string>
+    <string name="general_positive_button">Yes</string>
     <!-- Negative button to perform a general action -->
-    <string name="general_negative_button">NO</string>
+    <string name="general_negative_button">No</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Forgot your password?</string>
     <!-- Hint of the text when the user can write his master key -->
@@ -882,7 +882,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Set password protection</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(PRO ONLY)</string>
+    <string name="subtitle_set_expiry_date">(Pro only)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Set password</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1067,7 +1067,7 @@
     <!-- Label for the option of the sliding panel to edit the profile -->
     <string name="group_chat_edit_profile_label">Edit profile</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
-    <string name="title_properties_chat_leave_chat">Leave Group</string>
+    <string name="title_properties_chat_leave_chat">Leave group</string>
     <!-- Label for participants of a group chat -->
     <string name="participants_chat_label">Participants</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -1660,17 +1660,17 @@
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]No [/B][A]Contacts[/A]</string>
+    <string name="context_empty_contacts">[B]No [/B][A]contacts[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]No[/A] [B]Conversations[/B]</string>
+    <string name="recent_chat_empty">[A]No[/A] [B]conversations[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]Loading[/A] [B]Conversations&#8230;[/B]</string>
+    <string name="recent_chat_loading_conversations">[A]Loading[/A] [B]conversations&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]No [/B][A]Incoming Shared folders[/A]</string>
+    <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]No [/B][A]Outgoing Shared folders[/A]</string>
+    <string name="context_empty_outgoing">[B]No [/B][A]outgoing shared folders[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
-    <string name="context_empty_links">[B]No [/B][A]Public Links[/A][B][/B]</string>
+    <string name="context_empty_links">[B]No [/B][A]public links[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
     <string name="tab_sent_requests">Sent requests</string>
     <!-- Title of the received requests tab. Capital letters -->
@@ -1801,7 +1801,7 @@
         <item quantity="other">Error. The resources are no longer available</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
-    <string name="turn_on_notifications_title">Turn on Notifications</string>
+    <string name="turn_on_notifications_title">Turn on notifications</string>
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">This way, you will see new messages\non your Android phone instantly.</string>
     <!-- First step to turn on notifications -->
@@ -1884,7 +1884,7 @@
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
     <string name="save_MK_confirmation">The Recovery key has been successfully saved</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
-    <string name="pending_outshare_indicator">(Pending)</string>
+    <string name="pending_outshare_indicator">(pending)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="option_enable_chat_rich_preview">Rich URL Previews</string>
     <!-- Button to allow the rich links previews on chat -->
@@ -1927,7 +1927,7 @@
     <!--  -->
     <string name="two_factor_authentication_explain">Two-factor authentication is a second layer of security for your account. Which means that even if someone knows your password they cannot access it, without also having access to the 6-digit code only you have access to.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
-    <string name="button_setup_2fa">Begin Setup</string>
+    <string name="button_setup_2fa">Begin setup</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
     <string name="explain_qr_seed_2fa_1">Scan or copy the seed to your authenticator app.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
@@ -2030,7 +2030,7 @@
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Send Message</string>
+    <string name="context_send_message">Send message</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
     <!-- Title of the section Archived chats -->
@@ -2081,7 +2081,7 @@
         <item quantity="other">%1$d file versions, taking a total of %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
-    <string name="settings_file_management_category">File Management</string>
+    <string name="settings_file_management_category">File management</string>
     <!-- Option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_delete_versions">Delete all older versions of my files</string>
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
@@ -2300,7 +2300,7 @@
     <!-- Popup notification text on mouse-over taken down folder. -->
     <string name="message_folder_takedown_pop_out_notification">This folder has been the subject of a takedown notice.</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Dispute Takedown</string>
+    <string name="dispute_takendown_file">Dispute takedown</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">Not accessible as it violated our Terms of Service</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
@@ -2375,7 +2375,7 @@
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s has been compressed</string>
     <!-- notification title when compressing video -->
-    <string name="title_compress_video">Compressing Videos %1$d/%2$d</string>
+    <string name="title_compress_video">Compressing videos %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Invalid folder selected</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
@@ -2432,7 +2432,7 @@
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]No [/B][A]Notifications[/A]</string>
+    <string name="context_empty_notifications">[B]No [/B][A]notifications[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Set up MEGA</string>
     <!-- Permissions screen explanation -->
@@ -2493,7 +2493,7 @@
     <!-- label tomorrow -->
     <string name="label_tomorrow">Tomorrow</string>
     <!-- Text of the empty screen for the chat shared files -->
-    <string name="context_empty_shared_files">[B]No [/B][A]Shared Files[/A]</string>
+    <string name="context_empty_shared_files">[B]No [/B][A]shared files[/A]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -2532,7 +2532,7 @@
         <item quantity="other">Messages forwarded</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
-    <string name="title_geolocation_message">Pinned Location</string>
+    <string name="title_geolocation_message">Pinned location</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d file was not sent to %d chats</item>
@@ -2618,7 +2618,7 @@
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">It is not possible to play media files while there is a call in progress.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
-    <string name="ongoing_call_messages">Ongoing Call</string>
+    <string name="ongoing_call_messages">Ongoing call</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
     <string name="join_call_layout_in_group_call">Tap to join current group call.</string>
     <!-- Title of the layout to return to a call -->
@@ -2795,7 +2795,7 @@
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
     <string name="error_creating_group_and_attaching_file">Please select one or more contacts.</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
-    <string name="contacts_sent">Sent %s Contacts.</string>
+    <string name="contacts_sent">Sent %s contacts.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">My chat files</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
@@ -2813,7 +2813,7 @@
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">Email already sent. Please wait a few minutes before trying again.</string>
     <!-- Title of a helping view about locked accounts -->
-    <string name="locked_accounts_label">Locked Accounts</string>
+    <string name="locked_accounts_label">Locked accounts</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
     <string name="locked_accounts_text_1">It is possible that you are using the same password for your MEGA account as for other services, and that at least one of these other services has suffered a data breach.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
@@ -2876,7 +2876,7 @@
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">Storage Full</string>
+    <string name="over_disk_quota_paywall_header">Storage full</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Your data is at risk!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
@@ -3321,7 +3321,7 @@
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Recently Added</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <string name="context_empty_groups">[B]No [/B][A]groups[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Requests</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
@@ -3634,7 +3634,7 @@
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Favourites</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
-    <string name="empty_hint_favourite_album">[B]No[/B] [A]Favourites[/A]</string>
+    <string name="empty_hint_favourite_album">[B]No[/B] [A]favourites[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Remove favourites</string>
     <!-- Message of notice that the zip file format is error -->
@@ -4133,4 +4133,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
 </resources>
