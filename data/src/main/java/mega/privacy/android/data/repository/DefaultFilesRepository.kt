@@ -461,19 +461,23 @@ internal class DefaultFilesRepository @Inject constructor(
             }
         }
 
-    override fun openShareDialog(megaNode: MegaNode) =
-        megaApiGateway.openShareDialog(megaNode,
-            listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, _ ->
-
-                })
-        )
-
-    override fun upgradeSecurity() {
-        megaApiGateway.upgradeSecurity(listener = OptionalMegaRequestListenerInterface(
-            onRequestFinish = { _, _ ->
-
+    override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.openShareDialog(megaNode, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
             }
-        ))
+        }
+    }
+
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
     }
 }

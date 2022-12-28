@@ -238,10 +238,10 @@ interface FilesRepository {
      *
      * @param megaNode : [MegaNode] object which needs to be shared
      */
-    fun openShareDialog(megaNode: MegaNode)
+    suspend fun openShareDialog(megaNode: MegaNode)
 
     /**
      * Update cryptographic security
      */
-    fun upgradeSecurity()
+    suspend fun upgradeSecurity()
 }
