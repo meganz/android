@@ -23,39 +23,22 @@ import androidx.compose.ui.viewinterop.AndroidView
 /**
  * Reusable EmptyView with Icon & Text
  * Pass imageVector using ImageVector.vectorResource(id = R.drawable.ic_xyz)
+ * @param modifier
  * @param imageVector
  * @param text
  */
 @Composable
 fun MegaEmptyView(
+    modifier: Modifier = Modifier,
     imageVector: ImageVector,
     text: Spanned,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    MegaEmptyView(modifier, text) {
         Icon(
             imageVector = imageVector,
             contentDescription = "Empty Icon",
             modifier = Modifier.padding(bottom = 30.dp),
-            tint = if (!MaterialTheme.colors.isLight) {
-                Color.Gray
-            } else {
-                Color.Unspecified
-            }
-        )
-
-        AndroidView(
-            factory = { context ->
-                TextView(context).apply {
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                }
-            },
-            update = { it.text = text }
+            tint = getIconTint()
         )
     }
 }
@@ -63,39 +46,22 @@ fun MegaEmptyView(
 /**
  * Reusable EmptyView with Icon & Text
  * Pass imageBitmap using ImageBitmap.imageResource(id = R.drawable.ic_xyz)
+ * @param modifier
  * @param imageBitmap
  * @param text
  */
 @Composable
 fun MegaEmptyView(
+    modifier: Modifier = Modifier,
     imageBitmap: ImageBitmap,
     text: Spanned,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    MegaEmptyView(modifier, text) {
         Icon(
             bitmap = imageBitmap,
             contentDescription = "Empty Icon",
             modifier = Modifier.padding(bottom = 30.dp),
-            tint = if (!MaterialTheme.colors.isLight) {
-                Color.Gray
-            } else {
-                Color.Unspecified
-            }
-        )
-
-        AndroidView(
-            factory = { context ->
-                TextView(context).apply {
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                }
-            },
-            update = { it.text = text }
+            tint = getIconTint()
         )
     }
 }
@@ -103,32 +69,36 @@ fun MegaEmptyView(
 /**
  * Reusable EmptyView with Icon & Text
  * Pass imagePainter using painterResource(id = R.drawable.ic_xyz)
+ * @param modifier
  * @param imagePainter
  * @param text
  */
 @Composable
 fun MegaEmptyView(
+    modifier: Modifier = Modifier,
     imagePainter: Painter,
     text: Spanned,
 ) {
+    MegaEmptyView(modifier, text) {
+        Icon(
+            painter = imagePainter,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = getIconTint()
+        )
+    }
+}
+
+@Composable
+private fun MegaEmptyView(modifier: Modifier, text: Spanned, Icon: @Composable () -> Unit) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
-            painter = imagePainter,
-            contentDescription = "Empty Icon",
-            modifier = Modifier.padding(bottom = 30.dp),
-            tint = if (!MaterialTheme.colors.isLight) {
-                Color.Gray
-            } else {
-                Color.Unspecified
-            }
-        )
-
+        Icon()
         AndroidView(
             factory = { context ->
                 TextView(context).apply {
@@ -139,4 +109,14 @@ fun MegaEmptyView(
         )
     }
 }
+
+@Composable
+private fun getIconTint(): Color {
+    return if (MaterialTheme.colors.isLight) {
+        Color.Unspecified
+    } else {
+        Color.Gray
+    }
+}
+
 
