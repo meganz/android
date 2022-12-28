@@ -25,12 +25,15 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -66,6 +69,14 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
+    }
+    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares> {
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -102,6 +113,8 @@ class ManagerViewModelTest {
             getExtendedAccountDetail = mock(),
             getPricing = mock(),
             getFullAccountInfo = mock(),
+            getUnverifiedInComingShares = getUnverifiedInComingShares,
+            getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
         )
     }
 
@@ -381,6 +394,14 @@ class ManagerViewModelTest {
             assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
             assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that pending actions count is not null`() = runTest {
+        setUnderTest()
+        underTest.state.map { it.pendingActionsCount }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isEqualTo(2)
         }
     }
 }

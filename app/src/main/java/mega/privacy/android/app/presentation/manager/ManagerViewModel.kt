@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
@@ -44,6 +45,8 @@ import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -97,6 +100,8 @@ class ManagerViewModel @Inject constructor(
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
+    private val getUnverifiedInComingShares: GetUnverifiedIncomingShares,
+    private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
 ) : ViewModel() {
 
     /**
@@ -135,6 +140,7 @@ class ManagerViewModel @Inject constructor(
     )
 
     init {
+
         viewModelScope.launch {
             monitorNodeUpdates().collect {
                 checkItemForInbox(it)
@@ -147,6 +153,14 @@ class ManagerViewModel @Inject constructor(
                 { state: ManagerState -> state.copy(isFirstLogin = it) }
             }.collect {
                 _state.update(it)
+            }
+        }
+
+        viewModelScope.launch {
+            val incomingShares = getUnverifiedInComingShares(SortOrder.ORDER_DEFAULT_ASC).size
+            val outgoingShares = getUnverifiedOutgoingShares(SortOrder.ORDER_DEFAULT_ASC).size
+            _state.update {
+                it.copy(pendingActionsCount = incomingShares + outgoingShares)
             }
         }
     }
