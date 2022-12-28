@@ -101,4 +101,9 @@ internal class DefaultVerificationRepository @Inject constructor(
     }
 
     override suspend fun getCurrentCountryCode() = telephonyGateway.getCurrentCountryCode()
+
+    override suspend fun isRoaming() = telephonyGateway.isRoaming()
+
+    override suspend fun formatPhoneNumber(number: String, countryCode: String) =
+        telephonyGateway.formatPhoneNumber(number, countryCode)
 }
