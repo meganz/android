@@ -33,6 +33,7 @@ class DefaultVerificationRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             mock(),
+            mock(),
             countryCallingCodeMapper = countryCallingCodeMapper,
         )
     }

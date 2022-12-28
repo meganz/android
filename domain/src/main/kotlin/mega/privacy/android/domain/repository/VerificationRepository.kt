@@ -29,4 +29,9 @@ interface VerificationRepository {
      * reset sms verified phone number
      */
     suspend fun resetSMSVerifiedPhoneNumber()
+
+    /**
+     * get current country code based on the network
+     */
+    suspend fun getCurrentCountryCode(): String?
 }
