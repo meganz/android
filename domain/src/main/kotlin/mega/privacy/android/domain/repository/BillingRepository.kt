@@ -53,12 +53,6 @@ interface BillingRepository {
     suspend fun querySkus(): List<MegaSku>
 
     /**
-     * Disconnect
-     *
-     */
-    suspend fun disconnect()
-
-    /**
      * Monitor billing event
      *
      */

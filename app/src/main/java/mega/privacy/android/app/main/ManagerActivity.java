@@ -2204,7 +2204,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             this.setProfileAvatar();
 
-            initPayments();
+            preloadPayment();
 
             megaApi.isGeolocationEnabled(this);
 
@@ -3562,8 +3562,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
-
-        destroyPayments();
 
         cancelSearch();
         if (reconnectDialog != null) {

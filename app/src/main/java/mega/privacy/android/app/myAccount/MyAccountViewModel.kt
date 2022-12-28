@@ -46,7 +46,7 @@ import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
-import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -242,9 +242,9 @@ class MyAccountViewModel @Inject constructor(
      * @return ture is same
      */
     private fun isSubscriptionAndGatewaySame(subscriptionMethodId: Int): Boolean {
-        return (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
+        return (BillingConstant.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
                 && subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) ||
-                (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET
+                (BillingConstant.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET
                         && subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET)
     }
 

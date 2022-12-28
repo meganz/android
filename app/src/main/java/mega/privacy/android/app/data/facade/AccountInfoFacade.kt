@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
+import mega.privacy.android.app.middlelayer.iab.BillingConstant.PAYMENT_GATEWAY
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler

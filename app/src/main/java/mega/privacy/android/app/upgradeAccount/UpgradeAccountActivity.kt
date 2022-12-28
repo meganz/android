@@ -18,12 +18,6 @@ class UpgradeAccountActivity : PasscodeActivity() {
                 .add(R.id.upgrade_account_container, fragment)
                 .commit()
         }
-        initPayments()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        destroyPayments()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
