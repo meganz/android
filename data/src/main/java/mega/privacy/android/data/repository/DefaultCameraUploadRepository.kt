@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
@@ -11,6 +12,7 @@ import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
@@ -26,10 +28,14 @@ import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import java.io.IOException
 import java.util.Queue
 import javax.inject.Inject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.coroutines.Continuation
 
 /**
  * Default implementation of [CameraUploadRepository]
@@ -43,6 +49,7 @@ import javax.inject.Inject
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher CoroutineDispatcher
  */
+@OptIn(ExperimentalContracts::class)
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
@@ -350,6 +357,59 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localPath,
             isSecondary
         )
+    }
+
+    override suspend fun setupPrimaryFolder(primaryHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = onSetupFolderRequestFinish(
+                    continuation,
+                    false,
+                )
+            )
+            megaApiGateway.setCameraUploadsFolders(
+                primaryHandle,
+                getInvalidHandle(),
+                listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun setupSecondaryFolder(secondaryHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = onSetupFolderRequestFinish(
+                    continuation,
+                    true,
+                )
+            )
+            megaApiGateway.setCameraUploadsFolders(
+                getInvalidHandle(),
+                secondaryHandle,
+                listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    private fun onSetupFolderRequestFinish(
+        continuation: Continuation<Long>,
+        isSecondary: Boolean,
+    ) = { request: MegaRequest, error: MegaError ->
+        if (error.errorCode == MegaError.API_OK) {
+            continuation.resumeWith(
+                Result.success(
+                    if (!isSecondary) request.nodeHandle else request.parentHandle
+                )
+            )
+        } else {
+            continuation.failWithError(error)
+        }
     }
 
     override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> =

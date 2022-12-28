@@ -27,6 +27,8 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.PaymentMethod
+import mega.privacy.android.domain.entity.PaymentPlatformType
 import mega.privacy.android.domain.entity.Product
 import timber.log.Timber
 
@@ -352,19 +354,19 @@ class UpgradeAccountFragment : Fragment(), Scrollable {
      * @param upgradeType upgrade type
      * @param subscriptionMethod SubscriptionMethod
      */
-    private fun showSubscriptionDialog(upgradeType: Int, subscriptionMethod: SubscriptionMethod?) {
+    private fun showSubscriptionDialog(upgradeType: Int, subscriptionMethod: PaymentMethod?) {
         subscriptionMethod?.run {
             subscriptionWarningDialog = VerticalLayoutButtonDialog(
                 context = requireContext(),
                 title = getString(R.string.title_existing_subscription),
                 message = when (platformType) {
-                    SUBSCRIPTION_FROM_ANDROID_PLATFORM -> {
+                    PaymentPlatformType.SUBSCRIPTION_FROM_ANDROID_PLATFORM -> {
                         getString(
                             R.string.message_subscription_from_android_platform,
                             methodName
                         )
                     }
-                    SUBSCRIPTION_FROM_ITUNES -> {
+                    PaymentPlatformType.SUBSCRIPTION_FROM_ITUNES -> {
                         getString(R.string.message_subscription_from_itunes)
                     }
                     else -> {

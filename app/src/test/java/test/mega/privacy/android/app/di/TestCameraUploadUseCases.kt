@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
+import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
@@ -73,7 +74,11 @@ import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
+import mega.privacy.android.domain.usecase.SetupPrimaryFolder
+import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.StartCameraUpload
+import mega.privacy.android.domain.usecase.StopCameraUpload
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
@@ -85,6 +90,12 @@ import org.mockito.kotlin.mock
 )
 @Module(includes = [TestGetNodeModule::class])
 object TestCameraUploadUseCases {
+
+    @Provides
+    fun provideStartCameraUpload() = mock<StartCameraUpload>()
+
+    @Provides
+    fun provideStopCameraUpload() = mock<StopCameraUpload>()
 
     @Provides
     fun provideHasCredentials() = mock<HasCredentials>()
@@ -271,6 +282,15 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
+
+    @Provides
+    fun provideSetupPrimaryFolder() = mock<SetupPrimaryFolder>()
+
+    @Provides
+    fun provideSetupSecondaryFolder() = mock<SetupSecondaryFolder>()
+
+    @Provides
+    fun provideGetCameraUploadFolderName() = mock<GetCameraUploadFolderName>()
 
     @Provides
     fun provideDisableCameraUploadSettings() = mock<DisableCameraUploadSettings>()

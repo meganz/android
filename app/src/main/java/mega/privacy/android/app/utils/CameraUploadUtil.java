@@ -21,6 +21,7 @@ import java.io.File;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle;
 import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.data.database.DatabaseHandler;
@@ -190,6 +191,11 @@ public class CameraUploadUtil {
         disableCameraUploadSettingProcess(true);
     }
 
+    /**
+     * TODO replace with use case after settings are refactored in CU-3
+     *
+     * @see GetDefaultNodeHandle
+     */
     public static long findDefaultFolder(String folderName) {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         MegaNode node = megaApi.getNodeByPath(folderName, megaApi.getRootNode());
@@ -197,7 +203,7 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case
+     * TODO replace with use case after attributes are refactored in CU-123
      *
      * @see UpdateFolderIconBroadcast
      */

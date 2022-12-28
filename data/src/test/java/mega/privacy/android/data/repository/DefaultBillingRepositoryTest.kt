@@ -10,10 +10,13 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.PricingMapper
+import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.LocalPricing
+import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
@@ -43,15 +46,16 @@ class DefaultBillingRepositoryTest {
     private val paymentMethodFlagsCache = mock<Cache<PaymentMethodFlags>>()
     private val pricingCache = mock<Cache<Pricing>>()
     private val numberOfSubscriptionCache = mock<Cache<Long>>()
-    private val megaSkuObject1 = MegaSku("mega.android.pro1.onemonth", 9990000, "EUR")
-    private val megaSkuObject2 = MegaSku("mega.android.pro2.onemonth", 9990000, "EUR")
-    private val skuString = "mega.android.pro1.onemonth"
+    private val megaSkuObject1 = MegaSku(Skus.SKU_PRO_I_MONTH, 9990000, "EUR")
+    private val megaSkuObject2 = MegaSku(Skus.SKU_PRO_II_MONTH, 9990000, "EUR")
+    private val skuString = Skus.SKU_PRO_I_MONTH
     private val megaSkuList = listOf(megaSkuObject2, megaSkuObject1)
     private val localPricing =
         LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString)
     private val localPricingMapper = mock<LocalPricingMapper>()
     private val pricingMapper = mock<PricingMapper>()
     private val billingGateway = mock<BillingGateway>()
+    private val paymentMethodTypeMapper = ::toPaymentMethodType
 
     @Before
     fun setUp() {
@@ -64,7 +68,8 @@ class DefaultBillingRepositoryTest {
             localPricingMapper = localPricingMapper,
             pricingMapper = pricingMapper,
             numberOfSubscriptionCache = numberOfSubscriptionCache,
-            billingGateway = billingGateway
+            billingGateway = billingGateway,
+            paymentMethodTypeMapper = paymentMethodTypeMapper,
         )
     }
 
@@ -277,5 +282,39 @@ class DefaultBillingRepositoryTest {
     fun `test when disconnect billingGateway disconnect invoke`() = runTest {
         underTest.disconnect()
         verify(billingGateway, times(1)).disconnect()
+    }
+
+    @Test
+    fun `test that getCurrentPaymentMethod returns PaymentMethod correctly`() {
+        runTest {
+            val paymentMethod = PaymentMethod.GOOGLE_WALLET
+
+            whenever(accountInfoWrapper.subscriptionMethodId).thenReturn(3)
+
+            val actual = underTest.getCurrentPaymentMethod()
+            Truth.assertThat(actual).isEqualTo(paymentMethod)
+        }
+    }
+
+    @Test
+    fun `test that isBillingAvailable return true when availableSkus list is not empty`() {
+        runTest {
+            whenever(accountInfoWrapper.availableSkus).thenReturn(megaSkuList)
+
+            val actual = underTest.isBillingAvailable()
+
+            Truth.assertThat(actual).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `test that isBillingAvailable return false when availableSkus list is empty`() {
+        runTest {
+            whenever(accountInfoWrapper.availableSkus).thenReturn(emptyList())
+
+            val actual = underTest.isBillingAvailable()
+
+            Truth.assertThat(actual).isEqualTo(false)
+        }
     }
 }

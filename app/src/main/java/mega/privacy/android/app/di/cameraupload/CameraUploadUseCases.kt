@@ -1,12 +1,15 @@
 package mega.privacy.android.app.di.cameraupload
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
+import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
@@ -44,6 +47,7 @@ import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
+import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -56,6 +60,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
@@ -74,6 +79,8 @@ import mega.privacy.android.domain.usecase.DefaultResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.DefaultResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultRestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.DefaultSetupPrimaryFolder
+import mega.privacy.android.domain.usecase.DefaultSetupSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -82,6 +89,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
+import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
@@ -114,7 +122,11 @@ import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
+import mega.privacy.android.domain.usecase.SetupPrimaryFolder
+import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.StartCameraUpload
+import mega.privacy.android.domain.usecase.StopCameraUpload
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
@@ -182,6 +194,33 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideUpdateFolderDestinationBroadcast(cameraUploadRepository: CameraUploadRepository): UpdateFolderDestinationBroadcast =
             UpdateFolderDestinationBroadcast(cameraUploadRepository::sendUpdateFolderDestinationBroadcast)
+
+        // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
+        /**
+         * Provide the [StopCameraUpload] implementation
+         */
+        @Provides
+        fun provideStopCameraUpload(
+            jobUtilWrapper: JobUtilWrapper,
+            @ApplicationContext context: Context,
+        ): StopCameraUpload = StopCameraUpload {
+            jobUtilWrapper.fireStopCameraUploadJob(context)
+        }
+
+        // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
+        /**
+         * Provide the [StartCameraUpload] implementation
+         */
+        @Provides
+        fun provideStartCameraUpload(
+            jobUtilWrapper: JobUtilWrapper,
+            @ApplicationContext context: Context,
+        ): StartCameraUpload = StartCameraUpload { shouldIgnoreAttributes ->
+            jobUtilWrapper.fireCameraUploadJob(
+                context,
+                shouldIgnoreAttributes
+            )
+        }
 
         /**
          * Provide the [MediaLocalPathExists] implementation
@@ -413,6 +452,15 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideMonitorChargingStoppedState(cameraUploadRepository: CameraUploadRepository): MonitorChargingStoppedState =
             MonitorChargingStoppedState(cameraUploadRepository::monitorChargingStoppedInfo)
+
+        /**
+         * Provide the [CreateCameraUploadFolder] implementation
+         */
+        @Provides
+        fun provideCreateCameraUploadFolder(fileRepository: FileRepository): CreateCameraUploadFolder =
+            CreateCameraUploadFolder(fileRepository::createFolder)
+
+
     }
 
     /**
@@ -450,6 +498,24 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindResetCameraUploadTimelines(resetCameraUploadTimelines: DefaultResetCameraUploadTimelines): ResetCameraUploadTimelines
+
+    /**
+     * Provide the [SetupPrimaryFolder] implementation
+     */
+    @Binds
+    abstract fun bindSetupPrimaryFolder(setupPrimaryFolder: DefaultSetupPrimaryFolder): SetupPrimaryFolder
+
+    /**
+     * Provide the [SetupSecondaryFolder] implementation
+     */
+    @Binds
+    abstract fun bindSetupSecondaryFolder(setupSecondaryFolder: DefaultSetupSecondaryFolder): SetupSecondaryFolder
+
+    /**
+     * Provide the [GetCameraUploadFolderName] implementation
+     */
+    @Binds
+    abstract fun bindGetCameraUploadFolderName(getCameraUploadFolderName: DefaultGetCameraUploadFolderName): GetCameraUploadFolderName
 
     /**
      * Provide the [GetPrimarySyncHandle] implementation

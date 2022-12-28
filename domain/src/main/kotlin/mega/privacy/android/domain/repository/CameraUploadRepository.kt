@@ -42,6 +42,16 @@ interface CameraUploadRepository {
     suspend fun setSecondarySyncHandle(secondaryHandle: Long)
 
     /**
+     * Setup Primary Camera Upload Folder
+     */
+    suspend fun setupPrimaryFolder(primaryHandle: Long): Long
+
+    /**
+     * Setup Secondary Camera Upload Folder
+     */
+    suspend fun setupSecondaryFolder(secondaryHandle: Long): Long
+
+    /**
      * Is camera upload sync by wifi only
      *
      * @return true if sync is by wifi
