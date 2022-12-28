@@ -46,6 +46,7 @@ class DefaultBillingRepositoryTest {
     private val paymentMethodFlagsCache = mock<Cache<PaymentMethodFlags>>()
     private val pricingCache = mock<Cache<Pricing>>()
     private val numberOfSubscriptionCache = mock<Cache<Long>>()
+    private val skusCache = mock<Cache<List<MegaSku>>>()
     private val megaSkuObject1 = MegaSku(Skus.SKU_PRO_I_MONTH, 9990000, "EUR")
     private val megaSkuObject2 = MegaSku(Skus.SKU_PRO_II_MONTH, 9990000, "EUR")
     private val skuString = Skus.SKU_PRO_I_MONTH
@@ -70,13 +71,14 @@ class DefaultBillingRepositoryTest {
             numberOfSubscriptionCache = numberOfSubscriptionCache,
             billingGateway = billingGateway,
             paymentMethodTypeMapper = paymentMethodTypeMapper,
+            skusCache = skusCache
         )
     }
 
     @Test
     fun `test that get local pricing returns successfully`() =
         runTest {
-            whenever(accountInfoWrapper.availableSkus).thenReturn(megaSkuList)
+            whenever(skusCache.get()).thenReturn(megaSkuList)
             whenever(localPricingMapper(megaSkuObject1)).thenReturn(localPricing)
 
             val actual = underTest.getLocalPricing(skuString)
@@ -293,7 +295,7 @@ class DefaultBillingRepositoryTest {
     @Test
     fun `test that isBillingAvailable return true when availableSkus list is not empty`() {
         runTest {
-            whenever(accountInfoWrapper.availableSkus).thenReturn(megaSkuList)
+            whenever(skusCache.get()).thenReturn(megaSkuList)
 
             val actual = underTest.isBillingAvailable()
 
@@ -304,7 +306,7 @@ class DefaultBillingRepositoryTest {
     @Test
     fun `test that isBillingAvailable return false when availableSkus list is empty`() {
         runTest {
-            whenever(accountInfoWrapper.availableSkus).thenReturn(emptyList())
+            whenever(skusCache.get()).thenReturn(emptyList())
 
             val actual = underTest.isBillingAvailable()
 

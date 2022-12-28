@@ -26,15 +26,16 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.usecase.GetLocalPricing
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.text.NumberFormat
@@ -47,6 +48,8 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
     private val paymentMethodTypeMapper: PaymentMethodTypeMapper,
+    private val getLocalPricing: GetLocalPricing,
+    private val isBillingAvailable: IsBillingAvailable,
 ) : ViewModel() {
 
     companion object {
@@ -132,7 +135,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun getProductAccounts(): List<Product> = state.value.product
 
-    fun isBillingAvailable(): Boolean = myAccountInfo.availableSkus.isNotEmpty()
+    fun isBillingAvailable(): Boolean = isBillingAvailable.invoke()
 
     /**
      * Asks for pricing if needed.
@@ -164,11 +167,11 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
         var currency = product.currency
 
         // Try get the local pricing details from the store if available
-        val details = getSkuDetails(myAccountInfo.availableSkus, getSku(product))
+        val details = getLocalPricing(getSku(product))
 
         if (details != null) {
-            price = details.priceAmountMicros / 1000000.00
-            currency = details.priceCurrencyCode
+            price = details.amount.value / 1000000.00
+            currency = details.currency.currency
         }
 
         val format = NumberFormat.getCurrencyInstance()
