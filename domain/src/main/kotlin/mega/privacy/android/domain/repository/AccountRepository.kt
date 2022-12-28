@@ -195,6 +195,9 @@ interface AccountRepository {
      */
     suspend fun deleteContactLink(handle: Long)
 
+    /**
+     * Get an overview of all the existing achievements and rewards for current account
+     */
     suspend fun getAccountAchievementsOverview(): AchievementsOverview
 
     /**

@@ -10,6 +10,9 @@ import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaStringList
 
+/**
+ * Mapper to convert MegaAchievementsDetails to AchievementsOverview
+ */
 typealias AchievementsOverviewMapper = (
     @JvmSuppressWildcards MegaAchievementsDetails,
 ) -> @JvmSuppressWildcards AchievementsOverview
