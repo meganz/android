@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -330,4 +331,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideMonitorChargingStoppedState() = mock<MonitorChargingStoppedState>()
+
+    @Provides
+    fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()
 }

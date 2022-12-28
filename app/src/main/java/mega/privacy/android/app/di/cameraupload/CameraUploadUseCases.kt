@@ -471,8 +471,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideCreateCameraUploadFolder(fileRepository: FileRepository): CreateCameraUploadFolder =
             CreateCameraUploadFolder(fileRepository::createFolder)
-
-
     }
 
     /**
