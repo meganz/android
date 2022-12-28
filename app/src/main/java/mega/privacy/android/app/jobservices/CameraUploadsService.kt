@@ -144,16 +144,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
 
         /**
-         * Camera Uploads
-         */
-        const val CAMERA_UPLOADS_ENGLISH = "Camera Uploads"
-
-        /**
-         * Secondary Uploads
-         */
-        const val SECONDARY_UPLOADS_ENGLISH = "Media Uploads"
-
-        /**
          * Stop Camera Sync
          */
         const val ACTION_STOP = "STOP_SYNC"

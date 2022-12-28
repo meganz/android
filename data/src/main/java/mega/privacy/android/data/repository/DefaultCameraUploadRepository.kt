@@ -458,4 +458,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             }
         }
 
+    override suspend fun renameNode(nodeHandle: Long, newName: String): Unit =
+        withContext(ioDispatcher) {
+            val node = megaApiGateway.getMegaNodeByHandle(nodeHandle)
+            node?.let {
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener { return@getRequestListener }
+                    megaApiGateway.renameNode(it, newName, listener)
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeRequestListener(listener)
+                    }
+                }
+            }
+        }
 }
