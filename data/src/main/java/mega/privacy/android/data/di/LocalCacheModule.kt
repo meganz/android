@@ -9,6 +9,7 @@ import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.cache.ExpiringCache
 import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import java.util.concurrent.TimeUnit
@@ -38,5 +39,10 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     internal fun provideProductDetailCache(): Cache<List<ProductDetails>> =
+        PermanentCache()
+
+    @Provides
+    @Singleton
+    internal fun provideListMegaSkuCache(): Cache<List<MegaSku>> =
         PermanentCache()
 }

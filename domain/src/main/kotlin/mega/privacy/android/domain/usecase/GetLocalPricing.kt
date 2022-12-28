@@ -12,7 +12,7 @@ fun interface GetLocalPricing {
      * @param sku = String
      * @return LocalPricing?
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         sku: String,
     ): LocalPricing?
 }

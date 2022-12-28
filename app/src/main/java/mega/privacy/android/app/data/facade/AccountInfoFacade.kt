@@ -15,7 +15,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
@@ -75,12 +74,6 @@ class AccountInfoFacade @Inject constructor(
         sendBroadcastUpdateAccountDetails()
         accountDetail.emit(request.megaAccountDetails)
     }
-
-    override var availableSkus: List<MegaSku>
-        get() = myAccountInfo.availableSkus
-        set(value) {
-            myAccountInfo.availableSkus = value
-        }
 
     override val activeSubscription: MegaPurchase?
         get() = myAccountInfo.activeSubscription

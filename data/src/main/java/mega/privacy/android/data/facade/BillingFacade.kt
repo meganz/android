@@ -75,6 +75,7 @@ internal class BillingFacade @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val verifyPurchaseGateway: VerifyPurchaseGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val skusCache: Cache<List<MegaSku>>,
     private val accountInfoWrapper: AccountInfoWrapper,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
@@ -120,7 +121,7 @@ internal class BillingFacade @Inject constructor(
         val activeSubscription = accountInfoWrapper.activeSubscription
         val oldSku = activeSubscription?.sku
         val purchaseToken = activeSubscription?.token
-        val skuDetails = accountInfoWrapper.availableSkus.find { it.sku == productId }
+        val skuDetails = skusCache.get()?.find { it.sku == productId }
             ?: throw ProductNotFoundException()
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
@@ -205,8 +206,7 @@ internal class BillingFacade @Inject constructor(
             .mapNotNull {
                 megaSkuMapper(it)
             }
-        // legacy support, we still need to save into MyAccountInfo, will remove after refactoring
-        accountInfoWrapper.availableSkus = megaSkus
+        skusCache.set(megaSkus)
         return@withContext megaSkus
     }
 

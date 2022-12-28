@@ -12,7 +12,6 @@ import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -83,7 +82,6 @@ class MyAccountInfo @Inject constructor(
     var lastSessionFormattedDate: String? = null
     var createSessionTimeStamp = INVALID_VALUE.toLong()
 
-    var availableSkus: List<MegaSku> = ArrayList()
     var activeSubscription: MegaPurchase? = null
 
     var numVersions = INVALID_VALUE
@@ -135,7 +133,6 @@ class MyAccountInfo @Inject constructor(
         lastSessionFormattedDate = null
         createSessionTimeStamp = INVALID_VALUE.toLong()
 
-        availableSkus = ArrayList()
         activeSubscription = null
 
         numVersions = INVALID_VALUE
