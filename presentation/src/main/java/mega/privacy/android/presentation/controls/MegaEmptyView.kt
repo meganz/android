@@ -14,25 +14,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
 /**
  * Reusable EmptyView with Icon & Text
- * Support for Icons in below formats:
- * 1. Vector (isVectorImage true): <vector>
- * 2. Bitmap (isBimapImage true): <bitmap>
- * 3. PNG (isVectorImage false, isBimapImage false)
+ * Pass imageVector using ImageVector.vectorResource(id = R.drawable.ic_xyz)
+ * @param imageVector
+ * @param text
  */
 @Composable
 fun MegaEmptyView(
-    imageResId: Int,
-    isVectorImage: Boolean,
-    isBimapImage: Boolean,
+    imageVector: ImageVector,
     text: Spanned,
 ) {
     Column(
@@ -42,40 +37,16 @@ fun MegaEmptyView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (isVectorImage) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = imageResId),
-                contentDescription = "Empty",
-                modifier = Modifier.padding(bottom = 30.dp),
-                tint = if (!MaterialTheme.colors.isLight) {
-                    Color.Gray
-                } else {
-                    Color.Unspecified
-                }
-            )
-        } else if (isBimapImage) {
-            Icon(
-                bitmap = ImageBitmap.imageResource(id = imageResId),
-                contentDescription = "Empty",
-                modifier = Modifier.padding(bottom = 30.dp),
-                tint = if (!MaterialTheme.colors.isLight) {
-                    Color.Gray
-                } else {
-                    Color.Unspecified
-                }
-            )
-        } else {
-            Icon(
-                painter = painterResource(id = imageResId),
-                contentDescription = "Empty",
-                modifier = Modifier.padding(bottom = 30.dp),
-                tint = if (!MaterialTheme.colors.isLight) {
-                    Color.Gray
-                } else {
-                    Color.Unspecified
-                }
-            )
-        }
+        Icon(
+            imageVector = imageVector,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Gray
+            } else {
+                Color.Unspecified
+            }
+        )
 
         AndroidView(
             factory = { context -> TextView(context) },
@@ -83,3 +54,76 @@ fun MegaEmptyView(
         )
     }
 }
+
+/**
+ * Reusable EmptyView with Icon & Text
+ * Pass imageBitmap using ImageBitmap.imageResource(id = R.drawable.ic_xyz)
+ * @param imageBitmap
+ * @param text
+ */
+@Composable
+fun MegaEmptyView(
+    imageBitmap: ImageBitmap,
+    text: Spanned,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            bitmap = imageBitmap,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Gray
+            } else {
+                Color.Unspecified
+            }
+        )
+
+        AndroidView(
+            factory = { context -> TextView(context) },
+            update = { it.text = text }
+        )
+    }
+}
+
+/**
+ * Reusable EmptyView with Icon & Text
+ * Pass imagePainter using painterResource(id = R.drawable.ic_xyz)
+ * @param imagePainter
+ * @param text
+ */
+@Composable
+fun MegaEmptyView(
+    imagePainter: Painter,
+    text: Spanned,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            painter = imagePainter,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = if (!MaterialTheme.colors.isLight) {
+                Color.Gray
+            } else {
+                Color.Unspecified
+            }
+        )
+
+        AndroidView(
+            factory = { context -> TextView(context) },
+            update = { it.text = text }
+        )
+    }
+}
+

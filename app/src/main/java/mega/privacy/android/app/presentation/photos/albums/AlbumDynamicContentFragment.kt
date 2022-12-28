@@ -32,9 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -225,9 +227,7 @@ class AlbumDynamicContentFragment : Fragment() {
             } else {
                 when (uiState.currentAlbum) {
                     Album.FavouriteAlbum -> MegaEmptyView(
-                        imageResId = R.drawable.ic_photos_favourite_album,
-                        isVectorImage = true,
-                        isBimapImage = false,
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
                         text = getString(R.string.empty_hint_favourite_album)
                             .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
                             .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
@@ -236,9 +236,7 @@ class AlbumDynamicContentFragment : Fragment() {
                     Album.GifAlbum -> Back()
                     Album.RawAlbum -> Back()
                     is Album.UserAlbum -> MegaEmptyView(
-                        imageResId = R.drawable.ic_photos_user_album_empty,
-                        isVectorImage = true,
-                        isBimapImage = false,
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
                         text = getString(R.string.photos_user_album_empty_album)
                             .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
                             .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
