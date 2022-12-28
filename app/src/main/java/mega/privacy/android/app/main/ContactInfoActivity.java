@@ -481,8 +481,6 @@ public class ContactInfoActivity extends PasscodeActivity
         scaleW = getScaleW(outMetrics, density);
         scaleH = getScaleH(outMetrics, density);
 
-        viewModel = new ViewModelProvider(this).get(ContactInfoViewModel.class);
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
 
@@ -661,8 +659,8 @@ public class ContactInfoActivity extends PasscodeActivity
                 }
             }
 
+            viewModel.setupData(user.getHandle(), user.getEmail());
             updateUI();
-            updateVerifyCredentialsLayout();
             checkScreenRotationToShowCall();
 
             if (viewModel.isOnline()) {
@@ -1060,13 +1058,14 @@ public class ContactInfoActivity extends PasscodeActivity
      * Collecting Flows from ViewModel
      */
     private void collectFlows() {
-        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
-
-            if (chatState.getError() != null) {
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, state -> {
+            if (state.getError() != null) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
-            } else if (chatState.isCallStarted()) {
+            } else if (Boolean.TRUE.equals(state.isCallStarted())) {
                 enableCallLayouts(true);
             }
+
+            updateVerifyCredentialsLayout(state.getAreCredentialsVerified());
 
             return Unit.INSTANCE;
         });
@@ -1614,7 +1613,6 @@ public class ContactInfoActivity extends PasscodeActivity
     protected void onResume() {
         super.onResume();
 
-        updateVerifyCredentialsLayout();
         checkScreenRotationToShowCall();
         setContactPresenceStatus();
         requestLastGreen(-1);
@@ -2004,12 +2002,14 @@ public class ContactInfoActivity extends PasscodeActivity
 
     /**
      * Updates the "Verify credentials" view.
+     *
+     * @param verified True if contact credentials are verified, false otherwise.
      */
-    public void updateVerifyCredentialsLayout() {
+    public void updateVerifyCredentialsLayout(boolean verified) {
         if (user != null) {
             verifyCredentialsLayout.setVisibility(View.VISIBLE);
 
-            if (megaApi.areCredentialsVerified(user)) {
+            if (verified) {
                 verifiedText.setText(R.string.label_verified);
                 verifiedImage.setVisibility(View.VISIBLE);
             } else {
