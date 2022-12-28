@@ -721,18 +721,18 @@ internal class MegaApiFacade @Inject constructor(
             listener,
         )
 
-    override suspend fun getUnverifiedIncomingShares(order: Int): List<ShareData> =
+    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)
 
-    override suspend fun getUnverifiedOutgoingShares(order: Int): List<ShareData> =
+    override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)
 
-    override fun openShareDialog(
+    override suspend fun openShareDialog(
         megaNode: MegaNode,
         listener: MegaRequestListenerInterface,
     ) = megaApi.openShareDialog(megaNode, listener)
 
-    override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
+    override suspend fun upgradeSecurity(listener: MegaRequestListenerInterface) =
         megaApi.upgradeSecurity(listener)
 
 }

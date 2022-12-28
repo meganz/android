@@ -1323,7 +1323,7 @@ interface MegaApiGateway {
      * @param order : Sort order
      * @return List of [MegaShare]
      */
-    suspend fun getUnverifiedIncomingShares(order: Int): List<ShareData>
+    suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare>
 
     /**
      * Function to get unverified outgoing shares from [MegaApi]
@@ -1331,7 +1331,7 @@ interface MegaApiGateway {
      * @param order : Sort order
      * @return List of [MegaShare]
      */
-    suspend fun getUnverifiedOutgoingShares(order: Int): List<ShareData>
+    suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare>
 
     /**
      * Creates a new share key for the node if there is no share key already created.
@@ -1339,7 +1339,7 @@ interface MegaApiGateway {
      * @param megaNode : [MegaNode] object which needs to be shared
      * @param listener : Listener to track this request
      */
-    fun openShareDialog(
+    suspend fun openShareDialog(
         megaNode: MegaNode,
         listener: MegaRequestListenerInterface,
     )
@@ -1349,5 +1349,5 @@ interface MegaApiGateway {
      *
      * @param listener : Listener to track this request
      */
-    fun upgradeSecurity(listener: MegaRequestListenerInterface)
+    suspend fun upgradeSecurity(listener: MegaRequestListenerInterface)
 }
