@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,8 +45,7 @@ fun SecurityUpgradeDialogView(
 ) {
     Surface(modifier = Modifier
         .padding(10.dp)
-        .fillMaxWidth()
-        .fillMaxHeight(),
+        .fillMaxSize(),
         shape = RoundedCornerShape(8.dp),
         color = if (MaterialTheme.colors.isLight) {
             Color.White
