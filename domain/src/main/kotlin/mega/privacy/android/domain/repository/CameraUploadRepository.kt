@@ -444,6 +444,11 @@ interface CameraUploadRepository {
     suspend fun deleteAllSecondarySyncRecords()
 
     /**
+     * Convert Base 64 string to handle
+     */
+    suspend fun convertBase64ToHandle(base64: String): Long
+
+    /**
      * monitor upload service pause State
      */
     fun monitorCameraUploadPauseState(): Flow<Boolean>

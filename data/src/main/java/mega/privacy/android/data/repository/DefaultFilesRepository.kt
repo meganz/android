@@ -407,6 +407,12 @@ internal class DefaultFilesRepository @Inject constructor(
             .flowOn(ioDispatcher)
     }
 
+    override suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeHandle)?.let { megaApiGateway.isInRubbish(it) }
+                ?: true
+        }
+
     override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
         withContext(ioDispatcher) {
             megaLocalStorageGateway.getOfflineInformation(nodeId.id)
