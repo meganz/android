@@ -4138,4 +4138,6 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
 </resources>

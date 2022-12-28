@@ -116,8 +116,6 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override suspend fun querySkus(): List<MegaSku> = billingGateway.querySkus()
 
-    override suspend fun disconnect() = billingGateway.disconnect()
-
     override fun monitorBillingEvent(): Flow<BillingEvent> = billingGateway.monitorBillingEvent()
 
     override suspend fun launchPurchaseFlow(activity: Activity, productId: String) =

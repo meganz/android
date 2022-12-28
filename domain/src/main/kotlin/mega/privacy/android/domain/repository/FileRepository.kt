@@ -60,6 +60,11 @@ interface FileRepository {
     fun monitorNodeUpdates(): Flow<List<Node>>
 
     /**
+     * Check if node is in rubbish or deleted
+     */
+    suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean
+
+    /**
      * Get offline node information
      *
      * @param nodeId

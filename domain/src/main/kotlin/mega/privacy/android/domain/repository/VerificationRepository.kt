@@ -31,6 +31,11 @@ interface VerificationRepository {
     suspend fun resetSMSVerifiedPhoneNumber()
 
     /**
+     * get current country code based on the network
+     */
+    suspend fun getCurrentCountryCode(): String?
+
+    /**
      * check whether device is in roaming state
      */
     suspend fun isRoaming(): Boolean
