@@ -4,6 +4,7 @@
 
 
 import groovy.json.JsonSlurperClassic
+import groovy.json.JsonOutput
 
 /**
  * Check out mega chat SDK by commit ID
@@ -32,6 +33,34 @@ void checkoutSdkByCommit(String sdkCommitId) {
     cd $WORKSPACE
     cd sdk/src/main/jni/mega/sdk
     git checkout $sdkCommitId
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout SDK by git tag
+ * @param sdkTag the tag to checkout
+ */
+private void checkoutSdkByTag(String sdkTag) {
+    sh """
+    echo checkoutSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/mega/sdk
+    git checkout tags/$sdkTag
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * checkout MEGAchat SDK by git tag
+ * @param megaChatTag the tag to checkout
+ */
+private void checkoutMegaChatSdkByTag(String megaChatTag) {
+    sh """
+    echo checkoutMegaChatSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/megachat/sdk
+    git checkout tags/$megaChatTag
     cd $WORKSPACE
     """
 }
@@ -185,6 +214,62 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
+}
+
+/**
+ * Upload file to GitLab and return the GitLab link
+ * @param fileName the local file to be uploaded.
+ * @return file link on GitLab
+ */
+private String uploadFileToGitLab(String fileName) {
+    String link = ""
+    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
+        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
+        return link
+    }
+    return link
+}
+
+/**
+ *  Check the feature flag json file and set the feature flag.
+ *  If the feature_flag.json file already contains the flagName, set the flagValue.
+ *  Otherwise add the flagName and set the flagValue.
+ *  If featureFlagFile does not exist, a new file will be created.<p/>
+ *
+ * @param featureFlagFile relative path of the feature_flag.json file
+ * @param flagName name of the feature flag
+ * @param flagValue boolean value of the flag
+ */
+def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
+    def flagList
+    if (fileExists(featureFlagFile)) {
+        def fileContents = readFile(featureFlagFile)
+        flagList = new JsonSlurperClassic().parseText(fileContents)
+    } else {
+        println("setFeatureFlag() $featureFlagFile not exist!")
+        flagList = new ArrayList()
+    }
+
+    def exist = false
+    for (feature in flagList) {
+        def name = feature["name"]
+        if (name == flagName) {
+            feature["value"] = flagValue
+            exist = true
+            break
+        }
+    }
+
+    if (!exist) {
+        def newFeature = new HashMap<String, String>()
+        newFeature["value"] = flagValue
+        newFeature["name"] = flagName
+        flagList.add(newFeature)
+    }
+
+    def result = JsonOutput.prettyPrint(JsonOutput.toJson(flagList))
+    writeFile file: featureFlagFile, text: result.toString()
 }
 
 return this

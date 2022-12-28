@@ -53,9 +53,10 @@ pipeline {
         CONSOLE_LOG_FILE = 'console.txt'
 
         // CD pipeline uses this environment variable to assign version code
-        APK_VERSION_CODE_FOR_CD =  "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
+        APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
+
     }
     post {
         failure {
@@ -172,6 +173,17 @@ pipeline {
                 }
             }
         }
+        stage('Enable Permanent Logging') {
+            steps {
+                script {
+                    BUILD_STEP = 'Enable Permanent Logging'
+
+                    def featureFlagFile = "app/src/main/assets/featuretoggle/feature_flags.json"
+                    common.setFeatureFlag(featureFlagFile, "PermanentLogging", true)
+                    sh("cat $featureFlagFile")
+                }
+            }
+        }
         stage('Build GMS APK') {
             steps {
                 script {
@@ -225,6 +237,37 @@ pipeline {
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotesForFirebase()}"
                         ]) {
                             sh './gradlew appDistributionUploadGmsRelease'
+                        }
+                    }
+                }
+            }
+        }
+        stage('Build QA APK(GMS)') {
+            steps {
+                script {
+                    BUILD_STEP = 'Build QA APK(GMS)'
+                    withEnv([
+                            "APK_VERSION_NAME_TAG_FOR_CD=_QA"
+                    ]) {
+                        sh './gradlew app:assembleGmsQa'
+                    }
+                }
+            }
+        }
+        stage('Upload QA APK(GMS) to Firebase') {
+            steps {
+                script {
+                    BUILD_STEP = 'Upload QA APK(GMS) to Firebase'
+                }
+                withCredentials([
+                        file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
+                ]) {
+                    script {
+                        withEnv([
+                                "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
+                                "RELEASE_NOTES_FOR_CD=${readReleaseNotesForFirebase()}"
+                        ]) {
+                            sh './gradlew appDistributionUploadGmsQa'
                         }
                     }
                 }
@@ -358,7 +401,7 @@ pipeline {
                 script {
                     // Get the formatted release notes
                     String release_notes = releaseNotes(RELEASE_NOTES)
-                    
+
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
@@ -434,7 +477,6 @@ String getValueInMRDescriptionBy(String key) {
 static boolean isDefined(String value) {
     return value != null && !value.isEmpty()
 }
-
 
 
 /**
@@ -711,10 +753,10 @@ private void printWorkspaceSize(String prompt) {
 /**
  * Get the list of recent changes (release note) json string input
  * and return a formatted list following below example
- *[
+ * [
  * [language: 'en-GB', text: "Please test the changes from Jenkins build ${env.BUILD_NUMBER}."],
  * [language: 'de-DE', text: "Bitte die Änderungen vom Jenkins Build ${env.BUILD_NUMBER} testen."]
- *]
+ * ]
  *
  * @param input the json string to parse
  * @return the list of recent changes formatted

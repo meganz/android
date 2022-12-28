@@ -3,8 +3,6 @@
  * 1. Build and upload Android APK to Firebase AppDistribution
  * 2. Build SDK and publish to Artifactory
  */
-import groovy.json.JsonSlurperClassic
-import groovy.json.JsonOutput
 
 BUILD_STEP = ''
 
@@ -31,7 +29,7 @@ DELIVER_QA_CMD = "deliver_qa"
 PUBLISH_SDK_CMD = "publish_sdk"
 UPLOAD_COVERAGE_REPORT_CMD = "upload_coverage"
 
-// The log file of publishing pre-built SDK to Artifatory
+// The log file of publishing pre-built SDK to Artifactory
 ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
 
 /**
@@ -84,27 +82,24 @@ pipeline {
 
                 if (triggerByDeliverQaCmd() || triggerByDeliverQaCmd()) {
                     if (common.hasGitLabMergeRequest()) {
-                        // upload Jenkins console log
-                        String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
+                        String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                         String message = firebaseUploadFailureMessage("<br/>") +
                                 "<br/>Build Log:\t${jsonJenkinsLog}"
 
                         common.sendToMR(message)
                     } else {
-                        // if build is triggered by PUSH, send result only to Slack
                         slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
                         slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                     }
                 } else if (triggerByPublishSdkCmd()) {
-                    // upload Jenkins console log
-                    String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     // upload SDK build log if SDK build fails
                     String sdkBuildMessage = ""
                     if (BUILD_STEP == "Build SDK") {
                         if (fileExists(SDK_LOG_FILE_NAME)) {
-                            def jsonSdkLog = uploadFileToGitLab(SDK_LOG_FILE_NAME)
+                            def jsonSdkLog = common.uploadFileToGitLab(SDK_LOG_FILE_NAME)
                             sdkBuildMessage = "<br/>SDK BuildLog:\t${jsonSdkLog}"
                         } else {
                             sdkBuildMessage = "<br/>SDK Build log not valid"
@@ -126,7 +121,7 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-                if (triggerByDeliverQaCmd() || triggerByUploadCoverage() || triggerByPush()) {
+                if (triggerByDeliverQaCmd() || triggerByUploadCoverage()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
                 } else if (triggerByPublishSdkCmd()) {
@@ -136,7 +131,7 @@ pipeline {
             }
         }
         cleanup {
-            // delete whole workspace after each successful build, to save Jenkins storage
+            // Delete whole workspace after each successful build, to save Jenkins storage
             // We do not clean workspace if build fails, for a chance to investigate the crime scene.
             cleanWs(cleanWhenFailure: false)
         }
@@ -154,15 +149,14 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
+                expression { triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
                     checkSDKVersion()
                     REBUILD_SDK = getValueInMRDescriptionBy("REBUILD_SDK")
-                }
-                gitlabCommitStatus(name: 'Preparation') {
+
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
                     sh("rm -fv ${LOG_FILE}")  // sdk log file
                     sh('set')
@@ -189,21 +183,20 @@ pipeline {
                 script {
                     BUILD_STEP = 'Select SDK Version'
                 }
-                gitlabCommitStatus(name: 'Select SDK Version') {
-                    withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                        script {
-                            String sdkCommit = parseCommandParameter()["sdk-commit"]
-                            if (sdkCommit != null && sdkCommit.length() > 0) {
-                                common.checkoutSdkByCommit(sdkCommit)
-                            }
+                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
+                    script {
+                        String sdkCommit = parseCommandParameter()["sdk-commit"]
+                        if (sdkCommit != null && sdkCommit.length() > 0) {
+                            common.checkoutSdkByCommit(sdkCommit)
+                        }
 
-                            String chatCommit = parseCommandParameter()["chat-commit"]
-                            if (chatCommit != null && chatCommit.length() > 0) {
-                                common.checkoutMegaChatSdkByCommit(chatCommit)
-                            }
+                        String chatCommit = parseCommandParameter()["chat-commit"]
+                        if (chatCommit != null && chatCommit.length() > 0) {
+                            common.checkoutMegaChatSdkByCommit(chatCommit)
                         }
                     }
                 }
+
             }
         }
 
@@ -214,10 +207,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Download Dependency Lib for SDK'
-                }
-                gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-                    script {
-                        sh """
+
+                    sh """
                             cd "${WORKSPACE}/jenkinsfile/"
                             bash download_webrtc.sh
     
@@ -226,30 +217,28 @@ pipeline {
                             pwd
                             ls -lh
                         """
-                    }
                 }
+
             }
         }
         stage('Download Google Map API Key') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Download Google Map API Key'
                 }
-                gitlabCommitStatus(name: 'Download Google Map API Key') {
 
-                    withCredentials([
-                            file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_QA', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_QA')
-                    ]) {
-                        script {
-                            println("applying production google map api config... ")
-                            sh 'mkdir -p app/src/debug/res/values'
-                            sh 'mkdir -p app/src/release/res/values'
-                            sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/debug/res/values/google_maps_api.xml"
-                            sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/release/res/values/google_maps_api.xml"
-                        }
+                withCredentials([
+                        file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_QA', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_QA')
+                ]) {
+                    script {
+                        println("applying production google map api config... ")
+                        sh 'mkdir -p app/src/debug/res/values'
+                        sh 'mkdir -p app/src/release/res/values'
+                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/debug/res/values/google_maps_api.xml"
+                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/release/res/values/google_maps_api.xml"
                     }
                 }
             }
@@ -307,7 +296,7 @@ pipeline {
         }
         stage('Clean Android build') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByDeliverQaCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
@@ -318,49 +307,43 @@ pipeline {
         }
         stage('Enable Permanent Logging') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Enable Permanent Logging'
 
                     def featureFlagFile = "app/src/main/assets/featuretoggle/feature_flags.json"
-                    setFeatureFlag(featureFlagFile, "PermanentLogging", true)
+                    common.setFeatureFlag(featureFlagFile, "PermanentLogging", true)
                     sh("cat $featureFlagFile")
                 }
             }
         }
         stage('Build APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Build APK (GMS)'
-                }
-
-                gitlabCommitStatus(name: 'Build APK (GMS)') {
-                    script {
-                        sh './gradlew app:assembleGmsRelease'
-                    }
+                    sh './gradlew app:assembleGmsRelease'
                 }
             }
         }
         stage('Sign APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Sign APK(GMS)'
                 }
-                gitlabCommitStatus(name: 'Sign APK(GMS)') {
-                    withCredentials([
-                            string(credentialsId: 'ANDROID_QA_SIGN_PASSWORD', variable: 'ANDROID_QA_SIGN_PASSWORD'),
-                            file(credentialsId: 'ANDROID_QA_KEYSTORE', variable: 'ANDROID_QA_KEYSTORE')
-                    ]) {
-                        script {
-                            sh '''
+                withCredentials([
+                        string(credentialsId: 'ANDROID_QA_SIGN_PASSWORD', variable: 'ANDROID_QA_SIGN_PASSWORD'),
+                        file(credentialsId: 'ANDROID_QA_KEYSTORE', variable: 'ANDROID_QA_KEYSTORE')
+                ]) {
+                    script {
+                        sh '''
                                 cd app/build/outputs/apk/gms/release
                                 zipalign -v -p 4 app-*-unsigned.apk app-gms-release-unsigned-aligned.apk
                                 apksigner sign --ks "$ANDROID_QA_KEYSTORE" --ks-pass "pass:$ANDROID_QA_SIGN_PASSWORD" --out app-gms-release-signed.apk app-gms-release-unsigned-aligned.apk
@@ -370,14 +353,14 @@ pipeline {
                                 ls -lh
                                 cd -
                             '''
-                        }
                     }
                 }
+
             }
         }
         stage('Upload APK(GMS) to Firebase') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -403,7 +386,7 @@ pipeline {
         }
         stage('Build QA APK(GMS)') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -419,7 +402,7 @@ pipeline {
 
         stage('Upload QA APK(GMS) to Firebase') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() }
             }
             steps {
                 script {
@@ -444,13 +427,12 @@ pipeline {
 
         stage('Clean up Android') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
+                expression { triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Clean Up Android'
-                }
-                gitlabCommitStatus(name: 'Clean Up Android') {
+
                     sh """                    
                         cd ${WORKSPACE}
                         ./gradlew clean
@@ -460,13 +442,12 @@ pipeline {
         }
         stage('Clean up SDK') {
             when {
-                expression { triggerByPush() || triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
+                expression { triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
             }
             steps {
                 script {
                     BUILD_STEP = 'Clean Up SDK'
-                }
-                gitlabCommitStatus(name: 'Clean Up SDK') {
+
                     sh """
                         cd ${WORKSPACE}/sdk/src/main/jni
                         bash build.sh clean
@@ -477,81 +458,79 @@ pipeline {
 
         stage('Upload Code Coverage') {
             when {
-                expression { triggerByPush() || triggerByUploadCoverage() }
+                expression { triggerByUploadCoverage() }
             }
             steps {
                 script {
                     BUILD_STEP = "Upload Code Coverage"
-                }
-                gitlabCommitStatus(name: 'Upload Code Coverage') {
-                    script {
-                        withCredentials([
-                                string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
-                                string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
-                        ]) {
-                            String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
-                            // domain coverage
-                            sh "./gradlew domain:jacocoTestReport"
 
-                            // data coverage
-                            sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                    withCredentials([
+                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                    ]) {
+                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/"
+                        // domain coverage
+                        sh "./gradlew domain:jacocoTestReport"
 
-                            // temporarily disable the failed test cases
-                            sh "rm -frv ${WORKSPACE}/app/src/testDebug"
+                        // data coverage
+                        sh "./gradlew data:testGmsDebugUnitTestCoverage"
 
-                            // run coverage for app module
-                            sh "./gradlew app:createUnitTestCoverageReport"
+                        // temporarily disable the failed test cases
+                        sh "rm -frv ${WORKSPACE}/app/src/testDebug"
 
-                            // restore failed test cases
-                            sh "git checkout -- app/src/testDebug"
+                        // run coverage for app module
+                        sh "./gradlew app:createUnitTestCoverageReport"
 
-                            APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                            DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                            DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                            DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
-                            DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
-                            APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
-                            def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
-                            def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
-                            def dataSummaryCoverageArray = DATA_COVERAGE.split('=')[1].split('/')
-                            def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
-                            def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
-                            def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
+                        // restore failed test cases
+                        sh "git checkout -- app/src/testDebug"
 
-                            String appTestResultsRow = "| **app** | " +
-                                    "${appSummaryCoverageArray[0]} | " +
-                                    "${appSummaryCoverageArray[1]} | " +
-                                    "${appSummaryArray[0]} | " +
-                                    "${appSummaryArray[1]} | " +
-                                    "${appSummaryArray[2]} | " +
-                                    "${appSummaryArray[3]} | " +
-                                    "${appSummaryArray[4]} | "
+                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                        def appSummaryCoverageArray = APP_COVERAGE.split('=')[1].split('/')
+                        def domainSummaryCoverageArray = DOMAIN_COVERAGE.split('=')[1].split('/')
+                        def dataSummaryCoverageArray = DATA_COVERAGE.split('=')[1].split('/')
+                        def appSummaryArray = APP_UNIT_TEST_SUMMARY.split(',')
+                        def domainSummaryArray = DOMAIN_UNIT_TEST_SUMMARY.split(',')
+                        def dataSummaryArray = DATA_UNIT_TEST_SUMMARY.split(',')
 
-                            String domainTestResultsRow = "| **domain** | " +
-                                    "${domainSummaryCoverageArray[0]} | " +
-                                    "${domainSummaryCoverageArray[1]} | " +
-                                    "${domainSummaryArray[0]} | " +
-                                    "${domainSummaryArray[1]} | " +
-                                    "${domainSummaryArray[2]} | " +
-                                    "${domainSummaryArray[3]} | " +
-                                    "${domainSummaryArray[4]} | "
+                        String appTestResultsRow = "| **app** | " +
+                                "${appSummaryCoverageArray[0]} | " +
+                                "${appSummaryCoverageArray[1]} | " +
+                                "${appSummaryArray[0]} | " +
+                                "${appSummaryArray[1]} | " +
+                                "${appSummaryArray[2]} | " +
+                                "${appSummaryArray[3]} | " +
+                                "${appSummaryArray[4]} | "
 
-                            String dataTestResultsRow = "| **data** | " +
-                                    "${dataSummaryCoverageArray[0]} | " +
-                                    "${dataSummaryCoverageArray[1]} | " +
-                                    "${dataSummaryArray[0]} | " +
-                                    "${dataSummaryArray[1]} | " +
-                                    "${dataSummaryArray[2]} | " +
-                                    "${dataSummaryArray[3]} | " +
-                                    "${dataSummaryArray[4]} | "
+                        String domainTestResultsRow = "| **domain** | " +
+                                "${domainSummaryCoverageArray[0]} | " +
+                                "${domainSummaryCoverageArray[1]} | " +
+                                "${domainSummaryArray[0]} | " +
+                                "${domainSummaryArray[1]} | " +
+                                "${domainSummaryArray[2]} | " +
+                                "${domainSummaryArray[3]} | " +
+                                "${domainSummaryArray[4]} | "
+
+                        String dataTestResultsRow = "| **data** | " +
+                                "${dataSummaryCoverageArray[0]} | " +
+                                "${dataSummaryCoverageArray[1]} | " +
+                                "${dataSummaryArray[0]} | " +
+                                "${dataSummaryArray[1]} | " +
+                                "${dataSummaryArray[2]} | " +
+                                "${dataSummaryArray[3]} | " +
+                                "${dataSummaryArray[4]} | "
 
 
-                            writeFile file: 'coverage_summary.txt', text: "$appTestResultsRow\n$domainTestResultsRow\n$dataTestResultsRow"
+                        writeFile file: 'coverage_summary.txt', text: "$appTestResultsRow\n$domainTestResultsRow\n$dataTestResultsRow"
 
-                            sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/coverage_summary.txt\" \"${targetPath}/coverage_summary.txt\""
-                        }
+                        sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/coverage_summary.txt\" \"${targetPath}/coverage_summary.txt\""
                     }
                 }
+
             }
         }
     }
@@ -623,60 +602,6 @@ static boolean isDefined(String value) {
 }
 
 /**
- * checkout SDK by git tag
- * @param sdkTag the tag to checkout
- */
-private void checkoutSdkByTag(String sdkTag) {
-    sh """
-    echo checkoutSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout tags/$sdkTag
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by git tag
- * @param megaChatTag the tag to checkout
- */
-private void checkoutMegaChatSdkByTag(String megaChatTag) {
-    sh """
-    echo checkoutMegaChatSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout tags/$megaChatTag
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout SDK by branch
- * @param sdkBranch the branch to checkout
- */
-private void checkoutSdkByBranch(String sdkBranch) {
-    sh "echo checkoutSdkByBranch"
-    sh "cd \"$WORKSPACE\""
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
-    sh 'git submodule sync'
-    sh 'git submodule update --init --recursive --remote'
-}
-
-/**
- * checkout MEGAchat SDK by branch
- * @param megaChatBranch the branch to checkout
- */
-private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
-    sh "echo checkoutMegaChatSdkByBranch"
-    sh "cd \"$WORKSPACE\""
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
-    sh 'git submodule sync'
-    sh 'git submodule update --init --recursive --remote'
-}
-
-/**
  * compose the success message, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
@@ -708,14 +633,6 @@ private String publishSdkSuccessMessage(String lineBreak) {
             "${lineBreak}Version:\tnz.mega.sdk:sdk:${getSdkVersionText()}" +
             "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}" +
             "${lineBreak}AAR Artifactory Page: ${getSdkAarArtifactoryPage()}"
-}
-
-/**
- * Check this build is triggered by PUSH to a branch
- * @return
- */
-private boolean triggerByPush() {
-    return env.gitlabActionType == "PUSH"
 }
 
 /**
@@ -916,21 +833,6 @@ private String lastCommitMessage() {
 }
 
 /**
- * upload file to GitLab and return the GitLab link
- * @param fileName the local file to be uploaded
- * @return file link on GitLab
- */
-private String uploadFileToGitLab(String fileName) {
-    String link = ""
-    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
-        return link
-    }
-    return link
-}
-
-/**
  * Get publish type of SDK.
  * @return return value can be either "dev" or "rel"
  */
@@ -994,48 +896,6 @@ String getSdkGitHash() {
 String getMegaChatSdkGitHash() {
     return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
 }
-
-/**
- *  Check the feature flag json file and set the feature flag
- *  If the feature_flag.json file already contains the flagName, set the flagValue.
- *  Otherwise add the flagName with specified flagValue.
- *  If featureFlagFile does not exist, a new file will be created.
- *
- * @param featureFlagFile relative path of the feature_flag.json file
- * @param flagName name of the feature flag
- * @param flagValue boolean value of the flag
- */
-def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
-    def flagList
-    if (fileExists(featureFlagFile)) {
-        def fileContents = readFile(featureFlagFile)
-        flagList = new JsonSlurperClassic().parseText(fileContents)
-    } else {
-        println("setFeatureFlag() $featureFlagFile not exist!")
-        flagList = new ArrayList()
-    }
-
-    def exist = false
-    for (feature in flagList) {
-        def name = feature["name"]
-        if (name == flagName) {
-            feature["value"] = flagValue
-            exist = true
-            break
-        }
-    }
-
-    if (!exist) {
-        def newFeature = new HashMap<String, String>()
-        newFeature["value"] = flagValue
-        newFeature["name"] = flagName
-        flagList.add(newFeature)
-    }
-
-    def result = JsonOutput.prettyPrint(JsonOutput.toJson(flagList))
-    writeFile file: featureFlagFile, text: result.toString()
-}
-
 /**
  * Analyse unit test report and get the summary string
  * @param testReportPath path of the unit test report in xml format
