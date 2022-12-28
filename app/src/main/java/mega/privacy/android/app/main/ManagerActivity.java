@@ -10511,7 +10511,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void setPendingActionsBadge() {
-        if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
+        if (viewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
             sharedItemsView.addView(pendingActionsBadge);
             ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
                 TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);

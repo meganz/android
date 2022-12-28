@@ -12,6 +12,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param shouldStopCameraUpload camera upload should be stopped or not
  * @param shouldSendCameraBroadcastEvent broadcast event should be sent or not
  * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
+ * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
  * @param pendingActionsCount Pending actions count
  */
 data class ManagerState(
@@ -24,5 +25,6 @@ data class ManagerState(
     val shouldStopCameraUpload: Boolean = false,
     val shouldSendCameraBroadcastEvent: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
+    val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val pendingActionsCount: Int = 0
 )

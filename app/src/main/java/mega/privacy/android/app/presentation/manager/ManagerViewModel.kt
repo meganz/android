@@ -24,6 +24,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.getStateFlow
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetPricing
@@ -100,6 +102,7 @@ class ManagerViewModel @Inject constructor(
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
+    private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedInComingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
 ) : ViewModel() {
@@ -153,6 +156,12 @@ class ManagerViewModel @Inject constructor(
                 { state: ManagerState -> state.copy(isFirstLogin = it) }
             }.collect {
                 _state.update(it)
+            }
+        }
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
             }
         }
 
