@@ -1,6 +1,7 @@
 package mega.privacy.android.presentation.controls
 
 import android.text.Spanned
+import android.util.TypedValue
 import android.widget.TextView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,11 @@ fun MegaEmptyView(
         )
 
         AndroidView(
-            factory = { context -> TextView(context) },
+            factory = { context ->
+                TextView(context).apply {
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                }
+            },
             update = { it.text = text }
         )
     }
@@ -85,7 +90,11 @@ fun MegaEmptyView(
         )
 
         AndroidView(
-            factory = { context -> TextView(context) },
+            factory = { context ->
+                TextView(context).apply {
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                }
+            },
             update = { it.text = text }
         )
     }
@@ -121,7 +130,11 @@ fun MegaEmptyView(
         )
 
         AndroidView(
-            factory = { context -> TextView(context) },
+            factory = { context ->
+                TextView(context).apply {
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                }
+            },
             update = { it.text = text }
         )
     }
