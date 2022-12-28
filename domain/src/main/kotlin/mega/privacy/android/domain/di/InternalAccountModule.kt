@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 
 /**
  * Account module.
@@ -47,6 +48,10 @@ internal abstract class InternalAccountModule {
     abstract fun provideGetAccountAchievements(implementation: DefaultGetAccountAchievements): GetAccountAchievements
 
     companion object {
+
+        @Provides
+        fun provideAchievementsDetailUseCase(accountRepository: AccountRepository): GetAccountAchievementsOverview =
+            GetAccountAchievementsOverview(accountRepository::getAccountAchievementsOverview)
 
         /**
          * Provides the Use Case [GetSession]
