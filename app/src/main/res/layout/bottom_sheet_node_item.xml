@@ -211,10 +211,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/label_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/grey_012_white_012" />
+                android:background="@color/grey_012_white_012"
+                android:orientation="horizontal" />
 
             <LinearLayout
                 android:id="@+id/dispute_option"
