@@ -74,7 +74,7 @@ class IncomingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
             _state.update {
-                it.copy(unVerifiedInComingShares = getUnverifiedInComingShares())
+                it.copy(unVerifiedInComingShares = getUnverifiedInComingShares(_state.value.sortOrder))
             }
         }
     }
