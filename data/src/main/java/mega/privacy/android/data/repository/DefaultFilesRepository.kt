@@ -432,12 +432,6 @@ internal class DefaultFilesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUnVerifiedInComingShares(): Int = 3
-    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
-
-    override suspend fun getUnverifiedOutgoingShares(): Int = 5
-    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
-
     override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener {
@@ -447,6 +441,40 @@ internal class DefaultFilesRepository @Inject constructor(
                 }
             }
             megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getUnVerifiedInComingShares(order: SortOrder): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
+                megaShareMapper(it)
+            }
+        }
+
+    override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUnverifiedOutgoingShares(sortOrderIntMapper(order)).map {
+                megaShareMapper(it)
+            }
+        }
+
+    override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.openShareDialog(megaNode, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
             }

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
@@ -221,14 +222,26 @@ interface FilesRepository {
     /**
      * Provides Unverified incoming shares count from SDK
      *
-     * @return Integer count
+     * @return List of [ShareData]
      */
-    suspend fun getUnVerifiedInComingShares(): Int
+    suspend fun getUnVerifiedInComingShares(order: SortOrder): List<ShareData>
 
     /**
      * Provides Unverified outgoing shares count from SDK
      *
-     * @return Integer count
+     * @return List of [ShareData]
      */
-    suspend fun getUnverifiedOutgoingShares(): Int
+    suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
+
+    /**
+     * Creates a new share key for the node if there is no share key already created.
+     *
+     * @param megaNode : [MegaNode] object which needs to be shared
+     */
+    suspend fun openShareDialog(megaNode: MegaNode)
+
+    /**
+     * Update cryptographic security
+     */
+    suspend fun upgradeSecurity()
 }

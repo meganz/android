@@ -59,7 +59,7 @@ class OutgoingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
             _state.update {
-                it.copy(unVerifiedOutGoingShares = getUnverifiedOutgoingShares())
+                it.copy(unVerifiedOutGoingShares = getUnverifiedOutgoingShares(_state.value.sortOrder))
             }
         }
 

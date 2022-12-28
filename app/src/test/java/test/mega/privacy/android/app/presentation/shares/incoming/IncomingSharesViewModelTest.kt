@@ -15,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -92,7 +93,7 @@ class IncomingSharesViewModelTest {
             assertThat(initial.isInvalidHandle).isEqualTo(true)
             assertThat(initial.incomingParentHandle).isEqualTo(null)
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
-            assertThat(initial.unVerifiedInComingShares).isEqualTo(0)
+            assertThat(initial.unVerifiedInComingShares).isEmpty()
         }
     }
 
@@ -516,10 +517,12 @@ class IncomingSharesViewModelTest {
 
     @Test
     fun `test that unverified incoming shares are returned`() = runTest {
-        whenever(getUnverifiedInComingShares()).thenReturn(3)
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        whenever(getUnverifiedInComingShares(underTest.state.value.sortOrder)).thenReturn(listOf(
+            shareData))
         initViewModel()
         underTest.state.test {
-            assertThat(awaitItem().unVerifiedInComingShares).isEqualTo(3)
+            assertThat(awaitItem().unVerifiedInComingShares).isNotEmpty()
         }
     }
 }

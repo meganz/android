@@ -14,6 +14,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -59,7 +60,8 @@ class OutgoingSharesViewModelTest {
         }
 
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>() {
-        onBlocking { invoke() }.thenReturn(5)
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
 
     @Before
@@ -445,7 +447,7 @@ class OutgoingSharesViewModelTest {
     fun `test that unverified incoming shares are returned`() = runTest {
         initViewModel()
         underTest.state.test {
-            assertThat(awaitItem().unVerifiedOutGoingShares).isEqualTo(5)
+            assertThat(awaitItem().unVerifiedOutGoingShares).isNotEmpty()
         }
     }
 }

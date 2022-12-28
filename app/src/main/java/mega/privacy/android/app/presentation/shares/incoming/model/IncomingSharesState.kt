@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares.incoming.model
 
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaNode
 
@@ -24,7 +25,7 @@ data class IncomingSharesState(
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val unVerifiedInComingShares: Int = 0,
+    val unVerifiedInComingShares: List<ShareData> = emptyList(),
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
 ) {
 
