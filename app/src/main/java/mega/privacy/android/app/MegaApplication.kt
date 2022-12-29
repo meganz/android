@@ -42,6 +42,7 @@ import mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache
 import mega.privacy.android.app.utils.ChangeApiServerUtil
 import mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
@@ -52,6 +53,7 @@ import nz.mega.sdk.MegaHandleList
 import org.webrtc.ContextUtils
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * Mega application
@@ -154,6 +156,9 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
     @Inject
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
 
+    @Inject
+    lateinit var greeter: Provider<Greeter>
+
     var localIpAddress: String? = ""
 
     var isEsid = false
@@ -214,6 +219,8 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         // clear the cache files stored in the external cache folder.
         clearPublicCache(this)
         ContextUtils.initialize(applicationContext)
+
+        if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
     }
 
     /**

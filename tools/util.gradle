@@ -93,8 +93,22 @@ def getChatGitHash(String prebuiltSdkVersion) {
     return commit
 }
 
+/**
+ * Get flag to activate Greeter developer tool from local.properties file.
+ */
+boolean shouldActivateGreeter() {
+    def file = rootProject.file('local.properties')
+    if (file.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(file))
+        return props["activate_greeter"]?.toBoolean() ?: false
+    }
+    return false
+}
+
 ext {
     shouldUsePrebuiltSdk = this.&shouldUsePrebuiltSdk
     getSdkGitHash = this.&getSdkGitHash
     getChatGitHash = this.&getChatGitHash
+    shouldActivateGreeter = this.&shouldActivateGreeter
 }
