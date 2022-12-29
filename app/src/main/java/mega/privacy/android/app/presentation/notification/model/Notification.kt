@@ -24,7 +24,7 @@ data class Notification(
     @ColorRes val sectionColour: Int,
     @DrawableRes val sectionIcon: Int?,
     val title: (Context) -> CharSequence,
-    val titleTextSize: Dp,
+    val titleTextSize: Float,
     val description: (Context) -> CharSequence?,
     val dateText: (Context) -> String,
     val isNew: Boolean,
