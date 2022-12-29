@@ -46,8 +46,6 @@ import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.StartUpload
-import mega.privacy.android.app.listeners.CreateFolderListener
-import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -174,18 +172,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         private var ignoreAttr = false
         private var running = false
-
-        /**
-         * Creating primary folder now
-         */
-        @JvmField
-        var isCreatingPrimary = false
-
-        /**
-         * Creating secondary folder now
-         */
-        @JvmField
-        var isCreatingSecondary = false
 
         /**
          * Is Camera Upload running now
@@ -538,7 +524,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var lastUpdated: Long = 0
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
     private var setAttrUserListener: SetAttrUserListener? = null
-    private var createFolderListener: CreateFolderListener? = null
     private val cuTransfers: MutableList<MegaTransfer> = mutableListOf()
 
     private fun monitorUploadPauseStatus() {
@@ -586,7 +571,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         monitorUploadPauseStatus()
         getAttrUserListener = GetCameraUploadAttributeListener(this)
         setAttrUserListener = SetAttrUserListener(this)
-        createFolderListener = CreateFolderListener(this, ExtraAction.INIT_CAMERA_UPLOAD)
     }
 
     /**
@@ -599,7 +583,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         receiver?.let { unregisterReceiver(it) }
         getAttrUserListener = null
         setAttrUserListener = null
-        createFolderListener = null
 
         stopActiveHeartbeat()
         coroutineScope?.cancel()
