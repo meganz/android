@@ -30,6 +30,7 @@ import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
+import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
@@ -76,6 +77,7 @@ import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountType
+import mega.privacy.android.data.mapper.toAchievementsOverview
 import mega.privacy.android.data.mapper.toChatCall
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
@@ -376,6 +378,13 @@ internal class MapperModule {
      */
     @Provides
     fun provideMegaAchievementMapper(): MegaAchievementMapper = ::toMegaAchievement
+
+    /**
+     * Provide mega achievements detail mapper
+     */
+    @Provides
+    fun provideAchievementsOverviewMapper(): AchievementsOverviewMapper =
+        ::toAchievementsOverview
 
     /**
      * Provide [RecentActionsMapper] mapper
