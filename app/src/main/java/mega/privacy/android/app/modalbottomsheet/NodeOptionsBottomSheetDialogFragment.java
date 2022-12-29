@@ -89,9 +89,11 @@ import mega.privacy.android.app.main.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ViewUtils;
@@ -254,18 +256,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
 
-        if(searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
-            ////TODO This flag for false for now. This will get manipulated after SDK changes
-            TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
-            nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
-            optionVerifyUser.setVisibility(View.VISIBLE);
-            optionVerifyUser.setOnClickListener(this);
-            optionDownload.setOnClickListener(null);
-            optionOffline.setOnClickListener(null);
-            optionDownload.setVisibility(View.GONE);
-            optionOffline.setVisibility(View.GONE);
-        }
-
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
@@ -304,6 +294,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout separatorDownload = contentView.findViewById(R.id.separator_download_options);
         LinearLayout separatorShares = contentView.findViewById(R.id.separator_share_options);
         LinearLayout separatorModify = contentView.findViewById(R.id.separator_modify_options);
+        LinearLayout separatorLabel = contentView.findViewById(R.id.label_separator);
 
         if (!isScreenInPortrait(requireContext())) {
             Timber.d("Landscape configuration");
@@ -333,45 +324,78 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         if (isOnline(requireContext())) {
-            nodeName.setText(node.getName());
-            if (node.isFolder()) {
-                optionVersionsLayout.setVisibility(View.GONE);
-                nodeInfo.setText(getMegaNodeFolderInfo(node));
-                nodeVersionsIcon.setVisibility(View.GONE);
+            if(searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                ////TODO This flag for false for now. This will get manipulated after SDK changes
+                showOwnerSharedFolder();
+                TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
+                optionVerifyUser.setText(StringResourcesUtils.getString(R.string.shared_items_bottom_sheet_menu_verify_user, getMegaUserNameDB(user)));
+                nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+                optionVerifyUser.setVisibility(View.VISIBLE);
+                optionVerifyUser.setOnClickListener(this);
 
-                nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
+                //Removing the click listener & making it View.GONE
+                optionDownload.setOnClickListener(null);
+                optionDownload.setVisibility(View.GONE);
 
-                if (isEmptyFolder(node)) {
-                    counterSave--;
-                    optionOffline.setVisibility(View.GONE);
-                }
+                //Removing the click listener & making it View.GONE
+                optionOffline.setOnClickListener(null);
+                optionOffline.setVisibility(View.GONE);
 
-                counterShares--;
+                separatorDownload.setVisibility(View.GONE);
+                separatorLabel.setVisibility(View.GONE);
+                separatorOpen.setVisibility(View.GONE);
+                separatorModify.setVisibility(View.GONE);
+                separatorShares.setVisibility(View.GONE);
+
+                //Removing the click listener & making it View.GONE
+                optionSendChat.setOnClickListener(null);
                 optionSendChat.setVisibility(View.GONE);
+
+                //Removing the click listener & making it View.GONE
+                optionCopy.setOnClickListener(null);
+                optionCopy.setVisibility(View.GONE);
+
             } else {
-                if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
-                        && accessLevel >= MegaShare.ACCESS_READWRITE) {
-                    optionEdit.setVisibility(View.VISIBLE);
-                }
-
-                nodeInfo.setText(getFileInfo(node));
-
-                if (megaApi.hasVersions(node)) {
-                    nodeVersionsIcon.setVisibility(View.VISIBLE);
-                    optionVersionsLayout.setVisibility(View.VISIBLE);
-                    versions.setText(String.valueOf(megaApi.getNumVersions(node)));
-                } else {
-                    nodeVersionsIcon.setVisibility(View.GONE);
+                nodeName.setText(node.getName());
+                if (node.isFolder()) {
                     optionVersionsLayout.setVisibility(View.GONE);
-                }
+                    nodeInfo.setText(getMegaNodeFolderInfo(node));
+                    nodeVersionsIcon.setVisibility(View.GONE);
 
-                setNodeThumbnail(requireContext(), node, nodeThumb);
+                    nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
 
-                if (isTakenDown) {
+                    if (isEmptyFolder(node)) {
+                        counterSave--;
+                        optionOffline.setVisibility(View.GONE);
+                    }
+
                     counterShares--;
                     optionSendChat.setVisibility(View.GONE);
                 } else {
-                    optionSendChat.setVisibility(View.VISIBLE);
+                    if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                            && accessLevel >= MegaShare.ACCESS_READWRITE) {
+                        optionEdit.setVisibility(View.VISIBLE);
+                    }
+
+                    nodeInfo.setText(getFileInfo(node));
+
+                    if (megaApi.hasVersions(node)) {
+                        nodeVersionsIcon.setVisibility(View.VISIBLE);
+                        optionVersionsLayout.setVisibility(View.VISIBLE);
+                        versions.setText(String.valueOf(megaApi.getNumVersions(node)));
+                    } else {
+                        nodeVersionsIcon.setVisibility(View.GONE);
+                        optionVersionsLayout.setVisibility(View.GONE);
+                    }
+
+                    setNodeThumbnail(requireContext(), node, nodeThumb);
+
+                    if (isTakenDown) {
+                        counterShares--;
+                        optionSendChat.setVisibility(View.GONE);
+                    } else {
+                        optionSendChat.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         }
@@ -1028,6 +1052,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
                 break;
             case R.id.verify_user_option:
+                Intent authenticityCredentialsIntent = new Intent(getActivity(), AuthenticityCredentialsActivity.class);
+                authenticityCredentialsIntent.putExtra(Constants.EMAIL, user.getEmail());
+                requireActivity().startActivity(authenticityCredentialsIntent);
                 break;
             default:
                 break;
