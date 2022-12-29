@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.notification.model.mapper
 
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.model.extensions.backgroundColor
 import mega.privacy.android.app.presentation.notification.model.extensions.dateText
 import mega.privacy.android.app.presentation.notification.model.extensions.description
 import mega.privacy.android.app.presentation.notification.model.extensions.onClick
@@ -26,5 +27,6 @@ internal fun getNotification(alert: UserAlert) = Notification(
     description = alert.description(),
     dateText = alert.dateText(),
     isNew = !alert.seen,
+    backgroundColor = alert.backgroundColor(),
     onClick = alert.onClick(),
 )

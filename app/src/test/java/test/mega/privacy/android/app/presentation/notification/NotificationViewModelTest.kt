@@ -77,6 +77,7 @@ class NotificationViewModelTest {
             description = { "" },
             dateText = { "" },
             isNew = true,
+            backgroundColor = { "#D3D3D3" },
             onClick = {},
         )
 
@@ -105,6 +106,7 @@ class NotificationViewModelTest {
             description = { "" },
             dateText = { "" },
             isNew = true,
+            backgroundColor = { "#D3D3D3" },
             onClick = {},
         )
         val newNotification = initialNotification.copy(title = {"New title"})

@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.Dp
  * @property description
  * @property dateText
  * @property isNew
+ * @property backgroundColor
  * @property onClick
  * @constructor Create empty Notification
  */
@@ -28,5 +29,6 @@ data class Notification(
     val description: (Context) -> CharSequence?,
     val dateText: (Context) -> String,
     val isNew: Boolean,
+    val backgroundColor: (Context) -> String,
     val onClick: (NotificationNavigationHandler) -> Unit,
 )

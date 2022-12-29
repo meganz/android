@@ -18,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -28,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
@@ -41,6 +43,9 @@ import mega.privacy.android.presentation.theme.white_alpha_087
 @Composable
 internal fun NotificationItemView(modifier: Modifier, notification: Notification) {
     Column(modifier = modifier
+        .background(color = Color(notification
+            .backgroundColor(LocalContext.current)
+            .toColorInt()))
         .testTag("NotificationItemView")
         .fillMaxWidth()
         .wrapContentHeight()) {
@@ -189,6 +194,7 @@ private fun PreviewNotificationItemView() {
             description = { "xyz@gmail.com is now a contact" },
             dateText = { "11 October 2022 6:46 pm" },
             isNew = true,
+            backgroundColor = { "#D3D3D3" },
             onClick = {}))
 
 }

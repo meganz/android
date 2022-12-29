@@ -41,6 +41,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("NotificationListView").assertIsDisplayed()
@@ -59,6 +60,7 @@ class NotificationViewTest {
                     description = { "xyz@gmail.com is now a contact" },
                     dateText = { "11 October 2022 6:46 pm" },
                     isNew = true,
+                    backgroundColor = { "#D3D3D3" },
                     onClick = {}),
                 Notification(
                     sectionTitle = { "INCOMING SHARES" },
@@ -69,6 +71,7 @@ class NotificationViewTest {
                     description = { "Access to the folders shared by xyz@gmail.com were removed" },
                     dateText = { "13 May 2022 5:46 am" },
                     isNew = true,
+                    backgroundColor = { "#D3D3D3" },
                     onClick = {}))))
         }
         composeRule.onAllNodesWithTag("NotificationItemView").assertCountEquals(2)
@@ -86,6 +89,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("SectionTitle").assertIsDisplayed()
@@ -103,6 +107,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("Title").assertIsDisplayed()
@@ -120,6 +125,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("Description").assertIsDisplayed()
@@ -137,6 +143,7 @@ class NotificationViewTest {
                 description = { null },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("Description").assertDoesNotExist()
@@ -154,6 +161,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("DateText").assertIsDisplayed()
@@ -171,6 +179,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("IsNew").assertIsDisplayed()
@@ -188,6 +197,7 @@ class NotificationViewTest {
                 description = { "xyz@gmail.com is now a contact" },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = false,
+                backgroundColor = { "#D3D3D3" },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("IsNew").assertDoesNotExist()
