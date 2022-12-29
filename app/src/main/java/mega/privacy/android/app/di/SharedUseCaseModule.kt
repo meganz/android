@@ -6,8 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.data.repository.FilesRepository
-import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.Logout
 
 /**
  * Shared use case module
@@ -25,11 +23,5 @@ abstract class SharedUseCaseModule {
         @Provides
         fun provideCheckAccessErrorExtended(repository: FilesRepository) =
             CheckAccessErrorExtended(repository::checkAccessErrorExtended)
-
-        /**
-         * Provides the Use Case [Logout]
-         */
-        @Provides
-        fun provideLogout(repository: AccountRepository): Logout = Logout(repository::logout)
     }
 }

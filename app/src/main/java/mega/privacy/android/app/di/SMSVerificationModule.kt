@@ -10,6 +10,7 @@ import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
+import mega.privacy.android.domain.usecase.Logout
 import mega.privacy.android.domain.usecase.ResetSMSVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
@@ -71,5 +72,10 @@ abstract class SMSVerificationModule {
         fun provideGetCurrentCountryCode(repository: VerificationRepository): GetCurrentCountryCode =
             GetCurrentCountryCode(repository::getCurrentCountryCode)
 
+        /**
+         * Provides the Use Case [Logout]
+         */
+        @Provides
+        fun provideLogout(repository: AccountRepository): Logout = Logout(repository::logout)
     }
 }

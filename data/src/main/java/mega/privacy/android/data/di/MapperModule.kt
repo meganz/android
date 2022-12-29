@@ -479,7 +479,8 @@ internal class MapperModule {
      * Provide country calling codes mapper
      */
     @Provides
-    fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper = ::toCountryCallingCodes
+    fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper =
+        CountryCallingCodeMapper(::toCountryCallingCodes)
 
     /**
      * Provide video quality mapper

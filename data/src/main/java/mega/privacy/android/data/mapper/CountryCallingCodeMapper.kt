@@ -6,7 +6,12 @@ import nz.mega.sdk.MegaStringListMap
 /**
  * Map [MegaStringListMap] to [List]
  */
-typealias CountryCallingCodeMapper = (@JvmSuppressWildcards MegaStringListMap) -> List<String>
+fun interface CountryCallingCodeMapper {
+    /**
+     * invoke
+     */
+    operator fun invoke(callingCodes: MegaStringListMap?): List<String>
+}
 
 /**
  * Map [MegaStringListMap] to [List]
