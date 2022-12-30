@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
+import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -65,6 +66,8 @@ class IncomingSharesViewModelTest {
 
     private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares>()
 
+    private val getChildrenNode = mock<GetChildrenNode>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -82,6 +85,7 @@ class IncomingSharesViewModelTest {
             monitorNodeUpdates,
             getFeatureFlagValue,
             getUnverifiedInComingShares,
+            getChildrenNode,
         )
     }
 
@@ -95,7 +99,6 @@ class IncomingSharesViewModelTest {
             assertThat(initial.isInvalidHandle).isEqualTo(true)
             assertThat(initial.incomingParentHandle).isEqualTo(null)
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
-            assertThat(initial.unVerifiedInComingShares).isEmpty()
         }
     }
 
@@ -521,11 +524,15 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that unverified incoming shares are returned`() = runTest {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
-        whenever(getUnverifiedInComingShares(underTest.state.value.sortOrder)).thenReturn(listOf(
-            shareData))
-        initViewModel()
-        underTest.state.test {
-            assertThat(awaitItem().unVerifiedInComingShares).isNotEmpty()
+        whenever(getUnverifiedInComingShares(underTest.state.value.sortOrder))
+            .thenReturn(listOf(shareData))
+        val node1 = mock<MegaNode>()
+        val node2 = mock<MegaNode>()
+        val expected = listOf(node1, node2)
+        whenever(getNodeByHandle(any())).thenReturn(mock())
+        whenever(getChildrenNode(any(), any())).thenReturn(expected)
+        underTest.state.map { it.nodes }.distinctUntilChanged().test {
+            assertThat(awaitItem().size).isEqualTo(2)
         }
     }
 }
