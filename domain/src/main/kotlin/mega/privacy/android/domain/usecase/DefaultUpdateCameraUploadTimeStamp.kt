@@ -19,41 +19,26 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
         timestamp: Long?,
         timestampType: SyncTimeStamp,
     ) {
-        when (timestampType) {
-            SyncTimeStamp.PRIMARY_PHOTO -> {
-                val timeStampPrimary = timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                    false,
-                    SyncRecordType.TYPE_PHOTO
-                )
-                updateTimeStamp(timeStampPrimary, timestampType)
-            }
-            SyncTimeStamp.PRIMARY_VIDEO -> {
-                val timeStampPrimaryVideo = timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                    false,
-                    SyncRecordType.TYPE_VIDEO
-                )
-                updateTimeStamp(timeStampPrimaryVideo, timestampType)
-            }
-            SyncTimeStamp.SECONDARY_PHOTO -> {
-                if (isSecondaryFolderEnabled()) {
-                    val timeStampSecondary = timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                        true,
-                        SyncRecordType.TYPE_PHOTO
-                    )
-                    updateTimeStamp(timeStampSecondary, timestampType)
-                }
-            }
-            SyncTimeStamp.SECONDARY_VIDEO -> {
-                if (isSecondaryFolderEnabled()) {
-                    val timeStampSecondaryVideo =
-                        timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                            true,
-                            SyncRecordType.TYPE_VIDEO
-                        )
-                    updateTimeStamp(timeStampSecondaryVideo, timestampType)
-                }
-            }
+        if (timestampType.isPrimary || isSecondaryFolderEnabled()) {
+            setMaxTimeStamp(timestamp,
+                timestampType.isPrimary,
+                timestampType.syncRecordType,
+                timestampType)
         }
+    }
+
+    private suspend fun setMaxTimeStamp(
+        timestamp: Long?,
+        isPrimary: Boolean,
+        syncRecordType: SyncRecordType,
+        timestampType: SyncTimeStamp,
+    ) {
+        val maxTimeStamp =
+            timestamp ?: cameraUploadRepository.getMaxTimestamp(
+                !isPrimary,
+                syncRecordType
+            )
+        updateTimeStamp(maxTimeStamp, timestampType)
     }
 
     private suspend fun updateTimeStamp(
@@ -61,9 +46,25 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
         timestampType: SyncTimeStamp,
     ) {
         val currentTimeStamp =
-            cameraUploadRepository.getSyncTimeStamp(timestampType)?.toLongOrNull() ?: 0L
+            cameraUploadRepository.getSyncTimeStamp(timestampType) ?: 0L
         if (newTimeStamp > currentTimeStamp) {
             cameraUploadRepository.setSyncTimeStamp(newTimeStamp, timestampType)
         }
     }
+
+    private val SyncTimeStamp.isPrimary: Boolean
+        get() = when (this) {
+            SyncTimeStamp.PRIMARY_PHOTO -> true
+            SyncTimeStamp.PRIMARY_VIDEO -> true
+            SyncTimeStamp.SECONDARY_PHOTO -> false
+            SyncTimeStamp.SECONDARY_VIDEO -> false
+        }
+
+    private val SyncTimeStamp.syncRecordType: SyncRecordType
+        get() = when (this) {
+            SyncTimeStamp.PRIMARY_PHOTO -> SyncRecordType.TYPE_PHOTO
+            SyncTimeStamp.PRIMARY_VIDEO -> SyncRecordType.TYPE_VIDEO
+            SyncTimeStamp.SECONDARY_PHOTO -> SyncRecordType.TYPE_PHOTO
+            SyncTimeStamp.SECONDARY_VIDEO -> SyncRecordType.TYPE_VIDEO
+        }
 }

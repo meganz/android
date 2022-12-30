@@ -54,6 +54,13 @@ interface MediaPlayerGateway {
     fun getCurrentMediaItem(): MediaItem?
 
     /**
+     * Get the duration of current playing item
+     *
+     * @return of current playing item
+     */
+    fun getCurrentItemDuration(): Long
+
+    /**
      * Set the new shuffle order
      *
      * @param newShuffleOrder new shuffle order
@@ -112,9 +119,18 @@ interface MediaPlayerGateway {
     fun playerRelease()
 
     /**
-     * Player seek to
+     * Player seek to other item
+     *
+     * @param index the index of item that will be played
      */
     fun playerSeekTo(index: Int)
+
+    /**
+     * Player seed to playing position
+     *
+     * @param positionMs the position ms
+     */
+    fun playerSeekToPositionMs(positionMs: Long)
 
     /**
      * Build play sources for player

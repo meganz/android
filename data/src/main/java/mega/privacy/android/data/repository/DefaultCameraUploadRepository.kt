@@ -11,11 +11,15 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.SyncStatusIntMapper
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
+import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -48,6 +52,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val videoQualityMapper: VideoQualityMapper,
+    private val syncStatusIntMapper: SyncStatusIntMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -159,13 +165,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.saveSyncRecord(record)
     }
 
-    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): String? {
+    override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long? {
         return withContext(ioDispatcher) {
             when (type) {
                 SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
+                    ?.toLongOrNull()
                 SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.getVideoTimeStamp()
+                    ?.toLongOrNull()
                 SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.getSecondaryPhotoTimeStamp()
+                    ?.toLongOrNull()
                 SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.getSecondaryVideoTimeStamp()
+                    ?.toLongOrNull()
             }
         }
     }
@@ -218,6 +228,15 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.setSecondaryFolderPath(secondaryFolderPath)
         }
 
+    override suspend fun setPrimaryFolderHandle(primaryHandle: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setPrimaryFolderHandle(primaryHandle)
+    }
+
+    override suspend fun setSecondaryFolderHandle(secondaryHandle: Long) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setSecondaryFolderHandle(secondaryHandle)
+        }
+
     override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
         withContext(ioDispatcher) {
             localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)
@@ -231,8 +250,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getRemoveGpsDefault()
     }
 
-    override suspend fun getUploadVideoQuality(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getUploadVideoQuality()
+    override suspend fun getUploadVideoQuality(): VideoQuality? = withContext(ioDispatcher) {
+        videoQualityMapper(localStorageGateway.getUploadVideoQuality())
     }
 
     override suspend fun getKeepFileNames(): Boolean = withContext(ioDispatcher) {
@@ -263,6 +282,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.shouldClearSyncRecords()
     }
 
+    override suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean) =
+        withContext(ioDispatcher) {
+            cameraUploadMediaGateway.sendUpdateFolderIconBroadcast(nodeHandle, isSecondary)
+        }
+
     override suspend fun getMediaQueue(
         mediaStoreFileType: MediaStoreFileType,
         parentPath: String?,
@@ -290,9 +314,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             )
         }
 
-    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
+    override suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord> =
         withContext(ioDispatcher) {
-            localStorageGateway.getVideoSyncRecordsByStatus(syncStatusType)
+            localStorageGateway.getVideoSyncRecordsByStatus(syncStatusIntMapper(syncStatusType))
         }
 
     override suspend fun getChargingOnSizeString(): String = withContext(ioDispatcher) {

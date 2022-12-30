@@ -7,13 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
-import mega.privacy.android.app.presentation.photos.albums.model.mapper.DefaultUIAlbumMapper
+import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.DefaultCreateAlbum
-import mega.privacy.android.domain.usecase.DefaultDownloadPreview
-import mega.privacy.android.domain.usecase.DefaultDownloadThumbnail
 import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
@@ -54,12 +51,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetThumbnail(useCase: DefaultGetThumbnail): GetThumbnail
-
-    @Binds
-    abstract fun bindDownloadThumbnail(useCase: DefaultDownloadThumbnail): DownloadThumbnail
-
-    @Binds
-    abstract fun bindDownloadPreview(useCase: DefaultDownloadPreview): DownloadPreview
 
     @Binds
     abstract fun bindGetPreview(useCase: DefaultGetPreview): GetPreview
@@ -113,5 +104,13 @@ abstract class PhotosUseCases {
         @Provides
         fun providesIsCameraSyncPreferenceEnabled(settingsRepository: SettingsRepository): IsCameraSyncPreferenceEnabled =
             IsCameraSyncPreferenceEnabled(settingsRepository::isCameraSyncPreferenceEnabled)
+
+        @Provides
+        fun provideDownloadThumbnail(repository: ImageRepository): DownloadThumbnail =
+            DownloadThumbnail(repository::downloadThumbnail)
+
+        @Provides
+        fun provideDownloadPreview(repository: ImageRepository): DownloadPreview =
+            DownloadPreview(repository::downloadPreview)
     }
 }

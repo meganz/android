@@ -128,7 +128,8 @@ class FavouriteFolderViewModel @Inject constructor(
                                 context,
                                 favouriteInfo.id.id
                             ),
-                            stringUtilWrapper
+                            stringUtilWrapper,
+                            false
                         ) { name ->
                             MimeTypeList.typeForName(name).iconResourceId
                         }

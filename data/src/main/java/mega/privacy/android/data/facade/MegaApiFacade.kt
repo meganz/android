@@ -379,6 +379,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
         megaApi.getUserAvatarColor(megaUser)
 
+    override suspend fun getUserAvatarColor(userHandle: Long): String =
+        megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
+
     override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
@@ -531,7 +534,7 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getUserAttribute(attributeIdentifier, listener)
     }
 
-    override suspend fun isAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
+    override suspend fun areAccountAchievementsEnabled(): Boolean = megaApi.isAchievementsEnabled
 
     override fun getAccountAchievements(listener: MegaRequestListenerInterface?) =
         megaApi.getAccountAchievements(listener)
@@ -590,9 +593,6 @@ internal class MegaApiFacade @Inject constructor(
     override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
         megaApi.getCountryCallingCodes(listener)
 
-    override fun isAchievementsEnabled() =
-        megaApi.isAchievementsEnabled
-
     override fun logout(listener: MegaRequestListenerInterface?) {
         if (listener == null) {
             megaApi.logout()
@@ -629,4 +629,18 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.getExtendedAccountDetails(sessions, purchases, transactions, listener)
     }
+
+    override fun contactLinkCreate(renew: Boolean, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkCreate(renew, listener)
+    }
+
+    override fun contactLinkDelete(handle: Long, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkDelete(handle, listener)
+    }
+
+    override fun isChatNotifiable(chatId: Long): Boolean =
+        megaApi.isChatNotifiable(chatId)
+
+    override fun inviteContact(email: String, listener: MegaRequestListenerInterface) =
+        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, listener)
 }

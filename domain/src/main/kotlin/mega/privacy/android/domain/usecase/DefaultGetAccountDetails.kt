@@ -9,7 +9,7 @@ import javax.inject.Inject
  *
  * @property accountsRepository
  */
-class DefaultGetAccountDetails @Inject constructor(
+internal class DefaultGetAccountDetails @Inject constructor(
     private val accountsRepository: AccountRepository,
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
 ) : GetAccountDetails {

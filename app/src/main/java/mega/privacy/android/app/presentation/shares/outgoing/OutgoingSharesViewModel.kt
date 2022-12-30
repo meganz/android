@@ -10,8 +10,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
@@ -31,6 +33,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
+    private val getFeatureFlagValue: GetFeatureFlagValue,
 ) : ViewModel() {
 
     /** private UI state */
@@ -42,6 +45,14 @@ class OutgoingSharesViewModel @Inject constructor(
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
+    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
+
+    /**
+     * State for [MandatoryFingerPrintVerification] feature flag value
+     */
+    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
+        _mandatoryFingerPrintVerificationState
+
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
@@ -50,6 +61,8 @@ class OutgoingSharesViewModel @Inject constructor(
                 refreshNodes()?.let { setNodes(it) }
             }
         }
+
+        isMandatoryFingerprintRequired()
     }
 
     /**
@@ -173,5 +186,14 @@ class OutgoingSharesViewModel @Inject constructor(
             ?: true
     }
 
-
+    /**
+     * Gets the feature flag value & updates state
+     */
+    private fun isMandatoryFingerprintRequired() {
+        viewModelScope.launch {
+            _mandatoryFingerPrintVerificationState.update {
+                getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification)
+            }
+        }
+    }
 }

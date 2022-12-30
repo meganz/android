@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -51,6 +52,7 @@ import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 import nz.mega.sdk.MegaTransfer.STATE_PAUSED
 import timber.log.Timber
+import java.util.Collections
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -127,50 +129,59 @@ class TransfersManagement @Inject constructor(
         /**
          * Creates the initial notification when a service starts.
          *
-         * @param notificationChannelId   Identifier of the notification channel.
-         * @param notificationChannelName Name of the notification channel.
-         * @param mNotificationManager    NotificationManager to create the notification.
          * @param mBuilder                Builder to create the notification.
          * @return The initial notification created.
          */
         @JvmStatic
         fun createInitialServiceNotification(
+            mBuilder: Notification.Builder,
+        ): Notification {
+            mBuilder.apply {
+                setSmallIcon(R.drawable.ic_stat_notify)
+                setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
+                setContentTitle(getString(R.string.download_preparing_files))
+                setAutoCancel(true)
+            }
+
+            return mBuilder.build()
+        }
+
+        /**
+         * Creates the initial notification when a service starts.
+         *
+         * @param notificationChannelId   Identifier of the notification channel.
+         * @param notificationChannelName Name of the notification channel.
+         * @param mNotificationManager    NotificationManager to create the notification.
+         * @return The initial notification created.
+         */
+        @JvmStatic
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun createInitialServiceNotification(
             notificationChannelId: String?,
             notificationChannelName: String?,
             mNotificationManager: NotificationManager,
             mBuilderCompat: NotificationCompat.Builder,
-            mBuilder: Notification.Builder,
-        ): Notification =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    notificationChannelId,
-                    notificationChannelName,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ).apply {
-                    setShowBadge(true)
-                    setSound(null, null)
-                }
-
-                mNotificationManager.createNotificationChannel(channel)
-
-                mBuilderCompat.apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
-                    color = getColor(MegaApplication.getInstance(), R.color.red_600_red_300)
-                    setContentTitle(getString(R.string.download_preparing_files))
-                    setAutoCancel(true)
-                }
-
-                mBuilderCompat.build()
-            } else {
-                mBuilder.apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
-                    setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                    setContentTitle(getString(R.string.download_preparing_files))
-                    setAutoCancel(true)
-                }
-
-                mBuilder.build()
+        ): Notification {
+            val channel = NotificationChannel(
+                notificationChannelId,
+                notificationChannelName,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                setShowBadge(true)
+                setSound(null, null)
             }
+
+            mNotificationManager.createNotificationChannel(channel)
+
+            mBuilderCompat.apply {
+                setSmallIcon(R.drawable.ic_stat_notify)
+                color = getColor(MegaApplication.getInstance(), R.color.red_600_red_300)
+                setContentTitle(getString(R.string.download_preparing_files))
+                setAutoCancel(true)
+            }
+
+            return mBuilderCompat.build()
+        }
     }
 
     private var networkTimer: CountDownTimer? = null
@@ -187,7 +198,8 @@ class TransfersManagement @Inject constructor(
 
     private val pausedTransfers = ArrayList<String>()
 
-    private val scanningTransfers = ArrayList<ScanningTransferData>()
+    private val scanningTransfers =
+        Collections.synchronizedCollection(ArrayList<ScanningTransferData>())
     private var scanningTransfersToken: MegaCancelToken? = null
     var isProcessingFolders = false
     var isProcessingTransfers = false
@@ -490,14 +502,13 @@ class TransfersManagement @Inject constructor(
      *
      * @param transfer  Transfer to check.
      */
+    @Synchronized
     fun checkScanningTransferOnStart(transfer: MegaTransfer) {
+        Timber.d("checkScanningTransferOnStart ${transfer.nodeHandle}")
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.apply {
-                    val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
-                    if (!isFolder || updatedTransfer == null
-                        || updatedTransfer.state == STATE_COMPLETED
-                    ) {
+                    if (!isFolder || transfer.state == STATE_COMPLETED) {
                         removeProcessedScanningTransfer()
                     } else {
                         transferTag = transfer.tag
@@ -517,13 +528,11 @@ class TransfersManagement @Inject constructor(
      *
      * @param transfer  Transfer to check.
      */
+    @Synchronized
     fun checkScanningTransferOnUpdate(transfer: MegaTransfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
-                val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
-                if (transfer.stage >= STAGE_TRANSFERRING_FILES
-                    || updatedTransfer == null || updatedTransfer.state == STATE_COMPLETED
-                ) {
+                if (transfer.stage >= STAGE_TRANSFERRING_FILES || transfer.state == STATE_COMPLETED) {
                     data.removeProcessedScanningTransfer()
                 } else {
                     data.transferStage = transfer.stage
@@ -539,6 +548,7 @@ class TransfersManagement @Inject constructor(
      *
      * @param transfer  Transfer to check.
      */
+    @Synchronized
     fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {

@@ -18,37 +18,37 @@ import javax.inject.Inject
  * @property areChatLogsEnabled
  * @property coroutineDispatcher
  */
-class DefaultInitialiseLogging @Inject constructor(
+internal class DefaultInitialiseLogging @Inject constructor(
     private val loggingRepository: LoggingRepository,
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
     private val coroutineDispatcher: CoroutineDispatcher,
 ) : InitialiseLogging {
 
-    override suspend fun invoke() {
+    override suspend fun invoke(overrideEnabledSettings: Boolean) {
         coroutineScope {
-            launch(coroutineDispatcher) { monitorSdkLoggingSetting() }
-            launch(coroutineDispatcher) { monitorChatLoggingSetting() }
+            launch(coroutineDispatcher) { monitorSdkLoggingSetting(overrideEnabledSettings) }
+            launch(coroutineDispatcher) { monitorChatLoggingSetting(overrideEnabledSettings) }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun monitorSdkLoggingSetting() {
+    private suspend fun monitorSdkLoggingSetting(overrideEnabledSettings: Boolean) {
         areSdkLogsEnabled()
             .distinctUntilChanged()
             .flatMapLatest { enabled ->
-                if (enabled) loggingRepository.getSdkLoggingFlow() else emptyFlow()
+                if (enabled || overrideEnabledSettings) loggingRepository.getSdkLoggingFlow() else emptyFlow()
             }.collect {
                 loggingRepository.logToSdkFile(it)
             }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun monitorChatLoggingSetting() {
+    private suspend fun monitorChatLoggingSetting(overrideEnabledSettings: Boolean) {
         areChatLogsEnabled()
             .distinctUntilChanged()
             .flatMapLatest { enabled ->
-                if (enabled) loggingRepository.getChatLoggingFlow() else emptyFlow()
+                if (enabled || overrideEnabledSettings) loggingRepository.getChatLoggingFlow() else emptyFlow()
             }.collect {
                 loggingRepository.logToChatFile(it)
             }

@@ -22,6 +22,7 @@ sealed class MeetingItem(val id: Long) {
      * @property lastMessage        Last chat message
      * @property lastMessageIcon    Last chat icon
      * @property isPublic           Check if chat is public
+     * @property isActive           Check if chat is active
      * @property isMuted            Check if chat is muted
      * @property hasPermissions     Check if has permissions to clear history
      * @property firstUser          First user of the chat
@@ -41,6 +42,7 @@ sealed class MeetingItem(val id: Long) {
         val lastMessage: String?,
         @DrawableRes val lastMessageIcon: Int?,
         val isPublic: Boolean,
+        val isActive: Boolean,
         val isMuted: Boolean,
         val hasPermissions: Boolean,
         val firstUser: ContactGroupUser,

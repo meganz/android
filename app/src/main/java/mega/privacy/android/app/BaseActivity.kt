@@ -41,6 +41,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.constants.BroadcastConstants.IS_OPEN_WITH
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -108,6 +109,7 @@ import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
@@ -383,8 +385,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
                     showSnackbar(OPEN_FILE_SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE)
                 }
-                BroadcastConstants.DOWNLOAD_MS_FILE_AND_OPEN -> {
-                    //If the file is Microsoft file, open the file directly after downloaded
+                BroadcastConstants.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW -> {
                     autoPlayInfo = AutoPlayInfo(
                         intent.getStringExtra(BroadcastConstants.NODE_NAME) ?: return,
                         intent.getLongExtra(BroadcastConstants.NODE_HANDLE,
@@ -392,7 +393,20 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         intent.getStringExtra(BroadcastConstants.NODE_LOCAL_PATH) ?: return,
                         true
                     )
-                    openDownloadedFile()
+                    autoPlayInfo?.let {
+                        // After downloaded, if it's open with, open the file by third-party library.
+                        // If not, open the file directly
+                        if (intent.getBooleanExtra(IS_OPEN_WITH, false))
+                            MegaNodeUtil.launchActionView(
+                                this@BaseActivity,
+                                it.nodeName,
+                                it.localPath,
+                                this@BaseActivity,
+                                this@BaseActivity
+                            )
+                        else
+                            openDownloadedFile()
+                    } ?: openDownloadedFile()
                 }
             }
         }

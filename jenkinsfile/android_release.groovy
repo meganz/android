@@ -7,6 +7,8 @@ BUILD_STEP = ''
 // Below values will be read from MR description and are used to decide SDK versions
 SDK_BRANCH = 'develop'
 MEGACHAT_BRANCH = 'develop'
+SDK_TAG = ""
+MEGACHAT_TAG = ""
 
 /**
  * Flag to decide whether we do clean before build SDK.
@@ -24,13 +26,17 @@ DO_CLEANUP = true
  */
 ARCHIVE_FOLDER = "archive"
 NATIVE_SYMBOL_FILE = "symbols.zip"
-ARTIFACTORY_BASE_URL = 'https://artifactory.developers.mega.co.nz/artifactory/android-mega/release'
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
 /**
  * Default release notes content files
  */
 RELEASE_NOTES = "default_release_notes.json"
+
+/**
+ * common.groovy file with common methods
+ */
+def common
 
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
@@ -107,6 +113,16 @@ pipeline {
         }
     }
     stages {
+        stage('Load Common Script') {
+            steps {
+                script {
+                    BUILD_STEP = 'Load Common Script'
+
+                    // load the common library script
+                    common = load('jenkinsfile/common.groovy')
+                }
+            }
+        }
         stage('Preparation') {
             when {
                 expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
@@ -138,26 +154,8 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
+                    common.fetchSdkSubmodules()
                 }
-                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    script {
-                        sh '''
-                            cd ${WORKSPACE}
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch develop
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git
-                            git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch develop
-                            git submodule sync
-                            git submodule update --init --recursive --remote 
-                            cd sdk/src/main/jni/mega/sdk
-                            git fetch
-                            cd ../../megachat/sdk
-                            git fetch
-                            cd ${WORKSPACE}
-                        '''
-                    }
-                }
-
             }
         }
         stage('Select SDK Version') {
@@ -170,13 +168,21 @@ pipeline {
                 }
                 withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                     script {
-                        checkoutSdkByBranch(SDK_BRANCH)
-                        checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                        if (isDefined(SDK_TAG)) {
+                            common.checkoutSdkByTag(SDK_TAG)
+                        } else {
+                            common.checkoutSdkByBranch(SDK_BRANCH)
+                        }
+
+                        if (isDefined(MEGACHAT_TAG)) {
+                            common.checkoutMegaChatSdkByTag(MEGACHAT_TAG)
+                        } else {
+                            common.checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
+                        }
                     }
                 }
             }
         }
-
         stage('Download Dependency Lib for SDK') {
             when {
                 expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
@@ -368,7 +374,7 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
 
-                        String targetPath = "$ARTIFACTORY_BASE_URL/${artifactoryUploadPath()}/"
+                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${artifactoryUploadPath()}/"
 
                         withEnv([
                                 "TARGET_PATH=${targetPath}"
@@ -422,7 +428,7 @@ pipeline {
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
                             rolloutPercentage: '0',
-                            additionalVersionCodes: '476,485',
+                            additionalVersionCodes: '476,487',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
                             recentChangeList: getRecentChangeList(release_notes)
                 }
@@ -501,7 +507,7 @@ String getValueInMRDescriptionBy(String key) {
  * @param value value of tag
  * @return true if tag has a value. false if tag is null or zero length
  */
-static boolean isDefined(String value) {
+private boolean isDefined(String value) {
     return value != null && !value.isEmpty()
 }
 
@@ -512,7 +518,7 @@ static boolean isDefined(String value) {
 private void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url https://code.developers.mega.co.nz/sdk/sdk.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -525,7 +531,7 @@ private void checkoutSdkByBranch(String sdkBranch) {
 private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
-    sh 'git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url https://code.developers.mega.co.nz/megachat/MEGAchat.git'
+    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
     sh 'git submodule sync'
     sh 'git submodule update --init --recursive --remote'
@@ -549,7 +555,7 @@ private void sendToMR(String message) {
         def mrNumber = env.gitlabMergeRequestIid
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
             env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "https://code.developers.mega.co.nz/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
             sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
         }
     }
@@ -628,19 +634,17 @@ private String megaChatSdkCommitId() {
  */
 private String getBuildVersionInfo() {
 
-    String artifactoryUrl = "${ARTIFACTORY_BASE_URL}/${artifactoryUploadPath()}"
+    String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${artifactoryUploadPath()}"
     String artifactVersion = readAppVersion2()
 
     String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
     String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
 
-    String appCommitLink = "https://code.developers.mega.co.nz/mobile/android/android/-/commit/" + appCommitId()
-    String sdkCommitLink = "https://code.developers.mega.co.nz/sdk/sdk/-/commit/" + sdkCommitId()
-    String chatCommitLink = "https://code.developers.mega.co.nz/megachat/MEGAchat/-/commit/" + megaChatSdkCommitId()
+    String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + appCommitId()
+    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + sdkCommitId()
+    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + megaChatSdkCommitId()
 
     String appBranch = env.gitlabSourceBranch
-    String sdkBranch = SDK_BRANCH
-    String chatBranch = MEGACHAT_BRANCH
 
     def message = """
     Version: ${readAppVersion1()} <br/>
@@ -648,8 +652,8 @@ private String getBuildVersionInfo() {
        - Google (GMS):  [AAB](${gmsAabUrl}) | [APK](${gmsApkUrl}) <br/>
     Build info: <br/>
        - [Android commit](${appCommitLink}) (`${appBranch}`) <br/>
-       - [SDK commit](${sdkCommitLink}) (`${sdkBranch}`) <br/>
-       - [Karere commit](${chatCommitLink}) (`${chatBranch}`) <br/>
+       - [SDK commit](${sdkCommitLink}) (`${sdkBranchName()}`) <br/>
+       - [Karere commit](${chatCommitLink}) (`${megaChatBranchName()}`) <br/>
     """
     return message
 }
@@ -665,8 +669,8 @@ def createBriefBuildInfoFile() {
 Version: v${readAppVersion1()}
 Upload Time: ${new Date().toString()}
 Android: branch(${env.gitlabSourceBranch}) - commit(${appCommitId()})
-SDK: branch(${SDK_BRANCH}) - commit(${sdkCommitId()})
-Karere: branch(${MEGACHAT_BRANCH}) - commit(${megaChatSdkCommitId()})
+SDK: branch(${sdkBranchName()}) - commit(${sdkCommitId()})
+Karere: branch(${megaChatBranchName()}) - commit(${megaChatSdkCommitId()})
 """
     sh "rm -fv ${ARTIFACTORY_BUILD_INFO}"
     sh "echo \"${content}\" >> ${WORKSPACE}/${ARCHIVE_FOLDER}/${ARTIFACTORY_BUILD_INFO}"
@@ -682,12 +686,16 @@ private String skipMessage(String lineBreak) {
  * Read SDK versions from MR description and assign the values into environment.
  */
 private void checkSDKVersion() {
+    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
+    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
+
     SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
+    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
+
     if (!isDefined(SDK_BRANCH)) {
         SDK_BRANCH = "develop"
     }
 
-    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
     if (!isDefined(MEGACHAT_BRANCH)) {
         MEGACHAT_BRANCH = "develop"
     }
@@ -785,7 +793,7 @@ private String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
         // upload Jenkins console log to GitLab and get download link
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} https://code.developers.mega.co.nz/api/v4/projects/199/uploads", returnStdout: true).trim()
+        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
         link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
         return link
     }
@@ -874,6 +882,34 @@ private String releaseNotes(releaseNoteFile) {
                 """,
             returnStdout: true).trim()
     return release_notes
+}
+
+/**
+ * Get the SDK branch name for report. If build is specified by tag
+ *
+ * @return If SDK is specified by <code>SDK_BRANCH</code>, return the branch name. If SDK is specified
+ *         by <code>SDK_TAG</code>, return the tag name.
+ */
+private String sdkBranchName() {
+    if (isDefined(SDK_TAG)) {
+        return SDK_TAG
+    } else {
+        return SDK_BRANCH
+    }
+}
+
+/**
+ * Get the MEGAChat SDK branch name for report. If build is specified by tag
+ *
+ * @return If SDK is specified by <code>MEGACHAT_BRANCH</code>, return the branch name. If SDK is specified
+ *         by <code>MEGACHAT_TAG</code>, return the tag name.
+ */
+private String megaChatBranchName() {
+    if (isDefined(MEGACHAT_TAG)) {
+        return MEGACHAT_TAG
+    } else {
+        return MEGACHAT_BRANCH
+    }
 }
 
 

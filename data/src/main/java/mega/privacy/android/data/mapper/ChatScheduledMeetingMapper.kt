@@ -50,19 +50,18 @@ private fun MegaChatScheduledFlags.mapFlags(): ChatScheduledFlags =
 private fun MegaChatScheduledRules.mapRules(): ChatScheduledRules =
     ChatScheduledRules(freq(), interval(), until())
 
-fun MegaChatScheduledMeeting.mapChanges(): ScheduledMeetingChanges =
-    when {
-        hasChanged(MegaChatScheduledMeeting.SC_NEW_SCHED.toLong()) -> ScheduledMeetingChanges.NewScheduledMeeting
-        hasChanged(MegaChatScheduledMeeting.SC_PARENT.toLong()) -> ScheduledMeetingChanges.ParentScheduledMeetingId
-        hasChanged(MegaChatScheduledMeeting.SC_TZONE.toLong()) -> ScheduledMeetingChanges.TimeZone
-        hasChanged(MegaChatScheduledMeeting.SC_START.toLong()) -> ScheduledMeetingChanges.StartDate
-        hasChanged(MegaChatScheduledMeeting.SC_END.toLong()) -> ScheduledMeetingChanges.EndDate
-        hasChanged(MegaChatScheduledMeeting.SC_TITLE.toLong()) -> ScheduledMeetingChanges.Title
-        hasChanged(MegaChatScheduledMeeting.SC_DESC.toLong()) -> ScheduledMeetingChanges.Description
-        hasChanged(MegaChatScheduledMeeting.SC_ATTR.toLong()) -> ScheduledMeetingChanges.Attributes
-        hasChanged(MegaChatScheduledMeeting.SC_OVERR.toLong()) -> ScheduledMeetingChanges.OverrideDateTime
-        hasChanged(MegaChatScheduledMeeting.SC_CANC.toLong()) -> ScheduledMeetingChanges.CancelledFlag
-        hasChanged(MegaChatScheduledMeeting.SC_FLAGS.toLong()) -> ScheduledMeetingChanges.ScheduledMeetingsFlags
-        hasChanged(MegaChatScheduledMeeting.SC_RULES.toLong()) -> ScheduledMeetingChanges.RepetitionRules
-        else -> ScheduledMeetingChanges.ScheduledMeetingFlagsSize
-    }
+private fun MegaChatScheduledMeeting.mapChanges(): ScheduledMeetingChanges = when {
+    hasChanged(MegaChatScheduledMeeting.SC_NEW_SCHED.toLong()) -> ScheduledMeetingChanges.NewScheduledMeeting
+    hasChanged(MegaChatScheduledMeeting.SC_PARENT.toLong()) -> ScheduledMeetingChanges.ParentScheduledMeetingId
+    hasChanged(MegaChatScheduledMeeting.SC_TZONE.toLong()) -> ScheduledMeetingChanges.TimeZone
+    hasChanged(MegaChatScheduledMeeting.SC_START.toLong()) -> ScheduledMeetingChanges.StartDate
+    hasChanged(MegaChatScheduledMeeting.SC_END.toLong()) -> ScheduledMeetingChanges.EndDate
+    hasChanged(MegaChatScheduledMeeting.SC_TITLE.toLong()) -> ScheduledMeetingChanges.Title
+    hasChanged(MegaChatScheduledMeeting.SC_DESC.toLong()) -> ScheduledMeetingChanges.Description
+    hasChanged(MegaChatScheduledMeeting.SC_ATTR.toLong()) -> ScheduledMeetingChanges.Attributes
+    hasChanged(MegaChatScheduledMeeting.SC_OVERR.toLong()) -> ScheduledMeetingChanges.OverrideDateTime
+    hasChanged(MegaChatScheduledMeeting.SC_CANC.toLong()) -> ScheduledMeetingChanges.CancelledFlag
+    hasChanged(MegaChatScheduledMeeting.SC_FLAGS.toLong()) -> ScheduledMeetingChanges.ScheduledMeetingsFlags
+    hasChanged(MegaChatScheduledMeeting.SC_RULES.toLong()) -> ScheduledMeetingChanges.RepetitionRules
+    else -> ScheduledMeetingChanges.ScheduledMeetingFlagsSize
+}

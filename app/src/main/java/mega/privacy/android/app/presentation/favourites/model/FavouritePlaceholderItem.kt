@@ -7,7 +7,6 @@ import mega.privacy.android.app.utils.Constants.ITEM_PLACEHOLDER_TYPE
  */
 data class FavouritePlaceholderItem(
     override val favourite: Favourite? = null,
-    override val forceUpdate: Boolean = false
 ): FavouriteItem {
     override val type = ITEM_PLACEHOLDER_TYPE
 }

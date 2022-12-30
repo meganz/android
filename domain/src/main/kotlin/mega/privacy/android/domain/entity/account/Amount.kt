@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.account
 
+import mega.privacy.android.domain.entity.Currency
+
 /**
  * interface to represent pricing amount
  *
@@ -17,6 +19,5 @@ sealed interface CurrencyPoint {
 /**
  * value class to show either System pricing or Local Store pricing
  */
-//In the use case -> convert to CurrencyAmount
-@JvmInline
-value class CurrencyAmount(val value: Float)
+
+data class CurrencyAmount(val value: Float, val currency: Currency)

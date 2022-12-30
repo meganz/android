@@ -9,7 +9,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH;
 import static mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER;
@@ -144,6 +143,7 @@ import static mega.privacy.android.app.utils.Util.showMessageRandom;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
+import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED;
 import static nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -275,7 +275,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
-import mega.privacy.android.app.Product;
+import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -359,6 +359,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -838,6 +839,7 @@ public class ManagerActivity extends TransfersManagementActivity
     View chatBadge;
     View callBadge;
     View pendingActionsBadge;
+    BottomNavigationItemView sharedItemsView;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -993,8 +995,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (isBusinessAccount()) {
                         supportInvalidateOptionsMenu();
                     }
-                } else if (actionType == UPDATE_PAYMENT_METHODS) {
-                    Timber.d("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
         }
@@ -1803,10 +1803,8 @@ public class ManagerActivity extends TransfersManagementActivity
         setChatBadge();
 
         // Navi button Shared Items
-        BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+        sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
         pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
-        sharedItemsView.addView(pendingActionsBadge);
-        pendingActionsBadge.setVisibility(View.GONE);
         setPendingActionsBadge();
 
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
@@ -4218,6 +4216,29 @@ public class ManagerActivity extends TransfersManagementActivity
                     tab.setIcon(R.drawable.link_ic);
                 }
             }).attach();
+
+            if(incomingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                //// TODO hardcoded number for now. This will get changed after SDK changes are available
+                TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
+                if(incomingSharesTab != null ) {
+                    incomingSharesTab.getOrCreateBadge().setNumber(2);
+                }
+            }
+
+            if(outgoingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
+                if(outgoingSharesTab != null) {
+                    outgoingSharesTab.getOrCreateBadge().setNumber(2);
+                }
+            }
+
+            if(linksViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+                TabLayout.Tab linksTab = tabLayoutShares.getTabAt(2);
+                if(linksTab != null) {
+                    linksTab.getOrCreateBadge().setNumber(1);
+                }
+            }
+
         }
 
         updateSharesTab();
@@ -4566,6 +4587,10 @@ public class ManagerActivity extends TransfersManagementActivity
             case CLOUD_DRIVE: {
                 if (!isInMDMode) {
                     selectDrawerItemCloudDrive();
+                } else {
+                    Long mediaHandle = viewModel.getSafeBrowserParentHandle();
+                    skipToMediaDiscoveryFragment(
+                            MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle);
                 }
 
                 if (openFolderRefresh) {
@@ -7171,6 +7196,18 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
+     * Upon a node is open with, if it cannot be previewed in-app,
+     * then download it first, this download will be marked as "download by open with".
+     *
+     * @param node Node to be downloaded.
+     */
+    public Unit saveNodeByOpenWith(MegaNode node) {
+        PermissionUtils.checkNotificationsPermission(this);
+        nodeSaver.saveNodes(Collections.singletonList(node), true, false, false, false, true, true);
+        return null;
+    }
+
+    /**
      * Save nodes to device.
      *
      * @param handles         handles of nodes to save
@@ -8945,7 +8982,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     private Product getPRO3OneMonth() {
-        List<Product> products = myAccountInfo.getProductAccounts();
+        List<Product> products = viewModel.getProductAccounts();
         if (products != null) {
             for (Product product : products) {
                 if (product != null && product.getLevel() == PRO_III && product.getMonths() == 1) {
@@ -10497,7 +10534,11 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void setPendingActionsBadge() {
-        //// TODO Get pending actions count from SDK api and add a badge on UI
+        if(incomingSharesViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            sharedItemsView.addView(pendingActionsBadge);
+            TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
+            tvPendingActionsCount.setText("5");
+        }
     }
 
     private void setCallBadge() {
@@ -10830,7 +10871,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 return;
             }
 
-            if (transfer.getIsOfflineFile()) {
+            if (transfer.isOfflineFile()) {
                 File offlineFile = new File(transfer.getOriginalPath());
                 saveOffline(offlineFile.getParentFile(), node, ManagerActivity.this);
             } else {
@@ -10859,7 +10900,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public void openTransferLocation(AndroidCompletedTransfer transfer) {
         if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
-            if (transfer.getIsOfflineFile()) {
+            if (transfer.isOfflineFile()) {
                 selectDrawerItem(drawerItem = DrawerItem.HOMEPAGE);
                 openFullscreenOfflineFragment(
                         removeInitialOfflinePath(transfer.getPath()) + SEPARATOR);

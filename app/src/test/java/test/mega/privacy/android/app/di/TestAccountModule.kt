@@ -2,12 +2,13 @@ package test.mega.privacy.android.app.di
 
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.di.AccountModule
+import mega.privacy.android.domain.di.AccountModule
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.usecase.GetAccountAchievements
+import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.RetryPendingConnections
@@ -15,7 +16,7 @@ import org.mockito.kotlin.mock
 
 @TestInstallIn(
     replaces = [AccountModule::class],
-    components = [SingletonComponent::class, ViewModelComponent::class]
+    components = [SingletonComponent::class]
 )
 @Module
 object TestAccountModule {
@@ -34,6 +35,10 @@ object TestAccountModule {
         on { runBlocking { invoke(mock(), -1) } }.thenReturn(mock())
     }
 
+    private val getMyCredentials = mock<GetMyCredentials> {
+        on { runBlocking { invoke() } }.thenReturn(mock<AccountCredentials.MyAccountCredentials>())
+    }
+
     @Provides
     fun bindGetSession() = getSession
 
@@ -45,4 +50,7 @@ object TestAccountModule {
 
     @Provides
     fun provideGetAccountAchievements() = getAccountAchievements
+
+    @Provides
+    fun provideGetMyCredentials() = getMyCredentials
 }

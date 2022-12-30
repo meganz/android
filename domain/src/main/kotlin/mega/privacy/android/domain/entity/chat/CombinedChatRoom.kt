@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property lastMessageType    Last message type.
  * @property lastMessageSender  Last message sender.
  * @property lastTimestamp      Last timestamp.
+ * @property peerCount          Number of peers in a chat group.
  * @property isGroup            If chat room is a group chat room.
  * @property isPublic           If chat room is public.
  * @property isPreview          If chat room is in preview mode.
@@ -42,9 +44,10 @@ data class CombinedChatRoom constructor(
     val unreadCount: Int = 0,
     val lastMessage: String = "",
     val lastMessageId: Long = -1,
-    val lastMessageType: Int = 0,
+    val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
     val lastMessageSender: Long,
     val lastTimestamp: Long,
+    val peerCount: Long = 0,
     val isGroup: Boolean = false,
     val isPublic: Boolean = false,
     val isPreview: Boolean = false,

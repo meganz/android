@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityPaymentBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.service.iab.BillingManagerImpl
@@ -25,8 +26,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
+import mega.privacy.android.domain.entity.Product
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
+import java.util.BitSet
 
 /**
  * Activity for managing upgrade account payments.
@@ -73,7 +76,9 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
         val upgradeType = intent.getIntExtra(UPGRADE_TYPE, INVALID_VALUE)
 
         setupUpgradeType(upgradeType)
-        setupPaymentMethods(upgradeType)
+        collectFlow(viewModel.state) { state ->
+            setupPaymentMethods(upgradeType, state.paymentBitSet, state.product)
+        }
 
         binding.monthlyButton.setOnClickListener { binding.yearlyButton.isChecked = false }
         binding.monthlyText.setOnClickListener {
@@ -154,12 +159,12 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    private fun setupPaymentMethods(upgradeType: Int) {
-        viewModel.checkProductAccounts() ?: return
-
-        val paymentBitSet = viewModel.getPaymentBitSet()
-
-        if (paymentBitSet == null) {
+    private fun setupPaymentMethods(
+        upgradeType: Int,
+        paymentBitSet: BitSet,
+        product: List<Product>,
+    ) {
+        if (paymentBitSet.isEmpty) {
             Timber.w("Not payment bit set received!!!")
             hideBilling()
             return
@@ -176,10 +181,8 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
                 MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
             ) -> hideBilling()
             else -> {
-                val accounts = viewModel.checkProductAccounts() ?: return
-
-                for (i in accounts.indices) {
-                    val account = accounts[i]
+                for (i in product.indices) {
+                    val account = product[i]
 
                     if (account.level == upgradeType) {
                         val textToShow = viewModel.getPriceString(this, account, false)

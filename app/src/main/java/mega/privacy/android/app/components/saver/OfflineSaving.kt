@@ -149,5 +149,5 @@ class OfflineSaving(
         }
     }
 
-    override fun isDownloadByTap(): Boolean = false
+    override fun isDownloadForPreview(): Boolean = false
 }

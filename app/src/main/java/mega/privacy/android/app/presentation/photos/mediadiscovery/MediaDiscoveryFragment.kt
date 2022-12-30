@@ -341,13 +341,11 @@ class MediaDiscoveryFragment : Fragment() {
         actionMode = managerActivity.startSupportActionMode(
             actionModeCallback
         )
-        managerActivity.showHideBottomNavigationView(true)
     }
 
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
-        managerActivity.showHideBottomNavigationView(false)
     }
 
     private fun handleActionMode(photo: Photo) {

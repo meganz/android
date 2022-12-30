@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.DefaultAccountRepository
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
+import mega.privacy.android.data.repository.DefaultBillingRepository
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
@@ -15,6 +16,7 @@ import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultFilesRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
+import mega.privacy.android.data.repository.DefaultGetMeetingsRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.data.repository.DefaultImageRepository
 import mega.privacy.android.data.repository.DefaultLoginRepository
@@ -37,6 +39,7 @@ import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
+import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -45,6 +48,7 @@ import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
+import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -169,4 +173,10 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindVerificationRepository(repository: DefaultVerificationRepository): VerificationRepository
+
+    @Binds
+    abstract fun bindBillingRepository(repository: DefaultBillingRepository): BillingRepository
+
+    @Binds
+    abstract fun bindGetMeetingsRepository(repository: DefaultGetMeetingsRepository): GetMeetingsRepository
 }

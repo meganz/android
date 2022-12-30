@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
 import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.DefaultResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.DefaultResetSecondaryTimeline
@@ -103,6 +104,7 @@ import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
@@ -114,6 +116,7 @@ import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 
 /**
  * Provides the use case implementation for camera upload
@@ -164,6 +167,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetPendingSyncRecords(cameraUploadRepository: CameraUploadRepository): GetPendingSyncRecords =
             GetPendingSyncRecords(cameraUploadRepository::getPendingSyncRecords)
+
+        /**
+         * Provide the [UpdateFolderIconBroadcast]
+         */
+        @Provides
+        fun provideUpdateFolderIconBroadcast(cameraUploadRepository: CameraUploadRepository): UpdateFolderIconBroadcast =
+            UpdateFolderIconBroadcast(cameraUploadRepository::sendUpdateFolderIconBroadcast)
 
         /**
          * Provide the [MediaLocalPathExists] implementation
@@ -279,7 +289,7 @@ abstract class CameraUploadUseCases {
          */
         @Provides
         fun provideGetVideoSyncRecordsByStatus(cameraUploadRepository: CameraUploadRepository): GetVideoSyncRecordsByStatus =
-            GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it.value) }
+            GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it) }
 
         /**
          * Provide the [GetVideoQuality] implementation
@@ -426,6 +436,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindResetSecondaryTimeline(resetSecondaryTimeline: DefaultResetSecondaryTimeline): ResetSecondaryTimeline
+
+    /**
+     * Provide the [ResetCameraUploadTimelines] implementation
+     */
+    @Binds
+    abstract fun bindResetCameraUploadTimelines(resetCameraUploadTimelines: DefaultResetCameraUploadTimelines): ResetCameraUploadTimelines
 
     /**
      * Provide the [GetPrimarySyncHandle] implementation

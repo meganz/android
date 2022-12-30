@@ -237,14 +237,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         isForeground = try {
             startForeground(
                 Constants.NOTIFICATION_CHAT_UPLOAD,
-                TransfersManagement.createInitialServiceNotification(
-                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
-                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME, mNotificationManager!!,
-                    NotificationCompat.Builder(
-                        this@ChatUploadService,
-                        Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
-                    ), mBuilder!!
-                )
+                createInitialNotification()
             )
             true
         } catch (e: Exception) {
@@ -252,6 +245,23 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             false
         }
     }
+
+    @Suppress("DEPRECATION")
+    private fun createInitialNotification() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            TransfersManagement.createInitialServiceNotification(
+                notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
+                notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME,
+                mNotificationManager = mNotificationManager!!,
+                mBuilderCompat = NotificationCompat.Builder(this@ChatUploadService,
+                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID)
+            )
+
+        } else {
+            TransfersManagement.createInitialServiceNotification(
+                Notification.Builder(this@ChatUploadService)
+            )
+        }
 
     private fun stopForeground() {
         isForeground = false

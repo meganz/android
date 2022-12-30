@@ -2206,7 +2206,7 @@
     <!-- Item menu option upon right click on one or multiple files -->
     <string name="general_save_to_device">Simpan ke perangkat</string>
     <!-- Title of cloud explorer to upload a file -->
-    <string name="title_upload_explorer">Upload ke MEGA</string>
+    <string name="title_upload_explorer">Unggah ke MEGA</string>
     <!-- Label choose destination -->
     <string name="choose_destionation">Pilih tujuan</string>
     <!-- Label that indicates show more items -->
@@ -4024,4 +4024,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Kredensial anda</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Deskripsi</string>
 </resources>

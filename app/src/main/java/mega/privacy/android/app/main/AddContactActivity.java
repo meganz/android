@@ -152,6 +152,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     public static final String EXTRA_CHAT_LINK = "chatLink";
     public static final String EXTRA_CONTACT_TYPE = "contactType";
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
+    public static final String EXTRA_IS_START_CONVERSATION = "isStartConversation";
 
     private DisplayMetrics outMetrics;
 
@@ -223,7 +224,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private MenuItem scanQrMenuItem;
 
     private boolean comesFromChat;
-
+    private boolean isStartConversation;
     private boolean comesFromRecent;
     public static final String FROM_RECENT = "comesFromRecent";
     public static final String IS_ALLOWED_ADD_PARTICIPANTS = "isAllowAddParticipants";
@@ -1545,6 +1546,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 title = getIntent().getStringExtra("aBtitle");
             }
             onlyCreateGroup = getIntent().getBooleanExtra(EXTRA_ONLY_CREATE_GROUP, false);
+            isStartConversation = getIntent().getBooleanExtra(EXTRA_IS_START_CONVERSATION, false);
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
                 multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
                 if (multipleSelectIntent == 0) {
@@ -2861,7 +2863,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 if (contactType == CONTACT_TYPE_DEVICE) {
                     inviteContacts(addedContactsPhone);
                 } else if (contactType == CONTACT_TYPE_MEGA) {
-                    if (onlyCreateGroup && addedContactsMEGA.isEmpty()) {
+                    if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
                         showSnackbar(getString(R.string.error_creating_group_and_attaching_file));
                         break;
                     }
