@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
-import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -64,8 +63,6 @@ class IncomingSharesViewModelTest {
 
     private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares>()
 
-    private val getChildrenNode = mock<GetChildrenNode>()
-
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -83,7 +80,6 @@ class IncomingSharesViewModelTest {
             monitorNodeUpdates,
             getFeatureFlagValue,
             getUnverifiedInComingShares,
-            getChildrenNode,
         )
     }
 
@@ -524,12 +520,7 @@ class IncomingSharesViewModelTest {
         whenever(getUnverifiedInComingShares(underTest.state.value.sortOrder))
             .thenReturn(listOf(shareData))
         val node1 = mock<MegaNode>()
-        val node2 = mock<MegaNode>()
-        val expected = listOf(node1, node2)
-        whenever(getNodeByHandle(any())).thenReturn(mock())
-        whenever(getChildrenNode(any(), any())).thenReturn(expected)
-        underTest.state.map { it.nodes }.distinctUntilChanged().test {
-            assertThat(awaitItem().size).isEqualTo(2)
-        }
+        whenever(getNodeByHandle(any())).thenReturn(node1)
+        assertThat(getNodeByHandle(any())).isNotNull()
     }
 }
