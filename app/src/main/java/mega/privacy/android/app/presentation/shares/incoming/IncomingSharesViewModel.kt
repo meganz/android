@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
-import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -39,7 +38,6 @@ class IncomingSharesViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedInComingShares: GetUnverifiedIncomingShares,
-    private val getChildrenNode: GetChildrenNode,
 ) : ViewModel() {
 
     /** private UI state */
@@ -50,6 +48,8 @@ class IncomingSharesViewModel @Inject constructor(
 
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
+
+    private val unverifiedIncomingNodes = mutableListOf<MegaNode>()
 
     init {
         viewModelScope.launch {
@@ -74,21 +74,16 @@ class IncomingSharesViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            isMandatoryFingerprintRequired()
             getUnverifiedInComingShares(_state.value.sortOrder).forEach { shareData ->
-                if (shareData.nodeHandle != -1L || shareData.nodeHandle != INVALID_HANDLE) {
+                if (!isInvalidHandle(shareData.nodeHandle)) {
                     getNodeByHandle(shareData.nodeHandle)?.let { megaNode ->
-                        val unverifiedNodes = getChildrenNode(megaNode, _state.value.sortOrder)
-                        if (unverifiedNodes.isNotEmpty()) {
-                            _state.update {
-                                it.copy(nodes = _state.value.nodes + unverifiedNodes)
-                            }
-                        }
-                    }
-                } else {
-                    _state.update {
-                        it.copy(unVerifiedIncomingNodes = emptyList())
+                        unverifiedIncomingNodes.add(megaNode)
                     }
                 }
+            }
+            _state.update {
+                it.copy(nodes = _state.value.nodes + unverifiedIncomingNodes)
             }
         }
     }
