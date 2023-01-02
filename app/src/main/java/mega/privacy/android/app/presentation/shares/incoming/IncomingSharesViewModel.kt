@@ -83,7 +83,7 @@ class IncomingSharesViewModel @Inject constructor(
                 }
             }
             _state.update {
-                it.copy(nodes = _state.value.nodes + unverifiedIncomingNodes)
+                it.copy(nodes = unverifiedIncomingNodes + _state.value.nodes)
             }
         }
 
