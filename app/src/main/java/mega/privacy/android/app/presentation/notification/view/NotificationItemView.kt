@@ -33,6 +33,7 @@ import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
+import mega.privacy.android.presentation.controls.dpToSp
 import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.grey_alpha_087
@@ -95,6 +96,7 @@ private fun NotificationTitleRow(
 ) {
     val titleMaxLines = if (showDescription) 1 else 3
     val titleText = notification.title(LocalContext.current)
+    val titleTextSize = dpToSp(dp = notification.titleTextSize).value
 
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -108,7 +110,7 @@ private fun NotificationTitleRow(
                     setTextStyle(
                         textAppearance = R.style.TextAppearance_Mega_Subtitle1_Medium_Variant,
                     )
-                    setTextSize(TypedValue.COMPLEX_UNIT_DIP, notification.titleTextSize)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, titleTextSize)
                 }
             },
             update = { it.text = titleText },
@@ -190,7 +192,7 @@ private fun PreviewNotificationItemView() {
             sectionColour = R.color.orange_400_orange_300,
             sectionIcon = null,
             title = { "New Contact" },
-            titleTextSize = 16f,
+            titleTextSize = 16.dp,
             description = { "xyz@gmail.com is now a contact" },
             dateText = { "11 October 2022 6:46 pm" },
             isNew = true,

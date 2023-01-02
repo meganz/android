@@ -10,8 +10,8 @@ import mega.privacy.android.domain.entity.UserAlert
  *
  */
 internal fun UserAlert.titleTextSize() = when (this) {
-    is CustomAlert -> 14f
-    is IncomingShareAlert -> 14f
-    else -> 16f
+    is CustomAlert -> 14.dp
+    is IncomingShareAlert -> 14.dp
+    else -> 16.dp
 }
 
