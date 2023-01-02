@@ -231,7 +231,10 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             )
 
             _state.update {
-                it.copy(isSelectionCompleted = true)
+                it.copy(
+                    isSelectionCompleted = true,
+                    numCommittedPhotos = photoIds.size,
+                )
             }
         }
     }
