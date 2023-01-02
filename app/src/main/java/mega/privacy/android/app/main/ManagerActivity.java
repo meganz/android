@@ -4202,9 +4202,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
                     TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
                     if (incomingSharesTab != null) {
-                        int incomingSharesCount = incomingSharesState.getUnVerifiedIncomingNodesCount();
-                        if (incomingSharesCount > 0) {
-                            incomingSharesTab.getOrCreateBadge().setNumber(incomingSharesCount);
+                        int incomingNodesCount = incomingSharesState.getUnVerifiedIncomingNodesCount();
+                        if (incomingNodesCount > 0) {
+                            incomingSharesTab.getOrCreateBadge().setNumber(incomingNodesCount);
                         }
                     }
                 }
@@ -4215,9 +4215,9 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
                     TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
                     if (outgoingSharesTab != null) {
-                        int outgoingSharesCount = outgoingSharesState.getUnVerifiedOutGoingNodesCount();
-                        if (outgoingSharesCount > 0) {
-                            outgoingSharesTab.getOrCreateBadge().setNumber(outgoingSharesCount);
+                        int outgoingNodesCount = outgoingSharesState.getUnVerifiedOutGoingNodesCount();
+                        if (outgoingNodesCount > 0) {
+                            outgoingSharesTab.getOrCreateBadge().setNumber(outgoingNodesCount);
                         }
                     }
                 }

@@ -218,7 +218,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     visibilityFastScroller()
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
-
+                    adapter?.setMandatoryFingerprintVerificationValue(it.isMandatoryFingerprintVerificationNeeded)
                 }
             }
         }
@@ -254,14 +254,13 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             adapter?.parentHandle = state().outgoingHandle
             adapter?.setListFragment(recyclerView)
         }
-        adapter?.setOutgoingSharesViewModel(viewModel)
+        adapter?.setUnverifiedOutgoingNodes(viewModel.getUnverifiedOutgoingNodes())
         if (managerActivity?.isList == false)
             gridLayoutManager?.spanSizeLookup =
                 gridLayoutManager?.spanCount?.let { adapter?.getSpanSizeLookup(it) }
 
         adapter?.isMultipleSelect = false
         recyclerView?.adapter = adapter
-        adapter?.setMandatoryFingerprintVerificationValue(viewModel.state.value.isMandatoryFingerprintVerificationNeeded)
     }
 
     /**
