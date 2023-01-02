@@ -68,7 +68,7 @@ class OutgoingSharesViewModel @Inject constructor(
                 }
             }
             _state.update {
-                it.copy(nodes = _state.value.nodes + unverifiedOutgoingNodes)
+                it.copy(nodes = unverifiedOutgoingNodes + _state.value.nodes)
             }
         }
 
