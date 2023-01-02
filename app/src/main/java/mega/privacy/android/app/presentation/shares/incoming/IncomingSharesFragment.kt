@@ -263,7 +263,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             adapter?.parentHandle = state().incomingHandle
             adapter?.setListFragment(recyclerView)
         }
-
+        adapter?.setIncomingSharesViewModel(viewModel)
         if (managerActivity?.isList == false)
             gridLayoutManager?.spanSizeLookup =
                 gridLayoutManager?.let { adapter?.getSpanSizeLookup(it.spanCount) }

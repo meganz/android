@@ -4198,28 +4198,31 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }).attach();
 
-            if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
-                //// TODO hardcoded number for now. This will get changed after SDK changes are available
-                TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
-                if(incomingSharesTab != null ) {
-                    incomingSharesTab.getOrCreateBadge().setNumber(2);
+            ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
+                if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                    TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
+                    if (incomingSharesTab != null) {
+                        int incomingSharesCount = incomingSharesState.getUnVerifiedIncomingNodesCount();
+                        if (incomingSharesCount > 0) {
+                            incomingSharesTab.getOrCreateBadge().setNumber(incomingSharesCount);
+                        }
+                    }
                 }
-            }
+                return Unit.INSTANCE;
+            });
 
-            if(outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
-                TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
-                if(outgoingSharesTab != null) {
-                    outgoingSharesTab.getOrCreateBadge().setNumber(2);
+            ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
+                if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                    TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
+                    if (outgoingSharesTab != null) {
+                        int outgoingSharesCount = outgoingSharesState.getUnVerifiedOutGoingNodesCount();
+                        if (outgoingSharesCount > 0) {
+                            outgoingSharesTab.getOrCreateBadge().setNumber(outgoingSharesCount);
+                        }
+                    }
                 }
-            }
-
-            if(linksViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
-                TabLayout.Tab linksTab = tabLayoutShares.getTabAt(2);
-                if(linksTab != null) {
-                    linksTab.getOrCreateBadge().setNumber(1);
-                }
-            }
-
+                return Unit.INSTANCE;
+            });
         }
 
         updateSharesTab();

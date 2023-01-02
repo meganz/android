@@ -72,6 +72,11 @@ class OutgoingSharesViewModel @Inject constructor(
             }
         }
 
+        viewModelScope.launch {
+            _state.update {
+                it.copy(unVerifiedOutGoingNodesCount = unverifiedOutgoingNodes.size)
+            }
+        }
     }
 
     /**
@@ -203,4 +208,9 @@ class OutgoingSharesViewModel @Inject constructor(
             it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
         }
     }
+
+    /**
+     * Get the unverified outgoing nodes list to check in [MegaNodeAdapter]
+     */
+    fun getOutgoingUnverifiedNodes(): List<MegaNode> = unverifiedOutgoingNodes
 }

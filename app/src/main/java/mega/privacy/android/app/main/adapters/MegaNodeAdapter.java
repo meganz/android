@@ -92,8 +92,10 @@ import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
@@ -143,6 +145,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
+    private IncomingSharesViewModel incomingSharesViewModel;
+    private OutgoingSharesViewModel outgoingSharesViewModel;
     private Boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -1080,8 +1084,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if(isMandatoryFingerprintVerificationNeeded) {
-                        //// TODO This if will also contain a check from SDK which shows whether user needs to be authorised
+                    if(isMandatoryFingerprintVerificationNeeded && incomingSharesViewModel.getIncomingUnverifiedNodes().contains(node.getHandle())) {
+                        holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
@@ -1090,11 +1094,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                if(isMandatoryFingerprintVerificationNeeded) {
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
+
+                if(isMandatoryFingerprintVerificationNeeded && outgoingSharesViewModel.getOutgoingUnverifiedNodes().contains(node.getHandle())) {
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+                    holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                }
             }
         } else {
             Timber.d("Node is file");
@@ -1508,5 +1514,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void setMandatoryFingerprintVerificationValue(boolean isVerificationNeeded) {
         this.isMandatoryFingerprintVerificationNeeded = isVerificationNeeded;
+    }
+
+    public void setIncomingSharesViewModel(IncomingSharesViewModel viewModel) {
+        this.incomingSharesViewModel = viewModel;
+    }
+
+    public void setOutgoingSharesViewModel(OutgoingSharesViewModel viewModel) {
+        this.outgoingSharesViewModel = viewModel;
     }
 }
