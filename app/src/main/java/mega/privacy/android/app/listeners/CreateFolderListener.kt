@@ -7,7 +7,6 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.JobUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -38,11 +37,6 @@ class CreateFolderListener @JvmOverloads constructor(
          * MY_CHAT_FILES
          */
         MY_CHAT_FILES,
-
-        /**
-         * MY_CHAT_FILES
-         */
-        INIT_CAMERA_UPLOAD
     }
 
     /**
@@ -76,25 +70,6 @@ class CreateFolderListener @JvmOverloads constructor(
         if (request.type == MegaRequest.TYPE_CREATE_FOLDER) {
             val handle = request.nodeHandle
             val node = api.getNodeByHandle(request.nodeHandle)
-
-            if (extraAction == ExtraAction.INIT_CAMERA_UPLOAD) {
-                if (request.name == context.getString(R.string.section_photo_sync)) {
-                    CameraUploadsService.isCreatingPrimary = false
-                    //set primary only
-                    setCameraUploadFolder(megaError = e,
-                        nodeHandle = handle,
-                        isPrimary = true,
-                        megaApi = api)
-                } else if (request.name == context.getString(R.string.section_secondary_media_uploads)) {
-                    CameraUploadsService.isCreatingSecondary = false;
-                    //set secondary only
-                    setCameraUploadFolder(megaError = e,
-                        nodeHandle = handle,
-                        isPrimary = false,
-                        megaApi = api)
-                }
-            }
-
             when (context) {
                 is FileExplorerActivity -> {
                     if (e.errorCode == MegaError.API_OK) {
@@ -163,45 +138,5 @@ class CreateFolderListener @JvmOverloads constructor(
      */
     override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
         // Do nothing
-    }
-
-    /**
-     * Function to set camera upload folder based on response
-     *
-     * @param megaError : MegaError
-     * @param nodeHandle: Long
-     * @param isPrimary: Boolean
-     * @param megaApi: MegaApiJava
-     */
-    private fun setCameraUploadFolder(
-        megaError: MegaError,
-        nodeHandle: Long,
-        isPrimary: Boolean,
-        megaApi: MegaApiJava,
-    ) {
-        if (megaError.errorCode == MegaError.API_OK) {
-            if (isPrimary) {
-                Timber.d("Set CU primary attribute on create folder: %s", nodeHandle)
-                megaApi.setCameraUploadsFolders(nodeHandle,
-                    MegaApiJava.INVALID_HANDLE,
-                    SetAttrUserListener(context))
-            } else {
-                Timber.d("Set CU secondary attribute on create folder: %s", nodeHandle)
-                megaApi.setCameraUploadsFolders(MegaApiJava.INVALID_HANDLE,
-                    nodeHandle,
-                    SetAttrUserListener(context))
-            }
-        } else {
-            val folderName = if (isPrimary) {
-                "CU"
-            } else {
-                "MU"
-            }
-            Timber.w("Create %s folder failed, error code: %d, %s",
-                folderName,
-                megaError.errorCode,
-                megaError.errorString)
-            JobUtil.fireStopCameraUploadJob(context)
-        }
     }
 }
