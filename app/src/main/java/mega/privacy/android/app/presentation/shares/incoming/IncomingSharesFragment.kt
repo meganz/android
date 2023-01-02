@@ -65,6 +65,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             else getGridView(inflater, container)
 
         initAdapter()
+        observe()
         selectNewlyAddedNodes()
 
         return view
@@ -275,7 +276,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             adapter?.parentHandle = state().incomingHandle
             adapter?.setListFragment(recyclerView)
         }
-        adapter?.setIncomingSharesViewModel(viewModel)
+        adapter?.setUnverifiedIncomingNodes(viewModel.getUnverifiedIncomingNodes())
         if (managerActivity?.isList == false)
             gridLayoutManager?.spanSizeLookup =
                 gridLayoutManager?.let { adapter?.getSpanSizeLookup(it.spanCount) }
