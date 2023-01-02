@@ -212,5 +212,5 @@ class OutgoingSharesViewModel @Inject constructor(
     /**
      * Get the unverified outgoing nodes list to check in [MegaNodeAdapter]
      */
-    fun getOutgoingUnverifiedNodes(): List<MegaNode> = unverifiedOutgoingNodes
+    fun getUnverifiedOutgoingNodes(): List<MegaNode> = unverifiedOutgoingNodes
 }

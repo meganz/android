@@ -145,8 +145,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
-    private IncomingSharesViewModel incomingSharesViewModel;
-    private OutgoingSharesViewModel outgoingSharesViewModel;
+    private List<MegaNode> unverifiedIncomingNodes;
+    private List<MegaNode> unverifiedOutgoingNodes;
     private Boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -1091,7 +1091,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if(isMandatoryFingerprintVerificationNeeded && incomingSharesViewModel.getIncomingUnverifiedNodes().contains(node.getHandle())) {
+                    if(isMandatoryFingerprintVerificationNeeded && unverifiedIncomingNodes.contains(node.getHandle())) {
                         holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                     }
@@ -1104,7 +1104,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
 
-                if(isMandatoryFingerprintVerificationNeeded && outgoingSharesViewModel.getOutgoingUnverifiedNodes().contains(node.getHandle())) {
+                if(isMandatoryFingerprintVerificationNeeded && unverifiedOutgoingNodes.contains(node.getHandle())) {
                     holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                     holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                 }
@@ -1523,11 +1523,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.isMandatoryFingerprintVerificationNeeded = isVerificationNeeded;
     }
 
-    public void setIncomingSharesViewModel(IncomingSharesViewModel viewModel) {
-        this.incomingSharesViewModel = viewModel;
+    public void setUnverifiedIncomingNodes(List<MegaNode> nodes) {
+        this.unverifiedIncomingNodes = nodes;
     }
 
-    public void setOutgoingSharesViewModel(OutgoingSharesViewModel viewModel) {
-        this.outgoingSharesViewModel = viewModel;
+    public void setUnverifiedOutgoingNodes(List<MegaNode> nodes) {
+        this.unverifiedOutgoingNodes = nodes;
     }
 }
