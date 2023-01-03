@@ -92,10 +92,8 @@ import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
@@ -1091,11 +1089,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if (isMandatoryFingerprintVerificationNeeded) {
-                        if (!unverifiedIncomingNodes.isEmpty() && unverifiedIncomingNodes.get(position).getHandle() == node.getHandle()) {
-                            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                            holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
-                        }
+                    if (isMandatoryFingerprintVerificationNeeded && !unverifiedIncomingNodes.isEmpty()) {
+                        showUnverifiedNodeUi(unverifiedIncomingNodes, node, holder);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1105,11 +1100,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-                if (isMandatoryFingerprintVerificationNeeded) {
-                    if (!unverifiedOutgoingNodes.isEmpty() && unverifiedOutgoingNodes.get(position).getHandle() == node.getHandle()) {
-                        holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                        holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
-                    }
+                if (isMandatoryFingerprintVerificationNeeded && !unverifiedOutgoingNodes.isEmpty()) {
+                    showUnverifiedNodeUi(unverifiedOutgoingNodes, node, holder);
                 }
             }
         } else {
@@ -1532,5 +1524,22 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void setUnverifiedOutgoingNodes(List<MegaNode> nodes) {
         this.unverifiedOutgoingNodes = nodes;
+    }
+
+    /**
+     * Function to check if current node is unverified & show Ui items accordingly
+     *
+     * @param unverifiedNodes Unverified Nodes List
+     * @param adapterNode     Current node from adapter
+     * @param holder          [ViewHolderBrowserList]
+     */
+    private void showUnverifiedNodeUi(List<MegaNode> unverifiedNodes, MegaNode adapterNode, ViewHolderBrowserList holder) {
+        for (int i = 0; i < unverifiedNodes.size(); i++) {
+            if (unverifiedNodes.get(i).getHandle() == adapterNode.getHandle()) {
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+                holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                break;
+            }
+        }
     }
 }
