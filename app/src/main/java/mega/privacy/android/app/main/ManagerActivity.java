@@ -2597,6 +2597,9 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
+
+        addUnverifiedIncomingCountBadge();
+        addUnverifiedOutgoingCountBadge();
     }
 
 
@@ -4245,32 +4248,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     tab.setIcon(R.drawable.link_ic);
                 }
             }).attach();
-
-            ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
-                if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                    TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
-                    if (incomingSharesTab != null) {
-                        int incomingNodesCount = incomingSharesState.getUnVerifiedIncomingNodesCount();
-                        if (incomingNodesCount > 0) {
-                            incomingSharesTab.getOrCreateBadge().setNumber(incomingNodesCount);
-                        }
-                    }
-                }
-                return Unit.INSTANCE;
-            });
-
-            ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
-                if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                    TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
-                    if (outgoingSharesTab != null) {
-                        int outgoingNodesCount = outgoingSharesState.getUnVerifiedOutGoingNodesCount();
-                        if (outgoingNodesCount > 0) {
-                            outgoingSharesTab.getOrCreateBadge().setNumber(outgoingNodesCount);
-                        }
-                    }
-                }
-                return Unit.INSTANCE;
-            });
         }
 
         updateSharesTab();
@@ -11431,5 +11408,41 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private boolean isBusinessAccount() {
         return megaApi.isBusinessAccount() && myAccountInfo.getAccountType() == BUSINESS;
+    }
+
+    /**
+     * Function to add unverified incoming count on tabs
+     */
+    private void addUnverifiedIncomingCountBadge() {
+        ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
+            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
+                if (incomingSharesTab != null) {
+                    int incomingNodesCount = incomingSharesState.getUnVerifiedIncomingNodes().size();
+                    if (incomingNodesCount > 0) {
+                        incomingSharesTab.getOrCreateBadge().setNumber(incomingNodesCount);
+                    }
+                }
+            }
+            return Unit.INSTANCE;
+        });
+    }
+
+    /**
+     * Function to add unverified outgoing count on tabs
+     */
+    private void addUnverifiedOutgoingCountBadge() {
+        ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
+            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
+                if (outgoingSharesTab != null) {
+                    int outgoingNodesCount = outgoingSharesState.getUnVerifiedOutGoingNodes().size();
+                    if (outgoingNodesCount > 0) {
+                        outgoingSharesTab.getOrCreateBadge().setNumber(outgoingNodesCount);
+                    }
+                }
+            }
+            return Unit.INSTANCE;
+        });
     }
 }

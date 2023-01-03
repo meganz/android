@@ -1091,9 +1091,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if(isMandatoryFingerprintVerificationNeeded && unverifiedIncomingNodes.contains(node.getHandle())) {
-                        holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                        holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                    if (isMandatoryFingerprintVerificationNeeded) {
+                        if (unverifiedIncomingNodes.get(position).getHandle() == node.getHandle()) {
+                            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+                            holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                        }
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1103,10 +1105,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-
-                if(isMandatoryFingerprintVerificationNeeded && unverifiedOutgoingNodes.contains(node.getHandle())) {
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                    holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                if (isMandatoryFingerprintVerificationNeeded) {
+                    if (unverifiedOutgoingNodes.get(position).getHandle() == node.getHandle()) {
+                        holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+                        holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                    }
                 }
             }
         } else {
