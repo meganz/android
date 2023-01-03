@@ -75,20 +75,11 @@ class IncomingSharesViewModel @Inject constructor(
 
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
-            getUnverifiedInComingShares(_state.value.sortOrder).forEach { shareData ->
-                if (!isInvalidHandle(shareData.nodeHandle)) {
-                    getNodeByHandle(shareData.nodeHandle)?.let { megaNode ->
-                        unverifiedIncomingNodes.add(megaNode)
-                    }
-                }
-            }
+            val unverifiedIncomingNodes = getUnverifiedInComingShares(_state.value.sortOrder)
+                .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
+                .mapNotNull { shareData -> getNodeByHandle(shareData.nodeHandle) }
             _state.update {
                 it.copy(nodes = unverifiedIncomingNodes + _state.value.nodes)
-            }
-        }
-        viewModelScope.launch {
-            _state.update {
-                it.copy(unVerifiedIncomingNodesCount = unverifiedIncomingNodes.size)
             }
         }
     }
@@ -223,9 +214,4 @@ class IncomingSharesViewModel @Inject constructor(
             it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
         }
     }
-
-    /**
-     * Get the unverified incoming nodes list to check in [MegaNodeAdapter]
-     */
-    fun getUnverifiedIncomingNodes(): List<MegaNode> = unverifiedIncomingNodes
 }

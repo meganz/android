@@ -228,6 +228,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
                     adapter?.setMandatoryFingerprintVerificationValue(it.isMandatoryFingerprintVerificationNeeded)
+                    adapter?.setUnverifiedIncomingNodes(it.unVerifiedIncomingNodes)
                 }
             }
         }
@@ -263,7 +264,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             adapter?.parentHandle = state().incomingHandle
             adapter?.setListFragment(recyclerView)
         }
-        adapter?.setUnverifiedIncomingNodes(viewModel.getUnverifiedIncomingNodes())
         if (managerActivity?.isList == false)
             gridLayoutManager?.spanSizeLookup =
                 gridLayoutManager?.let { adapter?.getSpanSizeLookup(it.spanCount) }
