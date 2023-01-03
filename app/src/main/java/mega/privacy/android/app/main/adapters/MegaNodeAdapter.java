@@ -1092,7 +1092,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
 
                     if (isMandatoryFingerprintVerificationNeeded) {
-                        if (unverifiedIncomingNodes.get(position).getHandle() == node.getHandle()) {
+                        if (!unverifiedIncomingNodes.isEmpty() && unverifiedIncomingNodes.get(position).getHandle() == node.getHandle()) {
                             holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                             holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                         }
@@ -1106,7 +1106,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
                 if (isMandatoryFingerprintVerificationNeeded) {
-                    if (unverifiedOutgoingNodes.get(position).getHandle() == node.getHandle()) {
+                    if (!unverifiedOutgoingNodes.isEmpty() && unverifiedOutgoingNodes.get(position).getHandle() == node.getHandle()) {
                         holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                     }
