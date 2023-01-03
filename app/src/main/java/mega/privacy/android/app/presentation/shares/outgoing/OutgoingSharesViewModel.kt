@@ -47,8 +47,6 @@ class OutgoingSharesViewModel @Inject constructor(
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
-    private val unverifiedOutgoingNodes = mutableListOf<MegaNode>()
-
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
@@ -60,11 +58,11 @@ class OutgoingSharesViewModel @Inject constructor(
 
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
-            val unverifiedOutGoingNodes = getUnverifiedOutgoingShares(_state.value.sortOrder)
+            val unverifiedOutgoingNodes = getUnverifiedOutgoingShares(_state.value.sortOrder)
                 .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
                 .mapNotNull { shareData -> getNodeByHandle(shareData.nodeHandle) }
             _state.update {
-                it.copy(nodes = unverifiedOutGoingNodes + _state.value.nodes)
+                it.copy(unVerifiedOutgoingNodes = unverifiedOutgoingNodes)
             }
         }
     }
