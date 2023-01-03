@@ -1523,12 +1523,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * Function to check if current node is unverified & show Ui items accordingly
      *
      * @param unverifiedNodes Unverified Nodes List
-     * @param adapterNode     Current node from adapter
+     * @param currentNode     Current node from adapter
      * @param holder          [ViewHolderBrowserList]
      */
-    private void showUnverifiedNodeUi(List<MegaNode> unverifiedNodes, MegaNode adapterNode, ViewHolderBrowserList holder) {
+    private void showUnverifiedNodeUi(List<MegaNode> unverifiedNodes, MegaNode currentNode, ViewHolderBrowserList holder) {
         for (int i = 0; i < unverifiedNodes.size(); i++) {
-            if (unverifiedNodes.get(i).getHandle() == adapterNode.getHandle()) {
+            if (unverifiedNodes.get(i).getHandle() == currentNode.getHandle()) {
                 holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                 holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                 break;
