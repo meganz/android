@@ -216,8 +216,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                         hideTabs(true)
                         return@collect
                     }
-
-                    updateNodes(it.nodes)
                     hideTabs(!it.isFirstNavigationLevel())
 
                     managerActivity?.showFabButton()
@@ -229,6 +227,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     setEmptyView(it.isInvalidHandle)
                     adapter?.setMandatoryFingerprintVerificationValue(it.isMandatoryFingerprintVerificationNeeded)
                     adapter?.setUnverifiedIncomingNodes(it.unVerifiedIncomingNodes)
+                    updateNodes(it.unVerifiedIncomingNodes + it.nodes)
                 }
             }
         }

@@ -11403,7 +11403,7 @@ public class ManagerActivity extends TransfersManagementActivity
             if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
                 TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
                 if (outgoingSharesTab != null) {
-                    int outgoingNodesCount = outgoingSharesState.getUnVerifiedOutGoingNodes().size();
+                    int outgoingNodesCount = outgoingSharesState.getUnVerifiedOutgoingNodes().size();
                     if (outgoingNodesCount > 0) {
                         outgoingSharesTab.getOrCreateBadge().setNumber(outgoingNodesCount);
                     }
