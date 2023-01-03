@@ -60,7 +60,7 @@ class OutgoingSharesViewModelTest {
             }.thenReturn(true)
         }
 
-    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>() {
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
@@ -449,5 +449,10 @@ class OutgoingSharesViewModelTest {
         val node1 = mock<MegaNode>()
         whenever(getNodeByHandle(any())).thenReturn(node1)
         assertThat(getNodeByHandle(any())).isNotNull()
+        initViewModel()
+        underTest.state.map { it.nodes }.distinctUntilChanged()
+            .test {
+                assertThat(awaitItem().size).isEqualTo(1)
+            }
     }
 }
