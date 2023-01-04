@@ -2597,9 +2597,20 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
+        ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
+            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                addUnverifiedIncomingCountBadge(incomingSharesState.getUnVerifiedIncomingNodes().size());
+            }
+            return Unit.INSTANCE;
+        });
 
-        addUnverifiedIncomingCountBadge();
-        addUnverifiedOutgoingCountBadge();
+        ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
+            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnVerifiedOutgoingNodes().size());
+            }
+            return Unit.INSTANCE;
+        });
+
     }
 
 
@@ -11413,36 +11424,24 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * Function to add unverified incoming count on tabs
      */
-    private void addUnverifiedIncomingCountBadge() {
-        ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
-            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
-                if (incomingSharesTab != null) {
-                    int incomingNodesCount = incomingSharesState.getUnVerifiedIncomingNodes().size();
-                    if (incomingNodesCount > 0) {
-                        incomingSharesTab.getOrCreateBadge().setNumber(incomingNodesCount);
-                    }
-                }
+    private void addUnverifiedIncomingCountBadge(int unverifiedNodesCount) {
+        TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
+        if (incomingSharesTab != null) {
+            if (unverifiedNodesCount > 0) {
+                incomingSharesTab.getOrCreateBadge().setNumber(unverifiedNodesCount);
             }
-            return Unit.INSTANCE;
-        });
+        }
     }
 
     /**
      * Function to add unverified outgoing count on tabs
      */
-    private void addUnverifiedOutgoingCountBadge() {
-        ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
-            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
-                if (outgoingSharesTab != null) {
-                    int outgoingNodesCount = outgoingSharesState.getUnVerifiedOutgoingNodes().size();
-                    if (outgoingNodesCount > 0) {
-                        outgoingSharesTab.getOrCreateBadge().setNumber(outgoingNodesCount);
-                    }
-                }
+    private void addUnverifiedOutgoingCountBadge(int unverifiedNodesCount) {
+        TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
+        if (outgoingSharesTab != null) {
+            if (unverifiedNodesCount > 0) {
+                outgoingSharesTab.getOrCreateBadge().setNumber(unverifiedNodesCount);
             }
-            return Unit.INSTANCE;
-        });
+        }
     }
 }
