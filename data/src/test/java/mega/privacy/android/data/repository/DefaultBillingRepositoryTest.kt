@@ -334,4 +334,13 @@ class DefaultBillingRepositoryTest {
             assertNotNull(underTest.getActiveSubscription())
         }
     }
+
+    @Test
+    fun `test that clearCache invoke then following call`() {
+        underTest.clearCache()
+        verify(activeSubscriptionCache, times(1)).clear()
+        verify(numberOfSubscriptionCache, times(1)).clear()
+        assertNull(activeSubscriptionCache.get())
+        assertNull(numberOfSubscriptionCache.get())
+    }
 }

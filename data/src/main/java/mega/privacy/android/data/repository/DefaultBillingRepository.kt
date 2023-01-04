@@ -131,4 +131,9 @@ internal class DefaultBillingRepository @Inject constructor(
     override fun isBillingAvailable(): Boolean = skusCache.get().isNullOrEmpty().not()
 
     override fun getActiveSubscription() = activeSubscriptionCache.get()
+
+    override fun clearCache() {
+        activeSubscriptionCache.clear()
+        numberOfSubscriptionCache.clear()
+    }
 }
