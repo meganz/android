@@ -98,6 +98,7 @@ class ManagerViewModelTest {
             getExtendedAccountDetail = mock(),
             getPricing = mock(),
             getFullAccountInfo = mock(),
+            getActiveSubscription = mock(),
         )
     }
 

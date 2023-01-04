@@ -6,12 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.Purchase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.usecase.billing.LaunchPurchaseFlow
 import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEvent
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
@@ -48,8 +47,20 @@ class BillingViewModel @Inject constructor(
     /**
      * Billing update event
      */
-    val billingUpdateEvent = monitorBillingEvent()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+    private val _billingUpdateEvent = MutableStateFlow<BillingEvent?>(null)
+
+    /**
+     * Billing update event
+     */
+    val billingUpdateEvent = _billingUpdateEvent.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            monitorBillingEvent().collect {
+                _billingUpdateEvent.value = it
+            }
+        }
+    }
 
     /**
      * Load skus
@@ -95,5 +106,15 @@ class BillingViewModel @Inject constructor(
      */
     fun isPurchased(purchase: MegaPurchase): Boolean {
         return purchase.state == Purchase.PurchaseState.PURCHASED
+    }
+
+    /**
+     * Mark handle billing event
+     *
+     */
+    fun markHandleBillingEvent() {
+        viewModelScope.launch {
+            _billingUpdateEvent.value = null
+        }
     }
 }

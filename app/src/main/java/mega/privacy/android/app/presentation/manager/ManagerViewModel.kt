@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -94,6 +96,7 @@ class ManagerViewModel @Inject constructor(
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
+    private val getActiveSubscription: GetActiveSubscription,
 ) : ViewModel() {
 
     /**
@@ -386,4 +389,9 @@ class ManagerViewModel @Inject constructor(
             getFullAccountInfo()
         }
     }
+
+    /**
+     * Active subscription in local cache
+     */
+    val activeSubscription: MegaPurchase? get() = getActiveSubscription()
 }

@@ -7566,7 +7566,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.w("usedSpaceLayout is NULL");
         }
 
-        updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
+        updateSubscriptionLevel(myAccountInfo, viewModel.getActiveSubscription(), dbH, megaApi);
 
         int resId = R.drawable.custom_progress_bar_horizontal_ok;
         switch (storageState) {
