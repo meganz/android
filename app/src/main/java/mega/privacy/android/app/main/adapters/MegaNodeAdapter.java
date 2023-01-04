@@ -69,6 +69,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -143,8 +144,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
-    private List<MegaNode> unverifiedIncomingNodes;
-    private List<MegaNode> unverifiedOutgoingNodes;
+    private Set<Long> unverifiedIncomingNodeHandles;
+    private Set<Long> unverifiedOutgoingNodeHandles;
     private Boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -1082,8 +1083,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if (isMandatoryFingerprintVerificationNeeded && !unverifiedIncomingNodes.isEmpty()) {
-                        showUnverifiedNodeUi(unverifiedIncomingNodes, node, holder);
+                    if (isMandatoryFingerprintVerificationNeeded && !unverifiedIncomingNodeHandles.isEmpty()) {
+                        showUnverifiedNodeUi(unverifiedIncomingNodeHandles, node, holder);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1093,8 +1094,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-                if (isMandatoryFingerprintVerificationNeeded && !unverifiedOutgoingNodes.isEmpty()) {
-                    showUnverifiedNodeUi(unverifiedOutgoingNodes, node, holder);
+                if (isMandatoryFingerprintVerificationNeeded && !unverifiedOutgoingNodeHandles.isEmpty()) {
+                    showUnverifiedNodeUi(unverifiedOutgoingNodeHandles, node, holder);
                 }
             }
         } else {
@@ -1511,12 +1512,24 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.isMandatoryFingerprintVerificationNeeded = isVerificationNeeded;
     }
 
+    /**
+     * Adds unverified incoming nodes to Set
+     *
+     * @param nodes - List of incoming [MegaNode]
+     */
     public void setUnverifiedIncomingNodes(List<MegaNode> nodes) {
-        this.unverifiedIncomingNodes = nodes;
+        unverifiedIncomingNodeHandles.clear();
+        nodes.forEach(megaNode -> unverifiedIncomingNodeHandles.add(megaNode.getHandle()));
     }
 
+    /**
+     * Adds unverified outgoing nodes to Set
+     *
+     * @param nodes - List of outgoing [MegaNode]
+     */
     public void setUnverifiedOutgoingNodes(List<MegaNode> nodes) {
-        this.unverifiedOutgoingNodes = nodes;
+        unverifiedOutgoingNodeHandles.clear();
+        nodes.forEach(megaNode -> unverifiedOutgoingNodeHandles.add(megaNode.getHandle()));
     }
 
     /**
@@ -1526,13 +1539,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @param currentNode     Current node from adapter
      * @param holder          [ViewHolderBrowserList]
      */
-    private void showUnverifiedNodeUi(List<MegaNode> unverifiedNodes, MegaNode currentNode, ViewHolderBrowserList holder) {
-        for (int i = 0; i < unverifiedNodes.size(); i++) {
-            if (unverifiedNodes.get(i).getHandle() == currentNode.getHandle()) {
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
-                break;
-            }
+    private void showUnverifiedNodeUi(Set<Long> unverifiedNodes, MegaNode currentNode, ViewHolderBrowserList holder) {
+        if (unverifiedNodes.contains(currentNode.getHandle())) {
+            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+            holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
         }
     }
 }
