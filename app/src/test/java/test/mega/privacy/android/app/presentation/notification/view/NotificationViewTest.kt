@@ -25,7 +25,9 @@ class NotificationViewTest {
     @Test
     fun `test that no notifications displays empty view`() {
         composeRule.setContent {
-            NotificationView(state = NotificationState(emptyList()))
+            NotificationView(state = NotificationState(notifications = emptyList()),
+                onClick = {},
+                onNotificationsLoaded = {})
         }
         composeRule.onNodeWithTag("NotificationEmptyView").assertIsDisplayed()
     }
@@ -39,10 +41,13 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("NotificationListView").assertIsDisplayed()
@@ -58,10 +63,13 @@ class NotificationViewTest {
                     sectionIcon = null,
                     title = { "New Contact" },
                     titleTextSize = 16.dp,
+                    titleMaxWidth = { 200 },
                     description = { "xyz@gmail.com is now a contact" },
+                    descriptionMaxWidth = { 300 },
                     dateText = { "11 October 2022 6:46 pm" },
                     isNew = true,
                     backgroundColor = { "#D3D3D3" },
+                    separatorMargin = { 0 },
                     onClick = {}),
                 Notification(
                     sectionTitle = { "INCOMING SHARES" },
@@ -69,10 +77,13 @@ class NotificationViewTest {
                     sectionIcon = null,
                     title = { "New Incoming Share" },
                     titleTextSize = 16.dp,
+                    titleMaxWidth = { 200 },
                     description = { "Access to the folders shared by xyz@gmail.com were removed" },
+                    descriptionMaxWidth = { 300 },
                     dateText = { "13 May 2022 5:46 am" },
                     isNew = true,
                     backgroundColor = { "#D3D3D3" },
+                    separatorMargin = { 0 },
                     onClick = {}))))
         }
         composeRule.onAllNodesWithTag("NotificationItemView").assertCountEquals(2)
@@ -87,13 +98,16 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
-        composeRule.onNodeWithTag("SectionTitle").assertIsDisplayed()
+        composeRule.onNodeWithTag("SectionTitle", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -105,10 +119,13 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("Title").assertIsDisplayed()
@@ -123,10 +140,13 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("Description").assertIsDisplayed()
@@ -141,10 +161,13 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { null },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("Description").assertDoesNotExist()
@@ -159,13 +182,16 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
-        composeRule.onNodeWithTag("DateText").assertIsDisplayed()
+        composeRule.onNodeWithTag("DateText", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -177,13 +203,16 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = true,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
-        composeRule.onNodeWithTag("IsNew").assertIsDisplayed()
+        composeRule.onNodeWithTag("IsNew", useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -195,10 +224,13 @@ class NotificationViewTest {
                 sectionIcon = null,
                 title = { "New Contact" },
                 titleTextSize = 16.dp,
+                titleMaxWidth = { 200 },
                 description = { "xyz@gmail.com is now a contact" },
+                descriptionMaxWidth = { 300 },
                 dateText = { "11 October 2022 6:46 pm" },
                 isNew = false,
                 backgroundColor = { "#D3D3D3" },
+                separatorMargin = { 0 },
                 onClick = {}))))
         }
         composeRule.onNodeWithTag("IsNew").assertDoesNotExist()
