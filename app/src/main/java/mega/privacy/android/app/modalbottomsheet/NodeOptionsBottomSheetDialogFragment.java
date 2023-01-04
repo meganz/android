@@ -83,6 +83,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileContactListActivity;
 import mega.privacy.android.app.main.FileInfoActivity;
@@ -98,7 +99,10 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ViewUtils;
 import mega.privacy.android.domain.entity.SortOrder;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
@@ -954,19 +958,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                nodeType = checkBackupNodeTypeByHandle(megaApi, node);
-                if (isOutShare(node)) {
-                    i = new Intent(requireContext(), FileContactListActivity.class);
-                    i.putExtra(NAME, node.getHandle());
-                    startActivity(i);
-                } else {
-                    if (nodeType != BACKUP_NONE) {
-                        ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
-                    } else {
-                        nC.selectContactToShareFolder(node);
+                megaApi.openShareDialog(node, new OptionalMegaRequestListenerInterface() {
+                    @Override
+                    public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
+                        super.onRequestFinish(api, request, error);
+                        if (error.getErrorCode() == MegaError.API_OK) {
+                            int nodeType = checkBackupNodeTypeByHandle(megaApi, node);
+                            if (isOutShare(node)) {
+                                Intent intent = new Intent(requireContext(), FileContactListActivity.class);
+                                intent.putExtra(NAME, node.getHandle());
+                                startActivity(intent);
+                            } else {
+                                if (nodeType != BACKUP_NONE) {
+                                    ((ManagerActivity) requireActivity()).showWarningDialogOfShare(node, nodeType, ACTION_BACKUP_SHARE_FOLDER);
+                                } else {
+                                    nC.selectContactToShareFolder(node);
+                                }
+                            }
+                            dismissAllowingStateLoss();
+                        }
                     }
-                }
-                dismissAllowingStateLoss();
+                });
                 break;
 
             case R.id.clear_share_option:
