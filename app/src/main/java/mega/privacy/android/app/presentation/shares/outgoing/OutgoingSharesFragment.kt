@@ -208,7 +208,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                         return@collect
                     }
 
-                    updateNodes(it.nodes)
                     hideTabs(!it.isFirstNavigationLevel())
 
                     managerActivity?.showFabButton()
@@ -218,7 +217,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     visibilityFastScroller()
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
-
+                    adapter?.setMandatoryFingerprintVerificationValue(it.isMandatoryFingerprintVerificationNeeded)
+                    adapter?.setUnverifiedOutgoingNodes(it.unVerifiedOutgoingNodes)
+                    updateNodes(it.unVerifiedOutgoingNodes + it.nodes)
                 }
             }
         }
@@ -254,14 +255,12 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             adapter?.parentHandle = state().outgoingHandle
             adapter?.setListFragment(recyclerView)
         }
-
         if (managerActivity?.isList == false)
             gridLayoutManager?.spanSizeLookup =
                 gridLayoutManager?.spanCount?.let { adapter?.getSpanSizeLookup(it) }
 
         adapter?.isMultipleSelect = false
         recyclerView?.adapter = adapter
-        adapter?.setMandatoryFingerprintVerificationValue(viewModel.state.value.isMandatoryFingerprintVerificationNeeded)
     }
 
     /**

@@ -58,11 +58,13 @@ class OutgoingSharesViewModel @Inject constructor(
 
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
+            val unverifiedOutgoingNodes = getUnverifiedOutgoingShares(_state.value.sortOrder)
+                .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
+                .mapNotNull { shareData -> getNodeByHandle(shareData.nodeHandle) }
             _state.update {
-                it.copy(unVerifiedOutGoingShares = getUnverifiedOutgoingShares(_state.value.sortOrder))
+                it.copy(unVerifiedOutgoingNodes = unverifiedOutgoingNodes)
             }
         }
-
     }
 
     /**

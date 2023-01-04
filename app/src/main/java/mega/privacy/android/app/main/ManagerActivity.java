@@ -2598,6 +2598,20 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
+        ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
+            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                addUnverifiedIncomingCountBadge(incomingSharesState.getUnVerifiedIncomingNodes().size());
+            }
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
+            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnVerifiedOutgoingNodes().size());
+            }
+            return Unit.INSTANCE;
+        });
+
     }
 
 
@@ -4197,29 +4211,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     tab.setIcon(R.drawable.link_ic);
                 }
             }).attach();
-
-            if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
-                //// TODO hardcoded number for now. This will get changed after SDK changes are available
-                TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
-                if(incomingSharesTab != null ) {
-                    incomingSharesTab.getOrCreateBadge().setNumber(2);
-                }
-            }
-
-            if(outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
-                TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
-                if(outgoingSharesTab != null) {
-                    outgoingSharesTab.getOrCreateBadge().setNumber(2);
-                }
-            }
-
-            if(linksViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
-                TabLayout.Tab linksTab = tabLayoutShares.getTabAt(2);
-                if(linksTab != null) {
-                    linksTab.getOrCreateBadge().setNumber(1);
-                }
-            }
-
         }
 
         updateSharesTab();
@@ -11395,5 +11386,29 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private boolean isBusinessAccount() {
         return megaApi.isBusinessAccount() && myAccountInfo.getAccountType() == BUSINESS;
+    }
+
+    /**
+     * Function to add unverified incoming count on tabs
+     */
+    private void addUnverifiedIncomingCountBadge(int unverifiedNodesCount) {
+        TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
+        if (incomingSharesTab != null) {
+            if (unverifiedNodesCount > 0) {
+                incomingSharesTab.getOrCreateBadge().setNumber(unverifiedNodesCount);
+            }
+        }
+    }
+
+    /**
+     * Function to add unverified outgoing count on tabs
+     */
+    private void addUnverifiedOutgoingCountBadge(int unverifiedNodesCount) {
+        TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
+        if (outgoingSharesTab != null) {
+            if (unverifiedNodesCount > 0) {
+                outgoingSharesTab.getOrCreateBadge().setNumber(unverifiedNodesCount);
+            }
+        }
     }
 }

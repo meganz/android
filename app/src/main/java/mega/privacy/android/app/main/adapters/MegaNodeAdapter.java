@@ -69,6 +69,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -143,6 +144,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
+    private Set<Long> unverifiedIncomingNodeHandles;
+    private Set<Long> unverifiedOutgoingNodeHandles;
     private Boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -1080,9 +1083,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if(isMandatoryFingerprintVerificationNeeded) {
-                        //// TODO This if will also contain a check from SDK which shows whether user needs to be authorised
-                        holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+                    if (isMandatoryFingerprintVerificationNeeded && !unverifiedIncomingNodeHandles.isEmpty()) {
+                        showUnverifiedNodeUi(unverifiedIncomingNodeHandles, node, holder);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1090,11 +1092,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                if(isMandatoryFingerprintVerificationNeeded) {
-                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
-                }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
+                if (isMandatoryFingerprintVerificationNeeded && !unverifiedOutgoingNodeHandles.isEmpty()) {
+                    showUnverifiedNodeUi(unverifiedOutgoingNodeHandles, node, holder);
+                }
             }
         } else {
             Timber.d("Node is file");
@@ -1508,5 +1510,39 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void setMandatoryFingerprintVerificationValue(boolean isVerificationNeeded) {
         this.isMandatoryFingerprintVerificationNeeded = isVerificationNeeded;
+    }
+
+    /**
+     * Adds unverified incoming nodes to Set
+     *
+     * @param nodes - List of incoming [MegaNode]
+     */
+    public void setUnverifiedIncomingNodes(List<MegaNode> nodes) {
+        unverifiedIncomingNodeHandles.clear();
+        nodes.forEach(megaNode -> unverifiedIncomingNodeHandles.add(megaNode.getHandle()));
+    }
+
+    /**
+     * Adds unverified outgoing nodes to Set
+     *
+     * @param nodes - List of outgoing [MegaNode]
+     */
+    public void setUnverifiedOutgoingNodes(List<MegaNode> nodes) {
+        unverifiedOutgoingNodeHandles.clear();
+        nodes.forEach(megaNode -> unverifiedOutgoingNodeHandles.add(megaNode.getHandle()));
+    }
+
+    /**
+     * Function to check if current node is unverified & show Ui items accordingly
+     *
+     * @param unverifiedNodes Unverified Nodes List
+     * @param currentNode     Current node from adapter
+     * @param holder          [ViewHolderBrowserList]
+     */
+    private void showUnverifiedNodeUi(Set<Long> unverifiedNodes, MegaNode currentNode, ViewHolderBrowserList holder) {
+        if (unverifiedNodes.contains(currentNode.getHandle())) {
+            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+            holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
+        }
     }
 }

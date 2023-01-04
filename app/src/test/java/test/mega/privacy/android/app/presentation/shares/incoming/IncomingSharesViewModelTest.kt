@@ -61,7 +61,10 @@ class IncomingSharesViewModelTest {
             }.thenReturn(true)
         }
 
-    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares>()
+    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares> {
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
+    }
 
     @Before
     fun setUp() {
@@ -93,7 +96,6 @@ class IncomingSharesViewModelTest {
             assertThat(initial.isInvalidHandle).isEqualTo(true)
             assertThat(initial.incomingParentHandle).isEqualTo(null)
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
-            assertThat(initial.unVerifiedInComingShares).isEmpty()
         }
     }
 
@@ -516,13 +518,14 @@ class IncomingSharesViewModelTest {
     }
 
     @Test
-    fun `test that unverified incoming shares are returned`() = runTest {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
-        whenever(getUnverifiedInComingShares(underTest.state.value.sortOrder)).thenReturn(listOf(
-            shareData))
+    fun `test that unverified outgoing shares are returned`() = runTest {
+        val node1 = mock<MegaNode>()
+        whenever(getNodeByHandle(any())).thenReturn(node1)
+        assertThat(getNodeByHandle(any())).isNotNull()
         initViewModel()
-        underTest.state.test {
-            assertThat(awaitItem().unVerifiedInComingShares).isNotEmpty()
-        }
+        underTest.state.map { it.unVerifiedIncomingNodes }.distinctUntilChanged()
+            .test {
+                assertThat(awaitItem().size).isEqualTo(1)
+            }
     }
 }
