@@ -597,7 +597,7 @@ String getValueInMRDescriptionBy(String key) {
  * @param value value of tag
  * @return true if tag has a value. false if tag is null or zero length
  */
-static boolean isDefined(String value) {
+private boolean isDefined(String value) {
     return value != null && !value.isEmpty()
 }
 

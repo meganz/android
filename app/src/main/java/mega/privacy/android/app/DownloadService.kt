@@ -32,6 +32,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
@@ -198,15 +199,13 @@ class DownloadService : Service(), MegaRequestListenerInterface {
     private fun initialiseService() {
         isForeground = false
         canceled = false
-        CoroutineScope(ioDispatcher).launch {
-            megaApi.addRequestListener(this@DownloadService)
-            initialiseWifiLock()
-            initialiseWakeLock()
-            mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            setReceivers()
-            setRxSubscription()
-        }
+        mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         startForeground()
+        megaApi.addRequestListener(this@DownloadService)
+        initialiseWifiLock()
+        initialiseWakeLock()
+        setReceivers()
+        setRxSubscription()
     }
 
     private fun initialiseWifiLock() {
@@ -390,7 +389,8 @@ class DownloadService : Service(), MegaRequestListenerInterface {
         downloadByOpenWith = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_OPEN_WITH, false)
         type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE)
 
-        CoroutineScope(ioDispatcher).launch {
+        // we don't need to create ioDispatcher here, in already run in Background Thread by rx java setup
+        runBlocking {
             processIntent(intent)
         }
     }

@@ -38,34 +38,6 @@ void checkoutSdkByCommit(String sdkCommitId) {
 }
 
 /**
- * checkout SDK by git tag
- * @param sdkTag the tag to checkout
- */
-private void checkoutSdkByTag(String sdkTag) {
-    sh """
-    echo checkoutSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/mega/sdk
-    git checkout tags/$sdkTag
-    cd $WORKSPACE
-    """
-}
-
-/**
- * checkout MEGAchat SDK by git tag
- * @param megaChatTag the tag to checkout
- */
-private void checkoutMegaChatSdkByTag(String megaChatTag) {
-    sh """
-    echo checkoutMegaChatSdkByTag
-    cd $WORKSPACE
-    cd sdk/src/main/jni/megachat/sdk
-    git checkout tags/$megaChatTag
-    cd $WORKSPACE
-    """
-}
-
-/**
  * set up SDK submodules and check out to latest develop branch
  */
 void fetchSdkSubmodules() {
@@ -161,9 +133,36 @@ void downloadJenkinsConsoleLog(String downloaded) {
     }
 }
 
+/**
+ * checkout SDK by git tag
+ * @param sdkTag the tag to checkout
+ */
+void checkoutSdkByTag(String sdkTag) {
+    sh """
+    echo checkoutSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/mega/sdk
+    git checkout tags/$sdkTag
+    cd $WORKSPACE
+    """
+}
 
 /**
- * Rread the prebuilt SDK version from project build.gradle
+ * checkout MEGAchat SDK by git tag
+ * @param megaChatTag the tag to checkout
+ */
+void checkoutMegaChatSdkByTag(String megaChatTag) {
+    sh """
+    echo checkoutMegaChatSdkByTag
+    cd $WORKSPACE
+    cd sdk/src/main/jni/megachat/sdk
+    git checkout tags/$megaChatTag
+    cd $WORKSPACE
+    """
+}
+
+/**
+ * Read the prebuilt SDK version from project build.gradle
  * @return version of prebuilt SDK
  */
 String readPrebuiltSdkVersion() {
@@ -194,7 +193,7 @@ def queryPrebuiltSdkProperty(String property, String version) {
  * checkout SDK by branch
  * @param sdkBranch the branch to checkout
  */
-private void checkoutSdkByBranch(String sdkBranch) {
+void checkoutSdkByBranch(String sdkBranch) {
     sh "echo checkoutSdkByBranch"
     sh "cd \"$WORKSPACE\""
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
@@ -207,7 +206,7 @@ private void checkoutSdkByBranch(String sdkBranch) {
  * checkout MEGAchat SDK by branch
  * @param megaChatBranch the branch to checkout
  */
-private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
+void checkoutMegaChatSdkByBranch(String megaChatBranch) {
     sh "echo checkoutMegaChatSdkByBranch"
     sh "cd \"$WORKSPACE\""
     sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
@@ -221,7 +220,7 @@ private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
  * @param fileName the local file to be uploaded.
  * @return file link on GitLab
  */
-private String uploadFileToGitLab(String fileName) {
+String uploadFileToGitLab(String fileName) {
     String link = ""
     withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
         final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()

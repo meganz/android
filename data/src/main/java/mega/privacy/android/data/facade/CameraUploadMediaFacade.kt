@@ -57,7 +57,7 @@ internal class CameraUploadMediaFacade @Inject constructor(
         isVideo: Boolean,
         selectionQuery: String?,
     ): Queue<CameraUploadMedia> =
-        createMediaCursor(parentPath, selectionQuery, uri)?.let {
+        createMediaCursor(parentPath, selectionQuery, getPageSize(isVideo), uri)?.let {
             Timber.d("Extract ${it.count} Media from Cursor")
             extractMedia(it, parentPath)
         } ?: LinkedList<CameraUploadMedia>().also {
@@ -75,6 +75,9 @@ internal class CameraUploadMediaFacade @Inject constructor(
         context.sendBroadcast(intent)
     }
 
+
+    private fun getPageSize(isVideo: Boolean): Int = if (isVideo) 50 else 1000
+
     override suspend fun sendUpdateFolderDestinationBroadcast(
         nodeHandle: Long,
         isSecondary: Boolean,
@@ -89,15 +92,17 @@ internal class CameraUploadMediaFacade @Inject constructor(
         context.sendBroadcast(destinationIntent)
     }
 
+
     private fun createMediaCursor(
         parentPath: String?,
         selectionQuery: String?,
+        pageSize: Int,
         uri: Uri,
     ): Cursor? {
         val projection = getProjection()
         val mediaOrder = MediaStore.MediaColumns.DATE_MODIFIED + " ASC "
         return if (shouldPageCursor(parentPath)) {
-            mediaOrder.getPagedMediaCursor(selectionQuery, uri, projection)
+            mediaOrder.getPagedMediaCursor(selectionQuery, pageSize, uri, projection)
         } else {
             context.contentResolver?.query(
                 uri,
@@ -125,6 +130,7 @@ internal class CameraUploadMediaFacade @Inject constructor(
 
     private fun String.getPagedMediaCursor(
         selectionQuery: String?,
+        pageSize: Int,
         uri: Uri,
         projection: Array<String>,
     ): Cursor? {
@@ -133,14 +139,16 @@ internal class CameraUploadMediaFacade @Inject constructor(
             args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, this)
             args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
             args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
+            args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
             context.contentResolver?.query(uri, projection, args, null)
         } else {
+            val mediaOrderPreR = "$this LIMIT 0,$pageSize"
             context.contentResolver?.query(
                 uri,
                 projection,
                 selectionQuery,
                 null,
-                this
+                mediaOrderPreR
             )
         }
     }
