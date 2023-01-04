@@ -447,7 +447,7 @@ internal class DefaultFilesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUnVerifiedInComingShares(order: SortOrder): List<ShareData> =
+    override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
             megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
                 megaShareMapper(it)

@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaNode
  * @param searchQuery current search query
  * @param searchDepth current search depth count
  * @param isInProgress current progress state of the search request
+ * @param isMandatoryFingerPrintVerificationRequired - isMandatoryFingerPrintVerificationRequired
  */
 data class SearchState(
     val nodes: List<MegaNode>?,
@@ -27,4 +28,5 @@ data class SearchState(
     val searchQuery: String?,
     val searchDepth: Int,
     val isInProgress: Boolean,
+    val isMandatoryFingerPrintVerificationRequired: Boolean = false,
 )

@@ -83,7 +83,7 @@ class ManagerViewModelTest {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
-    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares> {
+    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares> {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
@@ -124,7 +124,7 @@ class ManagerViewModelTest {
             getPricing = mock(),
             getFullAccountInfo = mock(),
             getFeatureFlagValue = getFeatureFlagValue,
-            getUnverifiedInComingShares = getUnverifiedInComingShares,
+            getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
         )
     }

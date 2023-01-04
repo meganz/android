@@ -68,14 +68,6 @@ class SearchViewModel @Inject constructor(
      */
     val stateLiveData = _state.map { Event(it) }.asLiveData()
 
-    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
-
-    /**
-     * State for [MandatoryFingerPrintVerification] feature flag value
-     */
-    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
-        _mandatoryFingerPrintVerificationState
-
     /**
      * Monitor global node updates
      */
@@ -344,8 +336,8 @@ class SearchViewModel @Inject constructor(
      */
     fun isMandatoryFingerprintRequired() {
         viewModelScope.launch {
-            _mandatoryFingerPrintVerificationState.update {
-                getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification)
+            _state.update {
+                it.copy(isMandatoryFingerPrintVerificationRequired = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
             }
         }
     }
