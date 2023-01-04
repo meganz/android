@@ -876,7 +876,7 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getUnverifiedIncomingShares(order)
 
     override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
-        megaApi.getUnverifiedIncomingShares(order)
+        megaApi.getUnverifiedOutgoingShares(order)
 
     override fun openShareDialog(
         megaNode: MegaNode,
