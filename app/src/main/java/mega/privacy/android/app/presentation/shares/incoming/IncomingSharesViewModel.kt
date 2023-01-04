@@ -37,7 +37,7 @@ class IncomingSharesViewModel @Inject constructor(
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getFeatureFlagValue: GetFeatureFlagValue,
-    private val getUnverifiedInComingShares: GetUnverifiedIncomingShares,
+    private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
 ) : ViewModel() {
 
     /** private UI state */
@@ -73,7 +73,7 @@ class IncomingSharesViewModel @Inject constructor(
 
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
-            val unverifiedIncomingNodes = getUnverifiedInComingShares(_state.value.sortOrder)
+            val unverifiedIncomingNodes = getUnverifiedIncomingShares(_state.value.sortOrder)
                 .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
                 .mapNotNull { shareData -> getNodeByHandle(shareData.nodeHandle) }
             _state.update {

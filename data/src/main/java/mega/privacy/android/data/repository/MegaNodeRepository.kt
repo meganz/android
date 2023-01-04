@@ -239,7 +239,7 @@ interface MegaNodeRepository {
      *
      * @return List of [ShareData]
      */
-    suspend fun getUnVerifiedInComingShares(order: SortOrder): List<ShareData>
+    suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData>
 
     /**
      * Provides Unverified outgoing shares count from SDK
