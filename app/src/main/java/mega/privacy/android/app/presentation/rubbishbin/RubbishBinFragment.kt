@@ -147,7 +147,7 @@ class RubbishBinFragment : Fragment() {
             val parentNode =
                 megaApi.getNodeByHandle(rubbishBinViewModel.state.value.rubbishBinHandle)
             parentNode?.let {
-                Timber.d("The parent node is: %s", parentNode.handle)
+                Timber.d("The parent node is: ${parentNode.handle}")
                 nodes = megaApi.getChildren(parentNode, sortOrderToInt(managerViewModel.getOrder()))
                 (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
             }
@@ -513,7 +513,7 @@ class RubbishBinFragment : Fragment() {
                     }
                     pos
                 }
-                Timber.d("Push to stack %d position", lastFirstVisiblePosition)
+                Timber.d("Push to stack $lastFirstVisiblePosition position")
                 lastPositionStack.push(lastFirstVisiblePosition)
                 rubbishBinViewModel.setRubbishBinHandle(n.handle)
 
@@ -743,19 +743,15 @@ class RubbishBinFragment : Fragment() {
 
     private fun updateActionModeTitle() {
         actionMode?.let {
-            val documents = adapter?.selectedNodes
-            var files = 0
-            var folders = 0
-            documents?.forEach {
-                if (it.isFile) files++
-                else if (it.isFolder) folders++
+            val files = adapter?.selectedNodes?.count { it.isFile } ?: 0
+            val folders = adapter?.selectedNodes?.count { it.isFolder } ?: 0
+
+            actionMode?.title = when {
+                (files == 0 && folders == 0) -> 0.toString()
+                files == 0 -> folders.toString()
+                folders == 0 -> files.toString()
+                else -> (files + folders).toString()
             }
-            val sum = files + folders
-            val title = if (sum == 0) "0"
-            else if (files == 0) "0"
-            else if (folders == 0) "0"
-            else "$sum"
-            actionMode?.title = title
 
             runCatching {
                 actionMode?.invalidate()
@@ -811,7 +807,6 @@ class RubbishBinFragment : Fragment() {
                             sortOrderToInt(managerViewModel.getOrder()))
                         adapter?.setNodes(nodes)
                         val lastVisiblePosition = if (!lastPositionStack.empty()) {
-                            Timber.d("Pop of the stack ${lastPositionStack.pop()} position")
                             lastPositionStack.pop()
                         } else 0
 

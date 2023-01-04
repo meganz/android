@@ -937,9 +937,9 @@
     <string name="confirm_email_explanation">Veuillez vérifier vos courriels et toucher le lien pour confirmer votre compte.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
-        <item quantity="one">1 élément</item>
-        <item quantity="many">%1$d éléments</item>
-        <item quantity="other">%1$d éléments</item>
+        <item quantity="one">1&#160;élément</item>
+        <item quantity="many">%1$d d’éléments</item>
+        <item quantity="other">%1$d&#160;éléments</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été résilié en raison du non-respect répété de nos Conditions générales d’utilisation.</string>
@@ -1876,7 +1876,7 @@
     <!-- Dialog option that permits user do not show it again -->
     <string name="general_do_not_show">Ne plus afficher</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
-    <string name="remember_pwd_dialog_button_test">Confirmer le mot de passe</string>
+    <string name="remember_pwd_dialog_button_test">Tester le mot de passe</string>
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Le mot de passe a été accepté</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
@@ -4243,4 +4243,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Votre numéro d’identification</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Préparation de l’aperçu du fichier</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
 </resources>

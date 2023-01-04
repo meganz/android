@@ -59,7 +59,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Lỗi. Xin vui lòng thử lại.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MAPHUCHOI-MEGA</string>
+    <string name="general_rk">CHIAKHOAPHUCHOI-MEGA</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">Không tìm thấy thư mục secondary media, xin chọn một thư mục mới</string>
     <!-- when no external card exists -->
@@ -97,7 +97,7 @@
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Xem kiểu ảnh nhỏ</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Sao lưu Mã Phục Hồi</string>
+    <string name="action_export_master_key">Sao&#160;lưu Chìa&#160;Khóa Phục&#160;Hồi</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Hủy gói đăng ký dịch vụ</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -473,11 +473,11 @@
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Thêm tên liên lạc</string>
     <!-- Title of the alert to introduce the decryption key -->
-    <string name="alert_decryption_key">Chìa Khóa Giải Mã</string>
+    <string name="alert_decryption_key">Chìa&#160;Khóa Giải&#160;Mã</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Xin nhập chìa khóa mã cho đường liên kết</string>
+    <string name="message_decryption_key">Xin nhập chìa&#160;khóa giải&#160;mã cho đường liên&#160;kết</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
-    <string name="invalid_decryption_key">Chìa khóa mã không hợp lệ</string>
+    <string name="invalid_decryption_key">Chìa&#160;khóa giải&#160;mã không hợp&#160;lệ</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Âm Thanh</string>
     <!-- Title of the button in the contact info screen to start a video call -->
@@ -764,21 +764,21 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Tài Khoản Pro&#160;Lite</string>
     <!--  -->
-    <string name="backup_title">Sao lưu dự phòng Mã Phục Hồi</string>
+    <string name="backup_title">Sao&#160;lưu Chìa&#160;Khóa Phục&#160;Hồi của bạn</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Mật khẩu là cần thiết để dịch Mã Phục Hồi</string>
+    <string name="backup_subtitle">Mật&#160;khẩu là cần&#160;thiết để mở Chìa&#160;Khóa Phục&#160;Hồi</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">Dữ liệu của bạn chỉ có thể đọc được qua quá trình giải mã được dựa trên khóa mã chủ được thông dịch từ mật khẩu bạn đặt cho tài khoản. Điều này đồng nghĩa với việc nếu quên mất mật khẩu, và không lưu đề phòng Mã Phục Hồi, bạn sẽ không tài nào truy cập vào dữ liệu của mình được.</string>
+    <string name="backup_first_paragraph">Dữ&#160;liệu của bạn chỉ có thể đọc được qua quá&#160;trình giải&#160;mã được dựa&#160;trên thuật&#160;toán mật&#160;mã được dịch từ mật&#160;khẩu bạn đặt cho tài&#160;khoản. Điều này đồng&#160;nghĩa với việc nếu quên&#160;mất mật&#160;khẩu, và không có lưu đề phòng Chìa&#160;Khóa Phục&#160;Hồi, bạn sẽ không tài nào truy&#160;cập vào dữ&#160;liệu của mình được.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">Xuất ra Mã Phục Hồi và giữ mã ở một nơi an toàn và dễ nhớ sẽ giúp bạn tránh việc mất dữ liệu khi quên mật khẩu.</string>
+    <string name="backup_second_paragraph">Xuất ra Chìa&#160;Khóa Phục&#160;Hồi và giữ chìa&#160;khóa này ở một nơi an&#160;toàn và dễ&#160;nhớ sẽ giúp bạn tránh&#160;việc mất dữ&#160;liệu khi quên mật&#160;khẩu.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">Các kẻ tấn công không thể nào truy cập vào tài khoản của bạn chỉ với mã-khóa không thôi. Thủ tục đặt lại mật khẩu yêu cầu bạn phải có mã-khóa master và quyền truy cập vào e-mail của bạn.</string>
+    <string name="backup_third_paragraph">Các kẻ tấn&#160;công không&#160;thể&#160;nào truy&#160;cập vào tài&#160;khoản của bạn chỉ với chìa&#160;khóa không thôi. Khâu đặt&#160;lại mật&#160;khẩu yêu&#160;cầu bạn phải&#160;có chìa&#160;khóa và quyền truy&#160;cập vào email của bạn.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Sao chép Mã Phục Hồi vào bảng nhớ tạm hoặc lưu lại mã dưới dạng tệp tin chữ.</string>
+    <string name="backup_action">Sao&#160;chép Chìa&#160;Khóa Phục&#160;Hồi vào bảng nhớ tạm hoặc lưu&#160;lại chìa&#160;khóa dưới dạng tệp&#160;tin&#160;chữ.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Lưu</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Mã Phục Hồi đã được lưu lại vào bộ nhớ</string>
+    <string name="copy_MK_confirmation">Chìa&#160;Khóa Phục&#160;Hồi đã được lưu&#160;lại vào bảng&#160;nhớ</string>
     <!-- Button to change the password -->
     <string name="change_pass">Thay đổi</string>
     <!-- Positive button to perform a general action -->
@@ -788,7 +788,7 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Quên mất mật khẩu?</string>
     <!-- Hint of the text when the user can write his master key -->
-    <string name="edit_text_insert_mk">Điền Mã Phục Hồi ở đây</string>
+    <string name="edit_text_insert_mk">Xin điền Chìa&#160;Khóa Phục&#160;Hồi ở đây</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">điền mật khẩu ở đây</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
@@ -816,7 +816,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Đặt lại mật khẩu</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Xin nhập Mã Phục Hồi ở dưới đây</string>
+    <string name="text_dialog_insert_MK">Xin nhập Chìa&#160;Khóa Phục&#160;Hồi ở dưới đây</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Bạn vừa đổi mật khẩu.</string>
     <!-- Title of the dialog to park an account -->
@@ -830,7 +830,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Liên kết phục hồi này đã bị hết hạn, xin thử lại.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Mã Phục Hồi là cách duy nhất để đặt lại mật khẩu. Xin nhập mật khẩu ở dưới đây.</string>
+    <string name="text_reset_pass_logged_in">Chìa&#160;Khóa Phục&#160;Hồi của bạn là cách duy&#160;nhất để đặt&#160;lại mật&#160;khẩu. Xin nhập mật&#160;khẩu ở dưới đây.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">Nâng Cấp</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
@@ -854,9 +854,9 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Xóa ảnh đại diện</string>
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Mã vừa nhập không phù hợp với tài khoản này. Xin kiểm tra lại cho chắc chắn là Mã Phục Hồi chính xác và thử lại.</string>
+    <string name="incorrect_MK">Chìa&#160;khóa bạn vừa nhập không phù&#160;hợp với tài&#160;khoản này. Xin kiểm&#160;tra lại cho chắc&#160;chắn là Chìa&#160;Khóa Phục&#160;Hồi chính&#160;xác và thử&#160;lại.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Sai Mã Phục Hồi</string>
+    <string name="incorrect_MK_title">Chìa&#160;Khóa Phục&#160;Hồi không hợp&#160;lệ</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Đang lấy thông tin&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
@@ -916,7 +916,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">Tài khoản của chủ đường liên kết thư mục hay tệp tin này đã bị ngưng hoạt động do vi phạm Điều Khoản Dịch Vụ.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">Chìa khóa mã vừa cung cấp không đúng để dùng cho thư mục này.</string>
+    <string name="general_error_invalid_decryption_key">Chìa&#160;khóa giải&#160;mã vừa cung&#160;cấp không&#160;đúng để dùng cho đường liên&#160;kết thư&#160;mục này.</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chát</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -1419,7 +1419,7 @@
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">Âm báo chát</string>
     <!-- title of the section for achievements -->
-    <string name="achievements_title">Phần Thưởng Thành Tích</string>
+    <string name="achievements_title">Thành&#160;Tích</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Mời bạn bè tham gia và nhận thưởng</string>
     <!-- title of the introduction for the achievements screen -->
@@ -1439,7 +1439,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Thưởng tài khoản mới</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Cài đặt App MEGA cho Máy Tính</string>
+    <string name="title_install_desktop">Cài&#160;đặt App MEGA cho Máy&#160;Tính</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">còn lại %1$d ngày</string>
     <!-- State to indicate an achievement has expired -->
@@ -1792,13 +1792,13 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Mật khẩu chính xác</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Mật khẩu không đúng.\nLưu lại Mã Phục Hồi ngay lập tức!</string>
+    <string name="test_pwd_wrong">Mật&#160;khẩu không đúng.\nHãy lưu&#160;lại Chìa&#160;Khóa Phục&#160;Hồi ngay lập tức!</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Ghi vào bảng nhớ tạm</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Tiến hành đăng xuất</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Mã Phục Hồi</string>
+    <string name="recovery_key_bottom_sheet">Chìa&#160;Khóa Phục&#160;Hồi</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Lưu vào File System</string>
     <!-- Title of the notification shown on the action bar when there is a incoming call -->
@@ -1818,9 +1818,9 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Bảo Mật</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Sao lưu Mã Phục Hồi</string>
+    <string name="settings_recovery_key_title">Sao&#160;lưu Chìa&#160;Khóa Phục&#160;Hồi</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">Xuất ra Mã Phục Hồi và giữ mã ở một nơi an toàn và dễ nhớ sẽ giúp bạn tránh việc mất dữ liệu khi quên mật khẩu.</string>
+    <string name="settings_recovery_key_summary">Xuất ra Chìa&#160;Khóa Phục&#160;Hồi và giữ chìa&#160;khóa này ở một nơi an&#160;toàn và dễ&#160;nhớ sẽ giúp bạn tránh&#160;việc mất dữ&#160;liệu khi quên mật&#160;khẩu.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">Không liên lạc được tới MEGA. Xin kiểm tra kết nối mạng hoặc thử lại sau.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -1836,7 +1836,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">In</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Mã Phục Hồi đã được lưu vào máy</string>
+    <string name="save_MK_confirmation">Chìa&#160;Khóa Phục&#160;Hồi đã được lưu&#160;lại thành&#160;công</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Đang chờ)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1898,7 +1898,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ app lập xác thực.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Xin lưu <b>Mã Phục Hồi</b> cho tài&#160;khoản của bạn ở nơi an&#160;toàn, để tránh trường&#160;hợp mất khả&#160;năng truy&#160;cập vào ứng&#160;dụng, hoặc khi bạn muốn tắt đi xác&#160;thực 2&#160;yếu&#160;tố.</string>
+    <string name="recommendation_2fa_enabled">Xin lưu <b>Chìa&#160;Khóa Phục&#160;Hồi</b> của tài&#160;khoản của bạn ở nơi an&#160;toàn, để tránh trường&#160;hợp mất khả&#160;năng truy&#160;cập vào ứng&#160;dụng, hoặc khi bạn muốn tắt đi xác&#160;thực 2&#160;yếu&#160;tố.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1928,7 +1928,7 @@
     <!-- Text button -->
     <string name="general_close">Đóng</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Xuất ra Mã Phục Hồi để hoàn tất</string>
+    <string name="backup_rk_2fa_end">Xuất&#160;ra Chìa&#160;Khóa Phục&#160;Hồi để hoàn&#160;tất</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App Xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -1936,7 +1936,7 @@
     <!-- Label Play Store -->
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Cần phải có một app lập xác thực để bật tính năng XT2B với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
+    <string name="text_2fa_help">Cần phải có một app lập xác thực để bật tính năng 2FA với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">Chia sẻ %d tệp tin chưa được hoàn tất</string>
     <!-- button’s text to open a full screen image -->
@@ -2154,13 +2154,13 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Lấy liên kết vào cuộc chát</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Bật Luân Phiên Mã Khóa</string>
+    <string name="make_chat_private_option">Bật Luân&#160;Phiên Chìa&#160;Khóa&#160;Mã</string>
     <!-- Title of the view to inform that a chat is private -->
-    <string name="private_chat">Luân phiên mã khóa được bật</string>
+    <string name="private_chat">Luân&#160;phiên chìa&#160;khóa&#160;mã được bật</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="make_chat_private_option_text">Luân phiên mã khóa có an toàn hơn một chút, nhưng không cho phép bạn tạo liên kết phòng chát và những người mới tham gia sẽ không đọc được các tin nhắn cũ.</string>
+    <string name="make_chat_private_option_text">Luân&#160;phiên chìa&#160;khóa&#160;mã có an&#160;toàn hơn một chút, nhưng không&#160;cho phép bạn tạo liên&#160;kết phòng&#160;chát và những&#160;người mới tham&#160;gia sẽ không đọc được các tin&#160;nhắn cũ.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">Luân phiên mã khóa bị tắt đối với các cuộc trò chuyện có hơn 100 thành viên.</string>
+    <string name="make_chat_private_not_available_text">Luân&#160;phiên chìa&#160;khóa&#160;mã bị tắt đối&#160;với các cuộc trò&#160;chuyện có hơn 100&#160;thành&#160;viên.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">Không thể chuyển đổi cuộc chát này sang chế độ riêng tư được vì đã vượt quá số lượng thành viên.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2188,15 +2188,15 @@
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">Phần xem tổng quan của phòng chát không còn tồn tại. Nếu bạn thoát ra, bạn sẽ không mở lại được nữa.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_set_chat_private">[A]%1$s[/A][B] đã bật luân phiên mã khóa.[/B]</string>
+    <string name="message_set_chat_private">[A]%1$s[/A][B] đã bật luân&#160;phiên chìa&#160;khóa&#160;mã.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Cuộc trò chuyện này không còn tồn tại nữa</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
-    <string name="ekr_label">Luân Phiên Mã Khóa</string>
+    <string name="ekr_label">Luân&#160;phiên chìa&#160;khóa&#160;mã</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="ekr_explanation">Luân phiên mã khóa có an toàn hơn một chút, nhưng không cho phép bạn tạo liên kết phòng chát và những người mới tham gia sẽ không đọc được các tin nhắn cũ.</string>
+    <string name="ekr_explanation">Luân&#160;phiên chìa&#160;khóa&#160;mã có an&#160;toàn hơn một chút, nhưng không&#160;cho phép bạn tạo liên&#160;kết phòng&#160;chát và những&#160;người mới tham&#160;gia sẽ không đọc được các tin&#160;nhắn cũ.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="subtitle_chat_message_enabled_ERK">Luân phiên mã khóa có an toàn hơn một chút, nhưng không cho phép bạn tạo liên kết phòng chát và những người mới tham gia sẽ không đọc được các tin nhắn cũ.</string>
+    <string name="subtitle_chat_message_enabled_ERK">Luân&#160;phiên chìa&#160;khóa&#160;mã có an&#160;toàn hơn một chút, nhưng không&#160;cho phép bạn tạo liên&#160;kết phòng&#160;chát và những&#160;người mới tham&#160;gia sẽ không đọc được các tin&#160;nhắn cũ.</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới tên liên lạc %s trước đây rồi. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -2370,7 +2370,7 @@
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Cuộc Gọi Đã Bắt Đầu</string>
     <!-- Title of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_title">SSL key bị lỗi</string>
+    <string name="ssl_error_dialog_title">Chìa&#160;khóa&#160;SSL bị lỗi</string>
     <!-- Text of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_text">MEGA không khởi tạo được kết nối an ninh qua phương thức SSL. Thiết bị bạn đang sử dụng có thể đang dùng mạng Wi-Fi công cộng có yêu cầu một số điều kiện khi kết nối.</string>
     <!-- Text of the empty screen for the notifications section -->
@@ -2560,11 +2560,11 @@
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Cuộc trò truyện này sẽ không thể truy cập được nữa ngay sau khi xóa bỏ liên kết vào chat.</string>
     <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">Luân Phiên Mã Khóa sẽ không cho phép bạn đi vào liên kết tới chát mà bỏ qua việc tạo cuộc chát mới.</string>
+    <string name="context_create_chat_link_warning_text">Luân&#160;Phiên Chìa&#160;Khóa&#160;Mã sẽ không&#160;cho phép bạn đi vào liên&#160;kết tới cuộc&#160;chát mà bỏ&#160;qua việc tạo nhóm&#160;chát mới.</string>
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">Bạn có muốn tạo ra phòng chát mới và lấy đường liên kết vào phòng chát hay không?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="context_make_private_chat_warning_text">Luân phiên mã khóa có an toàn hơn một chút, nhưng không cho phép bạn tạo liên kết phòng chát và những người mới tham gia sẽ không đọc được các tin nhắn cũ.</string>
+    <string name="context_make_private_chat_warning_text">Luân&#160;phiên chìa&#160;khóa&#160;mã có an&#160;toàn hơn một chút, nhưng không&#160;cho phép bạn tạo liên&#160;kết phòng&#160;chát và những&#160;người mới tham&#160;gia sẽ không đọc được các tin&#160;nhắn cũ.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">Bước %1$d trong tổng %2$d bước</string>
     <!-- Hint of the Search view -->
@@ -2978,15 +2978,15 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">Không thay đổi được mức độ ưu tiên cho truyền tải “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">Gửi chìa khóa giải mã ra riêng</string>
+    <string name="option_send_decryption_key_separately">Gửi chìa&#160;khóa giải&#160;mã ra riêng</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">Xuất ra đường liên kết và mã giải khóa ở hai mục khác nhau.</string>
+    <string name="explanation_send_decryption_key_separately">Xuất đường liên&#160;kết và chìa&#160;khóa giải&#160;mã ra riêng&#160;rẽ.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">Tìm hiểu thêm</string>
     <!-- Label key referring to a link decryption key -->
-    <string name="key_label">Chìa Khóa</string>
+    <string name="key_label">Chìa&#160;khóa</string>
     <!-- Button which action is share the decryption key of a link -->
-    <string name="button_share_key">Chia sẻ chìa khóa</string>
+    <string name="button_share_key">Chia&#160;sẻ chìa&#160;khóa</string>
     <!-- Button which action is copy the decryption key of a link -->
     <string name="button_copy_key">Sao chép chìa khóa</string>
     <!-- Button which action is copy the password of a link -->
@@ -3008,7 +3008,7 @@
     <!-- Reset password label -->
     <string name="reset_password_label">Đặt lại mật khẩu</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">Chia sẻ chìa khóa cho đường liên kết này?</string>
+    <string name="share_key_warning">Chia&#160;sẻ chìa&#160;khóa cho đường liên&#160;kết này?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
     <string name="share_password_warning">Chia sẻ mật khẩu cho đường liên kết này?</string>
     <!-- Button which action is share the password of a link -->
@@ -4023,4 +4023,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Chứng thực của bạn</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Đang chuẩn bị tệp để xem trước</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Chi tiết</string>
 </resources>
