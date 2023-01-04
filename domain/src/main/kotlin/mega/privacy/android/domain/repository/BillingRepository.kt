@@ -67,4 +67,10 @@ interface BillingRepository {
      * Check if user can pay through the app
      */
     fun isBillingAvailable(): Boolean
+
+    /**
+     * Get active subscription
+     *
+     */
+    fun getActiveSubscription(): MegaPurchase?
 }

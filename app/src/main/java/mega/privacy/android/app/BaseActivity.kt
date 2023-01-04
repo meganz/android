@@ -123,7 +123,6 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
@@ -193,8 +192,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
     protected val billingViewModel by viewModels<BillingViewModel>()
 
-    private var skuDetailsList: List<MegaSku>? = null
-
     @JvmField
     protected var app: MegaApplication? = MegaApplication.getInstance()
     private var sslErrorDialog: AlertDialog? = null
@@ -206,6 +203,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     private var downloadLocation: String? = null
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
+    private var activeSubscriptionSku: String? = null
     private var expiredBusinessAlert: AlertDialog? = null
     private var isExpiredBusinessAlertShown = false
     private var psaWebBrowserContainer: FrameLayout? = null
@@ -471,8 +469,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         collectFlow(billingViewModel.billingUpdateEvent) {
-            when (it) {
-                is BillingEvent.OnPurchaseUpdate -> onPurchasesUpdated(it.purchases)
+            if (it is BillingEvent.OnPurchaseUpdate) {
+                onPurchasesUpdated(it.purchases, it.activeSubscription)
+                billingViewModel.markHandleBillingEvent()
             }
         }
 
@@ -541,7 +540,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     getSerializable(PURCHASE_TYPE)
                 } as PurchaseType?
 
-                showQueryPurchasesResult()
+                showQueryPurchasesResult(MegaPurchase(sku = getString(ACTIVE_SUBSCRIPTION_SKU)))
             }
         }
 
@@ -608,6 +607,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             putString(DOWNLOAD_LOCATION, downloadLocation)
             putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert))
             putSerializable(PURCHASE_TYPE, purchaseType)
+            putString(ACTIVE_SUBSCRIPTION_SKU, activeSubscriptionSku)
         }
         super.onSaveInstanceState(outState)
     }
@@ -1238,7 +1238,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         billingViewModel.loadPurchases()
     }
 
-    private fun onPurchasesUpdated(purchases: List<MegaPurchase>) {
+    private fun onPurchasesUpdated(
+        purchases: List<MegaPurchase>,
+        activeSubscription: MegaPurchase?,
+    ) {
         val type: PurchaseType = if (purchases.isNotEmpty()) {
             val purchase = purchases.first()
             //payment may take time to process, we will not give privilege until it has been fully processed
@@ -1265,8 +1268,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
                     || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
                     || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
-                purchaseType = type as PurchaseType?
-                showQueryPurchasesResult()
+                purchaseType = type
+                activeSubscriptionSku = activeSubscription?.sku
+                showQueryPurchasesResult(activeSubscription)
             }
         }
     }
@@ -1318,7 +1322,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     /**
      * Shows the result of a purchase as an alert.
      */
-    private fun showQueryPurchasesResult() {
+    private fun showQueryPurchasesResult(activeSubscription: MegaPurchase?) {
         if (purchaseType == null || isAlertDialogShown(upgradeAlert)) {
             return
         }
@@ -1346,11 +1350,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         val account: Int
                         var color = R.color.red_600_red_300
                         val image: Int
-                        val activeSubscriptionSku =
-                            if (myAccountInfo.activeSubscription != null) myAccountInfo.activeSubscription?.sku
-                            else ""
+                        val activeSubscriptionSku = activeSubscription?.sku.orEmpty()
 
-                        when (myAccountInfo.levelInventory) {
+                        when (activeSubscription?.level) {
                             PRO_I -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest
@@ -1459,6 +1461,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         private const val DOWNLOAD_LOCATION = "DOWNLOAD_LOCATION"
         private const val UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN"
         private const val PURCHASE_TYPE = "PURCHASE_TYPE"
+        private const val ACTIVE_SUBSCRIPTION_SKU = "ACTIVE_SUBSCRIPTION_SKU"
 
         /**
          * User account locked.

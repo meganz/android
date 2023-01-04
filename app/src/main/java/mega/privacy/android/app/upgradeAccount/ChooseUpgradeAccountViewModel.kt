@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.usecase.GetLocalPricing
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -50,6 +51,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val paymentMethodTypeMapper: PaymentMethodTypeMapper,
     private val getLocalPricing: GetLocalPricing,
     private val isBillingAvailable: IsBillingAvailable,
+    private val getActiveSubscription: GetActiveSubscription,
 ) : ViewModel() {
 
     companion object {
@@ -131,7 +133,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun getAccountType(): Int = myAccountInfo.accountType
 
-    fun isPurchasedAlready(sku: String): Boolean = myAccountInfo.isPurchasedAlready(sku)
+    private fun isPurchasedAlready(sku: String): Boolean = getActiveSubscription()?.sku == sku
 
     fun getProductAccounts(): List<Product> = state.value.product
 

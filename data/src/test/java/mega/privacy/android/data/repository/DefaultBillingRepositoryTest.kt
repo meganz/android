@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
@@ -35,6 +36,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExperimentalContracts
 @kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +50,7 @@ class DefaultBillingRepositoryTest {
     private val pricingCache = mock<Cache<Pricing>>()
     private val numberOfSubscriptionCache = mock<Cache<Long>>()
     private val skusCache = mock<Cache<List<MegaSku>>>()
+    private val activeSubscriptionCache = mock<Cache<MegaPurchase>>()
     private val megaSkuObject1 = MegaSku(Skus.SKU_PRO_I_MONTH, 9990000, "EUR")
     private val megaSkuObject2 = MegaSku(Skus.SKU_PRO_II_MONTH, 9990000, "EUR")
     private val skuString = Skus.SKU_PRO_I_MONTH
@@ -71,7 +75,8 @@ class DefaultBillingRepositoryTest {
             numberOfSubscriptionCache = numberOfSubscriptionCache,
             billingGateway = billingGateway,
             paymentMethodTypeMapper = paymentMethodTypeMapper,
-            skusCache = skusCache
+            skusCache = skusCache,
+            activeSubscriptionCache = activeSubscriptionCache
         )
     }
 
@@ -311,6 +316,22 @@ class DefaultBillingRepositoryTest {
             val actual = underTest.isBillingAvailable()
 
             Truth.assertThat(actual).isEqualTo(false)
+        }
+    }
+
+    @Test
+    fun `test that getActiveSubscription return null when activeSubscriptionCache null`() {
+        runTest {
+            whenever(activeSubscriptionCache.get()).thenReturn(null)
+            assertNull(underTest.getActiveSubscription())
+        }
+    }
+
+    @Test
+    fun `test that getActiveSubscription return non null when activeSubscriptionCache non null`() {
+        runTest {
+            whenever(activeSubscriptionCache.get()).thenReturn(MegaPurchase(""))
+            assertNotNull(underTest.getActiveSubscription())
         }
     }
 }
