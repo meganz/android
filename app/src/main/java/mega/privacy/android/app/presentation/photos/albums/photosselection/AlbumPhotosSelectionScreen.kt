@@ -96,8 +96,8 @@ fun AlbumPhotosSelectionScreen(
 
     handleAddPhotosCompletion(
         album = state.album,
-        selectedPhotoIds = state.selectedPhotoIds,
         isSelectionCompleted = state.isSelectionCompleted,
+        numCommittedPhotos = state.numCommittedPhotos,
         onCompletion = onCompletion,
     )
 
@@ -376,16 +376,16 @@ private fun SelectLocationDialog(
 @Composable
 private fun handleAddPhotosCompletion(
     album: Album.UserAlbum?,
-    selectedPhotoIds: Set<Long>,
     isSelectionCompleted: Boolean,
+    numCommittedPhotos: Int,
     onCompletion: (albumId: AlbumId, message: String) -> Unit,
 ) {
     val albumId = album?.id
     if (albumId != null && isSelectionCompleted) {
-        val message = "".takeIf { selectedPhotoIds.isEmpty() } ?: pluralStringResource(
+        val message = "".takeIf { numCommittedPhotos <= 0 } ?: pluralStringResource(
             id = R.plurals.photos_album_selection_added,
-            count = selectedPhotoIds.size,
-            selectedPhotoIds.size,
+            count = numCommittedPhotos,
+            numCommittedPhotos,
             album.title,
         )
 

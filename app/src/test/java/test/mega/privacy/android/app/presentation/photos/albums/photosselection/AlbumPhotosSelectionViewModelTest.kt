@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -169,12 +170,19 @@ class AlbumPhotosSelectionViewModelTest {
     @Test
     fun `test that add photos to album behaves correctly`() = runTest {
         val album = createUserAlbum(id = AlbumId(1L))
-        whenever(addPhotosToAlbum(album.id, listOf())).thenReturn(Unit)
+        val photoIds = listOf(
+            NodeId(1L),
+            NodeId(2L),
+            NodeId(3L),
+        )
+        whenever(addPhotosToAlbum(album.id, photoIds)).thenReturn(Unit)
 
-        underTest?.addPhotos(album, setOf())
+        underTest?.addPhotos(album, photoIds.map { it.id }.toSet())
 
         underTest?.state?.drop(1)?.test {
-            assertThat(awaitItem().isSelectionCompleted).isTrue()
+            val state = awaitItem()
+            assertThat(state.isSelectionCompleted).isTrue()
+            assertThat(state.numCommittedPhotos).isEqualTo(photoIds.size)
         }
     }
 
