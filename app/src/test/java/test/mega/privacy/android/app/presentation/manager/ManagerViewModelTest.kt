@@ -21,6 +21,7 @@ import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
@@ -72,11 +74,19 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
+
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> {
+            onBlocking {
+                invoke(AppFeatures.MandatoryFingerprintVerification)
+            }.thenReturn(true)
+        }
+
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
-    private val getUnverifiedInComingShares = mock<GetUnverifiedIncomingShares> {
+    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares> {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
@@ -118,7 +128,8 @@ class ManagerViewModelTest {
             getPricing = mock(),
             getFullAccountInfo = mock(),
             getActiveSubscription = mock(),
-            getUnverifiedInComingShares = getUnverifiedInComingShares,
+            getFeatureFlagValue = getFeatureFlagValue,
+            getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
         )
     }
