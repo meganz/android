@@ -73,4 +73,10 @@ interface BillingRepository {
      *
      */
     fun getActiveSubscription(): MegaPurchase?
+
+    /**
+     * Clear cache
+     *
+     */
+    fun clearCache()
 }

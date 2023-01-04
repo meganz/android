@@ -70,6 +70,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -86,7 +87,7 @@ class AccountController(private val context: Context) {
      */
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface AccountControllerEntryPoint {
+    internal interface AccountControllerEntryPoint {
         /**
          * Chat preferences gateway
          *
@@ -104,6 +105,8 @@ class AccountController(private val context: Context) {
          *
          */
         fun pushRepository(): PushesRepository
+
+        fun billingRepository(): BillingRepository
     }
 
     fun existsAvatar(): Boolean {
@@ -396,6 +399,7 @@ class AccountController(private val context: Context) {
                 entryPoint.chatPreferencesGateway().clearPreferences()
                 //clear push token
                 entryPoint.pushRepository().clearPushToken()
+                entryPoint.billingRepository().clearCache()
             }
 
             // Clear text editor preference
