@@ -78,6 +78,7 @@ internal class BillingFacade @Inject constructor(
     private val skusCache: Cache<List<MegaSku>>,
     private val accountInfoWrapper: AccountInfoWrapper,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
+    private val activeSubscription: Cache<MegaPurchase>,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
@@ -118,16 +119,16 @@ internal class BillingFacade @Inject constructor(
 
     @Throws(ProductNotFoundException::class)
     override suspend fun launchPurchaseFlow(activity: Activity, productId: String) {
-        val activeSubscription = accountInfoWrapper.activeSubscription
-        val oldSku = activeSubscription?.sku
-        val purchaseToken = activeSubscription?.token
+        val oldSubscription = activeSubscription.get()
+        val oldSku = oldSubscription?.sku
+        val purchaseToken = oldSubscription?.token
         val skuDetails = skusCache.get()?.find { it.sku == productId }
             ?: throw ProductNotFoundException()
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         val prorationMode =
-            if (getProductLevel(skuDetails.sku) > getProductLevel(oldSku)) ProrationMode.IMMEDIATE_WITH_TIME_PRORATION else ProrationMode.DEFERRED
+            if (MegaPurchase(skuDetails.sku).level > MegaPurchase(oldSku).level) ProrationMode.IMMEDIATE_WITH_TIME_PRORATION else ProrationMode.DEFERRED
         val productDetails: ProductDetails =
             productDetailsListCache.get().orEmpty().find { it.productId == productId }
                 ?: throw ProductNotFoundException()
@@ -174,7 +175,8 @@ internal class BillingFacade @Inject constructor(
             ) {
                 val client = ensureConnect()
                 val validPurchases = processPurchase(client, purchases.orEmpty())
-                billingEvent.emit(BillingEvent.OnPurchaseUpdate(validPurchases))
+                billingEvent.emit(BillingEvent.OnPurchaseUpdate(validPurchases,
+                    activeSubscription.get()))
             } else {
                 Timber.w("onPurchasesUpdated failed, with result code: %s", result.responseCode)
             }
@@ -310,18 +312,9 @@ internal class BillingFacade @Inject constructor(
     }
 
     private fun updateAccountInfo(purchases: List<MegaPurchase>) {
-        val max = purchases.maxByOrNull { getProductLevel(it.sku) }
-        accountInfoWrapper.updateActiveSubscription(max, getProductLevel(max?.sku))
-    }
-
-    private fun getProductLevel(sku: String?): Int {
-        return when (sku) {
-            SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> 0
-            SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> 1
-            SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> 2
-            SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> 3
-            else -> -1
-        }
+        val max = purchases.maxByOrNull { it.level }
+        activeSubscription.set(max)
+        accountInfoWrapper.updateActiveSubscription(max)
     }
 
     companion object {

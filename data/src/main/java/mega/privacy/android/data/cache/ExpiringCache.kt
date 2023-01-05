@@ -6,6 +6,8 @@ internal interface Cache<T> {
     fun get(): T?
 
     fun set(value: T?)
+
+    fun clear()
 }
 
 internal class ExpiringCache<T>(
@@ -22,6 +24,10 @@ internal class ExpiringCache<T>(
         expiredTime = deviceGateway.getElapsedRealtime() + timeOut
         curValue = value
     }
+
+    override fun clear() {
+        curValue = null
+    }
 }
 
 internal class PermanentCache<T> : Cache<T> {
@@ -31,5 +37,9 @@ internal class PermanentCache<T> : Cache<T> {
 
     override fun set(value: T?) {
         curValue = value
+    }
+
+    override fun clear() {
+        curValue = null
     }
 }

@@ -217,7 +217,7 @@
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
-    <string name="title_shared_items">Carpetas compartidas</string>
+    <string name="title_shared_items">Elementos compartidos</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
     <string name="section_rubbish_bin">Papelera</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
@@ -4242,5 +4242,12 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Tus credenciales</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando archivo para vista previa</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descripción</string>
 </resources>

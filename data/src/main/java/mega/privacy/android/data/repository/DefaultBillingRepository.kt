@@ -44,6 +44,7 @@ internal class DefaultBillingRepository @Inject constructor(
     private val paymentMethodFlagsCache: Cache<PaymentMethodFlags>,
     private val pricingCache: Cache<Pricing>,
     private val skusCache: Cache<List<MegaSku>>,
+    private val activeSubscriptionCache: Cache<MegaPurchase>,
     private val numberOfSubscriptionCache: Cache<Long>,
     private val pricingMapper: PricingMapper,
     private val localPricingMapper: LocalPricingMapper,
@@ -128,4 +129,11 @@ internal class DefaultBillingRepository @Inject constructor(
         }
 
     override fun isBillingAvailable(): Boolean = skusCache.get().isNullOrEmpty().not()
+
+    override fun getActiveSubscription() = activeSubscriptionCache.get()
+
+    override fun clearCache() {
+        activeSubscriptionCache.clear()
+        numberOfSubscriptionCache.clear()
+    }
 }

@@ -67,7 +67,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "7.0"
+    appVersion = "7.1"
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -76,7 +76,7 @@ ext {
     buildToolsVerion = '31.0.0'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20221216.131049-rel'
+    megaSdkVersion = '20221222.234343-rel'
 
     // App dependencies
     accompanistLayoutVersion = '0.24.13-rc'

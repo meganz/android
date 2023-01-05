@@ -45,12 +45,7 @@ interface AccountInfoWrapper {
      * Update active subscription
      *
      */
-    fun updateActiveSubscription(purchase: MegaPurchase?, levelInventory: Int)
-
-    /**
-     * Active subscription of the user
-     */
-    val activeSubscription: MegaPurchase?
+    fun updateActiveSubscription(purchase: MegaPurchase?)
 
     /**
      * Subscription payment method

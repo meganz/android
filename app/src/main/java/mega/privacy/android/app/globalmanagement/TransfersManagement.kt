@@ -52,6 +52,7 @@ import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 import nz.mega.sdk.MegaTransfer.STATE_PAUSED
 import timber.log.Timber
+import java.util.Collections
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -197,7 +198,8 @@ class TransfersManagement @Inject constructor(
 
     private val pausedTransfers = ArrayList<String>()
 
-    private val scanningTransfers = ArrayList<ScanningTransferData>()
+    private val scanningTransfers =
+        Collections.synchronizedCollection(ArrayList<ScanningTransferData>())
     private var scanningTransfersToken: MegaCancelToken? = null
     var isProcessingFolders = false
     var isProcessingTransfers = false
@@ -500,14 +502,13 @@ class TransfersManagement @Inject constructor(
      *
      * @param transfer  Transfer to check.
      */
+    @Synchronized
     fun checkScanningTransferOnStart(transfer: MegaTransfer) {
+        Timber.d("checkScanningTransferOnStart ${transfer.nodeHandle}")
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.apply {
-                    val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
-                    if (!isFolder || updatedTransfer == null
-                        || updatedTransfer.state == STATE_COMPLETED
-                    ) {
+                    if (!isFolder || transfer.state == STATE_COMPLETED) {
                         removeProcessedScanningTransfer()
                     } else {
                         transferTag = transfer.tag
@@ -527,13 +528,11 @@ class TransfersManagement @Inject constructor(
      *
      * @param transfer  Transfer to check.
      */
+    @Synchronized
     fun checkScanningTransferOnUpdate(transfer: MegaTransfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
-                val updatedTransfer = megaApi.getTransferByTag(transfer.tag)
-                if (transfer.stage >= STAGE_TRANSFERRING_FILES
-                    || updatedTransfer == null || updatedTransfer.state == STATE_COMPLETED
-                ) {
+                if (transfer.stage >= STAGE_TRANSFERRING_FILES || transfer.state == STATE_COMPLETED) {
                     data.removeProcessedScanningTransfer()
                 } else {
                     data.transferStage = transfer.stage
@@ -549,6 +548,7 @@ class TransfersManagement @Inject constructor(
      *
      * @param transfer  Transfer to check.
      */
+    @Synchronized
     fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {

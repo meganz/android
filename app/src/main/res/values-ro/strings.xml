@@ -375,7 +375,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Se creează folderul</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Empty Rubbish bin</string>
+    <string name="context_clear_rubbish">Golește Coșul de gunoi</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">Ești pe cale să elimini definitiv toate elementele din Coșul de gunoi.</string>
     <!-- send cancel subscriptions dialog -->
@@ -4138,7 +4138,7 @@
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">New album</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Share meeting link</string>
+    <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Partajează linkul întâlnirii</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
@@ -4243,4 +4243,11 @@
     <string name="shared_items_verify_credentials_my_credentials">Acreditările tale</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descriere</string>
 </resources>
