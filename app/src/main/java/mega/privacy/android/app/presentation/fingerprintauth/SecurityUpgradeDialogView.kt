@@ -60,7 +60,7 @@ fun SecurityUpgradeDialogView(
                         .height(140.dp)
                         .width(114.dp)
                         .testTag("HeaderImage"),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_contact_verification_required),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_security_upgrade),
                         contentDescription = "Empty")
 
                     Text(text = stringResource(id = R.string.shared_items_security_upgrade_dialog_title),
