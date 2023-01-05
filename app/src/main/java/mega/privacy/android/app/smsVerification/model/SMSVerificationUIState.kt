@@ -57,4 +57,9 @@ data class SMSVerificationUIState(
      * granted bonus storage if phone number is SMS verified
      */
     val bonusStorageSMS: String? = null,
+
+    /**
+     * current event
+     */
+    val event: SMSVerificationUIEvent = SMSVerificationUIEvent.Success,
 )
