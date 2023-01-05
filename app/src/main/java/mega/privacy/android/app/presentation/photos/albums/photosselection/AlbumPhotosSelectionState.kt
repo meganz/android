@@ -10,6 +10,7 @@ data class AlbumPhotosSelectionState(
     val isInvalidAlbum: Boolean = false,
     val albumPhotoIds: Set<Long> = setOf(),
     val photos: List<Photo> = listOf(),
+    val filteredPhotoIds: Set<Long> = setOf(),
     val uiPhotos: List<UIPhoto> = listOf(),
     val selectedPhotoIds: Set<Long> = setOf(),
     val selectedLocation: TimelinePhotosSource = TimelinePhotosSource.ALL_PHOTOS,

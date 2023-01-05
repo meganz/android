@@ -110,6 +110,7 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
+                showSelectAllMenu = (state.filteredPhotoIds - state.selectedPhotoIds).isNotEmpty(),
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -184,6 +185,7 @@ private fun AlbumPhotosSelectionHeader(
     numSelectedPhotos: Int,
     showFilterMenu: Boolean,
     showMoreMenu: Boolean,
+    showSelectAllMenu: Boolean,
     onBackClicked: () -> Unit,
     onFilterClicked: () -> Unit,
     onMoreClicked: () -> Unit,
@@ -259,8 +261,10 @@ private fun AlbumPhotosSelectionHeader(
                 }
 
                 DropdownMenu(expanded = showMoreMenu, onDismissRequest = onMoreDismissed) {
-                    DropdownMenuItem(onClick = onSelectAllClicked) {
-                        Text(text = stringResource(id = R.string.action_select_all))
+                    if (showSelectAllMenu) {
+                        DropdownMenuItem(onClick = onSelectAllClicked) {
+                            Text(text = stringResource(id = R.string.action_select_all))
+                        }
                     }
                     DropdownMenuItem(onClick = onClearSelectionClicked) {
                         Text(text = stringResource(id = R.string.action_unselect_all))
