@@ -25,6 +25,7 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedPriceString
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeGBBasedMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedPriceString
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
+import mega.privacy.android.domain.entity.account.CurrencyAmount
 
 /**
  * Module for providing mapper dependencies
@@ -85,7 +86,8 @@ class MapperModule {
      * Provide formatted price string mapper
      */
     @Provides
-    fun providePriceStringMapper(): FormattedPriceStringMapper = ::toFormattedPriceString
+    fun providePriceStringMapper(): FormattedPriceStringMapper =
+        { currency: CurrencyAmount -> toFormattedPriceString(currency) }
 
     /**
      * Provide FormattedSizeGBBased mapper
