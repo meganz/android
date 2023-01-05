@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.presentation.controls.dpToSp
+import mega.privacy.android.presentation.controls.intToDp
 import mega.privacy.android.presentation.theme.grey_alpha_012
 import mega.privacy.android.presentation.theme.grey_alpha_054
 import mega.privacy.android.presentation.theme.grey_alpha_087
@@ -42,8 +44,15 @@ import mega.privacy.android.presentation.theme.white_alpha_054
 import mega.privacy.android.presentation.theme.white_alpha_087
 
 @Composable
-internal fun NotificationItemView(modifier: Modifier, notification: Notification) {
+internal fun NotificationItemView(
+    modifier: Modifier,
+    notification: Notification,
+    position: Int,
+    notifications: List<Notification>,
+    onClick: () -> Unit,
+) {
     Column(modifier = modifier
+        .clickable { onClick() }
         .background(color = Color(notification
             .backgroundColor(LocalContext.current)
             .toColorInt()))
@@ -61,7 +70,28 @@ internal fun NotificationItemView(modifier: Modifier, notification: Notification
         }
 
         NotificationDate(notification)
-        NotificationDivider()
+
+        val horizontalPadding =
+            getHorizontalPaddingForDivider(notification, position, notifications)
+        NotificationDivider(horizontalPadding)
+    }
+}
+
+@Composable
+private fun getHorizontalPaddingForDivider(
+    notification: Notification,
+    position: Int,
+    notifications: List<Notification>,
+): Int {
+    return if (notification.isNew) {
+        if (position < notifications.size - 1) {
+            val nextNotification = notifications[position + 1]
+            if (nextNotification.isNew) notification.separatorMargin(LocalContext.current) else 0
+        } else {
+            0
+        }
+    } else {
+        notification.separatorMargin(LocalContext.current)
     }
 }
 
@@ -97,6 +127,7 @@ private fun NotificationTitleRow(
     val titleMaxLines = if (showDescription) 1 else 3
     val titleText = notification.title(LocalContext.current)
     val titleTextSize = dpToSp(dp = notification.titleTextSize).value
+    val titleMaxWidth = notification.titleMaxWidth(LocalContext.current)
 
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -111,6 +142,9 @@ private fun NotificationTitleRow(
                         textAppearance = R.style.TextAppearance_Mega_Subtitle1_Medium_Variant,
                     )
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, titleTextSize)
+                    titleMaxWidth?.let {
+                        maxWidth = it
+                    }
                 }
             },
             update = { it.text = titleText },
@@ -143,6 +177,8 @@ private fun NotificationDescription(
     notification: Notification,
 ) {
     val descriptionText = notification.description(LocalContext.current)
+    val descriptionMaxWidth = notification.descriptionMaxWidth(LocalContext.current)
+
     AndroidView(
         factory = { context ->
             TextView(context).apply {
@@ -152,6 +188,9 @@ private fun NotificationDescription(
                     textAppearance = R.style.TextAppearance_Mega_Subtitle2_Medium,
                 )
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                descriptionMaxWidth?.let {
+                    maxWidth = it
+                }
             }
         },
         update = { it.text = descriptionText },
@@ -177,8 +216,13 @@ private fun NotificationDate(
 
 
 @Composable
-private fun NotificationDivider() {
-    Divider(color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
+private fun NotificationDivider(horizontalPadding: Int) {
+    var modifier: Modifier = Modifier
+    if (horizontalPadding != 0) {
+        modifier = modifier.padding(horizontal = intToDp(px = horizontalPadding))
+    }
+    Divider(modifier = modifier,
+        color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
         thickness = 1.dp)
 }
 
@@ -187,16 +231,20 @@ private fun NotificationDivider() {
 @Preview(uiMode = UI_MODE_NIGHT_YES, name = "PreviewNotificationItemViewDark")
 @Composable
 private fun PreviewNotificationItemView() {
+    val notification = Notification(sectionTitle = { "CONTACTS" },
+        sectionColour = R.color.orange_400_orange_300,
+        sectionIcon = null,
+        title = { "New Contact" },
+        titleTextSize = 16.dp,
+        titleMaxWidth = { 200 },
+        description = { "xyz@gmail.com is now a contact" },
+        descriptionMaxWidth = { 300 },
+        dateText = { "11 October 2022 6:46 pm" },
+        isNew = true,
+        backgroundColor = { "#D3D3D3" },
+        separatorMargin = { 0 },
+        onClick = {})
     NotificationItemView(modifier = Modifier,
-        notification = Notification(sectionTitle = { "CONTACTS" },
-            sectionColour = R.color.orange_400_orange_300,
-            sectionIcon = null,
-            title = { "New Contact" },
-            titleTextSize = 16.dp,
-            description = { "xyz@gmail.com is now a contact" },
-            dateText = { "11 October 2022 6:46 pm" },
-            isNew = true,
-            backgroundColor = { "#D3D3D3" },
-            onClick = {}))
+        notification, position = 0, notifications = listOf(notification), onClick = {})
 
 }

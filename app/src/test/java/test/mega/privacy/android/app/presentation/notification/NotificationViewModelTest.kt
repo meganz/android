@@ -74,10 +74,13 @@ class NotificationViewModelTest {
             sectionIcon = null,
             title = { "" },
             titleTextSize = 16.dp,
+            titleMaxWidth = { 200 },
             description = { "" },
+            descriptionMaxWidth = { 300 },
             dateText = { "" },
             isNew = true,
             backgroundColor = { "#D3D3D3" },
+            separatorMargin = { 0 },
             onClick = {},
         )
 
@@ -103,10 +106,13 @@ class NotificationViewModelTest {
             sectionIcon = null,
             title = { "Initial" },
             titleTextSize = 16.dp,
+            titleMaxWidth = { 200 },
             description = { "" },
+            descriptionMaxWidth = { 300 },
             dateText = { "" },
             isNew = true,
             backgroundColor = { "#D3D3D3" },
+            separatorMargin = { 0 },
             onClick = {},
         )
         val newNotification = initialNotification.copy(title = {"New title"})

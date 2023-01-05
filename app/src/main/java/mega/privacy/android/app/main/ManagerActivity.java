@@ -213,6 +213,7 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
@@ -322,7 +323,6 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
@@ -358,6 +358,8 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
+import mega.privacy.android.app.presentation.notification.NotificationsFragment;
+import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
@@ -464,7 +466,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaTransferListenerInterface, OnClickListener,
         BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
         ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
+        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, NotificationNavigationHandler {
 
     private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -3446,13 +3448,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV);
                     break;
                 }
-                case NOTIFICATIONS: {
-                    notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
-                    if (notificationsFragment != null) {
-                        notificationsFragment.setNotifications();
-                    }
+                case NOTIFICATIONS:
                     break;
-                }
                 case HOMEPAGE:
                 default:
                     setBottomNavigationMenuItemChecked(HOME_BNV);
@@ -7747,6 +7744,17 @@ public class ManagerActivity extends TransfersManagementActivity
         showMyAccount();
     }
 
+
+    @Override
+    public void navigateToSharedNode(long nodeId, @Nullable long[] childNodes) {
+        openLocation(nodeId, childNodes);
+    }
+
+    @Override
+    public void navigateToContactInfo(@NonNull String email) {
+        ContactUtil.openContactInfoActivity(this, email);
+    }
+
     @Override
     public void onClick(View v) {
         Timber.d("onClick");
@@ -9718,10 +9726,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON);
-        notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
-        if (notificationsFragment != null && userAlerts != null) {
-            notificationsFragment.updateNotifications(userAlerts);
-        }
     }
 
     public void updateMyEmail(String email) {

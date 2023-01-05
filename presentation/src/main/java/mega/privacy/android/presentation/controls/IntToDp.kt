@@ -2,10 +2,9 @@ package mega.privacy.android.presentation.controls
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 
 /**
- * Convert Dp to Sp.
+ * Convert an Int pixel value to Dp.
  */
 @Composable
-fun dpToSp(dp: Dp) = with(LocalDensity.current) { dp.toSp() }
+fun intToDp(px: Int) = with(LocalDensity.current) { px.toDp() }

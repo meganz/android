@@ -13,10 +13,13 @@ import androidx.compose.ui.unit.Dp
  * @property sectionIcon
  * @property title
  * @property titleTextSize
+ * @property titleMaxWidth
  * @property description
+ * @property descriptionMaxWidth
  * @property dateText
  * @property isNew
  * @property backgroundColor
+ * @property separatorMargin
  * @property onClick
  * @constructor Create empty Notification
  */
@@ -26,9 +29,12 @@ data class Notification(
     @DrawableRes val sectionIcon: Int?,
     val title: (Context) -> CharSequence,
     val titleTextSize: Dp,
+    val titleMaxWidth: (Context) -> Int?,
     val description: (Context) -> CharSequence?,
+    val descriptionMaxWidth: (Context) -> Int?,
     val dateText: (Context) -> String,
     val isNew: Boolean,
     val backgroundColor: (Context) -> String,
+    val separatorMargin: (Context) -> Int,
     val onClick: (NotificationNavigationHandler) -> Unit,
 )
