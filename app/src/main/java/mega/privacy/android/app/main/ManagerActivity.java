@@ -350,6 +350,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
+import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
@@ -443,6 +444,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -1420,6 +1422,13 @@ public class ManagerActivity extends TransfersManagementActivity
                     updateContactRequests(contactRequests);
                     return null;
                 }));
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, state -> {
+            if (viewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded() && state.getEventType() == MegaEvent.EVENT_UPGRADE_SECURITY) {
+                replaceFragment(SecurityUpgradeDialogFragment.Companion.newInstance(), SecurityUpgradeDialogFragment.TAG);
+            }
+            return Unit.INSTANCE;
+        });
 
         collectFlows();
 

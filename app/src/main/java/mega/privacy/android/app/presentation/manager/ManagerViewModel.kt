@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -167,9 +168,23 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             val incomingShares = getUnverifiedIncomingShares(SortOrder.ORDER_DEFAULT_ASC).size
+            _state.update {
+                it.copy(pendingActionsCount = _state.value.pendingActionsCount + incomingShares)
+            }
+        }
+
+        viewModelScope.launch {
             val outgoingShares = getUnverifiedOutgoingShares(SortOrder.ORDER_DEFAULT_ASC).size
             _state.update {
-                it.copy(pendingActionsCount = incomingShares + outgoingShares)
+                it.copy(pendingActionsCount = _state.value.pendingActionsCount + outgoingShares)
+            }
+        }
+
+        viewModelScope.launch {
+            updateGlobalEvents.collect { megaEvent ->
+                _state.update {
+                    it.copy(eventType = megaEvent.peekContent().type)
+                }
             }
         }
     }
@@ -214,6 +229,13 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { it.userAlerts?.toList() }
             .map { Event(it) }
             .asLiveData()
+
+
+    private val updateGlobalEvents: Flow<Event<MegaEvent>> = _updates
+        .filterIsInstance<GlobalUpdate.OnEvent>()
+        .mapNotNull { (event) ->
+            event?.let { Event(it) }
+        }
 
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.manager.model
 
+import nz.mega.sdk.MegaEvent
+
 /**
  * Manager UI state
  *
@@ -14,6 +16,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
  * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
  * @param pendingActionsCount Pending actions count
+ * @param eventType [MegaEvent] type
  */
 data class ManagerState(
     val rubbishBinParentHandle: Long = -1L,
@@ -26,5 +29,6 @@ data class ManagerState(
     val shouldSendCameraBroadcastEvent: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
-    val pendingActionsCount: Int = 0
+    val pendingActionsCount: Int = 0,
+    val eventType: Int = -1,
 )
