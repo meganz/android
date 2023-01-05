@@ -286,7 +286,7 @@ android {
 dependencies {
 
     implementation project(':domain')
-    implementation project(':presentation')
+    implementation project(':core-ui')
     implementation project(':data')
 
     // decide SDK dependency

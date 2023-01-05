@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.theme
+package mega.privacy.android.core.ui.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable

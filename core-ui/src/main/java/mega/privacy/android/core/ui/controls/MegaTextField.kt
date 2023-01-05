@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -34,9 +34,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.grey_alpha_012
-import mega.privacy.android.presentation.theme.white_alpha_012
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.grey_alpha_012
+import mega.privacy.android.core.ui.theme.white_alpha_012
 
 @Composable
 fun MegaTextField(

@@ -47,18 +47,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
-import mega.privacy.android.presentation.controls.SimpleTopAppBar
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.dark_grey
-import mega.privacy.android.presentation.theme.grey_020
-import mega.privacy.android.presentation.theme.grey_800
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.grey_alpha_087
-import mega.privacy.android.presentation.theme.white
-import mega.privacy.android.presentation.theme.white_alpha_054
-import mega.privacy.android.presentation.theme.white_alpha_087
-import mega.privacy.android.presentation.theme.yellow_100
+import mega.privacy.android.core.ui.controls.SimpleTopAppBar
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.grey_020
+import mega.privacy.android.core.ui.theme.grey_800
+import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.grey_alpha_087
+import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.core.ui.theme.yellow_100
 
 /**
  * Authenticity credentials view.

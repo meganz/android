@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onSourceS
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**

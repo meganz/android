@@ -32,11 +32,11 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedPriceStri
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
-import mega.privacy.android.presentation.controls.SimpleTopAppBar
-import mega.privacy.android.presentation.theme.grey_300
-import mega.privacy.android.presentation.theme.grey_400
-import mega.privacy.android.presentation.theme.grey_500
-import mega.privacy.android.presentation.theme.grey_600
+import mega.privacy.android.core.ui.controls.SimpleTopAppBar
+import mega.privacy.android.core.ui.theme.grey_300
+import mega.privacy.android.core.ui.theme.grey_400
+import mega.privacy.android.core.ui.theme.grey_500
+import mega.privacy.android.core.ui.theme.grey_600
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

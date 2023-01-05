@@ -1,7 +1,7 @@
 include ':app'
 include ':domain'
 include ':sdk'
-include ':presentation'
+include ':core-ui'
 include ':screenshot'
 include ':data'
 include ':lint'

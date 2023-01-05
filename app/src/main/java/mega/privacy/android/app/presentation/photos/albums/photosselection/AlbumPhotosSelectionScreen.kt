@@ -54,13 +54,13 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.grey_alpha_087
-import mega.privacy.android.presentation.theme.teal_300
-import mega.privacy.android.presentation.theme.white
-import mega.privacy.android.presentation.theme.white_alpha_054
-import mega.privacy.android.presentation.theme.white_alpha_087
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.grey_alpha_087
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.core.ui.theme.white_alpha_087
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

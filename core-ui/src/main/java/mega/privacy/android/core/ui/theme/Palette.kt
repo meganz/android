@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.theme
+package mega.privacy.android.core.ui.theme
 
 import android.annotation.SuppressLint
 import androidx.compose.material.darkColors
