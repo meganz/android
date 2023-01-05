@@ -6,6 +6,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -65,13 +68,20 @@ private fun NotificationListView(
         }
     }
 
+    val allItemsLoaded by remember {
+        derivedStateOf { listState.layoutInfo.totalItemsCount == state.notifications.size }
+    }
+
+    if (allItemsLoaded) {
+        onNotificationsLoaded()
+    }
+
     LazyColumn(state = listState, modifier = modifier.testTag("NotificationListView")) {
         itemsIndexed(state.notifications) { index, notification ->
             NotificationItemView(modifier, notification, index, state.notifications) {
                 onClick(notification)
             }
         }
-        onNotificationsLoaded()
     }
 }
 

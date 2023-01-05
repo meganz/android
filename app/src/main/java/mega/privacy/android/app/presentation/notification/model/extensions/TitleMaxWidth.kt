@@ -21,12 +21,10 @@ internal fun UserAlert.titleMaxWidth(): (Context) -> Int? {
         this.description()(context)?.let {
             widthInPx = if (context.configuration.landscape) {
                 MAX_WIDTH_FIRST_LINE_SEEN_LAND
+            } else if (!this.seen) {
+                MAX_WIDTH_FIRST_LINE_NEW_PORT
             } else {
-                if (!this.seen) {
-                    MAX_WIDTH_FIRST_LINE_NEW_PORT
-                } else {
-                    MAX_WIDTH_FIRST_LINE_SEEN_PORT
-                }
+                MAX_WIDTH_FIRST_LINE_SEEN_PORT
             }
         } ?: run {
             widthInPx = if (!this.seen) {
