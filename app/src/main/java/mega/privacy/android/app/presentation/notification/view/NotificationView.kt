@@ -6,10 +6,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -20,7 +20,6 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
@@ -60,10 +59,9 @@ private fun NotificationListView(
     onNotificationsLoaded: () -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
 
     if (state.scrollToTop) {
-        coroutineScope.launch {
+        LaunchedEffect(listState) {
             listState.scrollToItem(0, 0)
         }
     }
