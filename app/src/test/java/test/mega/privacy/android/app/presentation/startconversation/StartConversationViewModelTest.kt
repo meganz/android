@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.StartConversation
-import mega.privacy.android.presentation.controls.SearchWidgetState
+import mega.privacy.android.core.ui.controls.SearchWidgetState
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

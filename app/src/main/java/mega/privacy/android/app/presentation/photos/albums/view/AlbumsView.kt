@@ -67,17 +67,17 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.presentation.controls.MegaDialog
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.button
-import mega.privacy.android.presentation.theme.caption
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.subtitle1
-import mega.privacy.android.presentation.theme.subtitle2
-import mega.privacy.android.presentation.theme.teal_200
-import mega.privacy.android.presentation.theme.teal_300
-import mega.privacy.android.presentation.theme.white
-import mega.privacy.android.presentation.theme.white_alpha_054
+import mega.privacy.android.core.ui.controls.MegaDialog
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.button
+import mega.privacy.android.core.ui.theme.caption
+import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.subtitle1
+import mega.privacy.android.core.ui.theme.subtitle2
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_054
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

@@ -60,7 +60,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import android.text.format.DateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

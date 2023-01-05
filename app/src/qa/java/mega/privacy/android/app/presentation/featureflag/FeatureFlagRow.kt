@@ -24,8 +24,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.grey_700
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.grey_700
 
 /**
  * Creates one row for each element in @@FeatureFlag list

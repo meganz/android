@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable
 fun SimpleTopAppBar(titleId: Int, elevation: Boolean, onBackPressed: () -> Unit) {

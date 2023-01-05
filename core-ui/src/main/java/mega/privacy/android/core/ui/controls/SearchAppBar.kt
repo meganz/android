@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth

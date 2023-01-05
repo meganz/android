@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.presentation.theme.h6
+import mega.privacy.android.core.ui.theme.h6
 
 /**
  * A reusable Dialog

@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
 import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.StartConversation
-import mega.privacy.android.presentation.controls.SearchWidgetState
+import mega.privacy.android.core.ui.controls.SearchWidgetState
 import timber.log.Timber
 import javax.inject.Inject
 

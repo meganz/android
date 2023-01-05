@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.theme
+package mega.privacy.android.core.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

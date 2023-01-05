@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.presentation.controls.MegaEmptyView
+import mega.privacy.android.core.ui.controls.MegaEmptyView
 import java.util.Locale
 
 /**

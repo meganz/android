@@ -72,11 +72,11 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.presentation.controls.MegaEmptyView
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.dark_grey
-import mega.privacy.android.presentation.theme.white
+import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.white
 import javax.inject.Inject
 
 /**

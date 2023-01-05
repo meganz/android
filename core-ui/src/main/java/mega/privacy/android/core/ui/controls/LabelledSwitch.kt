@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,14 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.grey_010
-import mega.privacy.android.presentation.theme.grey_200
-import mega.privacy.android.presentation.theme.grey_alpha_038
-import mega.privacy.android.presentation.theme.grey_alpha_087
-import mega.privacy.android.presentation.theme.teal_100
-import mega.privacy.android.presentation.theme.teal_300
-import mega.privacy.android.presentation.theme.white_alpha_087
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.grey_010
+import mega.privacy.android.core.ui.theme.grey_200
+import mega.privacy.android.core.ui.theme.grey_alpha_038
+import mega.privacy.android.core.ui.theme.grey_alpha_087
+import mega.privacy.android.core.ui.theme.teal_100
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white_alpha_087
 
 @Composable
 fun LabelledSwitch(

@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMe
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Compose function to handle empty states

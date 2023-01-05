@@ -16,12 +16,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.presentation.controls.MegaDialog
-import mega.privacy.android.presentation.theme.grey_alpha_060
-import mega.privacy.android.presentation.theme.subtitle1
-import mega.privacy.android.presentation.theme.teal_200
-import mega.privacy.android.presentation.theme.teal_300
-import mega.privacy.android.presentation.theme.white_alpha_060
+import mega.privacy.android.core.ui.controls.MegaDialog
+import mega.privacy.android.core.ui.theme.grey_alpha_060
+import mega.privacy.android.core.ui.theme.subtitle1
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white_alpha_060
 
 /**
  * Simple dialog

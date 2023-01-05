@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode

@@ -11,7 +11,7 @@ import com.airbnb.android.showkase.models.Showkase
 import com.airbnb.android.showkase.models.ShowkaseBrowserComponent
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

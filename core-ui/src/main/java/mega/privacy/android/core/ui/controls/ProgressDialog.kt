@@ -1,4 +1,4 @@
-package mega.privacy.android.presentation.controls
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.teal_200
-import mega.privacy.android.presentation.theme.teal_300
-import mega.privacy.android.presentation.theme.white_alpha_054
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white_alpha_054
 
 @Composable
 fun ProgressDialog(
