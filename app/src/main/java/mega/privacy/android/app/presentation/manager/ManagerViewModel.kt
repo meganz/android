@@ -103,7 +103,7 @@ class ManagerViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
     private val getFeatureFlagValue: GetFeatureFlagValue,
-    private val getUnverifiedInComingShares: GetUnverifiedIncomingShares,
+    private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
 ) : ViewModel() {
 
@@ -166,7 +166,7 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val incomingShares = getUnverifiedInComingShares(SortOrder.ORDER_DEFAULT_ASC).size
+            val incomingShares = getUnverifiedIncomingShares(SortOrder.ORDER_DEFAULT_ASC).size
             val outgoingShares = getUnverifiedOutgoingShares(SortOrder.ORDER_DEFAULT_ASC).size
             _state.update {
                 it.copy(pendingActionsCount = incomingShares + outgoingShares)
