@@ -85,7 +85,8 @@ internal class DefaultAccountRepository @Inject constructor(
         val user = megaApiGateway.getLoggedInUser()
         userAccountMapper(
             user?.let { UserId(it.handle) },
-            user?.email ?: "",
+            user?.email ?: megaChatApiGateway.getMyEmail(),
+            megaChatApiGateway.getMyFullname(),
             megaApiGateway.isBusinessAccount,
             megaApiGateway.isMasterBusinessAccount,
             accountTypeMapper(myAccountInfoFacade.accountTypeId),

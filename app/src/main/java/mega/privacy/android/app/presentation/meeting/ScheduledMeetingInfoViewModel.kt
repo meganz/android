@@ -64,7 +64,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -300,7 +300,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     startDate = scheduledMeetReceived.startDateTime,
                                     endDate = scheduledMeetReceived.endDateTime,
                                     isPast = ZonedDateTime.now()
-                                        .withZoneSameInstant(ZoneId.of("UTC"))
+                                        .withZoneSameInstant(ZoneOffset.UTC)
                                         .isAfter(scheduledMeetReceived.endDateTime))
                                 )
                             }
@@ -380,7 +380,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     startDate = scheduledMeetReceived.startDateTime,
                                     endDate = scheduledMeetReceived.endDateTime,
                                     isPast = ZonedDateTime.now()
-                                        .withZoneSameInstant(ZoneId.of("UTC"))
+                                        .withZoneSameInstant(ZoneOffset.UTC)
                                         .isAfter(scheduledMeetReceived.endDateTime))
                                 )
                             }
@@ -413,7 +413,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         startDate = scheduledMeetReceived.startDateTime,
                                         endDate = scheduledMeetReceived.endDateTime,
                                         isPast = ZonedDateTime.now()
-                                            .withZoneSameInstant(ZoneId.of("UTC"))
+                                            .withZoneSameInstant(ZoneOffset.UTC)
                                             .isAfter(scheduledMeetReceived.endDateTime))
                                     )
                                 }

@@ -27,6 +27,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter
 import timber.log.Timber
+import java.io.File
 
 object FrescoUtils {
 
@@ -203,6 +204,18 @@ object FrescoUtils {
             pb.visibility = View.GONE
         }
     }
+}
+
+/**
+ * Helper method to load file path into a SimpleDraweeView while resizing it to the View size
+ *
+ * @param filePath  File Path
+ */
+fun SimpleDraweeView.setImageRequestFromFilePath(filePath: String?) {
+    if (filePath.isNullOrBlank()) return
+
+    val fileUri = Uri.fromFile(File(filePath))
+    setImageRequestFromUri(fileUri)
 }
 
 /**
