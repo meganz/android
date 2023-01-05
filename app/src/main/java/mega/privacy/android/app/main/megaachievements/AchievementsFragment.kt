@@ -12,16 +12,20 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.data.extensions.getBigFormattedStorageString
-import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -33,8 +37,7 @@ import javax.inject.Inject
  * Achievements Fragment
  */
 @AndroidEntryPoint
-class AchievementsFragment : Fragment(), View.OnClickListener,
-    GetAchievementsListener.DataCallback {
+class AchievementsFragment : Fragment(), View.OnClickListener {
 
     /**
      * MegaApi
@@ -43,8 +46,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    @Inject
-    lateinit var getAchievementsListener: GetAchievementsListener
+    private val viewModel: AchievementsOverviewViewModel by activityViewModels()
 
     private lateinit var registrationLayout: RelativeLayout
     private lateinit var separatorRegistration: LinearLayout
@@ -215,6 +217,20 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
         return root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewLifecycleOwner.collectFlow(
+            viewModel.state,
+            collectBlock = ::handleEvent
+        )
+    }
+
+    private fun handleEvent(event: AchievementsUI) {
+        if (event is AchievementsUI.Content) {
+            onAchievementsReceived(event.achievementsOverview, event.areAllRewardsExpired)
+        }
+    }
+
     /**
      * Called after onCreateView
      */
@@ -227,9 +243,6 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
             actionBar.title =
                 StringResourcesUtils.getString(R.string.achievements_title)
         }
-
-        // The root view has been created, fill it with the data when data ready
-        getAchievementsListener.setDataCallback(this)
     }
 
     /**
@@ -284,16 +297,17 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
     /**
      * Receive Achievements
      */
-    override fun onAchievementsReceived() {
-        val details = getAchievementsListener.achievementsDetails ?: return
-        val bonuses = getAchievementsListener.referralBonuses
+    private fun onAchievementsReceived(
+        achievements: AchievementsOverview,
+        areAllRewardsExpired: Boolean,
+    ) {
         Timber.d("Achievements received - Update UI")
 
         var totalStorage: Long = 0
         var totalTransfer: Long = 0
-        storageReferrals = details.currentStorageReferrals()
+        storageReferrals = achievements.achievedStorageFromReferralsInBytes
         totalStorage += storageReferrals
-        transferReferrals = details.currentTransferReferrals()
+        transferReferrals = achievements.achievedTransferFromReferralsInBytes
         totalTransfer += transferReferrals
         Timber.d(
             "After referrals: storage: %s transfer %s",
@@ -302,67 +316,66 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
         )
 
         val referralsStorageValue =
-            details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE)
+            achievements.allAchievements.firstOrNull { it.type == AchievementType.MEGA_ACHIEVEMENT_INVITE }?.grantStorageInBytes
         val installAppStorageValue =
-            details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL)
+            achievements.allAchievements.firstOrNull { it.type == AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL }?.grantStorageInBytes
         val addPhoneStorageValue =
-            details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE)
+            achievements.allAchievements.firstOrNull { it.type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE }?.grantStorageInBytes
         val installDesktopStorageValue =
-            details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL)
+            achievements.allAchievements.firstOrNull { it.type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL }?.grantStorageInBytes
 
         if (transferReferrals > 0 || storageReferrals > 0) {
             figureReferralBonusesStorage.text = Util.getSizeString(storageReferrals)
             figuresReferralBonusesLayout.visibility = View.VISIBLE
             zeroFiguresReferralBonusesText.visibility = View.GONE
             Timber.d("Check if referrals are expired")
-            var expiredNumber = 0
-            for (i in bonuses.indices) {
-                val referralBonus = bonuses[i]
-                if (referralBonus.getDaysLeft() < 0) {
-                    expiredNumber++
-                }
-            }
-            if (expiredNumber >= bonuses.size - 1) {
+
+            if (areAllRewardsExpired) {
                 Timber.d("All the referrals are expired")
                 figuresReferralBonusesLayout.alpha = 0.5f
                 referralBonusIcon.alpha = 0.5f
             }
         } else {
             figuresReferralBonusesLayout.visibility = View.GONE
-            zeroFiguresReferralBonusesText.text = StringResourcesUtils.getString(
-                R.string.figures_achievements_text_referrals,
-                Util.getSizeString(referralsStorageValue)
-            )
-            zeroFiguresReferralBonusesText.visibility = View.VISIBLE
+            referralsStorageValue?.let {
+                zeroFiguresReferralBonusesText.text = StringResourcesUtils.getString(
+                    R.string.figures_achievements_text_referrals,
+                    Util.getSizeString(referralsStorageValue)
+                )
+                zeroFiguresReferralBonusesText.visibility = View.VISIBLE
+            }
         }
 
-        zeroFiguresInstallAppText.text = StringResourcesUtils.getString(
-            R.string.figures_achievements_text,
-            Util.getSizeString(installAppStorageValue)
-        )
-        zeroFiguresAddPhoneText.text = StringResourcesUtils.getString(
-            R.string.figures_achievements_text,
-            Util.getSizeString(addPhoneStorageValue)
-        )
-        zeroFiguresInstallDesktopText.text = StringResourcesUtils.getString(
-            R.string.figures_achievements_text,
-            Util.getSizeString(installDesktopStorageValue)
-        )
+        installAppStorageValue?.let {
+            zeroFiguresInstallAppText.text = StringResourcesUtils.getString(
+                R.string.figures_achievements_text,
+                Util.getSizeString(installAppStorageValue)
+            )
+        }
 
-        val count = details.awardsCount
+        addPhoneStorageValue?.let {
+            zeroFiguresAddPhoneText.text = StringResourcesUtils.getString(
+                R.string.figures_achievements_text,
+                Util.getSizeString(addPhoneStorageValue)
+            )
+        }
 
-        for (i in 0 until count) {
-            val type = details.getAwardClass(i)
-            val awardId = details.getAwardId(i)
-            val rewardId = details.getRewardAwardId(awardId.toLong())
-            Timber.d("AWARD ID: $awardId REWARD id: $rewardId")
-            Timber.d("type: $type AWARD ID: $awardId REWARD id: $rewardId")
+        installDesktopStorageValue?.let {
+            zeroFiguresInstallDesktopText.text = StringResourcesUtils.getString(
+                R.string.figures_achievements_text,
+                Util.getSizeString(installDesktopStorageValue)
+            )
+        }
 
-            if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL) {
+        achievements.awardedAchievements.forEach { award ->
+            val type = award.type
+
+            if (type == AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL) {
                 Timber.d("MEGA_ACHIEVEMENT_MOBILE_INSTALL")
                 figuresInstallAppLayout.visibility = View.VISIBLE
                 zeroFiguresInstallAppText.visibility = View.GONE
-                val storageInstallApp = details.getRewardStorageByAwardId(awardId)
+
+                val storageInstallApp = award.rewardedStorageInBytes
                 if (storageInstallApp > 0) {
                     figureInstallAppStorage.text = Util.getSizeString(storageInstallApp)
                     figureInstallAppStorage.visibility = View.VISIBLE
@@ -372,17 +385,15 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     textInstallAppStorage.visibility = View.INVISIBLE
                 }
 
-                val transferInstallApp = details.getRewardTransferByAwardId(awardId)
+                val transferInstallApp = award.rewardedTransferInBytes
                 daysLeftInstallAppText.visibility = View.VISIBLE
-                val daysLeftInstallApp = details.getAwardExpirationTs(i)
+                val daysLeftInstallApp = award.expirationTimestampInDays
                 Timber.d("Install App AwardExpirationTs: $daysLeftInstallApp")
 
                 val start = Util.calculateDateFromTimestamp(daysLeftInstallApp)
                 val end = Calendar.getInstance()
-                val startDate = start.time
-                val endDate = end.time
-                val startTime = startDate.time
-                val endTime = endDate.time
+                val startTime = start.timeInMillis
+                val endTime = end.timeInMillis
                 val diffTime = startTime - endTime
                 val diffDays = diffTime / (1000 * 60 * 60 * 24)
 
@@ -423,11 +434,11 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     daysLeftInstallAppText.text =
                         StringResourcesUtils.getString(R.string.expired_label)
                 }
-            } else if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
+            } else if (type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE) {
                 Timber.d("MEGA_ACHIEVEMENT_ADD_PHONE")
                 figuresAddPhoneLayout.visibility = View.VISIBLE
                 zeroFiguresAddPhoneText.visibility = View.GONE
-                val storageAddPhone = details.getRewardStorageByAwardId(awardId)
+                val storageAddPhone = award.rewardedStorageInBytes
                 if (storageAddPhone > 0) {
                     figureAddPhoneStorage.text = Util.getSizeString(storageAddPhone)
                     figureAddPhoneStorage.visibility = View.VISIBLE
@@ -437,9 +448,9 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     textAddPhoneStorage.visibility = View.INVISIBLE
                 }
 
-                val transferAddPhone = details.getRewardTransferByAwardId(awardId)
+                val transferAddPhone = award.rewardedTransferInBytes
                 daysLeftAddPhoneText.visibility = View.VISIBLE
-                val daysLeftAddPhone = details.getAwardExpirationTs(i)
+                val daysLeftAddPhone = award.expirationTimestampInDays
                 Timber.d("Add phone AwardExpirationTs: $daysLeftAddPhone")
 
                 val start = Util.calculateDateFromTimestamp(daysLeftAddPhone)
@@ -488,11 +499,11 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     daysLeftAddPhoneText.text =
                         StringResourcesUtils.getString(R.string.expired_label)
                 }
-            } else if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
+            } else if (type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
                 Timber.d("MEGA_ACHIEVEMENT_DESKTOP_INSTALL")
                 figuresInstallDesktopLayout.visibility = View.VISIBLE
                 zeroFiguresInstallDesktopText.visibility = View.GONE
-                val storageInstallDesktop = details.getRewardStorageByAwardId(awardId)
+                val storageInstallDesktop = award.rewardedStorageInBytes
                 if (storageInstallDesktop > 0) {
                     figureInstallDesktopStorage.text = Util.getSizeString(storageInstallDesktop)
                     textInstallDesktopStorage.visibility = View.VISIBLE
@@ -502,9 +513,9 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     textInstallDesktopStorage.visibility = View.INVISIBLE
                 }
 
-                val transferInstallDesktop = details.getRewardTransferByAwardId(awardId)
+                val transferInstallDesktop = award.rewardedTransferInBytes
                 daysLeftInstallDesktopText.visibility = View.VISIBLE
-                val daysLeftInstallDesktop = details.getAwardExpirationTs(i)
+                val daysLeftInstallDesktop = award.expirationTimestampInDays
                 Timber.d("Install Desktop AwardExpirationTs: $daysLeftInstallDesktop")
 
                 val start = Util.calculateDateFromTimestamp(daysLeftInstallDesktop)
@@ -553,11 +564,11 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     daysLeftInstallDesktopText.text =
                         StringResourcesUtils.getString(R.string.expired_label)
                 }
-            } else if (type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME) {
+            } else if (type == AchievementType.MEGA_ACHIEVEMENT_WELCOME) {
                 Timber.d("MEGA_ACHIEVEMENT_WELCOME")
                 registrationLayout.visibility = View.VISIBLE
                 separatorRegistration.visibility = View.VISIBLE
-                val storageRegistration = details.getRewardStorageByAwardId(awardId)
+                val storageRegistration = award.rewardedStorageInBytes
                 if (storageRegistration > 0) {
                     figureRegistrationStorage.text = Util.getSizeString(storageRegistration)
                     figureRegistrationStorage.visibility = View.VISIBLE
@@ -567,8 +578,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
                     textRegistrationStorage.visibility = View.INVISIBLE
                 }
 
-                val transferRegistration = details.getRewardTransferByAwardId(awardId)
-                val daysLeftRegistration = details.getAwardExpirationTs(i)
+                val transferRegistration = award.rewardedTransferInBytes
+                val daysLeftRegistration = award.expirationTimestampInDays
                 Timber.d("Registration AwardExpirationTs: $daysLeftRegistration")
 
                 val start = Util.calculateDateFromTimestamp(daysLeftRegistration)
@@ -618,7 +629,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener,
             }
         }
 
-        val storageQuota = details.currentStorage()
+        val storageQuota = achievements.currentStorageInBytes
         Timber.d("My calculated totalTransfer: $totalStorage")
         figureUnlockedRewardStorage.text = storageQuota.getBigFormattedStorageString()
         Timber.d("My calculated totalTransfer: $totalTransfer")
