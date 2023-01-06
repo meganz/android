@@ -14,7 +14,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
  * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
  * @param pendingActionsCount Pending actions count
- * @param showUpgradeSecurityAlert Boolean to decide whether to display security upgrade dialog or not
+ * @param shouldAlertUserAboutSecurityUpgrade Boolean to decide whether to display security upgrade dialog or not
  */
 data class ManagerState(
     val rubbishBinParentHandle: Long = -1L,
@@ -28,5 +28,5 @@ data class ManagerState(
     val nodeUpdateReceived: Boolean = false,
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val pendingActionsCount: Int = 0,
-    val showUpgradeSecurityAlert: Boolean = false,
+    val shouldAlertUserAboutSecurityUpgrade: Boolean = false,
 )
