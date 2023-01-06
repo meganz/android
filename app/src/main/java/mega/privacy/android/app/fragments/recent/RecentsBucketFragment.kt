@@ -222,7 +222,7 @@ class RecentsBucketFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar() {
+    fun setupToolbar() {
         (activity as ManagerActivity).setToolbarTitle(
             "${viewModel.items.value.size} ${getString(R.string.general_files)}"
         )

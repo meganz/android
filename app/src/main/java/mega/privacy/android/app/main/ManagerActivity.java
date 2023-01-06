@@ -300,6 +300,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
@@ -3944,6 +3945,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     case VIDEO:
                         titleId = R.string.sortby_type_video_first;
                         break;
+                    case RECENT_BUCKET:
+                        RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
+                        if (fragment != null) {
+                            fragment.setupToolbar();
+                        }
                 }
 
                 if (titleId != -1) {
