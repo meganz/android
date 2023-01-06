@@ -12,6 +12,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
@@ -23,6 +24,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChangePasswordBinding
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
 import mega.privacy.android.app.utils.ColorUtils.getThemeColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
@@ -43,6 +45,8 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     @ApplicationScope
     @Inject
     internal lateinit var sharingScope: CoroutineScope
+
+    private val viewModel: ChangePasswordViewModel by viewModels()
 
     private var changePassword = true
     private var linkToReset: String? = null
@@ -391,7 +395,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
 
     private fun onResetPasswordClick(hasMk: Boolean) {
         Timber.d("hasMk: %s", hasMk)
-        if (!Util.isOnline(this)) {
+        if (!viewModel.isConnected) {
             showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
@@ -413,7 +417,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
 
     private fun onChangePasswordClick() {
         Timber.d("onChangePasswordClick")
-        if (!Util.isOnline(this)) {
+        if (!viewModel.isConnected) {
             showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
