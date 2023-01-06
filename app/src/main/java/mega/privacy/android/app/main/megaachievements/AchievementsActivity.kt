@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -78,8 +77,8 @@ class AchievementsActivity : PasscodeActivity() {
         )
     }
 
-    private fun handleEvent(event: AchievementsUI) {
-        if (event is AchievementsUI.Error) {
+    private fun handleEvent(event: AchievementsUIState) {
+        if (event.showError) {
             showSnackbar(getString(R.string.cancel_subscription_error))
         }
     }

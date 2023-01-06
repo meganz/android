@@ -74,11 +74,9 @@ class InfoAchievementsFragment : Fragment() {
         )
     }
 
-    private fun handleEvent(event: AchievementsUI) {
-        if (event is AchievementsUI.Content) {
-            onAchievementsReceived(
-                event.achievementsOverview,
-            )
+    private fun handleEvent(event: AchievementsUIState) {
+        if (event.achievementsOverview != null) {
+            onAchievementsReceived(event.achievementsOverview)
         }
     }
 

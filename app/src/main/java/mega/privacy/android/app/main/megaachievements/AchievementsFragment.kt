@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
@@ -225,8 +224,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         )
     }
 
-    private fun handleEvent(event: AchievementsUI) {
-        if (event is AchievementsUI.Content) {
+    private fun handleEvent(event: AchievementsUIState) {
+        if (event.achievementsOverview != null && event.areAllRewardsExpired != null) {
             onAchievementsReceived(event.achievementsOverview, event.areAllRewardsExpired)
         }
     }

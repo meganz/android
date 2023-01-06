@@ -20,7 +20,7 @@ class AchievementsOverviewViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state =
-        MutableStateFlow<AchievementsUI>(AchievementsUI.Progress)
+        MutableStateFlow(AchievementsUIState())
 
     val state = _state.asStateFlow()
 
@@ -28,12 +28,12 @@ class AchievementsOverviewViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { getAccountAchievementsOverview() }
                 .onSuccess { achievementsOverview ->
-                    _state.value = AchievementsUI.Content(
-                        achievementsOverview,
-                        areAllRewardsExpired(achievementsOverview)
+                    _state.value = AchievementsUIState(
+                        achievementsOverview = achievementsOverview,
+                        areAllRewardsExpired = areAllRewardsExpired(achievementsOverview)
                     )
                 }
-                .onFailure { _state.value = AchievementsUI.Error }
+                .onFailure { _state.value = AchievementsUIState(showError = true) }
         }
     }
 

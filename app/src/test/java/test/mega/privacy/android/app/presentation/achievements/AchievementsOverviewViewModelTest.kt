@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.main.megaachievements.AchievementsOverviewViewModel
-import mega.privacy.android.app.main.megaachievements.AchievementsUI
+import mega.privacy.android.app.main.megaachievements.AchievementsUIState
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.junit.After
@@ -44,8 +44,8 @@ class AchievementsOverviewViewModelTest {
     }
 
     @Test
-    fun `test that initial state is progress`() = runTest {
-        assertEquals(AchievementsUI.Progress, underTest.state.value)
+    fun `test that initial state is empty`() = runTest {
+        assertEquals(AchievementsUIState(), underTest.state.value)
     }
 
     @Test
@@ -53,7 +53,7 @@ class AchievementsOverviewViewModelTest {
         runTest {
             val achievements = AchievementsOverview(listOf(), listOf(), 0L, 0L, 0L)
             val expectedUiContent =
-                AchievementsUI.Content(achievements, areAllRewardsExpired = true)
+                AchievementsUIState(achievements, areAllRewardsExpired = true)
             whenever(getAccountAchievementsOverview()).thenReturn(achievements)
 
             underTest.state.test {
@@ -72,7 +72,7 @@ class AchievementsOverviewViewModelTest {
             val initialState = awaitItem()
             val errorState = awaitItem()
 
-            assertEquals(AchievementsUI.Error, errorState)
+            assertEquals(AchievementsUIState(showError = true), errorState)
         }
     }
 }
