@@ -144,14 +144,21 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         val photos = _state.value.photos
         val location = _state.value.selectedLocation
 
-        val uiPhotos = when (location) {
+        val filteredPhotos = when (location) {
             ALL_PHOTOS -> photos
             CLOUD_DRIVE -> filterCloudDrivePhotos(photos)
             CAMERA_UPLOAD -> filterCameraUploadPhotos(photos)
-        }.toUIPhotos()
+        }
+        val filteredPhotoIds = withContext(defaultDispatcher) {
+            filteredPhotos.map { it.id }.toSet()
+        }
+        val uiPhotos = filteredPhotos.toUIPhotos()
 
         _state.update {
-            it.copy(uiPhotos = uiPhotos)
+            it.copy(
+                filteredPhotoIds = filteredPhotoIds,
+                uiPhotos = uiPhotos,
+            )
         }
     }
 
@@ -231,7 +238,10 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             )
 
             _state.update {
-                it.copy(isSelectionCompleted = true)
+                it.copy(
+                    isSelectionCompleted = true,
+                    numCommittedPhotos = photoIds.size,
+                )
             }
         }
     }

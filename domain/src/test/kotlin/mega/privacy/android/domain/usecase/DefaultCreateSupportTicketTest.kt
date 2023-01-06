@@ -28,6 +28,7 @@ class DefaultCreateSupportTicketTest {
     private val appVersion = "appVersion"
     private val sdkVersion = "sdkVersion"
     private val accountEmail = "accountEmail"
+    private val accountFullName = "accountFullName"
     private val accountTypeString = "accountTypeString"
     private val fileName = "123-fileName.zip"
     private val description = "Issue description"
@@ -62,6 +63,7 @@ class DefaultCreateSupportTicketTest {
                 UserAccount(
                     userId = UserId(1L),
                     email = accountEmail,
+                    fullName = accountFullName,
                     isBusinessAccount = true,
                     isMasterBusinessAccount = true,
                     accountTypeIdentifier = AccountType.FREE,

@@ -95,6 +95,8 @@ dependencies {
     implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
     kapt "com.google.auto.value:auto-value:$autovalueVersion"
 
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
+
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

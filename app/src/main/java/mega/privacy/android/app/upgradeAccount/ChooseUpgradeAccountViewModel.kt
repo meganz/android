@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.PRO_I
@@ -26,14 +26,17 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.usecase.GetLocalPricing
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.text.NumberFormat
@@ -46,6 +49,9 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
     private val paymentMethodTypeMapper: PaymentMethodTypeMapper,
+    private val getLocalPricing: GetLocalPricing,
+    private val isBillingAvailable: IsBillingAvailable,
+    private val getActiveSubscription: GetActiveSubscription,
 ) : ViewModel() {
 
     companion object {
@@ -98,7 +104,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
         PaymentMethod.values().firstOrNull {
             // Determines the current account if has the subscription and the current subscription
             // platform if is same as current payment platform.
-            if (BillingManagerImpl.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) {
+            if (BillingConstant.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) {
                 it.methodId != PaymentMethodType.GOOGLE_WALLET
                         && it.methodId == paymentMethodTypeMapper(myAccountInfo.subscriptionMethodId)
             } else {
@@ -127,13 +133,11 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
 
     fun getAccountType(): Int = myAccountInfo.accountType
 
-    fun isInventoryFinished(): Boolean = myAccountInfo.isInventoryFinished
-
-    fun isPurchasedAlready(sku: String): Boolean = myAccountInfo.isPurchasedAlready(sku)
+    private fun isPurchasedAlready(sku: String): Boolean = getActiveSubscription()?.sku == sku
 
     fun getProductAccounts(): List<Product> = state.value.product
 
-    fun isBillingAvailable(): Boolean = !myAccountInfo.availableSkus.isNullOrEmpty()
+    fun isBillingAvailable(): Boolean = isBillingAvailable.invoke()
 
     /**
      * Asks for pricing if needed.
@@ -165,11 +169,11 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
         var currency = product.currency
 
         // Try get the local pricing details from the store if available
-        val details = getSkuDetails(myAccountInfo.availableSkus, getSku(product))
+        val details = getLocalPricing(getSku(product))
 
         if (details != null) {
-            price = details.priceAmountMicros / 1000000.00
-            currency = details.priceCurrencyCode
+            price = details.amount.value / 1000000.00
+            currency = details.currency.currency
         }
 
         val format = NumberFormat.getCurrencyInstance()
@@ -257,36 +261,18 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      *          - YEARLY_SUBSCRIBED if already subscribed to the yearly plan
      *          - NOT_SUBSCRIBED if not subscribed.
      */
-    fun getSubscription(upgradeType: Int): Int =
-        when (upgradeType) {
-            PRO_I -> {
-                when {
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_MONTH) -> MONTHLY_SUBSCRIBED
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_YEAR) -> YEARLY_SUBSCRIBED
-                    else -> NOT_SUBSCRIBED
-                }
-            }
-            PRO_II -> {
-                when {
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_MONTH) -> MONTHLY_SUBSCRIBED
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_YEAR) -> YEARLY_SUBSCRIBED
-                    else -> NOT_SUBSCRIBED
-                }
-            }
-            PRO_III -> {
-                when {
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_MONTH) -> MONTHLY_SUBSCRIBED
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_YEAR) -> YEARLY_SUBSCRIBED
-                    else -> NOT_SUBSCRIBED
-                }
-            }
-            PRO_LITE -> {
-                when {
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_MONTH) -> MONTHLY_SUBSCRIBED
-                    isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_YEAR) -> YEARLY_SUBSCRIBED
-                    else -> NOT_SUBSCRIBED
-                }
-            }
+    fun getSubscription(upgradeType: Int): Int {
+        val skus = when (upgradeType) {
+            PRO_I -> Skus.SKU_PRO_I_MONTH to Skus.SKU_PRO_I_YEAR
+            PRO_II -> Skus.SKU_PRO_II_MONTH to Skus.SKU_PRO_II_YEAR
+            PRO_III -> Skus.SKU_PRO_III_MONTH to Skus.SKU_PRO_III_YEAR
+            PRO_LITE -> Skus.SKU_PRO_LITE_MONTH to Skus.SKU_PRO_LITE_MONTH
+            else -> "" to ""
+        }
+        return when {
+            skus.first.isNotEmpty() && isPurchasedAlready(skus.first) -> MONTHLY_SUBSCRIBED
+            skus.second.isNotEmpty() && isPurchasedAlready(skus.second) -> YEARLY_SUBSCRIBED
             else -> NOT_SUBSCRIBED
         }
+    }
 }

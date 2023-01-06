@@ -80,18 +80,18 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
-import mega.privacy.android.presentation.controls.MarqueeText
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.grey_alpha_012
-import mega.privacy.android.presentation.theme.grey_alpha_038
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.red_300
-import mega.privacy.android.presentation.theme.red_600
-import mega.privacy.android.presentation.theme.white
-import mega.privacy.android.presentation.theme.white_alpha_012
-import mega.privacy.android.presentation.theme.white_alpha_038
-import mega.privacy.android.presentation.theme.white_alpha_054
+import mega.privacy.android.core.ui.controls.MarqueeText
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.grey_alpha_012
+import mega.privacy.android.core.ui.theme.grey_alpha_038
+import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.red_300
+import mega.privacy.android.core.ui.theme.red_600
+import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.core.ui.theme.white_alpha_038
+import mega.privacy.android.core.ui.theme.white_alpha_054
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -351,6 +351,7 @@ private fun ScheduledMeetingInfoAppBar(
  *
  * @param state [ScheduledMeetingInfoState]
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
     val isLight = MaterialTheme.colors.isLight
@@ -379,13 +380,24 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                     }
                 }
                 state.scheduledMeeting?.let {
-                    it.date?.let { date ->
-                        Text(text = date,
+                    if (it.isPast) {
+                        Text(text = pluralStringResource(R.plurals.subtitle_of_group_chat,
+                            state.numOfParticipants,
+                            state.numOfParticipants),
                             style = MaterialTheme.typography.subtitle2,
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             fontWeight = FontWeight.Normal,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
+                    } else {
+                        it.date?.let { date ->
+                            Text(text = date,
+                                style = MaterialTheme.typography.subtitle2,
+                                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                                fontWeight = FontWeight.Normal,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis)
+                        }
                     }
                 }
             }
@@ -593,19 +605,31 @@ private fun ActionButton(
             }
         }) {
         when (action) {
-            ScheduledMeetingInfoAction.ShareMeetingLink -> {
+            ScheduledMeetingInfoAction.ShareMeetingLink,
+            ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
+            -> {
                 if (state.isPublic && state.enabledMeetingLinkOption) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(modifier = Modifier.padding(start = 72.dp,
-                            end = 16.dp,
-                            top = 16.dp,
-                            bottom = 16.dp),
-                            style = MaterialTheme.typography.button,
-                            text = stringResource(id = action.title),
-                            color = MaterialTheme.colors.secondary)
+                    if (action == ScheduledMeetingInfoAction.ShareMeetingLink && state.isHost) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(modifier = Modifier.padding(start = 72.dp,
+                                end = 16.dp,
+                                top = 16.dp,
+                                bottom = 16.dp),
+                                style = MaterialTheme.typography.button,
+                                text = stringResource(id = action.title),
+                                color = MaterialTheme.colors.secondary)
+                        }
+                        divider(withStartPadding = true)
+                    } else if (action == ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts && !state.isHost) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            ActionOption(
+                                state = state,
+                                action = action,
+                                isEnabled = true,
+                                hasSwitch = false)
+                        }
+                        divider(withStartPadding = false)
                     }
-
-                    divider(withStartPadding = true)
                 }
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
@@ -614,7 +638,7 @@ private fun ActionButton(
                         end = 16.dp,
                         top = 18.dp),
                         style = MaterialTheme.typography.button,
-                        text = stringResource(id = action.title).uppercase(),
+                        text = stringResource(id = action.title),
                         color = MaterialTheme.colors.secondary)
 
                     action.description?.let { description ->
@@ -703,7 +727,7 @@ private fun ActionButton(
                     action = action,
                     isEnabled = true,
                     hasSwitch = false)
-                divider(withStartPadding = state.isHost)
+                divider(withStartPadding = true)
             }
         }
     }
@@ -831,12 +855,12 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
             Row(verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(start = 16.dp,
                     end = 16.dp,
-                    top = 16.dp,
                     bottom = 16.dp)) {
                 Row(modifier = Modifier
                     .weight(1f)) {
                     Box(
                         modifier = Modifier
+                            .padding(top = 22.dp)
                             .clip(RectangleShape)
                             .wrapContentSize(Alignment.Center)
 
@@ -847,12 +871,19 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
                     }
 
                     Column(modifier = Modifier
+                        .padding(top = 14.dp)
                         .fillMaxSize()) {
                         Text(modifier = Modifier
-                            .padding(start = 32.dp, end = 23.dp),
+                            .padding(start = 32.dp, bottom = 6.dp),
                             style = MaterialTheme.typography.subtitle1,
-                            text = description,
+                            text = stringResource(id = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label),
                             color = black.takeIf { isLight } ?: white)
+                        Text(modifier = Modifier
+                            .padding(start = 32.dp),
+                            style = MaterialTheme.typography.subtitle2,
+                            text = description,
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            fontWeight = FontWeight.Normal)
                     }
                 }
             }

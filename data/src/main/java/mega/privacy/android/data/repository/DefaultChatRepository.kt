@@ -45,7 +45,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
+import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
@@ -412,6 +414,14 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun isChatNotifiable(chatId: Long): Boolean =
         withContext(ioDispatcher) {
             megaApiGateway.isChatNotifiable(chatId)
+        }
+
+    override suspend fun isChatLastMessageGeolocation(chatId: Long): Boolean =
+        withContext(ioDispatcher) {
+            val chat = megaChatApiGateway.getChatListItem(chatId) ?: return@withContext false
+            val lastMessage = megaChatApiGateway.getMessage(chatId, chat.lastMessageId)
+            chat.lastMessageType == MegaChatMessage.TYPE_CONTAINS_META
+                    && lastMessage?.containsMeta?.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
         }
 
     override fun monitorMutedChats(): Flow<Boolean> =

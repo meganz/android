@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -39,6 +40,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.BroadcastConstants.IS_OPEN_WITH
@@ -53,14 +55,11 @@ import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.middlelayer.iab.BillingManager
-import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
-import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaWebBrowser
-import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
@@ -114,12 +113,8 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
-import mega.privacy.android.app.utils.billing.PaymentUtils.updateAccountInfo
-import mega.privacy.android.app.utils.billing.PaymentUtils.updatePricing
-import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
@@ -128,7 +123,8 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
-import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import nz.mega.sdk.MegaAccountDetails
@@ -157,10 +153,11 @@ import javax.inject.Inject
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
  * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
  * @property getAccountDetails
+ * @property billingViewModel
  */
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
-    SnackbarShower, BillingUpdatesListener {
+    SnackbarShower {
 
     @Inject
     @MegaApi
@@ -193,8 +190,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
-    private var billingManager: BillingManager? = null
-    private var skuDetailsList: List<MegaSku>? = null
+    protected val billingViewModel by viewModels<BillingViewModel>()
 
     @JvmField
     protected var app: MegaApplication? = MegaApplication.getInstance()
@@ -207,6 +203,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     private var downloadLocation: String? = null
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
+    private var activeSubscriptionSku: String? = null
     private var expiredBusinessAlert: AlertDialog? = null
     private var isExpiredBusinessAlertShown = false
     private var psaWebBrowserContainer: FrameLayout? = null
@@ -471,6 +468,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
+        collectFlow(billingViewModel.billingUpdateEvent) {
+            if (it is BillingEvent.OnPurchaseUpdate) {
+                onPurchasesUpdated(it.purchases, it.activeSubscription)
+                billingViewModel.markHandleBillingEvent()
+            }
+        }
+
         registerReceiver(sslErrorReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED))
 
@@ -500,18 +504,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
         LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean::class.java)
             .observe(this) { showGeneralTransferOverQuotaWarning() }
-
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED).observe(this) { type: Any? ->
-            when {
-                this is PaymentActivity || this is UpgradeAccountActivity -> finish()
-                this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
-                        || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
-                        || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
-                    purchaseType = type as PurchaseType?
-                    showQueryPurchasesResult()
-                }
-            }
-        }
 
         savedInstanceState?.apply {
             isExpiredBusinessAlertShown =
@@ -548,7 +540,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     getSerializable(PURCHASE_TYPE)
                 } as PurchaseType?
 
-                showQueryPurchasesResult()
+                showQueryPurchasesResult(MegaPurchase(sku = getString(ACTIVE_SUBSCRIPTION_SKU)))
             }
         }
 
@@ -615,6 +607,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             putString(DOWNLOAD_LOCATION, downloadLocation)
             putBoolean(UPGRADE_ALERT_SHOWN, isAlertDialogShown(upgradeAlert))
             putSerializable(PURCHASE_TYPE, purchaseType)
+            putString(ACTIVE_SUBSCRIPTION_SKU, activeSubscriptionSku)
         }
         super.onSaveInstanceState(outState)
     }
@@ -1237,91 +1230,27 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         requestPermission(this, requestCode, *permissions)
     }
 
-    @SuppressWarnings("deprecation")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
-        if (requestCode == RequestCode.REQ_CODE_BUY) {
-            if (resultCode == RESULT_OK) {
-                val purchaseResult = billingManager?.getPurchaseResult(intent)
-                if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
-                    billingManager?.updatePurchase()
-                } else {
-                    Timber.w("Purchase failed, error code: %s", purchaseResult)
-                }
-            } else {
-                Timber.w("cancel subscribe")
-            }
-        } else {
-            Timber.w("No request code processed")
-            @Suppress("DEPRECATION")
-            super.onActivityResult(requestCode, resultCode, intent)
-        }
-    }
-
     /**
      * Initializes billing manager.
      */
-    protected fun initPayments() {
-        billingManager = BillingManagerImpl(this, this)
+    protected fun preloadPayment() {
+        billingViewModel.loadSkus()
+        billingViewModel.loadPurchases()
     }
 
-    /**
-     * Destroys billing manager.
-     */
-    protected fun destroyPayments() {
-        billingManager?.destroy()
-    }
-
-    /**
-     * Launches payment flow.
-     */
-    protected fun launchPayment(productId: String?) {
-        val skuDetails = getSkuDetails(skuDetailsList, productId ?: return)
-        if (skuDetails == null) {
-            Timber.e("Cannot launch payment, MegaSku is null.")
-            return
-        }
-
-        val purchase = myAccountInfo.activeSubscription
-        val oldSku = purchase?.sku
-        val token = purchase?.token
-        billingManager?.initiatePurchaseFlow(oldSku, token, skuDetails)
-    }
-
-    override fun onBillingClientSetupFinished() {
-        Timber.i("Billing client setup finished")
-        billingManager?.getInventory { skuList: List<MegaSku>? ->
-            skuDetailsList = skuList
-            myAccountInfo.availableSkus = (skuList ?: return@getInventory)
-            updatePricing(this)
-        }
-    }
-
-    override fun onBillingClientSetupFailed() {
-        Timber.w("Billing not available: Show pricing")
-        updatePricing(this)
-    }
-
-    override fun onPurchasesUpdated(
-        isFailed: Boolean,
-        resultCode: Int,
+    private fun onPurchasesUpdated(
         purchases: List<MegaPurchase>,
+        activeSubscription: MegaPurchase?,
     ) {
-        if (isFailed) {
-            Timber.w("Update purchase failed, with result code: %s", resultCode)
-            return
-        }
-        val purchaseResult: PurchaseType = if (purchases.isNotEmpty()) {
-            val purchase = purchases[0]
+        val type: PurchaseType = if (purchases.isNotEmpty()) {
+            val purchase = purchases.first()
             //payment may take time to process, we will not give privilege until it has been fully processed
             val sku = purchase.sku
-            if (billingManager?.isPurchased(purchase) == true) {
+            if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
                 Timber.d("Purchase " + sku + " successfully, subscription type is: "
                         + getSubscriptionType(sku) + ", subscription renewal type is: "
                         + getSubscriptionRenewalType(sku))
-                updateAccountInfo(this, purchases, myAccountInfo)
-                updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
                 RatingHandlerImpl(this).updateTransactionFlag(true)
                 PurchaseType.SUCCESS
             } else {
@@ -1334,22 +1263,16 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             Timber.d("Downgrade, the new subscription takes effect when the old one expires.")
             PurchaseType.DOWNGRADE
         }
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED, PurchaseType::class.java).post(purchaseResult)
-    }
-
-    override fun onQueryPurchasesFinished(
-        isFailed: Boolean,
-        resultCode: Int,
-        purchases: MutableList<MegaPurchase>?,
-    ) {
-        if (isFailed || purchases == null) {
-            Timber.w("Query of purchases failed, result code is %d, is purchase null: %s",
-                resultCode,
-                purchases == null)
-            return
+        when {
+            this is PaymentActivity || this is UpgradeAccountActivity -> finish()
+            this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
+                    || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
+                    || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
+                purchaseType = type
+                activeSubscriptionSku = activeSubscription?.sku
+                showQueryPurchasesResult(activeSubscription)
+            }
         }
-        updateAccountInfo(this, purchases, myAccountInfo)
-        updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
@@ -1399,7 +1322,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     /**
      * Shows the result of a purchase as an alert.
      */
-    private fun showQueryPurchasesResult() {
+    private fun showQueryPurchasesResult(activeSubscription: MegaPurchase?) {
         if (purchaseType == null || isAlertDialogShown(upgradeAlert)) {
             return
         }
@@ -1427,30 +1350,28 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         val account: Int
                         var color = R.color.red_600_red_300
                         val image: Int
-                        val activeSubscriptionSku =
-                            if (myAccountInfo.activeSubscription != null) myAccountInfo.activeSubscription?.sku
-                            else ""
+                        val activeSubscriptionSku = activeSubscription?.sku.orEmpty()
 
-                        when (myAccountInfo.levelInventory) {
+                        when (activeSubscription?.level) {
                             PRO_I -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
-                                    if (BillingManagerImpl.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_1_yearly
+                                    if (Skus.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_1_yearly
                                     else R.string.upgrade_account_successful_pro_1_monthly)
                             }
                             PRO_II -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
-                                    if (BillingManagerImpl.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_2_yearly
+                                    if (Skus.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_2_yearly
                                     else R.string.upgrade_account_successful_pro_2_monthly)
                             }
                             PRO_III -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
-                                    if (BillingManagerImpl.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_3_yearly
+                                    if (Skus.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_3_yearly
                                     else R.string.upgrade_account_successful_pro_3_monthly)
                             }
                             PRO_LITE -> {
@@ -1458,7 +1379,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                 color = R.color.orange_400_orange_300
                                 image = R.drawable.ic_lite_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
-                                    if (BillingManagerImpl.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_lite_yearly
+                                    if (Skus.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_lite_yearly
                                     else R.string.upgrade_account_successful_pro_lite_monthly)
                             }
                             else -> {
@@ -1539,8 +1460,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         private const val IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED"
         private const val DOWNLOAD_LOCATION = "DOWNLOAD_LOCATION"
         private const val UPGRADE_ALERT_SHOWN = "UPGRADE_ALERT_SHOWN"
-        private const val EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED"
         private const val PURCHASE_TYPE = "PURCHASE_TYPE"
+        private const val ACTIVE_SUBSCRIPTION_SKU = "ACTIVE_SUBSCRIPTION_SKU"
 
         /**
          * User account locked.

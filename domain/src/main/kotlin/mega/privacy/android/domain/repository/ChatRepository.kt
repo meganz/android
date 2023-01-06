@@ -272,6 +272,14 @@ interface ChatRepository {
     suspend fun isChatNotifiable(chatId: Long): Boolean
 
     /**
+     * Check if chat last message geolocation
+     *
+     * @param chatId    Chat id
+     * @return          True if last message is geolocation meta type or false otherwise
+     */
+    suspend fun isChatLastMessageGeolocation(chatId: Long): Boolean
+
+    /**
      * Monitor muted chats
      *
      * @return  A flow of Booleans indicating some changes has been made

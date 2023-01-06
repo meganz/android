@@ -1,10 +1,7 @@
 package mega.privacy.android.app.upgradeAccount
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
@@ -15,8 +12,6 @@ import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
-import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChooseAccountBinding
 import mega.privacy.android.app.interfaces.Scrollable
@@ -24,14 +19,12 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
-import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
@@ -47,25 +40,9 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     private lateinit var binding: ActivityChooseAccountBinding
     private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
 
-    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            manageUpdateReceiver(intent.getIntExtra(ACTION_TYPE, INVALID_ACTION))
-        }
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             onFreeClick()
-        }
-    }
-
-    private fun manageUpdateReceiver(action: Int) {
-        if (isFinishing) {
-            return
-        }
-
-        when (action) {
-            UPDATE_GET_PRICING -> setPricingInfo(viewModel.getProductAccounts())
         }
     }
 
@@ -78,22 +55,15 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         viewModel.refreshPricing()
+        billingViewModel.loadSkus()
         setupView()
         setupObservers()
-        initPayments()
 
         if (savedInstanceState != null
             && savedInstanceState.getBoolean(BILLING_WARNING_SHOWN, false)
         ) {
             showBillingWarning()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        unregisterReceiver(updateMyAccountReceiver)
-        destroyPayments()
     }
 
 
@@ -175,10 +145,9 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         collectFlow(viewModel.state) {
             setPricingInfo(it.product)
         }
-        registerReceiver(
-            updateMyAccountReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        )
+        collectFlow(billingViewModel.skus) {
+            setPricingInfo(viewModel.getProductAccounts())
+        }
     }
 
     override fun checkScroll() {

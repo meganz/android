@@ -234,6 +234,7 @@ class RecentActionsViewModelTest {
             val userAccount = UserAccount(
                 userId = null,
                 email = "aaa@aaa.com",
+                fullName = "name",
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
@@ -255,6 +256,7 @@ class RecentActionsViewModelTest {
             val userAccount = UserAccount(
                 userId = null,
                 email = "bbb@aaa.com",
+                fullName = "name",
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,

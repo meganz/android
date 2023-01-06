@@ -26,10 +26,14 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -54,7 +58,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import mega.privacy.android.app.utils.ViewUtils.isVisible
-import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -88,9 +91,9 @@ class RubbishBinFragment : Fragment() {
 
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
-    private val rubbishBinViewModel: RubbishBinViewModel by viewModels()
+    private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
 
-    private var nodes: List<MegaNode> = mutableListOf()
+    private var nodes = mutableListOf<MegaNode>()
 
     private var recyclerView: RecyclerView? = null
     private lateinit var emptyImageView: ImageView
@@ -128,30 +131,19 @@ class RubbishBinFragment : Fragment() {
         }
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
             EventObserver { showSortByPanel() })
-        managerViewModel.updateRubbishBinNodes.observe(viewLifecycleOwner, EventObserver { nodes ->
-            hideMultipleSelect()
-            setNodes(nodes)
-            recyclerView?.invalidate()
-        })
-        requireActivity().display?.getMetrics(outMetrics)
 
-        if (managerViewModel.state.value.rubbishBinParentHandle == -1L ||
-            managerViewModel.state.value.rubbishBinParentHandle == megaApi.rubbishNode.handle
-        ) {
-            Timber.d("Parent is the Rubbish: %s",
-                managerViewModel.state.value.rubbishBinParentHandle)
-            nodes = megaApi.getChildren(megaApi.rubbishNode,
-                sortOrderToInt(managerViewModel.getOrder()))
-        } else {
-            val parentNode =
-                megaApi.getNodeByHandle(managerViewModel.state.value.rubbishBinParentHandle)
-            parentNode?.let {
-                Timber.d("The parent node is: %s", parentNode.handle)
-                nodes = megaApi.getChildren(parentNode, sortOrderToInt(managerViewModel.getOrder()))
-                (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                rubbishBinViewModel.state.collect {
+                    Timber.d("updateRubbishBinNodes node update ${it.nodes.size}")
+                    hideMultipleSelect()
+                    setNodes(it.nodes)
+                    recyclerView?.invalidate()
+                }
             }
-            nodes = megaApi.getChildren(parentNode, sortOrderToInt(managerViewModel.getOrder()))
         }
+
+        requireActivity().display?.getMetrics(outMetrics)
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
         (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
@@ -164,14 +156,14 @@ class RubbishBinFragment : Fragment() {
             emptyTextView = listBinding.rubbishbinListEmptyTextFirst
 
             adapter?.let {
-                it.parentHandle = managerViewModel.state.value.rubbishBinParentHandle
+                it.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
                 it.setListFragment(recyclerView)
                 it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
             } ?: run {
                 adapter = MegaNodeAdapter(requireActivity(),
                     this@RubbishBinFragment,
                     nodes,
-                    managerViewModel.state.value.rubbishBinParentHandle,
+                    rubbishBinViewModel.state.value.rubbishBinHandle,
                     recyclerView,
                     Constants.RUBBISH_BIN_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
@@ -196,7 +188,6 @@ class RubbishBinFragment : Fragment() {
                 adapter = this@RubbishBinFragment.adapter
             }
 
-            setNodes(nodes)
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
@@ -215,14 +206,14 @@ class RubbishBinFragment : Fragment() {
             gridLayoutManager = recyclerView?.layoutManager as CustomizedGridLayoutManager
 
             adapter?.let {
-                it.parentHandle = managerViewModel.state.value.rubbishBinParentHandle
+                it.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
                 it.setListFragment(recyclerView)
                 it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
             } ?: run {
                 MegaNodeAdapter(requireActivity(),
                     this@RubbishBinFragment,
                     nodes,
-                    managerViewModel.state.value.rubbishBinParentHandle,
+                    rubbishBinViewModel.state.value.rubbishBinHandle,
                     recyclerView,
                     Constants.RUBBISH_BIN_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -245,7 +236,6 @@ class RubbishBinFragment : Fragment() {
             gridLayoutManager.spanSizeLookup =
                 adapter?.getSpanSizeLookup(gridLayoutManager.spanCount)
 
-            setNodes(nodes)
             checkAndConfigureAdapter(
                 textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
                 textGeneric = getString(R.string.file_browser_empty_folder_new),
@@ -258,7 +248,9 @@ class RubbishBinFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        DragToExitSupport.observeDragSupportEvents(viewLifecycleOwner, recyclerView, Constants.VIEWER_FROM_RUBBISH_BIN)
+        DragToExitSupport.observeDragSupportEvents(viewLifecycleOwner,
+            recyclerView,
+            Constants.VIEWER_FROM_RUBBISH_BIN)
     }
 
     /**
@@ -330,8 +322,8 @@ class RubbishBinFragment : Fragment() {
             emptyImageView.visibility = View.VISIBLE
             emptyTextView.visibility = View.VISIBLE
 
-            if (megaApi.rubbishNode.handle == managerViewModel.state.value.rubbishBinParentHandle ||
-                managerViewModel.state.value.rubbishBinParentHandle == -1L
+            if (megaApi.rubbishNode.handle == rubbishBinViewModel.state.value.rubbishBinHandle ||
+                rubbishBinViewModel.state.value.rubbishBinHandle == -1L
             ) {
                 if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.empty_rubbish_bin_landscape)
@@ -510,18 +502,14 @@ class RubbishBinFragment : Fragment() {
                     }
                     pos
                 }
-                Timber.d("Push to stack %d position", lastFirstVisiblePosition)
+                Timber.d("Push to stack $lastFirstVisiblePosition position")
                 lastPositionStack.push(lastFirstVisiblePosition)
-                managerViewModel.setRubbishBinParentHandle(n.handle)
+                rubbishBinViewModel.setRubbishBinHandle(n.handle)
 
                 (requireActivity() as ManagerActivity).setToolbarTitle()
                 (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
 
-                adapter?.parentHandle = managerViewModel.state.value.rubbishBinParentHandle
-                nodes = megaApi.getChildren(nodes[position],
-                    sortOrderToInt(managerViewModel.getOrder()))
-                adapter?.setNodes(nodes)
-                recyclerView?.scrollToPosition(0)
+                adapter?.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
 
                 //If folder has no files
                 checkAndConfigureAdapter(
@@ -740,19 +728,15 @@ class RubbishBinFragment : Fragment() {
 
     private fun updateActionModeTitle() {
         actionMode?.let {
-            val documents = adapter?.selectedNodes
-            var files = 0
-            var folders = 0
-            documents?.forEach {
-                if (it.isFile) files++
-                else if (it.isFolder) folders++
+            val files = adapter?.selectedNodes?.count { it.isFile } ?: 0
+            val folders = adapter?.selectedNodes?.count { it.isFolder } ?: 0
+
+            actionMode?.title = when {
+                (files == 0 && folders == 0) -> 0.toString()
+                files == 0 -> folders.toString()
+                folders == 0 -> files.toString()
+                else -> (files + folders).toString()
             }
-            val sum = files + folders
-            val title = if (sum == 0) "0"
-            else if (files == 0) "0"
-            else if (folders == 0) "0"
-            else "$sum"
-            actionMode?.title = title
 
             runCatching {
                 actionMode?.invalidate()
@@ -787,28 +771,25 @@ class RubbishBinFragment : Fragment() {
     fun onBackPressed(): Int {
         return adapter?.let {
             with(requireActivity() as ManagerActivity) {
-                if (comesFromNotifications && comesFromNotificationHandle == managerViewModel.state.value.rubbishBinParentHandle) {
+                if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
                     comesFromNotifications = false
                     comesFromNotificationHandle = -1
                     selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                    managerViewModel.setRubbishBinParentHandle(comesFromNotificationHandleSaved)
+                    rubbishBinViewModel.setRubbishBinHandle(comesFromNotificationHandleSaved)
                     comesFromNotificationHandleSaved = -1
                     2
                 } else {
                     val parentNode =
-                        megaApi.getParentNode(megaApi.getNodeByHandle(managerViewModel.state.value.rubbishBinParentHandle))
+                        megaApi.getParentNode(megaApi.getNodeByHandle(rubbishBinViewModel.state.value.rubbishBinHandle))
                     parentNode?.let {
                         recyclerView?.visibility = View.VISIBLE
                         emptyImageView.visibility = View.GONE
                         emptyTextView.visibility = View.GONE
                         supportInvalidateOptionsMenu()
-                        managerViewModel.setRubbishBinParentHandle(parentNode.handle)
+                        rubbishBinViewModel.setRubbishBinHandle(parentNode.handle)
                         setToolbarTitle()
-                        nodes = megaApi.getChildren(parentNode,
-                            sortOrderToInt(managerViewModel.getOrder()))
-                        adapter?.setNodes(nodes)
+
                         val lastVisiblePosition = if (!lastPositionStack.empty()) {
-                            Timber.d("Pop of the stack ${lastPositionStack.pop()} position")
                             lastPositionStack.pop()
                         } else 0
 
@@ -840,11 +821,12 @@ class RubbishBinFragment : Fragment() {
 
     /**
      * This method set nodes and updates the adapter
-     * @param nodes List of Mega Nodes
+     * @param rubbishNode List of Mega Nodes
      */
-    fun setNodes(nodes: List<MegaNode>) {
+    private fun setNodes(rubbishNode: List<MegaNode>) {
         Timber.d("setNodes")
-        this.nodes = nodes
+        nodes.clear()
+        nodes.addAll(rubbishNode)
 
         if (megaApi.rubbishNode == null) {
             Timber.e("megaApi.getRubbishNode() is NULL")

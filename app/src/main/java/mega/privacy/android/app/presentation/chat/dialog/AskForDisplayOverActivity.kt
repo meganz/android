@@ -3,14 +3,12 @@ package mega.privacy.android.app.presentation.chat.dialog
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +20,7 @@ import mega.privacy.android.app.presentation.chat.dialog.view.AskForDisplayOverD
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**

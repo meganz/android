@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -35,6 +34,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaEvent
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -67,7 +68,6 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
- * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param monitorContactRequestUpdates
  * @param getInboxNode
  * @param getNumUnreadUserAlerts
@@ -81,9 +81,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
-    private val monitorNodeUpdates: MonitorNodeUpdates,
+    monitorNodeUpdates: MonitorNodeUpdates,
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
-    private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getInboxNode: GetInboxNode,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
@@ -102,6 +101,7 @@ class ManagerViewModel @Inject constructor(
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
+    private val getActiveSubscription: GetActiveSubscription,
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
@@ -143,7 +143,6 @@ class ManagerViewModel @Inject constructor(
     )
 
     init {
-
         viewModelScope.launch {
             monitorNodeUpdates().collect {
                 checkItemForInbox(it)
@@ -195,12 +194,6 @@ class ManagerViewModel @Inject constructor(
      */
     @Suppress("DEPRECATION")
     private val _updates = monitorGlobalUpdates()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-    /**
-     * Monitor global node updates
-     */
-    private val _updateNodes = monitorNodeUpdates()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
@@ -256,29 +249,10 @@ class ManagerViewModel @Inject constructor(
             .asLiveData()
 
     /**
-     * Update Rubbish Nodes when a node update callback happens
-     */
-    val updateRubbishBinNodes: LiveData<Event<List<MegaNode>>> =
-        _updateNodes
-            .also { Timber.d("onRubbishNodesUpdate") }
-            .mapNotNull { getRubbishBinChildrenNode(_state.value.rubbishBinParentHandle) }
-            .map { Event(it) }
-            .asLiveData()
-
-    /**
      * On my avatar file changed
      */
     val onMyAvatarFileChanged: Flow<File?>
         get() = monitorMyAvatarFile()
-
-    /**
-     * Set the current rubbish bin parent handle to the UI state
-     *
-     * @param handle the id of the current rubbish bin parent handle to set
-     */
-    fun setRubbishBinParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(rubbishBinParentHandle = handle) }
-    }
 
     /**
      * Set a flag to know if the current navigation level is the first one
@@ -460,4 +434,9 @@ class ManagerViewModel @Inject constructor(
             getFullAccountInfo()
         }
     }
+
+    /**
+     * Active subscription in local cache
+     */
+    val activeSubscription: MegaPurchase? get() = getActiveSubscription()
 }

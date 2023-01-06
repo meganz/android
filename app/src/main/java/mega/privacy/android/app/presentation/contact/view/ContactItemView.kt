@@ -35,11 +35,11 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
-import mega.privacy.android.presentation.controls.MarqueeText
-import mega.privacy.android.presentation.theme.grey_alpha_012
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.white_alpha_012
-import mega.privacy.android.presentation.theme.white_alpha_054
+import mega.privacy.android.core.ui.controls.MarqueeText
+import mega.privacy.android.core.ui.theme.grey_alpha_012
+import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.core.ui.theme.white_alpha_054
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar

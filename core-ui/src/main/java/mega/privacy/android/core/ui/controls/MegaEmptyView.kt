@@ -1,0 +1,122 @@
+package mega.privacy.android.core.ui.controls
+
+import android.text.Spanned
+import android.util.TypedValue
+import android.widget.TextView
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+
+/**
+ * Reusable EmptyView with Icon & Text
+ * Pass imageVector using ImageVector.vectorResource(id = R.drawable.ic_xyz)
+ * @param modifier
+ * @param imageVector
+ * @param text
+ */
+@Composable
+fun MegaEmptyView(
+    modifier: Modifier = Modifier,
+    imageVector: ImageVector,
+    text: Spanned,
+) {
+    MegaEmptyView(modifier, text) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = getIconTint()
+        )
+    }
+}
+
+/**
+ * Reusable EmptyView with Icon & Text
+ * Pass imageBitmap using ImageBitmap.imageResource(id = R.drawable.ic_xyz)
+ * @param modifier
+ * @param imageBitmap
+ * @param text
+ */
+@Composable
+fun MegaEmptyView(
+    modifier: Modifier = Modifier,
+    imageBitmap: ImageBitmap,
+    text: Spanned,
+) {
+    MegaEmptyView(modifier, text) {
+        Icon(
+            bitmap = imageBitmap,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = getIconTint()
+        )
+    }
+}
+
+/**
+ * Reusable EmptyView with Icon & Text
+ * Pass imagePainter using painterResource(id = R.drawable.ic_xyz)
+ * @param modifier
+ * @param imagePainter
+ * @param text
+ */
+@Composable
+fun MegaEmptyView(
+    modifier: Modifier = Modifier,
+    imagePainter: Painter,
+    text: Spanned,
+) {
+    MegaEmptyView(modifier, text) {
+        Icon(
+            painter = imagePainter,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = getIconTint()
+        )
+    }
+}
+
+@Composable
+private fun MegaEmptyView(modifier: Modifier, text: Spanned, Icon: @Composable () -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon()
+        AndroidView(
+            factory = { context ->
+                TextView(context).apply {
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                }
+            },
+            update = { it.text = text }
+        )
+    }
+}
+
+@Composable
+private fun getIconTint(): Color {
+    return if (MaterialTheme.colors.isLight) {
+        Color.Unspecified
+    } else {
+        Color.Gray
+    }
+}
+
+

@@ -18,7 +18,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -45,7 +44,6 @@ import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
@@ -57,7 +55,6 @@ class ManagerViewModelTest {
 
     private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
-    private val getRubbishBinNodeByHandle = mock<GetRubbishBinChildrenNode>()
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
@@ -98,7 +95,6 @@ class ManagerViewModelTest {
         underTest = ManagerViewModel(
             monitorNodeUpdates = monitorNodeUpdates,
             monitorGlobalUpdates = monitorGlobalUpdates,
-            getRubbishBinChildrenNode = getRubbishBinNodeByHandle,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,
@@ -117,6 +113,7 @@ class ManagerViewModelTest {
             getExtendedAccountDetail = mock(),
             getPricing = mock(),
             getFullAccountInfo = mock(),
+            getActiveSubscription = mock(),
             getFeatureFlagValue = getFeatureFlagValue,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
@@ -145,7 +142,6 @@ class ManagerViewModelTest {
         setUnderTest()
         underTest.state.test {
             val initial = awaitItem()
-            assertThat(initial.rubbishBinParentHandle).isEqualTo(-1L)
             assertThat(initial.isFirstNavigationLevel).isTrue()
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
             assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
@@ -154,19 +150,6 @@ class ManagerViewModelTest {
             assertThat(initial.shouldStopCameraUpload).isFalse()
             assertThat(initial.nodeUpdateReceived).isFalse()
         }
-    }
-
-    @Test
-    fun `test that rubbish bin parent handle is updated if new value provided`() = runTest {
-        setUnderTest()
-
-        underTest.state.map { it.rubbishBinParentHandle }.distinctUntilChanged()
-            .test {
-                val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
-                underTest.setRubbishBinParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
     }
 
     @Test
@@ -230,37 +213,6 @@ class ManagerViewModelTest {
             setUnderTest()
 
             underTest.updateContactsRequests.test().assertNoValue()
-        }
-
-    @Test
-    fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() =
-        runTest {
-            whenever(getRubbishBinNodeByHandle(any())).thenReturn(listOf(mock(), mock()))
-
-            setUnderTest()
-
-            runCatching {
-                val result =
-                    underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                monitorNodeUpdates.emit(listOf(mock()))
-                result
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 2 }
-            }
-        }
-
-    @Test
-    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() =
-        runTest {
-            whenever(getRubbishBinNodeByHandle(any())).thenReturn(null)
-
-            setUnderTest()
-
-            runCatching {
-                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertNoValue()
-            }
         }
 
     @Test

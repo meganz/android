@@ -444,6 +444,11 @@ interface CameraUploadRepository {
     suspend fun deleteAllSecondarySyncRecords()
 
     /**
+     * Convert Base 64 string to handle
+     */
+    suspend fun convertBase64ToHandle(base64: String): Long
+
+    /**
      * monitor upload service pause State
      */
     fun monitorCameraUploadPauseState(): Flow<Boolean>
@@ -472,4 +477,12 @@ interface CameraUploadRepository {
         primaryFolder: Long,
         secondaryFolder: Long,
     )
+
+    /**
+     * rename camera uploads folder name
+     *
+     * @param nodeHandle handle for node to change name
+     * @param newName new name for camera upload folder
+     */
+    suspend fun renameNode(nodeHandle: Long, newName: String)
 }

@@ -512,6 +512,11 @@ public class Util {
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    /**
+     * Check if device connect to network
+     * @deprecated use MonitorConnectivity instead
+     */
+    @Deprecated
     static public boolean isOnline(Context context) {
         if (context == null) return true;
 

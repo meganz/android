@@ -20,6 +20,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
+import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
@@ -28,6 +29,7 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChatNotInitializedException
@@ -76,13 +78,15 @@ internal class DefaultAccountRepository @Inject constructor(
     private val currencyMapper: CurrencyMapper,
     private val subscriptionOptionListMapper: SubscriptionOptionListMapper,
     private val megaAchievementMapper: MegaAchievementMapper,
+    private val achievementsOverviewMapper: AchievementsOverviewMapper,
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
         userAccountMapper(
             user?.let { UserId(it.handle) },
-            user?.email ?: "",
+            user?.email ?: megaChatApiGateway.getMyEmail(),
+            megaChatApiGateway.getMyFullname(),
             megaApiGateway.isBusinessAccount,
             megaApiGateway.isMasterBusinessAccount,
             accountTypeMapper(myAccountInfoFacade.accountTypeId),
@@ -366,6 +370,27 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun getAccountAchievementsOverview(): AchievementsOverview =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(
+                                Result.success(achievementsOverviewMapper(
+                                    request.megaAchievementsDetails,
+                                )))
+                        } else {
+                            continuation.failWithError(error)
+                        }
+                    })
+                megaApiGateway.getAccountAchievements(listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 
     override val accountEmail: String?
         get() = megaApiGateway.accountEmail

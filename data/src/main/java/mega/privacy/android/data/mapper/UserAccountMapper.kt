@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.user.UserId
 typealias UserAccountMapper = (
     @JvmSuppressWildcards UserId?,
     @JvmSuppressWildcards String,
+    @JvmSuppressWildcards String?,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards Boolean,
     @JvmSuppressWildcards AccountType?,

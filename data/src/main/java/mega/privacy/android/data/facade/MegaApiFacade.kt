@@ -689,6 +689,12 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
 
+    override fun renameNode(
+        node: MegaNode,
+        newName: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.renameNode(node, newName, listener)
+
     override fun authorizeChatNode(node: MegaNode, authorizationToken: String): MegaNode? =
         megaApi.authorizeChatNode(node, authorizationToken)
 

@@ -117,6 +117,7 @@ android {
         ndk.abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
 
         buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
+        buildConfigField("boolean", "ACTIVATE_GREETER", "${shouldActivateGreeter}")
         resValue("string", "app_version", "\"${versionName}\"")
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
@@ -285,7 +286,7 @@ android {
 dependencies {
 
     implementation project(':domain')
-    implementation project(':presentation')
+    implementation project(':core-ui')
     implementation project(':data')
 
     // decide SDK dependency

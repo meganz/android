@@ -1,6 +1,5 @@
 package mega.privacy.android.app.globalmanagement
 
-import android.util.Base64
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -12,8 +11,6 @@ import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.account.MegaSku
-import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -21,9 +18,6 @@ import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,7 +48,6 @@ class MyAccountInfo @Inject constructor(
     var usedTransferPercentage = INVALID_VALUE
     var usedStorage = INVALID_VALUE.toLong()
     var accountType = INVALID_VALUE
-    private var accountInfo: MegaAccountDetails? = null
     var subscriptionStatus = INVALID_VALUE
     var subscriptionRenewTime = INVALID_VALUE.toLong()
     var proExpirationTime = INVALID_VALUE.toLong()
@@ -67,10 +60,8 @@ class MyAccountInfo @Inject constructor(
     private var formattedAvailableSpace = ""
     var usedTransferFormatted = ""
     var totalTransferFormatted = ""
-    var levelInventory = INVALID_VALUE
     var levelAccountDetails = INVALID_VALUE
 
-    var isInventoryFinished = false
     var isAccountDetailsFinished = false
     var isBusinessAlertShown = false
     private var wasBusinessAlertAlreadyShown = false
@@ -82,9 +73,6 @@ class MyAccountInfo @Inject constructor(
 
     var lastSessionFormattedDate: String? = null
     var createSessionTimeStamp = INVALID_VALUE.toLong()
-
-    var availableSkus: List<MegaSku> = ArrayList()
-    var activeSubscription: MegaPurchase? = null
 
     var numVersions = INVALID_VALUE
     var previousVersionsSize = INVALID_VALUE.toLong()
@@ -106,7 +94,6 @@ class MyAccountInfo @Inject constructor(
         usedTransferPercentage = INVALID_VALUE
         usedStorage = INVALID_VALUE.toLong()
         accountType = INVALID_VALUE
-        accountInfo = null
         subscriptionStatus = INVALID_VALUE
         subscriptionRenewTime = INVALID_VALUE.toLong()
         proExpirationTime = INVALID_VALUE.toLong()
@@ -119,10 +106,8 @@ class MyAccountInfo @Inject constructor(
         formattedAvailableSpace = ""
         usedTransferFormatted = ""
         totalTransferFormatted = ""
-        levelInventory = INVALID_VALUE
         levelAccountDetails = INVALID_VALUE
 
-        isInventoryFinished = false
         isAccountDetailsFinished = false
         isBusinessAlertShown = false
         wasBusinessAlertAlreadyShown = false
@@ -135,9 +120,6 @@ class MyAccountInfo @Inject constructor(
         lastSessionFormattedDate = null
         createSessionTimeStamp = INVALID_VALUE.toLong()
 
-        availableSkus = ArrayList()
-        activeSubscription = null
-
         numVersions = INVALID_VALUE
         previousVersionsSize = INVALID_VALUE.toLong()
 
@@ -146,14 +128,12 @@ class MyAccountInfo @Inject constructor(
         upgradeOpenedFrom = UpgradeFrom.MANAGER
     }
 
-    fun setAccountDetails(numDetails: Int) {
+    fun setAccountDetails(accountInfo: MegaAccountDetails, numDetails: Int) {
         Timber.d("numDetails: $numDetails")
-
-        if (accountInfo == null) {
-            Timber.e("Error because account info is NUll in setAccountDetails")
-        }
-
-        val accountInfo = accountInfo ?: return
+        Timber.d("Renews ts: ${accountInfo.subscriptionRenewTime}")
+        Timber.d("Renews on: ${getDateString(accountInfo.subscriptionRenewTime)}")
+        Timber.d("Expires ts: ${accountInfo.proExpiration}")
+        Timber.d("Expires on: ${getDateString(accountInfo.proExpiration)}")
 
         val storage = numDetails and HAS_STORAGE_DETAILS != 0
         val transfer = numDetails and HAS_TRANSFER_DETAILS != 0
@@ -241,7 +221,7 @@ class MyAccountInfo @Inject constructor(
         }
 
         isAccountDetailsFinished = true
-        Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails; LEVELINVENTORY: $levelInventory; INVENTORYFINISHED: $isInventoryFinished")
+        Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails")
     }
 
     /**
@@ -301,14 +281,6 @@ class MyAccountInfo @Inject constructor(
         }
     }
 
-    fun setAccountInfo(accountInfo: MegaAccountDetails) {
-        this.accountInfo = accountInfo
-        Timber.d("Renews ts: ${accountInfo.subscriptionRenewTime}")
-        Timber.d("Renews on: ${getDateString(accountInfo.subscriptionRenewTime)}")
-        Timber.d("Expires ts: ${accountInfo.proExpiration}")
-        Timber.d("Expires on: ${getDateString(accountInfo.proExpiration)}")
-    }
-
     fun getFirstNameText(): String = firstNameText
 
     fun setFirstNameText(firstName: String) {
@@ -359,43 +331,7 @@ class MyAccountInfo @Inject constructor(
         return getSizeString(previousVersionsSize)
     }
 
-    fun isPurchasedAlready(sku: String): Boolean {
-        if (activeSubscription == null) {
-            return false
-        }
-
-        val result = activeSubscription!!.sku == sku
-
-        if (result) {
-            Timber.d("$sku already subscribed.")
-        }
-
-        return result
-    }
-
     fun wasNotBusinessAlertShownYet(): Boolean = !wasBusinessAlertAlreadyShown
-
-    /**
-     * Generate an obfuscated account Id.
-     * The obfuscated account id can be passed to 'BillingFlowParams' for fraud prevention.
-     *
-     * @return A one-way hash based on the unique userHandleBinary.
-     */
-    fun generateObfuscatedAccountId(): String? {
-        try {
-            val digest = MessageDigest.getInstance("SHA-256")
-            val encodeHash = digest.digest(
-                megaApi.myUserHandleBinary.toString().toByteArray(StandardCharsets.UTF_8)
-            )
-
-            return Base64.encodeToString(encodeHash, Base64.DEFAULT)
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-            Timber.e(e, "Generate obfuscated account Id failed.")
-        }
-
-        return null
-    }
 
     fun isUpgradeFromAccount(): Boolean = upgradeOpenedFrom == UpgradeFrom.ACCOUNT
     fun isUpgradeFromManager(): Boolean = upgradeOpenedFrom == UpgradeFrom.MANAGER

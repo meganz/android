@@ -12,7 +12,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityPaymentBinding
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.upgradeAccount.ChooseUpgradeAccountViewModel.Companion.MONTHLY_SUBSCRIBED
 import mega.privacy.android.app.upgradeAccount.ChooseUpgradeAccountViewModel.Companion.YEARLY_SUBSCRIBED
 import mega.privacy.android.app.utils.ColorUtils
@@ -27,6 +27,7 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.account.Skus
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.util.BitSet
@@ -52,13 +53,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
         binding = ActivityPaymentBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initPayments()
         setupView()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        destroyPayments()
     }
 
     private fun setupView() {
@@ -121,9 +116,9 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
             text = StringResourcesUtils.getString(title)
         }
 
-        binding.walletIcon.setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID)
+        binding.walletIcon.setImageResource(BillingConstant.PAY_METHOD_ICON_RES_ID)
 
-        var textWallet = StringResourcesUtils.getString(BillingManagerImpl.PAY_METHOD_RES_ID)
+        var textWallet = StringResourcesUtils.getString(BillingConstant.PAY_METHOD_RES_ID)
 
         try {
             textWallet = textWallet.replace(
@@ -139,22 +134,21 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
         binding.proceedButton.setOnClickListener {
             when (upgradeType) {
-                PRO_I -> launchPayment(
-                    if (binding.monthlyButton.isChecked) BillingManagerImpl.SKU_PRO_I_MONTH
-                    else BillingManagerImpl.SKU_PRO_I_YEAR
-                )
-                PRO_II -> launchPayment(
-                    if (binding.monthlyButton.isChecked) BillingManagerImpl.SKU_PRO_II_MONTH
-                    else BillingManagerImpl.SKU_PRO_II_YEAR
-                )
-                PRO_III -> launchPayment(
-                    if (binding.monthlyButton.isChecked) BillingManagerImpl.SKU_PRO_III_MONTH
-                    else BillingManagerImpl.SKU_PRO_III_YEAR
-                )
-                PRO_LITE -> launchPayment(
-                    if (binding.monthlyButton.isChecked) BillingManagerImpl.SKU_PRO_LITE_MONTH
-                    else BillingManagerImpl.SKU_PRO_LITE_YEAR
-                )
+                PRO_I -> if (binding.monthlyButton.isChecked) Skus.SKU_PRO_I_MONTH
+                else Skus.SKU_PRO_I_YEAR
+                PRO_II -> if (binding.monthlyButton.isChecked) Skus.SKU_PRO_II_MONTH
+                else Skus.SKU_PRO_II_YEAR
+
+                PRO_III ->
+                    if (binding.monthlyButton.isChecked) Skus.SKU_PRO_III_MONTH
+                    else Skus.SKU_PRO_III_YEAR
+
+                PRO_LITE ->
+                    if (binding.monthlyButton.isChecked) Skus.SKU_PRO_LITE_MONTH
+                    else Skus.SKU_PRO_LITE_YEAR
+                else -> null
+            }?.let { productId ->
+                billingViewModel.startPurchase(this, productId)
             }
         }
     }
@@ -169,42 +163,35 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
             hideBilling()
             return
         }
+        if (viewModel.isBillingAvailable().not()
+            || !isPaymentMethodAvailable(paymentBitSet, MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)
+        ) {
+            hideBilling()
+            return
+        }
 
-        when {
-            !viewModel.isInventoryFinished() -> {
-                Timber.d("!isInventoryFinished()")
-                binding.walletIcon.isVisible = false
-                binding.walletText.isVisible = false
+        for (i in product.indices) {
+            val account = product[i]
+
+            if (account.level == upgradeType) {
+                val textToShow = viewModel.getPriceString(this, account, false)
+
+                if (account.months == 1) {
+                    binding.monthlyText.text = textToShow
+                } else if (account.months == 12) {
+                    binding.yearlyText.text = textToShow
+                }
             }
-            !isPaymentMethodAvailable(
-                paymentBitSet,
-                MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
-            ) -> hideBilling()
-            else -> {
-                for (i in product.indices) {
-                    val account = product[i]
+        }
 
-                    if (account.level == upgradeType) {
-                        val textToShow = viewModel.getPriceString(this, account, false)
-
-                        if (account.months == 1) {
-                            binding.monthlyText.text = textToShow
-                        } else if (account.months == 12) {
-                            binding.yearlyText.text = textToShow
-                        }
-                    }
-                }
-
-                when (viewModel.getSubscription(upgradeType)) {
-                    MONTHLY_SUBSCRIBED -> {
-                        disableBilling()
-                        binding.yearlyText.alpha = NOT_SUBSCRIBED_ALPHA
-                    }
-                    YEARLY_SUBSCRIBED -> {
-                        disableBilling()
-                        binding.monthlyText.alpha = NOT_SUBSCRIBED_ALPHA
-                    }
-                }
+        when (viewModel.getSubscription(upgradeType)) {
+            MONTHLY_SUBSCRIBED -> {
+                disableBilling()
+                binding.yearlyText.alpha = NOT_SUBSCRIBED_ALPHA
+            }
+            YEARLY_SUBSCRIBED -> {
+                disableBilling()
+                binding.monthlyText.alpha = NOT_SUBSCRIBED_ALPHA
             }
         }
     }

@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
+import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -57,12 +58,15 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.RenamePrimaryFolder
+import mega.privacy.android.domain.usecase.RenameSecondaryFolder
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -293,6 +297,12 @@ object TestCameraUploadUseCases {
     fun provideGetCameraUploadFolderName() = mock<GetCameraUploadFolderName>()
 
     @Provides
+    fun provideRenamePrimaryFolder() = mock<RenamePrimaryFolder>()
+
+    @Provides
+    fun provideRenameSecondaryFolder() = mock<RenameSecondaryFolder>()
+
+    @Provides
     fun provideDisableCameraUploadSettings() = mock<DisableCameraUploadSettings>()
 
     @Provides
@@ -314,8 +324,14 @@ object TestCameraUploadUseCases {
     fun provideBroadcastUploadPauseState() = mock<BroadcastUploadPauseState>()
 
     @Provides
+    fun provideIsNodeInRubbishOrDeleted() = mock<IsNodeInRubbishOrDeleted>()
+
+    @Provides
     fun provideMonitorBatteryInfo() = mock<MonitorBatteryInfo>()
 
     @Provides
     fun provideMonitorChargingStoppedState() = mock<MonitorChargingStoppedState>()
+
+    @Provides
+    fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()
 }

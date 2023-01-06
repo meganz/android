@@ -8,14 +8,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
+import mega.privacy.android.app.middlelayer.iab.BillingConstant.PAYMENT_GATEWAY
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
@@ -56,8 +55,7 @@ class AccountInfoFacade @Inject constructor(
         }
         val megaAccountDetails = request.megaAccountDetails ?: return
         // backward compatible, it will replace by new AccountDetail domain entity
-        myAccountInfo.setAccountInfo(megaAccountDetails)
-        myAccountInfo.setAccountDetails(request.numDetails)
+        myAccountInfo.setAccountDetails(megaAccountDetails, request.numDetails)
         val sessions =
             request.numDetails and MyAccountInfo.HAS_SESSIONS_DETAILS != 0
         if (sessions) {
@@ -76,24 +74,11 @@ class AccountInfoFacade @Inject constructor(
         accountDetail.emit(request.megaAccountDetails)
     }
 
-    override var availableSkus: List<MegaSku>
-        get() = myAccountInfo.availableSkus
-        set(value) {
-            myAccountInfo.availableSkus = value
-        }
-
-    override val activeSubscription: MegaPurchase?
-        get() = myAccountInfo.activeSubscription
-
     override val subscriptionMethodId: Int
         get() = myAccountInfo.subscriptionMethodId
 
-    override fun updateActiveSubscription(purchase: MegaPurchase?, levelInventory: Int) {
+    override fun updateActiveSubscription(purchase: MegaPurchase?) {
         Timber.d("Set current max subscription: $purchase")
-        myAccountInfo.activeSubscription = purchase
-
-        myAccountInfo.levelInventory = levelInventory
-        myAccountInfo.isInventoryFinished = true
         purchase?.let {
             updateSubscriptionLevel(it)
         }
@@ -114,7 +99,7 @@ class AccountInfoFacade @Inject constructor(
             }
         )
 
-        if (myAccountInfo.levelInventory > myAccountInfo.levelAccountDetails) {
+        if (purchase.level > myAccountInfo.levelAccountDetails) {
             Timber.d("megaApi.submitPurchaseReceipt is invoked")
             if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
                 megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)

@@ -357,7 +357,7 @@
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">正在创建文件夹</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">回收站为空</string>
+    <string name="context_clear_rubbish">清空回收站</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
     <string name="clear_rubbish_confirmation">您即将永久移除回收站中的所有项目。</string>
     <!-- send cancel subscriptions dialog -->
@@ -4004,7 +4004,7 @@
         <item quantity="other">相册将会被删除但是它里面的内容将保留在您的时间线中。</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">查看更少</string>
     <!--Title of the fingerprint verification screen-->
     <string name="shared_items_verify_credentials_contact_verification_title">联系人验证</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
@@ -4014,13 +4014,20 @@
     <!--Header message located at the top of "My credentials" section-->
     <string name="shared_items_verify_credentials_information">为了验证您的联系人，请确保您在上面看到的凭证与他们的账户凭证相符。您可以要求他们与您分享他们的凭证。</string>
     <!--Undecrypted folder label-->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[未解密的文件夹]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">为了访问此共享文件夹，与您分享它的人应该也对您进行验证。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">验证%s</string>
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">您的凭证</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在为预览准备文件</string>
+    <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
+    <plurals name="account_achievements_bonus_expiration_date">
+        <item quantity="one">Bonus expires in %1$d day</item>
+        <item quantity="other">Bonus expires in %1$d days</item>
+    </plurals>
+    <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">描述</string>
 </resources>

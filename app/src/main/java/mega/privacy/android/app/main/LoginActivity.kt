@@ -253,7 +253,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
                 if (passwdTemp != null && emailTemp != null) {
                     confirmEmailFragment.emailTemp = emailTemp
-                    confirmEmailFragment.passwdTemp = passwdTemp
                     confirmEmailFragment.firstNameTemp = firstNameTemp
                 }
 

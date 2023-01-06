@@ -24,13 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
-import mega.privacy.android.presentation.controls.LabelledSwitch
-import mega.privacy.android.presentation.controls.ProgressDialog
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.grey_alpha_012
-import mega.privacy.android.presentation.theme.grey_alpha_087
-import mega.privacy.android.presentation.theme.white_alpha_012
-import mega.privacy.android.presentation.theme.white_alpha_087
+import mega.privacy.android.core.ui.controls.LabelledSwitch
+import mega.privacy.android.core.ui.controls.ProgressDialog
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.grey_alpha_012
+import mega.privacy.android.core.ui.theme.grey_alpha_087
+import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.core.ui.theme.white_alpha_087
 
 @Composable
 fun ReportIssueView(

@@ -72,6 +72,8 @@ import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
 import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
+import mega.privacy.android.domain.usecase.DefaultRenamePrimaryFolder
+import mega.privacy.android.domain.usecase.DefaultRenameSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
@@ -105,12 +107,15 @@ import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.RenamePrimaryFolder
+import mega.privacy.android.domain.usecase.RenameSecondaryFolder
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -440,6 +445,13 @@ abstract class CameraUploadUseCases {
             BroadcastUploadPauseState(cameraUploadRepository::broadcastUploadPauseState)
 
         /**
+         * Provide the [IsNodeInRubbishOrDeleted] implementation
+         */
+        @Provides
+        fun provideIsNodeInRubbishOrDeleted(fileRepository: FileRepository): IsNodeInRubbishOrDeleted =
+            IsNodeInRubbishOrDeleted(fileRepository::isNodeInRubbishOrDeleted)
+
+        /**
          * Provide the [MonitorBatteryInfo] implementation
          */
         @Provides
@@ -459,8 +471,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideCreateCameraUploadFolder(fileRepository: FileRepository): CreateCameraUploadFolder =
             CreateCameraUploadFolder(fileRepository::createFolder)
-
-
     }
 
     /**
@@ -516,6 +526,18 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindGetCameraUploadFolderName(getCameraUploadFolderName: DefaultGetCameraUploadFolderName): GetCameraUploadFolderName
+
+    /**
+     * Provide the [RenamePrimaryFolder] implementation
+     */
+    @Binds
+    abstract fun bindRenamePrimaryFolder(renamePrimaryFolder: DefaultRenamePrimaryFolder): RenamePrimaryFolder
+
+    /**
+     * Provide the [RenameSecondaryFolder] implementation
+     */
+    @Binds
+    abstract fun bindRenameSecondaryFolder(renameSecondaryFolder: DefaultRenameSecondaryFolder): RenameSecondaryFolder
 
     /**
      * Provide the [GetPrimarySyncHandle] implementation

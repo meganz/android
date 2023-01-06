@@ -54,13 +54,13 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.grey_alpha_054
-import mega.privacy.android.presentation.theme.grey_alpha_087
-import mega.privacy.android.presentation.theme.teal_300
-import mega.privacy.android.presentation.theme.white
-import mega.privacy.android.presentation.theme.white_alpha_054
-import mega.privacy.android.presentation.theme.white_alpha_087
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.grey_alpha_087
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.core.ui.theme.white_alpha_087
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -96,8 +96,8 @@ fun AlbumPhotosSelectionScreen(
 
     handleAddPhotosCompletion(
         album = state.album,
-        selectedPhotoIds = state.selectedPhotoIds,
         isSelectionCompleted = state.isSelectionCompleted,
+        numCommittedPhotos = state.numCommittedPhotos,
         onCompletion = onCompletion,
     )
 
@@ -110,6 +110,7 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
+                showSelectAllMenu = (state.filteredPhotoIds - state.selectedPhotoIds).isNotEmpty(),
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -184,6 +185,7 @@ private fun AlbumPhotosSelectionHeader(
     numSelectedPhotos: Int,
     showFilterMenu: Boolean,
     showMoreMenu: Boolean,
+    showSelectAllMenu: Boolean,
     onBackClicked: () -> Unit,
     onFilterClicked: () -> Unit,
     onMoreClicked: () -> Unit,
@@ -259,8 +261,10 @@ private fun AlbumPhotosSelectionHeader(
                 }
 
                 DropdownMenu(expanded = showMoreMenu, onDismissRequest = onMoreDismissed) {
-                    DropdownMenuItem(onClick = onSelectAllClicked) {
-                        Text(text = stringResource(id = R.string.action_select_all))
+                    if (showSelectAllMenu) {
+                        DropdownMenuItem(onClick = onSelectAllClicked) {
+                            Text(text = stringResource(id = R.string.action_select_all))
+                        }
                     }
                     DropdownMenuItem(onClick = onClearSelectionClicked) {
                         Text(text = stringResource(id = R.string.action_unselect_all))
@@ -376,16 +380,16 @@ private fun SelectLocationDialog(
 @Composable
 private fun handleAddPhotosCompletion(
     album: Album.UserAlbum?,
-    selectedPhotoIds: Set<Long>,
     isSelectionCompleted: Boolean,
+    numCommittedPhotos: Int,
     onCompletion: (albumId: AlbumId, message: String) -> Unit,
 ) {
     val albumId = album?.id
     if (albumId != null && isSelectionCompleted) {
-        val message = "".takeIf { selectedPhotoIds.isEmpty() } ?: pluralStringResource(
+        val message = "".takeIf { numCommittedPhotos <= 0 } ?: pluralStringResource(
             id = R.plurals.photos_album_selection_added,
-            count = selectedPhotoIds.size,
-            selectedPhotoIds.size,
+            count = numCommittedPhotos,
+            numCommittedPhotos,
             album.title,
         )
 

@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.data.repository.AndroidBillingRepository
 import mega.privacy.android.data.repository.DefaultAccountRepository
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
@@ -199,4 +200,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindClipboardRepository(repository: DefaultClipboardRepository): ClipboardRepository
+
+    @Binds
+    abstract fun bindAndroidBillingRepository(repository: DefaultBillingRepository): AndroidBillingRepository
 }

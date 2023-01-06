@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation project(":presentation")
+    implementation project(':core-ui')
     implementation platform("androidx.compose:compose-bom:$composeBomVersion")
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.material:material'

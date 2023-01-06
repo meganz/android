@@ -27,6 +27,7 @@ class DefaultMonitorUserUpdatesTest {
             UserAccount(
                 userId = currentUserId,
                 email = "",
+                fullName = "name",
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,

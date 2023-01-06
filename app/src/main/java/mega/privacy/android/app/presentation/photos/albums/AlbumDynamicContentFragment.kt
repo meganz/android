@@ -31,11 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -60,20 +61,22 @@ import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
-import mega.privacy.android.app.presentation.photos.albums.view.EmptyView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
+import mega.privacy.android.app.utils.StringUtils.formatColorTag
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.presentation.theme.AndroidTheme
-import mega.privacy.android.presentation.theme.black
-import mega.privacy.android.presentation.theme.dark_grey
-import mega.privacy.android.presentation.theme.white
+import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.white
 import javax.inject.Inject
 
 /**
@@ -223,15 +226,21 @@ class AlbumDynamicContentFragment : Fragment() {
                 )
             } else {
                 when (uiState.currentAlbum) {
-                    Album.FavouriteAlbum -> EmptyView(
-                        imageResId = R.drawable.ic_photos_favourite_album,
-                        textResId = R.string.empty_hint_favourite_album
+                    Album.FavouriteAlbum -> MegaEmptyView(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
+                        text = getString(R.string.empty_hint_favourite_album)
+                            .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
+                            .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
+                            .toSpannedHtmlText()
                     )
                     Album.GifAlbum -> Back()
                     Album.RawAlbum -> Back()
-                    is Album.UserAlbum -> EmptyView(
-                        imageResId = R.drawable.ic_photos_user_album_empty,
-                        textResId = R.string.photos_user_album_empty_album
+                    is Album.UserAlbum -> MegaEmptyView(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
+                        text = getString(R.string.photos_user_album_empty_album)
+                            .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
+                            .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
+                            .toSpannedHtmlText()
                     )
                     null -> Back()
                 }

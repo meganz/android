@@ -44,6 +44,7 @@ import static mega.privacy.android.app.presentation.manager.ManagerActivityExten
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.linksState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.outgoingSharesState;
+import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.rubbishBinState;
 import static mega.privacy.android.app.presentation.permissions.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV;
 import static mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
@@ -212,6 +213,7 @@ import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
@@ -298,6 +300,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
@@ -321,7 +324,6 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
@@ -358,12 +360,15 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
+import mega.privacy.android.app.presentation.notification.NotificationsFragment;
+import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler;
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment;
 import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
+import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
@@ -463,7 +468,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaTransferListenerInterface, OnClickListener,
         BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
         ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
+        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, NotificationNavigationHandler {
 
     private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -513,6 +518,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public OutgoingSharesViewModel outgoingSharesViewModel;
     public InboxViewModel inboxViewModel;
     public LinksViewModel linksViewModel;
+    public RubbishBinViewModel rubbishBinViewModel;
     private SearchViewModel searchViewModel;
 
     @Inject
@@ -1405,6 +1411,7 @@ public class ManagerActivity extends TransfersManagementActivity
         outgoingSharesViewModel = new ViewModelProvider(this).get(OutgoingSharesViewModel.class);
         inboxViewModel = new ViewModelProvider(this).get(InboxViewModel.class);
         linksViewModel = new ViewModelProvider(this).get(LinksViewModel.class);
+        rubbishBinViewModel = new ViewModelProvider(this).get(RubbishBinViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
@@ -2208,7 +2215,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             this.setProfileAvatar();
 
-            initPayments();
+            preloadPayment();
 
             megaApi.isGeolocationEnabled(this);
 
@@ -2270,7 +2277,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                     selectDrawerItemPending = false;
                                 } else if (fragmentHandle == megaApi.getRubbishNode().getHandle()) {
                                     drawerItem = DrawerItem.RUBBISH_BIN;
-                                    viewModel.setRubbishBinParentHandle(handleIntent);
+                                    rubbishBinViewModel.setRubbishBinHandle(handleIntent);
                                     selectDrawerItem(drawerItem);
                                     selectDrawerItemPending = false;
                                 } else if (fragmentHandle == megaApi.getInboxNode().getHandle()) {
@@ -3161,7 +3168,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             default:
                 if (megaApi.isInRubbish(parentIntentN)) {
-                    viewModel.setRubbishBinParentHandle(handleIntent);
+                    rubbishBinViewModel.setRubbishBinHandle(handleIntent);
                     drawerItem = DrawerItem.RUBBISH_BIN;
                 } else if (megaApi.isInInbox(parentIntentN)) {
                     inboxViewModel.updateInboxHandle(handleIntent);
@@ -3464,13 +3471,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV);
                     break;
                 }
-                case NOTIFICATIONS: {
-                    notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
-                    if (notificationsFragment != null) {
-                        notificationsFragment.setNotifications();
-                    }
+                case NOTIFICATIONS:
                     break;
-                }
                 case HOMEPAGE:
                 default:
                     setBottomNavigationMenuItemChecked(HOME_BNV);
@@ -3580,8 +3582,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
         LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
-
-        destroyPayments();
 
         cancelSearch();
         if (reconnectDialog != null) {
@@ -3797,12 +3797,12 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case RUBBISH_BIN: {
                 aB.setSubtitle(null);
-                MegaNode node = megaApi.getNodeByHandle(viewModel.getState().getValue().getRubbishBinParentHandle());
+                MegaNode node = megaApi.getNodeByHandle(rubbishBinState(ManagerActivity.this).getRubbishBinHandle());
                 MegaNode rubbishNode = megaApi.getRubbishNode();
                 if (rubbishNode == null) {
-                    viewModel.setRubbishBinParentHandle(INVALID_HANDLE);
+                    rubbishBinViewModel.setRubbishBinHandle(INVALID_HANDLE);
                     viewModel.setIsFirstNavigationLevel(true);
-                } else if (viewModel.getState().getValue().getRubbishBinParentHandle() == INVALID_HANDLE || node == null || node.getHandle() == rubbishNode.getHandle()) {
+                } else if (rubbishBinState(ManagerActivity.this).getRubbishBinHandle() == INVALID_HANDLE || node == null || node.getHandle() == rubbishNode.getHandle()) {
                     aB.setTitle(StringResourcesUtils.getString(R.string.section_rubbish_bin));
                     viewModel.setIsFirstNavigationLevel(true);
                 } else {
@@ -3967,6 +3967,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     case VIDEO:
                         titleId = R.string.sortby_type_video_first;
                         break;
+                    case RECENT_BUCKET:
+                        RecentsBucketFragment fragment = getFragmentByType(RecentsBucketFragment.class);
+                        if (fragment != null) {
+                            fragment.setupToolbar();
+                        }
                 }
 
                 if (titleId != -1) {
@@ -5249,7 +5254,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         searchViewModel.setSearchQuery(newText);
                         searchViewModel.performSearch(
                                 fileBrowserState(ManagerActivity.this).getFileBrowserHandle(),
-                                viewModel.getState().getValue().getRubbishBinParentHandle(),
+                                rubbishBinState(ManagerActivity.this).getRubbishBinHandle(),
                                 inboxState(ManagerActivity.this).getInboxHandle(),
                                 incomingSharesState(ManagerActivity.this).getIncomingHandle(),
                                 outgoingSharesState(ManagerActivity.this).getOutgoingHandle(),
@@ -5814,20 +5819,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshRubbishBin() {
-        rubbishBinFragment = (RubbishBinFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
-        if (rubbishBinFragment != null) {
-            ArrayList<MegaNode> nodes;
-            if (viewModel.getState().getValue().getRubbishBinParentHandle() == -1) {
-                nodes = megaApi.getChildren(megaApi.getRubbishNode(), SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            } else {
-                nodes = megaApi.getChildren(megaApi.getNodeByHandle(viewModel.getState().getValue().getRubbishBinParentHandle()),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            }
-
-            rubbishBinFragment.hideMultipleSelect();
-            rubbishBinFragment.setNodes(nodes);
-            rubbishBinFragment.getRecyclerView().invalidate();
-        }
+        rubbishBinViewModel.refreshNodes();
     }
 
     /**
@@ -6196,7 +6188,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .subscribe((result, throwable) -> {
                     if (throwable == null) {
                         boolean notValidView = result.isSingleAction() && result.isSuccess()
-                                && viewModel.getState().getValue().getRubbishBinParentHandle() == nodes.get(0).getHandle();
+                                && rubbishBinState(ManagerActivity.this).getRubbishBinHandle() == nodes.get(0).getHandle();
 
                         showRestorationOrRemovalResult(notValidView, result.getResultText());
                     } else if (throwable instanceof ForeignNodeException) {
@@ -6213,7 +6205,7 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     private void showRestorationOrRemovalResult(boolean notValidView, String message) {
         if (notValidView) {
-            viewModel.setRubbishBinParentHandle(INVALID_HANDLE);
+            rubbishBinViewModel.setRubbishBinHandle(INVALID_HANDLE);
             setToolbarTitle();
             refreshRubbishBin();
         }
@@ -6334,7 +6326,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 if (throwable == null) {
                                     boolean notValidView = result.isSingleAction()
                                             && result.isSuccess()
-                                            && viewModel.getState().getValue().getRubbishBinParentHandle() == handleList.get(0);
+                                            && rubbishBinState(ManagerActivity.this).getRubbishBinHandle() == handleList.get(0);
 
                                     showRestorationOrRemovalResult(notValidView, result.getResultText());
                                 }
@@ -6785,7 +6777,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
 
             case RUBBISH_BIN:
-                parentHandle = viewModel.getState().getValue().getRubbishBinParentHandle();
+                parentHandle = rubbishBinState(ManagerActivity.this).getRubbishBinHandle();
                 break;
 
             case SHARED_ITEMS:
@@ -7563,7 +7555,7 @@ public class ManagerActivity extends TransfersManagementActivity
             Timber.w("usedSpaceLayout is NULL");
         }
 
-        updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
+        updateSubscriptionLevel(myAccountInfo, viewModel.getActiveSubscription(), dbH, megaApi);
 
         int resId = R.drawable.custom_progress_bar_horizontal_ok;
         switch (storageState) {
@@ -7665,7 +7657,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void setParentHandleRubbish(long parentHandleRubbish) {
         Timber.d("setParentHandleRubbish");
-        viewModel.setRubbishBinParentHandle(parentHandleRubbish);
+        rubbishBinViewModel.setRubbishBinHandle(parentHandleRubbish);
     }
 
     public void setParentHandleInbox(long parentHandleInbox) {
@@ -7742,6 +7734,17 @@ public class ManagerActivity extends TransfersManagementActivity
         Timber.d("navigateToMyAccount");
         getProLayout.setVisibility(View.GONE);
         showMyAccount();
+    }
+
+
+    @Override
+    public void navigateToSharedNode(long nodeId, @Nullable long[] childNodes) {
+        openLocation(nodeId, childNodes);
+    }
+
+    @Override
+    public void navigateToContactInfo(@NonNull String email) {
+        ContactUtil.openContactInfoActivity(this, email);
     }
 
     @Override
@@ -9686,8 +9689,8 @@ public class ManagerActivity extends TransfersManagementActivity
             //Rubbish
             drawerItem = DrawerItem.RUBBISH_BIN;
             openFolderRefresh = true;
-            comesFromNotificationHandleSaved = viewModel.getState().getValue().getRubbishBinParentHandle();
-            viewModel.setRubbishBinParentHandle(nodeHandle);
+            comesFromNotificationHandleSaved = rubbishBinState(ManagerActivity.this).getRubbishBinHandle();
+            rubbishBinViewModel.setRubbishBinHandle(nodeHandle);
             selectDrawerItem(drawerItem);
         } else if (parent.getHandle() == megaApi.getInboxNode().getHandle()) {
             //Inbox
@@ -9715,10 +9718,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON);
-        notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
-        if (notificationsFragment != null && userAlerts != null) {
-            notificationsFragment.updateNotifications(userAlerts);
-        }
     }
 
     public void updateMyEmail(String email) {
@@ -10918,7 +10917,7 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
             selectDrawerItem(DrawerItem.CLOUD_DRIVE);
         } else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
-            viewModel.setRubbishBinParentHandle(node.getParentHandle());
+            rubbishBinViewModel.setRubbishBinHandle(node.getParentHandle());
             refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
             selectDrawerItem(DrawerItem.RUBBISH_BIN);
         } else if (parentNode.isInShare()) {

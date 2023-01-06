@@ -131,7 +131,6 @@ public class Constants {
 
     public static final int SCROLL_TO_POSITION = 9000;
     public static final int UPDATE_IMAGE_DRAG = 9001;
-    public static final int UPDATE_GET_PRICING = 9002;
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
 
     public static final int REQUEST_WRITE_STORAGE = 1;

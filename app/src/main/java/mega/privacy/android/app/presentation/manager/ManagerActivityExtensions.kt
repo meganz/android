@@ -49,3 +49,11 @@ fun ManagerActivity.inboxState() = inboxViewModel.state.value
  * @return the LinksState hold in LinksViewModel
  */
 fun ManagerActivity.linksState() = linksViewModel.state.value
+
+/**
+ * Get the RubbishBinState in RubbishBinViewModel
+ * This function will be used until ManagerActivity is converted to Kotlin
+ *
+ * @return the RubbishBinState hold in RubbishBinViewModel
+ */
+fun ManagerActivity.rubbishBinState() = rubbishBinViewModel.state.value

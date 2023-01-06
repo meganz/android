@@ -10,8 +10,10 @@ sealed class BillingEvent {
      *
      * Emit when onPurchasesUpdated getting call
      * @property purchases
+     * @property activeSubscription
      */
     data class OnPurchaseUpdate(
         val purchases: List<MegaPurchase>,
+        val activeSubscription: MegaPurchase?,
     ) : BillingEvent()
 }

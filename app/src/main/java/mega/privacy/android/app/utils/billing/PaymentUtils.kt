@@ -1,32 +1,25 @@
 package mega.privacy.android.app.utils.billing
 
-import android.content.Context
-import android.content.Intent
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_MONTH
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_III_YEAR
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_MONTH
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_II_YEAR
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_I_MONTH
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_I_YEAR
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_LITE_MONTH
-import mega.privacy.android.app.service.iab.BillingManagerImpl.SKU_PRO_LITE_YEAR
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.middlelayer.iab.BillingConstant.PAYMENT_GATEWAY
 import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
-import mega.privacy.android.app.utils.Constants.UPDATE_GET_PRICING
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.domain.entity.Product
-import mega.privacy.android.domain.entity.account.MegaSku
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_III_MONTH
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_III_YEAR
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_II_MONTH
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_II_YEAR
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_I_MONTH
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_I_YEAR
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_MONTH
+import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_YEAR
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -34,23 +27,6 @@ import nz.mega.sdk.MegaError
 import timber.log.Timber
 
 object PaymentUtils {
-    /**
-     * Get the level of a certain sku.
-     *
-     * @param sku The id of the sku item.
-     * @return The level of the sku.
-     */
-    @JvmStatic
-    fun getProductLevel(sku: String?): Int {
-        return when (sku) {
-            SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> 0
-            SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> 1
-            SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> 2
-            SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> 3
-            else -> INVALID_VALUE
-        }
-    }
-
     /**
      * Get renewal type of a certain sku item.
      *
@@ -105,19 +81,6 @@ object PaymentUtils {
     }
 
     /**
-     * Gets the details of a SKU from current platform(Google play/Huawei app gallery).
-     *
-     * @param list List of available products in current platform.
-     * @param key Key of the product to get the details.
-     * @return Details of the product corresponding to the provided key.
-     */
-    @JvmStatic
-    fun getSkuDetails(list: List<MegaSku?>?, key: String): MegaSku? =
-        list?.firstOrNull { megaSku ->
-            megaSku?.sku == key
-        }
-
-    /**
      * Updates subscription level.
      *
      * @param myAccountInfo MyAccountInfo to check active subscription
@@ -127,16 +90,16 @@ object PaymentUtils {
     @JvmStatic
     fun updateSubscriptionLevel(
         myAccountInfo: MyAccountInfo,
+        activeSubscription: MegaPurchase?,
         dbH: DatabaseHandler,
         megaApi: MegaApiAndroid,
     ) {
-        val highestGooglePlaySubscription = myAccountInfo.activeSubscription
 
-        if (!myAccountInfo.isAccountDetailsFinished || highestGooglePlaySubscription == null) {
+        if (!myAccountInfo.isAccountDetailsFinished || activeSubscription == null) {
             return
         }
 
-        val json = highestGooglePlaySubscription.receipt
+        val json = activeSubscription.receipt
         Timber.d("ORIGINAL JSON:$json") //Print JSON in logs to help debug possible payments issues
 
         val attributes: MegaAttributes? = dbH.attributes
@@ -150,7 +113,7 @@ object PaymentUtils {
             }
         )
 
-        if (myAccountInfo.levelInventory > myAccountInfo.levelAccountDetails) {
+        if (activeSubscription.level > myAccountInfo.levelAccountDetails) {
             Timber.d("megaApi.submitPurchaseReceipt is invoked")
             if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
                 megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
@@ -160,64 +123,7 @@ object PaymentUtils {
                         lastPublicHandleType, lastPublicHandleTimeStamp, listener
                     )
                 }
-
             }
         }
-    }
-
-    /**
-     * Updates the account info after a purchase finished.
-     *
-     * @param context       Current Context.
-     * @param purchases     List of purchases
-     * @param myAccountInfo MyAccountInfo object.
-     */
-    @JvmStatic
-    fun updateAccountInfo(
-        context: Context,
-        purchases: List<MegaPurchase>,
-        myAccountInfo: MyAccountInfo,
-    ) {
-        var highest = INVALID_VALUE
-        var temp = INVALID_VALUE
-        var max: MegaPurchase? = null
-
-        for (purchase in purchases) {
-            when (purchase.sku) {
-                SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> temp = 0
-                SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> temp = 1
-                SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> temp = 2
-                SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> temp = 3
-            }
-
-            if (temp >= highest) {
-                highest = temp
-                max = purchase
-            }
-        }
-
-        if (max != null) {
-            Timber.d("Set current max subscription: $max")
-            myAccountInfo.activeSubscription = max
-        } else {
-            myAccountInfo.activeSubscription = null
-        }
-
-        myAccountInfo.levelInventory = highest
-        myAccountInfo.isInventoryFinished = true
-        updatePricing(context)
-    }
-
-    /**
-     * Launches a broadcast to update pricing info.
-     *
-     * @param context Current Context.
-     */
-    @JvmStatic
-    fun updatePricing(context: Context) {
-        context.sendBroadcast(
-            Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-                .putExtra(ACTION_TYPE, UPDATE_GET_PRICING)
-        )
     }
 }

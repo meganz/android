@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Base Compose Timeline View

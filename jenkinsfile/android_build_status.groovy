@@ -114,7 +114,7 @@ pipeline {
                     downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                     // upload Jenkins console log
-                    String jsonJenkinsLog = uploadFileToGitLab(CONSOLE_LOG_FILE)
+                    String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     // upload unit test report if unit test fail
                     String unitTestResult = ""
@@ -174,7 +174,7 @@ pipeline {
                         common.sendToMR(skipMessage)
                     } else {
                         // String containing the Lint Results
-                        String jsonLintReportLink = uploadFileToGitLab(LINT_REPORT_ARCHIVE)
+                        String jsonLintReportLink = common.uploadFileToGitLab(LINT_REPORT_ARCHIVE)
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +

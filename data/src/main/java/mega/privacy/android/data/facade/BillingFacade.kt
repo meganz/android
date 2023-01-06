@@ -3,6 +3,9 @@ package mega.privacy.android.data.facade
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -50,9 +53,21 @@ import mega.privacy.android.domain.exception.ProductNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Billing facade
+ * Sharing same billingClient instance across the application, we don't need to create every activity launch
+ * It manage connect and disconnect by process lifecycle
+ *
+ * https://developer.android.com/reference/com/android/billingclient/api/BillingClient
+ * It provides convenience methods for in-app billing. You can create one instance of this class for your application and use it to process in-app billing operations.
+ * It provides synchronous (blocking) and asynchronous (non-blocking) methods for many common in-app billing operations.
+ *
+ * It's strongly recommended that you instantiate only one BillingClient instance at one time to avoid multiple PurchasesUpdatedListener.onPurchasesUpdated(BillingResult, List) callbacks for a single event
+ */
 internal class BillingFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaSkuMapper: MegaSkuMapper,
@@ -60,26 +75,43 @@ internal class BillingFacade @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val verifyPurchaseGateway: VerifyPurchaseGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val skusCache: Cache<List<MegaSku>>,
     private val accountInfoWrapper: AccountInfoWrapper,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
-) : BillingGateway, PurchasesUpdatedListener {
+    private val activeSubscription: Cache<MegaPurchase>,
+) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
 
-    private val billingClient: BillingClient by lazy {
-        BillingClient.newBuilder(context)
-            .enablePendingPurchases()
-            .setListener(this)
-            .build()
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
+
+    override fun onStart(owner: LifecycleOwner) {
+        applicationScope.launch {
+            ensureConnect()
+        }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        applicationScope.launch {
+            disconnect()
+        }
+    }
+
+    private val billingClientRef: AtomicReference<BillingClient?> = AtomicReference(null)
 
     private val obfuscatedAccountId by lazy {
         verifyPurchaseGateway.generateObfuscatedAccountId()
     }
 
-    override suspend fun disconnect() {
-        if (billingClient.isReady) {
-            billingClient.endConnection()
+    private suspend fun disconnect() {
+        mutex.withLock {
+            val client = billingClientRef.get()
+            if (client?.isReady == true) {
+                client.endConnection()
+            }
+            billingClientRef.set(null)
         }
     }
 
@@ -87,16 +119,16 @@ internal class BillingFacade @Inject constructor(
 
     @Throws(ProductNotFoundException::class)
     override suspend fun launchPurchaseFlow(activity: Activity, productId: String) {
-        val activeSubscription = accountInfoWrapper.activeSubscription
-        val oldSku = activeSubscription?.sku
-        val purchaseToken = activeSubscription?.token
-        val skuDetails = accountInfoWrapper.availableSkus.find { it.sku == productId }
+        val oldSubscription = activeSubscription.get()
+        val oldSku = oldSubscription?.sku
+        val purchaseToken = oldSubscription?.token
+        val skuDetails = skusCache.get()?.find { it.sku == productId }
             ?: throw ProductNotFoundException()
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         val prorationMode =
-            if (getProductLevel(skuDetails.sku) > getProductLevel(oldSku)) ProrationMode.IMMEDIATE_WITH_TIME_PRORATION else ProrationMode.DEFERRED
+            if (MegaPurchase(skuDetails.sku).level > MegaPurchase(oldSku).level) ProrationMode.IMMEDIATE_WITH_TIME_PRORATION else ProrationMode.DEFERRED
         val productDetails: ProductDetails =
             productDetailsListCache.get().orEmpty().find { it.productId == productId }
                 ?: throw ProductNotFoundException()
@@ -131,8 +163,8 @@ internal class BillingFacade @Inject constructor(
             if (activity.intent == null) {
                 activity.intent = Intent()
             }
-            ensureConnect()
-            billingClient.launchBillingFlow(activity, purchaseParamsBuilder.build())
+            val client = ensureConnect()
+            client.launchBillingFlow(activity, purchaseParamsBuilder.build())
         }
     }
 
@@ -141,8 +173,10 @@ internal class BillingFacade @Inject constructor(
             if (result.responseCode == BillingClient.BillingResponseCode.OK
                 && purchases.isNullOrEmpty().not()
             ) {
-                val validPurchases = processPurchase(purchases.orEmpty())
-                billingEvent.emit(BillingEvent.OnPurchaseUpdate(validPurchases))
+                val client = ensureConnect()
+                val validPurchases = processPurchase(client, purchases.orEmpty())
+                billingEvent.emit(BillingEvent.OnPurchaseUpdate(validPurchases,
+                    activeSubscription.get()))
             } else {
                 Timber.w("onPurchasesUpdated failed, with result code: %s", result.responseCode)
             }
@@ -150,7 +184,7 @@ internal class BillingFacade @Inject constructor(
     }
 
     override suspend fun querySkus(): List<MegaSku> = withContext(ioDispatcher) {
-        ensureConnect()
+        val client = ensureConnect()
         // check the caller still observer, sometime it takes time to connect to BillingClient
         ensureActive()
         val productList = IN_APP_SKUS.map {
@@ -163,7 +197,7 @@ internal class BillingFacade @Inject constructor(
             .setProductList(productList)
             .build()
 
-        val result = billingClient.queryProductDetails(params)
+        val result = client.queryProductDetails(params)
         if (result.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
             Timber.w("Failed to get SkuDetails, error code is %s",
                 result.billingResult.responseCode)
@@ -174,36 +208,38 @@ internal class BillingFacade @Inject constructor(
             .mapNotNull {
                 megaSkuMapper(it)
             }
-        // legacy support, we still need to save into MyAccountInfo, will remove after refactoring
-        accountInfoWrapper.availableSkus = megaSkus
+        skusCache.set(megaSkus)
         return@withContext megaSkus
     }
 
     override suspend fun queryPurchase(): List<MegaPurchase> = withContext(ioDispatcher) {
-        ensureConnect()
+        val client = ensureConnect()
         // check the caller still observer, sometime it takes time to connect to BillingClient
         ensureActive()
-        val inAppPurchaseResult = billingClient.queryPurchasesAsync(
+        val inAppPurchaseResult = client.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
                 .build())
-        val purchases = if (areSubscriptionsSupported()) {
-            val subscriptionPurchaseResult = billingClient.queryPurchasesAsync(
+        val purchases = if (areSubscriptionsSupported(client)) {
+            val subscriptionPurchaseResult = client.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS)
                     .build())
             inAppPurchaseResult.purchasesList + subscriptionPurchaseResult.purchasesList
         } else {
             inAppPurchaseResult.purchasesList
         }
-        if (inAppPurchaseResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK || purchases.isEmpty()) {
-            Timber.w("Query of purchases failed, result code is %d, is purchase empty: %s",
-                inAppPurchaseResult.billingResult.responseCode,
-                purchases.isEmpty())
+        if (inAppPurchaseResult.billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+            Timber.w("Query of purchases failed, result code is ${inAppPurchaseResult.billingResult.responseCode}")
             return@withContext emptyList()
+        } else {
+            Timber.w("Query of purchases success, purchase size ${purchases.size}")
         }
-        return@withContext processPurchase(purchases)
+        return@withContext processPurchase(client, purchases)
     }
 
-    private suspend fun processPurchase(purchaseList: List<Purchase>): List<MegaPurchase> {
+    private suspend fun processPurchase(
+        client: BillingClient,
+        purchaseList: List<Purchase>,
+    ): List<MegaPurchase> {
         // Verify all available purchases
         val validPurchases = purchaseList.filter { purchase ->
             purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId
@@ -216,7 +252,7 @@ internal class BillingFacade @Inject constructor(
                     val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(purchase.purchaseToken)
                         .build()
-                    val result = billingClient.acknowledgePurchase(acknowledgePurchaseParams)
+                    val result = client.acknowledgePurchase(acknowledgePurchaseParams)
                     if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                         Timber.i("purchase acknowledged")
                     } else {
@@ -231,26 +267,31 @@ internal class BillingFacade @Inject constructor(
         return validMegaPurchases
     }
 
-    private fun areSubscriptionsSupported(): Boolean {
+    private fun areSubscriptionsSupported(client: BillingClient): Boolean {
         val responseCode: Int =
-            billingClient.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS).responseCode
+            client.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS).responseCode
         Timber.d("areSubscriptionsSupported %s",
             responseCode == BillingClient.BillingResponseCode.OK)
         return responseCode == BillingClient.BillingResponseCode.OK
     }
 
     // to make thread safe we need to wrap into Mutex for synchronized coroutine
-    private suspend fun ensureConnect() {
-        mutex.withLock {
-            if (billingClient.isReady) return
-            suspendCoroutine { continuation ->
+    private suspend fun ensureConnect(): BillingClient {
+        return mutex.withLock {
+            val oldClient = billingClientRef.get()
+            if (oldClient?.isReady == true) return@withLock oldClient
+            val newClient = BillingClient.newBuilder(context)
+                .enablePendingPurchases()
+                .setListener(this)
+                .build()
+            return@withLock suspendCoroutine { continuation ->
                 val listener = object : BillingClientStateListener {
                     override fun onBillingServiceDisconnected() {
                     }
 
                     override fun onBillingSetupFinished(result: BillingResult) {
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            continuation.resumeWith(Result.success(Unit))
+                            continuation.resumeWith(Result.success(newClient))
                         } else {
                             continuation.resumeWith(Result.failure(ConnectBillingServiceException(
                                 result.responseCode,
@@ -258,7 +299,7 @@ internal class BillingFacade @Inject constructor(
                         }
                     }
                 }
-                billingClient.startConnection(listener)
+                newClient.startConnection(listener)
             }
         }
     }
@@ -271,18 +312,9 @@ internal class BillingFacade @Inject constructor(
     }
 
     private fun updateAccountInfo(purchases: List<MegaPurchase>) {
-        val max = purchases.maxByOrNull { getProductLevel(it.sku) }
-        accountInfoWrapper.updateActiveSubscription(max, getProductLevel(max?.sku))
-    }
-
-    private fun getProductLevel(sku: String?): Int {
-        return when (sku) {
-            SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> 0
-            SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> 1
-            SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> 2
-            SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> 3
-            else -> -1
-        }
+        val max = purchases.maxByOrNull { it.level }
+        activeSubscription.set(max)
+        accountInfoWrapper.updateActiveSubscription(max)
     }
 
     companion object {

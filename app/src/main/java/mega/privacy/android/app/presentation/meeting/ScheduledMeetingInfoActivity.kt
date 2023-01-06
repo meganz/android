@@ -56,14 +56,17 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.presentation.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import android.text.format.DateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /**
@@ -100,7 +103,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, meetingLink, _, openSendToChat, openRemoveParticipantDialog, selected, openChatRoom, showChangePermissionsDialog, openChatCall) ->
+                viewModel.state.collect { (chatId, scheduledMeeting, finish, openAddContact, dndSecond, _, meetingLink, _, openSendToChat, openRemoveParticipantDialog, selected, openChatRoom, showChangePermissionsDialog, openChatCall) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
@@ -108,6 +111,14 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
                     if (chatRoomId != chatId) {
                         chatRoomId = chatId
+                    }
+
+                    scheduledMeeting?.let { sched ->
+                        sched.startDate?.let { start ->
+                            sched.endDate?.let { end ->
+                                getFormattedDate(start, end)
+                            }
+                        }
                     }
 
                     enabledChatNotification = dndSecond == null
@@ -187,6 +198,26 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
         }
+    }
+
+    /**
+     * Format ZonedDateTime to a readable date
+     */
+    private fun getFormattedDate(startDateTime: ZonedDateTime, endDateTime: ZonedDateTime) {
+        val is24Format = DateFormat.is24HourFormat(this)
+        val dateFormatter = if (is24Format)
+            DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").withZone(ZoneId.systemDefault())
+        else
+            DateTimeFormatter.ofPattern("d MMM yyyy '·' hh:mm").withZone(ZoneId.systemDefault())
+
+        val hourFormatter = if (is24Format)
+            DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
+        else
+            DateTimeFormatter.ofPattern("hh:mm").withZone(ZoneId.systemDefault())
+
+        viewModel.setScheduledMeetingDate("${dateFormatter.format(startDateTime)} - ${
+            hourFormatter.format(endDateTime)
+        }")
     }
 
     /**
@@ -426,7 +457,9 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
         when (action) {
             ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
-            ScheduledMeetingInfoAction.ShareMeetingLink -> showGetChatLinkPanel()
+            ScheduledMeetingInfoAction.ShareMeetingLink,
+            ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
+            -> showGetChatLinkPanel()
             ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()
