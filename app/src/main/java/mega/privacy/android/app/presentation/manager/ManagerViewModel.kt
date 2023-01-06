@@ -183,7 +183,7 @@ class ManagerViewModel @Inject constructor(
             updateGlobalEvents.collect { megaEvent ->
                 if (_state.value.isMandatoryFingerprintVerificationNeeded && megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
                     _state.update {
-                        it.copy(showUpgradeSecurityAlert = true)
+                        it.copy(shouldAlertUserAboutSecurityUpgrade = true)
                     }
                 }
             }

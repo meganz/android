@@ -1423,7 +1423,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }));
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, state -> {
-            if (viewModel.getState().getValue().getShowUpgradeSecurityAlert()) {
+            if (viewModel.getState().getValue().getShouldAlertUserAboutSecurityUpgrade()) {
                 replaceFragment(SecurityUpgradeDialogFragment.Companion.newInstance(), SecurityUpgradeDialogFragment.TAG);
             }
             return Unit.INSTANCE;
