@@ -175,14 +175,14 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val incomingShares = getUnverifiedIncomingShares(SortOrder.ORDER_DEFAULT_ASC).size
+            val incomingShares = getUnverifiedIncomingShares(getCloudSortOrder()).size
             _state.update {
                 it.copy(pendingActionsCount = _state.value.pendingActionsCount + incomingShares)
             }
         }
 
         viewModelScope.launch {
-            val outgoingShares = getUnverifiedOutgoingShares(SortOrder.ORDER_DEFAULT_ASC).size
+            val outgoingShares = getUnverifiedOutgoingShares(getCloudSortOrder()).size
             _state.update {
                 it.copy(pendingActionsCount = _state.value.pendingActionsCount + outgoingShares)
             }
@@ -190,8 +190,10 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateGlobalEvents.collect { megaEvent ->
-                _state.update {
-                    it.copy(eventType = megaEvent.peekContent().type)
+                if (_state.value.isMandatoryFingerprintVerificationNeeded && megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
+                    _state.update {
+                        it.copy(showUpgradeSecurityAlert = true)
+                    }
                 }
             }
         }
