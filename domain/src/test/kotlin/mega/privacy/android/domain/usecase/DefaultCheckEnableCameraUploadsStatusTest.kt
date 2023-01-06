@@ -27,6 +27,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     private val testUserAccount = UserAccount(
         userId = UserId(1L),
         email = "testemail@gmail.com",
+        fullName = "name",
         isBusinessAccount = false,
         isMasterBusinessAccount = false,
         accountTypeIdentifier = AccountType.PRO_I,

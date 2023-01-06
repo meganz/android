@@ -115,6 +115,7 @@ class SettingsFragmentTest {
         val refreshUserAccount = UserAccount(
             userId = UserId(2),
             email = "refreshEmail",
+            fullName = "name",
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
             accountTypeIdentifier = AccountType.FREE,

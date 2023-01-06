@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.user.UserId
  * @property accountTypeIdentifier
  * @property accountTypeString
  */
-data class UserAccount(
+data class UserAccount constructor(
     val userId: UserId?,
     val email: String,
     val fullName: String?,

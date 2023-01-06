@@ -53,6 +53,7 @@ class DefaultCanDeleteAccountTest {
         UserAccount(
             userId = UserId(1L),
             email = "",
+            fullName = "",
             isBusinessAccount = isBusinessAccount,
             isMasterBusinessAccount = isMasterBusinessAccount,
             accountTypeIdentifier = AccountType.FREE,
