@@ -1424,7 +1424,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }));
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, state -> {
-            if (viewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded() && state.getEventType() == MegaEvent.EVENT_UPGRADE_SECURITY) {
+            if (viewModel.getState().getValue().getShowUpgradeSecurityAlert()) {
                 replaceFragment(SecurityUpgradeDialogFragment.Companion.newInstance(), SecurityUpgradeDialogFragment.TAG);
             }
             return Unit.INSTANCE;

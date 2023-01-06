@@ -79,14 +79,8 @@ class ManagerViewModelTest {
             }.thenReturn(true)
         }
 
-    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
-        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
-    }
-    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares> {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
-        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
-    }
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
+    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -410,6 +404,10 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that pending actions count is not null`() = runTest {
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        val shareData1 = ShareData("user", 8766L, 0, 987654678L, true)
+        whenever(getUnverifiedIncomingShares(getCloudSortOrder())).thenReturn(listOf(shareData,
+            shareData1))
         setUnderTest()
         underTest.state.map { it.pendingActionsCount }.distinctUntilChanged().test {
             assertThat(awaitItem()).isEqualTo(2)
