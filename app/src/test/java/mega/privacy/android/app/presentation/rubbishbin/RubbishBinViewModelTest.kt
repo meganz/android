@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.rubbishbin
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import com.jraska.livedata.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -15,11 +14,9 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class RubbishBinViewModelTest {
@@ -66,30 +63,31 @@ class RubbishBinViewModelTest {
     }
 
     @Test
-    fun `test that rubbish bin node updates live data is set when node updates triggered from use case`() =
+    fun `test that on setting rubbish bin handle rubbish bin node returns empty list`() =
         runTest {
-            whenever(getRubbishBinChildrenNode(any())).thenReturn(listOf(mock(), mock()))
-
-            runCatching {
-                val result =
-                    underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                monitorNodeUpdates.emit(listOf(mock()))
-                result
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 2 }
-            }
+            val newValue = 123456789L
+            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(ArrayList())
+            monitorNodeUpdates.emit(listOf())
+            underTest.setRubbishBinHandle(newValue)
+            Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
         }
 
     @Test
-    fun `test that rubbish bin node updates live data is not set when get rubbish bin node returns a null list`() =
+    fun `test that on setting rubbish bin handle rubbish bin node returns some items in list`() =
         runTest {
-            whenever(getRubbishBinChildrenNode(any())).thenReturn(null)
-
-            runCatching {
-                underTest.updateRubbishBinNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-            }.onSuccess { result ->
-                result.assertNoValue()
-            }
+            val newValue = 123456789L
+            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(listOf(mock(),
+                mock()))
+            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            underTest.setRubbishBinHandle(newValue)
+            Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(2)
         }
 
+    @Test
+    fun `test that on setting rubbish bin handle rubbish bin node returns null`() = runTest {
+        val newValue = 123456789L
+        whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(null)
+        underTest.setRubbishBinHandle(newValue)
+        Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
+    }
 }

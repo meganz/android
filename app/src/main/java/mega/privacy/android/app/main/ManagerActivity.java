@@ -5814,20 +5814,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void refreshRubbishBin() {
-        rubbishBinFragment = (RubbishBinFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
-        if (rubbishBinFragment != null) {
-            ArrayList<MegaNode> nodes;
-            if (rubbishBinState(ManagerActivity.this).getRubbishBinHandle() == -1) {
-                nodes = megaApi.getChildren(megaApi.getRubbishNode(), SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            } else {
-                nodes = megaApi.getChildren(megaApi.getNodeByHandle(rubbishBinState(ManagerActivity.this).getRubbishBinHandle()),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            }
-
-            rubbishBinFragment.hideMultipleSelect();
-            rubbishBinFragment.setNodes(nodes);
-            rubbishBinFragment.getRecyclerView().invalidate();
-        }
+        rubbishBinViewModel.refreshNodes();
     }
 
     /**
