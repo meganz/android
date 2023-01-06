@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.manager.model
 
-import nz.mega.sdk.MegaEvent
-
 /**
  * Manager UI state
  *
