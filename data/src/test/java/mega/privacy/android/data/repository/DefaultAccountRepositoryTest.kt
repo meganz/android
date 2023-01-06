@@ -117,6 +117,8 @@ class DefaultAccountRepositoryTest {
             dbHandler = dbHandler,
             myAccountCredentialsMapper = myAccountCredentialsMapper,
         )
+
+        whenever(megaChatApiGateway.getMyEmail()).thenReturn("my@email.com")
     }
 
     @Test

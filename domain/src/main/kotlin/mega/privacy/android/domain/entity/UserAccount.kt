@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.user.UserId
 data class UserAccount(
     val userId: UserId?,
     val email: String,
-    val fullName: String,
+    val fullName: String?,
     val isBusinessAccount: Boolean,
     val isMasterBusinessAccount: Boolean,
     val accountTypeIdentifier: AccountType?,

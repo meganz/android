@@ -24,6 +24,7 @@ import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
+import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
@@ -44,7 +45,7 @@ import kotlin.coroutines.suspendCoroutine
  */
 internal class DefaultAvatarRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val contactsRepository: DefaultContactsRepository,
+    private val contactsRepository: ContactsRepository,
     private val cacheFolderGateway: CacheFolderGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
