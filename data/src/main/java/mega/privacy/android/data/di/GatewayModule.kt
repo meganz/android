@@ -18,7 +18,6 @@ import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
-import mega.privacy.android.data.facade.QRCodeFacade
 import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
@@ -37,7 +36,6 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.QRCodeGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
@@ -169,12 +167,6 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindTelephonyGateway(telephonyFacade: TelephonyFacade): TelephonyGateway
-
-    /**
-     * Provide implementation of [QRCodeGateway]
-     */
-    @Binds
-    abstract fun bindQRCodeGateway(implementation: QRCodeFacade): QRCodeGateway
 
     /**
      * Provides [ClipboardGateway] implementation
