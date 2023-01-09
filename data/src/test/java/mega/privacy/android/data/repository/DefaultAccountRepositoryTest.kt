@@ -14,8 +14,8 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
-import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
+import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.toAccountType
@@ -116,6 +116,7 @@ class DefaultAccountRepositoryTest {
             achievementsOverviewMapper = achievementsOverviewMapper,
             dbHandler = dbHandler,
             myAccountCredentialsMapper = myAccountCredentialsMapper,
+            accountDetailMapper = mock()
         )
 
         whenever(megaChatApiGateway.getMyEmail()).thenReturn("my@email.com")
@@ -371,6 +372,7 @@ class DefaultAccountRepositoryTest {
 
             val megaRequest = mock<MegaRequest> {
                 on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+                on { megaAccountDetails }.thenReturn(mock())
             }
 
             whenever(megaApiGateway.getSpecificAccountDetails(
@@ -444,6 +446,7 @@ class DefaultAccountRepositoryTest {
 
             val megaRequest = mock<MegaRequest> {
                 on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+                on { megaAccountDetails }.thenReturn(mock())
             }
 
             whenever(megaApiGateway.getExtendedAccountDetails(
@@ -506,6 +509,7 @@ class DefaultAccountRepositoryTest {
 
             val megaRequest = mock<MegaRequest> {
                 on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
+                on { megaAccountDetails }.thenReturn(mock())
             }
 
             whenever(megaApiGateway.getAccountDetails(listener = any())).thenAnswer {

@@ -3,7 +3,10 @@ package mega.privacy.android.app.data.facade
 import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -15,8 +18,8 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.MegaAttributes
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -38,7 +41,7 @@ class AccountInfoFacade @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val db: DatabaseHandler,
 ) : AccountInfoWrapper {
-    private val accountDetail = MutableSharedFlow<MegaAccountDetails>(replay = 1)
+    private val accountDetail = MutableStateFlow(AccountDetail())
 
     override val storageCapacityUsedAsFormattedString: String
         get() = myAccountInfo.usedFormatted
@@ -48,7 +51,6 @@ class AccountInfoFacade @Inject constructor(
         get() = getAccountTypeLabel(myAccountInfo.accountType)
 
     override suspend fun handleAccountDetail(request: MegaRequest) {
-        Timber.d("Account details request")
         val storage = request.numDetails and MyAccountInfo.HAS_STORAGE_DETAILS != 0
         if (storage && megaApiGateway.getRootNode() != null) {
             db.setAccountDetailsTimeStamp()
@@ -71,8 +73,21 @@ class AccountInfoFacade @Inject constructor(
             Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.usedPercentage)
         }
         sendBroadcastUpdateAccountDetails()
-        accountDetail.emit(request.megaAccountDetails)
     }
+
+    override suspend fun handleAccountDetail(newDetail: AccountDetail) {
+        val oldDetail = accountDetail.value
+        accountDetail.update {
+            oldDetail.copy(
+                storageDetail = newDetail.storageDetail ?: oldDetail.storageDetail,
+                sessionDetail = newDetail.sessionDetail ?: oldDetail.sessionDetail,
+                levelDetail = newDetail.levelDetail ?: oldDetail.levelDetail,
+                transferDetail = newDetail.transferDetail ?: oldDetail.transferDetail
+            )
+        }
+    }
+
+    override fun monitorAccountDetail(): Flow<AccountDetail> = accountDetail.asStateFlow()
 
     override val subscriptionMethodId: Int
         get() = myAccountInfo.subscriptionMethodId

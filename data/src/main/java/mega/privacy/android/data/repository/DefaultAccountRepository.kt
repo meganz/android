@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -17,10 +18,11 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
+import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
@@ -28,6 +30,7 @@ import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -80,6 +83,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val megaAchievementMapper: MegaAchievementMapper,
     private val achievementsOverviewMapper: AchievementsOverviewMapper,
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
+    private val accountDetailMapper: AccountDetailMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -113,7 +117,9 @@ internal class DefaultAccountRepository @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
+        // Legacy support, will remove completely once refactor to flow done
         myAccountInfoFacade.handleAccountDetail(request)
+        handleAccountDetail(request)
     }
 
     override suspend fun setUserHasLoggedIn() {
@@ -291,6 +297,7 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
         myAccountInfoFacade.handleAccountDetail(request)
+        handleAccountDetail(request)
     }
 
     override suspend fun getExtendedAccountDetails(
@@ -314,6 +321,7 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
         myAccountInfoFacade.handleAccountDetail(request)
+        handleAccountDetail(request)
     }
 
     override suspend fun getMyCredentials() = withContext(ioDispatcher) {
@@ -395,4 +403,18 @@ internal class DefaultAccountRepository @Inject constructor(
     override val accountEmail: String?
         get() = megaApiGateway.accountEmail
 
+    private suspend fun handleAccountDetail(request: MegaRequest) {
+        val newDetail = accountDetailMapper(
+            request.megaAccountDetails,
+            request.numDetails,
+            megaApiGateway.getRootNode(),
+            megaApiGateway.getRubbishNode(),
+            megaApiGateway.getIncomingSharesNode(null),
+        )
+        // keep previous info if new info null
+        myAccountInfoFacade.handleAccountDetail(newDetail)
+    }
+
+    override fun monitorAccountDetail(): Flow<AccountDetail> =
+        myAccountInfoFacade.monitorAccountDetail()
 }
