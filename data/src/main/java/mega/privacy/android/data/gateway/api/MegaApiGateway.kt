@@ -1012,6 +1012,14 @@ interface MegaApiGateway {
     suspend fun createSetElement(sid: Long, node: Long)
 
     /**
+     * Remove an element from a set
+     *
+     * @param sid the ID of the set
+     * @param eid the SetElement ID that will be removed
+     */
+    suspend fun removeSetElement(sid: Long, eid: Long)
+
+    /**
      * Get a list of all Sets available for current user.
      * The response value is stored as a MegaSetList.
      * You take the ownership of the returned value
