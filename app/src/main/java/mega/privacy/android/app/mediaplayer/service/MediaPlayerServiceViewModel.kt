@@ -122,7 +122,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     private val playlistItemMapper: PlaylistItemMapper,
     private val monitorConnectivity: MonitorConnectivity,
     private val savePlayingPositionHistories: SavePlayingPositionHistories,
@@ -833,7 +832,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             }
         }
 
-    private fun getSortOrderFromIntent(intent: Intent): Int {
+    private fun getSortOrderFromIntent(intent: Intent): SortOrder {
         val order =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getSerializableExtra(
@@ -845,7 +844,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
                     ?: SortOrder.ORDER_DEFAULT_ASC
             }
-        return sortOrderIntMapper(order)
+        return order
     }
 
     override fun initNewSearch(): MegaCancelToken {

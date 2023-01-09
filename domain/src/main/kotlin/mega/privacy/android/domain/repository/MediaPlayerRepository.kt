@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -46,7 +47,7 @@ interface MediaPlayerRepository {
      * @param order list order
      * @return audio nodes
      */
-    suspend fun getAudioNodes(order: Int): List<TypedNode>
+    suspend fun getAudioNodes(order: SortOrder): List<TypedNode>
 
     /**
      * Get all video nodes
@@ -54,7 +55,7 @@ interface MediaPlayerRepository {
      * @param order list order
      * @return video nodes
      */
-    suspend fun getVideoNodes(order: Int): List<TypedNode>
+    suspend fun getVideoNodes(order: SortOrder): List<TypedNode>
 
     /**
      * Get thumbnail
@@ -133,7 +134,7 @@ interface MediaPlayerRepository {
     suspend fun getChildrenByParentHandle(
         isAudio: Boolean,
         parentHandle: Long,
-        order: Int,
+        order: SortOrder,
     ): List<TypedNode>?
 
     /**
@@ -147,7 +148,7 @@ interface MediaPlayerRepository {
     suspend fun megaApiFolderGetChildrenByParentHandle(
         isAudio: Boolean,
         parentHandle: Long,
-        order: Int,
+        order: SortOrder,
     ): List<TypedNode>?
 
     /**
@@ -158,7 +159,7 @@ interface MediaPlayerRepository {
      */
     suspend fun getNodesFromPublicLinks(
         isAudio: Boolean,
-        order: Int,
+        order: SortOrder,
     ): List<TypedNode>
 
     /**
@@ -169,7 +170,7 @@ interface MediaPlayerRepository {
      */
     suspend fun getNodesFromInShares(
         isAudio: Boolean,
-        order: Int,
+        order: SortOrder,
     ): List<TypedNode>
 
     /**
@@ -181,7 +182,7 @@ interface MediaPlayerRepository {
     suspend fun getNodesFromOutShares(
         isAudio: Boolean,
         lastHandle: Long,
-        order: Int,
+        order: SortOrder,
     ): List<TypedNode>
 
     /**

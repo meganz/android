@@ -11,6 +11,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderType
@@ -39,6 +40,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
     private val fileGateway = mock<FileGateway>()
     private val getFolderType = mock<GetFolderType>()
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     private val expectedHandle = 100L
     private val expectedParentHandle = 999L
@@ -77,6 +79,7 @@ class DefaultMediaPlayerRepositoryTest {
             fileTypeInfoMapper = fileTypeInfoMapper,
             addNodeType = DefaultAddNodeType(getFolderType),
             fileGateway = fileGateway,
+            sortOrderIntMapper = sortOrderIntMapper,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
