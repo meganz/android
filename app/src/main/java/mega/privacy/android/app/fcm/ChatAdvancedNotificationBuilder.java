@@ -68,10 +68,10 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import mega.privacy.android.app.MegaApplication;
@@ -177,15 +177,10 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        Collections.sort(unreadMessages, new Comparator<MegaChatMessage>() {
-            public int compare(MegaChatMessage c1, MegaChatMessage c2) {
-                long timestamp1 = c1.getTimestamp();
-                long timestamp2 = c2.getTimestamp();
-
-                long result = timestamp2 - timestamp1;
-                return (int) result;
-            }
-        });
+        unreadMessages.sort(Comparator.comparing(
+                MegaChatMessage::getTimestamp,
+                Comparator.reverseOrder()
+        ));
 
         Notification notification = buildNotification(uriParameter, vibration, GROUP_KEY, chat, unreadMessages);
 
@@ -213,7 +208,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
 
-        for (Long chatHandle : request.getHandleList()) {
+        for (Long chatHandle : Objects.requireNonNull(request.getHandleList())) {
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandle);
             if (chat != null) {
                 if (isEnableChatNotifications(chat.getChatId())) {
@@ -225,7 +220,7 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        PendingIntent pendingIntent = null;
+        PendingIntent pendingIntent;
 
         if (chats.size() > 1) {
             Intent intent = new Intent(context, ManagerActivity.class);
@@ -235,16 +230,10 @@ public final class ChatAdvancedNotificationBuilder {
             pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
             //Order by last interaction
-            Collections.sort(chats, new Comparator<MegaChatListItem>() {
-
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
-
-                    long result = timestamp2 - timestamp1;
-                    return (int) result;
-                }
-            });
+            chats.sort(Comparator.comparing(
+                    MegaChatListItem::getLastTimestamp,
+                    Comparator.naturalOrder()
+            ));
         } else if (chats.size() == 1) {
             Intent intent = new Intent(context, ManagerActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -256,6 +245,7 @@ public final class ChatAdvancedNotificationBuilder {
             return;
         }
 
+        @SuppressWarnings("deprecation")
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
@@ -283,7 +273,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         for (int i = 0; i < chats.size(); i++) {
             if (MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
-                List<Long> handleListUnread = request.getPeersListByChatHandle().get(chats.get(i).getChatId());
+                List<Long> handleListUnread = Objects.requireNonNull(request.getPeersListByChatHandle()).get(chats.get(i).getChatId());
 
                 for (int j = 0; j < handleListUnread.size(); j++) {
                     Timber.d("Get message id: %d from chatId: %d", handleListUnread.get(j), chats.get(i).getChatId());
@@ -313,19 +303,15 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        String textToShow = context.getResources().getQuantityString(R.plurals.plural_number_messages_chat_notification, (int) chats.size(), chats.size());
+        String textToShow = context.getResources().getQuantityString(R.plurals.plural_number_messages_chat_notification, chats.size(), chats.size());
 
         notificationBuilder.setContentTitle("MEGA");
         notificationBuilder.setContentText(textToShow);
         inboxStyle.setSummaryText(textToShow);
 
-        Notification notif = notificationBuilder.build();
+        Notification notification = notificationBuilder.build();
 
-        if (notif != null) {
-            notificationManager.notify(NOTIFICATION_SUMMARY_CHAT, notif);
-        } else {
-            notificationManager.cancel(NOTIFICATION_SUMMARY_CHAT);
-        }
+        notificationManager.notify(NOTIFICATION_SUMMARY_CHAT, notification);
     }
 
     private String getSender(MegaChatMessage msg, MegaChatRoom chatRoom) {
@@ -1165,81 +1151,41 @@ public final class ChatAdvancedNotificationBuilder {
 
     public void newGenerateChatNotification(ChatRequest request) {
         Timber.d("newGenerateChatNotification");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            boolean beep = request.getFlag();
-            Timber.d("Should beep: %s", beep);
 
-            List<Long> chatHandleList = request.getHandleList();
-            Timber.d("chats size: %s", chatHandleList.size());
-            ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        boolean beep = request.getFlag();
+        Timber.d("Should beep: %s", beep);
 
+        List<Long> chatHandleList = request.getHandleList();
+        if (chatHandleList == null) {
+            return;
+        }
 
-            for (Long chatHandle : chatHandleList) {
-                chats.add(megaChatApi.getChatListItem(chatHandle));
-            }
+        Timber.d("Chats size: %s", chatHandleList.size());
+        ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        for (Long chatHandle : chatHandleList) {
+            chats.add(megaChatApi.getChatListItem(chatHandle));
+        }
 
-            //Order by last interaction
-            Collections.sort(chats, new Comparator<MegaChatListItem>() {
+        //Order by last interaction
+        chats.sort(Comparator.comparing(
+                MegaChatListItem::getLastTimestamp,
+                Comparator.naturalOrder()
+        ));
 
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
-
-                    long result = timestamp2 - timestamp1;
-                    return (int) result;
-                }
-            });
-            //Check if the last chat notification is enabled
-
-            long lastChatId;
-            if (!(chats.isEmpty())) {
-                lastChatId = chats.get(0).getChatId();
-            } else {
-                Timber.e("Chats empty, remove all chat notifications");
-                removeAllChatNotifications();
-                return;
-            }
-
-            checkShowChatNotifications(lastChatId, beep, request, chats);
+        //Check if the last chat notification is enabled
+        long lastChatId;
+        if (!(chats.isEmpty())) {
+            lastChatId = chats.get(0).getChatId();
         } else {
-            boolean beep = request.getFlag();
-            Timber.d("Should beep: %s", beep);
+            Timber.e("Chats empty, remove all chat notifications");
+            removeAllChatNotifications();
+            return;
+        }
 
-            ArrayList<MegaChatListItem> chats = new ArrayList<>();
-            for (Long chatHandle : request.getHandleList()) {
-                chats.add(megaChatApi.getChatListItem(chatHandle));
-            }
+        checkShowChatNotifications(lastChatId, beep, request, chats);
 
-            //Order by last interaction
-            Collections.sort(chats, new Comparator<MegaChatListItem>() {
-
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
-
-                    long result = timestamp2 - timestamp1;
-                    return (int) result;
-                }
-            });
-
-
-            //Check if the last chat notification is enabled
-
-            long lastChatId = -1;
-            if (chats != null) {
-                if (!(chats.isEmpty())) {
-                    lastChatId = chats.get(0).getChatId();
-                } else {
-                    Timber.e("ERROR:chatsEMPTY:return");
-                    return;
-                }
-            } else {
-                Timber.e("ERROR:chatsNULL:return");
-                return;
-            }
-
-            checkShowChatNotifications(lastChatId, beep, request, chats);
-            Notification summary = buildSummary(GROUP_KEY, request.getFlag());
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Notification summary = buildSummary(GROUP_KEY, beep);
             notificationManager.notify(NOTIFICATION_SUMMARY_CHAT, summary);
         }
     }
@@ -1249,7 +1195,7 @@ public final class ChatAdvancedNotificationBuilder {
             Timber.d("Generate chat notification for: %d chats", chats.size());
             for (int i = 0; i < chats.size(); i++) {
                 if (megaApi.isChatNotifiable(chats.get(i).getChatId()) && MegaApplication.getOpenChatId() != chats.get(i).getChatId()) {
-                    List<Long> handleListUnread = request.getPeersListByChatHandle().get(chats.get(i).getChatId());
+                    List<Long> handleListUnread = Objects.requireNonNull(request.getPeersListByChatHandle()).get(chats.get(i).getChatId());
                     showChatNotification(chats.get(i).getChatId(), handleListUnread, beep);
                     beep = false;
                 }
@@ -1261,29 +1207,26 @@ public final class ChatAdvancedNotificationBuilder {
 
     public void generateChatNotificationPreN(ChatRequest request) {
         Timber.d("generateChatNotificationPreN");
+
         boolean beep = request.getFlag();
         Timber.d("Should beep: %s", beep);
 
         List<Long> chatHandleList = request.getHandleList();
-        Timber.d("chats size: %s", chatHandleList.size());
+        if (chatHandleList == null) {
+            return;
+        }
+
+        Timber.d("Chats size: %s", chatHandleList.size());
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
-
-
         for (Long chatHandle : chatHandleList) {
             chats.add(megaChatApi.getChatListItem(chatHandle));
         }
 
         //Order by last interaction
-        Collections.sort(chats, new Comparator<MegaChatListItem>() {
-
-            public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                long timestamp1 = c1.getLastTimestamp();
-                long timestamp2 = c2.getLastTimestamp();
-
-                long result = timestamp2 - timestamp1;
-                return (int) result;
-            }
-        });
+        chats.sort(Comparator.comparing(
+                MegaChatListItem::getLastTimestamp,
+                Comparator.naturalOrder()
+        ));
 
         Timber.d("Generate chat notification for: %d chats", chats.size());
         if (!chats.isEmpty() && isEnableGeneralChatNotifications()) {
