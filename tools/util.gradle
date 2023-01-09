@@ -10,9 +10,8 @@ import groovy.json.JsonSlurperClassic
  * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
  */
 boolean shouldUsePrebuiltSdk() {
-    /*String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
-    return usePrebuiltSdk == null || usePrebuiltSdk != "false"*/
-    return false
+    String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
+    return usePrebuiltSdk == null || usePrebuiltSdk != "false"
 }
 
 /**
