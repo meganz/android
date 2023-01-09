@@ -1709,4 +1709,11 @@ interface MegaApiGateway {
      * @param listener : Listener to track this request
      */
     fun upgradeSecurity(listener: MegaRequestListenerInterface)
+
+    /**
+     * Sets the secure flag to true or false while sharing a node
+     *
+     * @param enable : Boolean value
+     */
+    fun setSecureFlag(enable: Boolean)
 }
