@@ -740,7 +740,6 @@ internal class MegaApiFacade @Inject constructor(
     override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
         megaApi.upgradeSecurity(listener)
 
-    override fun setSecureFlag(enable: Boolean) {
-        megaApi.setSecureFlag(enable)
-    }
+    override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
+
 }
