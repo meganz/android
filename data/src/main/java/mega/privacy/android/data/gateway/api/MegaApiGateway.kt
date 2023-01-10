@@ -1364,5 +1364,6 @@ interface MegaApiGateway {
      *
      * @param enable : Boolean value
      */
+    @Deprecated("This API is for testing purpose, will be deleted later")
     fun setSecureFlag(enable: Boolean)
 }
