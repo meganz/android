@@ -486,4 +486,8 @@ internal class DefaultFilesRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
+        megaApiGateway.setSecureFlag(enable)
+    }
 }

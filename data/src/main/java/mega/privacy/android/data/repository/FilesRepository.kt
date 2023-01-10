@@ -244,4 +244,11 @@ interface FilesRepository {
      * Update cryptographic security
      */
     suspend fun upgradeSecurity()
+
+    /**
+     * Sets the secure share flag to true or false
+     *
+     * @param enable : Boolean
+     */
+    suspend fun setSecureFlag(enable: Boolean)
 }
