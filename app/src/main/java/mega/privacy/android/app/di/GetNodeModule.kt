@@ -15,6 +15,7 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.SetSecureFlag
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
@@ -128,5 +129,15 @@ abstract class GetNodeModule {
             MoveNodeByHandle { nodeToCopy, newNodeParent ->
                 moveNodeUseCase.move(nodeToCopy.longValue, newNodeParent.longValue).await()
             }
+
+        /**
+         * Provides [SetSecureFlag] implementation
+         *
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [SetSecureFlag]
+         */
+        @Provides
+        fun provideSetSecureFlag(megaNodeRepository: MegaNodeRepository): SetSecureFlag =
+            SetSecureFlag(megaNodeRepository::setSecureFlag)
     }
 }
