@@ -886,6 +886,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
         megaApi.upgradeSecurity(listener)
 
+    @Deprecated("This API is for testing purpose, will be deleted later")
     override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
 
 }
