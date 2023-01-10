@@ -208,12 +208,12 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val dateFormatter = if (is24Format)
             DateTimeFormatter.ofPattern("d MMM yyyy '·' HH:mm").withZone(ZoneId.systemDefault())
         else
-            DateTimeFormatter.ofPattern("d MMM yyyy '·' hh:mm").withZone(ZoneId.systemDefault())
+            DateTimeFormatter.ofPattern("d MMM yyyy '·' hh:mm a").withZone(ZoneId.systemDefault())
 
         val hourFormatter = if (is24Format)
             DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault())
         else
-            DateTimeFormatter.ofPattern("hh:mm").withZone(ZoneId.systemDefault())
+            DateTimeFormatter.ofPattern("hh:mm a").withZone(ZoneId.systemDefault())
 
         viewModel.setScheduledMeetingDate("${dateFormatter.format(startDateTime)} - ${
             hourFormatter.format(endDateTime)
