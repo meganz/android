@@ -3,7 +3,6 @@ package mega.privacy.android.app.di
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
@@ -20,6 +19,8 @@ import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 
 /**
  * Contacts module.
@@ -85,4 +86,12 @@ class ContactsModule {
     @Provides
     fun provideResetCredentials(contactsRepository: ContactsRepository): ResetCredentials =
         ResetCredentials(contactsRepository::resetCredentials)
+
+    @Provides
+    fun provideGetCurrentUserFirstName(contactsRepository: ContactsRepository): GetCurrentUserFirstName =
+        GetCurrentUserFirstName(contactsRepository::getCurrentUserFirstName)
+
+    @Provides
+    fun provideGetCurrentUserLastName(contactsRepository: ContactsRepository): GetCurrentUserLastName =
+        GetCurrentUserLastName(contactsRepository::getCurrentUserLastName)
 }

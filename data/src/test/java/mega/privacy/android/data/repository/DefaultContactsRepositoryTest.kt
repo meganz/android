@@ -34,6 +34,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultContactsRepositoryTest {
@@ -386,5 +387,39 @@ class DefaultContactsRepositoryTest {
         runTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(null)
             assertThat(underTest.verifyCredentials(userEmail))
+        }
+
+    @Test
+    fun `test that getCurrentUserFirstName return correct value when getUserAttribute success`() =
+        runTest {
+            val expectedFirstName = "abc"
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedFirstName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    request,
+                    success
+                )
+            }
+            assertEquals(expectedFirstName, underTest.getCurrentUserFirstName())
+        }
+
+    @Test
+    fun `test that getCurrentUserLastName return correct value when getUserAttribute success`() =
+        runTest {
+            val expectedFirstName = "cde"
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedFirstName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    request,
+                    success
+                )
+            }
+            assertEquals(expectedFirstName, underTest.getCurrentUserLastName())
         }
 }

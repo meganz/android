@@ -173,4 +173,18 @@ interface ContactsRepository {
      * @return [AccountCredentials.ContactCredentials]
      */
     suspend fun getContactCredentials(userEmail: String): AccountCredentials.ContactCredentials?
+
+    /**
+     * Get current user first name
+     *
+     * @return
+     */
+    suspend fun getCurrentUserFirstName(): String
+
+    /**
+     * Get current user last name
+     *
+     * @return
+     */
+    suspend fun getCurrentUserLastName(): String
 }

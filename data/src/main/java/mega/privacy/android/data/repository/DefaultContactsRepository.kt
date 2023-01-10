@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.findItemByHandle
 import mega.privacy.android.data.extensions.getDecodedAliases
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -531,6 +533,25 @@ internal class DefaultContactsRepository @Inject constructor(
                     userEmail,
                     name
                 )
+            }
+        }
+
+    override suspend fun getCurrentUserFirstName(): String =
+        getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
+
+    override suspend fun getCurrentUserLastName(): String =
+        getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
+
+    private suspend fun getCurrentUserNameAttribute(attribute: Int): String =
+        withContext(ioDispatcher) {
+            return@withContext suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener {
+                    it.text.orEmpty()
+                }
+                megaApiGateway.getUserAttribute(attribute, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
             }
         }
 
