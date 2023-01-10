@@ -11,6 +11,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.SetSecureFlag
 
 /**
  * Get node module
@@ -72,5 +73,15 @@ abstract class GetNodeModule {
         @Provides
         fun provideGetUnverifiedOutGoingShares(filesRepository: FilesRepository): GetUnverifiedOutgoingShares =
             GetUnverifiedOutgoingShares(filesRepository::getUnverifiedOutgoingShares)
+
+        /**
+         * Provides [SetSecureFlag] implementation
+         *
+         * @param filesRepository [FilesRepository]
+         * @return [SetSecureFlag]
+         */
+        @Provides
+        fun provideSetSecureFlag(filesRepository: FilesRepository): SetSecureFlag =
+            SetSecureFlag(filesRepository::setSecureFlag)
     }
 }
