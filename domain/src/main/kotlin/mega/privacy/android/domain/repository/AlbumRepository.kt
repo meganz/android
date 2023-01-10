@@ -49,6 +49,14 @@ interface AlbumRepository {
     suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
 
     /**
+     * Remove photos from an album
+     *
+     * @param albumID the id of the album which we want to remove the elements from
+     * @param photoIDs the photos' node handles to be removed from the album
+     */
+    suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
+
+    /**
      * Monitor user sets update
      *
      * @return a flow of all new user sets update

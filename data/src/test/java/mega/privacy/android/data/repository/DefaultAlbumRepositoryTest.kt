@@ -112,6 +112,19 @@ class DefaultAlbumRepositoryTest {
         }
 
     @Test
+    fun `test that removePhotosFromAlbum invokes the removeSetElement api function for each photoID`() =
+        runTest {
+            val testAlbumId = AlbumId(1L)
+            val testPhotos = listOf(NodeId(1L), NodeId(2L))
+
+            underTest.removePhotosFromAlbum(albumID = testAlbumId, photoIDs = testPhotos)
+
+            for (photo in testPhotos) {
+                verify(megaApiGateway).removeSetElement(testAlbumId.id, photo.id)
+            }
+        }
+
+    @Test
     fun `test that getUserSets returns a single value if only one set exists`() = runTest {
         val expectedId = 1L
         val expectedName = "Album 1"

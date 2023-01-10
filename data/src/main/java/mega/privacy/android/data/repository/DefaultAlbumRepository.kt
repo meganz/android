@@ -100,6 +100,13 @@ internal class DefaultAlbumRepository @Inject constructor(
             }
         }
 
+    override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
+        withContext(ioDispatcher) {
+            for (photoID in photoIDs) {
+                megaApiGateway.removeSetElement(albumID.id, photoID.id)
+            }
+        }
+
     override suspend fun removeAlbums(albumIds: List<AlbumId>) = withContext(ioDispatcher) {
         albumIds.map { albumId ->
             async {
