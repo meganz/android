@@ -525,7 +525,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 quitEditTextError(dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon)
 
                 dialogBinding.firstNameField.apply {
-                    setText(firstName ?: viewModel.getFirstName())
+                    setText(firstName ?: editProfileViewModel.getFirstName())
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
                             getButton(AlertDialog.BUTTON_POSITIVE).performClick()
@@ -549,7 +549,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 }
 
                 dialogBinding.lastNameField.apply {
-                    setText(lastName ?: viewModel.getLastName())
+                    setText(lastName ?: editProfileViewModel.getLastName())
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
                             getButton(AlertDialog.BUTTON_POSITIVE).performClick()
@@ -588,6 +588,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                     if (!errorShown) {
                         binding.progressBar.isVisible =
                             viewModel.changeName(
+                                editProfileViewModel.getFirstName(),
+                                editProfileViewModel.getLastName(),
                                 dialogBinding.firstNameField.text.toString(),
                                 dialogBinding.lastNameField.text.toString()
                             ) { success -> updateName(success) }

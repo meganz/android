@@ -14,8 +14,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
@@ -23,6 +22,8 @@ import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaError
@@ -34,7 +35,7 @@ import javax.inject.Singleton
 
 @Singleton
 class HomepageRepository @Inject constructor(
-    private val myAccountInfo: MyAccountInfo,
+    private val getCurrentUserFullName: GetCurrentUserFullName,
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context,
 ) {
@@ -66,7 +67,11 @@ class HomepageRepository @Inject constructor(
 
     suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
         AvatarUtil.getDefaultAvatar(
-            getColorAvatar(megaApi.myUser), myAccountInfo.fullName, Constants.AVATAR_SIZE, true
+            getColorAvatar(megaApi.myUser), getCurrentUserFullName(
+                true,
+                defaultFirstName = context.getString(R.string.first_name_text),
+                defaultLastName = context.getString(R.string.lastname_text),
+            ), Constants.AVATAR_SIZE, true
         )
     }
 

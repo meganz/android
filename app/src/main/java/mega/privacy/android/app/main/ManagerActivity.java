@@ -355,6 +355,7 @@ import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
+import mega.privacy.android.app.presentation.manager.UserInfoViewModel;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
@@ -516,6 +517,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public LinksViewModel linksViewModel;
     public RubbishBinViewModel rubbishBinViewModel;
     private SearchViewModel searchViewModel;
+    private UserInfoViewModel userInfoViewModel;
 
     @Inject
     CheckPasswordReminderUseCase checkPasswordReminderUseCase;
@@ -1296,6 +1298,7 @@ public class ManagerActivity extends TransfersManagementActivity
         linksViewModel = new ViewModelProvider(this).get(LinksViewModel.class);
         rubbishBinViewModel = new ViewModelProvider(this).get(RubbishBinViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        userInfoViewModel = new ViewModelProvider(this).get(UserInfoViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
                     updateUsers(users);
@@ -2081,11 +2084,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             dbH.setInvalidateSdkCache(false);
             MegaMessageService.getToken(this);
-            nVEmail.setVisibility(View.VISIBLE);
-            nVEmail.setText(megaApi.getMyEmail());
-            megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
-            megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
-
+            userInfoViewModel.getUserInfo();
 
             this.setProfileAvatar();
 
@@ -2523,6 +2522,13 @@ public class ManagerActivity extends TransfersManagementActivity
                 fireStopCameraUploadJob(ManagerActivity.this);
                 showOfflineMode();
             }
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, userInfoViewModel.getState(), Lifecycle.State.STARTED, state -> {
+            updateUserNameNavigationView(state.getFullName());
+            nVEmail.setVisibility(View.VISIBLE);
+            nVEmail.setText(state.getEmail());
             return Unit.INSTANCE;
         });
     }
@@ -9121,11 +9127,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
-                updateMyData(true, request.getText(), e);
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-                updateMyData(false, request.getText(), e);
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
+            if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
 
                 if (e.getErrorCode() == MegaError.API_OK) {
                     Timber.d("Attribute USER_ATTR_GEOLOCATION enabled");
@@ -9364,19 +9366,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         }
-    }
-
-    /**
-     * Updates own firstName/lastName and fullName data in UI and DB.
-     *
-     * @param firstName True if the update makes reference to the firstName, false it to the lastName.
-     * @param newName   New firstName/lastName text.
-     * @param e         MegaError of the request.
-     */
-    private void updateMyData(boolean firstName, String newName, MegaError e) {
-        myAccountInfo.updateMyData(firstName, newName, e);
-        updateUserNameNavigationView(myAccountInfo.getFullName());
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean.class).post(true);
     }
 
     @Override

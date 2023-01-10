@@ -309,10 +309,6 @@ class MyAccountViewModel @Inject constructor(
 
     private var confirmationLink: String? = null
 
-    fun getFirstName(): String = myAccountInfo.getFirstNameText()
-
-    fun getLastName(): String = myAccountInfo.getLastNameText()
-
     fun getName(): String = state.value.name
 
     fun getEmail(): String? = megaApi.myEmail
@@ -764,43 +760,43 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Changes the name of the account.
      *
+     * @param oldFirstName
+     * @param oldLastName
      * @param newFirstName New first name if changed, same as current one if not.
      * @param newLastName  New last name if changed, same as current one if not.
      * @param action       Action to perform after change name.
      * @return True if something changed, false otherwise.
      */
-    fun changeName(newFirstName: String, newLastName: String, action: (Boolean) -> Unit): Boolean {
-        val shouldUpdateLastName = newLastName != myAccountInfo.getLastNameText()
+    fun changeName(
+        oldFirstName: String,
+        oldLastName: String,
+        newFirstName: String,
+        newLastName: String,
+        action: (Boolean) -> Unit,
+    ): Boolean {
+        val shouldUpdateFirstName = newFirstName != oldFirstName
+        val shouldUpdateLastName = newLastName != oldLastName
 
-        return when {
-            newFirstName != myAccountInfo.getFirstNameText() -> {
-                if (shouldUpdateLastName) {
-                    updateMyUserAttributesUseCase.updateFirstAndLastName(newFirstName, newLastName)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy { result -> action.invoke(result) }
-                        .addTo(composite)
-                } else {
-                    updateMyUserAttributesUseCase.updateFirstName(newFirstName)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy { result -> action.invoke(result) }
-                        .addTo(composite)
-                }
-
-                true
-            }
-            shouldUpdateLastName -> {
-                updateMyUserAttributesUseCase.updateLastName(newLastName)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy { result -> action.invoke(result) }
-                    .addTo(composite)
-
-                true
-            }
-            else -> false
+        when {
+            shouldUpdateFirstName && shouldUpdateLastName -> updateMyUserAttributesUseCase.updateFirstAndLastName(
+                newFirstName,
+                newLastName
+            ).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> action.invoke(result) }
+                .addTo(composite)
+            shouldUpdateFirstName -> updateMyUserAttributesUseCase.updateFirstName(newFirstName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> action.invoke(result) }
+                .addTo(composite)
+            shouldUpdateLastName -> updateMyUserAttributesUseCase.updateLastName(newLastName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> action.invoke(result) }
+                .addTo(composite)
         }
+        return shouldUpdateFirstName || shouldUpdateLastName
     }
 
     /**

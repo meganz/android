@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import mega.privacy.android.domain.usecase.contact.InviteContact
@@ -99,4 +101,8 @@ class ContactsModule {
     @Provides
     fun provideInviteContact(contactsRepository: ContactsRepository): InviteContact =
         InviteContact(contactsRepository::inviteContact)
+
+    @Provides
+    fun provideGetCurrentUserEmail(accountRepository: AccountRepository): GetCurrentUserEmail =
+        GetCurrentUserEmail { accountRepository.accountEmail }
 }
