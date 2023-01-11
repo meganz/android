@@ -35,6 +35,7 @@ import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -479,4 +480,11 @@ internal class DefaultFilesRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun getLocalFile(fileNode: FileNode) =
+        fileGateway.getLocalFile(
+            fileName = fileNode.name,
+            fileSize = fileNode.size,
+            lastModifiedDate = fileNode.modificationTime,
+        )
 }
