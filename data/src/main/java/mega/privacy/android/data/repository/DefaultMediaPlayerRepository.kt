@@ -304,7 +304,12 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         megaApi.getFingerprint(filePath)
 
     override suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String? =
-        fileGateway.getLocalFilePath(typedFileNode)
+        typedFileNode?.let {
+            fileGateway.getLocalFile(
+                typedFileNode.name,
+                typedFileNode.size,
+                typedFileNode.modificationTime)?.path
+        }
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
         MimeTypeList.typeForName(name).let { (type, extension) ->
