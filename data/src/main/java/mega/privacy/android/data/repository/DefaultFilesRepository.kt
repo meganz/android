@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
@@ -30,6 +31,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
@@ -87,6 +89,7 @@ internal class DefaultFilesRepository @Inject constructor(
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
+    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
 ) : FilesRepository, FileRepository {
 
     override suspend fun copyNode(
@@ -453,6 +456,24 @@ internal class DefaultFilesRepository @Inject constructor(
                 }
             }
             megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
+        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
+            ?: fetchFileVersionsOption().also {
+                fileVersionsOptionCache.set(it)
+            }
+
+    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                it.flag
+            }
+            megaApiGateway.getFileVersionsOption(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
             }

@@ -105,4 +105,12 @@ interface FileRepository {
      * @return node handle [Long]
      */
     suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
+
+    /**
+     * Get file versions option
+     *
+     * @param forceRefresh
+     * @return
+     */
+    suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
 }

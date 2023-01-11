@@ -1332,4 +1332,24 @@ interface MegaApiGateway {
      * @param listener   MegaRequestListener to track this request
      */
     fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Check if file versioning is enabled or disabled
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * <p>
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_DISABLE_VERSIONS
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - "1" for disable, "0" for enable
+     * - MegaRequest::getFlag - True if disabled, false if enabled
+     * <p>
+     * If the option has never been set, the error code will be MegaError::API_ENOENT.
+     * In that case, file versioning is enabled by default and MegaRequest::getFlag returns false.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getFileVersionsOption(listener: MegaRequestListenerInterface)
 }

@@ -728,4 +728,8 @@ internal class MegaApiFacade @Inject constructor(
             nodeHandle,
             listener,
         )
+
+    override fun getFileVersionsOption(listener: MegaRequestListenerInterface) {
+        megaApi.getFileVersionsOption(listener)
+    }
 }
