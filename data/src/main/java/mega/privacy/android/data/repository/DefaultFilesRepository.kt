@@ -21,6 +21,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -73,6 +74,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property offlineNodeInformationMapper
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
+ * @property streamingGateway
  */
 internal class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -91,6 +93,7 @@ internal class DefaultFilesRepository @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
+    private val streamingGateway: StreamingGateway,
 ) : FilesRepository, FileRepository {
 
     override suspend fun copyNode(
@@ -487,4 +490,10 @@ internal class DefaultFilesRepository @Inject constructor(
             fileSize = fileNode.size,
             lastModifiedDate = fileNode.modificationTime,
         )
+
+    override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(node.id.id)?.let {
+            streamingGateway.getLocalLink(it)
+        }
+    }
 }

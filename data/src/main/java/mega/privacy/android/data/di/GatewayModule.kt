@@ -31,6 +31,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
+import mega.privacy.android.data.gateway.DefaultStreamingGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
@@ -42,6 +43,7 @@ import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
@@ -181,4 +183,8 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindBillingFacade(implementation: BillingFacade): BillingGateway
+
+    @Binds
+    abstract fun bindStreamingGateway(implementation: DefaultStreamingGateway): StreamingGateway
+
 }

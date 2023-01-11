@@ -123,4 +123,12 @@ interface FileRepository {
      * @return local file if it exists
      */
     suspend fun getLocalFile(fileNode: FileNode): File?
+
+    /**
+     * Get file streaming uri for a node
+     *
+     * @param node
+     * @return local url string if found
+     */
+    suspend fun getFileStreamingUri(node: Node): String?
 }

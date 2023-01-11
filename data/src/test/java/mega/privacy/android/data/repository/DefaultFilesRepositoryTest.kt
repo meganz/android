@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -11,6 +12,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -18,6 +20,7 @@ import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -50,6 +53,7 @@ internal class DefaultFilesRepositoryTest {
     private val fileGateway: FileGateway = mock()
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
+    private val streamingGateway = mock<StreamingGateway>()
 
     @Before
     fun setUp() {
@@ -69,7 +73,8 @@ internal class DefaultFilesRepositoryTest {
             offlineNodeInformationMapper = offlineNodeInformationMapper,
             fileGateway = fileGateway,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
-            fileVersionsOptionCache = fileVersionsOptionCache
+            fileVersionsOptionCache = fileVersionsOptionCache,
+            streamingGateway = streamingGateway,
         )
     }
 
@@ -133,4 +138,15 @@ internal class DefaultFilesRepositoryTest {
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
             assertEquals(expectedFileVersionsOption, actual)
         }
+
+    @Test
+    fun `test that local file url string is returned if node exists`() = runTest {
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+        val expected = "expectedUrl"
+        whenever(streamingGateway.getLocalLink(any())).thenReturn(expected)
+
+        val actual = underTest.getFileStreamingUri(mock { on { id }.thenReturn(NodeId(1L)) })
+
+        assertThat(actual).isEqualTo(expected)
+    }
 }
