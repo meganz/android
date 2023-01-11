@@ -476,6 +476,7 @@ class RubbishBinFragment : Fragment() {
      * @param position Position of item which is clicked
      */
     fun itemClick(position: Int) {
+        val actualPosition = position - 1
         Timber.d("Position:$position")
         if (adapter?.isMultipleSelect == true) {
             Timber.d("Multiselect ON")
@@ -487,7 +488,6 @@ class RubbishBinFragment : Fragment() {
             }
         } else {
             if (nodes[position].isFolder) {
-                val n = nodes[position]
                 val lastFirstVisiblePosition = if ((requireActivity() as ManagerActivity).isList) {
                     layoutManager.findFirstCompletelyVisibleItemPosition()
                 } else {
@@ -500,8 +500,7 @@ class RubbishBinFragment : Fragment() {
                     pos
                 }
                 Timber.d("Push to stack $lastFirstVisiblePosition position")
-                rubbishBinViewModel.pushPositionOnStack(lastFirstVisiblePosition)
-                rubbishBinViewModel.setRubbishBinHandle(n.handle)
+                rubbishBinViewModel.onFolderItemClicked(lastFirstVisiblePosition, actualPosition)
 
                 (requireActivity() as ManagerActivity).setToolbarTitle()
                 (requireActivity() as ManagerActivity).invalidateOptionsMenu()

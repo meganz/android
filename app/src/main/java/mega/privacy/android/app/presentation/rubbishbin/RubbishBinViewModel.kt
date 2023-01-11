@@ -104,7 +104,17 @@ class RubbishBinViewModel @Inject constructor(
      * Push lastPosition to stack
      * @param lastPosition last position to be added to stack
      */
-    fun pushPositionOnStack(lastPosition: Int) {
+    private fun pushPositionOnStack(lastPosition: Int) {
         lastPositionStack.push(lastPosition)
+    }
+
+    /**
+     * Performs action when folder is clicked from adapter
+     * @param lastFirstVisiblePosition visible position based on listview type
+     * @param position item position
+     */
+    fun onFolderItemClicked(lastFirstVisiblePosition: Int, position: Int) {
+        pushPositionOnStack(lastFirstVisiblePosition)
+        setRubbishBinHandle(_state.value.nodes[position].handle)
     }
 }

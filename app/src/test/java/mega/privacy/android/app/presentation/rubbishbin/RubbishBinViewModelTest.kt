@@ -98,11 +98,19 @@ class RubbishBinViewModelTest {
     }
 
     @Test
-    fun `test that when pushing item to stack, then the same item will pop on invoking popLastPositionStack`() {
-        val pushedValue = 123456
-        underTest.pushPositionOnStack(pushedValue)
-        Truth.assertThat(underTest.popLastPositionStack()).isEqualTo(pushedValue)
-    }
+    fun `test that when folder is clicked from adapter, then stack gets updated with appropriate value`() =
+        runTest {
+            val lastFirstVisiblePosition = 123456
+            val newValue = 12345L
+
+            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(listOf(mock(),
+                mock()))
+            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            underTest.setRubbishBinHandle(newValue)
+
+            underTest.onFolderItemClicked(lastFirstVisiblePosition, 0)
+            Truth.assertThat(underTest.popLastPositionStack()).isEqualTo(lastFirstVisiblePosition)
+        }
 
     @Test
     fun `test that last position returns 0 when items are popped from stack and stack has no items`() {
