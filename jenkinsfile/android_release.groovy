@@ -704,6 +704,7 @@ private void checkSDKVersion() {
     }
 }
 
+/**
  * read the version name from source code(build.gradle)
  * read the version code from environment variable
  *
