@@ -11,10 +11,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
@@ -25,6 +28,7 @@ class RubbishBinViewModelTest {
 
     private val getRubbishBinChildrenNode = mock<GetRubbishBinChildrenNode>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -39,6 +43,7 @@ class RubbishBinViewModelTest {
         underTest = RubbishBinViewModel(
             getRubbishBinChildrenNode = getRubbishBinChildrenNode,
             monitorNodeUpdates = monitorNodeUpdates,
+            getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle
         )
     }
 
@@ -89,5 +94,37 @@ class RubbishBinViewModelTest {
         whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(null)
         underTest.setRubbishBinHandle(newValue)
         Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
+        verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)
     }
+
+    @Test
+    fun `test that when pushing item to stack, then the same item will pop on invoking popLastPositionStack`() {
+        val pushedValue = 123456
+        underTest.pushPositionOnStack(pushedValue)
+        Truth.assertThat(underTest.popLastPositionStack()).isEqualTo(pushedValue)
+    }
+
+    @Test
+    fun `test that last position returns 0 when items are popped from stack and stack has no items`() {
+        val poppedValue = underTest.popLastPositionStack()
+        Truth.assertThat(poppedValue).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that when handle on back pressed and parent handle is null, then getRubbishBinChildrenNode is not invoked`() =
+        runTest {
+            val newValue = 123456789L
+            underTest.onBackPressed()
+            verify(getRubbishBinChildrenNode, times(0)).invoke(newValue)
+        }
+
+    @Test
+    fun `test that when handle on back pressed and parent handle is not null, then getRubbishBinChildrenNode is invoked once`() =
+        runTest {
+            val newValue = 123456789L
+            // to update handles rubbishBinHandle
+            underTest.setRubbishBinHandle(newValue)
+            underTest.onBackPressed()
+            verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)
+        }
 }

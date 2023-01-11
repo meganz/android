@@ -87,8 +87,6 @@ class RubbishBinFragment : Fragment() {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    private val lastPositionStack = Stack<Int>()
-
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
@@ -135,7 +133,6 @@ class RubbishBinFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 rubbishBinViewModel.state.collect {
-                    Timber.d("updateRubbishBinNodes node update ${it.nodes.size}")
                     hideMultipleSelect()
                     setNodes(it.nodes)
                     recyclerView?.invalidate()
@@ -146,7 +143,7 @@ class RubbishBinFragment : Fragment() {
         requireActivity().display?.getMetrics(outMetrics)
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
-        (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
+        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
         return if ((requireActivity() as ManagerActivity).isList) {
             Timber.d("List View")
@@ -503,11 +500,11 @@ class RubbishBinFragment : Fragment() {
                     pos
                 }
                 Timber.d("Push to stack $lastFirstVisiblePosition position")
-                lastPositionStack.push(lastFirstVisiblePosition)
+                rubbishBinViewModel.pushPositionOnStack(lastFirstVisiblePosition)
                 rubbishBinViewModel.setRubbishBinHandle(n.handle)
 
                 (requireActivity() as ManagerActivity).setToolbarTitle()
-                (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
+                (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
                 adapter?.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
 
@@ -772,26 +769,17 @@ class RubbishBinFragment : Fragment() {
         return adapter?.let {
             with(requireActivity() as ManagerActivity) {
                 if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
-                    comesFromNotifications = false
-                    comesFromNotificationHandle = -1
-                    selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                    rubbishBinViewModel.setRubbishBinHandle(comesFromNotificationHandleSaved)
-                    comesFromNotificationHandleSaved = -1
+                    restoreRubbishAfterComingFromNotification()
                     2
                 } else {
-                    val parentNode =
-                        megaApi.getParentNode(megaApi.getNodeByHandle(rubbishBinViewModel.state.value.rubbishBinHandle))
-                    parentNode?.let {
+                    rubbishBinViewModel.state.value.parentHandle?.let {
+                        rubbishBinViewModel.onBackPressed()
                         recyclerView?.visibility = View.VISIBLE
                         emptyImageView.visibility = View.GONE
                         emptyTextView.visibility = View.GONE
-                        supportInvalidateOptionsMenu()
-                        rubbishBinViewModel.setRubbishBinHandle(parentNode.handle)
+                        invalidateOptionsMenu()
                         setToolbarTitle()
-
-                        val lastVisiblePosition = if (!lastPositionStack.empty()) {
-                            lastPositionStack.pop()
-                        } else 0
+                        val lastVisiblePosition = rubbishBinViewModel.popLastPositionStack()
 
                         Timber.d("Scroll to $lastVisiblePosition position")
                         if (lastVisiblePosition >= 0) {

@@ -6119,7 +6119,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (notValidView) {
             rubbishBinViewModel.setRubbishBinHandle(INVALID_HANDLE);
             setToolbarTitle();
-            refreshRubbishBin();
         }
 
         dismissAlertDialogIfExists(statusDialog);
@@ -11179,6 +11178,17 @@ public class ManagerActivity extends TransfersManagementActivity
         comesFromNotificationDeepBrowserTreeIncoming = INVALID_VALUE;
         comesFromNotificationHandleSaved = INVALID_VALUE;
         refreshIncomingShares();
+    }
+
+    /**
+     * Restores the Rubbish section after opening it from a notification in the Notifications section.
+     */
+    public void restoreRubbishAfterComingFromNotification() {
+        comesFromNotifications = false;
+        comesFromNotificationHandle = -1;
+        selectDrawerItem(DrawerItem.NOTIFICATIONS);
+        rubbishBinViewModel.setRubbishBinHandle(comesFromNotificationHandleSaved);
+        comesFromNotificationHandleSaved = -1;
     }
 
     /**
