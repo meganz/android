@@ -4098,7 +4098,7 @@
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Atinge pentru a debloca</string>
     <!-- Label that schedule a meeting -->
-    <string name="chat_schedule_meeting">Planiifică o întâlnire</string>
+    <string name="chat_schedule_meeting">Planifică o întâlnire</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">Thank you for your Pro&#160;Lite monthly subscription</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->

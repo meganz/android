@@ -525,7 +525,7 @@
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Última sessão</string>
     <!-- message displayed while the app is changing the password -->
-    <string name="my_account_changing_password">Mudando a senha</string>
+    <string name="my_account_changing_password">Alterando a senha</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">Nova senha</string>
     <!-- when changing the password -->
@@ -1471,7 +1471,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] deletou o histórico do chat[/B]</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">Modificando permissões</string>
+    <string name="context_permissions_changing_folder">Alterando as permissões</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Removendo o contato da pasta compartilhada</string>
     <!-- confirmation message before removing a file -->
@@ -3042,9 +3042,9 @@
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Pesquisar em GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">Não foram encontrados [A]GIFs[/A]</string>
+    <string name="empty_search_giphy">Não foi encontrado nenhum [A]GIF[/A]</string>
     <!-- Label indicating there is not available GIFs due to down server -->
-    <string name="server_down_giphy">Não há GIFs disponíveis. Por favor, tente novamente mais tarde</string>
+    <string name="server_down_giphy">Não há nenhum GIF disponível - tente novamente mais tarde</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]Fim[/A] dos resultados</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
@@ -4118,7 +4118,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permitir adicionar participantes a usuários que não forem anfitriões</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIFs</string>
+    <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
@@ -4209,13 +4209,13 @@
     <plurals name="photos_album_deleted_message">
         <item quantity="one">Álbum “%s” excluído</item>
         <item quantity="many">%d álbuns excluídos</item>
-        <item quantity="other">%d álbuns excluídos</item>
+        <item quantity="other">%d álbuns foram deletados</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
-        <item quantity="one">Excluir álbum?</item>
-        <item quantity="many">Excluir álbuns?</item>
-        <item quantity="other">Excluir álbuns?</item>
+        <item quantity="one">Deletar o álbum?</item>
+        <item quantity="many">Deletar os álbuns?</item>
+        <item quantity="other">Deletar os álbuns?</item>
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
@@ -4242,11 +4242,12 @@
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Suas credenciais</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando o arquivo para visualização</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">O bônus expira em %1$d dias</item>
+        <item quantity="many">O bônus expira em %1$d de dias</item>
+        <item quantity="other">O bônus expira em %1$d dias</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descrição</string>

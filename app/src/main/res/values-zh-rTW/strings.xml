@@ -2890,7 +2890,7 @@
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">搜尋GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">未找到[A]GIFs[/A]</string>
+    <string name="empty_search_giphy">未找到[A]GIF[/A]</string>
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">沒有可用的GIF圖案，請稍後再試</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
