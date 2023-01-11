@@ -59,6 +59,9 @@ pipeline {
 
         CONSOLE_LOG_FILE = 'console.txt'
 
+        // CD pipeline uses this environment variable to assign version code
+        APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
+
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
@@ -701,12 +704,13 @@ private void checkSDKVersion() {
     }
 }
 
-/**
- * read the version name and version code from source code(build.gradle)
+ * read the version name from source code(build.gradle)
+ * read the version code from environment variable
+ *
  * @return a tuple of version code and version name
  */
 def readAppVersion() {
-    String versionCode = sh(script: "grep versionCode build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim()
+    String versionCode = APK_VERSION_CODE_FOR_CD
     String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
     return [versionName, versionCode]
 }

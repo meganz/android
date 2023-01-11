@@ -18,8 +18,10 @@ apply from: "$project.rootDir/tools/util.gradle"
 def readVersionCode() {
     def versionCode = System.getenv('APK_VERSION_CODE_FOR_CD')
     if (versionCode != null && !versionCode.isEmpty()) {
+        // Jenkins build will compute version code using this variable
         return versionCode.toInteger()
     } else {
+        // Local build will compute version code using this function
         return new Date().format("yyDDDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
     }
 }
