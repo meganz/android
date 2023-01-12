@@ -458,7 +458,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        megaApi.setSecureFlag(true)
         nameCollisionActivityContract =
             registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
                 if (result != null) {

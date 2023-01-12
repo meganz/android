@@ -73,7 +73,16 @@ class IncomingSharesViewModel @Inject constructor(
 
         viewModelScope.launch {
             isMandatoryFingerprintRequired()
-            val unverifiedIncomingNodes = getUnverifiedIncomingShares(_state.value.sortOrder)
+        }
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(unverifiedIncomingShares = getUnverifiedIncomingShares(_state.value.sortOrder))
+            }
+        }
+
+        viewModelScope.launch {
+            val unverifiedIncomingNodes = _state.value.unverifiedIncomingShares
                 .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
                 .mapNotNull { shareData -> getNodeByHandle(shareData.nodeHandle) }
             _state.update {

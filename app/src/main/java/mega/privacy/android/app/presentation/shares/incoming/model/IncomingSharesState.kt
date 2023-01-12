@@ -15,7 +15,8 @@ import nz.mega.sdk.MegaNode
  * @param isLoading true if the nodes are loading
  * @param sortOrder current sort order
  * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
- * @param unVerifiedIncomingNodes List of unverified Incoming [MegaNode]
+ * @param unverifiedIncomingShares List of unverified incoming [ShareData]
+ * @param unVerifiedIncomingNodes List of unverified incoming [MegaNode]
  */
 data class IncomingSharesState(
     val incomingHandle: Long = -1L,
@@ -26,6 +27,7 @@ data class IncomingSharesState(
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
+    val unverifiedIncomingShares: List<ShareData> = emptyList(),
     val unVerifiedIncomingNodes: List<MegaNode> = emptyList(),
 ) {
 

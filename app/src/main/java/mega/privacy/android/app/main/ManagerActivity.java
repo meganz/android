@@ -845,8 +845,6 @@ public class ManagerActivity extends TransfersManagementActivity
     int bottomNavigationCurrentItem = -1;
     View chatBadge;
     View callBadge;
-    View pendingActionsBadge;
-    BottomNavigationItemView sharedItemsView;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -1815,11 +1813,6 @@ public class ManagerActivity extends TransfersManagementActivity
         itemView.addView(chatBadge);
         setChatBadge();
 
-        // Navi button Shared Items
-        sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
-        pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
-        setPendingActionsBadge();
-
         callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
         itemView.addView(callBadge);
         callBadge.setVisibility(View.GONE);
@@ -2615,20 +2608,20 @@ public class ManagerActivity extends TransfersManagementActivity
         }
         ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
             if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                addUnverifiedIncomingCountBadge(incomingSharesState.getUnVerifiedIncomingNodes().size());
+                addUnverifiedIncomingCountBadge(incomingSharesState.getUnverifiedIncomingShares().size());
             }
             return Unit.INSTANCE;
         });
 
         ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
             if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnVerifiedOutgoingNodes().size());
+                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
             }
             return Unit.INSTANCE;
         });
 
-    }
-
+        setPendingActionsBadge(menuView);
+     }
 
     /**
      * collecting Flows from ViewModels
@@ -10276,6 +10269,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public MegaNode getSelectedNode() {
+        callOpenShareDialog();
         return selectedNode;
     }
 
@@ -10508,15 +10502,28 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void setPendingActionsBadge() {
-        if (viewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
-            sharedItemsView.addView(pendingActionsBadge);
-            ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
-                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
-                tvPendingActionsCount.setText(managerState.getPendingActionsCount());
-                return Unit.INSTANCE;
+    private void callOpenShareDialog() {
+        if (searchViewModel.getState().getValue().isMandatoryFingerPrintVerificationRequired()) {
+            megaApi.openShareDialog(selectedNode, new OptionalMegaRequestListenerInterface() {
+                @Override
+                public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
+                    super.onRequestFinish(api, request, error);
+                }
             });
         }
+    }
+
+    public void setPendingActionsBadge(BottomNavigationMenuView menuView) {
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
+            if (managerState.isMandatoryFingerprintVerificationNeeded() && managerState.getPendingActionsCount() > 0) {
+                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+                View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
+                sharedItemsView.addView(pendingActionsBadge);
+                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
+                tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     private void setCallBadge() {

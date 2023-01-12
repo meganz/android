@@ -68,6 +68,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -144,9 +145,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
-    private Set<Long> unverifiedIncomingNodeHandles;
-    private Set<Long> unverifiedOutgoingNodeHandles;
-    private Boolean isMandatoryFingerprintVerificationNeeded;
+    private Set<Long> unverifiedIncomingNodeHandles = new HashSet<>();
+    private Set<Long> unverifiedOutgoingNodeHandles = new HashSet<>();
+    private boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 

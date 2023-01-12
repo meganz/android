@@ -96,11 +96,14 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
+import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ViewUtils;
+import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -174,6 +177,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private MegaUser user;
 
+    private IncomingSharesViewModel incomingSharesViewModel;
+    private OutgoingSharesViewModel outgoingSharesViewModel;
+
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
             mMode = mode;
@@ -184,14 +190,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         mMode = DEFAULT_MODE;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
+        incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
+        outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
         itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
-
-        searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
-
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
@@ -224,6 +235,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         nodeInfo = contentView.findViewById(R.id.node_info_text);
         ImageView nodeVersionsIcon = contentView.findViewById(R.id.node_info_versions_icon);
+        LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
+
         ImageView permissionsIcon = contentView.findViewById(R.id.permissions_icon);
 
         LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
@@ -239,7 +252,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
 //      counterSave
         TextView optionDownload = contentView.findViewById(R.id.download_option);
-        LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
+
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
 //      counterShares
         TextView optionLink = contentView.findViewById(R.id.link_option);
@@ -331,81 +344,47 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         if (isOnline(requireContext())) {
-            ViewExtensionsKt.collectFlow(requireActivity(), searchViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (state.isMandatoryFingerPrintVerificationRequired()) {
-                    showOwnerSharedFolder();
-                    TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
-                    optionVerifyUser.setText(StringResourcesUtils.getString(R.string.shared_items_bottom_sheet_menu_verify_user, getMegaUserNameDB(user)));
-                    nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
-                    optionVerifyUser.setVisibility(View.VISIBLE);
-                    optionVerifyUser.setOnClickListener(this);
+            nodeName.setText(node.getName());
+            if (node.isFolder()) {
+                optionVersionsLayout.setVisibility(View.GONE);
+                nodeInfo.setText(getMegaNodeFolderInfo(node));
+                nodeVersionsIcon.setVisibility(View.GONE);
 
-                    //Removing the click listener & making it View.GONE
-                    optionDownload.setOnClickListener(null);
-                    optionDownload.setVisibility(View.GONE);
+                nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
 
-                    //Removing the click listener & making it View.GONE
-                    optionOffline.setOnClickListener(null);
+                if (isEmptyFolder(node)) {
+                    counterSave--;
                     optionOffline.setVisibility(View.GONE);
-
-                    separatorDownload.setVisibility(View.GONE);
-                    separatorLabel.setVisibility(View.GONE);
-                    separatorOpen.setVisibility(View.GONE);
-                    separatorModify.setVisibility(View.GONE);
-                    separatorShares.setVisibility(View.GONE);
-
-                    //Removing the click listener & making it View.GONE
-                    optionSendChat.setOnClickListener(null);
-                    optionSendChat.setVisibility(View.GONE);
-
-                    //Removing the click listener & making it View.GONE
-                    optionCopy.setOnClickListener(null);
-                    optionCopy.setVisibility(View.GONE);
-                } else {
-                    nodeName.setText(node.getName());
-                    if (node.isFolder()) {
-                        optionVersionsLayout.setVisibility(View.GONE);
-                        nodeInfo.setText(getMegaNodeFolderInfo(node));
-                        nodeVersionsIcon.setVisibility(View.GONE);
-
-                        nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
-
-                        if (isEmptyFolder(node)) {
-                            counterSave--;
-                            optionOffline.setVisibility(View.GONE);
-                        }
-
-                        counterShares--;
-                        optionSendChat.setVisibility(View.GONE);
-                    } else {
-                        if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
-                                && accessLevel >= MegaShare.ACCESS_READWRITE) {
-                            optionEdit.setVisibility(View.VISIBLE);
-                        }
-
-                        nodeInfo.setText(getFileInfo(node));
-
-                        if (megaApi.hasVersions(node)) {
-                            nodeVersionsIcon.setVisibility(View.VISIBLE);
-                            optionVersionsLayout.setVisibility(View.VISIBLE);
-                            versions.setText(String.valueOf(megaApi.getNumVersions(node)));
-                        } else {
-                            nodeVersionsIcon.setVisibility(View.GONE);
-                            optionVersionsLayout.setVisibility(View.GONE);
-                        }
-
-                        setNodeThumbnail(requireContext(), node, nodeThumb);
-
-                        if (isTakenDown) {
-                            counterShares--;
-                            optionSendChat.setVisibility(View.GONE);
-                        } else {
-                            optionSendChat.setVisibility(View.VISIBLE);
-                        }
-                    }
                 }
-                return Unit.INSTANCE;
-            });
+
+                counterShares--;
+                optionSendChat.setVisibility(View.GONE);
+            } else {
+                if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                        && accessLevel >= MegaShare.ACCESS_READWRITE) {
+                    optionEdit.setVisibility(View.VISIBLE);
+                }
+
+                nodeInfo.setText(getFileInfo(node));
+
+                if (megaApi.hasVersions(node)) {
+                    nodeVersionsIcon.setVisibility(View.VISIBLE);
+                    optionVersionsLayout.setVisibility(View.VISIBLE);
+                    versions.setText(String.valueOf(megaApi.getNumVersions(node)));
+                } else {
+                    nodeVersionsIcon.setVisibility(View.GONE);
+                    optionVersionsLayout.setVisibility(View.GONE);
+                }
+
+                setNodeThumbnail(requireContext(), node, nodeThumb);
+
+                if (isTakenDown) {
+                    counterShares--;
+                    optionSendChat.setVisibility(View.GONE);
+                } else {
+                    optionSendChat.setVisibility(View.VISIBLE);
+                }
+            }
         }
 
         if (isTakenDown) {
@@ -742,6 +721,23 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         super.onViewCreated(view, savedInstanceState);
+        if(nC.nodeComesFromIncoming(node)) {
+            ViewExtensionsKt.collectFlow(requireActivity(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
+                if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded() && mMode == SHARED_ITEMS_MODE) {
+                    setUnverifiedNodeUserName(incomingSharesViewModel.getState().getValue().getUnverifiedIncomingShares());
+                    hideNodeActions();
+                }
+                return Unit.INSTANCE;
+            });
+        } else {
+            ViewExtensionsKt.collectFlow(requireActivity(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
+                if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded() && mMode == SHARED_ITEMS_MODE) {
+                    setUnverifiedNodeUserName(outgoingSharesViewModel.getState().getValue().getUnverifiedOutgoingShares());
+                    hideNodeActions();
+                }
+                return Unit.INSTANCE;
+            });
+        }
     }
 
     @Override
@@ -882,6 +878,40 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
     }
+    private void setUnverifiedNodeUserName(List<ShareData> shareDataList) {
+        for (int j = 0; j < shareDataList.size(); j++) {
+            ShareData mS = shareDataList.get(j);
+            if (mS.getNodeHandle() == node.getHandle()) {
+                user = megaApi.getContact(mS.getUser());
+                if (user != null) {
+                    nodeInfo.setText(getMegaUserNameDB(user));
+                } else {
+                    nodeInfo.setText(mS.getUser());
+                }
+            }
+        }
+    }
+
+    private void hideNodeActions() {
+        TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
+        optionVerifyUser.setText(StringResourcesUtils.getString(R.string.shared_items_bottom_sheet_menu_verify_user, getMegaUserNameDB(user)));
+        TextView nodeName = contentView.findViewById(R.id.node_name_text);
+        nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+        optionVerifyUser.setVisibility(View.VISIBLE);
+        optionVerifyUser.setOnClickListener(this);
+
+        contentView.findViewById(R.id.favorite_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.rename_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.link_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.remove_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.download_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.option_offline_layout).setVisibility(View.GONE);
+        contentView.findViewById(R.id.copy_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.rubbish_bin_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.share_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.share_folder_option).setVisibility(View.GONE);
+        contentView.findViewById(R.id.clear_share_option).setVisibility(View.GONE);
+    }
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -962,22 +992,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                ViewExtensionsKt.collectFlow(requireActivity(), searchViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                    if (state.isMandatoryFingerPrintVerificationRequired()) {
-                        megaApi.openShareDialog(node, new OptionalMegaRequestListenerInterface() {
-                            @Override
-                            public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
-                                super.onRequestFinish(api, request, error);
-                                if (error.getErrorCode() == MegaError.API_OK) {
-                                    showShareFolderOptions();
-                                }
-                            }
-                        });
-                    } else {
-                        showShareFolderOptions();
-                    }
-                    return Unit.INSTANCE;
-                });
+                showShareFolderOptions();
                 break;
 
             case R.id.clear_share_option:
