@@ -58,6 +58,7 @@ import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
@@ -445,7 +446,7 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId)
+        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
 
