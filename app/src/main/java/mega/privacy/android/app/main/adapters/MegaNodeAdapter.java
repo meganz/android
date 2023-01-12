@@ -102,6 +102,7 @@ import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -1523,32 +1524,34 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /**
      * Adds unverified incoming nodes to Set
      *
-     * @param nodes - List of incoming [MegaNode]
+     * @param shares - List of incoming [ShareData]
      */
-    public void setUnverifiedIncomingNodes(List<MegaNode> nodes) {
+    public void setUnverifiedIncomingNodes(List<ShareData> shares) {
         unverifiedIncomingNodeHandles.clear();
-        nodes.forEach(megaNode -> unverifiedIncomingNodeHandles.add(megaNode.getHandle()));
+        shares.forEach(share -> unverifiedIncomingNodeHandles.add(share.getNodeHandle()));
     }
 
     /**
      * Adds unverified outgoing nodes to Set
      *
-     * @param nodes - List of outgoing [MegaNode]
+     * @param shares - List of outgoing [ShareData]
      */
-    public void setUnverifiedOutgoingNodes(List<MegaNode> nodes) {
+    public void setUnverifiedOutgoingNodes(List<ShareData> shares) {
         unverifiedOutgoingNodeHandles.clear();
-        nodes.forEach(megaNode -> unverifiedOutgoingNodeHandles.add(megaNode.getHandle()));
+        shares.forEach(share -> unverifiedOutgoingNodeHandles.add(share.getNodeHandle()));
     }
 
     /**
      * Function to check if current node is unverified & show Ui items accordingly
      *
-     * @param unverifiedNodes Unverified Nodes List
-     * @param currentNode     Current node from adapter
-     * @param holder          [ViewHolderBrowserList]
+     * @param unverifiedNodeHandles Unverified Node handles list
+     * @param currentNode           Current node from adapter
+     * @param holder                [ViewHolderBrowserList]
      */
-    private void showUnverifiedNodeUi(Set<Long> unverifiedNodes, MegaNode currentNode, ViewHolderBrowserList holder) {
-        if (unverifiedNodes.contains(currentNode.getHandle())) {
+    private void showUnverifiedNodeUi(Set<Long> unverifiedNodeHandles, MegaNode currentNode, ViewHolderBrowserList holder) {
+        if (unverifiedNodeHandles.contains(currentNode.getHandle())) {
+            holder.permissionsIcon.setVisibility(View.VISIBLE);
+            holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));
             holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
             holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
         }
