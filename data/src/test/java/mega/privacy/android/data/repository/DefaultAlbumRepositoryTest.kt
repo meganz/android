@@ -12,6 +12,7 @@ import mega.privacy.android.data.model.GlobalUpdate.OnSetElementsUpdate
 import mega.privacy.android.data.model.GlobalUpdate.OnSetsUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
 import nz.mega.sdk.MegaApiJava
@@ -175,6 +176,7 @@ class DefaultAlbumRepositoryTest {
 
         val megaSetElement = mock<MegaSetElement> {
             on { node() }.thenReturn(expectedNode)
+            on { id() }.thenReturn(expectedNode)
         }
         val megaSetElementList = mock<MegaSetElementList> {
             on { size() }.thenReturn(1L)
@@ -185,7 +187,7 @@ class DefaultAlbumRepositoryTest {
         val actualElementIds = underTest.getAlbumElementIDs(albumId)
 
         assertThat(actualElementIds.size).isEqualTo(1)
-        assertThat(actualElementIds[0].longValue).isEqualTo(expectedNode)
+        assertThat(actualElementIds[0].nodeId.longValue).isEqualTo(expectedNode)
     }
 
     @Test
@@ -222,12 +224,17 @@ class DefaultAlbumRepositoryTest {
     fun `test that monitorAlbumElementIds emits correct result`() = runTest {
         val albumId = AlbumId(1L)
         val expectedElementIds = (1..3L).map {
-            NodeId(it)
+            AlbumPhotoId(
+                id = it,
+                nodeId = NodeId(it),
+                albumId = albumId,
+            )
         }
 
         val megaSetElements = expectedElementIds.map { node ->
             mock<MegaSetElement> {
-                on { node() }.thenReturn(node.longValue)
+                on { node() }.thenReturn(node.id)
+                on { id() }.thenReturn(node.id)
                 on { setId() }.thenReturn(albumId.id)
             }
         }

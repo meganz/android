@@ -29,12 +29,14 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -99,24 +101,25 @@ internal class DefaultPhotosRepository @Inject constructor(
         images.await() + videos.await()
     }
 
-    override suspend fun getPhotoFromNodeID(nodeId: NodeId): Photo? = withContext(ioDispatcher) {
-        megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
-            ?.let { megaNode ->
-                megaNode to fileTypeInfoMapper(megaNode)
-            }?.let { (megaNode, fileType) ->
-                when (fileType) {
-                    is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
-                        mapMegaNodeToImage(megaNode)
-                    }
-                    is VideoFileTypeInfo -> {
-                        mapMegaNodeToVideo(megaNode)
-                    }
-                    else -> {
-                        null
+    override suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId?): Photo? =
+        withContext(ioDispatcher) {
+            megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
+                ?.let { megaNode ->
+                    megaNode to fileTypeInfoMapper(megaNode)
+                }?.let { (megaNode, fileType) ->
+                    when (fileType) {
+                        is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
+                            mapMegaNodeToImage(megaNode, albumPhotoId?.id)
+                        }
+                        is VideoFileTypeInfo -> {
+                            mapMegaNodeToVideo(megaNode, albumPhotoId?.id)
+                        }
+                        else -> {
+                            null
+                        }
                     }
                 }
-            }
-    }
+        }
 
     override suspend fun getPhotosByFolderId(id: Long, order: SortOrder): List<Photo> =
         withContext(ioDispatcher) {
@@ -222,9 +225,10 @@ internal class DefaultPhotosRepository @Inject constructor(
      * @param megaNode MegaNode
      * @return Photo / Image
      */
-    private fun mapMegaNodeToImage(megaNode: MegaNode) =
+    private fun mapMegaNodeToImage(megaNode: MegaNode, albumPhotoId: Long? = null) =
         imageMapper(
             megaNode.handle,
+            albumPhotoId,
             megaNode.parentHandle,
             megaNode.name,
             megaNode.isFavourite,
@@ -240,9 +244,10 @@ internal class DefaultPhotosRepository @Inject constructor(
      * @param megaNode MegaNode
      * @return Photo / Video
      */
-    private fun mapMegaNodeToVideo(megaNode: MegaNode) =
+    private fun mapMegaNodeToVideo(megaNode: MegaNode, albumPhotoId: Long? = null) =
         videoMapper(
             megaNode.handle,
+            albumPhotoId,
             megaNode.parentHandle,
             megaNode.name,
             megaNode.isFavourite,

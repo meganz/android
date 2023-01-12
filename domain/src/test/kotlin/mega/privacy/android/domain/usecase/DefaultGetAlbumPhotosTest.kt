@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.PhotosRepository
@@ -39,16 +40,21 @@ class DefaultGetAlbumPhotosTest {
     @Test
     fun `test that album photo collect is working`() = runTest {
         val albumId = AlbumId(1L)
-        val nodeIds = (1..2L).map { NodeId(it) }
+        val albumPhotoIds =
+            (1..2L).map { AlbumPhotoId(id = it, nodeId = NodeId(it), albumId = albumId) }
 
         val expectedImage = createImage()
         val expectedVideo = createVideo()
 
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(nodeIds)
+        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(albumPhotoIds)
         whenever(albumRepository.monitorAlbumElementIds(albumId)).thenReturn(flowOf())
 
-        whenever(photosRepository.getPhotoFromNodeID(nodeIds[0])).thenReturn(expectedImage)
-        whenever(photosRepository.getPhotoFromNodeID(nodeIds[1])).thenReturn(expectedVideo)
+        whenever(photosRepository.getPhotoFromNodeID(albumPhotoIds[0].nodeId, albumPhotoIds[0])).thenReturn(
+            expectedImage
+        )
+        whenever(photosRepository.getPhotoFromNodeID(albumPhotoIds[1].nodeId, albumPhotoIds[1])).thenReturn(
+            expectedVideo
+        )
 
         underTest(albumId).test {
             val actualAlbumPhotos = awaitItem()
@@ -63,6 +69,7 @@ class DefaultGetAlbumPhotosTest {
 
     private fun createImage(
         id: Long = 0L,
+        albumPhotoId: Long? = null,
         parentId: Long = 0L,
         name: String = "",
         isFavourite: Boolean = false,
@@ -73,6 +80,7 @@ class DefaultGetAlbumPhotosTest {
         fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(mimeType = "", extension = ""),
     ): Photo = Photo.Image(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,
@@ -85,6 +93,7 @@ class DefaultGetAlbumPhotosTest {
 
     private fun createVideo(
         id: Long = 0L,
+        albumPhotoId: Long? = null,
         parentId: Long = 0L,
         name: String = "",
         isFavourite: Boolean = false,
@@ -98,6 +107,7 @@ class DefaultGetAlbumPhotosTest {
             duration = duration),
     ): Photo = Photo.Video(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,

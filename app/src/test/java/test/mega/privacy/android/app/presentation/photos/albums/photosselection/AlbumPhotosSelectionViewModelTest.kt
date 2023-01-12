@@ -207,6 +207,7 @@ class AlbumPhotosSelectionViewModelTest {
 
     private fun createImage(
         id: Long,
+        albumPhotoId: Long? = null,
         parentId: Long = 0L,
         name: String = "",
         isFavourite: Boolean = false,
@@ -217,6 +218,7 @@ class AlbumPhotosSelectionViewModelTest {
         fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(mimeType = "", extension = ""),
     ): Photo = Photo.Image(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,

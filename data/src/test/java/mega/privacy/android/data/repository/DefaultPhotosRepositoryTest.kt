@@ -144,6 +144,7 @@ class DefaultPhotosRepositoryTest {
 
     private fun createImage(
         id: Long,
+        albumPhotoId: Long? = null,
         parentId: Long,
         name: String,
         isFavourite: Boolean,
@@ -154,6 +155,7 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo: FileTypeInfo,
     ): Photo.Image = Photo.Image(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,
@@ -166,6 +168,7 @@ class DefaultPhotosRepositoryTest {
 
     private fun createVideo(
         id: Long,
+        albumPhotoId: Long? = null,
         parentId: Long,
         name: String,
         isFavourite: Boolean,
@@ -176,6 +179,7 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo: FileTypeInfo,
     ): Photo.Video = Photo.Video(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,

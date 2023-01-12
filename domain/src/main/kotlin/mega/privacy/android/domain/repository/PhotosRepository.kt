@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import java.io.File
 
@@ -51,7 +52,7 @@ interface PhotosRepository {
     /**
      * Get photo with [nodeId]
      */
-    suspend fun getPhotoFromNodeID(nodeId: NodeId): Photo?
+    suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId? = null): Photo?
 
     /**
      * Get Photos from a folder

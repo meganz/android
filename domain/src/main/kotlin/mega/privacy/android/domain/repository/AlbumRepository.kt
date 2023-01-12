@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.set.UserSet
 
 /**
@@ -31,7 +32,7 @@ interface AlbumRepository {
      *
      * @return a list of node id's
      */
-    suspend fun getAlbumElementIDs(albumId: AlbumId): List<NodeId>
+    suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId>
 
     /**
      * Create an album
@@ -69,7 +70,7 @@ interface AlbumRepository {
      * @param albumId the id of the album which we want to map the ids associated with
      * @return a flow of all new element ids update
      */
-    fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<NodeId>>
+    fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<AlbumPhotoId>>
 
     /**
      * Remove user albums

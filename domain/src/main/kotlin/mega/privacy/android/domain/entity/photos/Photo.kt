@@ -9,6 +9,7 @@ import java.time.LocalDateTime
  */
 sealed interface Photo {
     val id: Long
+    val albumPhotoId: Long?
     val parentId: Long
     val name: String
     val isFavourite: Boolean
@@ -20,6 +21,7 @@ sealed interface Photo {
 
     data class Video(
         override val id: Long,
+        override val albumPhotoId: Long? = null,
         override val parentId: Long,
         override val name: String,
         override val isFavourite: Boolean,
@@ -32,6 +34,7 @@ sealed interface Photo {
 
     data class Image(
         override val id: Long,
+        override val albumPhotoId: Long? = null,
         override val parentId: Long,
         override val name: String,
         override val isFavourite: Boolean,
