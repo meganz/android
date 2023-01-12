@@ -1352,4 +1352,9 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun getFileVersionsOption(listener: MegaRequestListenerInterface)
+
+    /**
+     * number of pending uploads
+     */
+    val numberOfPendingUploads: Int
 }
