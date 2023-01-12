@@ -9,16 +9,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemMeetingDataBinding
 import mega.privacy.android.app.databinding.ItemMeetingHeaderBinding
-import mega.privacy.android.app.meeting.list.MeetingItem
-import mega.privacy.android.app.meeting.list.MeetingItemDiffCallback
+import mega.privacy.android.app.meeting.list.MeetingAdapterItemDiffCallback
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import java.time.Instant
+import java.time.ZoneId
 
 class MeetingsAdapter constructor(
     private val itemCallback: (Long) -> Unit,
     private val itemMoreCallback: (Long) -> Unit,
-) : ListAdapter<MeetingItem, RecyclerView.ViewHolder>(MeetingItemDiffCallback()), SectionTitleProvider {
+) : ListAdapter<MeetingAdapterItem, RecyclerView.ViewHolder>(MeetingAdapterItemDiffCallback()), SectionTitleProvider {
 
     companion object {
         const val TYPE_HEADER = 100
@@ -29,7 +31,6 @@ class MeetingsAdapter constructor(
         setHasStableIds(true)
     }
 
-    private var enableScheduleMeetings: Boolean = false
     var tracker: SelectionTracker<Long>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -62,10 +63,10 @@ class MeetingsAdapter constructor(
         when (getItemViewType(position)) {
             TYPE_DATA -> {
                 val isItemSelected = tracker?.isSelected(item.id) ?: false
-                (holder as MeetingDataViewHolder).bind(item as MeetingItem.Data, isItemSelected)
+                (holder as MeetingDataViewHolder).bind(item as MeetingAdapterItem.Data, isItemSelected)
             }
             else -> {
-                (holder as MeetingHeaderViewHolder).bind(item as MeetingItem.Header)
+                (holder as MeetingHeaderViewHolder).bind(item as MeetingAdapterItem.Header)
             }
         }
     }
@@ -75,8 +76,8 @@ class MeetingsAdapter constructor(
 
     override fun getSectionTitle(position: Int): String? {
         val item = getItem(position)
-        return if (item is MeetingItem.Data && item.startTimestamp != null) {
-            val timeStamp = item.startTimestamp
+        return if (item is MeetingAdapterItem.Data && item.room.scheduledStartTimestamp != null) {
+            val timeStamp = item.room.scheduledStartTimestamp ?: return null
             TimeUtils.formatDate(timeStamp, TimeUtils.DATE_SHORT_SHORT_FORMAT)
         } else {
             null
@@ -85,44 +86,30 @@ class MeetingsAdapter constructor(
 
     override fun getItemViewType(position: Int): Int =
         when (getItem(position)) {
-            is MeetingItem.Data -> TYPE_DATA
+            is MeetingAdapterItem.Data -> TYPE_DATA
             else -> TYPE_HEADER
         }
 
-    override fun submitList(list: List<MeetingItem>?) {
-        if (enableScheduleMeetings && !list.isNullOrEmpty()) {
-            super.submitList(addSectionHeaders(list))
-        } else {
-            super.submitList(list)
-        }
-    }
-
-    override fun submitList(list: List<MeetingItem>?, commitCallback: Runnable?) {
-        if (enableScheduleMeetings && !list.isNullOrEmpty()) {
-            super.submitList(addSectionHeaders(list), commitCallback)
-        } else {
-            super.submitList(list, commitCallback)
-        }
+    fun submitRoomList(list: List<MeetingRoomItem>?, commitCallback: Runnable? = null) {
+        super.submitList(list.addSectionHeaders(), commitCallback)
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun addSectionHeaders(list: List<MeetingItem>): List<MeetingItem> {
-        val itemsWithHeader = mutableListOf<MeetingItem>()
-        val sortedItems = (list as List<MeetingItem.Data>).sortedWith(
-            compareByDescending<MeetingItem.Data> { it.isScheduled() }
-                .thenBy { it.startTimestamp }
-                .thenByDescending { it.timeStamp }
-        )
+    private fun List<MeetingRoomItem>?.addSectionHeaders(): List<MeetingAdapterItem>? {
+        if (isNullOrEmpty() || none { it.isScheduledMeeting() }) {
+            return this?.map { MeetingAdapterItem.Data(it) }
+        }
 
-        sortedItems.forEachIndexed { index, item ->
-            val previousItem = sortedItems.getOrNull(index - 1)
+        val itemsWithHeader = mutableListOf<MeetingAdapterItem>()
+        forEachIndexed { index, room ->
+            val previousItem = getOrNull(index - 1)
             when {
-                item.isScheduled() && !isSameDay(item.startTimestamp, previousItem?.startTimestamp) ->
-                    itemsWithHeader.add(MeetingItem.Header(item.getStartDay()))
-                !item.isScheduled() && previousItem?.isScheduled() == true ->
-                    itemsWithHeader.add(MeetingItem.Header(StringResourcesUtils.getString(R.string.meetings_list_past_header)))
+                room.isScheduledMeeting() && !isSameDay(room.scheduledStartTimestamp, previousItem?.scheduledStartTimestamp) ->
+                    itemsWithHeader.add(MeetingAdapterItem.Header(room.scheduledStartTimestamp!!.getHeaderTitle()))
+                !room.isScheduledMeeting() && previousItem?.isScheduledMeeting() == true ->
+                    itemsWithHeader.add(MeetingAdapterItem.Header(StringResourcesUtils.getString(R.string.meetings_list_past_header)))
             }
-            itemsWithHeader.add(item)
+            itemsWithHeader.add(MeetingAdapterItem.Data(room))
         }
         return itemsWithHeader
     }
@@ -131,11 +118,15 @@ class MeetingsAdapter constructor(
         if (timeStampA == null || timeStampB == null) {
             false
         } else {
-            TimeUtils.isSameDate(timeStampA, timeStampB)
+            val dayA = Instant.ofEpochSecond(timeStampA)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            val dayB = Instant.ofEpochSecond(timeStampB)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+            dayA.isEqual(dayB)
         }
 
-    fun setScheduleMeetingsEnabled(enable: Boolean) {
-        enableScheduleMeetings = enable
-        notifyDataSetChanged()
-    }
+    private fun Long.getHeaderTitle(): String =
+        TimeUtils.formatDate(this, TimeUtils.DATE_WEEK_DAY_FORMAT)
 }
