@@ -173,10 +173,8 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
 
                 if (position == 0) {
                     qrCodeFragment = 0;
-                    myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
                 } else {
                     qrCodeFragment = 1;
-                    scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
             }
 
