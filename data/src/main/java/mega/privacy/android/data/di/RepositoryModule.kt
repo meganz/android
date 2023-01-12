@@ -40,6 +40,7 @@ import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -69,6 +70,7 @@ import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
+import mega.privacy.android.domain.repository.StreamingServerRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
@@ -203,4 +205,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAndroidBillingRepository(repository: DefaultBillingRepository): AndroidBillingRepository
+
+    @Binds
+    abstract fun bindStreamingServerRepository(implementation: StreamingServerRepositoryImpl): StreamingServerRepository
+
 }
