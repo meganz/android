@@ -28,7 +28,6 @@ data class OutgoingSharesState(
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val unverifiedOutgoingShares: List<ShareData> = emptyList(),
-    val unVerifiedOutgoingNodes: List<MegaNode> = emptyList(),
 ) {
 
     /**
