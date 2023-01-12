@@ -96,14 +96,14 @@ internal class DefaultAlbumRepository @Inject constructor(
     override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
             for (photoID in photoIDs) {
-                megaApiGateway.createSetElement(albumID.id, photoID.id)
+                megaApiGateway.createSetElement(albumID.id, photoID.longValue)
             }
         }
 
     override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
             for (photoID in photoIDs) {
-                megaApiGateway.removeSetElement(albumID.id, photoID.id)
+                megaApiGateway.removeSetElement(albumID.id, photoID.longValue)
             }
         }
 
@@ -130,5 +130,5 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private fun MegaSet.toUserSet(): UserSet = userSetMapper(id(), name(), cover(), ts())
 
-    private fun MegaSetElement.toNodeId(): NodeId = NodeId(id = node())
+    private fun MegaSetElement.toNodeId(): NodeId = NodeId(longValue = node())
 }

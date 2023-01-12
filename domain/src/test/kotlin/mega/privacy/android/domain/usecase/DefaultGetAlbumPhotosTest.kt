@@ -70,7 +70,7 @@ class DefaultGetAlbumPhotosTest {
         modificationTime: LocalDateTime = LocalDateTime.now(),
         thumbnailFilePath: String? = null,
         previewFilePath: String? = null,
-        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(type = "", extension = ""),
+        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(mimeType = "", extension = ""),
     ): Photo = Photo.Image(
         id,
         parentId,
@@ -93,7 +93,7 @@ class DefaultGetAlbumPhotosTest {
         thumbnailFilePath: String? = null,
         previewFilePath: String? = null,
         duration: Int = 0,
-        fileTypeInfo: VideoFileTypeInfo = VideoFileTypeInfo(type = "",
+        fileTypeInfo: VideoFileTypeInfo = VideoFileTypeInfo(mimeType = "",
             extension = "",
             duration = duration),
     ): Photo = Photo.Video(

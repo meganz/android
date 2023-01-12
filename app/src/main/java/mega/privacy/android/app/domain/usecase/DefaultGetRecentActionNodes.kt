@@ -49,10 +49,10 @@ class DefaultGetRecentActionNodes @Inject constructor(
      */
     private suspend fun createNodeItem(node: TypedFileNode): NodeItem? =
         runCatching {
-            val megaNode = getNodeByHandle.invoke(node.id.id)
+            val megaNode = getNodeByHandle.invoke(node.id.longValue)
             NodeItem(
                 node = megaNode,
-                thumbnail = getThumbnail(node.id.id),
+                thumbnail = getThumbnail(node.id.longValue),
                 index = -1,
                 isVideo = node.type is VideoFileTypeInfo,
                 modifiedDate = node.modificationTime.toString(),

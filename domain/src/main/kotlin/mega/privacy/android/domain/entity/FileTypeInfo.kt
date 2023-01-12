@@ -7,7 +7,7 @@ sealed interface FileTypeInfo {
     /**
      * type of file
      */
-    val type: String
+    val mimeType: String
 
     /**
      * file extension
@@ -28,66 +28,66 @@ sealed interface TextEditorFileTypeInfo : FileTypeInfo
 /**
  * Unknown file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class UnknownFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
 ) : FileTypeInfo
 
 /**
  * Pdf file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 object PdfFileTypeInfo : FileTypeInfo {
-    override val type = "application/pdf"
+    override val mimeType = "application/pdf"
     override val extension = "pdf"
 }
 
 /**
  * Zip file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class ZipFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
 ) : FileTypeInfo
 
 /**
  * Url file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 object UrlFileTypeInfo : FileTypeInfo {
-    override val type = "web/url"
+    override val mimeType = "web/url"
     override val extension = "url"
 }
 
 /**
  * Static image file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class StaticImageFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
 ) : ImageFileTypeInfo
 
 /**
  * Audio file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class AudioFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
     /**
      * Duration
@@ -98,11 +98,11 @@ data class AudioFileTypeInfo(
 /**
  * Gif file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class GifFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
 ) : ImageFileTypeInfo
 
@@ -110,22 +110,22 @@ data class GifFileTypeInfo(
 /**
  * Raw file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class RawFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
 ) : ImageFileTypeInfo
 
 /**
  * Text file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  */
 data class TextFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
 ) : TextEditorFileTypeInfo
 
@@ -137,18 +137,18 @@ data class TextFileTypeInfo(
 data class UnMappedFileTypeInfo(
     override val extension: String,
 ) : TextEditorFileTypeInfo {
-    override val type = "application/octet-stream"
+    override val mimeType = "application/octet-stream"
 }
 
 /**
  * Video file type info
  *
- * @property type
+ * @property mimeType
  * @property extension
  * @constructor Create empty Video file type info
  */
 data class VideoFileTypeInfo(
-    override val type: String,
+    override val mimeType: String,
     override val extension: String,
     /**
      * Duration

@@ -177,7 +177,7 @@ class AlbumPhotosSelectionViewModelTest {
         )
         whenever(addPhotosToAlbum(album.id, photoIds)).thenReturn(Unit)
 
-        underTest?.addPhotos(album, photoIds.map { it.id }.toSet())
+        underTest?.addPhotos(album, photoIds.map { it.longValue }.toSet())
 
         underTest?.state?.drop(1)?.test {
             val state = awaitItem()
@@ -214,7 +214,7 @@ class AlbumPhotosSelectionViewModelTest {
         modificationTime: LocalDateTime = LocalDateTime.now(),
         thumbnailFilePath: String? = null,
         previewFilePath: String? = null,
-        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(type = "", extension = ""),
+        fileTypeInfo: FileTypeInfo = UnknownFileTypeInfo(mimeType = "", extension = ""),
     ): Photo = Photo.Image(
         id,
         parentId,

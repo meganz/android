@@ -31,7 +31,7 @@ class DefaultGetFolderType @Inject constructor(
 
 
     private suspend fun isMediaSyncFolder(folder: NodeId) =
-        folder.id in listOf(cameraUploadRepository.getPrimarySyncHandle(),
+        folder.longValue in listOf(cameraUploadRepository.getPrimarySyncHandle(),
             cameraUploadRepository.getSecondarySyncHandle())
 
     private suspend fun isChatFolder(folder: NodeId) =

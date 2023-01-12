@@ -96,7 +96,7 @@ class DefaultAlbumRepositoryTest {
             underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
             for (photo in testPhotos) {
-                verify(megaApiGateway).createSetElement(testAlbumId.id, photo.id)
+                verify(megaApiGateway).createSetElement(testAlbumId.id, photo.longValue)
             }
         }
 
@@ -120,7 +120,7 @@ class DefaultAlbumRepositoryTest {
             underTest.removePhotosFromAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
             for (photo in testPhotos) {
-                verify(megaApiGateway).removeSetElement(testAlbumId.id, photo.id)
+                verify(megaApiGateway).removeSetElement(testAlbumId.id, photo.longValue)
             }
         }
 
@@ -185,7 +185,7 @@ class DefaultAlbumRepositoryTest {
         val actualElementIds = underTest.getAlbumElementIDs(albumId)
 
         assertThat(actualElementIds.size).isEqualTo(1)
-        assertThat(actualElementIds[0].id).isEqualTo(expectedNode)
+        assertThat(actualElementIds[0].longValue).isEqualTo(expectedNode)
     }
 
     @Test
@@ -227,7 +227,7 @@ class DefaultAlbumRepositoryTest {
 
         val megaSetElements = expectedElementIds.map { node ->
             mock<MegaSetElement> {
-                on { node() }.thenReturn(node.id)
+                on { node() }.thenReturn(node.longValue)
                 on { setId() }.thenReturn(albumId.id)
             }
         }

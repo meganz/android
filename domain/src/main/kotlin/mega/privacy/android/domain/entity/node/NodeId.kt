@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity.node
 /**
  * NodeId id value class
  *
- * @property id
+ * @property longValue
  */
 @JvmInline
-value class NodeId(val id:Long)
+value class NodeId(val longValue: Long)

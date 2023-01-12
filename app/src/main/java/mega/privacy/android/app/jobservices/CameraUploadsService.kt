@@ -1348,7 +1348,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             )
         }.onSuccess { nodeId ->
             Timber.d("Copy node successful")
-            getNodeByHandle(nodeId.id)?.let { retrievedNode ->
+            getNodeByHandle(nodeId.longValue)?.let { retrievedNode ->
                 val fingerprint = retrievedNode.fingerprint
                 val isSecondary = retrievedNode.parentHandle == getSecondarySyncHandle()
                 // Delete the Camera Upload sync record by fingerprint

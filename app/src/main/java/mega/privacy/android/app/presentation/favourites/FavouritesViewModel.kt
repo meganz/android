@@ -187,7 +187,7 @@ class FavouritesViewModel @Inject constructor(
     private suspend fun List<TypedNode>.mapTypedNodesListToFavourites(selectedNodes: Set<NodeId>): List<Favourite> =
         mapNotNull { favouriteInfo ->
             val nodeId = favouriteInfo.id
-            val node = this@FavouritesViewModel.fetchNode(nodeId.id) ?: return@mapNotNull null
+            val node = this@FavouritesViewModel.fetchNode(nodeId.longValue) ?: return@mapNotNull null
             this@FavouritesViewModel.favouriteMapper(
                 node,
                 favouriteInfo,

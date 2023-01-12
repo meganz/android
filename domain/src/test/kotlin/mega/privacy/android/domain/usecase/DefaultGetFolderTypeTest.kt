@@ -30,7 +30,7 @@ class DefaultGetFolderTypeTest {
 
 
     private val chatRepository = mock<ChatRepository>()
-    private val backupFolderId = Result.success(NodeId(folderId.id + 1))
+    private val backupFolderId = Result.success(NodeId(folderId.longValue + 1))
 
     private val monitorBackupFolder = mock<MonitorBackupFolder> {
         onBlocking { invoke() }.thenReturn(flow {
@@ -67,7 +67,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that the primary sync folder is marked as a mediaFolder`() = runTest {
         cameraUploadRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(folderId.id)
+            onBlocking { getPrimarySyncHandle() }.thenReturn(folderId.longValue)
         }
         val actual = underTest(testFolder)
 
@@ -77,7 +77,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `tet that the secondary sync folder is marked as a media folder`() = runTest {
         cameraUploadRepository.stub {
-            onBlocking { getSecondarySyncHandle() }.thenReturn(folderId.id)
+            onBlocking { getSecondarySyncHandle() }.thenReturn(folderId.longValue)
         }
         val actual = underTest(testFolder)
 

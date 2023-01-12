@@ -100,7 +100,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     override suspend fun getPhotoFromNodeID(nodeId: NodeId): Photo? = withContext(ioDispatcher) {
-        megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.id)
+        megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
             ?.let { megaNode ->
                 megaNode to fileTypeInfoMapper(megaNode)
             }?.let { (megaNode, fileType) ->

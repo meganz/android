@@ -64,7 +64,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedModificationTime = 2000L
     private val expectedThumbnailPath: String? = null
     private val expectedFingerprint = "fingerprint"
-    private val expectedType = StaticImageFileTypeInfo(type = "", extension = "image")
+    private val expectedType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
     private val expectedFileMegaNode = createMegaNode(false)
     private val expectedFolderMegaNode = createMegaNode(true)
 

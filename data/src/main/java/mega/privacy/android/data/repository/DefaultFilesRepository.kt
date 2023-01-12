@@ -360,7 +360,7 @@ internal class DefaultFilesRepository @Inject constructor(
         }
 
     override suspend fun getNodeById(nodeId: NodeId) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.id)?.let {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
             nodeMapper(
                 it,
                 cacheFolderGateway::getThumbnailCacheFilePath,
@@ -376,7 +376,7 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
         return withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(folderNode.id.id)?.let { parent ->
+            megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)?.let { parent ->
                 megaApiGateway.getChildrenByNode(parent)
                     .map {
                         nodeMapper(
@@ -422,7 +422,7 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
         withContext(ioDispatcher) {
-            megaLocalStorageGateway.getOfflineInformation(nodeId.id)
+            megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
 
@@ -492,7 +492,7 @@ internal class DefaultFilesRepository @Inject constructor(
         )
 
     override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(node.id.id)?.let {
+        megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
             streamingGateway.getLocalLink(it)
         }
     }

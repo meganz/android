@@ -95,7 +95,7 @@ class InboxViewModel @Inject constructor(
                 it.getOrDefault(NodeId(MegaApiJava.INVALID_HANDLE))
             }
             .collectLatest { newMyBackupsFolder ->
-                Timber.d("The My Backups Folder Handle is: ${newMyBackupsFolder.id}")
+                Timber.d("The My Backups Folder Handle is: ${newMyBackupsFolder.longValue}")
                 onMyBackupsFolderUpdateReceived(newMyBackupsFolder)
             }
     }
@@ -116,9 +116,9 @@ class InboxViewModel @Inject constructor(
 
         _state.update { inboxState ->
             if (inboxState.inboxHandle == -1L) {
-                refreshNodes(newMyBackupsFolder.id).let { updatedNodes ->
+                refreshNodes(newMyBackupsFolder.longValue).let { updatedNodes ->
                     inboxState.copy(
-                        inboxHandle = newMyBackupsFolder.id,
+                        inboxHandle = newMyBackupsFolder.longValue,
                         nodes = updatedNodes,
                     )
                 }
@@ -180,7 +180,7 @@ class InboxViewModel @Inject constructor(
             // 3. The retrieved Parent Node Handle does not exist
             val inboxHandle = _state.value.inboxHandle
 
-            if (myBackupsFolderNode.id == -1L || myBackupsFolderNode.id == inboxHandle) {
+            if (myBackupsFolderNode.longValue == -1L || myBackupsFolderNode.longValue == inboxHandle) {
                 onExitInbox(true)
             } else {
                 getParentNodeHandle(inboxHandle)?.let { parentNodeHandle ->
@@ -248,7 +248,7 @@ class InboxViewModel @Inject constructor(
      * @return true if both values are equal or [InboxState.inboxHandle] is -1L, and false if otherwise
      */
     fun isCurrentlyOnBackupFolderLevel(): Boolean = with(_state.value) {
-        (this.inboxHandle == myBackupsFolderNode.id) || this.inboxHandle == -1L
+        (this.inboxHandle == myBackupsFolderNode.longValue) || this.inboxHandle == -1L
     }
 
     /**

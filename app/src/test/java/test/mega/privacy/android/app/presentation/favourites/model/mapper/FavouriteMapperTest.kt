@@ -106,7 +106,7 @@ class FavouriteMapperTest {
         val expectedModificationTime = 1000L
 
         val testNode = mock<MegaNode> {
-            on { handle }.thenReturn(expectedNodeId.id)
+            on { handle }.thenReturn(expectedNodeId.longValue)
             on { name }.thenReturn(expectedName)
             on { label }.thenReturn(expectedLabel)
             on { isFavourite }.thenReturn(expectedIsFavourite)

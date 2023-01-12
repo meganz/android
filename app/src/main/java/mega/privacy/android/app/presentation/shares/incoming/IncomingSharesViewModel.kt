@@ -59,9 +59,9 @@ class IncomingSharesViewModel @Inject constructor(
                 // if not redirect to root incoming shares
                 list
                     .filter { it.isIncomingShare }
-                    .singleOrNull { it.id.id == _state.value.incomingHandle }
+                    .singleOrNull { it.id.longValue == _state.value.incomingHandle }
                     ?.let { node ->
-                        (getNodeByHandle(node.id.id) ?: authorizeNode(node.id.id))
+                        (getNodeByHandle(node.id.longValue) ?: authorizeNode(node.id.longValue))
                             .takeIf { it == null }
                             .let {
                                 resetIncomingTreeDepth()

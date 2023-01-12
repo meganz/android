@@ -147,7 +147,7 @@ class FavouritesGridViewHolder(
                                         if (file.exists()) {
                                             setNodeGridThumbnail(itemThumbnail, file, info.icon)
                                         } else {
-                                            getThumbnail(info.typedNode.id.id) { thumbnail ->
+                                            getThumbnail(info.typedNode.id.longValue) { thumbnail ->
                                                 thumbnail?.let { fileByGetThumbnail ->
                                                     setNodeGridThumbnail(
                                                         itemThumbnail,

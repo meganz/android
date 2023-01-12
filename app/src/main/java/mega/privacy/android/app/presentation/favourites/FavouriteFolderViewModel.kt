@@ -119,14 +119,14 @@ class FavouriteFolderViewModel @Inject constructor(
             ChildrenNodesLoadState.Success(
                 title = name,
                 children = children.mapNotNull { favouriteInfo ->
-                    val node = fetchNode(favouriteInfo.id.id) ?: return@mapNotNull null
+                    val node = fetchNode(favouriteInfo.id.longValue) ?: return@mapNotNull null
                     FavouriteListItem(
                         favourite = favouriteMapper(
                             node,
                             favouriteInfo,
                             megaUtilWrapper.availableOffline(
                                 context,
-                                favouriteInfo.id.id
+                                favouriteInfo.id.longValue
                             ),
                             stringUtilWrapper,
                             false
@@ -157,7 +157,7 @@ class FavouriteFolderViewModel @Inject constructor(
      */
     fun openFile(favourite: Favourite) {
         if (favourite is FavouriteFolder) {
-            getChildrenNodes(favourite.typedNode.id.id)
+            getChildrenNodes(favourite.typedNode.id.longValue)
         } else {
             viewModelScope.launch {
                 _favouritesEventState.emit(FavouritesEventState.OpenFile(favourite as FavouriteFile))

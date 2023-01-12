@@ -396,7 +396,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             }
                             mediaPlayerRepository.getChildrenByParentHandle(
                                 isAudio = isAudioPlayer,
-                                parentHandle = parent.id.id,
+                                parentHandle = parent.id.longValue,
                                 order = getSortOrderFromIntent(intent))?.let { children ->
                                 buildPlaySourcesByTypedNodes(type, children, firstPlayHandle)
                             }
@@ -425,7 +425,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             playlistTitle.postValue(parent.name)
 
                             mediaPlayerRepository.megaApiFolderGetChildrenByParentHandle(
-                                isAudioPlayer, parent.id.id, order)?.let { children ->
+                                isAudioPlayer, parent.id.longValue, order)?.let { children ->
                                 buildPlaySourcesByTypedNodes(type, children, firstPlayHandle)
                             }
                         }
@@ -491,7 +491,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
             if (thumbnail != null && !thumbnail.exists() && node != null) {
                 mediaPlayerRepository.getThumbnail(isAudioPlayer,
-                    node.id.id,
+                    node.id.longValue,
                     thumbnail.absolutePath
                 ) { nodeHandle ->
                     if (nodeHandle == playingHandle) {
@@ -580,26 +580,26 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (typedNode is TypedFileNode) {
                 mediaPlayerRepository.getLocalFilePath(typedNode).let { localPath ->
                     if (localPath != null && isLocalFile(typedNode, localPath)) {
-                        mediaItemFromFile(File(localPath), typedNode.id.id.toString())
+                        mediaItemFromFile(File(localPath), typedNode.id.longValue.toString())
                     } else {
                         val url =
                             if (type == FOLDER_LINK_ADAPTER) {
                                 if (isMegaApiFolder(type)) {
                                     mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(
-                                        typedNode.id.id)
+                                        typedNode.id.longValue)
                                 } else {
                                     mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(
-                                        typedNode.id.id)
+                                        typedNode.id.longValue)
                                 }
                             } else {
-                                mediaPlayerRepository.getLocalLinkFromMegaApi(typedNode.id.id)
+                                mediaPlayerRepository.getLocalLinkFromMegaApi(typedNode.id.longValue)
                             }
                         if (url == null) {
                             null
                         } else {
                             MediaItem.Builder()
                                 .setUri(Uri.parse(url))
-                                .setMediaId(typedNode.id.id.toString())
+                                .setMediaId(typedNode.id.longValue.toString())
                                 .build()
                         }
                     }?.let {
@@ -607,7 +607,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     }
                 }
 
-                if (typedNode.id.id == firstPlayHandle) {
+                if (typedNode.id.longValue == firstPlayHandle) {
                     firstPlayIndex = currentIndex
                 }
                 val thumbnail = typedNode.thumbnailPath?.let { path ->
@@ -619,7 +619,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 }
 
                 playlistItemMapper(
-                    typedNode.id.id,
+                    typedNode.id.longValue,
                     typedNode.name,
                     thumbnail,
                     currentIndex,
@@ -632,7 +632,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     }
 
                 if (thumbnail != null && !thumbnail.exists()) {
-                    nodesWithoutThumbnail.add(Pair(typedNode.id.id, thumbnail))
+                    nodesWithoutThumbnail.add(Pair(typedNode.id.longValue, thumbnail))
                 }
             }
         }

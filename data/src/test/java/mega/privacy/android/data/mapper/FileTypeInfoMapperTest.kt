@@ -57,7 +57,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             ZipFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -71,7 +71,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             ZipFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -96,7 +96,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             StaticImageFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -114,7 +114,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             AudioFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension,
                 duration = expectedDuration
             )
@@ -133,7 +133,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             AudioFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension,
                 duration = expectedDuration,
             )
@@ -152,7 +152,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             AudioFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension,
                 duration = expectedDuration,
             )
@@ -167,7 +167,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             GifFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -182,7 +182,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             GifFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -208,7 +208,7 @@ class FileTypeInfoMapperTest {
             whenever(node.name).thenReturn("withExtension.$expectedExtension")
             assertThat(underTest(node) { expectedMimeType }).isEqualTo(
                 RawFileTypeInfo(
-                    type = expectedMimeType,
+                    mimeType = expectedMimeType,
                     extension = expectedExtension
                 )
             )
@@ -235,7 +235,7 @@ class FileTypeInfoMapperTest {
             whenever(node.name).thenReturn("withExtension.$expectedExtension")
             assertThat(underTest(node) { expectedMimeType }).isEqualTo(
                 RawFileTypeInfo(
-                    type = expectedMimeType,
+                    mimeType = expectedMimeType,
                     extension = expectedExtension
                 )
             )
@@ -250,7 +250,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             TextFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -305,7 +305,7 @@ class FileTypeInfoMapperTest {
             whenever(node.name).thenReturn("withExtension.$expectedExtension")
             assertThat(underTest(node) { expectedMimeType }).isEqualTo(
                 TextFileTypeInfo(
-                    type = expectedMimeType,
+                    mimeType = expectedMimeType,
                     extension = expectedExtension
                 )
             )
@@ -333,7 +333,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             UnknownFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension
             )
         )
@@ -351,7 +351,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             VideoFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension,
                 duration = expectedDuration
             )
@@ -370,7 +370,7 @@ class FileTypeInfoMapperTest {
 
         assertThat(underTest(node) { expectedMimeType }).isEqualTo(
             VideoFileTypeInfo(
-                type = expectedMimeType,
+                mimeType = expectedMimeType,
                 extension = expectedExtension,
                 duration = expectedDuration
             )
