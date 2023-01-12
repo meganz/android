@@ -15,7 +15,7 @@ import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
-import mega.privacy.android.data.repository.DefaultEnvironmentRepository
+import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultFilesRepository
@@ -89,7 +89,7 @@ internal abstract class RepositoryModule {
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
 
     @Binds
-    abstract fun bindDeviceRepository(implementation: DefaultEnvironmentRepository): EnvironmentRepository
+    abstract fun bindDeviceRepository(implementation: EnvironmentRepositoryImpl): EnvironmentRepository
 
     @Binds
     @Singleton

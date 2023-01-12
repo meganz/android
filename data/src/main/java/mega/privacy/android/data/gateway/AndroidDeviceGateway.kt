@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
@@ -47,4 +48,12 @@ internal class AndroidDeviceGateway @Inject constructor(
     override fun getCurrentTimeInMillis(): Long = System.currentTimeMillis()
 
     override fun getElapsedRealtime(): Long = SystemClock.elapsedRealtime()
+
+    override suspend fun getDeviceMemory(): Long? {
+        val activityManager =
+            context.getSystemService(ActivityManager::class.java) ?: return null
+        val memoryInfo = ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(memoryInfo)
+        return memoryInfo.totalMem
+    }
 }

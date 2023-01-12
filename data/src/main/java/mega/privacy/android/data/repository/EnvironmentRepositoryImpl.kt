@@ -20,7 +20,7 @@ import javax.inject.Inject
  * [EnvironmentRepository] Implementation
  *
  */
-internal class DefaultEnvironmentRepository @Inject constructor(
+internal class EnvironmentRepositoryImpl @Inject constructor(
     private val deviceGateway: DeviceGateway,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
@@ -29,11 +29,8 @@ internal class DefaultEnvironmentRepository @Inject constructor(
     private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
 ) : EnvironmentRepository {
 
-    override fun getDeviceInfo(): DeviceInfo {
-        val deviceName = getDeviceName()
-
-        return DeviceInfo(deviceName, getLanguage())
-    }
+    override suspend fun getDeviceInfo() =
+        withContext(ioDispatcher) { DeviceInfo(getDeviceName(), getLanguage()) }
 
     private fun getDeviceName(): String {
         val manufacturer = deviceGateway.getManufacturerName().run {
@@ -53,17 +50,23 @@ internal class DefaultEnvironmentRepository @Inject constructor(
     }
 
     override suspend fun getLastSavedVersionCode() =
-        appInfoPreferencesGateway.monitorLastVersionCode().first()
+        withContext(ioDispatcher) { appInfoPreferencesGateway.monitorLastVersionCode().first() }
 
     override suspend fun getInstalledVersionCode() = withContext(ioDispatcher) {
         appInfoGateway.getAppVersionCode()
     }
 
     override suspend fun saveVersionCode(newVersionCode: Int) {
-        appInfoPreferencesGateway.setLastVersionCode(newVersionCode)
+        withContext(ioDispatcher) { appInfoPreferencesGateway.setLastVersionCode(newVersionCode) }
     }
 
-    override suspend fun getDeviceSdkVersionInt() = deviceGateway.getSdkVersionInt()
+    override suspend fun getDeviceSdkVersionInt() =
+        withContext(ioDispatcher) { deviceGateway.getSdkVersionInt() }
 
-    override suspend fun getDeviceSdkVersionName() = deviceGateway.getSdkVersionName()
+    override suspend fun getDeviceSdkVersionName() =
+        withContext(ioDispatcher) { deviceGateway.getSdkVersionName() }
+
+    override suspend fun getDeviceMemorySizeInBytes() = withContext(ioDispatcher) {
+        deviceGateway.getDeviceMemory()
+    }
 }

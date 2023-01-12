@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway
 /**
  * Device gateway
  *
+ * @constructor Create empty Device gateway
  */
 interface DeviceGateway {
     /**
@@ -42,5 +43,12 @@ interface DeviceGateway {
      * Elapsed realtime
      *
      */
-    fun getElapsedRealtime() : Long
+    fun getElapsedRealtime(): Long
+
+    /**
+     * Get device memory
+     *
+     * @return the total device memory if available
+     */
+    suspend fun getDeviceMemory(): Long?
 }

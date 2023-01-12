@@ -17,7 +17,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class DefaultEnvironmentRepositoryTest {
+class EnvironmentRepositoryImplTest {
     private lateinit var underTest: EnvironmentRepository
 
     private val deviceGateway =
@@ -31,7 +31,7 @@ class DefaultEnvironmentRepositoryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultEnvironmentRepository(
+        underTest = EnvironmentRepositoryImpl(
             deviceGateway = deviceGateway,
             context = context,
             megaApiGateway = megaApiGateway,
@@ -42,7 +42,7 @@ class DefaultEnvironmentRepositoryTest {
     }
 
     @Test
-    fun `test that device manufacturer and model are included in device name`() {
+    fun `test that device manufacturer and model are included in device name`() = runTest {
         val manufacturer = "manufacturer"
         val model = "model"
         whenever(deviceGateway.getManufacturerName()).thenReturn(manufacturer)
@@ -54,7 +54,7 @@ class DefaultEnvironmentRepositoryTest {
     }
 
     @Test
-    fun `test that htc is capitalised`() {
+    fun `test that htc is capitalised`() = runTest {
         val manufacturer = "htc"
         val model = "model"
         whenever(deviceGateway.getManufacturerName()).thenReturn(manufacturer.lowercase())

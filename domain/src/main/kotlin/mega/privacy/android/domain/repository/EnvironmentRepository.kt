@@ -13,7 +13,7 @@ interface EnvironmentRepository {
      *
      * @return device info
      */
-    fun getDeviceInfo(): DeviceInfo
+    suspend fun getDeviceInfo(): DeviceInfo
 
     /**
      * Get app info
@@ -52,4 +52,11 @@ interface EnvironmentRepository {
      *
      */
     suspend fun getDeviceSdkVersionName(): String
+
+    /**
+     * Get device memory size in bytes
+     *
+     * @return memory size in bytes if found
+     */
+    suspend fun getDeviceMemorySizeInBytes(): Long?
 }
