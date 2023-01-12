@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.photos
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import java.time.LocalDateTime
 
 /**
@@ -26,7 +27,7 @@ sealed interface Photo {
         override val modificationTime: LocalDateTime,
         override val thumbnailFilePath: String?,
         override val previewFilePath: String?,
-        override val fileTypeInfo: FileTypeInfo,
+        override val fileTypeInfo: VideoFileTypeInfo,
     ) : Photo
 
     data class Image(

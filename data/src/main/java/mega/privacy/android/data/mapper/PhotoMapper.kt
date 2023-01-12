@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import java.time.LocalDateTime
 
@@ -75,5 +76,5 @@ internal fun toVideo(
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
     previewFilePath = previewFilePath,
-    fileTypeInfo = fileTypeInfo
+    fileTypeInfo = fileTypeInfo as VideoFileTypeInfo
 )

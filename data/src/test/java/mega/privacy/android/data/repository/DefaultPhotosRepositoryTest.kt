@@ -183,7 +183,7 @@ class DefaultPhotosRepositoryTest {
         modificationTime,
         thumbnailFilePath,
         previewFilePath,
-        fileTypeInfo,
+        fileTypeInfo as VideoFileTypeInfo,
     )
 
     private fun mapFileTypeInfo(megaNode: MegaNode): FileTypeInfo {

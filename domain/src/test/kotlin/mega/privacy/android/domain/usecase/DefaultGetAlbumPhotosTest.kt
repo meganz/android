@@ -93,7 +93,7 @@ class DefaultGetAlbumPhotosTest {
         thumbnailFilePath: String? = null,
         previewFilePath: String? = null,
         duration: Int = 0,
-        fileTypeInfo: FileTypeInfo = VideoFileTypeInfo(type = "",
+        fileTypeInfo: VideoFileTypeInfo = VideoFileTypeInfo(type = "",
             extension = "",
             duration = duration),
     ): Photo = Photo.Video(

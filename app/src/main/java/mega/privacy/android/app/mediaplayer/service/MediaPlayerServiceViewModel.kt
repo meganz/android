@@ -90,9 +90,8 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.getDuration
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -126,6 +125,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val savePlayingPositionHistories: SavePlayingPositionHistories,
     private val getPlayingPositionHistories: GetPlayingPositionHistories,
+    private val fileDurationMapper: FileDurationMapper,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -470,13 +470,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 }
             }
 
-            playlistItemMapper(firstPlayHandle,
+            val duration = node?.type?.let {
+                fileDurationMapper(it)
+            } ?: 0
+
+            playlistItemMapper(
+                firstPlayHandle,
                 firstPlayNodeName,
                 thumbnail,
                 0,
                 TYPE_PLAYING,
                 node?.size ?: INVALID_SIZE,
-                node?.type?.getDuration() ?: 0)
+                duration,
+            )
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)
                 }
@@ -608,13 +614,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     File(path)
                 }
 
-                playlistItemMapper(typedNode.id.id,
+                val duration = typedNode.type.let {
+                    fileDurationMapper(it) ?: 0
+                }
+
+                playlistItemMapper(
+                    typedNode.id.id,
                     typedNode.name,
                     thumbnail,
                     currentIndex,
                     TYPE_NEXT,
                     typedNode.size,
-                    typedNode.type.getDuration())
+                    duration,
+                )
                     .let { playlistItem ->
                         playlistItems.add(playlistItem)
                     }

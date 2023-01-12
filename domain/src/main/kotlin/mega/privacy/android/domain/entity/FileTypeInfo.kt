@@ -155,13 +155,3 @@ data class VideoFileTypeInfo(
      */
     val duration: Int,
 ) : FileTypeInfo
-
-
-/**
- *
- */
-fun FileTypeInfo.getDuration() = when (this) {
-    is AudioFileTypeInfo -> this.duration
-    is VideoFileTypeInfo -> this.duration
-    else -> 0
-}

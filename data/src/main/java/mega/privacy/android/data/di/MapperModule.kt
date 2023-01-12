@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
@@ -100,6 +101,7 @@ import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
+import mega.privacy.android.data.mapper.toDuration
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toLocalPricing
@@ -585,4 +587,10 @@ internal class MapperModule {
     @Provides
     fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper =
         ::toAccountLevelDetail
+
+    /**
+     * Provide file duration mapper
+     */
+    @Provides
+    fun provideFileDurationMapper(): FileDurationMapper = ::toDuration
 }

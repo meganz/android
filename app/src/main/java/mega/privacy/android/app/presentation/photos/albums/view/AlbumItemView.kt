@@ -36,10 +36,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.domain.entity.getDuration
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.core.ui.theme.grey_alpha_032
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.photos.Photo
 
 private val gap = 1.dp
 
@@ -309,7 +308,7 @@ private fun AlbumPhotoContainer(
             )
 
             Text(
-                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.getDuration()),
+                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration),
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()
