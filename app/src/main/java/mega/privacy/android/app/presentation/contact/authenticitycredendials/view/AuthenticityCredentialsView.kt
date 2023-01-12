@@ -152,7 +152,7 @@ fun ContactCredentials(
                             bottom = 14.dp,
                             end = 48.dp),
                             style = MaterialTheme.typography.body2,
-                            color = if (MaterialTheme.colors.isLight) black else white_alpha_087,
+                            color = black,
                             text = stringResource(id = R.string.shared_items_verify_credentials_verify_person_banner_label))
 
                         IconButton(
