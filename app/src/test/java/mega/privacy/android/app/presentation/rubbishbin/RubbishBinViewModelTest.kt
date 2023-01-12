@@ -108,7 +108,7 @@ class RubbishBinViewModelTest {
             monitorNodeUpdates.emit(listOf(mock(), mock()))
             underTest.setRubbishBinHandle(newValue)
 
-            underTest.onFolderItemClicked(lastFirstVisiblePosition, 0)
+            underTest.onFolderItemClicked(lastFirstVisiblePosition, newValue)
             Truth.assertThat(underTest.popLastPositionStack()).isEqualTo(lastFirstVisiblePosition)
         }
 

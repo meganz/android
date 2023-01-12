@@ -111,10 +111,10 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * Performs action when folder is clicked from adapter
      * @param lastFirstVisiblePosition visible position based on listview type
-     * @param position item position
+     * @param handle node handle
      */
-    fun onFolderItemClicked(lastFirstVisiblePosition: Int, position: Int) {
+    fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
         pushPositionOnStack(lastFirstVisiblePosition)
-        setRubbishBinHandle(_state.value.nodes[position].handle)
+        setRubbishBinHandle(handle)
     }
 }
