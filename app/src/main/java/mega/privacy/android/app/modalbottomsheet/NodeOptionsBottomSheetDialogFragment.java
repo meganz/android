@@ -76,7 +76,9 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import kotlin.Unit;
 import mega.privacy.android.app.MegaOffline;
@@ -179,6 +181,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private IncomingSharesViewModel incomingSharesViewModel;
     private OutgoingSharesViewModel outgoingSharesViewModel;
+    private Set<Long> unverifiedHandles = new HashSet<>();
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
@@ -723,16 +726,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onViewCreated(view, savedInstanceState);
         if(nC.nodeComesFromIncoming(node)) {
             ViewExtensionsKt.collectFlow(requireActivity(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded() && mMode == SHARED_ITEMS_MODE) {
-                    setUnverifiedNodeUserName(incomingSharesViewModel.getState().getValue().getUnverifiedIncomingShares());
+                if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
+                        && mMode == SHARED_ITEMS_MODE
+                        && isNodeUnverified(state.getUnverifiedIncomingShares())) {
+                    setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
                     hideNodeActions();
                 }
                 return Unit.INSTANCE;
             });
         } else {
             ViewExtensionsKt.collectFlow(requireActivity(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded() && mMode == SHARED_ITEMS_MODE) {
-                    setUnverifiedNodeUserName(outgoingSharesViewModel.getState().getValue().getUnverifiedOutgoingShares());
+                if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
+                        && mMode == SHARED_ITEMS_MODE
+                        && isNodeUnverified(state.getUnverifiedOutgoingShares())) {
+                    setUnverifiedNodeUserName(state.getUnverifiedOutgoingShares());
                     hideNodeActions();
                 }
                 return Unit.INSTANCE;
@@ -911,6 +918,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         contentView.findViewById(R.id.share_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.share_folder_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.clear_share_option).setVisibility(View.GONE);
+    }
+
+    private boolean isNodeUnverified(List<ShareData> shareDataList) {
+        unverifiedHandles.clear();
+        shareDataList.forEach(shareData -> unverifiedHandles.add(shareData.getNodeHandle()));
+        return unverifiedHandles.contains(node.getHandle());
     }
 
     @SuppressLint("NonConstantResourceId")
