@@ -113,6 +113,15 @@ class RubbishBinFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
 
+    /**
+     * [Boolean] value referenced from [ManagerActivity]
+     *
+     * If "true", the contents are displayed in a List View-like manner
+     * If "false", the contents are displayed in a Grid View-like manner
+     */
+    private val isList: Boolean
+        get() = (requireActivity() as ManagerActivity).isList
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -141,7 +150,16 @@ class RubbishBinFragment : Fragment() {
         (requireActivity() as ManagerActivity).setToolbarTitle()
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
-        return if ((requireActivity() as ManagerActivity).isList) {
+        adapter = MegaNodeAdapter(requireActivity(),
+            this@RubbishBinFragment,
+            emptyList(),
+            rubbishBinViewModel.state.value.rubbishBinHandle,
+            recyclerView,
+            Constants.RUBBISH_BIN_ADAPTER,
+            if (isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+            sortByHeaderViewModel)
+
+        return if (isList) {
             Timber.d("List View")
             _listBinding = FragmentRubbishbinlistBinding.inflate(inflater, container, false)
             recyclerView = listBinding.rubbishbinListView
@@ -152,15 +170,6 @@ class RubbishBinFragment : Fragment() {
                 it.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
                 it.setListFragment(recyclerView)
                 it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-            } ?: run {
-                adapter = MegaNodeAdapter(requireActivity(),
-                    this@RubbishBinFragment,
-                    emptyList(),
-                    rubbishBinViewModel.state.value.rubbishBinHandle,
-                    recyclerView,
-                    Constants.RUBBISH_BIN_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                    sortByHeaderViewModel)
             }
 
             adapter?.isMultipleSelect = false
@@ -187,7 +196,6 @@ class RubbishBinFragment : Fragment() {
                 colorPrimary = R.color.grey_900_grey_100,
                 colorSecondary = R.color.grey_300_grey_600
             )
-
             listBinding.root
         } else {
             Timber.d("Grid View")
@@ -202,15 +210,6 @@ class RubbishBinFragment : Fragment() {
                 it.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
                 it.setListFragment(recyclerView)
                 it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-            } ?: run {
-                MegaNodeAdapter(requireActivity(),
-                    this@RubbishBinFragment,
-                    emptyList(),
-                    rubbishBinViewModel.state.value.rubbishBinHandle,
-                    recyclerView,
-                    Constants.RUBBISH_BIN_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                    sortByHeaderViewModel)
             }
             adapter?.isMultipleSelect = false
 
@@ -826,7 +825,7 @@ class RubbishBinFragment : Fragment() {
      */
     private fun openFolder(node: MegaNode) {
         val lastFirstVisiblePosition =
-            if ((requireActivity() as ManagerActivity).isList) {
+            if (isList) {
                 layoutManager.findFirstCompletelyVisibleItemPosition()
             } else {
                 val pos =
