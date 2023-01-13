@@ -728,7 +728,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             ViewExtensionsKt.collectFlow(requireActivity(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
                         && mMode == SHARED_ITEMS_MODE
-                        && isNodeUnverified(state.getUnverifiedIncomingShares())) {
+                        && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
                     hideNodeActions();
                 }
@@ -738,7 +738,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             ViewExtensionsKt.collectFlow(requireActivity(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
                         && mMode == SHARED_ITEMS_MODE
-                        && isNodeUnverified(state.getUnverifiedOutgoingShares())) {
+                        && isNodeUnverified(state.getUnVerifiedOutgoingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedOutgoingShares());
                     hideNodeActions();
                 }
@@ -920,10 +920,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         contentView.findViewById(R.id.clear_share_option).setVisibility(View.GONE);
     }
 
-    private boolean isNodeUnverified(List<ShareData> shareDataList) {
-        unverifiedHandles.clear();
-        shareDataList.forEach(shareData -> unverifiedHandles.add(shareData.getNodeHandle()));
-        return unverifiedHandles.contains(node.getHandle());
+    private boolean isNodeUnverified(List<Long> shareDataList) {
+        return shareDataList.contains(node.getHandle());
     }
 
     @SuppressLint("NonConstantResourceId")

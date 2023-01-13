@@ -526,7 +526,7 @@ class IncomingSharesViewModelTest {
         whenever(getNodeByHandle(any())).thenReturn(node1)
         assertThat(getNodeByHandle(any())).isNotNull()
         initViewModel()
-        underTest.state.map { it.unVerifiedIncomingNodes }.distinctUntilChanged()
+        underTest.state.map { it.unverifiedIncomingShares }.distinctUntilChanged()
             .test {
                 assertThat(awaitItem().size).isEqualTo(1)
             }
