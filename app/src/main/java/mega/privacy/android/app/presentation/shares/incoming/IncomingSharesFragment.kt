@@ -226,7 +226,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
                     adapter?.setMandatoryFingerprintVerificationValue(it.isMandatoryFingerprintVerificationNeeded)
-                    adapter?.setUnverifiedIncomingNodes(it.unverifiedIncomingShares)
+                    adapter?.setUnverifiedIncomingNodeHandles(it.unVerifiedIncomingNodeHandles)
                     updateNodes(it.nodes)
                 }
             }

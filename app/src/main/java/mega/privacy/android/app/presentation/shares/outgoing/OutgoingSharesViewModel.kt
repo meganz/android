@@ -61,8 +61,15 @@ class OutgoingSharesViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            val unverifiedOutgoingShares = getUnverifiedOutgoingShares(_state.value.sortOrder)
+            val handles = unverifiedOutgoingShares
+                .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
+                .mapNotNull { shareData ->
+                    getNodeByHandle(shareData.nodeHandle)?.handle
+                }
             _state.update {
-                it.copy(unverifiedOutgoingShares = getUnverifiedOutgoingShares(_state.value.sortOrder))
+                it.copy(unverifiedOutgoingShares = unverifiedOutgoingShares,
+                    unVerifiedOutgoingNodeHandles = handles)
             }
         }
     }
