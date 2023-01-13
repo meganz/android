@@ -101,10 +101,10 @@ internal class DefaultAlbumRepository @Inject constructor(
             }
         }
 
-    override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
+    override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<AlbumPhotoId>) =
         withContext(ioDispatcher) {
             for (photoID in photoIDs) {
-                megaApiGateway.removeSetElement(albumID.id, photoID.longValue)
+                megaApiGateway.removeSetElement(albumID.id, photoID.id)
             }
         }
 

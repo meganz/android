@@ -116,12 +116,14 @@ class DefaultAlbumRepositoryTest {
     fun `test that removePhotosFromAlbum invokes the removeSetElement api function for each photoID`() =
         runTest {
             val testAlbumId = AlbumId(1L)
-            val testPhotos = listOf(NodeId(1L), NodeId(2L))
+            val testPhotos = (1..2L).map {
+                AlbumPhotoId(it, NodeId(1L), testAlbumId)
+            }
 
             underTest.removePhotosFromAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
             for (photo in testPhotos) {
-                verify(megaApiGateway).removeSetElement(testAlbumId.id, photo.longValue)
+                verify(megaApiGateway).removeSetElement(testAlbumId.id, photo.id)
             }
         }
 
