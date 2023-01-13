@@ -10,8 +10,6 @@ import androidx.lifecycle.asFlow
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ShuffleOrder
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -26,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -92,14 +89,17 @@ import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.GetPlayingPositionHistories
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.SavePlayingPositionHistories
+import mega.privacy.android.domain.usecase.MonitorPlaybackTimes
+import mega.privacy.android.domain.usecase.SavePlaybackTimes
+import mega.privacy.android.domain.usecase.TrackPlaybackPosition
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
@@ -123,8 +123,10 @@ class MediaPlayerServiceViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val playlistItemMapper: PlaylistItemMapper,
     private val monitorConnectivity: MonitorConnectivity,
-    private val savePlayingPositionHistories: SavePlayingPositionHistories,
-    private val getPlayingPositionHistories: GetPlayingPositionHistories,
+    private val trackPlaybackPositionUseCase: TrackPlaybackPosition,
+    private val monitorPlaybackTimesUseCase: MonitorPlaybackTimes,
+    private val savePlaybackTimesUseCase: SavePlaybackTimes,
+    private val addNodeType: AddNodeType,
     private val fileDurationMapper: FileDurationMapper,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
@@ -188,8 +190,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private var playingPosition = 0
 
     private var cancelToken: MegaCancelToken? = null
-
-    private val playingPositionHistories = mutableMapOf<Long, Long>()
 
     init {
         itemsSelectedCount.value = 0
@@ -294,7 +294,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         buildPlaySourcesByTypedNodes(type = type,
                             typedNodes = mediaPlayerRepository.getAudioNodes(
                                 getSortOrderFromIntent(intent)
-                            ),
+                            ).map {
+                                addNodeType(it)
+                            },
                             firstPlayHandle = firstPlayHandle)
                     }
                     VIDEO_BROWSE_ADAPTER -> {
@@ -302,7 +304,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         buildPlaySourcesByTypedNodes(type = type,
                             typedNodes = mediaPlayerRepository.getVideoNodes(
                                 getSortOrderFromIntent(intent)
-                            ),
+                            ).map {
+                                addNodeType(it)
+                            },
                             firstPlayHandle = firstPlayHandle)
                     }
                     FILE_BROWSER_ADAPTER,
@@ -325,7 +329,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 typedNodes = mediaPlayerRepository.getNodesFromPublicLinks(
                                     isAudio = isAudioPlayer,
                                     order = order
-                                ),
+                                ).map {
+                                    addNodeType(it)
+                                },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
                         }
@@ -336,7 +342,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 typedNodes = mediaPlayerRepository.getNodesFromPublicLinks(
                                     isAudio = isAudioPlayer,
                                     order = order
-                                ),
+                                ).map {
+                                    addNodeType(it)
+                                },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
                         }
@@ -348,7 +356,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                     isAudio = isAudioPlayer,
                                     lastHandle = INVALID_HANDLE,
                                     order = order
-                                ),
+                                ).map {
+                                    addNodeType(it)
+                                },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
                         }
@@ -365,7 +375,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                                     }
                                             }
                                             buildPlaySourcesByTypedNodes(type = type,
-                                                typedNodes = nodes,
+                                                typedNodes = nodes.map { addNodeType(it) },
                                                 firstPlayHandle = firstPlayHandle)
                                         }
                                 }
@@ -398,7 +408,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 isAudio = isAudioPlayer,
                                 parentHandle = parent.id.longValue,
                                 order = getSortOrderFromIntent(intent))?.let { children ->
-                                buildPlaySourcesByTypedNodes(type, children, firstPlayHandle)
+                                buildPlaySourcesByTypedNodes(type,
+                                    children.map { addNodeType(it) },
+                                    firstPlayHandle)
                             }
                         }
                     }
@@ -426,7 +438,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
                             mediaPlayerRepository.megaApiFolderGetChildrenByParentHandle(
                                 isAudioPlayer, parent.id.longValue, order)?.let { children ->
-                                buildPlaySourcesByTypedNodes(type, children, firstPlayHandle)
+                                buildPlaySourcesByTypedNodes(type,
+                                    children.map { addNodeType(it) },
+                                    firstPlayHandle)
                             }
                         }
                     }
@@ -668,7 +682,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
         firstPlayHandle: Long,
     ) {
         buildPlaySourcesByTypedNodes(type = type,
-            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles),
+            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles).map {
+                addNodeType(it)
+            },
             firstPlayHandle = firstPlayHandle)
     }
 
@@ -1144,50 +1160,25 @@ class MediaPlayerServiceViewModel @Inject constructor(
         retry.value = true
     }
 
-    override fun savePlayingPositionHistories(key: String?) {
-        sharingScope.launch {
-            savePlayingPositionHistories(key, Gson().toJson(playingPositionHistories))
+    override suspend fun trackPlayback(getCurrentPlaybackInformation: () -> PlaybackInformation) {
+        if (!isAudioPlayer) {
+            trackPlaybackPositionUseCase(getCurrentPlaybackInformation)
         }
     }
 
-    override fun getPlayingPositionHistoriesFromLocal(key: String?) {
-        runBlocking {
-            playingPositionHistories.clear()
-            getPlayingPositionHistories(key, null).firstOrNull()
-                ?.let { jsonString ->
-                    Gson().fromJson<Map<Long, Long>?>(jsonString,
-                        object : TypeToken<Map<Long, Long>>() {}.type)
-                        ?.let { histories ->
-                            histories.map {
-                                playingPositionHistories[it.key] = it.value
-                            }
-                        }
-                }
-        }
-    }
-
-    override fun putCurrentPlayingPosition(mediaId: Long?, playingPosition: Long, duration: Long) {
-        mediaId?.let {
-            // If the current position is more than 15ms for saving the media item playing history
-            if (playingPosition > 15000) {
-                // When duration minus current playing position less than 2 seconds,
-                // clear current playing position history
-                playingPositionHistories[it] =
-                    if (duration - playingPosition < 2000) 0 else playingPosition
+    override suspend fun monitorPlaybackTimes(
+        mediaId: Long?,
+        seekToPosition: (positionMs: Long) -> Unit,
+    ) {
+        if (!isAudioPlayer) {
+            monitorPlaybackTimesUseCase().firstOrNull()?.get(mediaId)?.currentPosition?.let {
+                seekToPosition(it)
             }
         }
     }
 
-    override fun checkAndSeekToPlayingPositionHistory(
-        currentPlayingHandle: Long,
-        seekToPlayingPosition: (positionMs: Long) -> Unit,
-    ) {
-        if (!isAudioPlayer) {
-            if (playingPositionHistories.containsKey(currentPlayingHandle))
-                playingPositionHistories[currentPlayingHandle]?.let { playingPosition ->
-                    seekToPlayingPosition(playingPosition)
-                }
-        }
+    override suspend fun savePlaybackTimes() {
+        savePlaybackTimesUseCase()
     }
 
     override fun updateItemName(handle: Long, newName: String) =

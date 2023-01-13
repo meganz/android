@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -98,27 +99,9 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
         }
 
-    private val playingPositionUpdateHandler = Handler()
-    private val playingPositionUpdateRunnable = object : Runnable {
-        override fun run() {
-            // Save the current playing position of current item every second
-            with(mediaPlayerGateway) {
-                viewModelGateway.putCurrentPlayingPosition(
-                    getCurrentMediaItem()?.mediaId?.toLong(),
-                    getCurrentPlayingPosition(),
-                    getCurrentItemDuration()
-                )
-            }
-            playingPositionUpdateHandler.postDelayed(this, INTERVAL_SAVE_PLAYING_POSITION)
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
         viewModelGateway.setAudioPlayer(this is AudioPlayerService)
-        if (!viewModelGateway.isAudioPlayer()) {
-            viewModelGateway.getPlayingPositionHistoriesFromLocal(PREFERENCE_KEY_VIDEO_EXIT_TIME)
-        }
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
         createPlayer()
@@ -147,29 +130,16 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                     handle: String?,
                     isUpdateName: Boolean,
                 ) {
-                    handle?.run {
-                        setCurrentPlayingHandle(this.toLong())
-                        val currentHandle = this.toLong()
-                        // Check current item whether includes the playing position history,
-                        // if yes, seek to playing position history
-                        viewModelGateway.checkAndSeekToPlayingPositionHistory(currentHandle) {
-                            mediaPlayerGateway.playerSeekToPositionMs(it)
+                    handle?.let {
+                        setCurrentPlayingHandle(it.toLong())
+                        lifecycleScope.launch {
+                            viewModelGateway.monitorPlaybackTimes(it.toLong()) { positionMs ->
+                                mediaPlayerGateway.playerSeekToPositionMs(positionMs)
+                            }
                         }
                         if (isUpdateName) {
-                            val nodeName = getPlaylistItem(this)?.nodeName ?: ""
+                            val nodeName = getPlaylistItem(it)?.nodeName ?: ""
                             metadata.value = Metadata(null, null, null, nodeName)
-                        }
-                    }
-                }
-
-                override fun onIsPlayingChangedCallback(isPlaying: Boolean) {
-                    if (!viewModelGateway.isAudioPlayer()) {
-                        // Only Start the handler to save playing position when the video is playing
-                        if (isPlaying) {
-                            playingPositionUpdateHandler.post(playingPositionUpdateRunnable)
-                        } else {
-                            playingPositionUpdateHandler.removeCallbacks(
-                                playingPositionUpdateRunnable)
                         }
                     }
                 }
@@ -294,6 +264,16 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                         }
                     }
                 }
+
+                lifecycleScope.launch {
+                    viewModelGateway.trackPlayback {
+                        PlaybackInformation(
+                            mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
+                            mediaPlayerGateway.getCurrentItemDuration(),
+                            mediaPlayerGateway.getCurrentPlayingPosition()
+                        )
+                    }
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -361,11 +341,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!viewModelGateway.isAudioPlayer()) {
-            // Save the playing position history to local when the service is destroyed
-            viewModelGateway.savePlayingPositionHistories(PREFERENCE_KEY_VIDEO_EXIT_TIME)
-            // Remove the handler that save the current playing position
-            playingPositionUpdateHandler.removeCallbacks(playingPositionUpdateRunnable)
+        lifecycleScope.launch {
+            viewModelGateway.savePlaybackTimes()
         }
         mediaPlayerGateway.getCurrentPlayingPosition()
         viewModelGateway.cancelSearch()
@@ -488,9 +465,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1
-
-        private const val PREFERENCE_KEY_VIDEO_EXIT_TIME = "PREFERENCE_KEY_VIDEO_EXIT_TIME"
-        private const val INTERVAL_SAVE_PLAYING_POSITION: Long = 1000
 
         private const val INTENT_EXTRA_KEY_COMMAND = "command"
         private const val COMMAND_CREATE = 1

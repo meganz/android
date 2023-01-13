@@ -174,6 +174,7 @@ internal abstract class RepositoryModule {
     abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
 
     @Binds
+    @Singleton
     abstract fun bindMediaPlayerRepository(repository: DefaultMediaPlayerRepository): MediaPlayerRepository
 
     @Binds

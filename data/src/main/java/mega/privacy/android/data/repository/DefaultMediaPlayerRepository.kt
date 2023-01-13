@@ -1,6 +1,10 @@
 package mega.privacy.android.data.repository
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.database.DatabaseHandler
@@ -9,17 +13,18 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.AddNodeType
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
@@ -39,16 +44,18 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val nodeMapper: NodeMapper,
     private val cacheFolder: CacheFolderGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val addNodeType: AddNodeType,
     private val fileGateway: FileGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
+    private val appPreferencesGateway: AppPreferencesGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MediaPlayerRepository {
 
-    override suspend fun getTypedNodeByHandle(handle: Long): TypedNode? =
+    private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
+
+    override suspend fun getTypedNodeByHandle(handle: Long): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(handle)?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
@@ -77,7 +84,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getAudioNodes(order: SortOrder): List<TypedNode> =
+    override suspend fun getAudioNodes(order: SortOrder): List<UnTypedNode> =
         withContext(ioDispatcher) {
             megaApi.searchByType(MegaCancelToken.createInstance(),
                 sortOrderIntMapper(order),
@@ -85,12 +92,12 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 SEARCH_TARGET_ROOTNODE).filter {
                 it.isFile && filterByNodeName(true, it.name)
             }.map { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
 
-    override suspend fun getVideoNodes(order: SortOrder): List<TypedNode> =
+    override suspend fun getVideoNodes(order: SortOrder): List<UnTypedNode> =
         withContext(ioDispatcher) {
             megaApi.searchByType(MegaCancelToken.createInstance(),
                 sortOrderIntMapper(order),
@@ -98,7 +105,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 SEARCH_TARGET_ROOTNODE).filter {
                 it.isFile && filterByNodeName(false, it.name)
             }.map { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
@@ -135,45 +142,45 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun credentialsIsNull(): Boolean = dbHandler.credentials == null
 
-    override suspend fun getRubbishNode(): TypedNode? =
+    override suspend fun getRubbishNode(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApi.getRubbishBinNode()?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
-    override suspend fun getInboxNode(): TypedNode? =
+    override suspend fun getInboxNode(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApi.getInboxNode()?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
-    override suspend fun getRootNode(): TypedNode? =
+    override suspend fun getRootNode(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApi.getRootNode()?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
-    override suspend fun megaApiFolderGetRootNode(): TypedNode? =
+    override suspend fun megaApiFolderGetRootNode(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolder.getRootNode()?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
-    override suspend fun getParentNodeByHandle(parentHandle: Long): TypedNode? =
+    override suspend fun getParentNodeByHandle(parentHandle: Long): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
-    override suspend fun megaApiFolderGetParentNode(parentHandle: Long): TypedNode? =
+    override suspend fun megaApiFolderGetParentNode(parentHandle: Long): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolder.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
-                convertToTypedNode(megaNode)
+                convertToUnTypedNode(megaNode)
             }
         }
 
@@ -181,13 +188,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         isAudio: Boolean,
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedNode>? =
+    ): List<UnTypedNode>? =
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(parentHandle)?.let { parent ->
                 megaApi.getChildren(parent, sortOrderIntMapper(order)).filter {
                     it.isFile && filterByNodeName(isAudio, it.name)
                 }.map { node ->
-                    convertToTypedNode(node)
+                    convertToUnTypedNode(node)
                 }
             }
         }
@@ -196,13 +203,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         isAudio: Boolean,
         parentHandle: Long,
         order: SortOrder,
-    ): List<TypedNode>? =
+    ): List<UnTypedNode>? =
         withContext(ioDispatcher) {
             megaApiFolder.getMegaNodeByHandle(parentHandle)?.let { parent ->
                 megaApiFolder.getChildren(parent, sortOrderIntMapper(order)).filter {
                     it.isFile && filterByNodeName(isAudio, it.name)
                 }.map { node ->
-                    convertToTypedNode(node)
+                    convertToUnTypedNode(node)
                 }
             }
         }
@@ -210,21 +217,24 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun getNodesFromPublicLinks(
         isAudio: Boolean,
         order: SortOrder,
-    ): List<TypedNode> =
+    ): List<UnTypedNode> =
         withContext(ioDispatcher) {
             megaApi.getPublicLinks(sortOrderIntMapper(order)).filter {
                 it.isFile && filterByNodeName(isAudio, it.name)
             }.map { node ->
-                convertToTypedNode(node)
+                convertToUnTypedNode(node)
             }
         }
 
-    override suspend fun getNodesFromInShares(isAudio: Boolean, order: SortOrder): List<TypedNode> =
+    override suspend fun getNodesFromInShares(
+        isAudio: Boolean,
+        order: SortOrder,
+    ): List<UnTypedNode> =
         withContext(ioDispatcher) {
             megaApi.getInShares(sortOrderIntMapper(order)).filter {
                 it.isFile && filterByNodeName(isAudio, it.name)
             }.map { node ->
-                convertToTypedNode(node)
+                convertToUnTypedNode(node)
             }
         }
 
@@ -232,7 +242,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         isAudio: Boolean,
         lastHandle: Long,
         order: SortOrder,
-    ): List<TypedNode> =
+    ): List<UnTypedNode> =
         withContext(ioDispatcher) {
             var handle: Long? = lastHandle
             val result = mutableListOf<MegaNode>()
@@ -249,17 +259,17 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             result.filter { megaNode ->
                 megaNode.isFile && filterByNodeName(isAudio, megaNode.name)
             }.map { node ->
-                convertToTypedNode(node)
+                convertToUnTypedNode(node)
             }
         }
 
-    override suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<TypedNode>? =
+    override suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<UnTypedNode>? =
         withContext(ioDispatcher) {
             megaApi.getContact(email)?.let { megaUser ->
                 megaApi.getInShares(megaUser).filter { megaNode ->
                     megaNode.isFile && filterByNodeName(isAudio, megaNode.name)
                 }.map { node ->
-                    convertToTypedNode(node)
+                    convertToUnTypedNode(node)
                 }
             }
         }
@@ -274,11 +284,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun getNodesByHandles(
         isAudio: Boolean,
         handles: List<Long>,
-    ): List<TypedNode> =
+    ): List<UnTypedNode> =
         handles.mapNotNull { handle ->
             megaApi.getMegaNodeByHandle(handle)
         }.map { node ->
-            convertToTypedNode(node)
+            convertToUnTypedNode(node)
         }
 
     override suspend fun megaApiHttpServerStop() = megaApi.httpServerStop()
@@ -309,6 +319,39 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 typedFileNode.name,
                 typedFileNode.size,
                 typedFileNode.modificationTime)?.path
+        }
+
+    override suspend fun deletePlaybackInformation(mediaId: Long) {
+        playbackInfoMap.remove(mediaId)
+    }
+
+    override suspend fun savePlaybackTimes() {
+        appPreferencesGateway.putString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
+            Gson().toJson(playbackInfoMap))
+    }
+
+    override suspend fun updatePlaybackInformation(playbackInformation: PlaybackInformation) {
+        playbackInformation.mediaId?.let { mediaId ->
+            playbackInfoMap[mediaId] = playbackInformation
+        }
+    }
+
+    override fun monitorPlaybackTimes(): Flow<Map<Long, PlaybackInformation>?> =
+        appPreferencesGateway.monitorString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
+            null).map { jsonString ->
+            jsonString?.let {
+                Gson().fromJson<Map<Long, PlaybackInformation>?>(it,
+                    object : TypeToken<Map<Long, PlaybackInformation>>() {}.type)
+            }
+        }.map { infoMap ->
+            infoMap?.let {
+                // If the playbackInfoMap is empty, using the local information
+                // else using the current playbackInfoMap
+                if (playbackInfoMap.isEmpty()) {
+                    playbackInfoMap.putAll(it)
+                }
+            }
+            playbackInfoMap
         }
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
@@ -390,18 +433,20 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             } ?: user.email
         }
 
-    private suspend fun convertToTypedNode(node: MegaNode): TypedNode =
-        addNodeType(
-            nodeMapper(
-                node,
-                ::getThumbnailCacheFilePath,
-                megaApi::hasVersion,
-                megaApi::getNumChildFolders,
-                megaApi::getNumChildFiles,
-                fileTypeInfoMapper,
-                megaApi::isPendingShare,
-                megaApi::isInRubbish,
-            )
+    private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
+        nodeMapper(
+            node,
+            ::getThumbnailCacheFilePath,
+            megaApi::hasVersion,
+            megaApi::getNumChildFolders,
+            megaApi::getNumChildFiles,
+            fileTypeInfoMapper,
+            megaApi::isPendingShare,
+            megaApi::isInRubbish,
         )
 
+
+    companion object {
+        private const val PREFERENCE_KEY_VIDEO_EXIT_TIME = "PREFERENCE_KEY_VIDEO_EXIT_TIME"
+    }
 }
