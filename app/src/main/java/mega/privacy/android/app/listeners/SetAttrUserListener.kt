@@ -161,11 +161,8 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                             .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE))
                     }
                     MegaApiJava.USER_ATTR_DISABLE_VERSIONS -> {
-                        MegaApplication.setDisableFileVersions(text.toBoolean())
                         if (e.errorCode != MegaError.API_OK) {
                             Timber.e("ERROR:USER_ATTR_DISABLE_VERSIONS")
-                            MegaApplication.getInstance()
-                                .sendBroadcast(Intent(BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS))
                         } else {
                             Timber.d("File versioning attribute changed correctly")
                         }

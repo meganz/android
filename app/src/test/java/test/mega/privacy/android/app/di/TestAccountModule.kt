@@ -11,6 +11,7 @@ import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
@@ -59,4 +60,7 @@ object TestAccountModule {
 
     @Provides
     fun provideGetMyCredentials() = getMyCredentials
+
+    @Provides
+    fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()
 }

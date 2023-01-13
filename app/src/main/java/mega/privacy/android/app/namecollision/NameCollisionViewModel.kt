@@ -3,15 +3,16 @@ package mega.privacy.android.app.namecollision
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.MegaApplication
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.myAccount.usecase.GetFileVersionsOptionUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
@@ -23,9 +24,11 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,11 +43,12 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NameCollisionViewModel @Inject constructor(
-    private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase,
+    private val getFileVersionsOption: GetFileVersionsOption,
     private val getNameCollisionResultUseCase: GetNameCollisionResultUseCase,
     private val uploadUseCase: UploadUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
+    private val monitorUserUpdates: MonitorUserUpdates,
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -72,7 +76,17 @@ class NameCollisionViewModel @Inject constructor(
     private var allCollisionsProcessed = false
 
     init {
-        getFileVersionsOption()
+        viewModelScope.launch {
+            monitorUserUpdates()
+                .filter { it == UserChanges.DisableVersions }
+                .collect {
+                    getFileVersionsOption(true)
+                    updateFileVersioningInfo()
+                }
+        }
+        viewModelScope.launch {
+            getFileVersionsOption(true)
+        }
     }
 
     /**
@@ -164,30 +178,16 @@ class NameCollisionViewModel @Inject constructor(
     }
 
     /**
-     * Checks if file versioning is enabled or not depending on if the value has been already set or not.
-     */
-    private fun getFileVersionsOption() {
-        if (MegaApplication.isDisableFileVersions == INVALID_VALUE) {
-            getFileVersionsOptionUseCase.get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = { Timber.d("File versioning: ${MegaApplication.isDisableFileVersions}") },
-                    onError = Timber::w
-                ).addTo(composite)
-        }
-    }
-
-    /**
      * Updates file versioning info.
      */
     fun updateFileVersioningInfo() {
-        if (currentCollision.value != null) {
+        val currentCollision = currentCollision.value ?: return
+        viewModelScope.launch {
             fileVersioningInfo.value =
                 Triple(
-                    isFileVersioningEnabled(),
+                    getFileVersionsOption(false).not(),
                     getCollisionType(),
-                    currentCollision.value!!.nameCollision.isFile
+                    currentCollision.nameCollision.isFile
                 )
         }
     }
@@ -202,17 +202,6 @@ class NameCollisionViewModel @Inject constructor(
             is NameCollision.Copy, is NameCollision.Import -> NameCollisionType.COPY
             is NameCollision.Movement -> NameCollisionType.MOVE
             else -> NameCollisionType.UPLOAD
-        }
-
-    /**
-     * Checks if is file versioning enabled.
-     *
-     * @return True if file versioning is enabled, false otherwise.
-     */
-    private fun isFileVersioningEnabled(): Boolean =
-        when (MegaApplication.isDisableFileVersions) {
-            0 -> true
-            else -> false
         }
 
     /**

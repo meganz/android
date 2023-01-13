@@ -9221,8 +9221,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     Timber.d("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
                 }
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
-                MegaApplication.setDisableFileVersions(request.getFlag());
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             Timber.d("TYPE_GET_CANCEL_LINK");

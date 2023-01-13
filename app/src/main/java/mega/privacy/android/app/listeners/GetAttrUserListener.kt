@@ -128,11 +128,6 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                             MegaApplication.getInstance().sendBroadcast(this)
                         }
                     }
-                    MegaApiJava.USER_ATTR_DISABLE_VERSIONS -> {
-                        MegaApplication.setDisableFileVersions(flag)
-                        MegaApplication.getInstance()
-                            .sendBroadcast(Intent(BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS))
-                    }
                     MegaApiJava.USER_ATTR_RICH_PREVIEWS -> {
                         if (e.errorCode == MegaError.API_ENOENT) {
                             Timber.w("Attribute USER_ATTR_RICH_PREVIEWS not set")
