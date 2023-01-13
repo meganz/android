@@ -164,6 +164,8 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 if (viewModel.intentAction == ACTION_FORCE_RELOAD_ACCOUNT) {
                     MegaApplication.isLoggingIn = false
                     finish()
+                } else if (viewModel.intentAction == ACTION_OPEN_APP) {
+                    loginFragment?.readyToManager()
                 }
             }
         }, IntentFilter(ACTION_FETCH_NODES_FINISHED))
@@ -547,6 +549,11 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
          * Intent action for showing the login fetching nodes.
          */
         const val ACTION_FORCE_RELOAD_ACCOUNT = "FORCE_RELOAD"
+
+        /**
+         * Intent action for opening app.
+         */
+        const val ACTION_OPEN_APP = "OPEN_APP"
 
         /**
          * Intent action for notifying fetchNodes finished.
