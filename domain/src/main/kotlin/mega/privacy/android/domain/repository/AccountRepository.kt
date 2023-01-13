@@ -211,4 +211,9 @@ interface AccountRepository {
      *
      */
     fun monitorAccountDetail(): Flow<AccountDetail>
+
+    /**
+     * Checks if User is Logged In
+     */
+    suspend fun isUserLoggedIn(): Boolean
 }

@@ -1373,4 +1373,11 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Is User Logged In
+     *
+     * @return 0 if not logged in, Otherwise a number > 0
+     */
+    fun isUserLoggedIn(): Int
 }

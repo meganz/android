@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
@@ -69,6 +70,7 @@ class DefaultAccountRepositoryTest {
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val achievementsOverviewMapper = mock<AchievementsOverviewMapper>()
     private val dbHandler = mock<DatabaseHandler>()
+    private val isUserLoggedIn = mock<IsUserLoggedIn>()
 
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
         { credentials: String? ->
@@ -663,5 +665,11 @@ class DefaultAccountRepositoryTest {
     fun `test that MegaApiGateway method is invoked when getting accountEmail`() {
         underTest.accountEmail
         verify(megaApiGateway).accountEmail
+    }
+
+    @Test
+    fun `test that MegaApiGateway method is invoked when calling isUserLoggedIn`() = runTest {
+        underTest.isUserLoggedIn()
+        verify(megaApiGateway).isUserLoggedIn()
     }
 }

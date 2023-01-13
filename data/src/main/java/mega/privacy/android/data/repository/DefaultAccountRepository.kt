@@ -417,4 +417,9 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override fun monitorAccountDetail(): Flow<AccountDetail> =
         myAccountInfoFacade.monitorAccountDetail()
+
+    override suspend fun isUserLoggedIn(): Boolean =
+        withContext(ioDispatcher) {
+            megaApiGateway.isUserLoggedIn() > 0
+        }
 }

@@ -742,4 +742,6 @@ internal class MegaApiFacade @Inject constructor(
     override fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface) {
         megaApi.setFileVersionsOption(disable, listener)
     }
+
+    override fun isUserLoggedIn(): Int = megaApi.isLoggedIn
 }
