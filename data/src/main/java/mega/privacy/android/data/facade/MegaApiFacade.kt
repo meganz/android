@@ -738,4 +738,8 @@ internal class MegaApiFacade @Inject constructor(
             "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
     override val numberOfPendingUploads: Int
         get() = megaApi.numPendingUploads
+
+    override fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface) {
+        megaApi.setFileVersionsOption(disable, listener)
+    }
 }

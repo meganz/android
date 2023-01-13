@@ -1357,4 +1357,20 @@ interface MegaApiGateway {
      * number of pending uploads
      */
     val numberOfPendingUploads: Int
+
+    /**
+     * Enable or disable file versioning
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * <p>
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_DISABLE_VERSIONS
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish:
+     * - MegaRequest::getText - "1" for disable, "0" for enable
+     *
+     * @param disable  True to disable file versioning. False to enable it
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface)
 }
