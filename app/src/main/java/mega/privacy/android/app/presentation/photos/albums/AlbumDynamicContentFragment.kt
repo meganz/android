@@ -160,7 +160,7 @@ class AlbumDynamicContentFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 albumsViewModel.state.collect { state ->
-                    if (state.selectedPhotoIds.isEmpty()) {
+                    if (state.selectedPhotos.isEmpty()) {
                         if (actionMode != null) {
                             exitActionMode()
                         }
@@ -168,7 +168,7 @@ class AlbumDynamicContentFragment : Fragment() {
                         if (actionMode == null) {
                             enterActionMode()
                         }
-                        actionMode?.title = state.selectedPhotoIds.size.toString()
+                        actionMode?.title = state.selectedPhotos.size.toString()
                     }
                     menu?.let { menu ->
                         state.currentAlbum?.let { album ->
@@ -223,7 +223,7 @@ class AlbumDynamicContentFragment : Fragment() {
                     photoDownload = photosViewModel::downloadPhoto,
                     onClick = this@AlbumDynamicContentFragment::onClick,
                     onLongPress = this@AlbumDynamicContentFragment::onLongPress,
-                    selectedPhotoIds = uiState.selectedPhotoIds
+                    selectedPhotos = uiState.selectedPhotos
                 )
             } else {
                 when (uiState.currentAlbum) {
@@ -301,13 +301,13 @@ class AlbumDynamicContentFragment : Fragment() {
     @Composable
     private fun showFilterFabButton(uiState: AlbumsViewState) =
         (uiState.currentMediaType != FilterMediaType.ALL_MEDIA
-                && uiState.selectedPhotoIds.isEmpty())
+                && uiState.selectedPhotos.isEmpty())
 
     @Composable
     private fun showAddFabButton(uiState: AlbumsViewState) =
         uiState.currentAlbum is Album.UserAlbum
                 && isAccountHasPhotos
-                && uiState.selectedPhotoIds.isEmpty()
+                && uiState.selectedPhotos.isEmpty()
 
     @Composable
     private fun AddFabButton(
@@ -453,11 +453,11 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     fun onClick(photo: Photo) {
-        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotos.isEmpty()) {
             openPhoto(photo)
         } else {
             if (actionMode != null) {
-                albumsViewModel.togglePhotoSelection(photo.id)
+                albumsViewModel.togglePhotoSelection(photo)
             }
         }
     }
@@ -478,11 +478,11 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleActionMode(photo: Photo) {
-        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotos.isEmpty()) {
             if (actionMode == null) {
                 enterActionMode()
             }
-            albumsViewModel.togglePhotoSelection(photo.id)
+            albumsViewModel.togglePhotoSelection(photo)
         } else {
             onClick(photo)
         }

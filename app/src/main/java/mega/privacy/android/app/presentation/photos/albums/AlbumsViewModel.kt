@@ -396,36 +396,34 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    fun togglePhotoSelection(id: Long) {
-        val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
-        if (id in selectedPhotoIds) {
-            selectedPhotoIds.remove(id)
+    fun togglePhotoSelection(photo: Photo) {
+        val selectedPhotos = _state.value.selectedPhotos.toMutableSet()
+        if (photo in selectedPhotos) {
+            selectedPhotos.remove(photo)
         } else {
-            selectedPhotoIds.add(id)
+            selectedPhotos.add(photo)
         }
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds)
+            it.copy(selectedPhotos = selectedPhotos)
         }
     }
 
     fun clearSelectedPhotos() {
         _state.update {
-            it.copy(selectedPhotoIds = emptySet())
+            it.copy(selectedPhotos = emptySet())
         }
     }
 
     fun selectAllPhotos() {
         _state.value.currentAlbum?.let { album ->
             val currentAlbumPhotos = _state.value.albums.getAlbumPhotos(album)
-            val albumPhotosHandles = when (_state.value.currentMediaType) {
-                FilterMediaType.ALL_MEDIA -> currentAlbumPhotos.map { it.id }
+            val albumPhotos = when (_state.value.currentMediaType) {
+                FilterMediaType.ALL_MEDIA -> currentAlbumPhotos
                 FilterMediaType.IMAGES -> currentAlbumPhotos.filterIsInstance<Photo.Image>()
-                    .map { it.id }
                 FilterMediaType.VIDEOS -> currentAlbumPhotos.filterIsInstance<Photo.Video>()
-                    .map { it.id }
             }
             _state.update {
-                it.copy(selectedPhotoIds = albumPhotosHandles.toMutableSet())
+                it.copy(selectedPhotos = albumPhotos.toMutableSet())
             }
         }
     }
@@ -435,15 +433,15 @@ class AlbumsViewModel @Inject constructor(
 
     fun removeFavourites() {
         viewModelScope.launch {
-            removeFavourites(_state.value.selectedPhotoIds.toList())
+            removeFavourites(_state.value.selectedPhotos.map { it.id }.toList())
         }
         _state.update {
-            it.copy(selectedPhotoIds = emptySet())
+            it.copy(selectedPhotos = emptySet())
         }
     }
 
     suspend fun getSelectedNodes() =
-        getNodeListByIds(_state.value.selectedPhotoIds.toList())
+        getNodeListByIds(_state.value.selectedPhotos.map { it.id }.toList())
 
     fun setCurrentSort(sort: Sort) {
         _state.update {
