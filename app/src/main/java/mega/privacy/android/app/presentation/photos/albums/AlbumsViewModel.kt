@@ -428,6 +428,15 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set the value for the viewstate property showRemovePhotosDialog
+     */
+    fun setShowRemovePhotosFromAlbumDialog(show: Boolean) {
+        _state.update {
+            it.copy(showRemovePhotosDialog = show)
+        }
+    }
+
     fun getAlbumPhotosCount() =
         _state.value.albums.find { it.id == _state.value.currentAlbum }?.count ?: 0
 

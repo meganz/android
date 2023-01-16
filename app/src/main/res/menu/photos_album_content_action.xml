@@ -13,6 +13,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/cab_menu_remove_photos"
+        android:orderInCategory="120"
+        android:title="@string/general_remove"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/cab_menu_download"
         android:icon="@drawable/ic_download_white"
         android:orderInCategory="120"

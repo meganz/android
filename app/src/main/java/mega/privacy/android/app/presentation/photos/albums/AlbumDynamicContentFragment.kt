@@ -65,6 +65,7 @@ import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
+import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDialog
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -293,6 +294,15 @@ class AlbumDynamicContentFragment : Fragment() {
                     onOptionSelected = {
                         albumsViewModel.setCurrentMediaType(it)
                     }
+                )
+            }
+
+            if (uiState.showRemovePhotosDialog) {
+                RemovePhotosFromAlbumDialog(
+                    onDialogDismissed = {
+                        albumsViewModel.setShowRemovePhotosFromAlbumDialog(false)
+                    },
+                    onPositiveButtonClick = {}
                 )
             }
         }

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property snackBarMessage
  * @property showSortByDialog
  * @property showFilterDialog
+ * @property showRemovePhotosDialog
  * @property deletedAlbumIds
  * @property albumDeletedMessage
  * @property showDeleteAlbumsConfirmation
@@ -38,6 +39,7 @@ data class AlbumsViewState(
     val snackBarMessage: String = "",
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
+    val showRemovePhotosDialog: Boolean = false,
     val deletedAlbumIds: Set<AlbumId> = setOf(),
     val albumDeletedMessage: String = "",
     val showDeleteAlbumsConfirmation: Boolean = false,
