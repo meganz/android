@@ -1,19 +1,18 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import javax.inject.Inject
@@ -26,12 +25,13 @@ class DefaultGetMeetings @Inject constructor(
     private val chatRepository: ChatRepository,
     private val getMeetingsRepository: GetMeetingsRepository,
     private val meetingRoomMapper: MeetingRoomMapper,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
 ) : GetMeetings {
 
     companion object {
-        private const val DEBOUNCE_TIMEOUT_MS = 250L // Needed for backpressure
+        private const val DEBOUNCE_TIMEOUT_MS = 150L // Needed for backpressure
     }
+
+    private val mutex = Mutex()
 
     override fun invoke(): Flow<List<MeetingRoomItem>> =
         flow {
@@ -40,22 +40,17 @@ class DefaultGetMeetings @Inject constructor(
             meetings.addChatRooms()
             emit(meetings)
 
-            meetings.updateFields()
-            emit(meetings)
-
-            if (meetings.addScheduledMeetings()) {
-                emit(meetings)
-            }
-
             emitAll(
                 merge(
+                    meetings.addScheduledMeetings(),
+                    meetings.updateFields(),
                     meetings.monitorMutedChats(),
                     meetings.monitorChatCalls(),
                     meetings.monitorChatItems(),
                     meetings.monitorScheduledMeetings()
                 ).debounce(DEBOUNCE_TIMEOUT_MS)
             )
-        }.flowOn(dispatcher)
+        }
 
     private suspend fun MutableList<MeetingRoomItem>.addChatRooms() {
         chatRepository.getMeetingChatRooms()?.forEach { chatRoom ->
@@ -66,32 +61,33 @@ class DefaultGetMeetings @Inject constructor(
         sortMeetings()
     }
 
-    private suspend fun MutableList<MeetingRoomItem>.updateFields() =
-        getMeetingsRepository.updateMeetingFields(this)
+    private suspend fun MutableList<MeetingRoomItem>.updateFields(): Flow<MutableList<MeetingRoomItem>> =
+        getMeetingsRepository.getUpdatedMeetingItems(this, mutex)
 
-    private suspend fun MutableList<MeetingRoomItem>.addScheduledMeetings(): Boolean {
-        val scheduledMeetings = chatRepository.getAllScheduledMeetings()
-        scheduledMeetings?.forEach { scheduledMeeting ->
-            val currentItemIndex = indexOfFirst { scheduledMeeting.chatId == it.chatId }
-            if (currentItemIndex != -1) {
-                val isRecurring = isRecurringScheduleMeeting(scheduledMeeting.chatId)
-                val updatedMeeting = get(currentItemIndex).copy(
-                    schedId = scheduledMeeting.schedId,
-                    isRecurring = isRecurring,
-                    scheduledStartTimestamp = scheduledMeeting.startDateTime?.toEpochSecond(),
-                    scheduledEndTimestamp = scheduledMeeting.endDateTime?.toEpochSecond(),
-                )
-                set(currentItemIndex, updatedMeeting)
+    private suspend fun MutableList<MeetingRoomItem>.addScheduledMeetings(): Flow<MutableList<MeetingRoomItem>> =
+        flow {
+            val iterator = listIterator()
+            while (iterator.hasNext()) {
+                mutex.withLock {
+                    val item = iterator.next()
+                    val schedMeetings = chatRepository.getScheduledMeetingsByChat(item.chatId)
+                    if (!schedMeetings.isNullOrEmpty()) {
+                        val schedMeeting = schedMeetings.first()
+                        val updatedItem = item.copy(
+                            schedId = schedMeeting.schedId,
+                            isRecurring = schedMeetings.size > 1,
+                            scheduledStartTimestamp = schedMeeting.startDateTime?.toEpochSecond(),
+                            scheduledEndTimestamp = schedMeeting.endDateTime?.toEpochSecond(),
+                        )
+                        iterator.set(updatedItem)
+                        emit(this@addScheduledMeetings)
+                    }
+                }
             }
-        }
 
-        return if (!scheduledMeetings.isNullOrEmpty()) {
             sortMeetings()
-            true
-        } else {
-            false
+            emit(this@addScheduledMeetings)
         }
-    }
 
     private suspend fun MutableList<MeetingRoomItem>.monitorMutedChats(): Flow<MutableList<MeetingRoomItem>> =
         chatRepository.monitorMutedChats()
@@ -100,9 +96,10 @@ class DefaultGetMeetings @Inject constructor(
                     val existingIndex = indexOfFirst { it.isMuted != !chatRepository.isChatNotifiable(it.chatId) }
                     if (existingIndex != -1) {
                         val existingItem = get(existingIndex)
-                        set(existingIndex, existingItem.copy(
+                        val updatedItem = existingItem.copy(
                             isMuted = !existingItem.isMuted,
-                        ))
+                        )
+                        mutex.withLock { set(existingIndex, updatedItem) }
                     }
                 }
             }
@@ -119,7 +116,8 @@ class DefaultGetMeetings @Inject constructor(
                                 || chatRoom.lastMessageType == ChatRoomLastMessage.CallStarted,
                         lastTimestamp = chatRoom.lastTimestamp
                     )
-                    set(currentItemIndex, updatedItem)
+
+                    mutex.withLock { set(currentItemIndex, updatedItem) }
                     sortMeetings()
                 }
             }
@@ -131,24 +129,25 @@ class DefaultGetMeetings @Inject constructor(
                     val currentItemIndex = indexOfFirst { it.chatId == chatListItem.chatId }
 
                     if (currentItemIndex != -1 && chatListItem.isArchived) {
-                        removeAt(currentItemIndex)
+                        mutex.withLock { removeAt(currentItemIndex) }
                         return@apply
                     }
 
                     val updated = chatRepository.getCombinedChatRoom(chatListItem.chatId)
                         ?.toMeetingRoomItem()
-                        ?.let { mutableListOf(it).apply { updateFields() }.first() }
+                        ?.let { getMeetingsRepository.getUpdatedMeetingItem(it) }
                         ?: return@apply
 
                     if (currentItemIndex != -1) {
                         val currentItem = get(currentItemIndex)
-                        set(currentItemIndex, updated.copy(
+                        val updatedItem = updated.copy(
                             schedId = currentItem.schedId,
                             scheduledStartTimestamp = currentItem.scheduledStartTimestamp,
                             scheduledEndTimestamp = currentItem.scheduledEndTimestamp,
-                        ))
+                        )
+                        mutex.withLock { set(currentItemIndex, updatedItem) }
                     } else {
-                        add(updated)
+                        mutex.withLock { add(updated) }
                     }
                     sortMeetings()
                 }
@@ -165,7 +164,7 @@ class DefaultGetMeetings @Inject constructor(
                         scheduledStartTimestamp = scheduledMeeting.startDateTime?.toEpochSecond(),
                         scheduledEndTimestamp = scheduledMeeting.endDateTime?.toEpochSecond(),
                     )
-                    set(currentItemIndex, updatedItem)
+                    mutex.withLock { set(currentItemIndex, updatedItem) }
                     sortMeetings()
                 }
             }
@@ -183,9 +182,12 @@ class DefaultGetMeetings @Inject constructor(
             chatRepository::isChatLastMessageGeolocation
         )
 
-    private fun MutableList<MeetingRoomItem>.sortMeetings() =
-        sortWith(compareByDescending<MeetingRoomItem> { it.isScheduledMeeting() }
-            .thenBy { it.scheduledStartTimestamp }
-            .thenByDescending { it.lastTimestamp }
-        )
+    private suspend fun MutableList<MeetingRoomItem>.sortMeetings() {
+        mutex.withLock {
+            sortWith(compareByDescending<MeetingRoomItem> { it.isScheduledMeeting() }
+                .thenBy { it.scheduledStartTimestamp }
+                .thenByDescending { it.lastTimestamp }
+            )
+        }
+    }
 }
