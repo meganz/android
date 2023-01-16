@@ -329,7 +329,7 @@ import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
-import mega.privacy.android.app.main.qrcode.ScanCodeFragment;
+import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
