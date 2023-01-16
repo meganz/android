@@ -863,7 +863,7 @@ class MyAccountViewModel @Inject constructor(
      */
     fun getFileVersionsOption() {
         viewModelScope.launch {
-            val isDisableFileVersions = getFileVersionsOption(foreRefresh = true)
+            val isDisableFileVersions = getFileVersionsOption(forceRefresh = true)
             _state.update {
                 it.copy(
                     versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(),

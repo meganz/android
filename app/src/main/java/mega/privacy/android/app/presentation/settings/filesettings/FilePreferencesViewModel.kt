@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetFolderVersionInfo
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +25,7 @@ class FilePreferencesViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val getFileVersionsOption: GetFileVersionsOption,
     private val monitorUserUpdates: MonitorUserUpdates,
+    private val enableFileVersionsOption: EnableFileVersionsOption,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FilePreferencesState())
 
@@ -66,8 +68,20 @@ class FilePreferencesViewModel @Inject constructor(
 
     private fun getFileVersionOption() {
         viewModelScope.launch {
-            val isDisableFileVersions = getFileVersionsOption(foreRefresh = true)
-            _state.update { it.copy(isFileVersioningEnabled = isDisableFileVersions.not()) }
+            val shouldEnableFileVersioning = !getFileVersionsOption(forceRefresh = true)
+            _state.update { it.copy(isFileVersioningEnabled = shouldEnableFileVersioning) }
+        }
+    }
+
+    /**
+     * Enable file version option
+     *
+     * @param enable
+     */
+    fun enableFileVersionOption(enable: Boolean) {
+        viewModelScope.launch {
+            enableFileVersionsOption(enabled = enable)
+            _state.update { it.copy(isFileVersioningEnabled = enable) }
         }
     }
 }

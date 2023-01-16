@@ -9,5 +9,5 @@ fun interface GetFileVersionsOption {
      * Invoke
      *
      */
-    suspend operator fun invoke(foreRefresh: Boolean): Boolean
+    suspend operator fun invoke(forceRefresh: Boolean): Boolean
 }
