@@ -4124,4 +4124,7 @@
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Remove from album?</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">In order to enable camera uploads we need your permission to access your photos and other media on your device.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Grant access</string>
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don\'t grant</string>
 </resources>

@@ -1,5 +1,10 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,6 +54,52 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     val isConnected: Boolean
         get() = monitorConnectivity().value
+
+    /**
+     * Handle specific behavior when permissions are granted / denied
+     *
+     * @param permissions A [Map] of permissions that were requested
+     */
+    fun handlePermissionsResult(permissions: Map<String, Boolean>) {
+        if (areMediaPermissionsGranted(permissions)) {
+            handleEnableCameraUploads()
+        } else {
+            setMediaPermissionsRationaleState(shouldShow = true)
+        }
+        if (!isNotificationPermissionGranted(permissions)) {
+            setNotificationPermissionRationaleState(shouldShow = true)
+        }
+    }
+
+    /**
+     * Checks whether the Media Permissions have been granted. The checking would vary depending
+     * on the user's Android OS
+     *
+     * @param permissions A [Map] of permissions that were requested
+     *
+     * @return Boolean value
+     */
+    fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true
+        } else {
+            permissions[READ_EXTERNAL_STORAGE] == true
+        }
+
+    /**
+     * Checks whether the Notification Permission been granted. For Devices running Android 12
+     * and below, this is automatically granted.
+     *
+     * @param permissions A [Map] of permissions that were requested
+     *
+     * @return Boolean value
+     */
+    private fun isNotificationPermissionGranted(permissions: Map<String, Boolean>) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions[POST_NOTIFICATIONS] == true
+        } else {
+            true
+        }
 
     /**
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
@@ -105,5 +156,21 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             restoreSecondaryTimestamps()
         }
+    }
+
+    /**
+     * Sets the value of [SettingsCameraUploadsState.shouldShowMediaPermissionsRationale]
+     * @param shouldShow The new state value
+     */
+    fun setMediaPermissionsRationaleState(shouldShow: Boolean) {
+        _state.update { it.copy(shouldShowMediaPermissionsRationale = shouldShow) }
+    }
+
+    /**
+     * Sets the value of [SettingsCameraUploadsState.shouldShowNotificationPermissionRationale]
+     * @param shouldShow The new state value
+     */
+    fun setNotificationPermissionRationaleState(shouldShow: Boolean) {
+        _state.update { it.copy(shouldShowNotificationPermissionRationale = shouldShow) }
     }
 }
