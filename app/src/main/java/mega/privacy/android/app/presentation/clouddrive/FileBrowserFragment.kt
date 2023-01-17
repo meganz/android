@@ -24,14 +24,13 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -53,6 +52,8 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
+import mega.privacy.android.app.databinding.FragmentFilebrowsergridBinding
+import mega.privacy.android.app.databinding.FragmentFilebrowserlistBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -102,6 +103,9 @@ import java.util.Locale
 import java.util.Stack
 import javax.inject.Inject
 
+/**
+ * Fragment is for File Browser
+ */
 @AndroidEntryPoint
 class FileBrowserFragment : RotatableFragment() {
 
@@ -111,6 +115,14 @@ class FileBrowserFragment : RotatableFragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    private var _browserListBinding: FragmentFilebrowserlistBinding? = null
+    private val browserListBinding: FragmentFilebrowserlistBinding
+        get() = _browserListBinding!!
+
+    private var _browserGridBinding: FragmentFilebrowsergridBinding? = null
+    private val browserGridBinding: FragmentFilebrowsergridBinding
+        get() = _browserGridBinding!!
 
     /**
      * SortOrderIntMapper
@@ -123,12 +135,12 @@ class FileBrowserFragment : RotatableFragment() {
 
     private var aB: ActionBar? = null
 
-    var recyclerView: RecyclerView? = null
+    private var recyclerView: RecyclerView? = null
 
-    private var fastScroller: FastScroller? = null
-    private var emptyImageView: ImageView? = null
-    private var emptyTextView: LinearLayout? = null
-    private var emptyTextViewFirst: TextView? = null
+    private lateinit var fastScroller: FastScroller
+    private lateinit var emptyImageView: ImageView
+    private lateinit var emptyTextView: LinearLayout
+    private lateinit var emptyTextViewFirst: TextView
     private var adapter: MegaNodeAdapter? = null
     private var lastPositionStack: Stack<Int>? = null
 
@@ -156,6 +168,9 @@ class FileBrowserFragment : RotatableFragment() {
 
     private var mediaDiscoveryViewSettings = MediaDiscoveryViewSettings.INITIAL.ordinal
 
+    private val isList: Boolean
+        get() = (requireActivity() as ManagerActivity).isList
+
     override fun activateActionMode() {
         Timber.d("activateActionMode")
         adapter?.let {
@@ -182,7 +197,8 @@ class FileBrowserFragment : RotatableFragment() {
             when (item.itemId) {
                 R.id.cab_menu_download -> {
                     (activity as? ManagerActivity)?.saveNodesToDevice(
-                        documents, false, false, false, false)
+                        documents, false, false, false, false
+                    )
                     clearSelections()
                     hideMultipleSelect()
                 }
@@ -274,7 +290,8 @@ class FileBrowserFragment : RotatableFragment() {
                     hideMultipleSelect()
                 }
                 R.id.cab_menu_remove_share -> (activity as? ManagerActivity)?.showConfirmationRemoveAllSharingContacts(
-                    documents)
+                    documents
+                )
             }
             return true
         }
@@ -307,8 +324,10 @@ class FileBrowserFragment : RotatableFragment() {
             if (selected.size == 1) {
                 val megaNode = selected[0]
                 if (!megaNode.isTakenDown) {
-                    if (megaApi.checkAccessErrorExtended(megaNode,
-                            MegaShare.ACCESS_OWNER).errorCode
+                    if (megaApi.checkAccessErrorExtended(
+                            megaNode,
+                            MegaShare.ACCESS_OWNER
+                        ).errorCode
                         == MegaError.API_OK
                     ) {
                         if (megaNode.isExported) {
@@ -347,7 +366,8 @@ class FileBrowserFragment : RotatableFragment() {
                     showSendToChat = false
                 } else if (node.isFile) {
                     val nodeMime = MimeTypeList.typeForName(
-                        node.name)
+                        node.name
+                    )
                     if (nodeMime.isImage || nodeMime.isVideo) {
                         mediaCounter++
                     }
@@ -412,13 +432,17 @@ class FileBrowserFragment : RotatableFragment() {
         Timber.d("After onCreate called super")
     }
 
+    /**
+     * This method checks scroll of recycler view
+     */
     fun checkScroll() {
         if (recyclerView == null) return
         val visible =
             (adapter?.isMultipleSelect == true
                     || transfersManagement.isTransferOverQuotaBannerShown
                     || recyclerView?.canScrollVertically(
-                -1) == true && recyclerView?.visibility == View.VISIBLE)
+                -1
+            ) == true && recyclerView?.visibility == View.VISIBLE)
         (activity as? ManagerActivity)?.changeAppBarElevation(visible)
     }
 
@@ -456,124 +480,142 @@ class FileBrowserFragment : RotatableFragment() {
         outMetrics = DisplayMetrics()
         display?.getMetrics(outMetrics)
         density = resources.displayMetrics.density
+
+        if (adapter == null) {
+            adapter = MegaNodeAdapter(
+                activity,
+                this,
+                _nodes,
+                fileBrowserViewModel.getSafeBrowserParentHandle(),
+                recyclerView,
+                Constants.FILE_BROWSER_ADAPTER,
+                if (isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+                sortByHeaderViewModel
+            )
+        }
         getNodes()
         (activity as? ManagerActivity)?.setToolbarTitle()
         (activity as? ManagerActivity)?.supportInvalidateOptionsMenu()
-        val v: View
-        if ((activity as? ManagerActivity)?.isList == true) {
+        val view = if (isList) {
             Timber.d("isList")
-            v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false)
-            recyclerView = v.findViewById(R.id.file_list_view_browser)
-            fastScroller = v.findViewById(R.id.fastscroll)
-            recyclerView?.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics))
-            recyclerView?.clipToPadding = false
+            _browserListBinding = FragmentFilebrowserlistBinding.inflate(inflater, container, false)
+            recyclerView = browserListBinding.fileListViewBrowser
+            fastScroller = browserListBinding.fastscroll
             mLayoutManager = LinearLayoutManager(context)
             mLayoutManager?.orientation = LinearLayoutManager.VERTICAL
-            recyclerView?.layoutManager = mLayoutManager
-            recyclerView?.setHasFixedSize(true)
-            recyclerView?.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-            recyclerView?.addItemDecoration(PositionDividerItemDecoration(requireContext(),
-                resources.displayMetrics))
-            recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    checkScroll()
-                }
-            })
-            emptyImageView = v.findViewById(R.id.file_list_empty_image)
-            emptyTextView = v.findViewById(R.id.file_list_empty_text)
-            emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first)
-            if (adapter == null) {
-                adapter = MegaNodeAdapter(activity,
-                    this,
-                    _nodes,
-                    fileBrowserViewModel.getSafeBrowserParentHandle(),
-                    recyclerView,
-                    Constants.FILE_BROWSER_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                    sortByHeaderViewModel)
-            } else {
-                (activity as? ManagerActivity)?.parentHandleBrowser?.let {
-                    adapter?.parentHandle = it
-                }
-                adapter?.setListFragment(recyclerView)
-                adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+            adapter?.let {
+                it.parentHandle = (requireActivity() as ManagerActivity).parentHandleBrowser
+                it.setListFragment(recyclerView)
+                it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                it.isMultipleSelect = false
             }
+
+            recyclerView?.apply {
+                setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics))
+                clipToPadding = false
+                layoutManager = mLayoutManager
+                setHasFixedSize(true)
+                itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+                addItemDecoration(
+                    PositionDividerItemDecoration(
+                        requireContext(),
+                        resources.displayMetrics
+                    )
+                )
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        checkScroll()
+                    }
+                })
+                adapter = this@FileBrowserFragment.adapter
+                fastScroller.setRecyclerView(this)
+            }
+            emptyImageView = browserListBinding.fileListEmptyImage
+            emptyTextView = browserListBinding.fileListEmptyText
+            emptyTextViewFirst = browserListBinding.fileListEmptyTextFirst
             adapter?.isMultipleSelect = false
-            recyclerView?.adapter = adapter
-            fastScroller?.setRecyclerView(recyclerView)
             setNodes(_nodes)
             if (adapter?.itemCount == 0) {
                 Timber.d("itemCount is 0")
                 recyclerView?.visibility = View.GONE
-                emptyImageView?.visibility = View.VISIBLE
-                emptyTextView?.visibility = View.VISIBLE
+                emptyImageView.visibility = View.VISIBLE
+                emptyTextView.visibility = View.VISIBLE
             } else {
                 Timber.d("itemCount is %s", adapter?.itemCount)
                 recyclerView?.visibility = View.VISIBLE
-                emptyImageView?.visibility = View.GONE
-                emptyTextView?.visibility = View.GONE
+                emptyImageView.visibility = View.GONE
+                emptyTextView.visibility = View.GONE
             }
+            transferOverQuotaBanner =
+                browserListBinding.layoutTransferOverQuotaBanner.transferOverQuotaBanner
+            transferOverQuotaBannerText =
+                browserListBinding.layoutTransferOverQuotaBanner.bannerContentText
+            browserListBinding.layoutTransferOverQuotaBanner.bannerDismissButton.setOnClickListener {
+                hideTransferOverQuotaBanner()
+            }
+            browserListBinding.layoutTransferOverQuotaBanner.bannerUpgradeButton.setOnClickListener {
+                hideTransferOverQuotaBanner()
+                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+            }
+            browserListBinding.root
         } else {
             Timber.d("Grid View")
-            v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false)
-            recyclerView = v.findViewById(R.id.file_grid_view_browser)
-            fastScroller = v.findViewById(R.id.fastscroll)
-            recyclerView?.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics))
-            recyclerView?.clipToPadding = false
-            recyclerView?.setHasFixedSize(true)
-            gridLayoutManager = recyclerView?.layoutManager as CustomizedGridLayoutManager?
-            recyclerView?.itemAnimator = DefaultItemAnimator()
-            recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    checkScroll()
-                }
-            })
-            emptyImageView = v.findViewById(R.id.file_grid_empty_image)
-            emptyTextView = v.findViewById(R.id.file_grid_empty_text)
-            emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first)
-            if (adapter == null) {
-                adapter = MegaNodeAdapter(activity,
-                    this,
-                    _nodes,
-                    fileBrowserViewModel.getSafeBrowserParentHandle(),
-                    recyclerView,
-                    Constants.FILE_BROWSER_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                    sortByHeaderViewModel)
-            } else {
-                (activity as? ManagerActivity)?.parentHandleBrowser?.let {
-                    adapter?.parentHandle = it
-                }
-                adapter?.setListFragment(recyclerView)
-                adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
+            _browserGridBinding = FragmentFilebrowsergridBinding.inflate(inflater, container, false)
+            recyclerView = browserGridBinding.fileGridViewBrowser
+            fastScroller = browserGridBinding.fastscroll
+            emptyImageView = browserGridBinding.fileGridEmptyImage
+            emptyTextView = browserGridBinding.fileGridEmptyText
+            emptyTextViewFirst = browserGridBinding.fileGridEmptyTextFirst
+
+            adapter?.let {
+                it.parentHandle = (requireActivity() as ManagerActivity).parentHandleBrowser
+                it.setListFragment(recyclerView)
+                it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
+                it.isMultipleSelect = false
+            }
+
+            recyclerView?.apply {
+                setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics))
+                clipToPadding = false
+                setHasFixedSize(true)
+                gridLayoutManager = layoutManager as CustomizedGridLayoutManager
+                itemAnimator = DefaultItemAnimator()
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        checkScroll()
+                    }
+                })
+                adapter = this@FileBrowserFragment.adapter
+                fastScroller.setRecyclerView(this)
             }
             gridLayoutManager?.let {
                 it.spanSizeLookup =
                     adapter?.getSpanSizeLookup(it.spanCount)
             }
-            adapter?.isMultipleSelect = false
-            recyclerView?.adapter = adapter
-            fastScroller?.setRecyclerView(recyclerView)
             setNodes(_nodes)
             if (adapter?.itemCount == 0) {
                 recyclerView?.visibility = View.GONE
-                emptyImageView?.visibility = View.VISIBLE
-                emptyTextView?.visibility = View.VISIBLE
+                emptyImageView.visibility = View.VISIBLE
+                emptyTextView.visibility = View.VISIBLE
             } else {
                 recyclerView?.visibility = View.VISIBLE
-                emptyImageView?.visibility = View.GONE
-                emptyTextView?.visibility = View.GONE
+                emptyImageView.visibility = View.GONE
+                emptyTextView.visibility = View.GONE
             }
-        }
-        transferOverQuotaBanner = v.findViewById(R.id.transfer_over_quota_banner)
-        transferOverQuotaBannerText = v.findViewById(R.id.banner_content_text)
-        v.findViewById<View>(R.id.banner_dismiss_button)
-            .setOnClickListener { hideTransferOverQuotaBanner() }
-        v.findViewById<View>(R.id.banner_upgrade_button).setOnClickListener {
-            hideTransferOverQuotaBanner()
-            (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+            transferOverQuotaBanner =
+                browserGridBinding.layoutTransferOverQuotaBanner.transferOverQuotaBanner
+            transferOverQuotaBannerText =
+                browserGridBinding.layoutTransferOverQuotaBanner.bannerContentText
+            browserGridBinding.layoutTransferOverQuotaBanner.bannerDismissButton.setOnClickListener {
+                hideTransferOverQuotaBanner()
+            }
+            browserGridBinding.layoutTransferOverQuotaBanner.bannerUpgradeButton.setOnClickListener {
+                hideTransferOverQuotaBanner()
+                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+            }
+            browserGridBinding.root
         }
         setTransferOverQuotaBannerVisibility()
         selectNewlyAddedNodes()
@@ -588,14 +630,16 @@ class FileBrowserFragment : RotatableFragment() {
             mediaDiscoveryViewSettings = it.mediaDiscoveryViewSettings
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        return v
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeDragSupportEvents(viewLifecycleOwner,
+        observeDragSupportEvents(
+            viewLifecycleOwner,
             recyclerView,
-            Constants.VIEWER_FROM_FILE_BROWSER)
+            Constants.VIEWER_FROM_FILE_BROWSER
+        )
     }
 
     override fun onAttach(context: Context) {
@@ -611,11 +655,19 @@ class FileBrowserFragment : RotatableFragment() {
                     result: MoveRequestResult?,
                     handle: Long,
                 ) {
-                    Timber.d("Nothing to do for actionType = %s",
-                        actionType)
+                    Timber.d(
+                        "Nothing to do for actionType = %s",
+                        actionType
+                    )
                 }
             }
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _browserGridBinding = null
+        _browserListBinding = null
     }
 
     override fun onDestroy() {
@@ -623,16 +675,22 @@ class FileBrowserFragment : RotatableFragment() {
         super.onDestroy()
     }
 
-    override fun getAdapter(): RotatableAdapter? {
-        return adapter
-    }
+    override fun getAdapter(): RotatableAdapter? = adapter
+
+    /**
+     * Get current recyclerview
+     * @return RecyclerView
+     */
+    fun getRecyclerView() = recyclerView
 
     private fun getNodes() {
         val parentHandleBrowser = fileBrowserViewModel.getSafeBrowserParentHandle()
         if (parentHandleBrowser == -1L || parentHandleBrowser == megaApi.rootNode.handle) {
             Timber.w("After consulting... the parent keeps -1 or ROOTNODE: %s", parentHandleBrowser)
-            _nodes = megaApi.getChildren(megaApi.rootNode,
-                sortOrderIntMapper(managerViewModel.getOrder()))
+            _nodes = megaApi.getChildren(
+                megaApi.rootNode,
+                sortOrderIntMapper(managerViewModel.getOrder())
+            )
             mediaHandle = megaApi.rootNode.handle
         } else {
             val parentNode = megaApi.getNodeByHandle(parentHandleBrowser)
@@ -643,12 +701,17 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     fun refreshNodes() {
-        if (adapter != null) {
+        adapter?.let {
             getNodes()
-            adapter?.setNodes(_nodes)
+            it.setNodes(_nodes)
         }
     }
 
+    /**
+     * Opens file
+     * @param node MegaNode
+     * @param position position of item clicked
+     */
     fun openFile(node: MegaNode, position: Int) {
         if (MimeTypeList.typeForName(node.name).isImage) {
             val intent = getIntentForParentNode(
@@ -657,22 +720,26 @@ class FileBrowserFragment : RotatableFragment() {
                 managerViewModel.getOrder(),
                 node.handle
             )
-            putThumbnailLocation(intent,
+            putThumbnailLocation(
+                intent,
                 recyclerView,
                 position,
                 Constants.VIEWER_FROM_FILE_BROWSER,
-                adapter)
+                adapter
+            )
             startActivity(intent)
             (activity as? ManagerActivity)?.overridePendingTransition(0, 0)
         } else if (MimeTypeList.typeForName(node.name).isVideoReproducible || MimeTypeList.typeForName(
-                node.name).isAudio
+                node.name
+            ).isAudio
         ) {
             val mimeType = MimeTypeList.typeForName(node.name).type
             val mediaIntent: Intent
             val internalIntent: Boolean
             var opusFile = false
             if (MimeTypeList.typeForName(node.name).isVideoNotSupported || MimeTypeList.typeForName(
-                    node.name).isAudioNotSupported
+                    node.name
+                ).isAudioNotSupported
             ) {
                 mediaIntent = Intent(Intent.ACTION_VIEW)
                 internalIntent = false
@@ -696,11 +763,13 @@ class FileBrowserFragment : RotatableFragment() {
             }
             mediaIntent.putExtra("orderGetChildren", managerViewModel.getOrder())
             mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER)
-            putThumbnailLocation(mediaIntent,
+            putThumbnailLocation(
+                mediaIntent,
                 recyclerView,
                 position,
                 Constants.VIEWER_FROM_FILE_BROWSER,
-                adapter)
+                adapter
+            )
             mediaIntent.putExtra("FILENAME", node.name)
             val localPath = FileUtil.getLocalFile(node)
             if (localPath != null) {
@@ -710,28 +779,41 @@ class FileBrowserFragment : RotatableFragment() {
                     val mediaFileUri = FileProvider.getUriForFile(
                         requireContext(),
                         "mega.privacy.android.app.providers.fileprovider",
-                        mediaFile)
+                        mediaFile
+                    )
                     if (mediaFileUri == null) {
                         Timber.d("itemClick:ERROR:NULLmediaFileUri")
-                        (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE,
+                        (activity as? ManagerActivity)?.showSnackbar(
+                            Constants.SNACKBAR_TYPE,
                             getString(
-                                R.string.general_text_error),
-                            -1)
+                                R.string.general_text_error
+                            ),
+                            -1
+                        )
                     } else {
-                        mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(
-                            node.name).type)
+                        mediaIntent.setDataAndType(
+                            mediaFileUri, MimeTypeList.typeForName(
+                                node.name
+                            ).type
+                        )
                     }
                 } else {
                     val mediaFileUri = Uri.fromFile(mediaFile)
                     if (mediaFileUri == null) {
                         Timber.e("itemClick:ERROR:NULLmediaFileUri")
-                        (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE,
+                        (activity as? ManagerActivity)?.showSnackbar(
+                            Constants.SNACKBAR_TYPE,
                             getString(
-                                R.string.general_text_error),
-                            -1)
+                                R.string.general_text_error
+                            ),
+                            -1
+                        )
                     } else {
-                        mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(
-                            node.name).type)
+                        mediaIntent.setDataAndType(
+                            mediaFileUri, MimeTypeList.typeForName(
+                                node.name
+                            ).type
+                        )
                     }
                 }
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -761,15 +843,21 @@ class FileBrowserFragment : RotatableFragment() {
                         mediaIntent.setDataAndType(parsedUri, mimeType)
                     } else {
                         Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                        (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE,
+                        (activity as? ManagerActivity)?.showSnackbar(
+                            Constants.SNACKBAR_TYPE,
                             getString(
-                                R.string.general_text_error),
-                            -1)
+                                R.string.general_text_error
+                            ),
+                            -1
+                        )
                     }
                 } else {
                     Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                    (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE, getString(
-                        R.string.general_text_error), -1)
+                    (activity as? ManagerActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE, getString(
+                            R.string.general_text_error
+                        ), -1
+                    )
                 }
             }
             mediaIntent.putExtra("HANDLE", node.handle)
@@ -784,10 +872,15 @@ class FileBrowserFragment : RotatableFragment() {
                     context?.startActivity(mediaIntent)
                 } else {
                     Timber.w("itemClick:noAvailableIntent")
-                    (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE, getString(
-                        R.string.intent_not_available), -1)
-                    (activity as? ManagerActivity)?.saveNodesToDevice(listOf<MegaNode?>(node),
-                        true, false, false, false)
+                    (activity as? ManagerActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE, getString(
+                            R.string.intent_not_available
+                        ), -1
+                    )
+                    (activity as? ManagerActivity)?.saveNodesToDevice(
+                        listOf<MegaNode?>(node),
+                        true, false, false, false
+                    )
                 }
             }
             (activity as? ManagerActivity)?.overridePendingTransition(0, 0)
@@ -803,15 +896,22 @@ class FileBrowserFragment : RotatableFragment() {
             if (localPath != null) {
                 val mediaFile = File(localPath)
                 if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                    pdfIntent.setDataAndType(FileProvider.getUriForFile(
-                        requireContext(),
-                        "mega.privacy.android.app.providers.fileprovider",
-                        mediaFile),
+                    pdfIntent.setDataAndType(
+                        FileProvider.getUriForFile(
+                            requireContext(),
+                            "mega.privacy.android.app.providers.fileprovider",
+                            mediaFile
+                        ),
                         MimeTypeList.typeForName(
-                            node.name).type)
+                            node.name
+                        ).type
+                    )
                 } else {
-                    pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(
-                        node.name).type)
+                    pdfIntent.setDataAndType(
+                        Uri.fromFile(mediaFile), MimeTypeList.typeForName(
+                            node.name
+                        ).type
+                    )
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } else {
@@ -837,49 +937,68 @@ class FileBrowserFragment : RotatableFragment() {
                         pdfIntent.setDataAndType(parsedUri, mimeType)
                     } else {
                         Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                        (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE,
+                        (activity as? ManagerActivity)?.showSnackbar(
+                            Constants.SNACKBAR_TYPE,
                             getString(
-                                R.string.general_text_error),
-                            -1)
+                                R.string.general_text_error
+                            ),
+                            -1
+                        )
                     }
                 } else {
                     Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                    (activity as? ManagerActivity)?.showSnackbar(Constants.SNACKBAR_TYPE, getString(
-                        R.string.general_text_error), -1)
+                    (activity as? ManagerActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE, getString(
+                            R.string.general_text_error
+                        ), -1
+                    )
                 }
             }
             pdfIntent.putExtra("HANDLE", node.handle)
-            putThumbnailLocation(pdfIntent,
+            putThumbnailLocation(
+                pdfIntent,
                 recyclerView,
                 position,
                 Constants.VIEWER_FROM_FILE_BROWSER,
-                adapter)
+                adapter
+            )
             if (MegaApiUtils.isIntentAvailable(context, pdfIntent)) {
                 context?.startActivity(pdfIntent)
             } else {
-                Toast.makeText(context,
+                Toast.makeText(
+                    context,
                     requireContext().resources.getString(R.string.intent_not_available),
-                    Toast.LENGTH_LONG).show()
-                (activity as? ManagerActivity)?.saveNodesToDevice(listOf<MegaNode?>(node),
-                    true, false, false, false)
+                    Toast.LENGTH_LONG
+                ).show()
+                (activity as? ManagerActivity)?.saveNodesToDevice(
+                    listOf<MegaNode?>(node),
+                    true, false, false, false
+                )
             }
             (activity as? ManagerActivity)?.overridePendingTransition(0, 0)
         } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(
-                node.size)
+                node.size
+            )
         ) {
             manageTextFileIntent(requireContext(), node, Constants.FILE_BROWSER_ADAPTER)
         } else {
             Timber.d("itemClick:isFile:otherOption")
 
             val managerActivity = activity as? ManagerActivity ?: return
-            onNodeTapped(requireActivity(),
+            onNodeTapped(
+                requireActivity(),
                 node,
                 { saveNode: MegaNode? -> (activity as? ManagerActivity)?.saveNodeByTap(saveNode) },
                 managerActivity,
-                managerActivity)
+                managerActivity
+            )
         }
     }
 
+    /**
+     * When an item clicked from adapter it calls below method
+     * @param position Position of item which is clicked
+     */
     fun itemClick(position: Int) {
         Timber.d("item click position: %s", position)
         if (adapter?.isMultipleSelect == true) {
@@ -895,10 +1014,14 @@ class FileBrowserFragment : RotatableFragment() {
             if (clickedNode?.isFolder == true) {
                 mediaHandle = clickedNode.handle
                 fileBrowserViewModel.setBrowserParentHandle(clickedNode.handle)
-                val childNodes: List<MegaNode> = megaApi.getChildren(clickedNode,
-                    sortOrderIntMapper(managerViewModel.getOrder()))
-                if (fileBrowserViewModel.shouldEnterMDMode(childNodes,
-                        mediaDiscoveryViewSettings)
+                val childNodes: List<MegaNode> = megaApi.getChildren(
+                    clickedNode,
+                    sortOrderIntMapper(managerViewModel.getOrder())
+                )
+                if (fileBrowserViewModel.shouldEnterMDMode(
+                        childNodes,
+                        mediaDiscoveryViewSettings
+                    )
                 ) {
                     showMediaDiscovery()
                 } else {
@@ -935,10 +1058,14 @@ class FileBrowserFragment : RotatableFragment() {
         adapter?.filClicked(position)
     }
 
+    /**
+     * Opens Folder
+     * @param n MegaNode
+     */
     @Suppress("DEPRECATION")
     fun setFolderInfoNavigation(n: MegaNode?) {
-        (activity as? ManagerActivity)?.supportInvalidateOptionsMenu()
-        (activity as? ManagerActivity)?.setToolbarTitle()
+        (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
+        (requireActivity() as ManagerActivity).setToolbarTitle()
         adapter?.parentHandle = fileBrowserViewModel.getSafeBrowserParentHandle()
         _nodes = megaApi.getChildren(n, sortOrderIntMapper(managerViewModel.getOrder()))
         adapter?.setNodes(_nodes)
@@ -946,86 +1073,137 @@ class FileBrowserFragment : RotatableFragment() {
         visibilityFastScroller()
 
         //If folder has no files
-        if (adapter?.itemCount == 0) {
-            recyclerView?.visibility = View.GONE
-            emptyImageView?.visibility = View.VISIBLE
-            emptyTextView?.visibility = View.VISIBLE
-            if (megaApi.rootNode != null && megaApi.rootNode.handle == n?.handle) {
-                if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView?.setImageResource(R.drawable.empty_cloud_drive_landscape)
-                } else {
-                    emptyImageView?.setImageResource(R.drawable.empty_cloud_drive_portrait)
-                }
-                var textToShow =
-                    requireContext().getString(R.string.context_empty_cloud_drive).uppercase(
-                        Locale.getDefault())
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                            + "\'>")
-                    textToShow = textToShow.replace("[/A]", "</font>")
-                    textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                            + "\'>")
-                    textToShow = textToShow.replace("[/B]", "</font>")
-                } catch (e: Exception) {
-                    Timber.e(e)
-                }
-                val result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                emptyTextViewFirst?.text = result
-            } else {
-                if (context?.resources?.configuration?.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView?.setImageResource(R.drawable.empty_folder_landscape)
-                } else {
-                    emptyImageView?.setImageResource(R.drawable.empty_folder_portrait)
-                }
-                var textToShow = requireContext().getString(R.string.file_browser_empty_folder_new)
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                            + "\'>")
-                    textToShow = textToShow.replace("[/A]", "</font>")
-                    textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                            + "\'>")
-                    textToShow = textToShow.replace("[/B]", "</font>")
-                } catch (e: Exception) {
-                    Timber.e(e)
-                }
-                val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                emptyTextViewFirst?.text = result
-            }
-        } else {
-            recyclerView?.visibility = View.VISIBLE
-            emptyImageView?.visibility = View.GONE
-            emptyTextView?.visibility = View.GONE
-        }
-        checkScroll()
+        checkAndConfigureAdapter(
+            n?.handle,
+            colorPrimary = R.color.grey_900_grey_100,
+            colorSecondary = R.color.grey_300_grey_600
+        )
     }
 
-    fun showSelectMenuItem(): Boolean {
-        Timber.d("showSelectMenuItem")
-        return adapter?.isMultipleSelect == true
-    }
+    /**
+     * To show select menu item
+     * @return if adapter's multiselect is on or off
+     */
+    fun showSelectMenuItem(): Boolean = adapter?.isMultipleSelect ?: false
 
+    /**
+     * Select all items from adapter
+     */
     fun selectAll() {
         Timber.d("selectAll")
-        if (adapter != null) {
-            if (adapter?.isMultipleSelect == true) {
-                adapter?.selectAll()
+        adapter?.let {
+            if (it.isMultipleSelect) {
+                it.selectAll()
             } else {
-                adapter?.isMultipleSelect = true
-                adapter?.selectAll()
+                it.isMultipleSelect = true
+                it.selectAll()
                 actionMode = (activity as? AppCompatActivity)?.startSupportActionMode(
-                    ActionBarCallBack())
+                    ActionBarCallBack()
+                )
             }
             Handler(Looper.getMainLooper()).post { updateActionModeTitle() }
         }
     }
 
-    /*
-     * Clear all selected items
+    /**
+     * Action to be performed based on adapter's items
+     * @param handle handle of node
+     * @param colorPrimary Primary color for the text to be highlighted
+     * @param colorSecondary Secondary color for the text to be displayed
      */
+    private fun checkAndConfigureAdapter(
+        handle: Long?,
+        @ColorRes colorPrimary: Int,
+        @ColorRes colorSecondary: Int,
+    ) {
+        if (adapter?.itemCount == 0) {
+            recyclerView?.visibility = View.GONE
+            emptyImageView.visibility = View.VISIBLE
+            emptyTextView.visibility = View.VISIBLE
+            if (megaApi.rootNode != null && megaApi.rootNode.handle == handle) {
+                if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    emptyImageView.setImageResource(R.drawable.empty_cloud_drive_landscape)
+                } else {
+                    emptyImageView.setImageResource(R.drawable.empty_cloud_drive_portrait)
+                }
+                runCatching {
+                    emptyTextViewFirst.text = Html.fromHtml(
+                        formatRequiredText(
+                            text = getString(R.string.context_empty_cloud_drive).uppercase(
+                                Locale.getDefault()
+                            ),
+                            colorResPrimary = colorPrimary,
+                            colorResSecondary = colorSecondary
+                        ), Html.FROM_HTML_MODE_LEGACY
+                    )
+                }.getOrElse {
+                    Timber.e(it)
+                }
+            } else {
+                if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    emptyImageView.setImageResource(R.drawable.empty_folder_landscape)
+                } else {
+                    emptyImageView.setImageResource(R.drawable.empty_folder_portrait)
+                }
+
+                runCatching {
+                    emptyTextViewFirst.text = Html.fromHtml(
+                        formatRequiredText(
+                            text = getString(R.string.file_browser_empty_folder_new).uppercase(
+                                Locale.getDefault()
+                            ),
+                            colorResPrimary = colorPrimary,
+                            colorResSecondary = colorSecondary
+                        ), Html.FROM_HTML_MODE_LEGACY
+                    )
+                }.getOrElse {
+                    Timber.e(it)
+                }
+            }
+        } else {
+            recyclerView?.visibility = View.VISIBLE
+            emptyImageView.visibility = View.GONE
+            emptyTextView.visibility = View.GONE
+        }
+        checkScroll()
+    }
+
+    /**
+     * This method will format text to be displayed on fragment when we need to show empty message
+     * @param text Text to be formatted and displayed
+     * @param colorResPrimary Primary color for the text to be highlighted
+     * @param colorResSecondary Secondary color for the text to be displayed
+     * @throws Exception
+     */
+    @Throws(Exception::class)
+    private fun formatRequiredText(
+        text: String,
+        @ColorRes colorResPrimary: Int,
+        @ColorRes colorResSecondary: Int,
+    ): String {
+        return runCatching {
+            var textToShow = text
+            textToShow = textToShow.replace(
+                "[A]", "<font color=\'"
+                        + getColorHexString(requireActivity(), colorResPrimary)
+                        + "\'>"
+            )
+            textToShow = textToShow.replace("[/A]", "</font>")
+            textToShow = textToShow.replace(
+                "[B]", "<font color=\'"
+                        + getColorHexString(requireActivity(), colorResSecondary)
+                        + "\'>"
+            )
+            textToShow = textToShow.replace("[/B]", "</font>")
+            textToShow
+        }.getOrElse {
+            throw it
+        }
+    }
+
+    /**
+     * Clear all selected items
+     **/
     private fun clearSelections() {
         if (adapter?.isMultipleSelect == true) {
             adapter?.clearSelections()
@@ -1062,8 +1240,8 @@ class FileBrowserFragment : RotatableFragment() {
         }
     }
 
-    /*
-     * Disable selection
+    /**
+     * Hides multi select option
      */
     fun hideMultipleSelect() {
         Timber.d("hideMultipleSelect")
@@ -1073,12 +1251,16 @@ class FileBrowserFragment : RotatableFragment() {
         }
     }
 
+    /**
+     * On back pressed clicked on activity
+     */
     @Suppress("DEPRECATION")
     fun onBackPressed(): Int {
         Timber.d("onBackPressed")
-        if (adapter != null) {
+        adapter?.let {
+
             Timber.d("Parent Handle is: %s", fileBrowserViewModel.getSafeBrowserParentHandle())
-            val managerActivity = activity as? ManagerActivity ?: return 0
+            val managerActivity = requireActivity() as ManagerActivity
             return if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationHandle == fileBrowserViewModel.getSafeBrowserParentHandle()) {
                 managerActivity.comesFromNotifications = false
                 managerActivity.comesFromNotificationHandle = -1
@@ -1088,25 +1270,31 @@ class FileBrowserFragment : RotatableFragment() {
                 managerActivity.refreshCloudDrive()
                 2
             } else {
-                val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(
-                    fileBrowserViewModel.getSafeBrowserParentHandle()))
+                val parentNode = megaApi.getParentNode(
+                    megaApi.getNodeByHandle(
+                        fileBrowserViewModel.getSafeBrowserParentHandle()
+                    )
+                )
                 if (parentNode != null) {
                     mediaHandle = parentNode.handle
                     recyclerView?.visibility = View.VISIBLE
-                    emptyImageView?.visibility = View.GONE
-                    emptyTextView?.visibility = View.GONE
+                    emptyImageView.visibility = View.GONE
+                    emptyTextView.visibility = View.GONE
                     fileBrowserViewModel.setBrowserParentHandle(parentNode.handle)
                     managerActivity.supportInvalidateOptionsMenu()
                     managerActivity.setToolbarTitle()
-                    _nodes = megaApi.getChildren(parentNode,
-                        sortOrderIntMapper(managerViewModel.getOrder()))
-                    adapter?.setNodes(_nodes)
+                    _nodes = megaApi.getChildren(
+                        parentNode,
+                        sortOrderIntMapper(managerViewModel.getOrder())
+                    )
+                    it.setNodes(_nodes)
                     visibilityFastScroller()
                     var lastVisiblePosition = 0
-                    lastPositionStack?.takeIf { it.isNotEmpty() }?.pop()?.let {
-                        lastVisiblePosition = it
-                        Timber.d("Pop of the stack $lastVisiblePosition position")
-                    }
+                    lastPositionStack?.takeIf { lastPosition -> lastPosition.isNotEmpty() }?.pop()
+                        ?.let { position ->
+                            lastVisiblePosition = position
+                            Timber.d("Pop of the stack $lastVisiblePosition position")
+                        }
                     Timber.d("Scroll to %d position", lastVisiblePosition)
                     if (lastVisiblePosition >= 0) {
                         if (managerActivity.isList) {
@@ -1126,99 +1314,64 @@ class FileBrowserFragment : RotatableFragment() {
         return 0
     }
 
+    /**
+     * Scrolls list to 1st item/position
+     */
     fun scrollToFirstPosition() {
-        if ((activity as? ManagerActivity)?.isList == true) {
+        if (isList) {
             mLayoutManager?.scrollToPositionWithOffset(0, 0)
         } else {
             gridLayoutManager?.scrollToPositionWithOffset(0, 0)
         }
     }
 
+    /**
+     * This method set nodes and updates the adapter
+     * @param nodes List of Mega Nodes
+     */
     @Suppress("DEPRECATION")
     fun setNodes(nodes: MutableList<MegaNode?>) {
         Timber.d("Nodes size: ${nodes.size}")
         visibilityFastScroller()
         this._nodes = nodes
-        if (adapter != null) {
-            adapter?.setNodes(nodes)
-            if (adapter?.itemCount == 0) {
-                recyclerView?.visibility = View.GONE
-                emptyImageView?.visibility = View.VISIBLE
-                emptyTextView?.visibility = View.VISIBLE
-                if (megaApi.rootNode != null && megaApi.rootNode.handle == fileBrowserViewModel.getSafeBrowserParentHandle() || fileBrowserViewModel.getSafeBrowserParentHandle() == -1L) {
-                    if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView?.setImageResource(R.drawable.empty_cloud_drive_landscape)
-                    } else {
-                        emptyImageView?.setImageResource(R.drawable.empty_cloud_drive_portrait)
-                    }
-                    var textToShow =
-                        requireContext().getString(R.string.context_empty_cloud_drive).uppercase(
-                            Locale.getDefault())
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'"
-                                + getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                                + "\'>")
-                        textToShow = textToShow.replace("[/A]", "</font>")
-                        textToShow = textToShow.replace("[B]", "<font color=\'"
-                                + getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                                + "\'>")
-                        textToShow = textToShow.replace("[/B]", "</font>")
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                    }
-                    val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                    emptyTextViewFirst?.text = result
-                } else {
-                    if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView?.setImageResource(R.drawable.empty_folder_landscape)
-                    } else {
-                        emptyImageView?.setImageResource(R.drawable.empty_folder_portrait)
-                    }
-                    var textToShow =
-                        requireContext().getString(R.string.file_browser_empty_folder_new)
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'"
-                                + getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                                + "\'>")
-                        textToShow = textToShow.replace("[/A]", "</font>")
-                        textToShow = textToShow.replace("[B]", "<font color=\'"
-                                + getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                                + "\'>")
-                        textToShow = textToShow.replace("[/B]", "</font>")
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                    }
-                    val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-                    emptyTextViewFirst?.text = result
-                }
-            } else {
-                recyclerView?.visibility = View.VISIBLE
-                emptyImageView?.visibility = View.GONE
-                emptyTextView?.visibility = View.GONE
-            }
-        } else {
+        adapter?.let {
+            it.setNodes(nodes)
+            checkAndConfigureAdapter(
+                handle = fileBrowserViewModel.getSafeBrowserParentHandle(),
+                colorPrimary = R.color.grey_900_grey_100,
+                colorSecondary = R.color.grey_300_grey_600
+            )
+        } ?: run {
             Timber.w("Adapter is NULL")
         }
     }
 
+    /**
+     * If adapter's multiple select is on or off
+     */
     val isMultipleselect: Boolean
         get() = adapter?.isMultipleSelect == true
+
+    /**
+     * Gets total number of items in an adapter
+     */
     val itemCount: Int
         get() = adapter?.itemCount ?: 0
 
+    /**
+     * This will set the visibility of fast scroller based on item count
+     */
     fun visibilityFastScroller() {
-        if (adapter == null) {
-            fastScroller?.visibility = View.GONE
-        } else {
-            if (itemCount < Constants.MIN_ITEMS_SCROLLBAR) {
-                fastScroller?.visibility = View.GONE
-            } else {
-                fastScroller?.visibility = View.VISIBLE
-            }
+        fastScroller.visibility = adapter?.let {
+            if (itemCount < Constants.MIN_ITEMS_SCROLLBAR) View.GONE else View.VISIBLE
+        } ?: run {
+            View.GONE
         }
     }
 
-    //refresh list when item updated
+    /**
+     * refresh list when item updated
+     */
     @SuppressLint("NotifyDataSetChanged")
     fun refresh(handle: Long) {
         if (handle == -1L) {
@@ -1242,12 +1395,17 @@ class FileBrowserFragment : RotatableFragment() {
         if (transfersManagement.isTransferOverQuotaBannerShown) {
             transferOverQuotaBanner?.visibility = View.VISIBLE
             transferOverQuotaBannerText?.text =
-                context?.getString(R.string.current_text_depleted_transfer_overquota,
+                context?.getString(
+                    R.string.current_text_depleted_transfer_overquota,
                     TimeUtils.getHumanizedTime(
-                        megaApi.bandwidthOverquotaDelay))
-            TimeUtils.createAndShowCountDownTimer(R.string.current_text_depleted_transfer_overquota,
+                        megaApi.bandwidthOverquotaDelay
+                    )
+                )
+            TimeUtils.createAndShowCountDownTimer(
+                R.string.current_text_depleted_transfer_overquota,
                 transferOverQuotaBanner,
-                transferOverQuotaBannerText)
+                transferOverQuotaBannerText
+            )
         } else {
             transferOverQuotaBanner?.visibility = View.GONE
         }
@@ -1275,8 +1433,10 @@ class FileBrowserFragment : RotatableFragment() {
                     outState.putSerializable(BACKUP_HANDLED_ITEM, backupHandleList)
                 }
                 backupNodeHandle?.let { backupNode ->
-                    outState.putLong(BACKUP_HANDLED_NODE,
-                        backupNode)
+                    outState.putLong(
+                        BACKUP_HANDLED_NODE,
+                        backupNode
+                    )
                 }
                 outState.putInt(BACKUP_NODE_TYPE, backupNodeType)
                 outState.putInt(BACKUP_ACTION_TYPE, backupActionType)
@@ -1337,10 +1497,14 @@ class FileBrowserFragment : RotatableFragment() {
     val nodeList: List<MegaNode?>
         get() = _nodes
 
-    fun showMediaDiscovery() {
+    /**
+     * Show Media discovery and launch [MediaDiscoveryFragment]
+     */
+    private fun showMediaDiscovery() {
         activity?.lifecycleScope?.launch {
             (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(
-                MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle)
+                MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle
+            )
         }
     }
 
@@ -1369,7 +1533,7 @@ class FileBrowserFragment : RotatableFragment() {
     /**
      * When user tap View in Folder option from Recents tab, animate the node once view is loaded
      */
-    fun animateNode(nodes: List<MegaNode?>) {
+    private fun animateNode(nodes: List<MegaNode?>) {
         val node = (activity as? ManagerActivity)?.viewInFolderNode
         nodePosition = nodes.indexOfFirst { it?.handle == node?.handle }.coerceAtLeast(0)
 
@@ -1379,7 +1543,8 @@ class FileBrowserFragment : RotatableFragment() {
             val holder = recyclerView?.findViewHolderForAdapterPosition(nodePosition)
             if (null != holder) {
                 val animFadeIn = AnimationUtils.loadAnimation(
-                    context?.applicationContext, R.anim.fade_in)
+                    context?.applicationContext, R.anim.fade_in
+                )
                 animFadeIn.duration = DURATION_ANIMATION.toLong()
                 holder.itemView.startAnimation(animFadeIn)
             }
@@ -1387,6 +1552,9 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     companion object {
+        /**
+         * Returns the instance of FileBrowserFragment
+         */
         @JvmStatic
         fun newInstance(): FileBrowserFragment {
             Timber.d("newInstance")

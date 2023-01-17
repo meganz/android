@@ -41,7 +41,9 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <include layout="@layout/transfer_over_quota_banner" />
+            <include
+                android:id="@+id/layout_transfer_over_quota_banner"
+                layout="@layout/transfer_over_quota_banner" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -67,6 +69,8 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <include layout="@layout/general_progress_bar"/>
+    <include
+        android:id="@+id/layout_general_progress_bar"
+        layout="@layout/general_progress_bar"/>
 
 </RelativeLayout>
