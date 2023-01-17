@@ -308,6 +308,15 @@ class AlbumDynamicContentFragment : Fragment() {
                     onPositiveButtonClick = {
                         with(albumsViewModel) {
                             removePhotosFromAlbum()
+                            setSnackBarMessage(
+                                requireContext()
+                                    .getQuantityStringOrDefault(
+                                        R.plurals.photos_album_photos_removal_snackbar_message,
+                                        state.value.selectedPhotos.size,
+                                        state.value.selectedPhotos.size,
+                                        getCurrentAlbumTitle(),
+                                    )
+                            )
                             clearSelectedPhotos()
                             setShowRemovePhotosFromAlbumDialog(false)
                         }

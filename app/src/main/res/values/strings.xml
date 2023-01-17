@@ -4124,7 +4124,14 @@
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Remove from album?</string>
-    <string name="settings_camera_uploads_grant_media_permissions_body">In order to enable camera uploads we need your permission to access your photos and other media on your device.</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, grant MEGA access to your photos and other media on your device.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Grant access</string>
-    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don\'t grant</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don’t grant</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">Removed %d item from “%s”</item>
+        <item quantity="other">Removed %d items from “%s”</item>
+    </plurals>
 </resources>
