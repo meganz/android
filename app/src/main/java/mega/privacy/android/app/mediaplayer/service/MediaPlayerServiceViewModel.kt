@@ -96,6 +96,14 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStop
+import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
+import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
+import mega.privacy.android.domain.usecase.MegaApiHttpServerStart
+import mega.privacy.android.domain.usecase.MegaApiHttpServerStop
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimes
 import mega.privacy.android.domain.usecase.SavePlaybackTimes
@@ -126,6 +134,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val trackPlaybackPositionUseCase: TrackPlaybackPosition,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimes,
     private val savePlaybackTimesUseCase: SavePlaybackTimes,
+    private val megaApiFolderHttpServerSetMaxBufferSize: MegaApiFolderHttpServerSetMaxBufferSize,
+    private val megaApiFolderHttpServerIsRunning: MegaApiFolderHttpServerIsRunning,
+    private val megaApiFolderHttpServerStart: MegaApiFolderHttpServerStart,
+    private val megaApiFolderHttpServerStop: MegaApiFolderHttpServerStop,
+    private val megaApiHttpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSize,
+    private val megaApiHttpServerIsRunning: MegaApiHttpServerIsRunning,
+    private val megaApiHttpServerStart: MegaApiHttpServerStart,
+    private val megaApiHttpServerStop: MegaApiHttpServerStop,
     private val addNodeType: AddNodeType,
     private val fileDurationMapper: FileDurationMapper,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
@@ -1255,8 +1271,8 @@ class MediaPlayerServiceViewModel @Inject constructor(
             compositeDisposable.dispose()
 
             if (needStopStreamingServer) {
-                mediaPlayerRepository.megaApiHttpServerStop()
-                mediaPlayerRepository.megaApiFolderHttpServerStop()
+                megaApiHttpServerStop()
+                megaApiFolderHttpServerStop()
             }
         }
     }
@@ -1345,31 +1361,30 @@ class MediaPlayerServiceViewModel @Inject constructor(
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.getMemoryInfo(memoryInfo)
 
-        with(mediaPlayerRepository) {
-            if (isMegaApiFolder(type)) {
-                if (megaApiFolderHttpServerIsRunning() != 0) {
-                    return false
-                }
-                megaApiFolderHttpServerStart()
-                megaApiFolderHttpServerSetMaxBufferSize(
-                    bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                        Constants.MAX_BUFFER_32MB
-                    else
-                        Constants.MAX_BUFFER_16MB
-                )
-            } else {
-                if (megaApiHttpServerIsRunning() != 0) {
-                    return false
-                }
-                megaApiHttpServerStart()
-                megaApiHttpServerSetMaxBufferSize(
-                    bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                        Constants.MAX_BUFFER_32MB
-                    else
-                        Constants.MAX_BUFFER_16MB
-                )
+        if (isMegaApiFolder(type)) {
+            if (megaApiFolderHttpServerIsRunning() != 0) {
+                return false
             }
+            megaApiFolderHttpServerStart()
+            megaApiFolderHttpServerSetMaxBufferSize(
+                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
+                    Constants.MAX_BUFFER_32MB
+                else
+                    Constants.MAX_BUFFER_16MB
+            )
+        } else {
+            if (megaApiHttpServerIsRunning() != 0) {
+                return false
+            }
+            megaApiHttpServerStart()
+            megaApiHttpServerSetMaxBufferSize(
+                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
+                    Constants.MAX_BUFFER_32MB
+                else
+                    Constants.MAX_BUFFER_16MB
+            )
         }
+
         return true
     }
 
