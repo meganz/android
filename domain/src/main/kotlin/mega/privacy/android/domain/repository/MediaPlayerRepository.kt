@@ -60,15 +60,26 @@ interface MediaPlayerRepository {
     suspend fun getVideoNodes(order: SortOrder): List<UnTypedNode>
 
     /**
-     * Get thumbnail
+     * Get thumbnail from MegaApiFolder
      *
-     * @param isMegaApiFolder true is MegaFolderApi, otherwise is false
      * @param nodeHandle node handle
      * @param path thumbnail path
      * @param finishedCallback callback of getting thumbnail finished
      */
-    suspend fun getThumbnail(
-        isMegaApiFolder: Boolean,
+    suspend fun getThumbnailFromMegaApiFolder(
+        nodeHandle: Long,
+        path: String,
+        finishedCallback: (nodeHandle: Long) -> Unit,
+    )
+
+    /**
+     * Get thumbnail from MegaApi
+     *
+     * @param nodeHandle node handle
+     * @param path thumbnail path
+     * @param finishedCallback callback of getting thumbnail finished
+     */
+    suspend fun getThumbnailFromMegaApi(
         nodeHandle: Long,
         path: String,
         finishedCallback: (nodeHandle: Long) -> Unit,

@@ -6,8 +6,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.usecase.CredentialsIsNull
 import mega.privacy.android.domain.usecase.DefaultGetTicker
 import mega.privacy.android.domain.usecase.DefaultTrackPlaybackPosition
+import mega.privacy.android.domain.usecase.GetLocalFilePath
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
+import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
@@ -57,6 +64,48 @@ abstract class MediaPlayerUseCases {
             SavePlaybackTimes(mediaPlayerRepository::savePlaybackTimes)
 
         /**
+         * Provide implementation for [GetLocalFolderLinkFromMegaApiFolder]
+         */
+        @Provides
+        fun provideGetLocalLinkFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetLocalFolderLinkFromMegaApiFolder =
+            GetLocalFolderLinkFromMegaApiFolder(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApiFolder)
+
+        /**
+         * Provide implementation for [GetLocalFolderLinkFromMegaApi]
+         */
+        @Provides
+        fun provideGetLocalFolderLinkFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetLocalFolderLinkFromMegaApi =
+            GetLocalFolderLinkFromMegaApi(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApi)
+
+        /**
+         * Provide implementation for [GetThumbnailFromMegaApiFolder]
+         */
+        @Provides
+        fun provideGetThumbnailFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetThumbnailFromMegaApiFolder =
+            GetThumbnailFromMegaApiFolder(mediaPlayerRepository::getThumbnailFromMegaApiFolder)
+
+        /**
+         * Provide implementation for [GetThumbnailFromMegaApiFolder]
+         */
+        @Provides
+        fun provideGetThumbnailFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetThumbnailFromMegaApi =
+            GetThumbnailFromMegaApi(mediaPlayerRepository::getThumbnailFromMegaApi)
+
+        /**
+         * Provide implementation for [GetLocalFilePath]
+         */
+        @Provides
+        fun provideGetLocalFilePath(mediaPlayerRepository: MediaPlayerRepository): GetLocalFilePath =
+            GetLocalFilePath(mediaPlayerRepository::getLocalFilePath)
+
+        /**
+         * Provide implementation for [GetLocalLinkFromMegaApi]
+         */
+        @Provides
+        fun provideGetLocalLinkFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetLocalLinkFromMegaApi =
+            GetLocalLinkFromMegaApi(mediaPlayerRepository::getLocalLinkFromMegaApi)
+
+        /**
          * Provide implementation for [MegaApiHttpServerStop]
          */
         @Provides
@@ -69,6 +118,13 @@ abstract class MediaPlayerUseCases {
         @Provides
         fun provideMegaApiFolderHttpServerStop(mediaPlayerRepository: MediaPlayerRepository): MegaApiFolderHttpServerStop =
             MegaApiFolderHttpServerStop(mediaPlayerRepository::megaApiFolderHttpServerStop)
+
+        /**
+         * Provide implementation for [CredentialsIsNull]
+         */
+        @Provides
+        fun provideCredentialsIsNull(mediaPlayerRepository: MediaPlayerRepository): CredentialsIsNull =
+            CredentialsIsNull(mediaPlayerRepository::credentialsIsNull)
 
         /**
          * Provide implementation for [MegaApiFolderHttpServerIsRunning]

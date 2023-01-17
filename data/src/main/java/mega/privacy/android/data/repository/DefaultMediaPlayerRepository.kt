@@ -109,28 +109,37 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getThumbnail(
-        isMegaApiFolder: Boolean,
+    override suspend fun getThumbnailFromMegaApi(
         nodeHandle: Long,
         path: String,
         finishedCallback: (nodeHandle: Long) -> Unit,
     ) {
         withContext(ioDispatcher) {
-            val listener =
-                OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, _ ->
-                    finishedCallback(megaRequest.nodeHandle)
-                })
-            if (isMegaApiFolder) {
+            OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, _ ->
+                finishedCallback(megaRequest.nodeHandle)
+            }).let { listener ->
                 megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
-                    megaApiFolder.getThumbnail(
+                    megaApi.getThumbnail(
                         node = node,
                         thumbnailFilePath = path,
                         listener = listener
                     )
                 }
-            } else {
+            }
+        }
+    }
+
+    override suspend fun getThumbnailFromMegaApiFolder(
+        nodeHandle: Long,
+        path: String,
+        finishedCallback: (nodeHandle: Long) -> Unit,
+    ) {
+        withContext(ioDispatcher) {
+            OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, _ ->
+                finishedCallback(megaRequest.nodeHandle)
+            }).let { listener ->
                 megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
-                    megaApi.getThumbnail(
+                    megaApiFolder.getThumbnail(
                         node = node,
                         thumbnailFilePath = path,
                         listener = listener
