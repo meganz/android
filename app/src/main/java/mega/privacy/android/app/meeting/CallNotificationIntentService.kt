@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting
 
+import android.Manifest
 import dagger.hilt.android.AndroidEntryPoint
 import android.app.Service
 import android.content.Intent
@@ -27,6 +28,7 @@ import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AnswerChatCall
@@ -225,9 +227,15 @@ class CallNotificationIntentService : Service(),
      * @param chatId Chat ID
      */
     private fun answerCall(chatId: Long) {
+        var enableAudio: Boolean = isTraditionalCall
+        if (enableAudio) {
+            enableAudio =
+                hasPermissions(this@CallNotificationIntentService, Manifest.permission.RECORD_AUDIO)
+        }
+
         coroutineScope?.launch {
             runCatching {
-                answerChatCall(chatId, false, isTraditionalCall, false)
+                answerChatCall(chatId, false, enableAudio, false)
             }.onFailure { exception ->
                 Util.showSnackbar(app?.applicationContext,
                     StringResourcesUtils.getString(R.string.call_error))
