@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.usecase.GetCurrentPayment
 import mega.privacy.android.domain.usecase.GetLocalPricing
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
@@ -52,6 +53,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val getLocalPricing: GetLocalPricing,
     private val isBillingAvailable: IsBillingAvailable,
     private val getActiveSubscription: GetActiveSubscription,
+    private val getCurrentPayment: GetCurrentPayment,
 ) : ViewModel() {
 
     companion object {
@@ -101,21 +103,12 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      * @param upgradeType upgrade type
      */
     fun subscriptionCheck(upgradeType: Int) {
-        PaymentMethod.values().firstOrNull {
-            // Determines the current account if has the subscription and the current subscription
-            // platform if is same as current payment platform.
-            if (BillingConstant.PAYMENT_GATEWAY == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET) {
-                it.methodId != PaymentMethodType.GOOGLE_WALLET
-                        && it.methodId == paymentMethodTypeMapper(myAccountInfo.subscriptionMethodId)
-            } else {
-                it.methodId != PaymentMethodType.HUAWEI_WALLET
-                        && it.methodId == paymentMethodTypeMapper(myAccountInfo.subscriptionMethodId)
-            }
-        }.run {
-            if (this == null) {
+        viewModelScope.launch {
+            val currentPayment = getCurrentPayment()
+            currentPayment?.let {
+                currentUpgradeClickedAndSubscription.value = Pair(upgradeType, currentPayment)
+            } ?: run {
                 upgradeClick.value = upgradeType
-            } else {
-                currentUpgradeClickedAndSubscription.value = Pair(upgradeType, this)
             }
         }
     }
