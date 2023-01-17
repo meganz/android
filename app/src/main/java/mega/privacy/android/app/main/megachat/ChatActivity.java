@@ -8386,6 +8386,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onStart() {
         super.onStart();
+        cleanBuffers();
         initAndShowChat();
     }
 
