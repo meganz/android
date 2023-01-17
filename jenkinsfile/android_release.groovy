@@ -67,22 +67,22 @@ pipeline {
     post {
         failure {
             script {
-                downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
                 if (hasGitLabMergeRequest()) {
                     String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     def message = ""
                     if (triggeredByDeliverAppStore()) {
-                        message = releaseFailureMessage("<br/>") +
+                        message = common.releaseFailureMessage("<br/>") +
                                 "<br/>Build Log:\t${link}"
                     } else if (triggeredByUploadSymbol()) {
-                        message = uploadSymbolFailureMessage("<br/>") +
+                        message = common.uploadSymbolFailureMessage("<br/>") +
                                 "<br/>Build Log:\t${link}"
                     }
-                    sendToMR(message)
+                    common.sendToMR(message)
                 } else {
-                    slackSend color: 'danger', message: releaseFailureMessage("\n")
+                    slackSend color: 'danger', message: common.releaseFailureMessage("\n")
                     slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
                 }
             }
@@ -90,25 +90,25 @@ pipeline {
         success {
             script {
                 if (!isOnReleaseBranch()) {
-                    sendToMR(skipMessage("<br/>"))
+                    common.sendToMR(skipMessage("<br/>"))
                 } else if (hasGitLabMergeRequest()) {
-                    downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                    common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
                     String link = uploadFileToGitLab(CONSOLE_LOG_FILE)
 
                     if (triggeredByDeliverAppStore()) {
-                        def message = releaseSuccessMessage("<br/>") +
+                        def message = releaseSuccessMessage("<br/>", common) +
                                 "<br/>Build Log:\t${link}"
-                        sendToMR(message)
+                        common.sendToMR(message)
 
-                        sendToMR(getBuildVersionInfo())
+                        common.sendToMR(getBuildVersionInfo(common))
 
-                        slackSend color: "good", message: releaseSuccessMessage("\n")
+                        slackSend color: "good", message: releaseSuccessMessage("\n", common)
                     } else if (triggeredByUploadSymbol()) {
-                        def message = uploadSymbolSuccessMessage("<br/>") +
+                        def message = common.uploadSymbolSuccessMessage("<br/>") +
                                 "<br/>Build Log:\t${link}"
-                        sendToMR(message)
+                        common.sendToMR(message)
 
-                        slackSend color: "good", message: uploadSymbolSuccessMessage("\n")
+                        slackSend color: "good", message: common.uploadSymbolSuccessMessage("\n")
                     }
 
                 }
@@ -135,13 +135,13 @@ pipeline {
                     BUILD_STEP = 'Preparation'
 
                     // send command acknowledgement to MR
-                    sendToMR(":runner: Android CD Release pipeline has started!!!" +
+                    common.sendToMR(":runner: Android CD Release pipeline has started!!!" +
                             "<br/><b>Command</b>: ${env.gitlabTriggerPhrase}"
                     )
 
-                    checkSDKVersion()
+                    common.checkSDKVersion()
 
-                    REBUILD_SDK = getValueInMRDescriptionBy("REBUILD_SDK")
+                    REBUILD_SDK = common.getValueInMRDescriptionBy("REBUILD_SDK")
 
                     sh("rm -frv $ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
@@ -157,6 +157,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Fetch SDK Submodules'
+
                     common.fetchSdkSubmodules()
                 }
             }
@@ -171,13 +172,13 @@ pipeline {
                 }
                 withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
                     script {
-                        if (isDefined(SDK_TAG)) {
+                        if (common.isDefined(SDK_TAG)) {
                             common.checkoutSdkByTag(SDK_TAG)
                         } else {
                             common.checkoutSdkByBranch(SDK_BRANCH)
                         }
 
-                        if (isDefined(MEGACHAT_TAG)) {
+                        if (common.isDefined(MEGACHAT_TAG)) {
                             common.checkoutMegaChatSdkByTag(MEGACHAT_TAG)
                         } else {
                             common.checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
@@ -227,7 +228,7 @@ pipeline {
                 script {
                     BUILD_STEP = 'Build SDK'
 
-                    cleanSdk()
+                    common.cleanSdk()
 
                     sh """
                         echo "=== START SDK BUILD===="
@@ -264,7 +265,7 @@ pipeline {
                         println("signing GMS APK")
                         String tempAlignedGmsApk = "unsigned_gms_apk_aligned.apk"
                         String gmsApkInput = "${WORKSPACE}/app/build/outputs/apk/gms/release/app-gms-release-unsigned.apk"
-                        String gmsApkOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${readAppVersion2()}-gms-release.apk"
+                        String gmsApkOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${common.readAppVersion2()}-gms-release.apk"
                         println("input = $gmsApkInput \noutput = $gmsApkOutput")
                         sh """
                             rm -fv ${tempAlignedGmsApk}
@@ -289,7 +290,6 @@ pipeline {
                 }
             }
         }
-
         stage('Sign GMS AAB') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -305,7 +305,7 @@ pipeline {
                     script {
                         println("signing GMS AAB")
                         String gmsAabInput = "${WORKSPACE}/app/build/outputs/bundle/gmsRelease/app-gms-release.aab"
-                        String gmsAabOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${readAppVersion2()}-gms-release.aab"
+                        String gmsAabOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${common.readAppVersion2()}-gms-release.aab"
                         println("input = $gmsAabInput \noutput = $gmsAabOutput")
                         withEnv([
                                 "GMS_AAB_INPUT=${gmsAabInput}",
@@ -340,16 +340,16 @@ pipeline {
                 script {
                     BUILD_STEP = 'Collect native symbol files'
 
-                    deleteAllFilesExcept(
+                    common.deleteAllFilesExcept(
                             "${WORKSPACE}/sdk/src/main/obj/local/arm64-v8a",
                             "libmega.so")
-                    deleteAllFilesExcept(
+                    common.deleteAllFilesExcept(
                             "${WORKSPACE}/sdk/src/main/obj/local/armeabi-v7a/",
                             "libmega.so")
-                    deleteAllFilesExcept(
+                    common.deleteAllFilesExcept(
                             "${WORKSPACE}/sdk/src/main/obj/local/x86",
                             "libmega.so")
-                    deleteAllFilesExcept(
+                    common.deleteAllFilesExcept(
                             "${WORKSPACE}/sdk/src/main/obj/local/x86_64",
                             "libmega.so")
 
@@ -377,12 +377,12 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
                     ]) {
 
-                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${artifactoryUploadPath()}/"
+                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${common.artifactoryUploadPath()}/"
 
                         withEnv([
                                 "TARGET_PATH=${targetPath}"
                         ]) {
-                            createBriefBuildInfoFile()
+                            common.createBriefBuildInfoFile()
 
                             sh '''
                                 cd ${WORKSPACE}/archive
@@ -424,7 +424,7 @@ pipeline {
                 }
                 script {
                     // Get the formatted release notes
-                    String release_notes = releaseNotes(RELEASE_NOTES)
+                    String release_notes = common.releaseNotes(RELEASE_NOTES)
                     
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
@@ -433,7 +433,8 @@ pipeline {
                             rolloutPercentage: '0',
                             additionalVersionCodes: '476,487',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
-                            recentChangeList: getRecentChangeList(release_notes)
+                            recentChangeList: common.getRecentChangeList(release_notes),
+                            releaseName: common.readAppVersion1()
                 }
             }
         }
@@ -442,102 +443,14 @@ pipeline {
                 script {
                     BUILD_STEP = 'Clean Up'
 
-                    printWorkspaceSize("workspace size before clean:")
-                    cleanAndroid()
-                    cleanSdk()
-                    printWorkspaceSize("workspace size after clean:")
+                    common.printWorkspaceSize("workspace size before clean:")
+                    common.cleanAndroid()
+                    common.cleanSdk()
+                    common.printWorkspaceSize("workspace size after clean:")
                 }
             }
         }
     }
-}
-
-/**
- * Compose the failure message of "deliver_appStore" command, which might be used for Slack or GitLab MR.
- * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
- * while GitLab MR uses "<br/>".
- * @return The success message to be sent
- */
-private String releaseFailureMessage(String lineBreak) {
-    String message = ":x: Android Release Failed!" +
-            "${lineBreak}Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}"
-    if (env.gitlabActionType == "PUSH") {
-        message += "${lineBreak}Trigger Reason: git PUSH"
-    } else if (env.gitlabActionType == "NOTE") {
-        message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
-    }
-    return message
-}
-
-/**
- * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
- * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
- * while GitLab MR uses "<br/>".
- * @return The success message to be sent
- */
-private String uploadSymbolFailureMessage(String lineBreak) {
-    return ":x: Android Firebase Crashlytics symbol upload Failed!" +
-            "${lineBreak}Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}"
-}
-
-/**
- * Get the value from GitLab MR description by key
- * @param key the key to check and read
- * @return actual value of key if key is specified. null otherwise.
- */
-String getValueInMRDescriptionBy(String key) {
-    if (key == null || key.isEmpty()) return null
-    def description = env.gitlabMergeRequestDescription
-    if (description == null) return null
-    String[] lines = description.split('\n')
-    for (String line : lines) {
-        line = line.trim()
-        if (line.startsWith(key)) {
-            String value = line.substring(key.length() + 1)
-            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
-            return value
-        }
-    }
-    return null
-}
-
-/**
- * check if a certain value is defined by checking the tag value
- * @param value value of tag
- * @return true if tag has a value. false if tag is null or zero length
- */
-private boolean isDefined(String value) {
-    return value != null && !value.isEmpty()
-}
-
-/**
- * checkout SDK by branch
- * @param sdkBranch the branch to checkout
- */
-private void checkoutSdkByBranch(String sdkBranch) {
-    sh "echo checkoutSdkByBranch"
-    sh "cd \"$WORKSPACE\""
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".url ${env.GITLAB_BASE_URL}/sdk/sdk.git"
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/mega/sdk\".branch \"$sdkBranch\""
-    sh 'git submodule sync'
-    sh 'git submodule update --init --recursive --remote'
-}
-
-/**
- * checkout MEGAchat SDK by branch
- * @param megaChatBranch the branch to checkout
- */
-private void checkoutMegaChatSdkByBranch(String megaChatBranch) {
-    sh "echo checkoutMegaChatSdkByBranch"
-    sh "cd \"$WORKSPACE\""
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".url ${env.GITLAB_BASE_URL}/megachat/MEGAchat.git"
-    sh "git config --file=.gitmodules submodule.\"sdk/src/main/jni/megachat/sdk\".branch \"${megaChatBranch}\""
-    sh 'git submodule sync'
-    sh 'git submodule update --init --recursive --remote'
 }
 
 /**
@@ -550,196 +463,58 @@ private boolean hasGitLabMergeRequest() {
 }
 
 /**
- * send message to GitLab MR comment
- * @param message message to send
- */
-private void sendToMR(String message) {
-    if (hasGitLabMergeRequest()) {
-        def mrNumber = env.gitlabMergeRequestIid
-        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
-            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
-        }
-    }
-}
-
-/**
  * compose the success message of "deliver_appStore" command, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
+ * @param common The common functions loaded from common.groovy
  * @return The success message to be sent
  */
-private String releaseSuccessMessage(String lineBreak) {
+private String releaseSuccessMessage(String lineBreak, Object common) {
     return ":rocket: Android Release uploaded to Google Play Alpha channel successfully!" +
-            "${lineBreak}Version:\t${readAppVersion1()}" +
-            "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
+            "${lineBreak}Version:\t${common.readAppVersion1()}" +
+            "${lineBreak}Last Commit Msg:\t${common.lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}"
-}
-
-/**
- * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
- * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
- * while GitLab MR uses "<br/>".
- * @return The success message to be sent
- */
-private String uploadSymbolSuccessMessage(String lineBreak) {
-    return ":rocket: Firebase Crashlytics symbol uploaded successfully!" +
-            "${lineBreak}Version:\t${readAppVersion1()}" +
-            "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
-            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
-            "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
-            "${lineBreak}Author:\t${gitlabUserName}" +
-            "${lineBreak}Commit:\t${GIT_COMMIT}"
-}
-
-private String sdkCommitId() {
-    String commitId = sh(
-            script: """
-                cd ${WORKSPACE}/sdk/src/main/jni/mega/sdk
-                git rev-parse HEAD
-                """,
-            returnStdout: true).trim()
-    println("sdk commit id = ${commitId}")
-    return commitId
-}
-
-
-private String appCommitId() {
-    String commitId = sh(
-            script: """
-                cd ${WORKSPACE}
-                git rev-parse HEAD
-                """,
-            returnStdout: true).trim()
-    println("Android commit id = ${commitId}")
-    return commitId
-}
-
-private String megaChatSdkCommitId() {
-    String commitId = sh(
-            script: """
-                cd ${WORKSPACE}/sdk/src/main/jni/megachat/sdk
-                git rev-parse HEAD
-                """,
-            returnStdout: true).trim()
-    println("chat sdk commit id = ${commitId}")
-    return commitId
 }
 
 /**
  * Generate a message with all key release information. This message can be posted to MR and then
  * directly published by Release Process.
+ * @param common The common functions loaded from common.groovy
  * @return the composed message
  */
-private String getBuildVersionInfo() {
+private String getBuildVersionInfo(Object common) {
 
-    String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${artifactoryUploadPath()}"
-    String artifactVersion = readAppVersion2()
+    String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${common.artifactoryUploadPath()}"
+    String artifactVersion = common.readAppVersion2()
 
     String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
     String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
 
-    String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + appCommitId()
-    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + sdkCommitId()
-    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + megaChatSdkCommitId()
+    String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + common.appCommitId()
+    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.sdkCommitId()
+    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.megaChatSdkCommitId()
 
     String appBranch = env.gitlabSourceBranch
 
     def message = """
-    Version: ${readAppVersion1()} <br/>
+    Version: ${common.readAppVersion1()} <br/>
     App Bundles and APKs: <br/>
        - Google (GMS):  [AAB](${gmsAabUrl}) | [APK](${gmsApkUrl}) <br/>
     Build info: <br/>
        - [Android commit](${appCommitLink}) (`${appBranch}`) <br/>
-       - [SDK commit](${sdkCommitLink}) (`${sdkBranchName()}`) <br/>
-       - [Karere commit](${chatCommitLink}) (`${megaChatBranchName()}`) <br/>
+       - [SDK commit](${sdkCommitLink}) (`${common.sdkBranchName()}`) <br/>
+       - [Karere commit](${chatCommitLink}) (`${common.megaChatBranchName()}`) <br/>
     """
     return message
-}
-
-
-/**
- * create a build info file with key version information of build.
- * This file will be uploaded to Artifactory repo.
- *
- */
-def createBriefBuildInfoFile() {
-    def content = """
-Version: v${readAppVersion1()}
-Upload Time: ${new Date().toString()}
-Android: branch(${env.gitlabSourceBranch}) - commit(${appCommitId()})
-SDK: branch(${sdkBranchName()}) - commit(${sdkCommitId()})
-Karere: branch(${megaChatBranchName()}) - commit(${megaChatSdkCommitId()})
-"""
-    sh "rm -fv ${ARTIFACTORY_BUILD_INFO}"
-    sh "echo \"${content}\" >> ${WORKSPACE}/${ARCHIVE_FOLDER}/${ARTIFACTORY_BUILD_INFO}"
 }
 
 private String skipMessage(String lineBreak) {
     return ":raising_hand: Android Release Upload skipped!" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Build can only be triggered on release branch by MR command."
-}
-
-/**
- * Read SDK versions from MR description and assign the values into environment.
- */
-private void checkSDKVersion() {
-    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
-    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
-
-    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
-    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
-
-    if (!isDefined(SDK_BRANCH)) {
-        SDK_BRANCH = "develop"
-    }
-
-    if (!isDefined(MEGACHAT_BRANCH)) {
-        MEGACHAT_BRANCH = "develop"
-    }
-}
-
-/**
- * read the version name from source code(build.gradle)
- * read the version code from environment variable
- *
- * @return a tuple of version code and version name
- */
-def readAppVersion() {
-    String versionCode = APK_VERSION_CODE_FOR_CD
-    String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
-    return [versionName, versionCode]
-}
-
-/**
- * get app version in a format like "6.6(433)"
- * @return version string
- */
-private String readAppVersion1() {
-    def (versionName, versionCode) = readAppVersion()
-    return versionName + "(" + versionCode + ")"
-}
-
-/**
- * get app version in a format like "437_6_9" (for v6.9(437))
- * @return version string
- */
-private String readAppVersion2() {
-    def (versionName, versionCode) = readAppVersion()
-    return "${versionCode}_${versionName.replaceAll("\\.", "_")}"
-}
-
-/**
- * read the last git commit message
- * @return last git commit message
- */
-private String lastCommitMessage() {
-    return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
 }
 
 /**
@@ -770,25 +545,6 @@ private boolean triggeredByUploadSymbol() {
             env.gitlabTriggerPhrase == "upload_symbol"
 }
 
-private void deleteAllFilesExcept(String folder, String except) {
-    println("Deleting all files except ${except} in folder ${folder}")
-    sh """
-        cd ${folder}
-        mv -v ${except} /tmp/
-        rm -fr *
-        mv -v /tmp/${except} .
-    """
-}
-
-/**
- * download jenkins build console log and save to file.
- */
-private void downloadJenkinsConsoleLog(String downloaded) {
-    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-        sh "curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o ${downloaded}"
-    }
-}
-
 /**
  * upload file to GitLab and return the GitLab link
  * @param fileName the local file to be uploaded
@@ -804,117 +560,4 @@ private String uploadFileToGitLab(String fileName) {
     }
     return link
 }
-
-/**
- * get relative path of artifactory folder
- * @return relative path.
- */
-private String artifactoryUploadPath() {
-    def (versionName, versionCode) = readAppVersion()
-    return "v${versionName}/${versionCode}"
-}
-
-
-/**
- * clean SDK
- */
-private void cleanSdk() {
-    println("clean SDK")
-    sh """
-        cd $WORKSPACE/sdk/src/main/jni
-        bash build.sh clean
-    """
-}
-
-/**
- * clean Android project
- */
-private void cleanAndroid() {
-    println("clean Android code")
-    sh """
-        cd $WORKSPACE
-        ./gradlew clean
-    """
-}
-
-/**
- * print the size of workspace.
- * @param prompt a prompt message can be printed before the size value.
- */
-private void printWorkspaceSize(String prompt) {
-    println(prompt)
-    sh """
-        cd ${WORKSPACE}
-        du -sh
-    """
-}
-
-/**
- * Get the list of recent changes (release note) json string input
- * and return a formatted list following below example
- *[
- * [language: 'en-GB', text: "Please test the changes from Jenkins build ${env.BUILD_NUMBER}."],
- * [language: 'de-DE', text: "Bitte die Änderungen vom Jenkins Build ${env.BUILD_NUMBER} testen."]
- *]
- *
- * @param input the json string to parse
- * @return the list of recent changes formatted
- */
-def getRecentChangeList(input) {
-    def map = []
-    def languages = new groovy.json.JsonSlurperClassic().parseText(input)
-    def keyList = languages.keySet()
-    keyList.each { language ->
-        def languageMap = [:]
-        languageMap["language"] = "${language}"
-        languageMap["text"] = "${languages[language]}"
-        map.add(languageMap)
-    }
-    return map
-}
-
-/**
- * Get release notes content from releaseNoteFile
- * releaseNoteFile should be in json format
- *
- * @return a String with the content of releaseNoteFile
- */
-private String releaseNotes(releaseNoteFile) {
-    String release_notes = sh(
-            script: """
-                cd ${WORKSPACE}/jenkinsfile/
-                cat $releaseNoteFile
-                """,
-            returnStdout: true).trim()
-    return release_notes
-}
-
-/**
- * Get the SDK branch name for report. If build is specified by tag
- *
- * @return If SDK is specified by <code>SDK_BRANCH</code>, return the branch name. If SDK is specified
- *         by <code>SDK_TAG</code>, return the tag name.
- */
-private String sdkBranchName() {
-    if (isDefined(SDK_TAG)) {
-        return SDK_TAG
-    } else {
-        return SDK_BRANCH
-    }
-}
-
-/**
- * Get the MEGAChat SDK branch name for report. If build is specified by tag
- *
- * @return If SDK is specified by <code>MEGACHAT_BRANCH</code>, return the branch name. If SDK is specified
- *         by <code>MEGACHAT_TAG</code>, return the tag name.
- */
-private String megaChatBranchName() {
-    if (isDefined(MEGACHAT_TAG)) {
-        return MEGACHAT_TAG
-    } else {
-        return MEGACHAT_BRANCH
-    }
-}
-
 
