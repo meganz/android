@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.streaming
 
 /**
- * Start streaming server
+ * Stop streaming server
  */
 fun interface StopStreamingServer {
     /**
