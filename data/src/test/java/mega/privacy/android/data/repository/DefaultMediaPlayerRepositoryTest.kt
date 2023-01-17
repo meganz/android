@@ -101,7 +101,7 @@ class DefaultMediaPlayerRepositoryTest {
 
         val expectedTypedNode = createTypedFileNode()
 
-        val actualTypedFile = underTest.getTypedNodeByHandle(expectedHandle)
+        val actualTypedFile = underTest.getUnTypedNodeByHandle(expectedHandle)
 
         assertThat(actualTypedFile).isNotNull()
         assertThat(actualTypedFile).isInstanceOf(DefaultFileNode::class.java)
@@ -133,7 +133,7 @@ class DefaultMediaPlayerRepositoryTest {
         initTestConditions(expectedFolderMegaNode, expectedType)
 
         val expectedTypedNode = createTypedFolderNode()
-        val actualTypedFolder = underTest.getTypedNodeByHandle(expectedHandle)
+        val actualTypedFolder = underTest.getUnTypedNodeByHandle(expectedHandle)
 
         assertThat(actualTypedFolder).isNotNull()
         assertThat(actualTypedFolder).isInstanceOf(DefaultFolderNode::class.java)

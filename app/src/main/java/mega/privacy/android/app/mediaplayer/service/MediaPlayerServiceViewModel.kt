@@ -96,13 +96,20 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AddNodeType
-import mega.privacy.android.domain.usecase.CredentialsIsNull
+import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.GetInboxNode
 import mega.privacy.android.domain.usecase.GetLocalFilePath
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetParentNodeByHandle
+import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetRootNode
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetRubbishNode
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -149,13 +156,20 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val megaApiHttpServerIsRunning: MegaApiHttpServerIsRunning,
     private val megaApiHttpServerStart: MegaApiHttpServerStart,
     private val megaApiHttpServerStop: MegaApiHttpServerStop,
-    private val credentialsIsNull: CredentialsIsNull,
+    private val areCredentialsNull: AreCredentialsNull,
     private val getLocalFilePath: GetLocalFilePath,
     private val getLocalFolderLinkFromMegaApiFolder: GetLocalFolderLinkFromMegaApiFolder,
     private val getLocalFolderLinkFromMegaApi: GetLocalFolderLinkFromMegaApi,
     private val getLocalLinkFromMegaApi: GetLocalLinkFromMegaApi,
     private val getThumbnailFromMegaApi: GetThumbnailFromMegaApi,
     private val getThumbnailFromMegaApiFolder: GetThumbnailFromMegaApiFolder,
+    private val getInboxNode: GetInboxNode,
+    private val getParentNodeByHandle: GetParentNodeByHandle,
+    private val getParentNodeFromMegaApiFolder: GetParentNodeFromMegaApiFolder,
+    private val getRootNode: GetRootNode,
+    private val getRootNodeFromMegaApiFolder: GetRootNodeFromMegaApiFolder,
+    private val getRubbishNode: GetRubbishNode,
+    private val getUnTypedNodeByHandle: GetUnTypedNodeByHandle,
     private val addNodeType: AddNodeType,
     private val fileDurationMapper: FileDurationMapper,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
@@ -414,12 +428,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
                         if (parentHandle == INVALID_HANDLE) {
                             when (type) {
-                                RUBBISH_BIN_ADAPTER -> mediaPlayerRepository.getRubbishNode()
-                                INBOX_ADAPTER -> mediaPlayerRepository.getInboxNode()
-                                else -> mediaPlayerRepository.getRootNode()
+                                RUBBISH_BIN_ADAPTER -> getRubbishNode()
+                                INBOX_ADAPTER -> getInboxNode()
+                                else -> getRootNode()
                             }
                         } else {
-                            mediaPlayerRepository.getParentNodeByHandle(parentHandle)
+                            getParentNodeByHandle(parentHandle)
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
                                 getString(
@@ -460,9 +474,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         val order = getSortOrderFromIntent(intent)
 
                         (if (parentHandle == INVALID_HANDLE) {
-                            mediaPlayerRepository.megaApiFolderGetRootNode()
+                            getRootNodeFromMegaApiFolder()
                         } else {
-                            mediaPlayerRepository.megaApiFolderGetParentNode(parentHandle)
+                            getParentNodeFromMegaApiFolder(parentHandle)
                         })?.let { parent ->
                             playlistTitle.postValue(parent.name)
 
@@ -499,8 +513,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         } else {
             playlistItems.clear()
 
-            val node: TypedFileNode? =
-                mediaPlayerRepository.getTypedNodeByHandle(firstPlayHandle) as? TypedFileNode
+            val node: TypedFileNode? = getUnTypedNodeByHandle(firstPlayHandle) as? TypedFileNode
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
                     offlineThumbnailFileWrapper.getThumbnailFile(context,
@@ -536,14 +549,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (thumbnail != null && !thumbnail.exists() && node != null) {
                 if (isMegaApiFolder(type = type)) {
                     getThumbnailFromMegaApiFolder(nodeHandle = node.id.longValue,
-                        path = thumbnail.absolutePath) { nodeHandle ->
+                        path = thumbnail.absolutePath)?.let { nodeHandle ->
                         if (nodeHandle == playingHandle) {
                             postPlayingThumbnail()
                         }
                     }
                 } else {
                     getThumbnailFromMegaApi(nodeHandle = node.id.longValue,
-                        path = thumbnail.absolutePath) { nodeHandle ->
+                        path = thumbnail.absolutePath)?.let { nodeHandle ->
                         if (nodeHandle == playingHandle) {
                             postPlayingThumbnail()
                         }
@@ -691,14 +704,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 nodesWithoutThumbnail.map {
                     if (isMegaApiFolder(type = type)) {
                         getThumbnailFromMegaApiFolder(nodeHandle = it.first,
-                            path = it.second.absolutePath) { nodeHandle ->
+                            path = it.second.absolutePath)?.let { nodeHandle ->
                             if (nodeHandle == playingHandle) {
                                 postPlayingThumbnail()
                             }
                         }
                     } else {
                         getThumbnailFromMegaApi(nodeHandle = it.first,
-                            path = it.second.absolutePath) { nodeHandle ->
+                            path = it.second.absolutePath)?.let { nodeHandle ->
                             if (nodeHandle == playingHandle) {
                                 postPlayingThumbnail()
                             }
@@ -1303,7 +1316,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     }
 
     private suspend fun isMegaApiFolder(type: Int) =
-        type == FOLDER_LINK_ADAPTER && credentialsIsNull()
+        type == FOLDER_LINK_ADAPTER && areCredentialsNull()
 
     override fun swapItems(current: Int, target: Int) {
         if (playlistItemsChanged.isEmpty()) {

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase
 /**
  * The use case for credentials whether is null
  */
-fun interface CredentialsIsNull {
+fun interface AreCredentialsNull {
 
     /**
      * Credentials whether is null

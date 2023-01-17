@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.exception.MegaException
 
 /**
  * Repository for media player
@@ -17,7 +18,7 @@ interface MediaPlayerRepository {
      * @param handle node handle
      * @return [UnTypedNode]?
      */
-    suspend fun getTypedNodeByHandle(handle: Long): UnTypedNode?
+    suspend fun getUnTypedNodeByHandle(handle: Long): UnTypedNode?
 
     /**
      * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApiFolder
@@ -64,33 +65,25 @@ interface MediaPlayerRepository {
      *
      * @param nodeHandle node handle
      * @param path thumbnail path
-     * @param finishedCallback callback of getting thumbnail finished
      */
-    suspend fun getThumbnailFromMegaApiFolder(
-        nodeHandle: Long,
-        path: String,
-        finishedCallback: (nodeHandle: Long) -> Unit,
-    )
+    @Throws(MegaException::class)
+    suspend fun getThumbnailFromMegaApiFolder(nodeHandle: Long, path: String): Long?
 
     /**
      * Get thumbnail from MegaApi
      *
      * @param nodeHandle node handle
      * @param path thumbnail path
-     * @param finishedCallback callback of getting thumbnail finished
      */
-    suspend fun getThumbnailFromMegaApi(
-        nodeHandle: Long,
-        path: String,
-        finishedCallback: (nodeHandle: Long) -> Unit,
-    )
+    @Throws(MegaException::class)
+    suspend fun getThumbnailFromMegaApi(nodeHandle: Long, path: String): Long?
 
     /**
      * Credentials whether is null
      *
      * @return true is null, otherwise is false
      */
-    suspend fun credentialsIsNull(): Boolean
+    suspend fun areCredentialsNull(): Boolean
 
     /**
      * Get rubbish node
@@ -118,7 +111,7 @@ interface MediaPlayerRepository {
      *
      * @return [UnTypedNode]?
      */
-    suspend fun megaApiFolderGetRootNode(): UnTypedNode?
+    suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode?
 
     /**
      * Get parent node by handle
@@ -134,7 +127,7 @@ interface MediaPlayerRepository {
      * @param parentHandle node handle
      * @return [UnTypedNode]?
      */
-    suspend fun megaApiFolderGetParentNode(parentHandle: Long): UnTypedNode?
+    suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode?
 
     /**
      * Get children by parent node handle

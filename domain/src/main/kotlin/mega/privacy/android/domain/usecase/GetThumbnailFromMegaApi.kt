@@ -10,11 +10,6 @@ fun interface GetThumbnailFromMegaApi {
      *
      * @param nodeHandle node handle
      * @param path thumbnail path
-     * @param finishedCallback callback of getting thumbnail finished
      */
-    suspend operator fun invoke(
-        nodeHandle: Long,
-        path: String,
-        finishedCallback: (nodeHandle: Long) -> Unit,
-    )
+    suspend operator fun invoke(nodeHandle: Long, path: String): Long?
 }

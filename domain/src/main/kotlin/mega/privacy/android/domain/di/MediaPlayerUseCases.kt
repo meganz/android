@@ -6,16 +6,23 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.CredentialsIsNull
+import mega.privacy.android.domain.usecase.AreCredentialsNull
 import mega.privacy.android.domain.usecase.DefaultGetTicker
 import mega.privacy.android.domain.usecase.DefaultTrackPlaybackPosition
+import mega.privacy.android.domain.usecase.GetInboxNode
 import mega.privacy.android.domain.usecase.GetLocalFilePath
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetParentNodeByHandle
+import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetRootNode
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetRubbishNode
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
+import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -78,6 +85,55 @@ abstract class MediaPlayerUseCases {
             GetLocalFolderLinkFromMegaApi(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApi)
 
         /**
+         * Provide implementation for [GetRootNode]
+         */
+        @Provides
+        fun provideGetRootNode(mediaPlayerRepository: MediaPlayerRepository): GetRootNode =
+            GetRootNode(mediaPlayerRepository::getRootNode)
+
+        /**
+         * Provide implementation for [GetInboxNode]
+         */
+        @Provides
+        fun provideGetInboxNode(mediaPlayerRepository: MediaPlayerRepository): GetInboxNode =
+            GetInboxNode(mediaPlayerRepository::getInboxNode)
+
+        /**
+         * Provide implementation for [GetRubbishNode]
+         */
+        @Provides
+        fun provideGetRubbishNode(mediaPlayerRepository: MediaPlayerRepository): GetRubbishNode =
+            GetRubbishNode(mediaPlayerRepository::getRubbishNode)
+
+        /**
+         * Provide implementation for [GetParentNodeByHandle]
+         */
+        @Provides
+        fun provideGetParentNodeByHandle(mediaPlayerRepository: MediaPlayerRepository): GetParentNodeByHandle =
+            GetParentNodeByHandle(mediaPlayerRepository::getParentNodeByHandle)
+
+        /**
+         * Provide implementation for [GetRootNodeFromMegaApiFolder]
+         */
+        @Provides
+        fun provideGetRootNodeFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetRootNodeFromMegaApiFolder =
+            GetRootNodeFromMegaApiFolder(mediaPlayerRepository::getRootNodeFromMegaApiFolder)
+
+        /**
+         * Provide implementation for [GetParentNodeFromMegaApiFolder]
+         */
+        @Provides
+        fun provideGetParentNodeFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetParentNodeFromMegaApiFolder =
+            GetParentNodeFromMegaApiFolder(mediaPlayerRepository::getParentNodeFromMegaApiFolder)
+
+        /**
+         * Provide implementation for [GetUnTypedNodeByHandle]
+         */
+        @Provides
+        fun provideGetUnTypedNodeByHandle(mediaPlayerRepository: MediaPlayerRepository): GetUnTypedNodeByHandle =
+            GetUnTypedNodeByHandle(mediaPlayerRepository::getUnTypedNodeByHandle)
+
+        /**
          * Provide implementation for [GetThumbnailFromMegaApiFolder]
          */
         @Provides
@@ -120,11 +176,11 @@ abstract class MediaPlayerUseCases {
             MegaApiFolderHttpServerStop(mediaPlayerRepository::megaApiFolderHttpServerStop)
 
         /**
-         * Provide implementation for [CredentialsIsNull]
+         * Provide implementation for [AreCredentialsNull]
          */
         @Provides
-        fun provideCredentialsIsNull(mediaPlayerRepository: MediaPlayerRepository): CredentialsIsNull =
-            CredentialsIsNull(mediaPlayerRepository::credentialsIsNull)
+        fun provideCredentialsNull(mediaPlayerRepository: MediaPlayerRepository): AreCredentialsNull =
+            AreCredentialsNull(mediaPlayerRepository::areCredentialsNull)
 
         /**
          * Provide implementation for [MegaApiFolderHttpServerIsRunning]

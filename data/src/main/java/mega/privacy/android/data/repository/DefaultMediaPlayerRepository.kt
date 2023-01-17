@@ -5,9 +5,12 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
@@ -29,10 +32,12 @@ import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import java.io.File
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Implementation of MediaPlayerRepository
@@ -52,7 +57,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
 
-    override suspend fun getTypedNodeByHandle(handle: Long): UnTypedNode? =
+    override suspend fun getUnTypedNodeByHandle(handle: Long): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(handle)?.let { megaNode ->
                 convertToUnTypedNode(megaNode)
@@ -109,47 +114,35 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getThumbnailFromMegaApi(
-        nodeHandle: Long,
-        path: String,
-        finishedCallback: (nodeHandle: Long) -> Unit,
-    ) {
+    override suspend fun getThumbnailFromMegaApi(nodeHandle: Long, path: String): Long? =
         withContext(ioDispatcher) {
-            OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, _ ->
-                finishedCallback(megaRequest.nodeHandle)
-            }).let { listener ->
-                megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
-                    megaApi.getThumbnail(
-                        node = node,
-                        thumbnailFilePath = path,
-                        listener = listener
-                    )
+            megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener { it.nodeHandle }
+                    megaApi.getThumbnail(node = node, thumbnailFilePath = path, listener = listener)
+                    continuation.invokeOnCancellation {
+                        megaApi.removeRequestListener(listener)
+                    }
                 }
             }
         }
-    }
 
-    override suspend fun getThumbnailFromMegaApiFolder(
-        nodeHandle: Long,
-        path: String,
-        finishedCallback: (nodeHandle: Long) -> Unit,
-    ) {
+    override suspend fun getThumbnailFromMegaApiFolder(nodeHandle: Long, path: String): Long? =
         withContext(ioDispatcher) {
-            OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, _ ->
-                finishedCallback(megaRequest.nodeHandle)
-            }).let { listener ->
-                megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
-                    megaApiFolder.getThumbnail(
-                        node = node,
+            megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener { it.nodeHandle }
+                    megaApiFolder.getThumbnail(node = node,
                         thumbnailFilePath = path,
-                        listener = listener
-                    )
+                        listener = listener)
+                    continuation.invokeOnCancellation {
+                        megaApi.removeRequestListener(listener)
+                    }
                 }
             }
         }
-    }
 
-    override suspend fun credentialsIsNull(): Boolean = dbHandler.credentials == null
+    override suspend fun areCredentialsNull(): Boolean = dbHandler.credentials == null
 
     override suspend fun getRubbishNode(): UnTypedNode? =
         withContext(ioDispatcher) {
@@ -172,7 +165,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun megaApiFolderGetRootNode(): UnTypedNode? =
+    override suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolder.getRootNode()?.let { megaNode ->
                 convertToUnTypedNode(megaNode)
@@ -186,7 +179,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun megaApiFolderGetParentNode(parentHandle: Long): UnTypedNode? =
+    override suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolder.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
                 convertToUnTypedNode(megaNode)
