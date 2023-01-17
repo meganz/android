@@ -300,11 +300,15 @@ class AlbumDynamicContentFragment : Fragment() {
             if (uiState.showRemovePhotosDialog) {
                 RemovePhotosFromAlbumDialog(
                     onDialogDismissed = {
-                        albumsViewModel.setShowRemovePhotosFromAlbumDialog(false)
+                        with(albumsViewModel) {
+                            clearSelectedPhotos()
+                            setShowRemovePhotosFromAlbumDialog(false)
+                        }
                     },
                     onPositiveButtonClick = {
                         with(albumsViewModel) {
                             removePhotosFromAlbum()
+                            clearSelectedPhotos()
                             setShowRemovePhotosFromAlbumDialog(false)
                         }
                     }

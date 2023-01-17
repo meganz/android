@@ -51,7 +51,6 @@ class AlbumContentActionModeCallback(
             }
             R.id.cab_menu_remove_photos -> {
                 fragment.actionShowRemovePhotosFromAlbumDialog()
-                fragment.destroyActionMode()
             }
         }
         return true
