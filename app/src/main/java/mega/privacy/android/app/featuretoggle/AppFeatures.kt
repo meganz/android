@@ -35,11 +35,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ScheduleMeeting("Enable schedule meetings feature", false),
 
     /**
-     * Dynamic album layout toggle
-     */
-    DynamicAlbum("Enable dynamic album feature", true),
-
-    /**
      * App Test toggle
      */
     AppTest("This is a test toggle. It does nothing", false);

@@ -50,7 +50,8 @@ class AlbumContentActionModeCallback(
                 fragment.actionRemoveFavourites()
             }
             R.id.cab_menu_remove_photos -> {
-                fragment.actionRemovePhotosFromAlbum()
+                fragment.actionShowRemovePhotosFromAlbumDialog()
+                fragment.destroyActionMode()
             }
         }
         return true

@@ -531,7 +531,8 @@ class PhotosFragment : Fragment() {
         )
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Creation)
+        val intent =
+            AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Creation)
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
 
@@ -670,13 +671,9 @@ class PhotosFragment : Fragment() {
     fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
         resetAlbumContentState(album = album, resetMessage = resetMessage)
         activity?.lifecycleScope?.launch {
-            val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
-            if (dynamicAlbumEnabled) {
-                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
-                    isAccountHasPhotos()))
-            } else {
-                managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
-            }
+            managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
+                isAccountHasPhotos()))
+
         }
     }
 

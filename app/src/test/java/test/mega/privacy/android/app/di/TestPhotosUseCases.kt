@@ -9,6 +9,7 @@ import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -27,4 +28,6 @@ object TestPhotosUseCases {
     @Provides
     fun provideGetPhotosByFolderId(): GetPhotosByFolderId = mock()
 
+    @Provides
+    fun provideRemovePhotosFromAlbumUseCase(): RemovePhotosFromAlbumUseCase = mock()
 }

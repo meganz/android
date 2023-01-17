@@ -43,7 +43,9 @@ import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.RemoveAlbums
+import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.impl.DefaultRemovePhotosFromAlbumUseCase
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -99,6 +101,9 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindRemoveAlbums(useCase: DefaultRemoveAlbums): RemoveAlbums
+
+    @Binds
+    abstract fun bindRemovePhotosFromAlbum(useCase: DefaultRemovePhotosFromAlbumUseCase): RemovePhotosFromAlbumUseCase
 
     companion object {
         @Provides

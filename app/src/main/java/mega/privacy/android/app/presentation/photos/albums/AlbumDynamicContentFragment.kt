@@ -302,7 +302,12 @@ class AlbumDynamicContentFragment : Fragment() {
                     onDialogDismissed = {
                         albumsViewModel.setShowRemovePhotosFromAlbumDialog(false)
                     },
-                    onPositiveButtonClick = {}
+                    onPositiveButtonClick = {
+                        with(albumsViewModel) {
+                            removePhotosFromAlbum()
+                            setShowRemovePhotosFromAlbumDialog(false)
+                        }
+                    }
                 )
             }
         }

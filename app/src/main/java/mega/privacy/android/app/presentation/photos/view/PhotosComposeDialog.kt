@@ -196,7 +196,7 @@ internal fun RemovePhotosFromAlbumDialog(
                 Text(
                     text = stringResource(id = R.string.general_remove),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
+                    color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
                     )
                 )
@@ -209,7 +209,7 @@ internal fun RemovePhotosFromAlbumDialog(
                 Text(
                     text = stringResource(id = R.string.general_cancel),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
+                    color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
                     )
                 )
