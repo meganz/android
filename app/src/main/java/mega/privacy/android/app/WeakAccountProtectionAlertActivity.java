@@ -27,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
-import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import timber.log.Timber;

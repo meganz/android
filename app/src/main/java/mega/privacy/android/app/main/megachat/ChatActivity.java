@@ -357,7 +357,7 @@ import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.FolderLinkActivity;
-import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
