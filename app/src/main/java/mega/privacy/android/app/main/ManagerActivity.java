@@ -7339,7 +7339,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         // isInBackup Indicates if the current node is under "My backup"
         if (fileBackupManager.fabForBackup(
-                fileBrowserFragment.getNodeList(),
+                fileBrowserViewModel.getState().getValue().getNodes(),
                 getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE),
                 actionType,
                 fileBackupManager.getActionBackupNodeCallback()

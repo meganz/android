@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -138,7 +137,6 @@ class FileBrowserFragment : RotatableFragment() {
     private var density = 0f
     private var outMetrics: DisplayMetrics? = null
     private var display: Display? = null
-    private var _nodes = mutableListOf<MegaNode?>()
     private var actionMode: ActionMode? = null
     private lateinit var mLayoutManager: LinearLayoutManager
     private var gridLayoutManager: CustomizedGridLayoutManager? = null
@@ -476,7 +474,7 @@ class FileBrowserFragment : RotatableFragment() {
             adapter = MegaNodeAdapter(
                 activity,
                 this,
-                _nodes,
+                emptyList(),
                 fileBrowserViewModel.getSafeBrowserParentHandle(),
                 recyclerView,
                 Constants.FILE_BROWSER_ADAPTER,
@@ -608,7 +606,7 @@ class FileBrowserFragment : RotatableFragment() {
         setTransferOverQuotaBannerVisibility()
         selectNewlyAddedNodes()
         if ((activity as? ManagerActivity)?.viewInFolderNode != null) {
-            animateNode(_nodes)
+            animateNode(fileBrowserViewModel.state.value.nodes)
         }
 
         fileBrowserViewModel.state.flowWithLifecycle(
@@ -1265,9 +1263,9 @@ class FileBrowserFragment : RotatableFragment() {
     private fun setNodes(nodes: MutableList<MegaNode?>) {
         Timber.d("Nodes size: ${nodes.size}")
         visibilityFastScroller()
-        this._nodes = nodes
+        val megaNodes = nodes.toMutableList()
         adapter?.let {
-            it.setNodes(nodes)
+            it.setNodes(megaNodes)
             checkAndConfigureAdapter(
                 handle = fileBrowserViewModel.getSafeBrowserParentHandle(),
                 colorPrimary = R.color.grey_900_grey_100,
@@ -1298,25 +1296,6 @@ class FileBrowserFragment : RotatableFragment() {
             if (itemCount < Constants.MIN_ITEMS_SCROLLBAR) View.GONE else View.VISIBLE
         } ?: run {
             View.GONE
-        }
-    }
-
-    /**
-     * refresh list when item updated
-     */
-    @SuppressLint("NotifyDataSetChanged")
-    fun refresh(handle: Long) {
-        if (handle == -1L) {
-            return
-        }
-        updateNode(handle)
-        adapter?.notifyDataSetChanged()
-    }
-
-    private fun updateNode(handle: Long) {
-        val index = _nodes.indexOfFirst { it?.handle == handle }.takeUnless { it == -1 }
-        if (index != null) {
-            _nodes[index] = megaApi.getNodeByHandle(handle)
         }
     }
 
@@ -1422,14 +1401,6 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     /**
-     * Get the nodes for operation of file backup
-     *
-     * @return the list of selected nodes
-     */
-    val nodeList: List<MegaNode?>
-        get() = _nodes
-
-    /**
      * Show Media discovery and launch [MediaDiscoveryFragment]
      */
     private fun showMediaDiscovery() {
@@ -1446,10 +1417,10 @@ class FileBrowserFragment : RotatableFragment() {
      */
     private fun selectNewlyAddedNodes() {
         val positions =
-            (activity as? ManagerActivity)?.getPositionsList(_nodes)?.takeUnless { it.isEmpty() }
-                ?: return
+            (requireActivity() as ManagerActivity).getPositionsList(fileBrowserViewModel.state.value.nodes)
+                .takeUnless { it.isEmpty() }
         activateActionMode()
-        positions.forEach {
+        positions?.forEach {
             if (isMultipleselect) {
                 adapter?.toggleSelection(it)
             }
@@ -1458,7 +1429,7 @@ class FileBrowserFragment : RotatableFragment() {
         if (selectedNodes?.isNotEmpty() == true) {
             updateActionModeTitle()
         }
-        recyclerView?.scrollToPosition(positions.minOrNull() ?: 0)
+        recyclerView?.scrollToPosition(positions?.minOrNull() ?: 0)
     }
 
     private var nodePosition = 0
