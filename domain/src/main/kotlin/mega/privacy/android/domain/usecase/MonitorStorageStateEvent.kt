@@ -6,10 +6,10 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 /**
  * Use case to monitor the latest state of [StorageStateEvent]
  */
-interface MonitorStorageStateEvent {
+fun interface MonitorStorageStateEvent {
     /**
      *
      * The state flow of [StorageStateEvent]
      */
-    val storageState: StateFlow<StorageStateEvent>
+    operator fun invoke(): StateFlow<StorageStateEvent>
 }
