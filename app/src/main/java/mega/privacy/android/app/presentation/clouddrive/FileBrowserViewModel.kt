@@ -14,9 +14,11 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
+import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -26,6 +28,7 @@ import javax.inject.Inject
  * @param getBrowserChildrenNode Fetch the cloud drive nodes
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
  * @param monitorNodeUpdates Monitor node updates
+ * @param getFileBrowserParentNodeHandle To get parent handle of current node
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -33,6 +36,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getBrowserChildrenNode: GetBrowserChildrenNode,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val getFileBrowserParentNodeHandle: GetParentNodeHandle
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -41,6 +45,11 @@ class FileBrowserViewModel @Inject constructor(
      * State flow
      */
     val state: StateFlow<FileBrowserState> = _state
+
+    /**
+     * Stack to maintain folder navigation clicks
+     */
+    private val lastPositionStack = Stack<Int>()
 
     init {
         monitorMediaDiscovery()
@@ -83,7 +92,12 @@ class FileBrowserViewModel @Inject constructor(
      * @param handle the id of the current browser handle to set
      */
     fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
-        _state.update { it.copy(fileBrowserHandle = handle) }
+        _state.update {
+            it.copy(
+                fileBrowserHandle = handle,
+                mediaHandle = handle
+            )
+        }
         refreshNodes()
     }
 
@@ -103,8 +117,8 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * If a folder only contains images or videos, then go to MD mode directly
      */
-    fun shouldEnterMDMode(nodes: List<MegaNode>, mediaDiscoveryViewSettings: Int): Boolean {
-        if (nodes.isEmpty())
+    fun shouldEnterMDMode(mediaDiscoveryViewSettings: Int): Boolean {
+        if (_state.value.nodes.isEmpty())
             return false
         val isMediaDiscoveryEnable =
             mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.ENABLED.ordinal ||
@@ -112,7 +126,7 @@ class FileBrowserViewModel @Inject constructor(
         if (!isMediaDiscoveryEnable)
             return false
 
-        for (node: MegaNode in nodes) {
+        for (node: MegaNode in _state.value.nodes) {
             if (node.isFolder ||
                 !MimeTypeList.typeForName(node.name).isImage &&
                 !MimeTypeList.typeForName(node.name).isVideoReproducible
@@ -130,9 +144,44 @@ class FileBrowserViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList()
+                    nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList(),
+                    parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle)
                 )
             }
         }
+    }
+
+    /**
+     * Handles back click of rubbishBinFragment
+     */
+    fun onBackPressed() {
+        _state.value.parentHandle?.let {
+            setBrowserParentHandle(it)
+        }
+    }
+
+    /**
+     * Pop scroll position for previous depth
+     *
+     * @return last position saved
+     */
+    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
+
+    /**
+     * Push lastPosition to stack
+     * @param lastPosition last position to be added to stack
+     */
+    private fun pushPositionOnStack(lastPosition: Int) {
+        lastPositionStack.push(lastPosition)
+    }
+
+    /**
+     * Performs action when folder is clicked from adapter
+     * @param lastFirstVisiblePosition visible position based on listview type
+     * @param handle node handle
+     */
+    fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
+        pushPositionOnStack(lastFirstVisiblePosition)
+        setBrowserParentHandle(handle)
     }
 }

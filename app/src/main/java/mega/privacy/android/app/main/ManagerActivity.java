@@ -11151,6 +11151,17 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
+     * Restores the FileBrowser section after opening it from a notification in the Notifications section.
+     */
+    public void restoreFileBrowserAfterComingFromNotification() {
+        comesFromNotifications = false;
+        comesFromNotificationHandle = -1;
+        selectDrawerItem(DrawerItem.NOTIFICATIONS);
+        fileBrowserViewModel.setBrowserParentHandle(comesFromNotificationHandleSaved);
+        comesFromNotificationHandleSaved = -1;
+        refreshCloudDrive();
+    }
+    /**
      * Updates Inbox section visibility depending on if it has children.
      *
      * @param hasChildren True if the Inbox node has children, false otherwise.
