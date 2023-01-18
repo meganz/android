@@ -1025,15 +1025,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-            MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-
-            ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-                            ? parentNode
-                            : megaApi.getRootNode(),
-                    SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-
-            fileBrowserFragment.setNodes(nodes);
-            fileBrowserFragment.getRecyclerView().invalidate();
+            fileBrowserViewModel.refreshNodes();
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
             refreshIncomingShares();
         }
@@ -4123,24 +4115,24 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }).attach();
 
-            if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
+            if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
                 //// TODO hardcoded number for now. This will get changed after SDK changes are available
                 TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
-                if(incomingSharesTab != null ) {
+                if (incomingSharesTab != null) {
                     incomingSharesTab.getOrCreateBadge().setNumber(2);
                 }
             }
 
-            if(outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
+            if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
                 TabLayout.Tab outgoingSharesTab = tabLayoutShares.getTabAt(1);
-                if(outgoingSharesTab != null) {
+                if (outgoingSharesTab != null) {
                     outgoingSharesTab.getOrCreateBadge().setNumber(2);
                 }
             }
 
-            if(linksViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            if (linksViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
                 TabLayout.Tab linksTab = tabLayoutShares.getTabAt(2);
-                if(linksTab != null) {
+                if (linksTab != null) {
                     linksTab.getOrCreateBadge().setNumber(1);
                 }
             }
@@ -4512,7 +4504,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
                 if (getIntent() != null && getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
-                    fileBrowserFragment.refreshNodes();
+                    fileBrowserViewModel.refreshNodes();
                 }
                 Timber.d("END for Cloud Drive");
                 break;
@@ -7476,21 +7468,10 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaNode parentNode = rootNode;
 
         if (isCloudAdded()) {
-            ArrayList<MegaNode> nodes;
-            if (fileBrowserState(ManagerActivity.this).getFileBrowserHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            } else {
-                parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-                if (parentNode == null) return;
-
-                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            }
-            Timber.d("Nodes: %s", nodes.size());
+            fileBrowserViewModel.refreshNodes();
             if (comesFromNotificationChildNodeHandleList == null) {
                 fileBrowserFragment.hideMultipleSelect();
             }
-            fileBrowserFragment.setNodes(nodes);
-            fileBrowserFragment.getRecyclerView().invalidate();
         }
     }
 
@@ -7769,7 +7750,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (isCloudAdded()) {
                             String handle = node.getHandle();
                             if (handle != null && !handle.equals("")) {
-                                fileBrowserFragment.refresh(Long.parseLong(handle));
+                                fileBrowserViewModel.setBrowserParentHandle(Long.parseLong(handle));
                             }
                         }
 
@@ -8070,16 +8051,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                fileBrowserViewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-
-                ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-                                ? parentNode
-                                : megaApi.getRootNode(),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-
-                fileBrowserFragment.setNodes(nodes);
-                fileBrowserFragment.getRecyclerView().invalidate();
+                fileBrowserViewModel.refreshNodes();
             } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
                 refreshIncomingShares();
             }
@@ -8126,15 +8098,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
                 if (parentNode != null) {
                     if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
-                    }
-                } else {
-                    if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
+                        fileBrowserViewModel.refreshNodes();
                     }
                 }
             } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -8226,7 +8190,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (requestCode == REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK) {
             if (isCloudAdded()) {
                 long handle = intent.getLongExtra(NODE_HANDLE, -1);
-                fileBrowserFragment.refresh(handle);
+                fileBrowserViewModel.setBrowserParentHandle(handle);
             }
 
             onNodesSharedUpdate();
@@ -8302,10 +8266,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle()),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-                fileBrowserFragment.setNodes(nodes);
-                fileBrowserFragment.getRecyclerView().invalidate();
+                fileBrowserViewModel.refreshNodes();
             }
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             refreshRubbishBin();
@@ -10397,7 +10358,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void setPendingActionsBadge() {
-        if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
+        if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
             sharedItemsView.addView(pendingActionsBadge);
             TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.chat_badge_text);
             tvPendingActionsCount.setText("5");

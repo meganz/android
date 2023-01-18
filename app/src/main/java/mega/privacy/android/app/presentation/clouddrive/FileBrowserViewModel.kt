@@ -1,14 +1,10 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -16,7 +12,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
@@ -36,8 +31,8 @@ import javax.inject.Inject
 class FileBrowserViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val getBrowserChildrenNode: GetBrowserChildrenNode,
-    monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
-    monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
+    private val monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -48,6 +43,15 @@ class FileBrowserViewModel @Inject constructor(
     val state: StateFlow<FileBrowserState> = _state
 
     init {
+        monitorMediaDiscovery()
+        monitorFileBrowserChildrenNodes()
+    }
+
+    /**
+     * This will monitor media discovery from [MonitorMediaDiscoveryView] and update
+     * [FileBrowserState.mediaDiscoveryViewSettings]
+     */
+    private fun monitorMediaDiscovery() {
         viewModelScope.launch {
             monitorMediaDiscoveryView().collect { mediaDiscoveryViewSettings ->
                 _state.update {
@@ -61,13 +65,17 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
-     * Update Browser Nodes when a node update callback happens
+     * This will monitor FileBrowserNodeUpdates from [MonitorNodeUpdates] and
+     * will update [FileBrowserState.nodes]
      */
-    val updateBrowserNodes: LiveData<Event<List<MegaNode>>> =
-        monitorNodeUpdates()
-            .mapNotNull { getBrowserChildrenNode(_state.value.fileBrowserHandle) }
-            .map { Event(it) }
-            .asLiveData()
+    private fun monitorFileBrowserChildrenNodes() {
+        viewModelScope.launch {
+            refreshNodes()
+            monitorNodeUpdates().collect {
+                refreshNodes()
+            }
+        }
+    }
 
     /**
      * Set the current browser handle to the UI state
@@ -76,6 +84,7 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
         _state.update { it.copy(fileBrowserHandle = handle) }
+        refreshNodes()
     }
 
     /**
@@ -112,5 +121,18 @@ class FileBrowserViewModel @Inject constructor(
             }
         }
         return true
+    }
+
+    /**
+     * This will refresh filebrowser nodes and update [FileBrowserState.nodes]
+     */
+    fun refreshNodes() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList()
+                )
+            }
+        }
     }
 }
