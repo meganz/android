@@ -18,7 +18,6 @@ import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
-import mega.privacy.android.data.facade.QRCodeFacade
 import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
@@ -32,18 +31,19 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
+import mega.privacy.android.data.gateway.DefaultStreamingGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.QRCodeGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
@@ -171,12 +171,6 @@ internal abstract class GatewayModule {
     abstract fun bindTelephonyGateway(telephonyFacade: TelephonyFacade): TelephonyGateway
 
     /**
-     * Provide implementation of [QRCodeGateway]
-     */
-    @Binds
-    abstract fun bindQRCodeGateway(implementation: QRCodeFacade): QRCodeGateway
-
-    /**
      * Provides [ClipboardGateway] implementation
      */
     @Binds
@@ -189,4 +183,8 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindBillingFacade(implementation: BillingFacade): BillingGateway
+
+    @Binds
+    abstract fun bindStreamingGateway(implementation: DefaultStreamingGateway): StreamingGateway
+
 }

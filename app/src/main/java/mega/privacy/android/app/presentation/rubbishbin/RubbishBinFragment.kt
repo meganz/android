@@ -45,7 +45,6 @@ import mega.privacy.android.app.databinding.FragmentRubbishbinlistBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
@@ -66,7 +65,6 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import java.util.Collections
-import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -87,13 +85,9 @@ class RubbishBinFragment : Fragment() {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
-    private val lastPositionStack = Stack<Int>()
-
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
-
-    private var nodes = mutableListOf<MegaNode>()
 
     private var recyclerView: RecyclerView? = null
     private lateinit var emptyImageView: ImageView
@@ -119,6 +113,15 @@ class RubbishBinFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
 
+    /**
+     * [Boolean] value referenced from [ManagerActivity]
+     *
+     * If "true", the contents are displayed in a List View-like manner
+     * If "false", the contents are displayed in a Grid View-like manner
+     */
+    private val isList: Boolean
+        get() = (requireActivity() as ManagerActivity).isList
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -135,7 +138,6 @@ class RubbishBinFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 rubbishBinViewModel.state.collect {
-                    Timber.d("updateRubbishBinNodes node update ${it.nodes.size}")
                     hideMultipleSelect()
                     setNodes(it.nodes)
                     recyclerView?.invalidate()
@@ -146,9 +148,18 @@ class RubbishBinFragment : Fragment() {
         requireActivity().display?.getMetrics(outMetrics)
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
-        (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
+        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
-        return if ((requireActivity() as ManagerActivity).isList) {
+        adapter = MegaNodeAdapter(requireActivity(),
+            this@RubbishBinFragment,
+            emptyList(),
+            rubbishBinViewModel.state.value.rubbishBinHandle,
+            recyclerView,
+            Constants.RUBBISH_BIN_ADAPTER,
+            if (isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+            sortByHeaderViewModel)
+
+        return if (isList) {
             Timber.d("List View")
             _listBinding = FragmentRubbishbinlistBinding.inflate(inflater, container, false)
             recyclerView = listBinding.rubbishbinListView
@@ -159,15 +170,6 @@ class RubbishBinFragment : Fragment() {
                 it.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
                 it.setListFragment(recyclerView)
                 it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-            } ?: run {
-                adapter = MegaNodeAdapter(requireActivity(),
-                    this@RubbishBinFragment,
-                    nodes,
-                    rubbishBinViewModel.state.value.rubbishBinHandle,
-                    recyclerView,
-                    Constants.RUBBISH_BIN_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                    sortByHeaderViewModel)
             }
 
             adapter?.isMultipleSelect = false
@@ -194,7 +196,6 @@ class RubbishBinFragment : Fragment() {
                 colorPrimary = R.color.grey_900_grey_100,
                 colorSecondary = R.color.grey_300_grey_600
             )
-
             listBinding.root
         } else {
             Timber.d("Grid View")
@@ -209,15 +210,6 @@ class RubbishBinFragment : Fragment() {
                 it.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
                 it.setListFragment(recyclerView)
                 it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-            } ?: run {
-                MegaNodeAdapter(requireActivity(),
-                    this@RubbishBinFragment,
-                    nodes,
-                    rubbishBinViewModel.state.value.rubbishBinHandle,
-                    recyclerView,
-                    Constants.RUBBISH_BIN_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                    sortByHeaderViewModel)
             }
             adapter?.isMultipleSelect = false
 
@@ -489,238 +481,11 @@ class RubbishBinFragment : Fragment() {
                 updateActionModeTitle()
             }
         } else {
-            if (nodes[position].isFolder) {
-                val n = nodes[position]
-                val lastFirstVisiblePosition = if ((requireActivity() as ManagerActivity).isList) {
-                    layoutManager.findFirstCompletelyVisibleItemPosition()
+            adapter?.getItem(position)?.let { node ->
+                if (node.isFolder) {
+                    openFolder(node = node)
                 } else {
-                    val pos =
-                        (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
-                    if (pos == -1) {
-                        Timber.w("Completely -1 then find just visible position")
-                        (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
-                    }
-                    pos
-                }
-                Timber.d("Push to stack $lastFirstVisiblePosition position")
-                lastPositionStack.push(lastFirstVisiblePosition)
-                rubbishBinViewModel.setRubbishBinHandle(n.handle)
-
-                (requireActivity() as ManagerActivity).setToolbarTitle()
-                (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
-
-                adapter?.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
-
-                //If folder has no files
-                checkAndConfigureAdapter(
-                    textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
-                    textGeneric = getString(R.string.file_browser_empty_folder_new),
-                    colorPrimary = R.color.grey_900_grey_100,
-                    colorSecondary = R.color.grey_300_grey_600
-                )
-                checkScroll()
-            } else {
-                //Is FILE
-                if (MimeTypeList.typeForName(nodes[position].name).isImage) {
-                    val intent = ImageViewerActivity.getIntentForParentNode(
-                        requireActivity(),
-                        megaApi.getParentNode(nodes[position]).handle,
-                        managerViewModel.getOrder(),
-                        nodes[position].handle
-                    )
-                    DragToExitSupport.putThumbnailLocation(intent,
-                        recyclerView,
-                        position,
-                        Constants.VIEWER_FROM_RUBBISH_BIN,
-                        adapter)
-                    startActivity(intent)
-                    ((requireActivity()) as ManagerActivity).overridePendingTransition(0, 0)
-                } else if (MimeTypeList.typeForName(nodes[position].name).isVideoReproducible ||
-                    MimeTypeList.typeForName(nodes[position].name).isAudio
-                ) {
-                    val file = nodes[position]
-                    val mimeType = MimeTypeList.typeForName(file.name).type
-                    Timber.d("FILE HANDLE: ${file.handle}, TYPE: $mimeType")
-                    var opusFile = false
-                    val intentInternalIntentPair =
-                        if (MimeTypeList.typeForName(file.name).isVideoNotSupported ||
-                            MimeTypeList.typeForName(file.name).isAudioNotSupported
-                        ) {
-                            val s = file.name.split("\\.".toRegex())
-                            if (s.size > 1 && s[s.size - 1] == "opus") {
-                                opusFile = true
-                            }
-                            Pair(Intent(Intent.ACTION_VIEW), false)
-                        } else {
-                            Pair(getMediaIntent(context, nodes[position].name), true)
-                        }
-
-                    intentInternalIntentPair.first.putExtra("placeholder",
-                        adapter?.placeholderCount)
-                    DragToExitSupport.putThumbnailLocation(intentInternalIntentPair.first,
-                        recyclerView,
-                        position,
-                        Constants.VIEWER_FROM_RUBBISH_BIN,
-                        adapter)
-                    intentInternalIntentPair.first.apply {
-                        putExtra("FILENAME", file.name)
-                        putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
-                        if (megaApi.getParentNode(nodes[position]).type == MegaNode.TYPE_RUBBISH) {
-                            putExtra("parentNodeHandle", -1L)
-                        } else {
-                            putExtra("parentNodeHandle",
-                                megaApi.getParentNode(nodes[position]).handle)
-                        }
-                    }
-                    val localPath = FileUtil.getLocalFile(file)
-                    localPath?.let {
-                        val mediaFile = File(it)
-                        if (it.contains(Environment.getExternalStorageDirectory().path)) {
-                            intentInternalIntentPair.first.setDataAndType(
-                                FileProvider.getUriForFile(requireActivity(),
-                                    "mega.privacy.android.app.providers.fileprovider",
-                                    mediaFile),
-                                MimeTypeList.typeForName(file.name).type)
-                        } else {
-                            intentInternalIntentPair.first.setDataAndType(
-                                Uri.fromFile(mediaFile),
-                                MimeTypeList.typeForName(file.name).type)
-                        }
-                        intentInternalIntentPair.first.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    } ?: run {
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart()
-                            intentInternalIntentPair.first.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
-                                true)
-                        }
-
-                        val mi = ActivityManager.MemoryInfo()
-                        val activityManager =
-                            requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.getMemoryInfo(mi)
-
-                        if (mi.totalMem > Constants.BUFFER_COMP) {
-                            Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                        } else {
-                            Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-                        }
-
-                        val url = megaApi.httpServerGetLocalLink(file)
-                        intentInternalIntentPair.first.setDataAndType(Uri.parse(url), mimeType)
-                    }
-                    intentInternalIntentPair.first.putExtra("HANDLE", file.handle)
-                    if (opusFile) {
-                        intentInternalIntentPair.first.setDataAndType(intentInternalIntentPair.first.data,
-                            "audio/*")
-                    }
-                    if (intentInternalIntentPair.second) {
-                        startActivity(intentInternalIntentPair.first)
-                    } else {
-                        if (MegaApiUtils.isIntentAvailable(context,
-                                intentInternalIntentPair.first)
-                        ) {
-                            startActivity(intentInternalIntentPair.first)
-                        } else {
-                            (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
-                                getString(R.string.intent_not_available),
-                                -1)
-                            adapter?.notifyDataSetChanged()
-                            (requireActivity() as ManagerActivity).saveNodesToDevice(
-                                Collections.singletonList(nodes[position]),
-                                true, false, false, false)
-                        }
-                    }
-                    (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
-                } else if (MimeTypeList.typeForName(nodes[position].name).isPdf) {
-
-                    val file = nodes[position]
-
-                    val mimeType = MimeTypeList.typeForName(file.name).type
-                    Timber.d("FILE HANDLE: ${file.handle}, TYPE: $mimeType")
-
-                    val pdfIntent = Intent(requireActivity(), PdfViewerActivity::class.java)
-                    pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    pdfIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-                    pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
-                    pdfIntent.putExtra("inside", true)
-                    pdfIntent.putExtra("APP", true)
-
-                    val localPath = FileUtil.getLocalFile(file)
-
-                    localPath?.let {
-                        val mediaFile = File(it)
-                        if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                            pdfIntent.setDataAndType(
-                                FileProvider.getUriForFile(
-                                    requireActivity(),
-                                    "mega.privacy.android.app.providers.fileprovider",
-                                    mediaFile
-                                ),
-                                MimeTypeList.typeForName(file.name).type)
-                        } else {
-                            pdfIntent.setDataAndType(Uri.fromFile(mediaFile),
-                                MimeTypeList.typeForName(file.name).type)
-                        }
-                        pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    } ?: run {
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart()
-                            pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
-                                true)
-                        }
-
-                        val mi = ActivityManager.MemoryInfo()
-                        val activityManager =
-                            requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                        activityManager.getMemoryInfo(mi)
-
-                        if (mi.totalMem > Constants.BUFFER_COMP) {
-                            Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
-                        } else {
-                            Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
-                        }
-
-                        val url = megaApi.httpServerGetLocalLink(file)
-                        pdfIntent.setDataAndType(Uri.parse(url), mimeType)
-                    }
-                    pdfIntent.putExtra("HANDLE", file.handle)
-                    DragToExitSupport.putThumbnailLocation(pdfIntent,
-                        recyclerView,
-                        position,
-                        Constants.VIEWER_FROM_RUBBISH_BIN,
-                        adapter)
-                    if (MegaApiUtils.isIntentAvailable(context, pdfIntent)) {
-                        startActivity(pdfIntent)
-                    } else {
-                        Toast.makeText(context,
-                            getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG).show()
-
-                        (requireActivity() as ManagerActivity).saveNodesToDevice(
-                            Collections.singletonList(nodes[position]),
-                            true, false, false, false)
-                    }
-                    (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
-                } else if (MimeTypeList.typeForName(nodes[position].name).isURL) {
-                    MegaNodeUtil.manageURLNode(requireActivity(), megaApi, nodes[position])
-                } else if (MimeTypeList.typeForName(nodes[position].name)
-                        .isOpenableTextFile(nodes[position].size)
-                ) {
-                    MegaNodeUtil.manageTextFileIntent(requireActivity(),
-                        nodes[position],
-                        Constants.RUBBISH_BIN_ADAPTER)
-                } else {
-                    adapter?.notifyDataSetChanged()
-                    MegaNodeUtil.onNodeTapped(requireActivity(),
-                        nodes[position],
-                        ((requireActivity()) as ManagerActivity)::saveNodeByTap,
-                        requireActivity() as ManagerActivity,
-                        requireActivity() as ManagerActivity)
+                    openFile(node = node, position = position)
                 }
             }
         }
@@ -772,26 +537,17 @@ class RubbishBinFragment : Fragment() {
         return adapter?.let {
             with(requireActivity() as ManagerActivity) {
                 if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
-                    comesFromNotifications = false
-                    comesFromNotificationHandle = -1
-                    selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                    rubbishBinViewModel.setRubbishBinHandle(comesFromNotificationHandleSaved)
-                    comesFromNotificationHandleSaved = -1
+                    restoreRubbishAfterComingFromNotification()
                     2
                 } else {
-                    val parentNode =
-                        megaApi.getParentNode(megaApi.getNodeByHandle(rubbishBinViewModel.state.value.rubbishBinHandle))
-                    parentNode?.let {
+                    rubbishBinViewModel.state.value.parentHandle?.let {
+                        rubbishBinViewModel.onBackPressed()
                         recyclerView?.visibility = View.VISIBLE
                         emptyImageView.visibility = View.GONE
                         emptyTextView.visibility = View.GONE
-                        supportInvalidateOptionsMenu()
-                        rubbishBinViewModel.setRubbishBinHandle(parentNode.handle)
+                        invalidateOptionsMenu()
                         setToolbarTitle()
-
-                        val lastVisiblePosition = if (!lastPositionStack.empty()) {
-                            lastPositionStack.pop()
-                        } else 0
+                        val lastVisiblePosition = rubbishBinViewModel.popLastPositionStack()
 
                         Timber.d("Scroll to $lastVisiblePosition position")
                         if (lastVisiblePosition >= 0) {
@@ -825,8 +581,7 @@ class RubbishBinFragment : Fragment() {
      */
     private fun setNodes(rubbishNode: List<MegaNode>) {
         Timber.d("setNodes")
-        nodes.clear()
-        nodes.addAll(rubbishNode)
+        val nodes = rubbishNode.toMutableList()
 
         if (megaApi.rubbishNode == null) {
             Timber.e("megaApi.getRubbishNode() is NULL")
@@ -857,6 +612,247 @@ class RubbishBinFragment : Fragment() {
      * Gets total number of items in an adapter
      */
     fun getItemCount() = adapter?.itemCount ?: -1
+
+    /**
+     * Opens file
+     * @param node MegaNode
+     * @param position position of item clicked
+     */
+    private fun openFile(node: MegaNode, position: Int) {
+        //Is FILE
+        if (MimeTypeList.typeForName(node.name).isImage) {
+            val intent = ImageViewerActivity.getIntentForParentNode(
+                requireActivity(),
+                megaApi.getParentNode(node).handle,
+                managerViewModel.getOrder(),
+                node.handle
+            )
+            DragToExitSupport.putThumbnailLocation(intent,
+                recyclerView,
+                position,
+                Constants.VIEWER_FROM_RUBBISH_BIN,
+                adapter)
+            startActivity(intent)
+            ((requireActivity()) as ManagerActivity).overridePendingTransition(0, 0)
+        } else if (MimeTypeList.typeForName(node.name).isVideoReproducible ||
+            MimeTypeList.typeForName(node.name).isAudio
+        ) {
+            val mimeType = MimeTypeList.typeForName(node.name).type
+            Timber.d("FILE HANDLE: ${node.handle}, TYPE: $mimeType")
+            var opusFile = false
+            val intentInternalIntentPair =
+                if (MimeTypeList.typeForName(node.name).isVideoNotSupported ||
+                    MimeTypeList.typeForName(node.name).isAudioNotSupported
+                ) {
+                    val s = node.name.split("\\.".toRegex())
+                    if (s.size > 1 && s[s.size - 1] == "opus") {
+                        opusFile = true
+                    }
+                    Pair(Intent(Intent.ACTION_VIEW), false)
+                } else {
+                    Pair(getMediaIntent(context, node.name), true)
+                }
+
+            intentInternalIntentPair.first.putExtra("placeholder",
+                adapter?.placeholderCount)
+            DragToExitSupport.putThumbnailLocation(intentInternalIntentPair.first,
+                recyclerView,
+                position,
+                Constants.VIEWER_FROM_RUBBISH_BIN,
+                adapter)
+            intentInternalIntentPair.first.apply {
+                putExtra("FILENAME", node.name)
+                putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
+                if (megaApi.getParentNode(node).type == MegaNode.TYPE_RUBBISH) {
+                    putExtra("parentNodeHandle", -1L)
+                } else {
+                    putExtra("parentNodeHandle",
+                        megaApi.getParentNode(node).handle)
+                }
+            }
+            val localPath = FileUtil.getLocalFile(node)
+            localPath?.let {
+                val mediaFile = File(it)
+                if (it.contains(Environment.getExternalStorageDirectory().path)) {
+                    intentInternalIntentPair.first.setDataAndType(
+                        FileProvider.getUriForFile(requireActivity(),
+                            "mega.privacy.android.app.providers.fileprovider",
+                            mediaFile),
+                        MimeTypeList.typeForName(node.name).type)
+                } else {
+                    intentInternalIntentPair.first.setDataAndType(
+                        Uri.fromFile(mediaFile),
+                        MimeTypeList.typeForName(node.name).type)
+                }
+                intentInternalIntentPair.first.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } ?: run {
+                if (megaApi.httpServerIsRunning() == 0) {
+                    megaApi.httpServerStart()
+                    intentInternalIntentPair.first.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
+                        true)
+                }
+
+                val mi = ActivityManager.MemoryInfo()
+                val activityManager =
+                    requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                activityManager.getMemoryInfo(mi)
+
+                if (mi.totalMem > Constants.BUFFER_COMP) {
+                    Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
+                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
+                } else {
+                    Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
+                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
+                }
+
+                val url = megaApi.httpServerGetLocalLink(node)
+                intentInternalIntentPair.first.setDataAndType(Uri.parse(url), mimeType)
+            }
+            intentInternalIntentPair.first.putExtra("HANDLE", node.handle)
+            if (opusFile) {
+                intentInternalIntentPair.first.setDataAndType(intentInternalIntentPair.first.data,
+                    "audio/*")
+            }
+            if (intentInternalIntentPair.second) {
+                startActivity(intentInternalIntentPair.first)
+            } else {
+                if (MegaApiUtils.isIntentAvailable(context,
+                        intentInternalIntentPair.first)
+                ) {
+                    startActivity(intentInternalIntentPair.first)
+                } else {
+                    (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+                        getString(R.string.intent_not_available),
+                        -1)
+                    adapter?.notifyDataSetChanged()
+                    (requireActivity() as ManagerActivity).saveNodesToDevice(
+                        Collections.singletonList(node),
+                        true, false, false, false)
+                }
+            }
+            (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
+        } else if (MimeTypeList.typeForName(node.name).isPdf) {
+            val mimeType = MimeTypeList.typeForName(node.name).type
+            Timber.d("FILE HANDLE: ${node.handle}, TYPE: $mimeType")
+
+            val pdfIntent = Intent(requireActivity(), PdfViewerActivity::class.java)
+            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            pdfIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+            pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
+            pdfIntent.putExtra("inside", true)
+            pdfIntent.putExtra("APP", true)
+
+            val localPath = FileUtil.getLocalFile(node)
+
+            localPath?.let {
+                val mediaFile = File(it)
+                if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
+                    pdfIntent.setDataAndType(
+                        FileProvider.getUriForFile(
+                            requireActivity(),
+                            "mega.privacy.android.app.providers.fileprovider",
+                            mediaFile
+                        ),
+                        MimeTypeList.typeForName(node.name).type)
+                } else {
+                    pdfIntent.setDataAndType(Uri.fromFile(mediaFile),
+                        MimeTypeList.typeForName(node.name).type)
+                }
+                pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } ?: run {
+                if (megaApi.httpServerIsRunning() == 0) {
+                    megaApi.httpServerStart()
+                    pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER,
+                        true)
+                }
+
+                val mi = ActivityManager.MemoryInfo()
+                val activityManager =
+                    requireActivity().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                activityManager.getMemoryInfo(mi)
+
+                if (mi.totalMem > Constants.BUFFER_COMP) {
+                    Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
+                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
+                } else {
+                    Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
+                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
+                }
+
+                val url = megaApi.httpServerGetLocalLink(node)
+                pdfIntent.setDataAndType(Uri.parse(url), mimeType)
+            }
+            pdfIntent.putExtra("HANDLE", node.handle)
+            DragToExitSupport.putThumbnailLocation(pdfIntent,
+                recyclerView,
+                position,
+                Constants.VIEWER_FROM_RUBBISH_BIN,
+                adapter)
+            if (MegaApiUtils.isIntentAvailable(context, pdfIntent)) {
+                startActivity(pdfIntent)
+            } else {
+                Toast.makeText(context,
+                    getString(R.string.intent_not_available),
+                    Toast.LENGTH_LONG).show()
+
+                (requireActivity() as ManagerActivity).saveNodesToDevice(
+                    Collections.singletonList(node),
+                    true, false, false, false)
+            }
+            (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
+        } else if (MimeTypeList.typeForName(node.name).isURL) {
+            MegaNodeUtil.manageURLNode(requireActivity(), megaApi, node)
+        } else if (MimeTypeList.typeForName(node.name)
+                .isOpenableTextFile(node.size)
+        ) {
+            MegaNodeUtil.manageTextFileIntent(requireActivity(),
+                node,
+                Constants.RUBBISH_BIN_ADAPTER)
+        } else {
+            adapter?.notifyDataSetChanged()
+            MegaNodeUtil.onNodeTapped(requireActivity(),
+                node,
+                ((requireActivity()) as ManagerActivity)::saveNodeByTap,
+                requireActivity() as ManagerActivity,
+                requireActivity() as ManagerActivity)
+        }
+    }
+
+    /**
+     * Opens Folder
+     * @param node MegaNode
+     */
+    private fun openFolder(node: MegaNode) {
+        val lastFirstVisiblePosition =
+            if (isList) {
+                layoutManager.findFirstCompletelyVisibleItemPosition()
+            } else {
+                val pos =
+                    (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
+                if (pos == -1) {
+                    Timber.w("Completely -1 then find just visible position")
+                    (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
+                }
+                pos
+            }
+        Timber.d("Push to stack $lastFirstVisiblePosition position")
+        rubbishBinViewModel.onFolderItemClicked(lastFirstVisiblePosition, node.handle)
+
+        (requireActivity() as ManagerActivity).setToolbarTitle()
+        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
+
+        adapter?.parentHandle = rubbishBinViewModel.state.value.rubbishBinHandle
+
+        //If folder has no files
+        checkAndConfigureAdapter(
+            textRubbishBinParentHandle = getString(R.string.context_empty_rubbish_bin),
+            textGeneric = getString(R.string.file_browser_empty_folder_new),
+            colorPrimary = R.color.grey_900_grey_100,
+            colorSecondary = R.color.grey_300_grey_600
+        )
+        checkScroll()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

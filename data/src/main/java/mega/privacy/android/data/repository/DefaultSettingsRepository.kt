@@ -7,10 +7,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isTypeWithParam
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -392,4 +394,16 @@ internal class DefaultSettingsRepository @Inject constructor(
         withContext(ioDispatcher) {
             cameraTimestampsPreferenceGateway.clearSecondaryCameraSyncRecords()
         }
+
+    override suspend fun enableFileVersionsOption(enabled: Boolean) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            apiFacade.setFileVersionsOption(enabled.not(), listener)
+            continuation.invokeOnCancellation {
+                apiFacade.removeRequestListener(listener)
+            }
+        }
+    }
 }

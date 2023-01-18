@@ -76,10 +76,6 @@ class MediaPlayerFacade @Inject constructor(
                             isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED)
                     }
 
-                    override fun onIsPlayingChanged(isPlaying: Boolean) {
-                        mediaPlayerCallback.onIsPlayingChangedCallback(isPlaying)
-                    }
-
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                         mediaPlayerCallback.onShuffleModeEnabledChangedCallback(shuffleModeEnabled)
                     }

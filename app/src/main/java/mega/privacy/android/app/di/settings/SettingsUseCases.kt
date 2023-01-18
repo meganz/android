@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import mega.privacy.android.domain.di.SettingModule
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CanDeleteAccount
@@ -40,7 +41,7 @@ import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
  *
  * Provides use cases used by the [mega.privacy.android.app.presentation.settings.SettingsViewModel]
  */
-@Module
+@Module(includes = [SettingModule::class])
 @InstallIn(ViewModelComponent::class)
 abstract class SettingsUseCases {
 

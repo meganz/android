@@ -12,7 +12,6 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication.Companion.isDisableFileVersions
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -28,7 +27,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_OFFLINE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RUBBISH
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.tasks.ManageCacheTask
 import mega.privacy.android.app.main.tasks.ManageOfflineTask
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
@@ -83,7 +81,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
         cacheAdvancedOptions?.onPreferenceClickListener = this
         rubbishFileManagement?.onPreferenceClickListener = this
         enableRbSchedulerSwitch?.onPreferenceClickListener = this
-        updateEnabledFileVersions()
         clearVersionsFileManagement?.onPreferenceClickListener = this
         autoPlaySwitch?.onPreferenceClickListener = this
         autoPlaySwitch?.isChecked = prefs.isAutoPlayEnabled()
@@ -111,7 +108,6 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
             myAccountInfo.formattedUsedRubbish)
         taskGetSizeCache()
         taskGetSizeOffline()
-        megaApi.getFileVersionsOption(GetAttrUserListener(context))
         if (savedInstanceState != null
             && savedInstanceState.getBoolean(IS_DISABLE_VERSIONS_SHOWN, false)
         ) {
@@ -121,8 +117,8 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.filePreferencesStateLiveData.observe(viewLifecycleOwner) { filePreferencesState ->
-            observeState(filePreferencesState)
+        viewLifecycleOwner.collectFlow(viewModel.state) {
+            observeState(it)
         }
         viewLifecycleOwner.collectFlow(viewModel.monitorConnectivityEvent,
             Lifecycle.State.STARTED) { isConnected ->
@@ -132,6 +128,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
 
     private fun observeState(filePreferencesState: FilePreferencesState) {
         val versions = filePreferencesState.numberOfPreviousVersions
+        updateEnabledFileVersions(filePreferencesState.isFileVersioningEnabled)
         if (versions == null) {
             fileVersionsFileManagement?.summary =
                 getString(R.string.settings_advanced_features_calculating)
@@ -205,7 +202,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                         showWarningDisableVersions()
                         return false
                     }
-                    megaApi.setFileVersionsOption(!it.isChecked, SetAttrUserListener(context))
+                    viewModel.enableFileVersionOption(it.isChecked)
                 }
             }
             KEY_CLEAR_VERSIONS ->
@@ -243,22 +240,12 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
     /**
      * Method for enable or disable the file versions.
      */
-    fun updateEnabledFileVersions() {
-        Timber.d("updateEnabledFileVersions: %s", isDisableFileVersions)
-        enableVersionsSwitch?.let {
-            it.onPreferenceClickListener = null
-            if (isDisableFileVersions == 1) {
-                if (it.isChecked) {
-                    it.isChecked = false
-                }
-            } else if (isDisableFileVersions == 0) {
-                if (!it.isChecked) {
-                    it.isChecked = true
-                }
-            } else {
-                it.isChecked = false
-            }
-            it.onPreferenceClickListener = this
+    private fun updateEnabledFileVersions(enableFileVersions: Boolean) {
+        Timber.d("updateEnabledFileVersions: $enableFileVersions")
+        enableVersionsSwitch?.apply {
+            onPreferenceClickListener = null
+            isChecked = enableFileVersions
+            onPreferenceClickListener = this@SettingsFileManagementFragment
         }
     }
 
@@ -404,8 +391,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
             .setMessage(StringResourcesUtils.getString(R.string.disable_versioning_warning))
             .setPositiveButton(StringResourcesUtils.getString(R.string.verify_2fa_subtitle_diable_2fa)
             ) { _, _ ->
-                megaApi.setFileVersionsOption(true,
-                    SetAttrUserListener(context))
+                viewModel.enableFileVersionOption(false)
             }
             .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
             .show()

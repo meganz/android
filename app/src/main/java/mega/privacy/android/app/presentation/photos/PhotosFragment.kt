@@ -54,6 +54,7 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -530,7 +531,8 @@ class PhotosFragment : Fragment() {
         )
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId)
+        val intent =
+            AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Creation)
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
 
@@ -669,13 +671,9 @@ class PhotosFragment : Fragment() {
     fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
         resetAlbumContentState(album = album, resetMessage = resetMessage)
         activity?.lifecycleScope?.launch {
-            val dynamicAlbumEnabled = getFeatureFlag(AppFeatures.DynamicAlbum)
-            if (dynamicAlbumEnabled) {
-                managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
-                    isAccountHasPhotos()))
-            } else {
-                managerActivity.skipToAlbumContentFragment(AlbumContentFragment.getInstance())
-            }
+            managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
+                isAccountHasPhotos()))
+
         }
     }
 

@@ -1,7 +1,11 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.exception.MegaException
 
 /**
  * Repository for media player
@@ -12,9 +16,9 @@ interface MediaPlayerRepository {
      * Get type node by handle
      *
      * @param handle node handle
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun getTypedNodeByHandle(handle: Long): TypedNode?
+    suspend fun getUnTypedNodeByHandle(handle: Long): UnTypedNode?
 
     /**
      * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApiFolder
@@ -46,7 +50,7 @@ interface MediaPlayerRepository {
      * @param order list order
      * @return audio nodes
      */
-    suspend fun getAudioNodes(order: Int): List<TypedNode>
+    suspend fun getAudioNodes(order: SortOrder): List<UnTypedNode>
 
     /**
      * Get all video nodes
@@ -54,73 +58,76 @@ interface MediaPlayerRepository {
      * @param order list order
      * @return video nodes
      */
-    suspend fun getVideoNodes(order: Int): List<TypedNode>
+    suspend fun getVideoNodes(order: SortOrder): List<UnTypedNode>
 
     /**
-     * Get thumbnail
+     * Get thumbnail from MegaApiFolder
      *
-     * @param isMegaApiFolder true is MegaFolderApi, otherwise is false
      * @param nodeHandle node handle
      * @param path thumbnail path
-     * @param finishedCallback callback of getting thumbnail finished
      */
-    suspend fun getThumbnail(
-        isMegaApiFolder: Boolean,
-        nodeHandle: Long,
-        path: String,
-        finishedCallback: (nodeHandle: Long) -> Unit,
-    )
+    @Throws(MegaException::class)
+    suspend fun getThumbnailFromMegaApiFolder(nodeHandle: Long, path: String): Long?
+
+    /**
+     * Get thumbnail from MegaApi
+     *
+     * @param nodeHandle node handle
+     * @param path thumbnail path
+     */
+    @Throws(MegaException::class)
+    suspend fun getThumbnailFromMegaApi(nodeHandle: Long, path: String): Long?
 
     /**
      * Credentials whether is null
      *
      * @return true is null, otherwise is false
      */
-    suspend fun credentialsIsNull(): Boolean
+    suspend fun areCredentialsNull(): Boolean
 
     /**
      * Get rubbish node
      *
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun getRubbishNode(): TypedNode?
+    suspend fun getRubbishNode(): UnTypedNode?
 
     /**
      * Get inbox node
      *
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun getInboxNode(): TypedNode?
+    suspend fun getInboxNode(): UnTypedNode?
 
     /**
      * Get root node
      *
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun getRootNode(): TypedNode?
+    suspend fun getRootNode(): UnTypedNode?
 
     /**
      * MegaApiFolder gets root node
      *
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun megaApiFolderGetRootNode(): TypedNode?
+    suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode?
 
     /**
      * Get parent node by handle
      *
      * @param parentHandle node handle
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun getParentNodeByHandle(parentHandle: Long): TypedNode?
+    suspend fun getParentNodeByHandle(parentHandle: Long): UnTypedNode?
 
     /**
      * MegaApiFolder gets parent node by handle
      *
      * @param parentHandle node handle
-     * @return [TypedNode]?
+     * @return [UnTypedNode]?
      */
-    suspend fun megaApiFolderGetParentNode(parentHandle: Long): TypedNode?
+    suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode?
 
     /**
      * Get children by parent node handle
@@ -128,13 +135,13 @@ interface MediaPlayerRepository {
      * @param isAudio true is audio player, otherwise is false
      * @param parentHandle parent node handle
      * @param order list order
-     * @return List<[TypedNode]>?
+     * @return List<[UnTypedNode]>?
      */
     suspend fun getChildrenByParentHandle(
         isAudio: Boolean,
         parentHandle: Long,
-        order: Int,
-    ): List<TypedNode>?
+        order: SortOrder,
+    ): List<UnTypedNode>?
 
     /**
      * MegaApiFolder gets children by parent node handle
@@ -142,56 +149,56 @@ interface MediaPlayerRepository {
      * @param isAudio true is audio player, otherwise is false
      * @param parentHandle parent node handle
      * @param order list order
-     * @return List<[TypedNode]>?
+     * @return List<[UnTypedNode]>?
      */
     suspend fun megaApiFolderGetChildrenByParentHandle(
         isAudio: Boolean,
         parentHandle: Long,
-        order: Int,
-    ): List<TypedNode>?
+        order: SortOrder,
+    ): List<UnTypedNode>?
 
     /**
      * Get nodes from public links
      * @param isAudio true is audio player, otherwise is false
      * @param order list order
-     * @return List<[TypedNode]>
+     * @return List<[UnTypedNode]>
      */
     suspend fun getNodesFromPublicLinks(
         isAudio: Boolean,
-        order: Int,
-    ): List<TypedNode>
+        order: SortOrder,
+    ): List<UnTypedNode>
 
     /**
      * Get nodes from InShares
      * @param isAudio true is audio player, otherwise is false
      * @param order list order
-     * @return List<[TypedNode]>
+     * @return List<[UnTypedNode]>
      */
     suspend fun getNodesFromInShares(
         isAudio: Boolean,
-        order: Int,
-    ): List<TypedNode>
+        order: SortOrder,
+    ): List<UnTypedNode>
 
     /**
      * Get nodes from OutShares
      * @param isAudio true is audio player, otherwise is false
      * @param order list order
-     * @return List<[TypedNode]>
+     * @return List<[UnTypedNode]>
      */
     suspend fun getNodesFromOutShares(
         isAudio: Boolean,
         lastHandle: Long,
-        order: Int,
-    ): List<TypedNode>
+        order: SortOrder,
+    ): List<UnTypedNode>
 
     /**
      * Get nodes by email
      *
      * @param isAudio true is audio player, otherwise is false
      * @param email email of account
-     * @return List<[TypedNode]>?
+     * @return List<[UnTypedNode]>?
      */
-    suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<TypedNode>?
+    suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<UnTypedNode>?
 
     /**
      * Get username by email
@@ -206,9 +213,9 @@ interface MediaPlayerRepository {
      *
      * @param isAudio true is audio player, otherwise is false
      * @param handles handle list
-     * @return List<[TypedNode]>
+     * @return List<[UnTypedNode]>
      */
-    suspend fun getNodesByHandles(isAudio: Boolean, handles: List<Long>): List<TypedNode>
+    suspend fun getNodesByHandles(isAudio: Boolean, handles: List<Long>): List<UnTypedNode>
 
     /**
      * MegaApi http server stop
@@ -279,4 +286,30 @@ interface MediaPlayerRepository {
      * @return folder path or null
      */
     suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String?
+
+    /**
+     * Delete the playback information
+     *
+     * @param mediaId the media id of deleted item
+     */
+    suspend fun deletePlaybackInformation(mediaId: Long)
+
+    /**
+     * Save the playback times
+     */
+    suspend fun savePlaybackTimes()
+
+    /**
+     * Update playback information
+     *
+     * @param playbackInformation the new playback information
+     */
+    suspend fun updatePlaybackInformation(playbackInformation: PlaybackInformation)
+
+    /**
+     * Monitor playback times
+     *
+     * @return Flow<Map<Long, PlaybackInformation>?>
+     */
+    fun monitorPlaybackTimes(): Flow<Map<Long, PlaybackInformation>?>
 }

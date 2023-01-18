@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import timber.log.Timber;
 
 public class QRCodePageAdapter extends FragmentPagerAdapter {

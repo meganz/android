@@ -17,6 +17,7 @@ import javax.inject.Inject
  * GetAchievementsListener
  */
 @ActivityScoped
+@Deprecated("You should call GetAccountAchievementsOverview instead")
 class GetAchievementsListener @Inject constructor() : MegaRequestListenerInterface {
 
     /**

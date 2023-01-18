@@ -49,11 +49,18 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
     companion object {
         const val ALBUM_ID: String = "album_id"
 
+        const val ALBUM_FLOW: String = "album_flow"
+
         const val MESSAGE: String = "message"
 
-        fun create(context: Context, albumId: AlbumId): Intent {
+        fun create(
+            context: Context,
+            albumId: AlbumId,
+            albumFlow: AlbumFlow,
+        ): Intent {
             return Intent(context, AlbumPhotosSelectionActivity::class.java).apply {
                 putExtra(ALBUM_ID, albumId.id)
+                putExtra(ALBUM_FLOW, albumFlow.ordinal)
             }
         }
     }

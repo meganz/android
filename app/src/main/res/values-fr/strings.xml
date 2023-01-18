@@ -1695,7 +1695,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre Disque nuagique[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Aucun fichier[/B][A]enregistré Hors&#160;ligne[/A]</string>
+    <string name="context_empty_offline">[B]Aucun fichier [/B][A]enregistré Hors&#160;ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Aucun [/B][A]contact[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -2552,7 +2552,7 @@
     <!-- label yesterday -->
     <string name="label_yesterday">Hier</string>
     <!-- label tomorrow -->
-    <string name="label_tomorrow">demain</string>
+    <string name="label_tomorrow">Demain</string>
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]Aucun [/B][A]fichier partagé[/A]</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
@@ -4245,8 +4245,9 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Préparation de l’aperçu du fichier</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">La prime arrivera à expiration dans %1$d&#160;jour</item>
+        <item quantity="many">La prime arrivera à expiration dans %1$d de jours</item>
+        <item quantity="other">La prime arrivera à expiration dans %1$d&#160;jours</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>

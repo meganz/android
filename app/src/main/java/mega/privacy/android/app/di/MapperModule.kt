@@ -21,6 +21,10 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
+import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
+import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
+import mega.privacy.android.app.presentation.meeting.mapper.toLastTimeFormatted
+import mega.privacy.android.app.presentation.meeting.mapper.toScheduledTimeFormatted
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeGBBasedMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedPriceString
@@ -94,4 +98,17 @@ class MapperModule {
      */
     @Provides
     fun provideFormattedSizeGBBasedMapper(): FormattedSizeGBBasedMapper = ::toFormattedSizeGBBased
+
+    /**
+     * Provide meeting last timestamp mapper
+     */
+    @Provides
+    fun provideMeetingLastTimestampMapper(): MeetingLastTimestampMapper = ::toLastTimeFormatted
+
+    /**
+     * Provide scheduled meeting timestamp mapper
+     */
+    @Provides
+    fun provideScheduledMeetingTimestampMapper(): ScheduledMeetingTimestampMapper =
+        ::toScheduledTimeFormatted
 }

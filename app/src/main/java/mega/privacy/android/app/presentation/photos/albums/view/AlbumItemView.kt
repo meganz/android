@@ -36,10 +36,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.domain.entity.getDuration
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.core.ui.theme.grey_alpha_032
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.photos.Photo
 
 private val gap = 1.dp
 
@@ -49,7 +48,7 @@ internal fun PhotosBig2SmallItems(
     photoDownload: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: Set<Long>,
+    selectedPhotos: Set<Photo>,
 ) {
     Column {
         Row(
@@ -69,7 +68,7 @@ internal fun PhotosBig2SmallItems(
                     )
                 },
                 photo = photos[0],
-                isSelected = photos[0].id in selectedPhotoIds
+                isSelected = photos[0] in selectedPhotos
             )
             if (photos.size >= 2) {
                 Column(
@@ -87,7 +86,7 @@ internal fun PhotosBig2SmallItems(
                             )
                         },
                         photo = photos[1],
-                        isSelected = photos[1].id in selectedPhotoIds
+                        isSelected = photos[1] in selectedPhotos
                     )
                     if (photos.size == 3) {
                         Spacer(
@@ -105,7 +104,7 @@ internal fun PhotosBig2SmallItems(
                                 )
                             },
                             photo = photos[2],
-                            isSelected = photos[2].id in selectedPhotoIds
+                            isSelected = photos[2] in selectedPhotos
                         )
                     }
                 }
@@ -124,7 +123,7 @@ internal fun Photos3SmallItems(
     downloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: Set<Long>,
+    selectedPhotos: Set<Photo>,
 ) {
     Column {
         Row(
@@ -143,7 +142,7 @@ internal fun Photos3SmallItems(
                     )
                 },
                 photo = photos[0],
-                isSelected = photos[0].id in selectedPhotoIds
+                isSelected = photos[0] in selectedPhotos
             )
             if (photos.size >= 2) {
                 AlbumPhotoContainer(
@@ -158,7 +157,7 @@ internal fun Photos3SmallItems(
                         )
                     },
                     photo = photos[1],
-                    isSelected = photos[1].id in selectedPhotoIds
+                    isSelected = photos[1] in selectedPhotos
                 )
                 if (photos.size == 2) {
                     Spacer(modifier = Modifier.size(size))
@@ -177,7 +176,7 @@ internal fun Photos3SmallItems(
                         )
                     },
                     photo = photos[2],
-                    isSelected = photos[2].id in selectedPhotoIds
+                    isSelected = photos[2] in selectedPhotos
                 )
             }
         }
@@ -193,7 +192,7 @@ internal fun Photos2SmallBigItems(
     downloadPhoto: PhotoDownload,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: Set<Long>,
+    selectedPhotos: Set<Photo>,
 ) {
     Column {
         Row(
@@ -215,7 +214,7 @@ internal fun Photos2SmallBigItems(
                         )
                     },
                     photo = photos[0],
-                    isSelected = photos[0].id in selectedPhotoIds
+                    isSelected = photos[0] in selectedPhotos
                 )
 
                 if (photos.size == 3) {
@@ -234,7 +233,7 @@ internal fun Photos2SmallBigItems(
                             )
                         },
                         photo = photos[2],
-                        isSelected = photos[2].id in selectedPhotoIds
+                        isSelected = photos[2] in selectedPhotos
                     )
                 }
             }
@@ -252,7 +251,7 @@ internal fun Photos2SmallBigItems(
                         )
                     },
                     photo = photos[1],
-                    isSelected = photos[1].id in selectedPhotoIds
+                    isSelected = photos[1] in selectedPhotos
                 )
             }
         }
@@ -309,7 +308,7 @@ private fun AlbumPhotoContainer(
             )
 
             Text(
-                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.getDuration()),
+                text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration),
                 color = white,
                 modifier = Modifier
                     .wrapContentSize()

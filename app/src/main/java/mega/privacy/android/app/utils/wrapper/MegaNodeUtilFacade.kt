@@ -44,7 +44,7 @@ class MegaNodeUtilFacade @Inject constructor(
                     it.getOrDefault(NodeId(MegaApiJava.INVALID_HANDLE))
                 }
                 .collectLatest {
-                    MegaNodeUtil.myBackupHandle = it.id
+                    MegaNodeUtil.myBackupHandle = it.longValue
                 }
         }
     }

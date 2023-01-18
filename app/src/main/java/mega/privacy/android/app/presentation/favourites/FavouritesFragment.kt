@@ -465,7 +465,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             is FavouriteFolder -> {
                 findNavController().navigate(
                     HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
-                        item.typedNode.id.id
+                        item.typedNode.id.longValue
                     )
                 )
             }

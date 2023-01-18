@@ -93,7 +93,7 @@
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">Alle auswählen</string>
     <!-- Menu item to unselect all the elements of a list -->
-    <string name="action_unselect_all">Auswahl löschen</string>
+    <string name="action_unselect_all">Auswahl aufheben</string>
     <!-- Menu item to change from list view to grid view -->
     <string name="action_grid">Thumbnail-Ansicht</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -4135,8 +4135,8 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Datei wird für Vorschau vorbereitet</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">Der Bonus läuft in %1$d Tag ab.</item>
+        <item quantity="other">Bonus läuft in %1$d Tagen ab</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Beschreibung</string>

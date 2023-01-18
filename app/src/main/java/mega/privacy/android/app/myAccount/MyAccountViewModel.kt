@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -33,20 +34,19 @@ import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.qrcode.QRCodeActivity
+import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
 import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
 import mega.privacy.android.app.myAccount.usecase.CheckVersionsUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
-import mega.privacy.android.app.myAccount.usecase.GetFileVersionsOptionUseCase
 import mega.privacy.android.app.myAccount.usecase.GetMyAvatarUseCase
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
-import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -78,6 +78,7 @@ import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -106,7 +107,7 @@ class MyAccountViewModel @Inject constructor(
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase,
+    private val getFileVersionsOption: GetFileVersionsOption,
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
@@ -126,7 +127,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
-    private val versionsInfo: MutableLiveData<String> = MutableLiveData()
     private val updateAccountDetails: MutableLiveData<Boolean> = MutableLiveData()
     private val processingFile: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -149,6 +149,9 @@ class MyAccountViewModel @Inject constructor(
      * Number of subscription
      */
     val numberOfSubscription = _numberOfSubscription.asStateFlow()
+
+    private val _state = MutableStateFlow(MyAccountUiState())
+    val state = _state.asStateFlow()
 
     /**
      * On my avatar file changed flow
@@ -249,7 +252,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     fun checkElevation(): LiveData<Boolean> = withElevation
-    fun getVersionsInfo(): LiveData<String> = versionsInfo
     fun onUpdateAccountDetails(): LiveData<Boolean> = updateAccountDetails
     fun isProcessingFile(): LiveData<Boolean> = processingFile
 
@@ -258,7 +260,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     private fun setVersionsInfo() {
-        versionsInfo.value = myAccountInfo.getFormattedPreviousVersionsSize()
+        _state.update {
+            it.copy(versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize())
+        }
     }
 
     fun updateAccountDetails() {
@@ -858,13 +862,15 @@ class MyAccountViewModel @Inject constructor(
      * Gets file versions option.
      */
     fun getFileVersionsOption() {
-        getFileVersionsOptionUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { setVersionsInfo() },
-                onError = Timber::w)
-            .addTo(composite)
+        viewModelScope.launch {
+            val isDisableFileVersions = getFileVersionsOption(forceRefresh = true)
+            _state.update {
+                it.copy(
+                    versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(),
+                    isFileVersioningEnabled = isDisableFileVersions.not()
+                )
+            }
+        }
     }
 
     /**

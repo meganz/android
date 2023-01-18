@@ -55,6 +55,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_OPEN_APP
 import mega.privacy.android.app.main.controllers.AccountController.Companion.localLogoutApp
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginViewModel
@@ -956,6 +957,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 megaChatApi.refreshUrl()
             }
         } else {
+            viewModel.intentAction = ACTION_OPEN_APP
             Timber.w("Another login is processing")
         }
     }
@@ -1328,7 +1330,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     /**
      * Launches Manager activity.
      */
-    private fun readyToManager() {
+    fun readyToManager() {
         confirmLogoutDialog?.dismiss()
         val loginActivity = requireActivity() as LoginActivity
 

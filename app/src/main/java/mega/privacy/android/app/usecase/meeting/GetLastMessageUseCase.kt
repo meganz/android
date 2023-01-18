@@ -30,6 +30,7 @@ import nz.mega.sdk.MegaChatMessage.TYPE_NORMAL
 import nz.mega.sdk.MegaChatMessage.TYPE_PRIV_CHANGE
 import nz.mega.sdk.MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE
 import nz.mega.sdk.MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE
+import nz.mega.sdk.MegaChatMessage.TYPE_SCHED_MEETING
 import nz.mega.sdk.MegaChatMessage.TYPE_SET_PRIVATE_MODE
 import nz.mega.sdk.MegaChatMessage.TYPE_SET_RETENTION_TIME
 import nz.mega.sdk.MegaChatMessage.TYPE_TRUNCATE
@@ -53,6 +54,16 @@ class GetLastMessageUseCase @Inject constructor(
 
     private val chatController: ChatController by lazy { ChatController(context) }
     private val chatManagement: ChatManagement by lazy { MegaApplication.getChatManagement() }
+
+    /**
+     * Get a formatted String with the last message given the chatId
+     *
+     * @param chatId    Chat Id to retrieve chat message
+     * @return          Single
+     */
+    fun get(chatId: Long): Single<String> =
+        Single.fromCallable { megaChatApi.getChatListItem(chatId).lastMessageId }
+            .flatMap { lastMessageId -> get(chatId, lastMessageId) }
 
     /**
      * Get a formatted String with the last message
@@ -88,7 +99,7 @@ class GetLastMessageUseCase @Inject constructor(
             }
 
             return@fromCallable when (chatListItem.lastMessageType) {
-                TYPE_INVALID ->
+                TYPE_INVALID, TYPE_SCHED_MEETING ->
                     getString(R.string.no_conversation_history)
                 LAST_MSG_LOADING ->
                     getString(R.string.general_loading)

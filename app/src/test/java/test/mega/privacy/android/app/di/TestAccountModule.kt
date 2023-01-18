@@ -11,7 +11,10 @@ import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -39,6 +42,10 @@ object TestAccountModule {
         on { runBlocking { invoke() } }.thenReturn(mock<AccountCredentials.MyAccountCredentials>())
     }
 
+    private val getAccountAchievementsOverview = mock<GetAccountAchievementsOverview>()
+
+    private val isUserLoggedIn = mock<IsUserLoggedIn>()
+
     @Provides
     fun bindGetSession() = getSession
 
@@ -52,5 +59,14 @@ object TestAccountModule {
     fun provideGetAccountAchievements() = getAccountAchievements
 
     @Provides
+    fun provideGetAccountAchievementsOverview() = getAccountAchievementsOverview
+
+    @Provides
     fun provideGetMyCredentials() = getMyCredentials
+
+    @Provides
+    fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()
+    
+    @Provides
+    fun provideIsUserLoggedIn() = isUserLoggedIn
 }

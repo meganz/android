@@ -107,7 +107,7 @@ class FavouritesViewHolder(
                                 if (file.exists()) {
                                     itemThumbnail.setImageURI(Uri.fromFile(file))
                                 } else {
-                                    getThumbnail(favourite.typedNode.id.id) { thumbnail ->
+                                    getThumbnail(favourite.typedNode.id.longValue) { thumbnail ->
                                         thumbnail?.let { fileByGetThumbnail ->
                                             itemThumbnail.setImageURI(
                                                 Uri.fromFile(

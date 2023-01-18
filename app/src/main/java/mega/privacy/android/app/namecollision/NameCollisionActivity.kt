@@ -1,10 +1,8 @@
 package mega.privacy.android.app.namecollision
 
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.drawable.Animatable
 import android.os.Build
 import android.os.Bundle
@@ -24,7 +22,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -93,14 +90,6 @@ class NameCollisionActivity : PasscodeActivity() {
     }
     private val noElevationColor by lazy { ContextCompat.getColor(this, R.color.dark_grey) }
 
-    private val updateFileVersionsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (ACTION_UPDATE_FILE_VERSIONS != intent.action) return
-
-            viewModel.updateFileVersioningInfo()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNameCollisionBinding.inflate(layoutInflater)
@@ -141,11 +130,6 @@ class NameCollisionActivity : PasscodeActivity() {
 
         setupView()
         setupObservers()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(updateFileVersionsReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -214,11 +198,6 @@ class NameCollisionActivity : PasscodeActivity() {
             }
         }
         viewModel.getCollisionsResolution().observe(this, ::manageCollisionsResolution)
-
-        registerReceiver(
-            updateFileVersionsReceiver,
-            IntentFilter(ACTION_UPDATE_FILE_VERSIONS)
-        )
     }
 
     /**

@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
+import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -58,6 +59,7 @@ class AlbumsViewModelTest {
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
     private val removeAlbums = mock<RemoveAlbums>()
+    private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
 
@@ -76,6 +78,7 @@ class AlbumsViewModelTest {
             getNodeListByIds = getNodeListByIds,
             createAlbum = createAlbum,
             removeAlbums = removeAlbums,
+            removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }

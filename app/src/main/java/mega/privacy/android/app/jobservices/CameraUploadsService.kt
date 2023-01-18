@@ -22,6 +22,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.AndroidCompletedTransfer
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -46,6 +48,7 @@ import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.StartUpload
+import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.ManagerActivity
@@ -380,6 +383,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var getDefaultNodeHandle: GetDefaultNodeHandle
+
+    /**
+     * LegacyDatabaseHandler
+     */
+    @Inject
+    lateinit var tempDbHandler: LegacyDatabaseHandler
 
     /**
      * AreAllUploadTransfersPaused
@@ -1348,7 +1357,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             )
         }.onSuccess { nodeId ->
             Timber.d("Copy node successful")
-            getNodeByHandle(nodeId.id)?.let { retrievedNode ->
+            getNodeByHandle(nodeId.longValue)?.let { retrievedNode ->
                 val fingerprint = retrievedNode.fingerprint
                 val isSecondary = retrievedNode.parentHandle == getSecondarySyncHandle()
                 // Delete the Camera Upload sync record by fingerprint
@@ -1679,6 +1688,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         val path = transfer.path
         if (isOverQuota) {
             return
+        }
+
+        if (transfer.state == MegaTransfer.STATE_COMPLETED) {
+            addCompletedTransfer(
+                AndroidCompletedTransfer(transfer, e),
+                tempDbHandler
+            )
         }
 
         if (e.errorCode == MegaError.API_OK) {

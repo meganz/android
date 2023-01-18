@@ -4,36 +4,54 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaNode
 
-internal typealias AccountDetailMapper = suspend (
+internal typealias AccountDetailMapper = (
     @JvmSuppressWildcards MegaAccountDetails,
+    @JvmSuppressWildcards Int,
     @JvmSuppressWildcards MegaNode?,
     @JvmSuppressWildcards MegaNode?,
-    @JvmSuppressWildcards List<MegaNode>?,
-    @JvmSuppressWildcards GetStorageUsed,
-    @JvmSuppressWildcards AccountTypeMapper,
-    @JvmSuppressWildcards SubscriptionStatusMapper,
+    @JvmSuppressWildcards List<MegaNode>,
 ) -> @JvmSuppressWildcards AccountDetail
 
-internal typealias GetStorageUsed = suspend (List<MegaNode>, MegaAccountDetails) -> Long
+internal const val HAS_STORAGE_DETAILS = 0x01
+internal const val HAS_TRANSFER_DETAILS = 0x02
+internal const val HAS_PRO_DETAILS = 0x04
+internal const val HAS_SESSIONS_DETAILS = 0x020
 
-internal suspend fun toAccountDetail(
+internal fun toAccountDetail(
     details: MegaAccountDetails,
+    numDetails: Int,
     rootNode: MegaNode?,
     rubbishNode: MegaNode?,
-    inShares: List<MegaNode>?,
-    getStorageUsed: GetStorageUsed,
+    inShares: List<MegaNode>,
+    accountStorageDetailMapper: AccountStorageDetailMapper,
+    accountSessionDetailMapper: AccountSessionDetailMapper,
+    accountTransferDetailMapper: AccountTransferDetailMapper,
+    accountLevelDetailMapper: AccountLevelDetailMapper,
     accountTypeMapper: AccountTypeMapper,
     subscriptionStatusMapper: SubscriptionStatusMapper,
 ) = AccountDetail(
-    usedCloudDrive = rootNode?.let { getStorageUsed(listOf(it), details) } ?: 0L,
-    usedRubbish = rubbishNode?.let { getStorageUsed(listOf(it), details) } ?: 0L,
-    usedIncoming = inShares?.let { getStorageUsed(it, details) } ?: 0L,
-    usedStorage = details.storageUsed,
-    subscriptionMethodId = details.subscriptionMethodId,
-    transferMax = details.transferMax,
-    transferUsed = details.transferUsed,
-    accountType = accountTypeMapper(details.proLevel),
-    subscriptionStatus = subscriptionStatusMapper(details.subscriptionStatus),
-    subscriptionRenewTime = details.subscriptionRenewTime,
-    proExpirationTime = details.proExpiration
+    sessionDetail = details.takeIf { numDetails and HAS_SESSIONS_DETAILS != 0 }
+        ?.getSession(0)
+        ?.let {
+            accountSessionDetailMapper(it.mostRecentUsage, it.creationTimestamp)
+        },
+    transferDetail = details.takeIf { numDetails and HAS_TRANSFER_DETAILS != 0 }
+        ?.let { accountTransferDetailMapper(it.transferMax, it.transferUsed) },
+    levelDetail = details.takeIf { numDetails and HAS_PRO_DETAILS != 0 }?.let {
+        accountLevelDetailMapper(it.subscriptionRenewTime,
+            it.proExpiration,
+            accountTypeMapper(it.proLevel),
+            subscriptionStatusMapper(it.subscriptionStatus))
+    },
+    storageDetail = details.takeIf { numDetails and HAS_STORAGE_DETAILS != 0 }?.let {
+        accountStorageDetailMapper(
+            details,
+            rootNode,
+            rubbishNode,
+            inShares,
+            details.storageMax,
+            details.storageUsed,
+            details.subscriptionMethodId
+        )
+    },
 )

@@ -14,6 +14,7 @@ import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -37,26 +38,24 @@ class DefaultCreateSupportTicketTest {
 
     @Before
     fun setUp() {
-        whenever(deviceRepository.getDeviceInfo()).thenReturn(
-            DeviceInfo(
-                device = device,
-                language = languageCode
+        deviceRepository.stub {
+            onBlocking { getDeviceInfo() }.thenReturn(
+                DeviceInfo(
+                    device = device,
+                    language = languageCode
+                )
             )
-        )
 
-        runBlocking {
-            whenever(deviceRepository.getAppInfo()).thenReturn(
+            onBlocking { getAppInfo() }.thenReturn(
                 AppInfo(
                     appVersion = appVersion,
                     sdkVersion = sdkVersion
                 )
             )
+            onBlocking { getDeviceSdkVersionInt() }.thenReturn(deviceSdkVersionInt)
+            onBlocking { getDeviceSdkVersionName() }.thenReturn(deviceSdkVersionName)
         }
 
-        runBlocking {
-            whenever(deviceRepository.getDeviceSdkVersionInt()).thenReturn(deviceSdkVersionInt)
-            whenever(deviceRepository.getDeviceSdkVersionName()).thenReturn(deviceSdkVersionName)
-        }
 
         runBlocking {
             whenever(getAccountDetails(false)).thenReturn(

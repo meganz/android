@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -205,4 +206,14 @@ interface AccountRepository {
      */
     val accountEmail: String?
 
+    /**
+     * Monitor account detail
+     *
+     */
+    fun monitorAccountDetail(): Flow<AccountDetail>
+
+    /**
+     * Checks if User is Logged In
+     */
+    suspend fun isUserLoggedIn(): Boolean
 }

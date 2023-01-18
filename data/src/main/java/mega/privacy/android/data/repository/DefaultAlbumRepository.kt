@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -78,25 +79,32 @@ internal class DefaultAlbumRepository @Inject constructor(
         .mapNotNull { it.sets }
         .map { sets -> sets.map { it.toUserSet() } }
 
-    override suspend fun getAlbumElementIDs(albumId: AlbumId): List<NodeId> =
+    override suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId> =
         withContext(ioDispatcher) {
             val elementList = megaApiGateway.getSetElements(sid = albumId.id)
             (0 until elementList.size()).map { index ->
-                elementList.get(index).toNodeId()
+                elementList[index].toAlbumPhotoId()
             }
         }
 
-    override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<NodeId>> =
+    override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<AlbumPhotoId>> =
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
             .mapNotNull { it.elements }
             .map { elements -> elements.filter { it.setId() == albumId.id } }
-            .map { elements -> elements.map { it.toNodeId() } }
+            .map { elements -> elements.map { it.toAlbumPhotoId() } }
 
     override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
             for (photoID in photoIDs) {
-                megaApiGateway.createSetElement(albumID.id, photoID.id)
+                megaApiGateway.createSetElement(albumID.id, photoID.longValue)
+            }
+        }
+
+    override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<AlbumPhotoId>) =
+        withContext(ioDispatcher) {
+            for (photoID in photoIDs) {
+                megaApiGateway.removeSetElement(albumID.id, photoID.id)
             }
         }
 
@@ -123,5 +131,11 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private fun MegaSet.toUserSet(): UserSet = userSetMapper(id(), name(), cover(), ts())
 
-    private fun MegaSetElement.toNodeId(): NodeId = NodeId(id = node())
+    private fun MegaSetElement.toNodeId(): NodeId = NodeId(longValue = node())
+
+    private fun MegaSetElement.toAlbumPhotoId(): AlbumPhotoId = AlbumPhotoId(
+        id = id(),
+        nodeId = NodeId(node()),
+        albumId = AlbumId(setId()),
+    )
 }

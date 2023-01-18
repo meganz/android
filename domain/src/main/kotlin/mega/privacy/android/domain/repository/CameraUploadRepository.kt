@@ -485,4 +485,12 @@ interface CameraUploadRepository {
      * @param newName new name for camera upload folder
      */
     suspend fun renameNode(nodeHandle: Long, newName: String)
+
+
+    /**
+     * number of pending uploads
+     */
+    @Deprecated("Function related to statistics will be reviewed in future updates to\n" +
+            "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
+    fun getNumberOfPendingUploads(): Int
 }

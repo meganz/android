@@ -108,10 +108,6 @@ class GlobalListener @Inject constructor(
                 api.getRubbishBinAutopurgePeriod(GetAttrUserListener(appContext))
                 return@forEach
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
-                api.getFileVersionsOption(GetAttrUserListener(appContext))
-                return@forEach
-            }
 
             // Receive the avatar change, send the event
             if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0) {

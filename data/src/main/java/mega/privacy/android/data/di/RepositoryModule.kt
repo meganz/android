@@ -15,7 +15,7 @@ import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
-import mega.privacy.android.data.repository.DefaultEnvironmentRepository
+import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultFilesRepository
@@ -40,6 +40,7 @@ import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -69,6 +70,7 @@ import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
+import mega.privacy.android.domain.repository.StreamingServerRepository
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
@@ -89,7 +91,7 @@ internal abstract class RepositoryModule {
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
 
     @Binds
-    abstract fun bindDeviceRepository(implementation: DefaultEnvironmentRepository): EnvironmentRepository
+    abstract fun bindDeviceRepository(implementation: EnvironmentRepositoryImpl): EnvironmentRepository
 
     @Binds
     @Singleton
@@ -172,6 +174,7 @@ internal abstract class RepositoryModule {
     abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
 
     @Binds
+    @Singleton
     abstract fun bindMediaPlayerRepository(repository: DefaultMediaPlayerRepository): MediaPlayerRepository
 
     @Binds
@@ -203,4 +206,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAndroidBillingRepository(repository: DefaultBillingRepository): AndroidBillingRepository
+
+    @Binds
+    abstract fun bindStreamingServerRepository(implementation: StreamingServerRepositoryImpl): StreamingServerRepository
+
 }

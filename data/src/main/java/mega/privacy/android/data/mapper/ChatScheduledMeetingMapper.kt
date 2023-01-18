@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import nz.mega.sdk.MegaChatScheduledFlags
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledRules
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -39,7 +40,8 @@ internal fun toChatScheduledMeeting(megaChatScheduledMeeting: MegaChatScheduledM
     )
 
 private fun String.mapTimestamp(): ZonedDateTime =
-    ZonedDateTime.parse(this, dateTimeZoneFormatter)
+    toLongOrNull()?.let { ZonedDateTime.from(Instant.ofEpochSecond(it).atZone(ZoneOffset.UTC)) }
+        ?: ZonedDateTime.parse(this, dateTimeZoneFormatter)
 
 private fun String.mapTimezone(): ZoneId =
     ZoneId.of(this)

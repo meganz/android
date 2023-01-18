@@ -599,6 +599,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun createSetElement(sid: Long, node: Long) =
         megaApi.createSetElement(sid, node)
 
+    override suspend fun removeSetElement(sid: Long, eid: Long) =
+        megaApi.removeSetElement(sid, eid)
+
     override suspend fun getSets(): MegaSetList = megaApi.sets
 
     override suspend fun getSet(sid: Long): MegaSet? = megaApi.getSet(sid)
@@ -725,6 +728,22 @@ internal class MegaApiFacade @Inject constructor(
             nodeHandle,
             listener,
         )
+
+    override fun getFileVersionsOption(listener: MegaRequestListenerInterface) {
+        megaApi.getFileVersionsOption(listener)
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("Function related to statistics will be reviewed in future updates to\n" +
+            "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
+    override val numberOfPendingUploads: Int
+        get() = megaApi.numPendingUploads
+
+    override fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface) {
+        megaApi.setFileVersionsOption(disable, listener)
+    }
+
+    override fun isUserLoggedIn(): Int = megaApi.isLoggedIn
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)

@@ -96,16 +96,7 @@ internal class DefaultAvatarRepository @Inject constructor(
     }
 
     override suspend fun getMyAvatarFile(): File? =
-        withContext(ioDispatcher) {
-            val userEmail = megaApiGateway.accountEmail ?: return@withContext null
-            val fileName = userEmail + FileConstant.JPG_EXTENSION
-            val myAvatarFile = cacheFolderGateway.buildAvatarFile(fileName)
-            if (myAvatarFile?.exists() == true && myAvatarFile.canRead()) {
-                myAvatarFile
-            } else {
-                getAvatarFile(userEmail, true)
-            }
-        }
+        cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File? =
         withContext(ioDispatcher) {

@@ -1506,8 +1506,6 @@
     <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free registration bonus.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Bonus expires in %1$d days</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Share folder</item>
@@ -3583,22 +3581,6 @@
     <string name="payment_methods">Payment methods</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Proceed</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Remove as host</string>
     <!-- Title message of existing subscription dialog -->
@@ -4140,6 +4122,18 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Remove from album?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, grant MEGA access to your photos and other media on your device.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Grant access</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don’t grant</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">Removed %d item from “%s”</item>
+        <item quantity="other">Removed %d items from “%s”</item>
+    </plurals>
     <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
     <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you have seen this message for this account before, press Cancel.</string>
     <string name="shared_items_security_upgrade_dialog_node_sharing_info">You are currently sharing the following folders: %s</string>

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -32,10 +33,12 @@ class DefaultGetAlbumPhotos @Inject constructor(
 
     private suspend fun getAlbumPhotos(albumId: AlbumId): List<Photo> =
         albumRepository.getAlbumElementIDs(albumId)
-            .mapNotNull { nodeId -> photosRepository.getPhotoFromNodeID(nodeId) }
+            .mapNotNull { albumPhotoId ->
+                photosRepository.getPhotoFromNodeID(albumPhotoId.nodeId, albumPhotoId)
+            }
 
     private fun monitorAlbumPhotosUpdate(albumId: AlbumId): Flow<List<Photo>> =
         albumRepository.monitorAlbumElementIds(albumId)
-            .filter(List<NodeId>::isNotEmpty)
+            .filter(List<AlbumPhotoId>::isNotEmpty)
             .mapLatest { getAlbumPhotos(albumId) }
 }

@@ -39,12 +39,12 @@ private fun getFileTypeInfoForExtension(
     extension: String,
     duration: Int,
 ) = when {
-    mimeType.startsWith(PdfFileTypeInfo.type) -> {
+    mimeType.startsWith(PdfFileTypeInfo.mimeType) -> {
         PdfFileTypeInfo
     }
     mimeType.isZipMimeType() -> {
         ZipFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
         )
     }
@@ -53,38 +53,38 @@ private fun getFileTypeInfoForExtension(
     }
     extension.lowercase().isGifExtension() -> {
         GifFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
         )
     }
     extension.lowercase().isRawExtension() -> {
         RawFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
         )
     }
     mimeType.startsWith("image/") -> {
         StaticImageFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
         )
     }
     mimeType.isAudioMimeType(extension) -> {
         AudioFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
             duration = duration
         )
     }
     mimeType.isTextMimeType(extension) -> {
         TextFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
         )
     }
     mimeType.isVideoMimeType(extension) -> {
         VideoFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
             duration = duration
         )
@@ -94,7 +94,7 @@ private fun getFileTypeInfoForExtension(
     }
     else -> {
         UnknownFileTypeInfo(
-            type = mimeType,
+            mimeType = mimeType,
             extension = extension,
         )
     }

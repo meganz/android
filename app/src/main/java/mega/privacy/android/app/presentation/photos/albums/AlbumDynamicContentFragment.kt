@@ -58,12 +58,14 @@ import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
+import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDialog
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -159,7 +161,7 @@ class AlbumDynamicContentFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 albumsViewModel.state.collect { state ->
-                    if (state.selectedPhotoIds.isEmpty()) {
+                    if (state.selectedPhotos.isEmpty()) {
                         if (actionMode != null) {
                             exitActionMode()
                         }
@@ -167,7 +169,7 @@ class AlbumDynamicContentFragment : Fragment() {
                         if (actionMode == null) {
                             enterActionMode()
                         }
-                        actionMode?.title = state.selectedPhotoIds.size.toString()
+                        actionMode?.title = state.selectedPhotos.size.toString()
                     }
                     menu?.let { menu ->
                         state.currentAlbum?.let { album ->
@@ -222,7 +224,7 @@ class AlbumDynamicContentFragment : Fragment() {
                     photoDownload = photosViewModel::downloadPhoto,
                     onClick = this@AlbumDynamicContentFragment::onClick,
                     onLongPress = this@AlbumDynamicContentFragment::onLongPress,
-                    selectedPhotoIds = uiState.selectedPhotoIds
+                    selectedPhotos = uiState.selectedPhotos
                 )
             } else {
                 when (uiState.currentAlbum) {
@@ -294,19 +296,46 @@ class AlbumDynamicContentFragment : Fragment() {
                     }
                 )
             }
+
+            if (uiState.showRemovePhotosDialog) {
+                RemovePhotosFromAlbumDialog(
+                    onDialogDismissed = {
+                        with(albumsViewModel) {
+                            clearSelectedPhotos()
+                            setShowRemovePhotosFromAlbumDialog(false)
+                        }
+                    },
+                    onPositiveButtonClick = {
+                        with(albumsViewModel) {
+                            removePhotosFromAlbum()
+                            setSnackBarMessage(
+                                requireContext()
+                                    .getQuantityStringOrDefault(
+                                        R.plurals.photos_album_photos_removal_snackbar_message,
+                                        state.value.selectedPhotos.size,
+                                        state.value.selectedPhotos.size,
+                                        getCurrentAlbumTitle(),
+                                    )
+                            )
+                            clearSelectedPhotos()
+                            setShowRemovePhotosFromAlbumDialog(false)
+                        }
+                    }
+                )
+            }
         }
     }
 
     @Composable
     private fun showFilterFabButton(uiState: AlbumsViewState) =
         (uiState.currentMediaType != FilterMediaType.ALL_MEDIA
-                && uiState.selectedPhotoIds.isEmpty())
+                && uiState.selectedPhotos.isEmpty())
 
     @Composable
     private fun showAddFabButton(uiState: AlbumsViewState) =
         uiState.currentAlbum is Album.UserAlbum
                 && isAccountHasPhotos
-                && uiState.selectedPhotoIds.isEmpty()
+                && uiState.selectedPhotos.isEmpty()
 
     @Composable
     private fun AddFabButton(
@@ -445,18 +474,18 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId)
+        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
 
     }
 
     fun onClick(photo: Photo) {
-        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotos.isEmpty()) {
             openPhoto(photo)
         } else {
             if (actionMode != null) {
-                albumsViewModel.togglePhotoSelection(photo.id)
+                albumsViewModel.togglePhotoSelection(photo)
             }
         }
     }
@@ -477,11 +506,11 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     private fun handleActionMode(photo: Photo) {
-        if (albumsViewModel.state.value.selectedPhotoIds.isEmpty()) {
+        if (albumsViewModel.state.value.selectedPhotos.isEmpty()) {
             if (actionMode == null) {
                 enterActionMode()
             }
-            albumsViewModel.togglePhotoSelection(photo.id)
+            albumsViewModel.togglePhotoSelection(photo)
         } else {
             onClick(photo)
         }

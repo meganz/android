@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.DefaultGetMeetings
+import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
 import mega.privacy.android.domain.usecase.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
+import mega.privacy.android.domain.usecase.MeetingRoomMapper
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
@@ -55,6 +57,12 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindGetMeetings(useCase: DefaultGetMeetings): GetMeetings
+
+    /**
+     * Meeting item room mapper
+     */
+    @Binds
+    abstract fun bindMeetingRoomMapper(implementation: DefaultMeetingRoomMapper): MeetingRoomMapper
 
     /**
      * Open call or start call and open it

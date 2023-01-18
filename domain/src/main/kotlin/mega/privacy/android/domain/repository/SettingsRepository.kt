@@ -384,4 +384,11 @@ interface SettingsRepository {
      * Clear Secondary Sync Records from Preference
      */
     suspend fun clearSecondaryCameraSyncRecords()
+
+    /**
+     * Enable file versions option
+     *
+     * @param enabled
+     */
+    suspend fun enableFileVersionsOption(enabled: Boolean)
 }

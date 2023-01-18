@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -220,4 +221,6 @@ object TestSettingsModule {
     @ElementsIntoSet
     fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
 
+    @Provides
+    fun provideEnableFileVersionsOption(): EnableFileVersionsOption = mock()
 }

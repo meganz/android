@@ -3,47 +3,60 @@ package mega.privacy.android.app.meeting.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
+import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
 import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.app.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
-import mega.privacy.android.app.usecase.meeting.GetMeetingListUseCase
-import mega.privacy.android.app.utils.RxUtil.debounceImmediate
+import mega.privacy.android.app.usecase.meeting.GetLastMessageUseCase
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetMeetings
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
  * Meeting list view model
  *
- * @property getMeetingListUseCase      Use case to retrieve meeting list
- * @property archiveChatUseCase         Use case to archive chats
- * @property leaveChatUseCase           Use case to leave chats
- * @property signalChatPresenceUseCase  Use case to signal chat presence
- * @property clearChatHistoryUseCase    Use case to clear chat history
+ * @property archiveChatUseCase
+ * @property leaveChatUseCase
+ * @property signalChatPresenceUseCase
+ * @property clearChatHistoryUseCase
+ * @property getMeetingsUseCase
+ * @property getLastMessageUseCase
+ * @property dispatcher
  */
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
-    private val getMeetingListUseCase: GetMeetingListUseCase,
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
     private val signalChatPresenceUseCase: SignalChatPresenceUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
+    private val getMeetingsUseCase: GetMeetings,
+    private val getLastMessageUseCase: GetLastMessageUseCase,
+    private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
+    private val scheduledMeetingTimestampMapper: ScheduledMeetingTimestampMapper,
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
-    companion object {
-        private const val REQUEST_TIMEOUT_IN_MS = 100L
-    }
-
     private var queryString: String? = null
-    private val meetings: MutableLiveData<List<MeetingItem.Data>> = MutableLiveData(emptyList())
+    private val meetings: MutableLiveData<List<MeetingRoomItem>> = MutableLiveData(emptyList())
 
     init {
         retrieveMeetings()
@@ -51,35 +64,35 @@ class MeetingListViewModel @Inject constructor(
     }
 
     private fun retrieveMeetings() {
-        getMeetingListUseCase.get()
-            .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { items ->
-                    meetings.value = items.toList()
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+        viewModelScope.launch(dispatcher) {
+            getMeetingsUseCase()
+                .mapLatest { items ->
+                    items.map { item ->
+                        item.copy(
+                            lastMessage = getLastMessageUseCase.get(item.chatId).blockingGetOrNull(),
+                            lastTimestampFormatted = meetingLastTimestampMapper(item.lastTimestamp),
+                            scheduledTimestampFormatted = scheduledMeetingTimestampMapper(item)
+                        )
+                    }
+                }
+                .flowOn(dispatcher)
+                .catch { Timber.e(it) }
+                .collectLatest { items -> meetings.postValue(items) }
+        }
     }
 
     /**
      * Get meetings
      *
-     * @return  LiveData with a list of MeetingItem.Data
+     * @return  LiveData with a list of filtered MeetingRoomItem
      */
-    fun getMeetings(): LiveData<List<MeetingItem.Data>> =
+    fun getMeetings(): LiveData<List<MeetingRoomItem>> =
         meetings.map { items ->
             val searchQuery = queryString
             if (!searchQuery.isNullOrBlank() && !items.isNullOrEmpty()) {
-                items.filter { (_, title, lastMessage, _, _, _, _, _, firstUser, lastUser, _, _, _) ->
+                items.filter { (_, title, lastMessage, _, _, _, _, _, _, _, _, _, _) ->
                     title.contains(searchQuery, true)
                             || lastMessage?.contains(searchQuery, true) == true
-                            || firstUser.firstName?.contains(searchQuery, true) == true
-                            || lastUser?.firstName?.contains(searchQuery, true) == true
-                            || firstUser.email?.contains(searchQuery, true) == true
-                            || lastUser?.email?.contains(searchQuery, true) == true
                 }
             } else {
                 items
@@ -98,10 +111,10 @@ class MeetingListViewModel @Inject constructor(
      * Get specific meeting given its chat id
      *
      * @param chatId    Chat id to identify chat
-     * @return          LiveData with MeetingItem.Data
+     * @return          LiveData with MeetingRoomItem
      */
-    fun getMeeting(chatId: Long): LiveData<MeetingItem.Data?> =
-        meetings.map { meeting -> meeting.find { it.id == chatId } }
+    fun getMeeting(chatId: Long): LiveData<MeetingRoomItem?> =
+        meetings.map { meeting -> meeting.find { it.chatId == chatId } }
 
     /**
      * Set search query string

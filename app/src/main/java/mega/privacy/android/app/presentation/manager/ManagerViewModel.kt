@@ -234,7 +234,7 @@ class ManagerViewModel @Inject constructor(
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
         inboxNode?.let { node ->
-            updatedNodes.find { node.handle == it.parentId.id }
+            updatedNodes.find { node.handle == it.parentId.longValue }
                 ?.run { updateInboxSectionVisibility() }
         }
     }
@@ -377,7 +377,7 @@ class ManagerViewModel @Inject constructor(
             val primaryHandle = getPrimarySyncHandle()
             val secondaryHandle = getSecondarySyncHandle()
             updatedNodes?.let {
-                val nodeMap = it.associateBy { node -> node.id.id }
+                val nodeMap = it.associateBy { node -> node.id.longValue }
                 // If CU and MU folder don't change then return.
                 if (!nodeMap.containsKey(primaryHandle) && !nodeMap.containsKey(secondaryHandle)) {
                     Timber.d("Updated nodes don't include CU/MU, return.")

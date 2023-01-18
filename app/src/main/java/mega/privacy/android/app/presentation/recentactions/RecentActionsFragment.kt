@@ -132,7 +132,7 @@ class RecentActionsFragment : Fragment() {
             if (item.bucket.nodes.size == 1) {
                 lifecycleScope.launch {
                     val node = item.bucket.nodes[0]
-                    viewModel.getMegaNode(node.id.id)?.let {
+                    viewModel.getMegaNode(node.id.longValue)?.let {
                         openFile(position, it)
                     }
                 }
@@ -156,7 +156,7 @@ class RecentActionsFragment : Fragment() {
                     requireContext().getString(R.string.error_server_connection_problem), -1)
             } else {
                 lifecycleScope.launch {
-                    val megaNode = viewModel.getMegaNode(node.id.id)
+                    val megaNode = viewModel.getMegaNode(node.id.longValue)
                     (requireActivity() as ManagerActivity).showNodeOptionsPanel(megaNode,
                         NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
                 }

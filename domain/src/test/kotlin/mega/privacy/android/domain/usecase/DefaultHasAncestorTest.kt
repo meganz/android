@@ -37,7 +37,7 @@ class DefaultHasAncestorTest {
 
     @Test
     fun `test that true is returned if direct parent is the ancestor`() = runTest {
-        val ancestor = NodeId(targetNode.id + 1)
+        val ancestor = NodeId(targetNode.longValue + 1)
         val Node = mock<Node> { on { parentId }.thenReturn(ancestor) }
         val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
@@ -61,8 +61,8 @@ class DefaultHasAncestorTest {
     @Test
     fun `test that true is returned if the parent of the direct parent is the ancestor`() =
         runTest {
-            val ancestor = NodeId(targetNode.id + 1)
-            val directParentId = NodeId(ancestor.id + 1)
+            val ancestor = NodeId(targetNode.longValue + 1)
+            val directParentId = NodeId(ancestor.longValue + 1)
             val Node = mock<Node> { on { parentId }.thenReturn(directParentId) }
             val directParent = mock<Node> { on { parentId }.thenReturn(ancestor) }
             val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
@@ -78,8 +78,8 @@ class DefaultHasAncestorTest {
 
     @Test
     fun `test that true is returned if distant ancestor is the ancestor`() = runTest {
-        val ancestor = NodeId(targetNode.id + 1)
-        val directParentId = NodeId(ancestor.id + 1)
+        val ancestor = NodeId(targetNode.longValue + 1)
+        val directParentId = NodeId(ancestor.longValue + 1)
         val Node = mock<Node> { on { parentId }.thenReturn(directParentId) }
         val directParent = mock<Node> {
             on { parentId }.thenReturn(directParentId,

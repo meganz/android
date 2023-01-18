@@ -1,6 +1,10 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
 import android.Manifest
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -30,6 +34,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -62,6 +67,7 @@ import mega.privacy.android.app.constants.SettingsConstants.REQUEST_LOCAL_SECOND
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
@@ -76,8 +82,9 @@ import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.model.MegaPreferences
@@ -122,6 +129,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var fileUpload = ""
     private var compressionQueueSizeDialog: AlertDialog? = null
     private var queueSizeInput: EditText? = null
+    private var mediaPermissionsDialog: AlertDialog? = null
 
     // Secondary Folder
     private var localSecondaryFolderPath: String? = ""
@@ -136,23 +144,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private val viewModel by viewModels<SettingsCameraUploadsViewModel>()
 
     /**
-     * Register the permissions callback, used when the user attempts to enable Camera Uploads
-     * without granting the necessary permissions
+     * Register the permissions callback when the user attempts to enable Camera Uploads
      */
     private val enableCameraUploadsPermissionLauncher =
-        registerForActivityResult(RequestMultiplePermissions()) { permissionsResult ->
-            if (permissionsResult.containsValue(false)) {
-                // If at least one permission is not granted, display a Snackbar explaining that
-                // the necessary permissions should be granted before enabling Camera Uploads
-                Timber.d("At least one permission in enableCameraUploadsPermissionLauncher denied")
-                Util.showSnackbar(requireContext(),
-                    getString(R.string.on_refuse_storage_permission))
-            } else {
-                // Otherwise if all necessary permissions have been granted, check the user
-                // Business Account status
-                Timber.d("All permissions in enableCameraUploadsPermissionLauncher granted")
-                viewModel.handleEnableCameraUploads()
-            }
+        registerForActivityResult(RequestMultiplePermissions()) { permissions ->
+            viewModel.handlePermissionsResult(permissions)
         }
 
     /**
@@ -169,8 +165,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Otherwise, display a Snackbar explaining that permission ACCESS_MEDIA_LOCATION should be
                 // granted before enabling Camera Uploads
                 Timber.d("Permission ACCESS_MEDIA_LOCATION denied")
-                Util.showSnackbar(requireContext(),
-                    getString(R.string.on_refuse_storage_permission))
+                showMediaPermissionRejectedSnackbar()
             }
         }
 
@@ -228,6 +223,16 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     if (it.shouldTriggerCameraUploads) {
                         enableCameraUploads()
                         viewModel.setTriggerCameraUploadsState(false)
+                    }
+                    // Display the Media Permissions Dialog if said permissions were not granted
+                    if (it.shouldShowMediaPermissionsRationale) {
+                        displayMediaAccessDialog()
+                    }
+                    // Display the Notification Permission Rationale if the Notification permission is not granted,
+                    // and reset the state
+                    if (it.shouldShowNotificationPermissionRationale) {
+                        displayNotificationPermissionRationale()
+                        viewModel.setNotificationPermissionRationaleState(shouldShow = false)
                     }
                 }
         }
@@ -842,6 +847,74 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
+     * Display a [Snackbar] explaining that the Media permissions should be granted
+     * in order to enable Camera Uploads
+     */
+    private fun showMediaPermissionRejectedSnackbar() {
+        view?.let {
+            Snackbar.make(
+                it,
+                getString(R.string.on_refuse_storage_permission),
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    /**
+     * Display a [MaterialAlertDialogBuilder] explaining that the Media permissions should be granted
+     * in order to enable Camera Uploads
+     */
+    private fun displayMediaAccessDialog() {
+        if (mediaPermissionsDialog?.isShowing == true) mediaPermissionsDialog?.dismiss()
+
+        mediaPermissionsDialog = MaterialAlertDialogBuilder(requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(R.string.settings_camera_uploads_grant_media_permissions_body)
+            .setPositiveButton(R.string.settings_camera_uploads_grant_media_permissions_positive_button) { dialog, _ ->
+                if (shouldShowMediaPermissionsRationale()) {
+                    enableCameraUploadsPermissionLauncher.launch(
+                        arrayOf(
+                            getImagePermissionByVersion(),
+                            getVideoPermissionByVersion(),
+                        )
+                    )
+                } else {
+                    // User has selected "Never Ask Again". Starting Android 11, selecting "Deny"
+                    // more than once is equivalent to selecting "Never Ask Again"
+                    requireContext().navigateToAppSettings()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.settings_camera_uploads_grant_media_permissions_negative_button) { dialog, _ -> dialog.dismiss() }
+            .setOnDismissListener {
+                viewModel.setMediaPermissionsRationaleState(shouldShow = false)
+            }
+            .show()
+    }
+
+    /**
+     * Checks whether a rationale is needed for Media Permissions
+     *
+     * @return Boolean value
+     */
+    private fun shouldShowMediaPermissionsRationale() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            shouldShowRequestPermissionRationale(READ_MEDIA_IMAGES) && shouldShowRequestPermissionRationale(
+                READ_MEDIA_VIDEO)
+        } else {
+            shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE)
+        }
+
+    /**
+     * Displays the Notification Permission Rationale when needed
+     */
+    private fun displayNotificationPermissionRationale() {
+        if (shouldShowRequestPermissionRationale(POST_NOTIFICATIONS)) {
+            displayNotificationPermissionRationale(requireActivity())
+        }
+    }
+
+    /**
      * Checks the Secondary Folder
      */
     private fun checkSecondaryMediaFolder() {
@@ -935,11 +1008,18 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             // Check if the necessary permissions to enable Camera Uploads have been granted.
             // The permissions are adaptive depending on the Android SDK version
             Timber.d("Checking if the necessary permissions have been granted")
-            checkNotificationsPermission(requireActivity())
-            val permissionsList = arrayOf(
-                getImagePermissionByVersion(),
-                getVideoPermissionByVersion()
-            )
+            val permissionsList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                arrayOf(
+                    getNotificationsPermission(),
+                    getImagePermissionByVersion(),
+                    getVideoPermissionByVersion()
+                )
+            } else {
+                arrayOf(
+                    getImagePermissionByVersion(),
+                    getVideoPermissionByVersion()
+                )
+            }
             if (hasPermissions(context, *permissionsList)) {
                 Timber.d("All necessary permissions have been granted")
                 viewModel.handleEnableCameraUploads()

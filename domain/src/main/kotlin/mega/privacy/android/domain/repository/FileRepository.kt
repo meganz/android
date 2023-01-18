@@ -3,12 +3,14 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import java.io.File
 
 /**
  * File repository
@@ -105,4 +107,28 @@ interface FileRepository {
      * @return node handle [Long]
      */
     suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
+
+    /**
+     * Get file versions option
+     *
+     * @param forceRefresh
+     * @return
+     */
+    suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
+
+    /**
+     * Get local file
+     *
+     * @param fileNode
+     * @return local file if it exists
+     */
+    suspend fun getLocalFile(fileNode: FileNode): File?
+
+    /**
+     * Get file streaming uri for a node
+     *
+     * @param node
+     * @return local url string if found
+     */
+    suspend fun getFileStreamingUri(node: Node): String?
 }
