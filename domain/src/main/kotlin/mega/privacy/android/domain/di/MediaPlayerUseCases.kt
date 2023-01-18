@@ -7,8 +7,17 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromInShares
+import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromOutShares
+import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultGetTicker
+import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromInShares
+import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromOutShares
+import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultTrackPlaybackPosition
+import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.GetInboxNode
 import mega.privacy.android.domain.usecase.GetLocalFilePath
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
@@ -23,6 +32,9 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -53,6 +65,42 @@ abstract class MediaPlayerUseCases {
      */
     @Binds
     abstract fun bindGetTicker(implementation: DefaultGetTicker): GetTicker
+
+    /**
+     * Provide implementation for [GetAudioNodesFromPublicLinks]
+     */
+    @Binds
+    abstract fun bindGetAudioNodesFromPublicLinks(implementation: DefaultGetAudioNodesFromPublicLinks): GetAudioNodesFromPublicLinks
+
+    /**
+     * Provide implementation for [GetVideoNodesFromPublicLinks]
+     */
+    @Binds
+    abstract fun bindGetVideoNodesFromPublicLinks(implementation: DefaultGetVideoNodesFromPublicLinks): GetVideoNodesFromPublicLinks
+
+    /**
+     * Provide implementation for [GetAudioNodesFromInShares]
+     */
+    @Binds
+    abstract fun bindGetAudioNodesFromInShares(implementation: DefaultGetAudioNodesFromInShares): GetAudioNodesFromInShares
+
+    /**
+     * Provide implementation for [GetVideoNodesFromInShares]
+     */
+    @Binds
+    abstract fun bindGetVideoNodesFromInShares(implementation: DefaultGetVideoNodesFromInShares): GetVideoNodesFromInShares
+
+    /**
+     * Provide implementation for [GetAudioNodesFromOutShares]
+     */
+    @Binds
+    abstract fun bindGetAudioNodesFromOutShares(implementation: DefaultGetAudioNodesFromOutShares): GetAudioNodesFromOutShares
+
+    /**
+     * Provide implementation for [GetVideoNodesFromOutShares]
+     */
+    @Binds
+    abstract fun bindGetVideoNodesFromOutShares(implementation: DefaultGetVideoNodesFromOutShares): GetVideoNodesFromOutShares
 
     companion object {
 

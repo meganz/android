@@ -13,7 +13,7 @@ import mega.privacy.android.domain.exception.MegaException
 interface MediaPlayerRepository {
 
     /**
-     * Get type node by handle
+     * Get [UnTypedNode] by handle
      *
      * @param handle node handle
      * @return [UnTypedNode]?
@@ -158,38 +158,46 @@ interface MediaPlayerRepository {
     ): List<UnTypedNode>?
 
     /**
-     * Get nodes from public links
-     * @param isAudio true is audio player, otherwise is false
+     * Get audio nodes from public links
      * @param order list order
      * @return List<[UnTypedNode]>
      */
-    suspend fun getNodesFromPublicLinks(
-        isAudio: Boolean,
-        order: SortOrder,
-    ): List<UnTypedNode>
+    suspend fun getAudioNodesFromPublicLinks(order: SortOrder): List<UnTypedNode>
 
     /**
-     * Get nodes from InShares
-     * @param isAudio true is audio player, otherwise is false
+     * Get video nodes from public links
      * @param order list order
      * @return List<[UnTypedNode]>
      */
-    suspend fun getNodesFromInShares(
-        isAudio: Boolean,
-        order: SortOrder,
-    ): List<UnTypedNode>
+    suspend fun getVideoNodesFromPublicLinks(order: SortOrder): List<UnTypedNode>
 
     /**
-     * Get nodes from OutShares
-     * @param isAudio true is audio player, otherwise is false
+     * Get audio nodes from InShares
      * @param order list order
      * @return List<[UnTypedNode]>
      */
-    suspend fun getNodesFromOutShares(
-        isAudio: Boolean,
-        lastHandle: Long,
-        order: SortOrder,
-    ): List<UnTypedNode>
+    suspend fun getAudioNodesFromInShares(order: SortOrder): List<UnTypedNode>
+
+    /**
+     * Get video nodes from InShares
+     * @param order list order
+     * @return List<[UnTypedNode]>
+     */
+    suspend fun getVideoNodesFromInShares(order: SortOrder): List<UnTypedNode>
+
+    /**
+     * Get audio nodes from OutShares
+     * @param order list order
+     * @return List<[UnTypedNode]>
+     */
+    suspend fun getAudioNodesFromOutShares(lastHandle: Long, order: SortOrder): List<UnTypedNode>
+
+    /**
+     * Get video nodes from OutShares
+     * @param order list order
+     * @return List<[UnTypedNode]>
+     */
+    suspend fun getVideoNodesFromOutShares(lastHandle: Long, order: SortOrder): List<UnTypedNode>
 
     /**
      * Get nodes by email
@@ -211,7 +219,6 @@ interface MediaPlayerRepository {
     /**
      * Get nodes by handles
      *
-     * @param isAudio true is audio player, otherwise is false
      * @param handles handle list
      * @return List<[UnTypedNode]>
      */
@@ -283,7 +290,7 @@ interface MediaPlayerRepository {
      * Get the local folder path
      *
      * @param typedFileNode [TypedFileNode]
-     * @return folder path or null
+     * @return local file if it exists
      */
     suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String?
 

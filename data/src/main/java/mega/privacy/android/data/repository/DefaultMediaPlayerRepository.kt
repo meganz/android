@@ -9,7 +9,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -17,7 +16,6 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -28,16 +26,13 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import java.io.File
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Implementation of MediaPlayerRepository
@@ -90,25 +85,26 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     override suspend fun getAudioNodes(order: SortOrder): List<UnTypedNode> =
-        withContext(ioDispatcher) {
-            megaApi.searchByType(MegaCancelToken.createInstance(),
-                sortOrderIntMapper(order),
-                FILE_TYPE_AUDIO,
-                SEARCH_TARGET_ROOTNODE).filter {
-                it.isFile && filterByNodeName(true, it.name)
-            }.map { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
+        getMediaNodes(isAudio = false, order = order)
 
 
     override suspend fun getVideoNodes(order: SortOrder): List<UnTypedNode> =
+        getMediaNodes(isAudio = true, order = order)
+
+    /**
+     * Get media nodes
+     *
+     * @param isAudio true is audio, false is video
+     * @param order [SortOrder]
+     * @return media nodes
+     */
+    private suspend fun getMediaNodes(isAudio: Boolean, order: SortOrder): List<UnTypedNode> =
         withContext(ioDispatcher) {
             megaApi.searchByType(MegaCancelToken.createInstance(),
                 sortOrderIntMapper(order),
                 FILE_TYPE_VIDEO,
                 SEARCH_TARGET_ROOTNODE).filter {
-                it.isFile && filterByNodeName(false, it.name)
+                it.isFile && filterByNodeName(isAudio, it.name)
             }.map { megaNode ->
                 convertToUnTypedNode(megaNode)
             }
@@ -216,7 +212,20 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getNodesFromPublicLinks(
+    override suspend fun getAudioNodesFromPublicLinks(order: SortOrder): List<UnTypedNode> =
+        getNodesFromPublicLinks(isAudio = true, order = order)
+
+    override suspend fun getVideoNodesFromPublicLinks(order: SortOrder): List<UnTypedNode> =
+        getNodesFromPublicLinks(isAudio = false, order = order)
+
+    /**
+     * Get media nodes from public links
+     *
+     * @param isAudio true is audio, false is video
+     * @param order [SortOrder]
+     * @return media nodes
+     */
+    private suspend fun getNodesFromPublicLinks(
         isAudio: Boolean,
         order: SortOrder,
     ): List<UnTypedNode> =
@@ -228,7 +237,20 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getNodesFromInShares(
+    override suspend fun getAudioNodesFromInShares(order: SortOrder): List<UnTypedNode> =
+        getNodesFromInShares(isAudio = true, order = order)
+
+    override suspend fun getVideoNodesFromInShares(order: SortOrder): List<UnTypedNode> =
+        getNodesFromInShares(isAudio = false, order = order)
+
+    /**
+     * Get media nodes from InShares
+     *
+     * @param isAudio true is audio, false is video
+     * @param order [SortOrder]
+     * @return media nodes
+     */
+    private suspend fun getNodesFromInShares(
         isAudio: Boolean,
         order: SortOrder,
     ): List<UnTypedNode> =
@@ -240,7 +262,27 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getNodesFromOutShares(
+    override suspend fun getAudioNodesFromOutShares(
+        lastHandle: Long,
+        order: SortOrder,
+    ): List<UnTypedNode> =
+        getNodesFromOutShares(isAudio = true, lastHandle = lastHandle, order = order)
+
+    override suspend fun getVideoNodesFromOutShares(
+        lastHandle: Long,
+        order: SortOrder,
+    ): List<UnTypedNode> =
+        getNodesFromOutShares(isAudio = false, lastHandle = lastHandle, order = order)
+
+    /**
+     * Get media nodes from OutShares
+     *
+     * @param isAudio true is audio, false is video
+     * @param lastHandle the handle of last item
+     * @param order [SortOrder]
+     * @return media nodes
+     */
+    private suspend fun getNodesFromOutShares(
         isAudio: Boolean,
         lastHandle: Long,
         order: SortOrder,
