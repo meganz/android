@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
@@ -24,6 +25,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -178,4 +180,25 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorTransferEvents(): Flow<TransferEvent> =
         megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) }
+
+    override suspend fun cancelTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(Unit))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                }
+            )
+            megaApiGateway.cancelTransferByTag(
+                transferTag = transferTag,
+                listener = listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

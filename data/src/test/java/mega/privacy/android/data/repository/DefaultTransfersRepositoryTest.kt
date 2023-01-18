@@ -7,11 +7,14 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -25,7 +28,7 @@ import org.mockito.kotlin.whenever
  */
 @ExperimentalCoroutinesApi
 class DefaultTransfersRepositoryTest {
-    private lateinit var underTest: TransfersRepository
+    private lateinit var underTest: DefaultTransfersRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val databaseHandler = mock<DatabaseHandler>()
@@ -137,4 +140,48 @@ class DefaultTransfersRepositoryTest {
             assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferData::class.java)
         }
     }
+
+
+    @Test
+    fun `test that cancelTransferByTag returns success when MegaApi returns API_OK`() = runTest {
+        val transferTag = 1000
+
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        val megaRequest = mock<MegaRequest>()
+
+        whenever(megaApiGateway.cancelTransferByTag(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError,
+            )
+        }
+
+        underTest.cancelTransferByTag(transferTag)
+    }
+
+    @Test(expected = MegaException::class)
+    fun `test that cancelTransferByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
+        runTest {
+            val transferTag = 1000
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.cancelTransferByTag(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.cancelTransferByTag(transferTag)
+        }
 }
