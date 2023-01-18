@@ -35,6 +35,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -59,7 +60,6 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.ActionBackupListener
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
@@ -91,7 +91,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
@@ -100,7 +99,6 @@ import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import java.util.Locale
-import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -124,12 +122,6 @@ class FileBrowserFragment : RotatableFragment() {
     private val browserGridBinding: FragmentFilebrowsergridBinding
         get() = _browserGridBinding!!
 
-    /**
-     * SortOrderIntMapper
-     */
-    @Inject
-    lateinit var sortOrderIntMapper: SortOrderIntMapper
-
     private val managerViewModel by activityViewModels<ManagerViewModel>()
     private val fileBrowserViewModel by activityViewModels<FileBrowserViewModel>()
 
@@ -142,20 +134,17 @@ class FileBrowserFragment : RotatableFragment() {
     private lateinit var emptyTextView: LinearLayout
     private lateinit var emptyTextViewFirst: TextView
     private var adapter: MegaNodeAdapter? = null
-    private var lastPositionStack: Stack<Int>? = null
-
 
     private var density = 0f
     private var outMetrics: DisplayMetrics? = null
     private var display: Display? = null
     private var _nodes = mutableListOf<MegaNode?>()
     private var actionMode: ActionMode? = null
-    private var mLayoutManager: LinearLayoutManager? = null
+    private lateinit var mLayoutManager: LinearLayoutManager
     private var gridLayoutManager: CustomizedGridLayoutManager? = null
     private var downloadLocationDefaultPath: String? = null
     private var transferOverQuotaBanner: RelativeLayout? = null
     private var transferOverQuotaBannerText: TextView? = null
-    private var mediaHandle: Long = 0
 
     // Backup warning dialog
     private var backupWarningDialog: AlertDialog? = null
@@ -427,7 +416,6 @@ class FileBrowserFragment : RotatableFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         downloadLocationDefaultPath = FileUtil.getDownloadLocation()
-        lastPositionStack = Stack()
         super.onCreate(savedInstanceState)
         Timber.d("After onCreate called super")
     }
@@ -460,13 +448,16 @@ class FileBrowserFragment : RotatableFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
             EventObserver { showSortByPanel() })
 
-        fileBrowserViewModel.updateBrowserNodes.observe(viewLifecycleOwner,
-            EventObserver { nodes: List<MegaNode> ->
-                hideMultipleSelect()
-                setNodes(nodes.toMutableList())
-                recyclerView?.invalidate()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                fileBrowserViewModel.state.collect {
+                    hideMultipleSelect()
+                    setNodes(it.nodes.toMutableList())
+                    recyclerView?.invalidate()
+                }
             }
-        )
+        }
+
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
             .observe(this) { showMediaDiscovery() }
         Timber.d("Fragment ADDED")
@@ -493,7 +484,6 @@ class FileBrowserFragment : RotatableFragment() {
                 sortByHeaderViewModel
             )
         }
-        getNodes()
         (activity as? ManagerActivity)?.setToolbarTitle()
         (activity as? ManagerActivity)?.supportInvalidateOptionsMenu()
         val view = if (isList) {
@@ -502,7 +492,7 @@ class FileBrowserFragment : RotatableFragment() {
             recyclerView = browserListBinding.fileListViewBrowser
             fastScroller = browserListBinding.fastscroll
             mLayoutManager = LinearLayoutManager(context)
-            mLayoutManager?.orientation = LinearLayoutManager.VERTICAL
+            mLayoutManager.orientation = LinearLayoutManager.VERTICAL
             adapter?.let {
                 it.parentHandle = (requireActivity() as ManagerActivity).parentHandleBrowser
                 it.setListFragment(recyclerView)
@@ -535,14 +525,13 @@ class FileBrowserFragment : RotatableFragment() {
             emptyTextView = browserListBinding.fileListEmptyText
             emptyTextViewFirst = browserListBinding.fileListEmptyTextFirst
             adapter?.isMultipleSelect = false
-            setNodes(_nodes)
             if (adapter?.itemCount == 0) {
                 Timber.d("itemCount is 0")
                 recyclerView?.visibility = View.GONE
                 emptyImageView.visibility = View.VISIBLE
                 emptyTextView.visibility = View.VISIBLE
             } else {
-                Timber.d("itemCount is %s", adapter?.itemCount)
+                Timber.d("itemCount is ${adapter?.itemCount}")
                 recyclerView?.visibility = View.VISIBLE
                 emptyImageView.visibility = View.GONE
                 emptyTextView.visibility = View.GONE
@@ -594,7 +583,6 @@ class FileBrowserFragment : RotatableFragment() {
                 it.spanSizeLookup =
                     adapter?.getSpanSizeLookup(it.spanCount)
             }
-            setNodes(_nodes)
             if (adapter?.itemCount == 0) {
                 recyclerView?.visibility = View.GONE
                 emptyImageView.visibility = View.VISIBLE
@@ -655,10 +643,7 @@ class FileBrowserFragment : RotatableFragment() {
                     result: MoveRequestResult?,
                     handle: Long,
                 ) {
-                    Timber.d(
-                        "Nothing to do for actionType = %s",
-                        actionType
-                    )
+                    Timber.d("Nothing to do for actionType = $actionType")
                 }
             }
         )
@@ -682,30 +667,6 @@ class FileBrowserFragment : RotatableFragment() {
      * @return RecyclerView
      */
     fun getRecyclerView() = recyclerView
-
-    private fun getNodes() {
-        val parentHandleBrowser = fileBrowserViewModel.getSafeBrowserParentHandle()
-        if (parentHandleBrowser == -1L || parentHandleBrowser == megaApi.rootNode.handle) {
-            Timber.w("After consulting... the parent keeps -1 or ROOTNODE: %s", parentHandleBrowser)
-            _nodes = megaApi.getChildren(
-                megaApi.rootNode,
-                sortOrderIntMapper(managerViewModel.getOrder())
-            )
-            mediaHandle = megaApi.rootNode.handle
-        } else {
-            val parentNode = megaApi.getNodeByHandle(parentHandleBrowser)
-            _nodes =
-                megaApi.getChildren(parentNode, sortOrderIntMapper(managerViewModel.getOrder()))
-            mediaHandle = parentHandleBrowser
-        }
-    }
-
-    fun refreshNodes() {
-        adapter?.let {
-            getNodes()
-            it.setNodes(_nodes)
-        }
-    }
 
     /**
      * Opens file
@@ -830,10 +791,10 @@ class FileBrowserFragment : RotatableFragment() {
                     context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 activityManager.getMemoryInfo(mi)
                 if (mi.totalMem > Constants.BUFFER_COMP) {
-                    Timber.d("itemClick:total mem: %d allocate 32 MB", mi.totalMem)
+                    Timber.d("itemClick:total mem: ${mi.totalMem} allocate 32 MB")
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
                 } else {
-                    Timber.d("itemClick:total mem: %d allocate 16 MB", mi.totalMem)
+                    Timber.d("itemClick:total mem: ${mi.totalMem} allocate 16 MB")
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
                 }
                 val url = megaApi.httpServerGetLocalLink(node)
@@ -924,10 +885,10 @@ class FileBrowserFragment : RotatableFragment() {
                     requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 activityManager.getMemoryInfo(mi)
                 if (mi.totalMem > Constants.BUFFER_COMP) {
-                    Timber.d("Total mem: %d allocate 32 MB", mi.totalMem)
+                    Timber.d("Total mem: ${mi.totalMem} allocate 32 MB")
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB)
                 } else {
-                    Timber.d("Total mem: %d allocate 16 MB", mi.totalMem)
+                    Timber.d("Total mem: ${mi.totalMem} allocate 16 MB")
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB)
                 }
                 val url = megaApi.httpServerGetLocalLink(node)
@@ -1000,52 +961,47 @@ class FileBrowserFragment : RotatableFragment() {
      * @param position Position of item which is clicked
      */
     fun itemClick(position: Int) {
-        Timber.d("item click position: %s", position)
+        Timber.d("Position:$position")
         if (adapter?.isMultipleSelect == true) {
-            Timber.d("itemClick:multiselectON")
+            Timber.d("Multiselect ON")
             adapter?.toggleSelection(position)
+
             val selectedNodes = adapter?.selectedNodes
-            if (selectedNodes?.isNotEmpty() == true) {
+            if (selectedNodes.isNullOrEmpty().not()) {
                 updateActionModeTitle()
             }
         } else {
-            Timber.d("itemClick:multiselectOFF")
-            val clickedNode = _nodes.getOrNull(position)
-            if (clickedNode?.isFolder == true) {
-                mediaHandle = clickedNode.handle
-                fileBrowserViewModel.setBrowserParentHandle(clickedNode.handle)
-                val childNodes: List<MegaNode> = megaApi.getChildren(
-                    clickedNode,
-                    sortOrderIntMapper(managerViewModel.getOrder())
-                )
-                if (fileBrowserViewModel.shouldEnterMDMode(
-                        childNodes,
-                        mediaDiscoveryViewSettings
-                    )
-                ) {
-                    showMediaDiscovery()
-                } else {
-                    var lastFirstVisiblePosition: Int?
-                    if ((activity as? ManagerActivity)?.isList == true) {
-                        lastFirstVisiblePosition =
-                            mLayoutManager?.findFirstCompletelyVisibleItemPosition()
-                        Timber.d("lastFirstVisiblePosition: %s", lastFirstVisiblePosition)
+            adapter?.getItem(position)?.let { node ->
+                if (node.isFolder) {
+                    fileBrowserViewModel.setBrowserParentHandle(node.handle)
+                    if (fileBrowserViewModel.shouldEnterMDMode(
+                            mediaDiscoveryViewSettings
+                        )
+                    ) {
+                        showMediaDiscovery()
                     } else {
-                        lastFirstVisiblePosition =
-                            (recyclerView as NewGridRecyclerView?)?.findFirstCompletelyVisibleItemPosition()
-                        if (lastFirstVisiblePosition == -1) {
-                            Timber.d("Completely -1 then find just visible position")
-                            lastFirstVisiblePosition =
-                                (recyclerView as NewGridRecyclerView?)?.findFirstVisibleItemPosition()
-                        }
+                        val lastFirstVisiblePosition =
+                            if (isList) {
+                                mLayoutManager.findFirstCompletelyVisibleItemPosition()
+                            } else {
+                                val pos =
+                                    (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
+                                if (pos == -1) {
+                                    Timber.w("Completely -1 then find just visible position")
+                                    (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
+                                }
+                                pos
+                            }
+                        Timber.d("Push to stack $lastFirstVisiblePosition position")
+                        fileBrowserViewModel.onFolderItemClicked(
+                            lastFirstVisiblePosition,
+                            node.handle
+                        )
+                        setFolderInfoNavigation(node)
                     }
-                    Timber.d("Push to stack $lastFirstVisiblePosition position")
-                    lastFirstVisiblePosition?.let { lastPositionStack?.push(it) }
-                    setFolderInfoNavigation(clickedNode)
+                } else {
+                    openFile(node = node, position = position)
                 }
-            } else {
-                //Is file
-                _nodes[position]?.let { openFile(it, position) }
             }
         }
     }
@@ -1064,20 +1020,18 @@ class FileBrowserFragment : RotatableFragment() {
      */
     @Suppress("DEPRECATION")
     fun setFolderInfoNavigation(n: MegaNode?) {
-        (requireActivity() as ManagerActivity).supportInvalidateOptionsMenu()
         (requireActivity() as ManagerActivity).setToolbarTitle()
-        adapter?.parentHandle = fileBrowserViewModel.getSafeBrowserParentHandle()
-        _nodes = megaApi.getChildren(n, sortOrderIntMapper(managerViewModel.getOrder()))
-        adapter?.setNodes(_nodes)
-        recyclerView?.scrollToPosition(0)
-        visibilityFastScroller()
+        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
+
+        adapter?.parentHandle = fileBrowserViewModel.state.value.fileBrowserHandle
 
         //If folder has no files
         checkAndConfigureAdapter(
-            n?.handle,
+            handle = n?.handle,
             colorPrimary = R.color.grey_900_grey_100,
             colorSecondary = R.color.grey_300_grey_600
         )
+        checkScroll()
     }
 
     /**
@@ -1259,54 +1213,32 @@ class FileBrowserFragment : RotatableFragment() {
         Timber.d("onBackPressed")
         adapter?.let {
 
-            Timber.d("Parent Handle is: %s", fileBrowserViewModel.getSafeBrowserParentHandle())
+            Timber.d("Parent Handle is: ${fileBrowserViewModel.getSafeBrowserParentHandle()}")
             val managerActivity = requireActivity() as ManagerActivity
             return if (managerActivity.comesFromNotifications && managerActivity.comesFromNotificationHandle == fileBrowserViewModel.getSafeBrowserParentHandle()) {
-                managerActivity.comesFromNotifications = false
-                managerActivity.comesFromNotificationHandle = -1
-                managerActivity.selectDrawerItem(DrawerItem.NOTIFICATIONS)
-                fileBrowserViewModel.setBrowserParentHandle(managerActivity.comesFromNotificationHandleSaved)
-                managerActivity.comesFromNotificationHandleSaved = -1
-                managerActivity.refreshCloudDrive()
+                managerActivity.restoreFileBrowserAfterComingFromNotification()
                 2
             } else {
-                val parentNode = megaApi.getParentNode(
-                    megaApi.getNodeByHandle(
-                        fileBrowserViewModel.getSafeBrowserParentHandle()
-                    )
-                )
-                if (parentNode != null) {
-                    mediaHandle = parentNode.handle
+                fileBrowserViewModel.state.value.parentHandle?.let {
+                    fileBrowserViewModel.onBackPressed()
                     recyclerView?.visibility = View.VISIBLE
                     emptyImageView.visibility = View.GONE
                     emptyTextView.visibility = View.GONE
-                    fileBrowserViewModel.setBrowserParentHandle(parentNode.handle)
                     managerActivity.supportInvalidateOptionsMenu()
                     managerActivity.setToolbarTitle()
-                    _nodes = megaApi.getChildren(
-                        parentNode,
-                        sortOrderIntMapper(managerViewModel.getOrder())
-                    )
-                    it.setNodes(_nodes)
-                    visibilityFastScroller()
-                    var lastVisiblePosition = 0
-                    lastPositionStack?.takeIf { lastPosition -> lastPosition.isNotEmpty() }?.pop()
-                        ?.let { position ->
-                            lastVisiblePosition = position
-                            Timber.d("Pop of the stack $lastVisiblePosition position")
-                        }
-                    Timber.d("Scroll to %d position", lastVisiblePosition)
+
+                    val lastVisiblePosition = fileBrowserViewModel.popLastPositionStack()
+                    Timber.d("Scroll to $lastVisiblePosition position")
                     if (lastVisiblePosition >= 0) {
-                        if (managerActivity.isList) {
-                            mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        if (isList) {
+                            mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                         } else {
                             gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
                         }
                     }
                     Timber.d("return 2")
                     2
-                } else {
-                    Timber.w("ParentNode is NULL")
+                } ?: run {
                     0
                 }
             }
@@ -1319,7 +1251,7 @@ class FileBrowserFragment : RotatableFragment() {
      */
     fun scrollToFirstPosition() {
         if (isList) {
-            mLayoutManager?.scrollToPositionWithOffset(0, 0)
+            mLayoutManager.scrollToPositionWithOffset(0, 0)
         } else {
             gridLayoutManager?.scrollToPositionWithOffset(0, 0)
         }
@@ -1330,7 +1262,7 @@ class FileBrowserFragment : RotatableFragment() {
      * @param nodes List of Mega Nodes
      */
     @Suppress("DEPRECATION")
-    fun setNodes(nodes: MutableList<MegaNode?>) {
+    private fun setNodes(nodes: MutableList<MegaNode?>) {
         Timber.d("Nodes size: ${nodes.size}")
         visibilityFastScroller()
         this._nodes = nodes
@@ -1503,7 +1435,8 @@ class FileBrowserFragment : RotatableFragment() {
     private fun showMediaDiscovery() {
         activity?.lifecycleScope?.launch {
             (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(
-                MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle
+                MediaDiscoveryFragment.getNewInstance(fileBrowserViewModel.state.value.mediaHandle),
+                fileBrowserViewModel.state.value.mediaHandle
             )
         }
     }

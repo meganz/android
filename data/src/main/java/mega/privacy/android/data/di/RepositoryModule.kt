@@ -198,6 +198,7 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindCallRepository(repository: DefaultCallRepository): CallRepository
 
+    @ExperimentalContracts
     @Binds
     abstract fun bindQRCodeRepository(repository: DefaultQRCodeRepository): QRCodeRepository
 

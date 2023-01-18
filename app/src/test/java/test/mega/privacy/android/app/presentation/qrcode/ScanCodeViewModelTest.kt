@@ -11,15 +11,18 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
+import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class ScanCodeViewModelTest {
 
     private lateinit var underTest: ScanCodeViewModel
+    private val queryScannedContactLink = mock<QueryScannedContactLink>()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -31,7 +34,7 @@ class ScanCodeViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = ScanCodeViewModel()
+        underTest = ScanCodeViewModel(queryScannedContactLink)
     }
 
     @Test

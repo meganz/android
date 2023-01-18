@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.qrcode.scan
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -37,9 +39,6 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import java.util.Locale
@@ -68,7 +67,6 @@ class ScanCodeFragment : Fragment() {
     private val viewModel: ScanCodeViewModel by activityViewModels()
 
     private var handler: Handler? = null
-    private var userQuery: MegaUser? = null
 
     @MegaApi
     @Inject
@@ -134,7 +132,12 @@ class ScanCodeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
-                    if (it.showInviteResultDialog) {
+                    if (it.finishActivity) {
+                        val intent = Intent()
+                        intent.putExtra("mail", it.myEmail)
+                        requireActivity().setResult(Activity.RESULT_OK, intent)
+                        requireActivity().finish()
+                    } else if (it.showInviteResultDialog) {
                         showInviteResultDialog(
                             it.dialogTitleContent,
                             it.dialogTextContent,
@@ -275,10 +278,7 @@ class ScanCodeFragment : Fragment() {
             binding.invalidCodeText.visibility = View.VISIBLE
         } else {
             binding.invalidCodeText.visibility = View.GONE
-
-            val handle = MegaApiAndroid.base64ToHandle(s[1].trim { it <= ' ' })
-            Timber.d("Contact link: $contactLink s[1]: ${s[1]} handle: $handle")
-            megaApi.contactLinkQuery(handle, activity as QRCodeActivity?)
+            viewModel.queryContactLink(s[1])
         }
     }
 
@@ -364,8 +364,9 @@ class ScanCodeFragment : Fragment() {
         val c = Canvas(defaultAvatar)
         val p = Paint()
         p.isAntiAlias = true
-        if (state().isContact && userQuery != null) {
-            val color = megaApi.getUserAvatarColor(userQuery)
+        if (state().isContact) {
+            val color =
+                megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(state().handleContactLink))
             if (color != null) {
                 Timber.d("The color to set the avatar is $color")
                 p.color = Color.parseColor(color)
@@ -473,7 +474,10 @@ class ScanCodeFragment : Fragment() {
 
                 if (isContact) {
                     acceptContactMail.text =
-                        getString(R.string.context_contact_already_exists, myEmail)
+                        requireContext().getFormattedStringOrDefault(
+                            R.string.context_contact_already_exists,
+                            myEmail
+                        )
                     acceptContactInvite.visibility = View.GONE
                     viewContact.visibility = View.VISIBLE
                 } else {
@@ -487,61 +491,6 @@ class ScanCodeFragment : Fragment() {
             }
         }
         inviteAlertDialog?.show()
-    }
-
-    private fun queryIfIsContact(): MegaUser? {
-        val contacts = megaApi.contacts
-        for (i in contacts.indices) {
-            if (contacts[i].visibility == MegaUser.VISIBILITY_VISIBLE) {
-                Timber.d("Contact mail[i]=$i:${contacts[i].email} contact mail request: ${state().myEmail}")
-                if (contacts[i].email == state().myEmail) {
-                    return contacts[i]
-                }
-            }
-        }
-        return null
-    }
-
-    /**
-     * Show appropriate dialog based on request type
-     *
-     * @param request   object containing information of the sdk request
-     * @param e         error object of the sdk request
-     */
-    fun initDialogInvite(request: MegaRequest, e: MegaError) {
-        viewModel.updateMyEmail(request.email)
-        when (e.errorCode) {
-            MegaError.API_OK -> {
-                Timber.d(
-                    "Contact link query ${request.nodeHandle}_${
-                        MegaApiAndroid.handleToBase64(request.nodeHandle)
-                    }_${request.email}_${request.name}_${request.text}"
-                )
-                userQuery = queryIfIsContact()
-                viewModel.showInviteDialog(
-                    request.name + " " + request.text,
-                    request.email,
-                    userQuery != null,
-                    request.nodeHandle
-                )
-            }
-            MegaError.API_EEXIST -> {
-                viewModel.showInviteResultDialog(
-                    R.string.invite_not_sent,
-                    R.string.invite_not_sent_text_already_contact,
-                    success = true,
-                    printEmail = true
-                )
-            }
-            else -> {
-                viewModel.showInviteResultDialog(
-                    R.string.invite_not_sent,
-                    R.string.invite_not_sent_text,
-                    success = false,
-                    printEmail = false
-                )
-            }
-        }
     }
 
     companion object {

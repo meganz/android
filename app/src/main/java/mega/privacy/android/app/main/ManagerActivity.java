@@ -768,6 +768,8 @@ public class ManagerActivity extends TransfersManagementActivity
     int bottomNavigationCurrentItem = -1;
     View chatBadge;
     View callBadge;
+    View pendingActionsBadge;
+    BottomNavigationItemView sharedItemsView;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -1024,15 +1026,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-            MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-
-            ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-                            ? parentNode
-                            : megaApi.getRootNode(),
-                    SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-
-            fileBrowserFragment.setNodes(nodes);
-            fileBrowserFragment.getRecyclerView().invalidate();
+            fileBrowserViewModel.refreshNodes();
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
             refreshIncomingShares();
         }
@@ -4504,7 +4498,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
                 if (getIntent() != null && getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
-                    fileBrowserFragment.refreshNodes();
+                    fileBrowserViewModel.refreshNodes();
                 }
                 Timber.d("END for Cloud Drive");
                 break;
@@ -7468,21 +7462,10 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaNode parentNode = rootNode;
 
         if (isCloudAdded()) {
-            ArrayList<MegaNode> nodes;
-            if (fileBrowserState(ManagerActivity.this).getFileBrowserHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            } else {
-                parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-                if (parentNode == null) return;
-
-                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            }
-            Timber.d("Nodes: %s", nodes.size());
+            fileBrowserViewModel.refreshNodes();
             if (comesFromNotificationChildNodeHandleList == null) {
                 fileBrowserFragment.hideMultipleSelect();
             }
-            fileBrowserFragment.setNodes(nodes);
-            fileBrowserFragment.getRecyclerView().invalidate();
         }
     }
 
@@ -7761,7 +7744,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (isCloudAdded()) {
                             String handle = node.getHandle();
                             if (handle != null && !handle.equals("")) {
-                                fileBrowserFragment.refresh(Long.parseLong(handle));
+                                fileBrowserViewModel.setBrowserParentHandle(Long.parseLong(handle));
                             }
                         }
 
@@ -8062,16 +8045,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                fileBrowserViewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-
-                ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-                                ? parentNode
-                                : megaApi.getRootNode(),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-
-                fileBrowserFragment.setNodes(nodes);
-                fileBrowserFragment.getRecyclerView().invalidate();
+                fileBrowserViewModel.refreshNodes();
             } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
                 refreshIncomingShares();
             }
@@ -8118,15 +8092,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
                 if (parentNode != null) {
                     if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
-                    }
-                } else {
-                    if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
+                        fileBrowserViewModel.refreshNodes();
                     }
                 }
             } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -8218,7 +8184,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (requestCode == REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK) {
             if (isCloudAdded()) {
                 long handle = intent.getLongExtra(NODE_HANDLE, -1);
-                fileBrowserFragment.refresh(handle);
+                fileBrowserViewModel.setBrowserParentHandle(handle);
             }
 
             onNodesSharedUpdate();
@@ -8294,10 +8260,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle()),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-                fileBrowserFragment.setNodes(nodes);
-                fileBrowserFragment.getRecyclerView().invalidate();
+                fileBrowserViewModel.refreshNodes();
             }
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             refreshRubbishBin();
@@ -11198,6 +11161,17 @@ public class ManagerActivity extends TransfersManagementActivity
         comesFromNotificationHandleSaved = -1;
     }
 
+    /**
+     * Restores the FileBrowser section after opening it from a notification in the Notifications section.
+     */
+    public void restoreFileBrowserAfterComingFromNotification() {
+        comesFromNotifications = false;
+        comesFromNotificationHandle = -1;
+        selectDrawerItem(DrawerItem.NOTIFICATIONS);
+        fileBrowserViewModel.setBrowserParentHandle(comesFromNotificationHandleSaved);
+        comesFromNotificationHandleSaved = -1;
+        refreshCloudDrive();
+    }
     /**
      * Updates Inbox section visibility depending on if it has children.
      *

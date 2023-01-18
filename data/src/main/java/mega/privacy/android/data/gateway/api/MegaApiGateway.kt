@@ -1382,6 +1382,14 @@ interface MegaApiGateway {
     fun isUserLoggedIn(): Int
 
     /**
+     * Get contact details
+     *
+     * @param handle Handle of the contact
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
+
+    /**
      * Function to get unverified incoming shares from [MegaApi]
      *
      * @param order : Sort order

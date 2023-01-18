@@ -3,10 +3,10 @@ package test.mega.privacy.android.app.presentation.clouddrive
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.jraska.livedata.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -15,16 +15,18 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
-import java.util.concurrent.TimeUnit
+import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
 class FileBrowserViewModelTest {
@@ -32,8 +34,13 @@ class FileBrowserViewModelTest {
 
     private val getRootFolder = mock<GetRootFolder>()
     private val getBrowserChildrenNode = mock<GetBrowserChildrenNode>()
-    private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView>()
+    private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
+        on { invoke() }.thenReturn(
+            emptyFlow()
+        )
+    }
     private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -50,6 +57,7 @@ class FileBrowserViewModelTest {
             getBrowserChildrenNode = getBrowserChildrenNode,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             monitorNodeUpdates = monitorNodeUpdates,
+            getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle
         )
     }
 
@@ -90,32 +98,92 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that browser node updates live data is set when node updates triggered from use case`() =
+    fun `test that on setting Browser Parent Handle, handle File Browser node returns some items in list`() =
         runTest {
-            whenever(getBrowserChildrenNode(any())).thenReturn(listOf(mock(), mock()))
-
-            runCatching {
-                val result =
-                    underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                monitorNodeUpdates.emit(listOf(mock()))
-                result
-            }.onSuccess { result ->
-                result.assertValue { it.getContentIfNotHandled()?.size == 2 }
-            }
+            val newValue = 123456789L
+            whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
+                listOf(mock(), mock())
+            )
+            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            underTest.setBrowserParentHandle(newValue)
+            assertThat(underTest.state.value.nodes.size).isEqualTo(2)
         }
 
     @Test
-    fun `test that browser node updates live data is not set when get browser node returns a null list`() =
+    fun `test that on setting Browser Parent Handle, handle File Browser node returns null`() =
         runTest {
-            whenever(getBrowserChildrenNode(any())).thenReturn(null)
+            val newValue = 123456789L
+            whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(null)
+            underTest.setBrowserParentHandle(newValue)
+            assertThat(underTest.state.value.nodes.size).isEqualTo(0)
+            verify(getBrowserChildrenNode, times(1)).invoke(newValue)
+        }
 
-            runCatching {
-                val result =
-                    underTest.updateBrowserNodes.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                monitorNodeUpdates.emit(listOf(mock()))
-                result
-            }.onSuccess { result ->
-                result.assertNoValue()
-            }
+    @Test
+    fun `test that when nodes are empty then Enter in MD mode will return false`() = runTest {
+        val newValue = 123456789L
+        whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(null)
+        underTest.setBrowserParentHandle(newValue)
+
+        val shouldEnter =
+            underTest.shouldEnterMDMode(MediaDiscoveryViewSettings.INITIAL.ordinal)
+        assertFalse(shouldEnter)
+    }
+
+    @Test
+    fun `test that when MediaDiscoveryViewSettings is Disabled then Enter in MD mode will return false`() =
+        runTest {
+            val newValue = 123456789L
+            whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
+                listOf(mock(), mock())
+            )
+            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            underTest.setBrowserParentHandle(newValue)
+
+            val shouldEnter =
+                underTest.shouldEnterMDMode(
+                    MediaDiscoveryViewSettings.DISABLED.ordinal
+                )
+            assertFalse(shouldEnter)
+        }
+
+    @Test
+    fun `test that when folder is clicked from adapter, then stack gets updated with appropriate value`() =
+        runTest {
+            val lastFirstVisiblePosition = 123456
+            val newValue = 12345L
+
+            val thenReturn = whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
+                listOf(mock(), mock())
+            )
+            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            underTest.setBrowserParentHandle(newValue)
+
+            underTest.onFolderItemClicked(lastFirstVisiblePosition, newValue)
+            assertThat(underTest.popLastPositionStack()).isEqualTo(lastFirstVisiblePosition)
+        }
+
+    @Test
+    fun `test that last position returns 0 when items are popped from stack and stack has no items`() {
+        val poppedValue = underTest.popLastPositionStack()
+        assertThat(poppedValue).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that when handle on back pressed and parent handle is null, then getRubbishBinChildrenNode is not invoked`() =
+        runTest {
+            val newValue = 123456789L
+            underTest.onBackPressed()
+            verify(getBrowserChildrenNode, times(0)).invoke(newValue)
+        }
+
+    @Test
+    fun `test that when handle on back pressed and parent handle is not null, then getBrowserChildrenNode is invoked once`() =
+        runTest {
+            val newValue = 123456789L
+            // to update handles rubbishBinHandle
+            underTest.setBrowserParentHandle(newValue)
+            underTest.onBackPressed()
+            verify(getBrowserChildrenNode, times(1)).invoke(newValue)
         }
 }

@@ -97,6 +97,9 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.GetInboxNode
 import mega.privacy.android.domain.usecase.GetLocalFilePath
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
@@ -110,6 +113,9 @@ import mega.privacy.android.domain.usecase.GetRubbishNode
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -170,8 +176,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getRootNodeFromMegaApiFolder: GetRootNodeFromMegaApiFolder,
     private val getRubbishNode: GetRubbishNode,
     private val getUnTypedNodeByHandle: GetUnTypedNodeByHandle,
-    private val addNodeType: AddNodeType,
+    private val getAudioNodesFromPublicLinks: GetAudioNodesFromPublicLinks,
+    private val getVideoNodesFromPublicLinks: GetVideoNodesFromPublicLinks,
+    private val getAudioNodesFromInShares: GetAudioNodesFromInShares,
+    private val getVideoNodesFromInShares: GetVideoNodesFromInShares,
+    private val getAudioNodesFromOutShares: GetAudioNodesFromOutShares,
+    private val getVideoNodesFromOutShares: GetVideoNodesFromOutShares,
     private val fileDurationMapper: FileDurationMapper,
+    private val addNodeType: AddNodeType,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -370,11 +382,10 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (isInRootLinksLevel(type, parentHandle)) {
                             playlistTitle.postValue(getString(R.string.tab_links_shares))
                             buildPlaySourcesByTypedNodes(type = type,
-                                typedNodes = mediaPlayerRepository.getNodesFromPublicLinks(
-                                    isAudio = isAudioPlayer,
-                                    order = order
-                                ).map {
-                                    addNodeType(it)
+                                typedNodes = if (isAudioPlayer) {
+                                    getAudioNodesFromPublicLinks(order)
+                                } else {
+                                    getVideoNodesFromPublicLinks(order)
                                 },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
@@ -383,11 +394,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                             playlistTitle.postValue(getString(R.string.tab_incoming_shares))
                             buildPlaySourcesByTypedNodes(type = type,
-                                typedNodes = mediaPlayerRepository.getNodesFromPublicLinks(
-                                    isAudio = isAudioPlayer,
-                                    order = order
-                                ).map {
-                                    addNodeType(it)
+                                typedNodes =
+                                if (isAudioPlayer) {
+                                    getAudioNodesFromInShares(order)
+                                } else {
+                                    getVideoNodesFromInShares(order)
                                 },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
@@ -396,12 +407,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                             playlistTitle.postValue(getString(R.string.tab_outgoing_shares))
                             buildPlaySourcesByTypedNodes(type = type,
-                                typedNodes = mediaPlayerRepository.getNodesFromOutShares(
-                                    isAudio = isAudioPlayer,
-                                    lastHandle = INVALID_HANDLE,
-                                    order = order
-                                ).map {
-                                    addNodeType(it)
+                                typedNodes = if (isAudioPlayer) {
+                                    getAudioNodesFromOutShares(lastHandle = INVALID_HANDLE,
+                                        order = order)
+                                } else {
+                                    getVideoNodesFromOutShares(lastHandle = INVALID_HANDLE,
+                                        order = order)
                                 },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
