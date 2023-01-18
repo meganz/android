@@ -25,7 +25,7 @@ DO_CLEANUP = true
  * Folder to contain build outputs, including APK, AAG and symbol files
  */
 ARCHIVE_FOLDER = "archive"
-NATIVE_SYMBOL_FILE = "symbols.zip"
+NATIVE_SYMBOLS_FILE = "symbols.zip"
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
 /**
@@ -150,9 +150,26 @@ pipeline {
                 }
             }
         }
+        stage('Fetch native symbols') {
+            when {
+                expression { triggeredByDeliverAppStore() }
+            }
+            steps {
+                script {
+                    withCredentials([
+                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                    ]) {
+                        BUILD_STEP = 'Fetch native symbols'
+
+                        common.downloadAndExtractNativeSymbols()
+                    }
+                }
+            }
+        }
         stage('Fetch SDK Submodules') {
             when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
+                expression { triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -164,7 +181,7 @@ pipeline {
         }
         stage('Select SDK Version') {
             when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
+                expression { triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -189,7 +206,7 @@ pipeline {
         }
         stage('Download Dependency Lib for SDK') {
             when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
+                expression { triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -204,6 +221,16 @@ pipeline {
                         pwd
                         ls -lh
                     """
+                }
+            }
+        }
+        stage('Apply Google Map API Key') {
+            when {
+                expression { triggeredByDeliverAppStore() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Apply Google Map API Key'
                 }
 
                 withCredentials([
@@ -222,7 +249,7 @@ pipeline {
         }
         stage('Build SDK') {
             when {
-                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
+                expression { triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -279,6 +306,20 @@ pipeline {
                 }
             }
         }
+        stage('Upload Firebase Crashlytics symbol files') {
+            when {
+                expression { triggeredByUploadSymbol() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
+                    sh """
+                    cd $WORKSPACE
+                    ./gradlew app:uploadCrashlyticsSymbolFileGmsRelease
+                    """
+                }
+            }
+        }
         stage('Build GMS AAB') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -318,51 +359,6 @@ pipeline {
                 }
             }
         }
-        stage('Upload Firebase Crashlytics symbol files') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
-                    sh """
-                    cd $WORKSPACE
-                    ./gradlew clean app:assembleGmsRelease app:uploadCrashlyticsSymbolFileGmsRelease
-                    """
-                }
-            }
-        }
-        stage('Collect native symbol files') {
-            when {
-                expression { triggeredByDeliverAppStore() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Collect native symbol files'
-
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/arm64-v8a",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/armeabi-v7a/",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/x86",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/x86_64",
-                            "libmega.so")
-
-                    sh """
-                        cd ${WORKSPACE}/sdk/src/main/obj/local
-                        rm -fv */.DS_Store
-                        rm -fv .DS_Store
-                        zip -r ${NATIVE_SYMBOL_FILE} .
-                        mv -v ${NATIVE_SYMBOL_FILE} ${WORKSPACE}/${ARCHIVE_FOLDER}
-                    """
-                }
-            }
-        }
         stage('Archive files') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -398,11 +394,6 @@ pipeline {
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
                                 done
                                 
-                                echo Uploading native symbol file
-                                for FILE in *.zip; do
-                                    curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
-                                done
-                                
                                 echo Uploading documentation
                                 for FILE in *.txt; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
@@ -414,6 +405,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to Google Play Alpha') {
             when {
                 expression { triggeredByDeliverAppStore() }
@@ -425,14 +417,14 @@ pipeline {
                 script {
                     // Get the formatted release notes
                     String release_notes = common.releaseNotes(RELEASE_NOTES)
-                    
+
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
                             rolloutPercentage: '0',
                             additionalVersionCodes: '476,487',
-                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
+                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(release_notes),
                             releaseName: common.readAppVersion1()
                 }

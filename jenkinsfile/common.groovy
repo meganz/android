@@ -362,8 +362,7 @@ def createBriefBuildInfoFile() {
 Version: v${readAppVersion1()}
 Upload Time: ${new Date().toString()}
 Android: branch(${env.gitlabSourceBranch}) - commit(${appCommitId()})
-SDK: branch(${sdkBranchName()}) - commit(${sdkCommitId()})
-Karere: branch(${megaChatBranchName()}) - commit(${megaChatSdkCommitId()})
+SDK version: ${readPrebuiltSdkVersion()}
 """
     sh "rm -fv ${ARTIFACTORY_BUILD_INFO}"
     sh "echo \"${content}\" >> ${WORKSPACE}/${ARCHIVE_FOLDER}/${ARTIFACTORY_BUILD_INFO}"
@@ -576,6 +575,18 @@ String getValueInMRDescriptionBy(String key) {
         }
     }
     return null
+}
+
+void downloadAndExtractNativeSymbols() {
+    String nativeSymbolLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/native-symbol/${readPrebuiltSdkVersion()}.zip"
+    String targetObjLocalLocation = "sdk/src/main/obj/local"
+    sh """
+        cd ${WORKSPACE}
+        curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} ${nativeSymbolLocation}
+        rm -frv ${targetObjLocalLocation}
+        mkdir -p ${targetObjLocalLocation}
+        unzip ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} -d ${targetObjLocalLocation}
+    """
 }
 
 

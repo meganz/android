@@ -76,7 +76,7 @@ ext {
     buildToolsVerion = '31.0.0'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20230111.044949-rel'
+    megaSdkVersion = '20230117.025136-rel'
 
     // App dependencies
     accompanistLayoutVersion = '0.24.13-rc'

@@ -4,12 +4,6 @@
 
 BUILD_STEP = ''
 
-// Below values will be read from MR description and are used to decide SDK versions
-SDK_BRANCH = 'develop'
-MEGACHAT_BRANCH = 'develop'
-SDK_TAG = ""
-MEGACHAT_TAG = ""
-
 /**
  * Flag to decide whether we do clean before build SDK.
  * Possible values: yes|no
@@ -25,7 +19,7 @@ DO_CLEANUP = true
  * Folder to contain build outputs, including APK, AAG and symbol files
  */
 ARCHIVE_FOLDER = "archive"
-NATIVE_SYMBOL_FILE = "symbols.zip"
+NATIVE_SYMBOLS_FILE = "symbols.zip"
 ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
 
 /**
@@ -98,54 +92,31 @@ pipeline {
 
                     REBUILD_SDK = common.getValueInMRDescriptionBy("REBUILD_SDK")
 
-                    sh("rm -frv $ARCHIVE_FOLDER")
+                    sh("rm -frv ${WORKSPACE}/$ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
                     sh('set')
                 }
             }
         }
-        stage('Fetch SDK Submodules') {
+        stage('Fetch native symbols') {
             steps {
                 script {
-                    BUILD_STEP = 'Fetch SDK Submodules'
+                    withCredentials([
+                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                    ]) {
+                        BUILD_STEP = 'Fetch native symbols'
 
-                    common.fetchSdkSubmodules()
-                }
-            }
-        }
-        stage('Select SDK Version') {
-            steps {
-                script {
-                    BUILD_STEP = 'Select SDK Version'
-                }
-                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    script {
-                        def prebuiltSdkVersion = common.readPrebuiltSdkVersion()
-
-                        def sdkCommit = common.queryPrebuiltSdkProperty("sdk-commit", prebuiltSdkVersion)
-                        common.checkoutSdkByCommit(sdkCommit)
-
-                        def megaChatCommit = common.queryPrebuiltSdkProperty("chat-commit", prebuiltSdkVersion)
-                        common.checkoutMegaChatSdkByCommit(megaChatCommit)
+                        common.downloadAndExtractNativeSymbols()
                     }
                 }
             }
         }
-        stage('Download Dependency Lib for SDK') {
+        stage('Apply Google Map API Key') {
             steps {
                 script {
-                    BUILD_STEP = 'Download Dependency Lib for SDK'
-                    sh """
-
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
-
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        pwd
-                        ls -lh
-                    """
+                    BUILD_STEP = 'Apply Google Map API Key'
                 }
 
                 withCredentials([
@@ -159,21 +130,6 @@ pipeline {
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
-                }
-            }
-        }
-        stage('Build SDK') {
-            steps {
-                script {
-                    BUILD_STEP = 'Build SDK'
-
-                    common.cleanSdk()
-
-                    sh """
-                        echo "=== START SDK BUILD===="
-                        cd ${WORKSPACE}/sdk/src/main/jni
-                        bash build.sh all
-                    """
                 }
             }
         }
@@ -246,6 +202,17 @@ pipeline {
                 }
             }
         }
+        stage('Upload Firebase Crashlytics symbol files') {
+            steps {
+                script {
+                    BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
+                    sh """
+                    cd $WORKSPACE
+                    ./gradlew app:uploadCrashlyticsSymbolFileGmsRelease
+                    """
+                }
+            }
+        }
         stage('Build QA APK(GMS)') {
             steps {
                 script {
@@ -310,45 +277,6 @@ pipeline {
                 }
             }
         }
-        stage('Upload Firebase Crashlytics symbol files') {
-            steps {
-                script {
-                    BUILD_STEP = 'Upload Firebase Crashlytics symbol files'
-                    sh """
-                    cd $WORKSPACE
-                    ./gradlew clean app:assembleGmsRelease app:uploadCrashlyticsSymbolFileGmsRelease
-                    """
-                }
-            }
-        }
-        stage('Collect native symbol files') {
-            steps {
-                script {
-                    BUILD_STEP = 'Collect native symbol files'
-
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/arm64-v8a",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/armeabi-v7a/",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/x86",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/x86_64",
-                            "libmega.so")
-
-                    sh """
-                        cd ${WORKSPACE}/sdk/src/main/obj/local
-                        rm -fv */.DS_Store
-                        rm -fv .DS_Store
-                        zip -r ${NATIVE_SYMBOL_FILE} .
-                        mv -v ${NATIVE_SYMBOL_FILE} ${WORKSPACE}/${ARCHIVE_FOLDER}
-                    """
-                }
-            }
-        }
         stage('Archive files') {
             steps {
                 script {
@@ -381,11 +309,6 @@ pipeline {
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
                                 done
                                 
-                                echo Uploading native symbol file
-                                for FILE in *.zip; do
-                                    curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
-                                done
-                                
                                 echo Uploading documentation
                                 for FILE in *.txt; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
@@ -412,7 +335,7 @@ pipeline {
                             trackName: 'internal',
                             rolloutPercentage: '100',
                             additionalVersionCodes: '476,487',
-                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOL_FILE}",
+                            nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(release_notes),
                             releaseName: common.readAppVersion1()
                 }
@@ -448,54 +371,6 @@ private String releaseSuccessMessage(String lineBreak, Object common) {
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}"
-}
-
-/**
- * Generate a message with all key release information. This message can be posted to MR and then
- * directly published by Release Process.
- * @param common The common functions loaded from common.groovy
- * @return the composed message
- */
-private String getBuildVersionInfo(Object common) {
-
-    String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/internal/${common.artifactoryUploadPath()}"
-    String artifactVersion = common.readAppVersion2()
-
-    String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
-    String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
-
-    String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + common.appCommitId()
-    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.sdkCommitId()
-    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.megaChatSdkCommitId()
-
-    String appBranch = env.gitlabSourceBranch
-
-    def message = """
-    Version: ${common.readAppVersion1()} <br/>
-    App Bundles and APKs: <br/>
-       - Google (GMS):  [AAB](${gmsAabUrl}) | [APK](${gmsApkUrl}) <br/>
-    Build info: <br/>
-       - [Android commit](${appCommitLink}) (`${appBranch}`) <br/>
-       - [SDK commit](${sdkCommitLink}) (`${common.sdkBranchName()}`) <br/>
-       - [Karere commit](${chatCommitLink}) (`${common.megaChatBranchName()}`) <br/>
-    """
-    return message
-}
-
-/**
- * upload file to GitLab and return the GitLab link
- * @param fileName the local file to be uploaded
- * @return file link on GitLab
- */
-private String uploadFileToGitLab(String fileName) {
-    String link = ""
-    withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-        // upload Jenkins console log to GitLab and get download link
-        final String response = sh(script: "curl -s --request POST --header PRIVATE-TOKEN:$TOKEN --form file=@${fileName} ${env.GITLAB_BASE_URL}/api/v4/projects/199/uploads", returnStdout: true).trim()
-        link = new groovy.json.JsonSlurperClassic().parseText(response).markdown
-        return link
-    }
-    return link
 }
 
 /**

@@ -23,6 +23,12 @@ DOMAIN_COVERAGE = ""
 DATA_COVERAGE = ""
 
 /**
+ * Folder to contain build outputs, including APK, AAG and symbol files
+ */
+ARCHIVE_FOLDER = "archive"
+NATIVE_SYMBOLS_FILE = "symbols.zip"
+
+/**
  * GitLab commands that can trigger this job.
  */
 DELIVER_QA_CMD = "deliver_qa"
@@ -157,6 +163,8 @@ pipeline {
                     checkSDKVersion()
                     REBUILD_SDK = getValueInMRDescriptionBy("REBUILD_SDK")
 
+                    sh("rm -frv $ARCHIVE_FOLDER")
+                    sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
                     sh("rm -fv ${LOG_FILE}")  // sdk log file
                     sh('set')
@@ -257,7 +265,7 @@ pipeline {
                                 cd ${WORKSPACE}/sdk/src/main/jni
                                 echo CLEANING SDK
                                 bash build.sh clean
-                            
+
                                 echo "=== START SDK BUILD===="
                                 bash build.sh all
                             """
@@ -266,6 +274,39 @@ pipeline {
 
             }
         }
+
+        stage('Collect native symbol files') {
+            when {
+                expression { triggerByPublishSdkCmd() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Collect native symbol files'
+
+                    common.deleteAllFilesExcept(
+                            "${WORKSPACE}/sdk/src/main/obj/local/arm64-v8a",
+                            "libmega.so")
+                    common.deleteAllFilesExcept(
+                            "${WORKSPACE}/sdk/src/main/obj/local/armeabi-v7a/",
+                            "libmega.so")
+                    common.deleteAllFilesExcept(
+                            "${WORKSPACE}/sdk/src/main/obj/local/x86",
+                            "libmega.so")
+                    common.deleteAllFilesExcept(
+                            "${WORKSPACE}/sdk/src/main/obj/local/x86_64",
+                            "libmega.so")
+
+                    sh """
+                        cd ${WORKSPACE}/sdk/src/main/obj/local
+                        rm -fv */.DS_Store
+                        rm -fv .DS_Store
+                        zip -r ${NATIVE_SYMBOLS_FILE} .
+                        mv -v ${NATIVE_SYMBOLS_FILE} ${WORKSPACE}/${ARCHIVE_FOLDER}
+                    """
+                }
+            }
+        }
+
         stage('Publish SDK to Artifactory') {
             when {
                 expression { triggerByPublishSdkCmd() }
@@ -278,6 +319,7 @@ pipeline {
                             string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
                     ]) {
+                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/native-symbol/"
                         withEnv([
                                 "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
@@ -290,6 +332,8 @@ pipeline {
                                 ./gradlew sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
                             """
                         }
+
+                        sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"${WORKSPACE}/${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE}\" \"${targetPath}/${getSdkVersionText()}.zip\""
                     }
                 }
             }
