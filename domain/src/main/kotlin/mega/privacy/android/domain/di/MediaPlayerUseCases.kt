@@ -7,14 +7,17 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.DefaultGetAudioNodes
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultGetTicker
+import mega.privacy.android.domain.usecase.DefaultGetVideoNodes
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultTrackPlaybackPosition
+import mega.privacy.android.domain.usecase.GetAudioNodes
 import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
@@ -32,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetVideoNodes
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
@@ -65,6 +69,18 @@ abstract class MediaPlayerUseCases {
      */
     @Binds
     abstract fun bindGetTicker(implementation: DefaultGetTicker): GetTicker
+
+    /**
+     * Provide implementation for [GetAudioNodes]
+     */
+    @Binds
+    abstract fun bindGetAudioNodes(implementation: DefaultGetAudioNodes): GetAudioNodes
+
+    /**
+     * Provide implementation for [GetVideoNodes]
+     */
+    @Binds
+    abstract fun bindGetVideoNodes(implementation: DefaultGetVideoNodes): GetVideoNodes
 
     /**
      * Provide implementation for [GetAudioNodesFromPublicLinks]
@@ -131,6 +147,7 @@ abstract class MediaPlayerUseCases {
         @Provides
         fun provideGetLocalFolderLinkFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetLocalFolderLinkFromMegaApi =
             GetLocalFolderLinkFromMegaApi(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApi)
+
 
         /**
          * Provide implementation for [GetRootNode]

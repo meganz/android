@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaCancelToken
@@ -85,11 +86,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     override suspend fun getAudioNodes(order: SortOrder): List<UnTypedNode> =
-        getMediaNodes(isAudio = false, order = order)
+        getMediaNodes(isAudio = true, order = order)
 
 
     override suspend fun getVideoNodes(order: SortOrder): List<UnTypedNode> =
-        getMediaNodes(isAudio = true, order = order)
+        getMediaNodes(isAudio = false, order = order)
 
     /**
      * Get media nodes
@@ -102,7 +103,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApi.searchByType(MegaCancelToken.createInstance(),
                 sortOrderIntMapper(order),
-                FILE_TYPE_VIDEO,
+                if (isAudio) {
+                    FILE_TYPE_AUDIO
+                } else {
+                    FILE_TYPE_VIDEO
+                },
                 SEARCH_TARGET_ROOTNODE).filter {
                 it.isFile && filterByNodeName(isAudio, it.name)
             }.map { megaNode ->
