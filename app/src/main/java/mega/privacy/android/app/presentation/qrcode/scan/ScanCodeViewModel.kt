@@ -1,18 +1,27 @@
 package mega.privacy.android.app.presentation.qrcode.scan
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.extensions.dialogContent
+import mega.privacy.android.app.presentation.extensions.dialogTitle
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * View model for [ScanCodeFragment]
  */
 @HiltViewModel
-class ScanCodeViewModel @Inject constructor() : ViewModel() {
+class ScanCodeViewModel @Inject constructor(
+    private val queryScannedContactLink: QueryScannedContactLink,
+) : ViewModel() {
 
     /**
      * The ScanCode UI State
@@ -67,6 +76,66 @@ class ScanCodeViewModel @Inject constructor() : ViewModel() {
      */
     fun updateShowInviteDialog(value: Boolean) {
         _state.update { it.copy(showInviteDialog = value) }
+    }
+
+    /**
+     * Update boolean to finish the activity on completing the scan of QR code
+     */
+    fun updateFinishActivityOnScanComplete(value: Boolean) {
+        _state.update { it.copy(finishActivityOnScanComplete = value) }
+    }
+
+    /**
+     * Update state to finish the activity
+     */
+    private fun finishActivity() {
+        _state.update { it.copy(finishActivity = true) }
+    }
+
+    /**
+     * Query details of scanned contact and update the ui state
+     *
+     * @param scannedHandle Base 64 handle of the scanned qr code
+     */
+    fun queryContactLink(scannedHandle: String) {
+        viewModelScope.launch {
+            with(queryScannedContactLink(scannedHandle)) {
+                updateMyEmail(email)
+
+                if (state.value.finishActivityOnScanComplete) {
+                    finishActivity()
+                    return@launch
+                }
+
+                when (qrCodeQueryResult) {
+                    QRCodeQueryResults.CONTACT_QUERY_OK -> {
+                        Timber.d("Contact link query ${handle}_${email}_${contactName}")
+                        showInviteDialog(
+                            contactName,
+                            email,
+                            isContact,
+                            handle
+                        )
+                    }
+                    QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
+                        showInviteResultDialog(
+                            qrCodeQueryResult.dialogTitle,
+                            qrCodeQueryResult.dialogContent,
+                            success = true,
+                            printEmail = true
+                        )
+                    }
+                    else -> {
+                        showInviteResultDialog(
+                            qrCodeQueryResult.dialogTitle,
+                            qrCodeQueryResult.dialogContent,
+                            success = false,
+                            printEmail = false
+                        )
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -115,6 +115,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         }
 
         scanCodeViewModel = new ViewModelProvider(this).get(ScanCodeViewModel.class);
+        scanCodeViewModel.updateFinishActivityOnScanComplete(inviteContacts);
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -439,27 +440,6 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                     scanCodeViewModel.showInviteResultDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, true, true);
                 } else if (e.getErrorCode() == MegaError.API_EARGS) {
                     scanCodeViewModel.showInviteResultDialog(R.string.invite_not_sent, R.string.error_own_email_as_contact, true, false);
-                }
-            }
-        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                dbH.setLastPublicHandle(request.getNodeHandle());
-                dbH.setLastPublicHandleTimeStamp();
-                dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CONTACT);
-            }
-
-            if (inviteContacts) {
-                Intent intent = new Intent();
-                intent.putExtra("mail", request.getEmail());
-                setResult(RESULT_OK, intent);
-                finish();
-            } else {
-                if (scanCodeFragment == null) {
-                    Timber.w("ScanCodeFragment is NULL");
-                    scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
-                }
-                if (scanCodeFragment.isAdded()) {
-                    scanCodeFragment.initDialogInvite(request, e);
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {

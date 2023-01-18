@@ -744,4 +744,8 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override fun isUserLoggedIn(): Int = megaApi.isLoggedIn
+
+    override fun getContactLink(handle: Long, listener: MegaRequestListenerInterface) {
+        megaApi.contactLinkQuery(handle, listener)
+    }
 }

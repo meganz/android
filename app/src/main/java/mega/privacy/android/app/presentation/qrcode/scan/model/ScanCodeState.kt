@@ -15,6 +15,8 @@ package mega.privacy.android.app.presentation.qrcode.scan.model
  * @property inviteResultDialogShown Whether dialog is shown or not
  * @property showInviteResultDialog Whether to show dialog
  * @property showInviteDialog Whether to show dialog
+ * @property finishActivityOnScanComplete Whether to finish activity on completing the scan
+ * @property finishActivity Finish the current activity
  */
 data class ScanCodeState(
     var dialogTitleContent: Int = -1,
@@ -28,5 +30,7 @@ data class ScanCodeState(
     var inviteDialogShown: Boolean = false,
     var inviteResultDialogShown: Boolean = false,
     var showInviteResultDialog: Boolean = false,
-    var showInviteDialog: Boolean = false
+    var showInviteDialog: Boolean = false,
+    var finishActivityOnScanComplete: Boolean = false,
+    var finishActivity: Boolean = false,
 )

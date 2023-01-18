@@ -1380,4 +1380,12 @@ interface MegaApiGateway {
      * @return 0 if not logged in, Otherwise a number > 0
      */
     fun isUserLoggedIn(): Int
+
+    /**
+     * Get contact details
+     *
+     * @param handle Handle of the contact
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
 }

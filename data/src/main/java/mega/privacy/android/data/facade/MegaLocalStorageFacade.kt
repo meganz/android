@@ -326,6 +326,14 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getOfflineInformation(nodeHandle: Long) =
         dbHandler.getOfflineInformation(nodeHandle)
 
+    override suspend fun setLastPublicHandle(handle: Long) = dbHandler.setLastPublicHandle(handle)
+
+    override suspend fun setLastPublicHandleTimeStamp() = dbHandler.setLastPublicHandleTimeStamp()
+
+    override suspend fun setLastPublicHandleType(type: Int) {
+        dbHandler.lastPublicHandleType = type
+    }
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
