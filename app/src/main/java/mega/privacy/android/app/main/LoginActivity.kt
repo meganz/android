@@ -161,11 +161,18 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
         registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (viewModel.intentAction == ACTION_FORCE_RELOAD_ACCOUNT) {
-                    MegaApplication.isLoggingIn = false
-                    finish()
-                } else if (viewModel.intentAction == ACTION_OPEN_APP) {
-                    loginFragment?.readyToManager()
+                when (viewModel.intentAction) {
+                    ACTION_FORCE_RELOAD_ACCOUNT -> {
+                        MegaApplication.isLoggingIn = false
+                        finish()
+                    }
+                    ACTION_OPEN_APP -> {
+                        if (loginFragment?.isAdded == true) {
+                            loginFragment?.readyToManager()
+                        } else {
+                            finish()
+                        }
+                    }
                 }
             }
         }, IntentFilter(ACTION_FETCH_NODES_FINISHED))
