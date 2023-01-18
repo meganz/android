@@ -64,6 +64,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
+import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -297,11 +298,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     scheduledMeetingId = scheduledMeetReceived.schedId,
                                     title = scheduledMeetReceived.title,
                                     description = scheduledMeetReceived.description,
-                                    startDate = scheduledMeetReceived.startDateTime,
-                                    endDate = scheduledMeetReceived.endDateTime,
+                                    startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                    endDate = scheduledMeetReceived.endDateTime?.parseDate(),
                                     isPast = ZonedDateTime.now()
                                         .withZoneSameInstant(ZoneOffset.UTC)
-                                        .isAfter(scheduledMeetReceived.endDateTime))
+                                        .isAfter(scheduledMeetReceived.endDateTime?.parseDate()))
                                 )
                             }
                             return@forEach
@@ -377,11 +378,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     scheduledMeetingId = scheduledMeetReceived.schedId,
                                     title = scheduledMeetReceived.title,
                                     description = scheduledMeetReceived.description,
-                                    startDate = scheduledMeetReceived.startDateTime,
-                                    endDate = scheduledMeetReceived.endDateTime,
+                                    startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                    endDate = scheduledMeetReceived.endDateTime?.parseDate(),
                                     isPast = ZonedDateTime.now()
                                         .withZoneSameInstant(ZoneOffset.UTC)
-                                        .isAfter(scheduledMeetReceived.endDateTime))
+                                        .isAfter(scheduledMeetReceived.endDateTime?.parseDate()))
                                 )
                             }
                         }
@@ -410,11 +411,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
                                     state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                                        startDate = scheduledMeetReceived.startDateTime,
-                                        endDate = scheduledMeetReceived.endDateTime,
+                                        startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                        endDate = scheduledMeetReceived.endDateTime?.parseDate(),
                                         isPast = ZonedDateTime.now()
                                             .withZoneSameInstant(ZoneOffset.UTC)
-                                            .isAfter(scheduledMeetReceived.endDateTime))
+                                            .isAfter(scheduledMeetReceived.endDateTime?.parseDate()))
                                     )
                                 }
                             }
@@ -960,6 +961,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             ))
         }
     }
+
+    /**
+     * Parse ZonedDateTime from an EpochSecond
+     *
+     * @return  ZonedDateTime
+     */
+    private fun Long.parseDate(): ZonedDateTime =
+        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100

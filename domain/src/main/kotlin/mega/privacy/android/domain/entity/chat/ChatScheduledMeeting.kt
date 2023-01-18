@@ -1,8 +1,5 @@
 package mega.privacy.android.domain.entity.chat
 
-import java.time.ZoneId
-import java.time.ZonedDateTime
-
 /**
  * Chat scheduled meeting
  *
@@ -26,13 +23,13 @@ data class ChatScheduledMeeting constructor(
     val schedId: Long,
     val parentSchedId: Long?,
     val organizerUserId: Long?,
-    val timezone: ZoneId? = null,
-    val startDateTime: ZonedDateTime? = null,
-    val endDateTime: ZonedDateTime? = null,
+    val timezone: String? = null,
+    val startDateTime: Long? = null,
+    val endDateTime: Long? = null,
     val title: String? = "",
     val description: String? = "",
     val attributes: String?,
-    val overrides: String? = null,
+    val overrides: Long? = null,
     val flags: ChatScheduledFlags? = null,
     val rules: ChatScheduledRules? = null,
     val changes: ScheduledMeetingChanges? = null,

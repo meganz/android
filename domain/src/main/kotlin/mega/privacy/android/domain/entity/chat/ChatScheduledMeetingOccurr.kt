@@ -13,6 +13,6 @@ data class ChatScheduledMeetingOccurr(
     val schedId: Long,
     val cancelled: Int,
     val timezone: String,
-    val startDateTime: String,
-    val endDateTime: String,
+    val startDateTime: Long,
+    val endDateTime: Long,
 )

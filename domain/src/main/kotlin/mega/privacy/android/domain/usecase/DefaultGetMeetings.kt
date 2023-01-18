@@ -76,8 +76,8 @@ class DefaultGetMeetings @Inject constructor(
                         val updatedItem = item.copy(
                             schedId = schedMeeting.schedId,
                             isRecurring = schedMeetings.size > 1,
-                            scheduledStartTimestamp = schedMeeting.startDateTime?.toEpochSecond(),
-                            scheduledEndTimestamp = schedMeeting.endDateTime?.toEpochSecond(),
+                            scheduledStartTimestamp = schedMeeting.startDateTime,
+                            scheduledEndTimestamp = schedMeeting.endDateTime,
                         )
                         iterator.set(updatedItem)
                         emit(this@addScheduledMeetings)
@@ -161,20 +161,13 @@ class DefaultGetMeetings @Inject constructor(
                     val currentItemIndex = indexOfFirst { it.chatId == scheduledMeeting.chatId }
                     val updatedItem = get(currentItemIndex).copy(
                         schedId = scheduledMeeting.schedId,
-                        scheduledStartTimestamp = scheduledMeeting.startDateTime?.toEpochSecond(),
-                        scheduledEndTimestamp = scheduledMeeting.endDateTime?.toEpochSecond(),
+                        scheduledStartTimestamp = scheduledMeeting.startDateTime,
+                        scheduledEndTimestamp = scheduledMeeting.endDateTime,
                     )
                     mutex.withLock { set(currentItemIndex, updatedItem) }
                     sortMeetings()
                 }
             }
-
-    private suspend fun isRecurringScheduleMeeting(chatId: Long): Boolean =
-        runCatching { chatRepository.fetchScheduledMeetingOccurrencesByChat(chatId) }
-            .fold(
-                onSuccess = { occurrences -> (occurrences?.size ?: 0) > 1 },
-                onFailure = { false }
-            )
 
     private suspend fun CombinedChatRoom.toMeetingRoomItem(): MeetingRoomItem =
         meetingRoomMapper.invoke(this,

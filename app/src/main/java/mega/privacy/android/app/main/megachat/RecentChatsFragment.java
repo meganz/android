@@ -1524,6 +1524,15 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         refreshMegaContactsList();
     }
 
+    /**
+     * Scroll to the top of the list
+     */
+    public void scrollToTop() {
+        if ((listView.getAdapter() != null) && (listView.getAdapter().getItemCount() > 0)) {
+            listView.smoothScrollToPosition(0);
+        }
+    }
+
     // Multiselect
     private class ActionBarCallBack implements ActionMode.Callback {
 

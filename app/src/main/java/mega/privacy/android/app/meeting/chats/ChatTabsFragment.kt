@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -38,24 +39,8 @@ class ChatTabsFragment : Fragment() {
 
     private var skipClearSelection = false
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-    private val pageChangeCallback by lazy {
-        object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                (activity as? ManagerActivity?)?.closeSearchView()
-
-                if (!skipClearSelection) {
-                    childFragmentManager.fragments.forEach { fragment ->
-                        when (fragment) {
-                            is RecentChatsFragment -> fragment.clearSelections()
-                            is MeetingListFragment -> fragment.clearSelections(true)
-                        }
-                    }
-                } else {
-                    skipClearSelection = false
-                }
-            }
-        }
-    }
+    private val tabSelectedListener by lazy { buildTabSelectedListener() }
+    private val pageChangeCallback by lazy { buildPageChangeCallback() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,11 +71,13 @@ class ChatTabsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        binding.tabs.removeOnTabSelectedListener(tabSelectedListener)
         binding.pager.unregisterOnPageChangeCallback(pageChangeCallback)
         super.onDestroyView()
     }
 
     private fun setupView() {
+        binding.tabs.addOnTabSelectedListener(tabSelectedListener)
         binding.pager.apply {
             adapter = ChatTabsPageAdapter(this@ChatTabsFragment)
 
@@ -109,6 +96,43 @@ class ChatTabsFragment : Fragment() {
             (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
             (activity as? ManagerActivity?)?.showFabButton()
             (activity as? ManagerActivity?)?.invalidateOptionsMenu()
+        }
+    }
+
+    private fun buildTabSelectedListener() = object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {}
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        override fun onTabReselected(tab: TabLayout.Tab?) {
+            scrollToTop()
+        }
+    }
+
+    private fun buildPageChangeCallback() = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            (activity as? ManagerActivity?)?.closeSearchView()
+
+            if (!skipClearSelection) {
+                childFragmentManager.fragments.forEach { fragment ->
+                    when (fragment) {
+                        is RecentChatsFragment -> fragment.clearSelections()
+                        is MeetingListFragment -> fragment.clearSelections(true)
+                    }
+                }
+            } else {
+                skipClearSelection = false
+            }
+        }
+    }
+
+    /**
+     * Make children fragment scroll to top of the list
+     */
+    private fun scrollToTop() {
+        childFragmentManager.fragments.firstOrNull { it.isResumed }?.let { fragment ->
+            when (fragment) {
+                is RecentChatsFragment -> fragment.scrollToTop()
+                is MeetingListFragment -> fragment.scrollToTop()
+            }
         }
     }
 
