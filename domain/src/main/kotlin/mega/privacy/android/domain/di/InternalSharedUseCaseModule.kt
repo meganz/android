@@ -9,10 +9,12 @@ import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.FileRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.usecase.DefaultDeleteQRCode
+import mega.privacy.android.domain.usecase.DefaultGetCurrentUserFullName
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.DefaultResetQRCode
 import mega.privacy.android.domain.usecase.DeleteQRCode
+import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
@@ -54,13 +56,18 @@ internal abstract class InternalSharedUseCaseModule {
      *
      */
     @Binds
-    abstract fun bindGetExtendedAccountDetail(implementation: DefaultGetExtendedAccountDetail): GetExtendedAccountDetail
+    abstract fun bindGetExtendedAccountDetail(implementation: DefaultGetExtendedAccountDetail)
+            : GetExtendedAccountDetail
 
     @Binds
     abstract fun bindDeleteQRCode(implementation: DefaultDeleteQRCode): DeleteQRCode
 
     @Binds
     abstract fun bindResetQRCode(implementation: DefaultResetQRCode): ResetQRCode
+
+    @Binds
+    abstract fun bindGetCurrentUserFullName(implementation: DefaultGetCurrentUserFullName)
+            : GetCurrentUserFullName
 
     companion object {
 
@@ -73,16 +80,14 @@ internal abstract class InternalSharedUseCaseModule {
             GetPaymentMethod(repository::getPaymentMethod)
 
         @Provides
-        fun provideGetPricing(repository: BillingRepository) =
-            GetPricing(repository::getPricing)
+        fun provideGetPricing(repository: BillingRepository) = GetPricing(repository::getPricing)
 
         @Provides
         fun provideGetNumberOfSubscription(repository: BillingRepository) =
             GetNumberOfSubscription(repository::getNumberOfSubscription)
 
         @Provides
-        fun provideBuildQRCodeFile(repository: QRCodeRepository) =
-            GetQRFile(repository::getQRFile)
+        fun provideBuildQRCodeFile(repository: QRCodeRepository) = GetQRFile(repository::getQRFile)
 
         @Provides
         fun provideGetFileVersionsOption(repository: FileRepository) =

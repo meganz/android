@@ -177,14 +177,18 @@ interface ContactsRepository {
     /**
      * Get current user first name
      *
-     * @return
+     * @param forceRefresh If true, force read from backend, refresh cache and return.
+     *                     If false, use value in cache
+     * @return first name
      */
-    suspend fun getCurrentUserFirstName(): String
+    suspend fun getCurrentUserFirstName(forceRefresh: Boolean): String
 
     /**
      * Get current user last name
      *
-     * @return
+     * @param forceRefresh If true, force read from backend, refresh cache and return.
+     *                     If false, use value in cache
+     * @return last name
      */
-    suspend fun getCurrentUserLastName(): String
+    suspend fun getCurrentUserLastName(forceRefresh: Boolean): String
 }
