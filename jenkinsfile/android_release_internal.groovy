@@ -56,6 +56,9 @@ pipeline {
         // CD pipeline uses this environment variable to assign version code
         APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
 
+        // Channel to add in the suffix of the version name
+        APK_VERSION_NAME_CHANNEL_FOR_CD = "-internal"
+
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
@@ -117,13 +120,11 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Apply Google Map API Key'
-                }
 
-                withCredentials([
-                        file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG'),
-                        file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE')
-                ]) {
-                    script {
+                    withCredentials([
+                            file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG'),
+                            file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE')
+                    ]) {
                         println("applying production google map api config... ")
                         sh 'mkdir -p app/src/debug/res/values'
                         sh 'mkdir -p app/src/release/res/values'
@@ -148,6 +149,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS APK'
+
                     sh './gradlew clean app:assembleGmsRelease'
                 }
             }
@@ -156,13 +158,13 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Sign GMS APK'
-                }
-                withCredentials([
-                        file(credentialsId: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE'),
-                        file(credentialsId: 'ANDROID_PRD_GMS_APK_KEYSTORE', variable: 'ANDROID_PRD_GMS_APK_KEYSTORE')
-                ]) {
-                    script {
+
+                    withCredentials([
+                            file(credentialsId: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE'),
+                            file(credentialsId: 'ANDROID_PRD_GMS_APK_KEYSTORE', variable: 'ANDROID_PRD_GMS_APK_KEYSTORE')
+                    ]) {
                         println("signing GMS APK")
+
                         String tempAlignedGmsApk = "unsigned_gms_apk_aligned.apk"
                         String gmsApkInput = "${WORKSPACE}/app/build/outputs/apk/gms/release/app-gms-release-unsigned.apk"
                         String gmsApkOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${common.readAppVersion2()}-gms-release.apk"
@@ -173,7 +175,7 @@ pipeline {
                             apksigner sign --ks "${ANDROID_PRD_GMS_APK_KEYSTORE}" --ks-pass file:"${ANDROID_PRD_GMS_APK_PASSWORD_FILE}" --out ${gmsApkOutput} ${tempAlignedGmsApk}
                             ls -lh ${WORKSPACE}/${ARCHIVE_FOLDER}
                             rm -fv ${tempAlignedGmsApk}
-                            
+                              
                             echo Copy the signed production APK to original folder, for firebase upload in next step
                             rm -fv ${gmsApkInput}
                             cp -fv ${gmsApkOutput}  ${WORKSPACE}/app/build/outputs/apk/gms/release/
@@ -187,11 +189,10 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Upload APK(GMS) to Firebase'
-                }
-                withCredentials([
-                        file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
-                ]) {
-                    script {
+
+                    withCredentials([
+                            file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
+                    ]) {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotesForFirebase()}"
@@ -229,11 +230,10 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Upload QA APK(GMS) to Firebase'
-                }
-                withCredentials([
-                        file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
-                ]) {
-                    script {
+
+                    withCredentials([
+                            file(credentialsId: 'android_firebase_credentials', variable: 'FIREBASE_CONFIG')
+                    ]) {
                         withEnv([
                                 "GOOGLE_APPLICATION_CREDENTIALS=$FIREBASE_CONFIG",
                                 "RELEASE_NOTES_FOR_CD=${readReleaseNotesForFirebase()}"
@@ -248,6 +248,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Build GMS AAB'
+
                     sh './gradlew clean app:bundleGmsRelease'
                 }
             }
@@ -256,12 +257,11 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Sign GMS AAB'
-                }
-                withCredentials([
-                        string(credentialsId: 'ANDROID_PRD_GMS_AAB_PASSWORD', variable: 'ANDROID_PRD_GMS_AAB_PASSWORD'),
-                        file(credentialsId: 'ANDROID_PRD_GMS_AAB_KEYSTORE', variable: 'ANDROID_PRD_GMS_AAB_KEYSTORE')
-                ]) {
-                    script {
+
+                    withCredentials([
+                            string(credentialsId: 'ANDROID_PRD_GMS_AAB_PASSWORD', variable: 'ANDROID_PRD_GMS_AAB_PASSWORD'),
+                            file(credentialsId: 'ANDROID_PRD_GMS_AAB_KEYSTORE', variable: 'ANDROID_PRD_GMS_AAB_KEYSTORE')
+                    ]) {
                         println("signing GMS AAB")
                         String gmsAabInput = "${WORKSPACE}/app/build/outputs/bundle/gmsRelease/app-gms-release.aab"
                         String gmsAabOutput = "${WORKSPACE}/${ARCHIVE_FOLDER}/${common.readAppVersion2()}-gms-release.aab"
@@ -315,7 +315,6 @@ pipeline {
                                 done
                             '''
                         }
-
                     }
                 }
             }
@@ -324,8 +323,7 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Deploy to Google Play Internal'
-                }
-                script {
+
                     // Get the formatted release notes
                     String release_notes = common.releaseNotes(RELEASE_NOTES)
 

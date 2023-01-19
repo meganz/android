@@ -395,26 +395,28 @@ void checkSDKVersion() {
  */
 def readAppVersion() {
     String versionCode = APK_VERSION_CODE_FOR_CD
-    String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
-    return [versionName, versionCode]
+    String versionName = sh(script: "./gradlew -q printAppVersionName  | tail -n 1", returnStdout: true).trim()
+    String versionNameChannel = sh(script: "./gradlew -q printAppVersionNameChannel | tail -n 1", returnStdout: true).trim()
+    String appGitHash = sh(script: "./gradlew -q printAppGitHash | tail -n 1", returnStdout: true).trim()
+    return [versionName, versionNameChannel, versionCode, appGitHash]
 }
 
 /**
- * get app version in a format like "6.6(433)"
+ * get app version in a format like "7.2(230111014)(5cf9df7410c)"
  * @return version string
  */
 String readAppVersion1() {
-    def (versionName, versionCode) = readAppVersion()
-    return versionName + "(" + versionCode + ")"
+    def (versionName, versionNameChannel, versionCode, appGitHash) = readAppVersion()
+    return versionName + versionNameChannel + "(" + versionCode + ")" + "(" + appGitHash + ")"
 }
 
 /**
- * get app version in a format like "437_6_9" (for v6.9(437))
+ * get app version in a format like "230111014_5cf9df7410c_7_2" (for 7.2(230111014)(5cf9df7410c))
  * @return version string
  */
 String readAppVersion2() {
-    def (versionName, versionCode) = readAppVersion()
-    return "${versionCode}_${versionName.replaceAll("\\.", "_")}"
+    def (versionName, versionNameChannel, versionCode, appGitHash) = readAppVersion()
+    return "${versionCode}_${appGitHash}_${versionName.replaceAll("\\.", "_")}${versionNameChannel.replaceAll("-", "_")}"
 }
 
 /**
@@ -440,8 +442,8 @@ void deleteAllFilesExcept(String folder, String except) {
  * @return relative path.
  */
 String artifactoryUploadPath() {
-    def (versionName, versionCode) = readAppVersion()
-    return "v${versionName}/${versionCode}"
+    def (versionName, versionNameChannel, versionCode, appGitHash) = readAppVersion()
+    return "v${versionName}${versionNameChannel.replaceAll("-", "_")}/${versionCode}_${appGitHash}"
 }
 
 /**
