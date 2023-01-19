@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -53,12 +54,10 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
@@ -281,11 +280,11 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     secondPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
-                        secondPin.setText("");
-                        thirdPin.setText("");
-                        fourthPin.setText("");
-                        fifthPin.setText("");
-                        sixthPin.setText("");
+                        clearText(secondPin);
+                        clearText(thirdPin);
+                        clearText(fourthPin);
+                        clearText(fifthPin);
+                        clearText(sixthPin);
                     } else if (pinLongClick) {
                         pasteClipboard();
                     } else {
@@ -321,10 +320,10 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     thirdPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
-                        thirdPin.setText("");
-                        fourthPin.setText("");
-                        fifthPin.setText("");
-                        sixthPin.setText("");
+                        clearText(thirdPin);
+                        clearText(fourthPin);
+                        clearText(fifthPin);
+                        clearText(sixthPin);
                     } else if (pinLongClick) {
                         pasteClipboard();
                     } else {
@@ -360,9 +359,9 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     fourthPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
-                        fourthPin.setText("");
-                        fifthPin.setText("");
-                        sixthPin.setText("");
+                        clearText(fourthPin);
+                        clearText(fifthPin);
+                        clearText(sixthPin);
                     } else if (pinLongClick) {
                         pasteClipboard();
                     } else {
@@ -398,8 +397,8 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     fifthPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
-                        fifthPin.setText("");
-                        sixthPin.setText("");
+                        clearText(fifthPin);
+                        clearText(sixthPin);
                     } else if (pinLongClick) {
                         pasteClipboard();
                     } else {
@@ -435,7 +434,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     sixthPin.setCursorVisible(true);
 
                     if (firstTime && !pinLongClick) {
-                        sixthPin.setText("");
+                        clearText(sixthPin);
                     } else if (pinLongClick) {
                         pasteClipboard();
                     } else {
@@ -531,6 +530,15 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         }
     }
 
+    private void clearAllPins() {
+        clearText(firstPin);
+        clearText(secondPin);
+        clearText(thirdPin);
+        clearText(fourthPin);
+        clearText(fifthPin);
+        clearText(sixthPin);
+    }
+
     void showScanOrCopyLayout() {
         scanOrCopyIsShown = true;
         qrSeedContainer.setVisibility(View.VISIBLE);
@@ -619,12 +627,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                     fifthPin.setText("" + code.charAt(4));
                     sixthPin.setText("" + code.charAt(5));
                 } else {
-                    firstPin.setText("");
-                    secondPin.setText("");
-                    thirdPin.setText("");
-                    fourthPin.setText("");
-                    fifthPin.setText("");
-                    sixthPin.setText("");
+                    clearAllPins();
                 }
             }
         }
@@ -791,6 +794,10 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    private void clearText(EditText editText) {
+        editText.setText("");
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -819,6 +826,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
                 scrollContainer2FAEnabled.setVisibility(View.GONE);
                 firstPin.requestFocus();
                 imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
+                clearAllPins();
                 break;
             }
             case R.id.button_open_with_2fa: {
@@ -1112,40 +1120,43 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         switch (v.getId()) {
             case R.id.pass_first: {
                 if (hasFocus) {
-                    firstPin.setText("");
+                    clearText(firstPin);
                 }
                 break;
             }
             case R.id.pass_second: {
                 if (hasFocus) {
-                    secondPin.setText("");
+                    clearText(secondPin);
                 }
                 break;
             }
             case R.id.pass_third: {
                 if (hasFocus) {
-                    thirdPin.setText("");
+                    clearText(thirdPin);
                 }
                 break;
             }
             case R.id.pass_fourth: {
                 if (hasFocus) {
-                    fourthPin.setText("");
+                    clearText(fourthPin);
                 }
                 break;
             }
             case R.id.pass_fifth: {
                 if (hasFocus) {
-                    fifthPin.setText("");
+                    clearText(fifthPin);
                 }
                 break;
             }
             case R.id.pass_sixth: {
                 if (hasFocus) {
-                    sixthPin.setText("");
+                    clearText(sixthPin);
+
                 }
                 break;
             }
         }
     }
 }
+
+
