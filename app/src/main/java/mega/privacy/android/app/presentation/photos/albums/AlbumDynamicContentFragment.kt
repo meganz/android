@@ -16,6 +16,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.FloatingActionButton
@@ -248,29 +251,31 @@ class AlbumDynamicContentFragment : Fragment() {
                 }
             }
 
-            if (uiState.snackBarMessage.isNotEmpty()) {
-                SnackBar(
-                    message = uiState.snackBarMessage,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(8.dp, 80.dp)
-                )
-            }
+            Column(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+                if (uiState.snackBarMessage.isNotEmpty()) {
+                    SnackBar(
+                        message = uiState.snackBarMessage,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
 
-            if (showFilterFabButton(uiState)) {
-                FilterFabButton(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 24.dp, bottom = 88.dp)
-                )
-            }
+                if (showFilterFabButton(uiState)) {
+                    FilterFabButton(
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(end = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.padding(top = 16.dp))
+                }
 
-            if (showAddFabButton(uiState)) {
-                AddFabButton(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                )
+                if (showAddFabButton(uiState)) {
+                    AddFabButton(
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    )
+                }
             }
 
             if (uiState.showSortByDialog) {

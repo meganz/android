@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.login
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -25,8 +25,10 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
+import mega.privacy.android.app.main.ConfirmEmailFragment
+import mega.privacy.android.app.main.CreateAccountFragment
+import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util
@@ -161,11 +163,18 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
         registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (viewModel.intentAction == ACTION_FORCE_RELOAD_ACCOUNT) {
-                    MegaApplication.isLoggingIn = false
-                    finish()
-                } else if (viewModel.intentAction == ACTION_OPEN_APP) {
-                    loginFragment?.readyToManager()
+                when (viewModel.intentAction) {
+                    ACTION_FORCE_RELOAD_ACCOUNT -> {
+                        MegaApplication.isLoggingIn = false
+                        finish()
+                    }
+                    ACTION_OPEN_APP -> {
+                        if (loginFragment?.isAdded == true) {
+                            loginFragment?.readyToManager()
+                        } else {
+                            finish()
+                        }
+                    }
                 }
             }
         }, IntentFilter(ACTION_FETCH_NODES_FINISHED))

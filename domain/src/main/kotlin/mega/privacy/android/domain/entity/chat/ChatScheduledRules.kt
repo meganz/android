@@ -10,5 +10,5 @@ package mega.privacy.android.domain.entity.chat
 data class ChatScheduledRules(
     val freq: Int,
     val interval: Int? = null,
-    val until: String? = null,
+    val until: Long? = null,
 )

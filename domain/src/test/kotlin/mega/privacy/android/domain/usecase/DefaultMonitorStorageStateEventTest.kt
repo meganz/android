@@ -46,7 +46,7 @@ class DefaultMonitorStorageStateEventTest {
             scope = this
         )
 
-        underTest.storageState.test {
+        underTest().test {
             assertThat(awaitItem().storageState).isEqualTo(StorageState.Unknown)
         }
     }
@@ -63,7 +63,7 @@ class DefaultMonitorStorageStateEventTest {
             scope = this
         )
 
-        underTest.storageState.test {
+        underTest().test {
             assertThat(awaitItem().storageState).isEqualTo(StorageState.Unknown)
             assertThat(awaitItem().storageState).isEqualTo(StorageState.PayWall)
         }
@@ -89,12 +89,12 @@ class DefaultMonitorStorageStateEventTest {
                 scope = this
             )
 
-            underTest.storageState.test {
+            underTest().test {
                 assertThat(awaitItem().storageState).isEqualTo(StorageState.Unknown)
                 assertThat(awaitItem().storageState).isEqualTo(StorageState.Red)
                 assertThat(awaitItem().storageState).isEqualTo(StorageState.Green)
                 assertThat(awaitItem().storageState).isEqualTo(StorageState.Orange)
             }
-            assertThat(underTest.storageState.value.storageState).isEqualTo(StorageState.Orange)
+            assertThat(underTest().value.storageState).isEqualTo(StorageState.Orange)
         }
 }

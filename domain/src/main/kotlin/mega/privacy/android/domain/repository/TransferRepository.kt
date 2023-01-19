@@ -83,4 +83,10 @@ interface TransferRepository {
      * Cancels all upload transfers
      */
     suspend fun cancelAllUploadTransfers()
+
+    /**
+     * Cancel Transfer by Tag
+     * @param transferTag   Tag that identifies the transfer
+     */
+    suspend fun cancelTransferByTag(transferTag: Int)
 }

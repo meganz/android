@@ -202,11 +202,18 @@ interface MediaPlayerRepository {
     /**
      * Get nodes by email
      *
-     * @param isAudio true is audio player, otherwise is false
      * @param email email of account
      * @return List<[UnTypedNode]>?
      */
-    suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<UnTypedNode>?
+    suspend fun getAudioNodesByEmail(email: String): List<UnTypedNode>?
+
+    /**
+     * Get nodes by email
+     *
+     * @param email email of account
+     * @return List<[UnTypedNode]>?
+     */
+    suspend fun getVideoNodesByEmail(email: String): List<UnTypedNode>?
 
     /**
      * Get username by email

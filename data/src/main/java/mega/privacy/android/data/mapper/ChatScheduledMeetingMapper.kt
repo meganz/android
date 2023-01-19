@@ -7,19 +7,11 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import nz.mega.sdk.MegaChatScheduledFlags
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledRules
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Mapper to convert [MegaChatScheduledMeeting] to [ChatScheduledMeeting]
  */
 typealias ChatScheduledMeetingMapper = (@JvmSuppressWildcards MegaChatScheduledMeeting) -> @JvmSuppressWildcards ChatScheduledMeeting
-
-private val dateTimeZoneFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss").withZone(ZoneOffset.UTC)
 
 internal fun toChatScheduledMeeting(megaChatScheduledMeeting: MegaChatScheduledMeeting): ChatScheduledMeeting =
     ChatScheduledMeeting(
@@ -27,9 +19,9 @@ internal fun toChatScheduledMeeting(megaChatScheduledMeeting: MegaChatScheduledM
         megaChatScheduledMeeting.schedId(),
         megaChatScheduledMeeting.parentSchedId(),
         megaChatScheduledMeeting.organizerUserId(),
-        megaChatScheduledMeeting.timezone()?.mapTimezone(),
-        megaChatScheduledMeeting.startDateTime()?.mapTimestamp(),
-        megaChatScheduledMeeting.endDateTime()?.mapTimestamp(),
+        megaChatScheduledMeeting.timezone(),
+        megaChatScheduledMeeting.startDateTime(),
+        megaChatScheduledMeeting.endDateTime(),
         megaChatScheduledMeeting.title(),
         megaChatScheduledMeeting.description(),
         megaChatScheduledMeeting.attributes(),
@@ -38,13 +30,6 @@ internal fun toChatScheduledMeeting(megaChatScheduledMeeting: MegaChatScheduledM
         megaChatScheduledMeeting.rules()?.mapRules(),
         megaChatScheduledMeeting.mapChanges()
     )
-
-private fun String.mapTimestamp(): ZonedDateTime =
-    toLongOrNull()?.let { ZonedDateTime.from(Instant.ofEpochSecond(it).atZone(ZoneOffset.UTC)) }
-        ?: ZonedDateTime.parse(this, dateTimeZoneFormatter)
-
-private fun String.mapTimezone(): ZoneId =
-    ZoneId.of(this)
 
 private fun MegaChatScheduledFlags.mapFlags(): ChatScheduledFlags =
     ChatScheduledFlags(emailsDisabled())

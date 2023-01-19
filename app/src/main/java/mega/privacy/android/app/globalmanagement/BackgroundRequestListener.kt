@@ -8,7 +8,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
-import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
+import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker

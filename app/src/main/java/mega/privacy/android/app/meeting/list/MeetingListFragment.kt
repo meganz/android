@@ -137,14 +137,7 @@ class MeetingListFragment : Fragment() {
 
     private fun setupObservers(savedInstanceState: Bundle?) {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            val currentFirstItem = meetingsAdapter.currentList.firstOrNull()?.id
             meetingsAdapter.submitRoomList(items) {
-                if (currentFirstItem != items.firstOrNull()?.chatId) {
-                    binding.list.postDelayed({
-                        binding.list.smoothScrollToPosition(0)
-                    }, 250L)
-                }
-
                 if (savedInstanceState != null && !actionModeRestored) {
                     meetingsAdapter.tracker?.onRestoreInstanceState(savedInstanceState)
                     if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
@@ -319,5 +312,14 @@ class MeetingListFragment : Fragment() {
     fun clearSelections(forceUpdate: Boolean = false) {
         meetingsAdapter.tracker?.clearSelection()
         if (forceUpdate) meetingsAdapter.notifyDataSetChanged()
+    }
+
+    /**
+     * Scroll to the top of the list
+     */
+    fun scrollToTop() {
+        if ((binding.list.adapter?.itemCount ?: 0) > 0) {
+            binding.list.smoothScrollToPosition(0)
+        }
     }
 }

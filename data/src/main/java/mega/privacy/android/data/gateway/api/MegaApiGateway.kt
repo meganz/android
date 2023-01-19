@@ -1382,6 +1382,14 @@ interface MegaApiGateway {
     fun isUserLoggedIn(): Int
 
     /**
+     * Cancels a Transfer by Tag
+     *
+     * @param transferTag the MegaTransfer Tag to cancel
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun cancelTransferByTag(transferTag: Int, listener: MegaRequestListenerInterface?)
+
+    /**
      * Get contact details
      *
      * @param handle Handle of the contact

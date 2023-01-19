@@ -140,7 +140,7 @@
             android:value="false" />
 
         <activity
-            android:name=".main.LoginActivity"
+            android:name=".presentation.login.LoginActivity"
             android:label="@string/login_text"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />

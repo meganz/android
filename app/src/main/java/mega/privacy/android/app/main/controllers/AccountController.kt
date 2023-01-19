@@ -36,7 +36,7 @@ import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity

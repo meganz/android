@@ -12,7 +12,7 @@ import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.logging.LegacyLoggingSettings;
-import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
