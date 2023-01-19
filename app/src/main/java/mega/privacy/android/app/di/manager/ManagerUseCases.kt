@@ -28,7 +28,7 @@ import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -71,8 +71,8 @@ abstract class ManagerUseCases {
 
     companion object {
         @Provides
-        fun provideMonitorNodeUpdates(filesRepository: FileRepository): MonitorNodeUpdates =
-            MonitorNodeUpdates(filesRepository::monitorNodeUpdates)
+        fun provideMonitorNodeUpdates(nodeRepository: NodeRepository): MonitorNodeUpdates =
+            MonitorNodeUpdates(nodeRepository::monitorNodeUpdates)
 
         @Provides
         fun provideGetRootFolder(filesRepository: FilesRepository): GetRootFolder =

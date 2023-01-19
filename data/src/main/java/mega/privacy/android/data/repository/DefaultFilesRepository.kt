@@ -48,7 +48,8 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -97,7 +98,7 @@ internal class DefaultFilesRepository @Inject constructor(
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
-) : FilesRepository, FileRepository {
+) : FilesRepository, FileSystemRepository, NodeRepository {
 
     override suspend fun copyNode(
         nodeToCopy: MegaNode,

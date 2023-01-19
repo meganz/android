@@ -55,13 +55,14 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -152,7 +153,10 @@ internal abstract class RepositoryModule {
     abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
 
     @Binds
-    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileRepository
+    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileSystemRepository
+
+    @Binds
+    abstract fun bindNodeRepository(repository: DefaultFilesRepository): NodeRepository
 
     @Binds
     @Singleton

@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.ParentNotAFolderException
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
@@ -20,7 +20,7 @@ import javax.inject.Inject
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetTypedNodesFromFolder @Inject constructor(
-    private val fileRepository: FileRepository,
+    private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
 ) : GetTypedNodesFromFolder {
 
@@ -36,14 +36,14 @@ class DefaultGetTypedNodesFromFolder @Inject constructor(
     }
 
     private suspend fun getChildren(folderId: NodeId): List<UnTypedNode> {
-        val folder = fileRepository.getNodeById(folderId) as? FolderNode
+        val folder = nodeRepository.getNodeById(folderId) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch folder node: $folderId")
-        return fileRepository.getNodeChildren(folder)
+        return nodeRepository.getNodeChildren(folder)
 
     }
 
     private fun getMonitoredList(folderId: NodeId, nodeIds: List<NodeId>) =
-        fileRepository.monitorNodeUpdates()
+        nodeRepository.monitorNodeUpdates()
             .filter { changes ->
                 changes.map { it.id }
                     .intersect(

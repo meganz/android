@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.file
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -12,19 +12,19 @@ import org.mockito.kotlin.stub
 internal class DefaultDoesPathHaveSufficientSpaceTest {
     private lateinit var underTest: DoesPathHaveSufficientSpace
 
-    private val fileRepository = mock<FileRepository>()
+    private val fileSystemRepository = mock<FileSystemRepository>()
 
     @Before
     fun setUp() {
         underTest = DefaultDoesPathHaveSufficientSpace(
-            fileRepository = fileRepository
+            fileSystemRepository = fileSystemRepository
         )
     }
 
     @Test
     fun `test that if the path has less space than required, false is returned`() = runTest {
         val required = 123L
-        fileRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenReturn(required - 1) }
+        fileSystemRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenReturn(required - 1) }
 
         assertThat(underTest("", required)).isFalse()
     }
@@ -32,7 +32,7 @@ internal class DefaultDoesPathHaveSufficientSpaceTest {
     @Test
     fun `test that if the path has more space than required, true is returned`() = runTest {
         val required = 123L
-        fileRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenReturn(required + 1) }
+        fileSystemRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenReturn(required + 1) }
 
         assertThat(underTest("", required)).isTrue()
     }
@@ -40,7 +40,7 @@ internal class DefaultDoesPathHaveSufficientSpaceTest {
     @Test
     fun `test that if file repository throws an error, true is returned`() = runTest {
         val required = 123L
-        fileRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenAnswer { throw IllegalArgumentException() } }
+        fileSystemRepository.stub { onBlocking { getDiskSpaceBytes(any()) }.thenAnswer { throw IllegalArgumentException() } }
 
         assertThat(underTest("", required)).isTrue()
     }

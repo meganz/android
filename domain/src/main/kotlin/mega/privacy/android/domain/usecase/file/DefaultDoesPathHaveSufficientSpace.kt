@@ -1,12 +1,12 @@
 package mega.privacy.android.domain.usecase.file
 
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import javax.inject.Inject
 
 class DefaultDoesPathHaveSufficientSpace @Inject constructor(
-    private val fileRepository: FileRepository,
+    private val fileSystemRepository: FileSystemRepository,
 ) : DoesPathHaveSufficientSpace {
     override suspend fun invoke(path: String, requiredSpace: Long) = kotlin.runCatching {
-        fileRepository.getDiskSpaceBytes(path) > requiredSpace
+        fileSystemRepository.getDiskSpaceBytes(path) > requiredSpace
     }.getOrDefault(true)
 }

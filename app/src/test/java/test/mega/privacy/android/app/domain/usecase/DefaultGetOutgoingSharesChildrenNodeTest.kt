@@ -8,7 +8,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import nz.mega.sdk.MegaApiJava
@@ -35,7 +35,7 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
     private val getOthersSortOrder = mock<GetOthersSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
-    private val fileRepository = mock<FileRepository>()
+    private val nodeRepository = mock<NodeRepository>()
 
     @Before
     fun setUp() {
@@ -44,27 +44,27 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
             getChildrenNode,
             getCloudSortOrder,
             getOthersSortOrder,
-            fileRepository,
+            nodeRepository,
         )
     }
 
     @Test
     fun `test that invoke with -1L execute filesRepository getOutgoingSharesNode function with others sort order`() =
         runTest {
-            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
+            whenever(nodeRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
             underTest(-1L)
 
-            verify(fileRepository).getOutgoingSharesNode(getOthersSortOrder())
+            verify(nodeRepository).getOutgoingSharesNode(getOthersSortOrder())
         }
 
     @Test
     fun `test that invoke with INVALID_HANDLE executes filesRepository getOutgoingSharesNode function with others sort order`() =
         runTest {
-            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
+            whenever(nodeRepository.getOutgoingSharesNode(any())).thenReturn(emptyList())
 
             underTest(MegaApiJava.INVALID_HANDLE)
 
-            verify(fileRepository).getOutgoingSharesNode(getOthersSortOrder())
+            verify(nodeRepository).getOutgoingSharesNode(getOthersSortOrder())
         }
 
     @Test
@@ -86,7 +86,7 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
                 on { user }.thenReturn("user3")
             }
             val list = listOf(megaShare1, megaShare2, megaShare3)
-            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(list)
+            whenever(nodeRepository.getOutgoingSharesNode(any())).thenReturn(list)
 
             underTest(-1L)
 
@@ -114,7 +114,7 @@ class DefaultGetOutgoingSharesChildrenNodeTest {
                 on { user }.thenReturn("user3")
             }
             val list = listOf(megaShare1, megaShare2, megaShare3)
-            whenever(fileRepository.getOutgoingSharesNode(any())).thenReturn(list)
+            whenever(nodeRepository.getOutgoingSharesNode(any())).thenReturn(list)
 
             underTest(-1L)
 

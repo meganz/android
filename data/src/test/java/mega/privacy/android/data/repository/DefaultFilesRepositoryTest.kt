@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -42,7 +42,7 @@ import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
 internal class DefaultFilesRepositoryTest {
-    private lateinit var underTest: FileRepository
+    private lateinit var underTest: FileSystemRepository
 
     private val context: Context = mock()
     private val megaApiGateway: MegaApiGateway = mock()

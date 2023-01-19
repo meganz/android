@@ -52,7 +52,8 @@ import mega.privacy.android.data.repository.FilesRepository
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
@@ -423,8 +424,8 @@ abstract class CameraUploadUseCases {
          * Provide the [IsNodeInRubbish] implementation
          */
         @Provides
-        fun provideIsNodeInRubbish(fileRepository: FileRepository): IsNodeInRubbish =
-            IsNodeInRubbish(fileRepository::isNodeInRubbish)
+        fun provideIsNodeInRubbish(nodeRepository: NodeRepository): IsNodeInRubbish =
+            IsNodeInRubbish(nodeRepository::isNodeInRubbish)
 
         /**
          * Provide the [ClearCacheDirectory] implementation
@@ -451,8 +452,8 @@ abstract class CameraUploadUseCases {
          * Provide the [IsNodeInRubbishOrDeleted] implementation
          */
         @Provides
-        fun provideIsNodeInRubbishOrDeleted(fileRepository: FileRepository): IsNodeInRubbishOrDeleted =
-            IsNodeInRubbishOrDeleted(fileRepository::isNodeInRubbishOrDeleted)
+        fun provideIsNodeInRubbishOrDeleted(nodeRepository: NodeRepository): IsNodeInRubbishOrDeleted =
+            IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation
@@ -472,8 +473,8 @@ abstract class CameraUploadUseCases {
          * Provide the [CreateCameraUploadFolder] implementation
          */
         @Provides
-        fun provideCreateCameraUploadFolder(fileRepository: FileRepository): CreateCameraUploadFolder =
-            CreateCameraUploadFolder(fileRepository::createFolder)
+        fun provideCreateCameraUploadFolder(fileSystemRepository: FileSystemRepository): CreateCameraUploadFolder =
+            CreateCameraUploadFolder(fileSystemRepository::createFolder)
 
         /**
          * Provide the [GetNumberOfPendingUploads] implementation

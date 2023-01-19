@@ -3,7 +3,7 @@ package mega.privacy.android.domain.di
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.StreamingServerRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
@@ -21,8 +21,8 @@ internal abstract class InternalOpenFileUseCasesModule {
 
     companion object {
         @Provides
-        fun provideGetLocalFileForNode(fileRepository: FileRepository): GetLocalFileForNode =
-            GetLocalFileForNode(fileRepository::getLocalFile)
+        fun provideGetLocalFileForNode(fileSystemRepository: FileSystemRepository): GetLocalFileForNode =
+            GetLocalFileForNode(fileSystemRepository::getLocalFile)
 
         @Provides
         fun provideStartStreamingServer(repository: StreamingServerRepository): StartStreamingServer =
@@ -33,7 +33,7 @@ internal abstract class InternalOpenFileUseCasesModule {
             StopStreamingServer(repository::stopServer)
 
         @Provides
-        fun provideGetStreamingUriStringForNode(repository: FileRepository): GetStreamingUriStringForNode {
+        fun provideGetStreamingUriStringForNode(repository: FileSystemRepository): GetStreamingUriStringForNode {
             return GetStreamingUriStringForNode(repository::getFileStreamingUri)
         }
     }

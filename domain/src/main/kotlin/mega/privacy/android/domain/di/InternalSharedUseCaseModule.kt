@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.usecase.DefaultDeleteQRCode
 import mega.privacy.android.domain.usecase.DefaultGetCurrentUserFullName
@@ -90,7 +90,7 @@ internal abstract class InternalSharedUseCaseModule {
         fun provideBuildQRCodeFile(repository: QRCodeRepository) = GetQRFile(repository::getQRFile)
 
         @Provides
-        fun provideGetFileVersionsOption(repository: FileRepository) =
+        fun provideGetFileVersionsOption(repository: FileSystemRepository) =
             GetFileVersionsOption(repository::getFileVersionsOption)
     }
 }

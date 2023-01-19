@@ -7,7 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ChatRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
@@ -208,7 +208,7 @@ abstract class ChatModule {
          * Provides the Use Case [SetMyChatFilesFolder]
          */
         @Provides
-        fun provideSetMyChatFilesFolder(fileRepository: FileRepository): SetMyChatFilesFolder =
-            SetMyChatFilesFolder(fileRepository::setMyChatFilesFolder)
+        fun provideSetMyChatFilesFolder(fileSystemRepository: FileSystemRepository): SetMyChatFilesFolder =
+            SetMyChatFilesFolder(fileSystemRepository::setMyChatFilesFolder)
     }
 }

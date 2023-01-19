@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -26,16 +26,19 @@ class DefaultGetAllFavoritesTest {
         onBlocking { invoke(any()) }.thenReturn(typedNode)
     }
 
-    private val fileRepository = mock<FileRepository> {
-        on { monitorNodeUpdates() }.thenReturn(flowOf(
-            emptyList()))
+    private val nodeRepository = mock<NodeRepository> {
+        on { monitorNodeUpdates() }.thenReturn(
+            flowOf(
+                emptyList()
+            )
+        )
     }
 
     @Before
     fun setUp() {
         underTest = DefaultGetAllFavorites(
             favouritesRepository = favouritesRepository,
-            fileRepository = fileRepository,
+            nodeRepository = nodeRepository,
             addNodeType = addNodeType,
         )
     }
@@ -67,7 +70,7 @@ class DefaultGetAllFavoritesTest {
     fun `test that favourites returns result of getAllFavorites when a node update occur`() =
         runTest {
             whenever(favouritesRepository.getAllFavorites()).thenReturn(emptyList())
-            whenever(fileRepository.monitorNodeUpdates()).thenReturn(flowOf(mock()))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(mock()))
             Truth.assertThat(underTest().count()).isEqualTo(2)
         }
 }
