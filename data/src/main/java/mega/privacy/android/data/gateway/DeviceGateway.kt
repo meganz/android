@@ -51,4 +51,11 @@ interface DeviceGateway {
      * @return the total device memory if available
      */
     suspend fun getDeviceMemory(): Long?
+
+    /**
+     * Get disk space bytes
+     *
+     * @param path
+     */
+    suspend fun getDiskSpaceBytes(path: String): Long
 }

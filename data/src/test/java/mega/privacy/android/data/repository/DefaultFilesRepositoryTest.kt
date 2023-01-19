@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -60,6 +61,8 @@ internal class DefaultFilesRepositoryTest {
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
     private val streamingGateway = mock<StreamingGateway>()
+    private val deviceGateway = mock<DeviceGateway>()
+
 
     @Before
     fun setUp() {
@@ -81,6 +84,7 @@ internal class DefaultFilesRepositoryTest {
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             fileVersionsOptionCache = fileVersionsOptionCache,
             streamingGateway = streamingGateway,
+            deviceGateway = deviceGateway,
         )
     }
 

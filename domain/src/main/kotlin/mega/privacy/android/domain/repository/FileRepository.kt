@@ -148,4 +148,12 @@ interface FileRepository {
      */
     suspend fun removeGPSCoordinates(filePath: String)
 
+
+    /**
+     * Get disk space
+     *
+     * @param path
+     * @return disk space at path in bytes
+     */
+    suspend fun getDiskSpaceBytes(path: String): Long
 }

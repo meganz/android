@@ -16,6 +16,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -95,6 +96,7 @@ internal class DefaultFilesRepository @Inject constructor(
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
+    private val deviceGateway: DeviceGateway,
 ) : FilesRepository, FileRepository {
 
     override suspend fun copyNode(
@@ -512,5 +514,9 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun removeGPSCoordinates(filePath: String) = withContext(ioDispatcher) {
         fileGateway.removeGPSCoordinates(filePath)
+    }
+
+    override suspend fun getDiskSpaceBytes(path: String) = withContext(ioDispatcher){
+        deviceGateway.getDiskSpaceBytes(path)
     }
 }

@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
+import android.os.StatFs
 import android.os.SystemClock
 import android.provider.Settings
 import androidx.annotation.RequiresApi
@@ -55,5 +56,9 @@ internal class AndroidDeviceGateway @Inject constructor(
         val memoryInfo = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(memoryInfo)
         return memoryInfo.totalMem
+    }
+
+    override suspend fun getDiskSpaceBytes(path: String) = with(StatFs(path)) {
+        availableBlocksLong * blockSizeLong
     }
 }
