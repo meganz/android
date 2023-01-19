@@ -8,16 +8,19 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AreCredentialsNull
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodes
+import mega.privacy.android.domain.usecase.DefaultGetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultGetTicker
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodes
+import mega.privacy.android.domain.usecase.DefaultGetVideoNodesByEmail
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultTrackPlaybackPosition
 import mega.privacy.android.domain.usecase.GetAudioNodes
+import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
@@ -35,7 +38,9 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetUserNameByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodes
+import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
@@ -118,6 +123,18 @@ abstract class MediaPlayerUseCases {
     @Binds
     abstract fun bindGetVideoNodesFromOutShares(implementation: DefaultGetVideoNodesFromOutShares): GetVideoNodesFromOutShares
 
+    /**
+     * Provide implementation for [GetAudioNodesByEmail]
+     */
+    @Binds
+    abstract fun bindGetAudioNodesByEmail(implementation: DefaultGetAudioNodesByEmail): GetAudioNodesByEmail
+
+    /**
+     * Provide implementation for [GetVideoNodesByEmail]
+     */
+    @Binds
+    abstract fun bindGetVideoNodesByEmail(implementation: DefaultGetVideoNodesByEmail): GetVideoNodesByEmail
+
     companion object {
 
         /**
@@ -148,6 +165,12 @@ abstract class MediaPlayerUseCases {
         fun provideGetLocalFolderLinkFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetLocalFolderLinkFromMegaApi =
             GetLocalFolderLinkFromMegaApi(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApi)
 
+        /**
+         * Provide implementation for [GetUserNameByEmail]
+         */
+        @Provides
+        fun provideGetUserNameByEmail(mediaPlayerRepository: MediaPlayerRepository): GetUserNameByEmail =
+            GetUserNameByEmail(mediaPlayerRepository::getUserNameByEmail)
 
         /**
          * Provide implementation for [GetRootNode]

@@ -312,7 +312,20 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<UnTypedNode>? =
+    override suspend fun getAudioNodesByEmail(email: String): List<UnTypedNode>? =
+        getNodesByEmail(isAudio = true, email = email)
+
+    override suspend fun getVideoNodesByEmail(email: String): List<UnTypedNode>? =
+        getNodesByEmail(isAudio = false, email = email)
+
+    /**
+     * Get nodes by email
+     *
+     * @param isAudio true is audio, false is video
+     * @param email email of account
+     * @return List<UnTypedNode>?
+     */
+    private suspend fun getNodesByEmail(isAudio: Boolean, email: String): List<UnTypedNode>? =
         withContext(ioDispatcher) {
             megaApi.getContact(email)?.let { megaUser ->
                 megaApi.getInShares(megaUser).filter { megaNode ->

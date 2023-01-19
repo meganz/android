@@ -98,6 +98,7 @@ import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.AreCredentialsNull
 import mega.privacy.android.domain.usecase.GetAudioNodes
+import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
@@ -114,7 +115,9 @@ import mega.privacy.android.domain.usecase.GetRubbishNode
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetUserNameByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodes
+import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
@@ -186,6 +189,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getVideoNodesFromOutShares: GetVideoNodesFromOutShares,
     private val getAudioNodes: GetAudioNodes,
     private val getVideoNodes: GetVideoNodes,
+    private val getAudioNodesByEmail: GetAudioNodesByEmail,
+    private val getVideoNodesByEmail: GetVideoNodesByEmail,
+    private val getUserNameByEmail: GetUserNameByEmail,
     private val fileDurationMapper: FileDurationMapper,
     private val addNodeType: AddNodeType,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
@@ -417,18 +423,21 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (type == CONTACT_FILE_ADAPTER && parentHandle == INVALID_HANDLE) {
                             intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)
                                 ?.let { email ->
-                                    mediaPlayerRepository.getNodesByEmail(isAudioPlayer, email)
-                                        ?.let { nodes ->
-                                            mediaPlayerRepository.getUserNameByEmail(email)?.let {
-                                                getString(R.string.title_incoming_shares_with_explorer)
-                                                    .let { sharesTitle ->
-                                                        playlistTitle.postValue("$sharesTitle $it")
-                                                    }
-                                            }
-                                            buildPlaySourcesByTypedNodes(type = type,
-                                                typedNodes = nodes.map { addNodeType(it) },
-                                                firstPlayHandle = firstPlayHandle)
+                                    if (isAudioPlayer) {
+                                        getAudioNodesByEmail(email)
+                                    } else {
+                                        getVideoNodesByEmail(email)
+                                    }?.let { nodes ->
+                                        getUserNameByEmail(email)?.let {
+                                            getString(R.string.title_incoming_shares_with_explorer)
+                                                .let { sharesTitle ->
+                                                    playlistTitle.postValue("$sharesTitle $it")
+                                                }
                                         }
+                                        buildPlaySourcesByTypedNodes(type = type,
+                                            typedNodes = nodes,
+                                            firstPlayHandle = firstPlayHandle)
+                                    }
                                 }
                             return@launch
                         }
