@@ -9,80 +9,6 @@ apply plugin: 'jacoco'
 
 apply from: "$project.rootDir/tools/util.gradle"
 
-/**
- * For Continuous Delivery in Google Play Internal Channel <p/>
- * For Android builds in CD pipeline, read the environment variable and assign to version code
- * For local builds, compute string with formatted date and assign to version code
- * @return app's version name
- */
-def readVersionCode() {
-    def versionCode = System.getenv('APK_VERSION_CODE_FOR_CD')
-    if (versionCode != null && !versionCode.isEmpty()) {
-        return versionCode.toInteger()
-    } else {
-        return new Date().format("yyDDDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
-    }
-}
-
-/**
- * For Continuous Delivery with Firebase AppDistribution <p/>
- * For Android builds in CD pipeline, read the environment variable and
- * add to standard version name, in order to distinguish versions on Firebase.
- * For normal builds, use default version name format.
- * @return app's version name
- */
-def readVersionName() {
-    def versionNameTag = System.getenv('APK_VERSION_NAME_TAG_FOR_CD')
-    if (versionNameTag != null && !versionNameTag.isEmpty()) {
-        return "$rootProject.appVersion (${readVersionCode()}${versionNameTag})"
-    } else {
-        return "$rootProject.appVersion (${readVersionCode()})"
-    }
-}
-
-/**
- * For Continuous Delivery with Firebase AppDistribution <p/>
- * Get release note string from environment variable.
- * @return release note to be shown on Firebase. If environment variable is not set,
- *         return "Release Note not available"
- */
-def readReleaseNotes() {
-    def releaseNote = System.getenv('RELEASE_NOTES_FOR_CD')
-    if (releaseNote != null && !releaseNote.isEmpty()) {
-        return releaseNote
-    } else {
-        return "Release Notes not available"
-    }
-}
-
-/**
- * For Continuous Delivery with Firebase AppDistribution
- * Get tester list from environment. Tester list should be
- * comma-separated list of email address.
- * @returnn tester list or "" if there is no tester
- */
-String readTesters() {
-    String testers = System.getenv("TESTERS_FOR_CD")
-    if (testers == null || testers.trim().isEmpty()) {
-        testers = ""
-    }
-    return testers
-}
-
-/**
- * For Continuous Delivery with Firebase AppDistribution
- * Get tester group list from environment. Tester group list should be
- * comma-separated list of group names.
- * @return tester group list or default group list if there is no environment setting
- */
-String readTesterGroupList() {
-    String groups = System.getenv("TESTER_GROUP_FOR_CD")
-    if (groups == null || groups.trim().isEmpty()) {
-        groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
-    }
-    return groups
-}
-
 configurations {
     jacocoAnt
 }
@@ -111,14 +37,15 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode readVersionCode()
-        versionName readVersionName()
+        versionName rootProject.appVersion
+        versionNameSuffix "${readVersionNameChannel()}(${readVersionCode()}${readVersionNameTag()})(${getAppGitHash()})"
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
 
-        buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${appVersion}_${versionCode}\"")
+        buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${versionName}_${versionCode}\"")
         buildConfigField("boolean", "ACTIVATE_GREETER", "${shouldActivateGreeter}")
-        resValue("string", "app_version", "\"${versionName}\"")
+        resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
 
@@ -632,5 +559,35 @@ task createUnitTestCoverageReport(dependsOn: ['instrumentClasses', 'testGmsDebug
             html(destdir: "$buildDir.path/reports/jacoco/html")
             csv(destfile: "$buildDir.path/reports/jacoco/gmsDebugUnitTestCoverage.csv")
         }
+    }
+}
+
+/**
+ * Gradle task for getting the app git hash
+ * Run ./gradlew -q printAppGitHash
+ */
+task printAppGitHash {
+    doLast {
+        println getAppGitHash()
+    }
+}
+
+/**
+ * Gradle task for getting the app version name
+ * Run ./gradlew -q printAppVersionName
+ */
+task printAppVersionName {
+    doLast {
+        println android.defaultConfig.versionName
+    }
+}
+
+/**
+ * Gradle task for getting the app version name channel
+ * Run ./gradlew -q printAppVersionNameChannel
+ */
+task printAppVersionNameChannel {
+    doLast {
+        println readVersionNameChannel()
     }
 }

@@ -38,7 +38,6 @@ import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LoggedInUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
@@ -56,6 +55,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.AreTransfersPaused
+import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -76,7 +76,7 @@ import javax.inject.Inject
  * @property removeNodeUseCase          Needed to remove image node on demand
  * @property exportNodeUseCase          Needed to export image node on demand
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
- * @property loggedInUseCase            UseCase required to check when the user is already logged in
+ * @property isUserLoggedInUseCase      UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
  * @property areTransfersPaused         UseCase required to check if transfers are paused
  * @property copyNodeUseCase            UseCase required to copy nodes
@@ -92,7 +92,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val cancelTransferUseCase: CancelTransferUseCase,
-    private val loggedInUseCase: LoggedInUseCase,
+    private val isUserLoggedInUseCase: IsUserLoggedIn,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
     private val areTransfersPaused: AreTransfersPaused,
     private val copyNodeUseCase: CopyNodeUseCase,
@@ -741,16 +741,9 @@ class ImageViewerViewModel @Inject constructor(
      * Check if current user is logged in
      */
     private fun checkIfUserIsLoggedIn() {
-        loggedInUseCase.isUserLoggedIn()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { isLoggedIn ->
-                    isUserLoggedIn = isLoggedIn
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+        viewModelScope.launch {
+            isUserLoggedIn = isUserLoggedInUseCase()
+        }
     }
 
     /**

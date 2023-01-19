@@ -34,7 +34,6 @@ import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.getScaleH;
 import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.getSizeString;
-import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
@@ -111,8 +110,8 @@ import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFrag
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
-import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel;
 import mega.privacy.android.app.presentation.clouddrive.FolderLinkViewModel;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.data.CopyRequestResult;

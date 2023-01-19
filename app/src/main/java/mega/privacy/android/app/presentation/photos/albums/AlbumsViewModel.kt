@@ -23,8 +23,10 @@ import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
+import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,6 +58,7 @@ class AlbumsViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val createAlbum: CreateAlbum,
     private val removeAlbums: RemoveAlbums,
+    private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -67,15 +71,6 @@ class AlbumsViewModel @Inject constructor(
 
     private var createAlbumJob: Job? = null
 
-    private suspend fun getSystemAlbums(): Map<Album, PhotoPredicate> {
-        val albums = getDefaultAlbumsMap()
-        return if (getFeatureFlag(AppFeatures.DynamicAlbum)) {
-            albums
-        } else {
-            albums.filter { it.key is Album.FavouriteAlbum }
-        }
-    }
-
     init {
         loadAlbums()
         loadUserAlbums()
@@ -83,7 +78,7 @@ class AlbumsViewModel @Inject constructor(
 
     private fun loadAlbums() {
         currentNodeJob = viewModelScope.launch {
-            val includedSystemAlbums = getSystemAlbums()
+            val includedSystemAlbums = getDefaultAlbumsMap()
             runCatching {
                 getDefaultAlbumPhotos(
                     includedSystemAlbums.values.toList()
@@ -396,36 +391,62 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    fun togglePhotoSelection(id: Long) {
-        val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
-        if (id in selectedPhotoIds) {
-            selectedPhotoIds.remove(id)
+    fun togglePhotoSelection(photo: Photo) {
+        val selectedPhotos = _state.value.selectedPhotos.toMutableSet()
+        if (photo in selectedPhotos) {
+            selectedPhotos.remove(photo)
         } else {
-            selectedPhotoIds.add(id)
+            selectedPhotos.add(photo)
         }
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds)
+            it.copy(selectedPhotos = selectedPhotos)
         }
     }
 
     fun clearSelectedPhotos() {
         _state.update {
-            it.copy(selectedPhotoIds = emptySet())
+            it.copy(selectedPhotos = emptySet())
         }
     }
 
     fun selectAllPhotos() {
         _state.value.currentAlbum?.let { album ->
             val currentAlbumPhotos = _state.value.albums.getAlbumPhotos(album)
-            val albumPhotosHandles = when (_state.value.currentMediaType) {
-                FilterMediaType.ALL_MEDIA -> currentAlbumPhotos.map { it.id }
+            val albumPhotos = when (_state.value.currentMediaType) {
+                FilterMediaType.ALL_MEDIA -> currentAlbumPhotos
                 FilterMediaType.IMAGES -> currentAlbumPhotos.filterIsInstance<Photo.Image>()
-                    .map { it.id }
                 FilterMediaType.VIDEOS -> currentAlbumPhotos.filterIsInstance<Photo.Video>()
-                    .map { it.id }
             }
             _state.update {
-                it.copy(selectedPhotoIds = albumPhotosHandles.toMutableSet())
+                it.copy(selectedPhotos = albumPhotos.toMutableSet())
+            }
+        }
+    }
+
+    /**
+     * Set the value for the viewstate property showRemovePhotosDialog
+     */
+    fun setShowRemovePhotosFromAlbumDialog(show: Boolean) {
+        _state.update {
+            it.copy(showRemovePhotosDialog = show)
+        }
+    }
+
+    /**
+     * Function to remove the currently selected photos from the current album
+     */
+    fun removePhotosFromAlbum() = viewModelScope.launch {
+        (_state.value.currentAlbum as? Album.UserAlbum)?.let { album ->
+            _state.value.selectedPhotos.mapNotNull { photo ->
+                photo.albumPhotoId?.let {
+                    AlbumPhotoId(
+                        id = it,
+                        nodeId = NodeId(photo.id),
+                        albumId = album.id,
+                    )
+                }
+            }.also {
+                removePhotosFromAlbumUseCase(albumId = album.id, photoIds = it)
             }
         }
     }
@@ -435,15 +456,15 @@ class AlbumsViewModel @Inject constructor(
 
     fun removeFavourites() {
         viewModelScope.launch {
-            removeFavourites(_state.value.selectedPhotoIds.toList())
+            removeFavourites(_state.value.selectedPhotos.map { it.id }.toList())
         }
         _state.update {
-            it.copy(selectedPhotoIds = emptySet())
+            it.copy(selectedPhotos = emptySet())
         }
     }
 
     suspend fun getSelectedNodes() =
-        getNodeListByIds(_state.value.selectedPhotoIds.toList())
+        getNodeListByIds(_state.value.selectedPhotos.map { it.id }.toList())
 
     fun setCurrentSort(sort: Sort) {
         _state.update {

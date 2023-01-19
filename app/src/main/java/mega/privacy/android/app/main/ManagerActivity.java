@@ -298,7 +298,6 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
-import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
@@ -330,7 +329,8 @@ import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
-import mega.privacy.android.app.main.qrcode.ScanCodeFragment;
+import mega.privacy.android.app.presentation.login.LoginActivity;
+import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
@@ -391,7 +391,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.DownloadNodeUseCase;
-import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
@@ -423,7 +422,6 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
-import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.data.model.UserCredentials;
@@ -538,8 +536,6 @@ public class ManagerActivity extends TransfersManagementActivity
     @Inject
     RemoveNodeUseCase removeNodeUseCase;
     @Inject
-    GetNodeUseCase getNodeUseCase;
-    @Inject
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
     DownloadNodeUseCase downloadNodeUseCase;
@@ -611,14 +607,8 @@ public class ManagerActivity extends TransfersManagementActivity
     MegaNode parentNodeManager;
 
     public DrawerLayout drawerLayout;
-    ArrayList<MegaUser> contacts = new ArrayList<>();
-    ArrayList<MegaUser> visibleContacts = new ArrayList<>();
 
     public boolean openFolderRefresh = false;
-
-    public boolean openSettingsStartScreen;
-    public boolean openSettingsStorage = false;
-    public boolean openSettingsQR = false;
     boolean newAccount = false;
     public boolean newCreationAccount;
 
@@ -629,7 +619,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private boolean isStorageStatusDialogShown = false;
 
     private boolean isTransferOverQuotaWarningShown;
-    private AlertDialog transferOverQuotaWarning;
     private AlertDialog confirmationTransfersDialog;
 
     private AlertDialog reconnectDialog;
@@ -650,56 +639,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public boolean isInFilterPage = false;
     private boolean isInAlbumContent;
     public boolean fromAlbumContent = false;
-
-    public enum FragmentTag {
-        CLOUD_DRIVE, HOMEPAGE, PHOTOS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SEARCH, TRANSFERS, COMPLETED_TRANSFERS,
-        RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
-        LINKS, MEDIA_DISCOVERY, ALBUM_CONTENT, PHOTOS_FILTER;
-
-        public String getTag() {
-            switch (this) {
-                case CLOUD_DRIVE:
-                    return "fileBrowserFragment";
-                case HOMEPAGE:
-                    return "homepageFragment";
-                case RUBBISH_BIN:
-                    return "rubbishBinFragment";
-                case PHOTOS:
-                    return "photosFragment";
-                case INBOX:
-                    return "inboxFragment";
-                case INCOMING_SHARES:
-                    return "incomingSharesFragment";
-                case OUTGOING_SHARES:
-                    return "outgoingSharesFragment";
-                case SEARCH:
-                    return "searchFragment";
-                case TRANSFERS:
-                    return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 0;
-                case COMPLETED_TRANSFERS:
-                    return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 1;
-                case RECENT_CHAT:
-                    return "chatTabsFragment";
-                case NOTIFICATIONS:
-                    return "notificationsFragment";
-                case TURN_ON_NOTIFICATIONS:
-                    return "turnOnNotificationsFragment";
-                case PERMISSIONS:
-                    return "permissionsFragment";
-                case SMS_VERIFICATION:
-                    return "smsVerificationFragment";
-                case LINKS:
-                    return "linksFragment";
-                case MEDIA_DISCOVERY:
-                    return "mediaDiscoveryFragment";
-                case ALBUM_CONTENT:
-                    return "fragmentAlbumContent";
-                case PHOTOS_FILTER:
-                    return "fragmentPhotosFilter";
-            }
-            return null;
-        }
-    }
 
     public boolean turnOnNotifications = false;
 
@@ -734,8 +673,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private RelativeLayout callInProgressLayout;
     private Chronometer callInProgressChrono;
     private TextView callInProgressText;
-    private LinearLayout microOffLayout;
-    private LinearLayout videoOnLayout;
 
     boolean firstTimeAfterInstallation = true;
     SearchView searchView;
@@ -751,11 +688,6 @@ public class ManagerActivity extends TransfersManagementActivity
     boolean megaContacts = true;
 
     private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
-
-    private enum HomepageScreen {
-        HOMEPAGE, IMAGES, FAVOURITES, DOCUMENTS, AUDIO, VIDEO,
-        FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
-    }
 
     public boolean isList = true;
 
@@ -775,7 +707,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private Fragment albumContentFragment;
     private PhotosFilterFragment photosFilterFragment;
     private ChatTabsFragment chatTabsFragment;
-    private NotificationsFragment notificationsFragment;
     private TurnOnNotificationsFragment turnOnNotificationsFragment;
     private PermissionsFragment permissionsFragment;
     private SMSVerificationFragment smsVerificationFragment;
@@ -791,17 +722,12 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private AlertDialog permissionsDialog;
     private AlertDialog presenceStatusDialog;
-    private AlertDialog alertNotPermissionsUpload;
-    private AlertDialog clearRubbishBinDialog;
-    private AlertDialog insertPassDialog;
-    private AlertDialog changeUserAttributeDialog;
     private AlertDialog alertDialogStorageStatus;
     private AlertDialog alertDialogSMSVerification;
     private AlertDialog newTextFileDialog;
     private AlertDialog newFolderDialog;
 
     private MenuItem searchMenuItem;
-    private MenuItem enableSelectMenuItem;
     private MenuItem doNotDisturbMenuItem;
     private MenuItem clearRubbishBinMenuitem;
     private MenuItem cancelAllTransfersMenuItem;
@@ -809,7 +735,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private MenuItem pauseTransfersMenuIcon;
     private MenuItem retryTransfers;
     private MenuItem clearCompletedTransfers;
-    private MenuItem scanQRcodeMenuItem;
     private MenuItem returnCallMenuItem;
     private MenuItem openLinkMenuItem;
     private Chronometer chronometerMenuItem;
@@ -820,8 +745,6 @@ public class ManagerActivity extends TransfersManagementActivity
     boolean isEnable2FADialogShown = false;
     Button enable2FAButton;
     Button skip2FAButton;
-
-    private boolean is2FAEnabled = false;
 
     public boolean comesFromNotifications = false;
     public int comesFromNotificationsLevel = 0;
@@ -917,8 +840,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private final ArrayList<View> fabs = new ArrayList<>();
     // end for Meeting
 
-    // Backup warning dialog
-    private AlertDialog backupWarningDialog;
     private ArrayList<Long> backupHandleList;
     private int backupDialogType = BACKUP_DIALOG_SHOW_NONE;
     private Long backupNodeHandle;
@@ -1103,15 +1024,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-            MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-
-            ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-                            ? parentNode
-                            : megaApi.getRootNode(),
-                    SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-
-            fileBrowserFragment.setNodes(nodes);
-            fileBrowserFragment.getRecyclerView().invalidate();
+            fileBrowserViewModel.refreshNodes();
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
             refreshIncomingShares();
         }
@@ -1362,7 +1275,8 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS_FILTER.getTag(), photosFilterFragment);
         }
 
-        backupWarningDialog = fileBackupManager.getBackupWarningDialog();
+        // Backup warning dialog
+        AlertDialog backupWarningDialog = fileBackupManager.getBackupWarningDialog();
         if (backupWarningDialog != null && backupWarningDialog.isShowing()) {
             backupHandleList = fileBackupManager.getBackupHandleList();
             backupNodeHandle = fileBackupManager.getBackupNodeHandle();
@@ -1965,8 +1879,6 @@ public class ManagerActivity extends TransfersManagementActivity
         callInProgressLayout.setOnClickListener(this);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressText = findViewById(R.id.call_in_progress_text);
-        microOffLayout = findViewById(R.id.micro_off_layout);
-        videoOnLayout = findViewById(R.id.video_on_layout);
         callInProgressLayout.setVisibility(View.GONE);
 
         if (mElevationCause > 0) {
@@ -4234,7 +4146,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         setBottomNavigationMenuItemChecked(NO_BNV);
 
-        notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
+        NotificationsFragment notificationsFragment = (NotificationsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
         if (notificationsFragment == null) {
             Timber.w("New NotificationsFragment");
             notificationsFragment = NotificationsFragment.newInstance();
@@ -4584,7 +4496,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
                 if (getIntent() != null && getIntent().getBooleanExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, false)) {
-                    fileBrowserFragment.refreshNodes();
+                    fileBrowserViewModel.refreshNodes();
                 }
                 Timber.d("END for Cloud Drive");
                 break;
@@ -4728,14 +4640,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             case CHAT: {
                 Timber.d("Chat selected");
-                if (megaApi != null) {
-                    contacts = megaApi.getContacts();
-                    for (int i = 0; i < contacts.size(); i++) {
-                        if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                            visibleContacts.add(contacts.get(i));
-                        }
-                    }
-                }
                 selectDrawerItemChat();
                 supportInvalidateOptionsMenu();
                 showHideBottomNavigationView(false);
@@ -5260,7 +5164,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         });
 
-        enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
+        MenuItem enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
         doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
         clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
         cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
@@ -5268,7 +5172,6 @@ public class ManagerActivity extends TransfersManagementActivity
         retryTransfers = menu.findItem(R.id.action_menu_retry_transfers);
         playTransfersMenuIcon = menu.findItem(R.id.action_play);
         pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
-        scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
         returnCallMenuItem = menu.findItem(R.id.action_return_call);
         RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
         layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
@@ -6200,7 +6103,6 @@ public class ManagerActivity extends TransfersManagementActivity
         if (notValidView) {
             rubbishBinViewModel.setRubbishBinHandle(INVALID_HANDLE);
             setToolbarTitle();
-            refreshRubbishBin();
         }
 
         dismissAlertDialogIfExists(statusDialog);
@@ -6894,7 +6796,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
-        clearRubbishBinDialog = builder.create();
+        AlertDialog clearRubbishBinDialog = builder.create();
         clearRubbishBinDialog.show();
     }
 
@@ -7311,27 +7213,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * Checks if should update some cu view visibility.
-     *
-     * @param visibility New requested visibility update.
-     * @return True if should apply the visibility update, false otherwise.
-     */
-    private boolean rightCUVisibilityChange(int visibility) {
-        return drawerItem == DrawerItem.PHOTOS || visibility == View.GONE;
-    }
-
-    /**
-     * Updates cuViewTypes view visibility.
-     *
-     * @param visibility New visibility value to set.
-     */
-    public void updateCUViewTypes(int visibility) {
-        if (rightCUVisibilityChange(visibility)) {
-            cuViewTypes.setVisibility(visibility);
-        }
-    }
-
-    /**
      * Shows the bottom sheet to manage a completed transfer.
      *
      * @param transfer the completed transfer to manage.
@@ -7450,7 +7331,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         // isInBackup Indicates if the current node is under "My backup"
         if (fileBackupManager.fabForBackup(
-                fileBrowserFragment.getNodeList(),
+                fileBrowserViewModel.getState().getValue().getNodes(),
                 getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE),
                 actionType,
                 fileBackupManager.getActionBackupNodeCallback()
@@ -7579,21 +7460,10 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaNode parentNode = rootNode;
 
         if (isCloudAdded()) {
-            ArrayList<MegaNode> nodes;
-            if (fileBrowserState(ManagerActivity.this).getFileBrowserHandle() == -1) {
-                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            } else {
-                parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-                if (parentNode == null) return;
-
-                nodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-            }
-            Timber.d("Nodes: %s", nodes.size());
+            fileBrowserViewModel.refreshNodes();
             if (comesFromNotificationChildNodeHandleList == null) {
                 fileBrowserFragment.hideMultipleSelect();
             }
-            fileBrowserFragment.setNodes(nodes);
-            fileBrowserFragment.getRecyclerView().invalidate();
         }
     }
 
@@ -7872,7 +7742,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         if (isCloudAdded()) {
                             String handle = node.getHandle();
                             if (handle != null && !handle.equals("")) {
-                                fileBrowserFragment.refresh(Long.parseLong(handle));
+                                fileBrowserViewModel.setBrowserParentHandle(Long.parseLong(handle));
                             }
                         }
 
@@ -8173,16 +8043,7 @@ public class ManagerActivity extends TransfersManagementActivity
             viewModel.askForExtendedAccountDetails();
 
             if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                fileBrowserViewModel.setBrowserParentHandle(intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE));
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-
-                ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode != null
-                                ? parentNode
-                                : megaApi.getRootNode(),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-
-                fileBrowserFragment.setNodes(nodes);
-                fileBrowserFragment.getRecyclerView().invalidate();
+                fileBrowserViewModel.refreshNodes();
             } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
                 refreshIncomingShares();
             }
@@ -8229,15 +8090,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
                 if (parentNode != null) {
                     if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
-                    }
-                } else {
-                    if (isCloudAdded()) {
-                        ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-                        fileBrowserFragment.setNodes(nodes);
-                        fileBrowserFragment.getRecyclerView().invalidate();
+                        fileBrowserViewModel.refreshNodes();
                     }
                 }
             } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
@@ -8329,7 +8182,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else if (requestCode == REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK) {
             if (isCloudAdded()) {
                 long handle = intent.getLongExtra(NODE_HANDLE, -1);
-                fileBrowserFragment.refresh(handle);
+                fileBrowserViewModel.setBrowserParentHandle(handle);
             }
 
             onNodesSharedUpdate();
@@ -8405,10 +8258,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
             if (isCloudAdded()) {
-                ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle()),
-                        SortOrderIntMapperKt.sortOrderToInt(viewModel.getOrder()));
-                fileBrowserFragment.setNodes(nodes);
-                fileBrowserFragment.getRecyclerView().invalidate();
+                fileBrowserViewModel.refreshNodes();
             }
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             refreshRubbishBin();
@@ -9324,8 +9174,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     Timber.d("Attribute USER_ATTR_GEOLOCATION disabled");
                     MegaApplication.setEnabledGeoLocation(false);
                 }
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
-                MegaApplication.setDisableFileVersions(request.getFlag());
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             Timber.d("TYPE_GET_CANCEL_LINK");
@@ -10562,31 +10410,6 @@ public class ManagerActivity extends TransfersManagementActivity
         supportInvalidateOptionsMenu();
     }
 
-    public boolean is2FAEnabled() {
-        return is2FAEnabled;
-    }
-
-    /**
-     * Sets or removes the layout behaviour to hide the bottom view when scrolling.
-     *
-     * @param enable True if should set the behaviour, false if should remove it.
-     */
-    public void enableHideBottomViewOnScroll(boolean enable) {
-        LinearLayout layout = findViewById(R.id.container_bottom);
-        if (layout == null || isInImagesPage()) {
-            return;
-        }
-
-        final CoordinatorLayout.LayoutParams fParams
-                = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        fParams.setMargins(0, 0, 0, enable ? 0 : getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
-        fragmentLayout.setLayoutParams(fParams);
-
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-        params.setBehavior(enable ? new CustomHideBottomViewOnScrollBehaviour<LinearLayout>() : null);
-        layout.setLayoutParams(params);
-    }
-
     /**
      * Shows all the content of bottom view.
      */
@@ -10599,33 +10422,6 @@ public class ManagerActivity extends TransfersManagementActivity
         bottomView.animate().translationY(0).setDuration(175)
                 .withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
                 .start();
-    }
-
-    /**
-     * Shows or hides the bottom view and animates the transition.
-     *
-     * @param hide True if should hide it, false if should show it.
-     */
-    public void animateBottomView(boolean hide) {
-        LinearLayout bottomView = findViewById(R.id.container_bottom);
-        if (bottomView == null || fragmentLayout == null) {
-            return;
-        }
-
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
-
-        if (hide && bottomView.getVisibility() == View.VISIBLE) {
-            bottomView.animate().translationY(bottomView.getHeight()).setDuration(ANIMATION_DURATION)
-                    .withStartAction(() -> params.bottomMargin = 0)
-                    .withEndAction(() -> bottomView.setVisibility(View.GONE)).start();
-        } else if (!hide && bottomView.getVisibility() == View.GONE) {
-            int bottomMargin = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
-
-            bottomView.animate().translationY(0).setDuration(ANIMATION_DURATION)
-                    .withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
-                    .withEndAction(() -> params.bottomMargin = bottomMargin)
-                    .start();
-        }
     }
 
     public void showHideBottomNavigationView(boolean hide) {
@@ -10950,7 +10746,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         int messageResource = R.string.warning_transfer_over_quota;
 
-        transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)
+        AlertDialog transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)
                 .setMessage(getString(messageResource, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())))
                 .setPositiveButton(R.string.my_account_upgrade_pro, (dialog, which) -> {
                     navigateToUpgradeAccount();
@@ -11076,10 +10872,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private PermissionsFragment getPermissionsFragment() {
         return permissionsFragment = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
-    }
-
-    public Fragment getMDFragment() {
-        return mediaDiscoveryFragment;
     }
 
     public Fragment getAlbumContentFragment() {
@@ -11234,15 +11026,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * Checks if the current screen is Media discovery page.
-     *
-     * @return True if the current screen is Media discovery page, false otherwise.
-     */
-    public boolean isInMDPage() {
-        return drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode;
-    }
-
-    /**
      * Create the instance of FileBackupManager
      */
     private void initFileBackupManager() {
@@ -11365,6 +11148,28 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshIncomingShares();
     }
 
+    /**
+     * Restores the Rubbish section after opening it from a notification in the Notifications section.
+     */
+    public void restoreRubbishAfterComingFromNotification() {
+        comesFromNotifications = false;
+        comesFromNotificationHandle = -1;
+        selectDrawerItem(DrawerItem.NOTIFICATIONS);
+        rubbishBinViewModel.setRubbishBinHandle(comesFromNotificationHandleSaved);
+        comesFromNotificationHandleSaved = -1;
+    }
+
+    /**
+     * Restores the FileBrowser section after opening it from a notification in the Notifications section.
+     */
+    public void restoreFileBrowserAfterComingFromNotification() {
+        comesFromNotifications = false;
+        comesFromNotificationHandle = -1;
+        selectDrawerItem(DrawerItem.NOTIFICATIONS);
+        fileBrowserViewModel.setBrowserParentHandle(comesFromNotificationHandleSaved);
+        comesFromNotificationHandleSaved = -1;
+        refreshCloudDrive();
+    }
     /**
      * Updates Inbox section visibility depending on if it has children.
      *

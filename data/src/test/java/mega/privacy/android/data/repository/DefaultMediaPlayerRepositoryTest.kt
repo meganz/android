@@ -1,7 +1,10 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
@@ -10,21 +13,24 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.toNode
+import mega.privacy.android.data.model.node.DefaultFileNode
+import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.DefaultAddNodeType
 import mega.privacy.android.domain.usecase.GetFolderType
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -39,6 +45,8 @@ class DefaultMediaPlayerRepositoryTest {
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
     private val fileGateway = mock<FileGateway>()
     private val getFolderType = mock<GetFolderType>()
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
+    private val appPreferencesGateway = mock<AppPreferencesGateway>()
 
     private val expectedHandle = 100L
     private val expectedParentHandle = 999L
@@ -62,9 +70,13 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedModificationTime = 2000L
     private val expectedThumbnailPath: String? = null
     private val expectedFingerprint = "fingerprint"
-    private val expectedType = StaticImageFileTypeInfo(type = "", extension = "image")
+    private val expectedType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
     private val expectedFileMegaNode = createMegaNode(false)
     private val expectedFolderMegaNode = createMegaNode(true)
+
+    private val expectedMediaId: Long = 1234567
+    private val expectedTotalDuration: Long = 200000
+    private val expectedCurrentPosition: Long = 16000
 
     @Before
     fun setUp() {
@@ -75,8 +87,9 @@ class DefaultMediaPlayerRepositoryTest {
             nodeMapper = ::toNode,
             cacheFolder = cacheFolder,
             fileTypeInfoMapper = fileTypeInfoMapper,
-            addNodeType = DefaultAddNodeType(getFolderType),
             fileGateway = fileGateway,
+            sortOrderIntMapper = sortOrderIntMapper,
+            appPreferencesGateway = appPreferencesGateway,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -88,13 +101,13 @@ class DefaultMediaPlayerRepositoryTest {
 
         val expectedTypedNode = createTypedFileNode()
 
-        val actualTypedFile = underTest.getTypedNodeByHandle(expectedHandle)
+        val actualTypedFile = underTest.getUnTypedNodeByHandle(expectedHandle)
 
         assertThat(actualTypedFile).isNotNull()
-        assertThat(actualTypedFile).isInstanceOf(TypedFileNode::class.java)
+        assertThat(actualTypedFile).isInstanceOf(DefaultFileNode::class.java)
         actualTypedFile?.let { nonNullActualTypedFile ->
             with(nonNullActualTypedFile) {
-                this as TypedFileNode
+                this as DefaultFileNode
                 assertThat(id).isEqualTo(expectedTypedNode.id)
                 assertThat(parentId).isEqualTo(expectedTypedNode.parentId)
                 assertThat(name).isEqualTo(expectedTypedNode.name)
@@ -120,13 +133,13 @@ class DefaultMediaPlayerRepositoryTest {
         initTestConditions(expectedFolderMegaNode, expectedType)
 
         val expectedTypedNode = createTypedFolderNode()
-        val actualTypedFolder = underTest.getTypedNodeByHandle(expectedHandle)
+        val actualTypedFolder = underTest.getUnTypedNodeByHandle(expectedHandle)
 
         assertThat(actualTypedFolder).isNotNull()
-        assertThat(actualTypedFolder).isInstanceOf(TypedFolderNode::class.java)
+        assertThat(actualTypedFolder).isInstanceOf(DefaultFolderNode::class.java)
         actualTypedFolder?.let { nonNullActualTypedFolder ->
             with(nonNullActualTypedFolder) {
-                this as TypedFolderNode
+                this as DefaultFolderNode
                 assertThat(id).isEqualTo(expectedTypedNode.id)
                 assertThat(parentId).isEqualTo(expectedTypedNode.parentId)
                 assertThat(name).isEqualTo(expectedTypedNode.name)
@@ -184,6 +197,64 @@ class DefaultMediaPlayerRepositoryTest {
         assertThat(actual).isEqualTo(expectedLocalLink)
     }
 
+    @Test
+    fun `test that updatePlayback information that there is no local data`() = runTest {
+        val expectedPlaybackInfo = createPlaybackInformation()
+
+        underTest.updatePlaybackInformation(expectedPlaybackInfo)
+        whenever(appPreferencesGateway.monitorString(anyOrNull(),
+            anyOrNull())).thenReturn(flowOf(null))
+        val actual = underTest.monitorPlaybackTimes().firstOrNull()
+
+        assertThat(actual?.get(expectedMediaId)?.mediaId).isEqualTo(expectedMediaId)
+        assertThat(actual?.get(expectedMediaId)?.totalDuration).isEqualTo(expectedTotalDuration)
+        assertThat(actual?.get(expectedMediaId)?.currentPosition).isEqualTo(expectedCurrentPosition)
+    }
+
+    @Test
+    fun `test that monitorPlaybackTimes`() = runTest {
+        val expectedPlaybackInfo = createPlaybackInformation()
+
+        whenever(appPreferencesGateway.monitorString(anyOrNull(),
+            anyOrNull())).thenReturn(flowOf(Gson().toJson(mapOf(Pair(expectedMediaId,
+            expectedPlaybackInfo)))))
+        val actual = underTest.monitorPlaybackTimes().firstOrNull()
+
+        assertThat(actual?.get(expectedMediaId)?.mediaId).isEqualTo(expectedMediaId)
+        assertThat(actual?.get(expectedMediaId)?.totalDuration).isEqualTo(expectedTotalDuration)
+        assertThat(actual?.get(expectedMediaId)?.currentPosition).isEqualTo(expectedCurrentPosition)
+    }
+
+    @Test
+    fun `test that deletePlaybackInformation that playbackInfoMap doesn't include deleted item even local data includes it`() =
+        runTest {
+            val expectedPlaybackInfo = createPlaybackInformation()
+            val expectedDeleteMediaId: Long = 7654321
+            val expectedDeleteTotalDuration: Long = 300000
+            val expectedDeleteCurrentPosition: Long = 20000
+            val expectedDeletePlaybackInfo = PlaybackInformation(
+                expectedDeleteMediaId,
+                expectedDeleteTotalDuration,
+                expectedDeleteCurrentPosition
+            )
+
+            val expectedPlaybackInfoMap = mapOf(
+                Pair(expectedMediaId, expectedPlaybackInfo),
+                Pair(expectedDeleteMediaId, expectedDeletePlaybackInfo)
+            )
+
+            underTest.updatePlaybackInformation(expectedPlaybackInfo)
+            underTest.updatePlaybackInformation(expectedDeletePlaybackInfo)
+            underTest.deletePlaybackInformation(expectedDeleteMediaId)
+
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(
+                    Gson().toJson(expectedPlaybackInfoMap)))
+            val actual = underTest.monitorPlaybackTimes().firstOrNull()
+
+            assertThat(actual?.containsKey(expectedDeleteMediaId)).isFalse()
+        }
+
     private fun createMegaNode(isFolder: Boolean) = mock<MegaNode> {
         on { handle }.thenReturn(expectedHandle)
         on { parentHandle }.thenReturn(expectedParentHandle)
@@ -203,42 +274,42 @@ class DefaultMediaPlayerRepositoryTest {
         on { fingerprint }.thenReturn(expectedFingerprint)
     }
 
-    private fun createTypedFolderNode() = mock<TypedFolderNode> {
-        on { id }.thenReturn(expectedNodeId)
-        on { parentId }.thenReturn(expectedParentNodeId)
-        on { name }.thenReturn(expectedName)
-        on { base64Id }.thenReturn(expectedBase64Id)
-        on { label }.thenReturn(expectedLabel)
-        on { hasVersion }.thenReturn(expectedHasVersion)
-        on { childFileCount }.thenReturn(expectedGetNumChildFiles)
-        on { childFolderCount }.thenReturn(expectedGetNumChildFolders)
-        on { isFavourite }.thenReturn(expectedIsFavourite)
-        on { isExported }.thenReturn(expectedIsExported)
-        on { isTakenDown }.thenReturn(expectedIsTakenDown)
-        on { isInRubbishBin }.thenReturn(expectedInRubbishBin)
-        on { isIncomingShare }.thenReturn(expectedIncomingShare)
-        on { isShared }.thenReturn(expectedInShared)
-        on { isPendingShare }.thenReturn(expectedIsPendingShare)
-        on { device }.thenReturn(expectedDevice)
-    }
+    private fun createTypedFolderNode() = DefaultFolderNode(
+        id = expectedNodeId,
+        parentId = expectedParentNodeId,
+        name = expectedName,
+        base64Id = expectedBase64Id,
+        label = expectedLabel,
+        hasVersion = expectedHasVersion,
+        childFileCount = expectedGetNumChildFiles,
+        childFolderCount = expectedGetNumChildFolders,
+        isFavourite = expectedIsFavourite,
+        isExported = expectedIsExported,
+        isTakenDown = expectedIsTakenDown,
+        isInRubbishBin = expectedInRubbishBin,
+        isIncomingShare = expectedIncomingShare,
+        isShared = expectedInShared,
+        isPendingShare = expectedIsPendingShare,
+        device = expectedDevice
+    )
 
-    private fun createTypedFileNode() = mock<TypedFileNode> {
-        on { id }.thenReturn(expectedNodeId)
-        on { parentId }.thenReturn(expectedParentNodeId)
-        on { name }.thenReturn(expectedName)
-        on { base64Id }.thenReturn(expectedBase64Id)
-        on { label }.thenReturn(expectedLabel)
-        on { hasVersion }.thenReturn(expectedHasVersion)
-        on { isFavourite }.thenReturn(expectedIsFavourite)
-        on { isExported }.thenReturn(expectedIsExported)
-        on { isTakenDown }.thenReturn(expectedIsTakenDown)
-        on { isIncomingShare }.thenReturn(expectedIncomingShare)
-        on { size }.thenReturn(expectedSize)
-        on { modificationTime }.thenReturn(expectedModificationTime)
-        on { fingerprint }.thenReturn(expectedFingerprint)
-        on { thumbnailPath }.thenReturn(expectedThumbnailPath)
-        on { type }.thenReturn(expectedType)
-    }
+    private fun createTypedFileNode() = DefaultFileNode(
+        id = expectedNodeId,
+        parentId = expectedParentNodeId,
+        name = expectedName,
+        base64Id = expectedBase64Id,
+        label = expectedLabel,
+        hasVersion = expectedHasVersion,
+        isFavourite = expectedIsFavourite,
+        isExported = expectedIsExported,
+        isTakenDown = expectedIsTakenDown,
+        isIncomingShare = expectedIncomingShare,
+        size = expectedSize,
+        modificationTime = expectedModificationTime,
+        fingerprint = expectedFingerprint,
+        thumbnailPath = expectedThumbnailPath,
+        type = expectedType
+    )
 
     private suspend fun initTestConditions(megaNode: MegaNode, typeInfo: FileTypeInfo) {
         whenever(megaApi.hasVersion(megaNode)).thenReturn(expectedHasVersion)
@@ -251,4 +322,10 @@ class DefaultMediaPlayerRepositoryTest {
         whenever(getFolderType(any())).thenReturn(FolderType.Default)
         whenever(fileTypeInfoMapper(any())).thenReturn(typeInfo)
     }
+
+    private fun createPlaybackInformation() = PlaybackInformation(
+        mediaId = expectedMediaId,
+        totalDuration = expectedTotalDuration,
+        currentPosition = expectedCurrentPosition
+    )
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -7,14 +8,17 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.findItemByHandle
 import mega.privacy.android.data.extensions.getDecodedAliases
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -64,6 +68,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property contactItemMapper        [ContactItemMapper]
  * @property contactDataMapper        [ContactDataMapper]
  * @property contactCredentialsMapper [ContactCredentialsMapper]
+ * @property localStorageGateway      [MegaLocalStorageGateway]
  */
 internal class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -78,6 +83,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val contactItemMapper: ContactItemMapper,
     private val contactDataMapper: ContactDataMapper,
     private val contactCredentialsMapper: ContactCredentialsMapper,
+    private val localStorageGateway: MegaLocalStorageGateway,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -122,11 +128,13 @@ internal class DefaultContactsRepository @Inject constructor(
                 if (!isGroup && chat1to1 != null) {
                     continuation.resumeWith(Result.success(chat1to1.chatId))
                 } else {
-                    megaChatApiGateway.createChat(isGroup,
-                        megaChatPeerListMapper(userHandles),
-                        OptionalMegaChatRequestListenerInterface(
+                    megaChatApiGateway.createChat(
+                        isGroup = isGroup,
+                        peers = megaChatPeerListMapper(userHandles),
+                        listener = OptionalMegaChatRequestListenerInterface(
                             onRequestFinish = onRequestCreateChatCompleted(continuation)
-                        ))
+                        )
+                    )
                 }
             }
         }
@@ -152,8 +160,10 @@ internal class DefaultContactsRepository @Inject constructor(
                 val fullName = megaChatApiGateway.getUserFullNameFromCache(megaUser.handle)
                 val alias = megaChatApiGateway.getUserAliasFromCache(megaUser.handle)
                 val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
-                val avatarUri = cacheFolderGateway.getCacheFile(CacheFolderConstant.AVATAR_FOLDER,
-                    "${megaUser.email}.jpg")?.absolutePath
+                val avatarUri = cacheFolderGateway.getCacheFile(
+                    folderName = CacheFolderConstant.AVATAR_FOLDER,
+                    fileName = "${megaUser.email}.jpg"
+                )?.absolutePath
 
                 checkLastGreen(status, megaUser.handle)
 
@@ -212,10 +222,12 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getUserAlias(handle: Long): String? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.getUserAlias(handle,
-                    OptionalMegaRequestListenerInterface(
+                megaApiGateway.getUserAlias(
+                    userHandle = handle,
+                    listener = OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetUserAliasCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -290,11 +302,13 @@ internal class DefaultContactsRepository @Inject constructor(
                 }
             }
             suspendCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(handle.toBase64Handle(),
-                    MegaApiJava.USER_ATTR_FIRSTNAME,
-                    OptionalMegaRequestListenerInterface(
+                megaApiGateway.getUserAttribute(
+                    emailOrHandle = handle.toBase64Handle(),
+                    type = MegaApiJava.USER_ATTR_FIRSTNAME,
+                    listener = OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -307,11 +321,13 @@ internal class DefaultContactsRepository @Inject constructor(
                 }
             }
             suspendCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(handle.toBase64Handle(),
-                    MegaApiJava.USER_ATTR_LASTNAME,
-                    OptionalMegaRequestListenerInterface(
+                megaApiGateway.getUserAttribute(
+                    emailOrHandle = handle.toBase64Handle(),
+                    type = MegaApiJava.USER_ATTR_LASTNAME,
+                    listener = OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetUserNameCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -365,7 +381,8 @@ internal class DefaultContactsRepository @Inject constructor(
                     )?.let { aliases ->
                         outdatedContactList.forEach { (handle, _, contactData) ->
                             val newContactData = contactData.copy(
-                                alias = if (aliases.containsKey(handle)) aliases[handle] else null)
+                                alias = if (aliases.containsKey(handle)) aliases[handle] else null
+                            )
 
                             updatedContact = updatedList.findItemByHandle(handle)
                                 ?.copy(contactData = newContactData)
@@ -423,8 +440,10 @@ internal class DefaultContactsRepository @Inject constructor(
     private suspend fun getAliases(): Map<Long, String> = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.myUser?.let {
-                megaApiGateway.getUserAttribute(it, MegaApiJava.USER_ATTR_ALIAS,
-                    OptionalMegaRequestListenerInterface(
+                megaApiGateway.getUserAttribute(
+                    user = it,
+                    type = MegaApiJava.USER_ATTR_ALIAS,
+                    listener = OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestGetAliasesCompleted(continuation)
                     )
                 )
@@ -461,9 +480,12 @@ internal class DefaultContactsRepository @Inject constructor(
 
     private suspend fun getUserCredentials(user: MegaUser) = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
-            megaApiGateway.getUserCredentials(user, OptionalMegaRequestListenerInterface(
-                onRequestFinish = onGetUserCredentialsCompleted(continuation)
-            ))
+            megaApiGateway.getUserCredentials(
+                user = user,
+                listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onGetUserCredentialsCompleted(continuation)
+                )
+            )
         }
     }
 
@@ -485,9 +507,12 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun resetCredentials(userEmail: String) = withContext(ioDispatcher) {
         megaApiGateway.getContact(userEmail)?.let {
             suspendCoroutine { continuation: Continuation<Unit> ->
-                megaApiGateway.resetCredentials(it, OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onResetCredentialsCompleted(continuation)
-                ))
+                megaApiGateway.resetCredentials(
+                    user = it,
+                    listener = OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onResetCredentialsCompleted(continuation)
+                    )
+                )
             }
         } ?: throw ContactDoesNotExistException()
     }
@@ -504,9 +529,12 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun verifyCredentials(userEmail: String) = withContext(ioDispatcher) {
         megaApiGateway.getContact(userEmail)?.let {
             suspendCoroutine { continuation: Continuation<Unit> ->
-                megaApiGateway.verifyCredentials(it, OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onVerifyCredentialsCompleted(continuation)
-                ))
+                megaApiGateway.verifyCredentials(
+                    user = it,
+                    listener = OptionalMegaRequestListenerInterface(
+                        onRequestFinish = onVerifyCredentialsCompleted(continuation)
+                    )
+                )
             }
         } ?: throw ContactDoesNotExistException()
     }
@@ -531,6 +559,43 @@ internal class DefaultContactsRepository @Inject constructor(
                     userEmail,
                     name
                 )
+            }
+        }
+
+    override suspend fun getCurrentUserFirstName(forceRefresh: Boolean): String =
+        withContext(ioDispatcher) {
+            if (forceRefresh) {
+                getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
+                    .also { localStorageGateway.saveMyFirstName(it) }
+            } else {
+                localStorageGateway.getUserCredentials()?.firstName
+                    ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
+                        .also { localStorageGateway.saveMyFirstName(it) }
+            }
+        }
+
+    override suspend fun getCurrentUserLastName(forceRefresh: Boolean): String =
+        withContext(ioDispatcher) {
+            if (forceRefresh) {
+                getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
+                    .also { localStorageGateway.saveMyLastName(it) }
+            } else {
+                localStorageGateway.getUserCredentials()?.lastName
+                    ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
+                        .also { localStorageGateway.saveMyLastName(it) }
+            }
+        }
+
+    private suspend fun getCurrentUserNameAttribute(attribute: Int): String =
+        withContext(ioDispatcher) {
+            return@withContext suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener {
+                    it.text.orEmpty()
+                }
+                megaApiGateway.getUserAttribute(attribute, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
             }
         }
 

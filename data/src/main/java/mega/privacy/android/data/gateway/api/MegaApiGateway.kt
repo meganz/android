@@ -1012,6 +1012,14 @@ interface MegaApiGateway {
     suspend fun createSetElement(sid: Long, node: Long)
 
     /**
+     * Remove an element from a set
+     *
+     * @param sid the ID of the set
+     * @param eid the SetElement ID that will be removed
+     */
+    suspend fun removeSetElement(sid: Long, eid: Long)
+
+    /**
      * Get a list of all Sets available for current user.
      * The response value is stored as a MegaSetList.
      * You take the ownership of the returned value
@@ -1324,6 +1332,70 @@ interface MegaApiGateway {
      * @param listener   MegaRequestListener to track this request
      */
     fun setMyChatFilesFolder(nodeHandle: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Check if file versioning is enabled or disabled
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * <p>
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_DISABLE_VERSIONS
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - "1" for disable, "0" for enable
+     * - MegaRequest::getFlag - True if disabled, false if enabled
+     * <p>
+     * If the option has never been set, the error code will be MegaError::API_ENOENT.
+     * In that case, file versioning is enabled by default and MegaRequest::getFlag returns false.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getFileVersionsOption(listener: MegaRequestListenerInterface)
+
+    /**
+     * number of pending uploads
+     */
+    val numberOfPendingUploads: Int
+
+    /**
+     * Enable or disable file versioning
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * <p>
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_DISABLE_VERSIONS
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish:
+     * - MegaRequest::getText - "1" for disable, "0" for enable
+     *
+     * @param disable  True to disable file versioning. False to enable it
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface)
+
+    /**
+     * Is User Logged In
+     *
+     * @return 0 if not logged in, Otherwise a number > 0
+     */
+    fun isUserLoggedIn(): Int
+
+    /**
+     * Cancels a Transfer by Tag
+     *
+     * @param transferTag the MegaTransfer Tag to cancel
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun cancelTransferByTag(transferTag: Int, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Get contact details
+     *
+     * @param handle Handle of the contact
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
 
     /**
      * Function to get unverified incoming shares from [MegaApi]

@@ -10,9 +10,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import android.view.View
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
@@ -20,11 +18,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
-import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
-import mega.privacy.android.app.utils.Util
-import timber.log.Timber
 
 /**
  * Declare singleton PermissionUtils
@@ -168,7 +163,7 @@ object PermissionUtils {
      * @return POST_NOTIFICATIONS
      */
     @RequiresApi(33)
-    private fun getNotificationsPermission() = POST_NOTIFICATIONS
+    fun getNotificationsPermission() = POST_NOTIFICATIONS
 
     /**
      * Checks if should ask for notifications permission.
@@ -181,14 +176,23 @@ object PermissionUtils {
             && !hasPermissions(activity, getNotificationsPermission())
         ) {
             if (shouldShowRequestPermissionRationale(activity, getNotificationsPermission())) {
-                activity.startActivity(Intent(activity,
-                    NotificationsPermissionActivity::class.java))
+                displayNotificationPermissionRationale(activity)
             } else {
                 requestPermission(activity,
                     REQUEST_NOTIFICATIONS_PERMISSION,
                     getNotificationsPermission())
             }
         }
+    }
+
+    /**
+     * Displays the Notification Permission Rationale
+     *
+     * @param activity Required Activity to display the rationale
+     */
+    @JvmStatic
+    fun displayNotificationPermissionRationale(activity: Activity) {
+        activity.startActivity(Intent(activity, NotificationsPermissionActivity::class.java))
     }
 
     /**
@@ -256,24 +260,7 @@ object PermissionUtils {
     @JvmStatic
     fun toAppInfo(@NonNull context: Context): View.OnClickListener {
         return View.OnClickListener {
-            val intent = Intent()
-            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            val uri = Uri.fromParts("package", context.packageName, null)
-            intent.data = uri
-            try {
-                context.startActivity(intent)
-            } catch (e: Exception) {
-                if (context is ManagerActivity) {
-                    // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
-                    Util.showSnackbar(
-                        context,
-                        context.getString(R.string.on_permanently_denied)
-                    )
-                } else {
-                    Timber.e(e, "Exception opening device settings")
-                }
-            }
+            context.navigateToAppSettings()
         }
     }
 

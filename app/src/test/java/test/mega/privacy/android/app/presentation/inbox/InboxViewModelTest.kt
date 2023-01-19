@@ -46,7 +46,7 @@ class InboxViewModelTest {
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
     private val myBackupsNode = mock<NodeId> {
-        on { this.id }.thenReturn(MY_BACKUPS_HANDLE)
+        on { this.longValue }.thenReturn(MY_BACKUPS_HANDLE)
     }
     private val inboxNode = mock<MegaNode> {
         on { this.handle }.thenReturn(INBOX_NODE_HANDLE)
@@ -154,7 +154,7 @@ class InboxViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.inboxHandle).isEqualTo(myBackupsNode.id)
+                assertThat(state.inboxHandle).isEqualTo(myBackupsNode.longValue)
                 assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
             }
         }
@@ -218,7 +218,7 @@ class InboxViewModelTest {
         assertThat(underTest.isCurrentlyOnBackupFolderLevel()).isTrue()
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.inboxHandle).isEqualTo(myBackupsNode.id)
+            assertThat(state.inboxHandle).isEqualTo(myBackupsNode.longValue)
         }
     }
 

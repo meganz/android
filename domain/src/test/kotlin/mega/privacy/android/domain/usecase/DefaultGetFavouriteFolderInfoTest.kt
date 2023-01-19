@@ -38,7 +38,7 @@ class DefaultGetFavouriteFolderInfoTest {
         val fileNode = mock<FileNode>()
         val nodeId = NodeId(1)
         whenever(fileRepository.getNodeById(nodeId)).thenReturn(fileNode)
-        underTest(nodeId.id).test {
+        underTest(nodeId.longValue).test {
             val error = awaitError()
             assertThat(error).isInstanceOf(ParentNotAFolderException::class.java)
         }
@@ -57,7 +57,7 @@ class DefaultGetFavouriteFolderInfoTest {
         whenever(fileRepository.getNodeById(nodeId)).thenReturn(folderNode)
         whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(emptyList())
 
-        underTest(nodeId.id).test {
+        underTest(nodeId.longValue).test {
             assertThat(awaitItem()?.name).isEqualTo(first)
             assertThat(awaitItem()?.name).isEqualTo(second)
             cancelAndIgnoreRemainingEvents()
@@ -75,7 +75,7 @@ class DefaultGetFavouriteFolderInfoTest {
         whenever(fileRepository.getNodeById(nodeId)).thenReturn(folderNode)
         whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(children)
 
-        underTest(nodeId.id).test {
+        underTest(nodeId.longValue).test {
             assertThat(awaitItem()?.children).isNotEmpty()
             cancelAndIgnoreRemainingEvents()
         }

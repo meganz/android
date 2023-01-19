@@ -8,10 +8,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.usecase.billing.LaunchPurchaseFlow
 import mega.privacy.android.data.repository.AndroidBillingRepository
 
-/**
- * Account module
- *
- */
 @Module(includes = [DomainBillingModule::class])
 @InstallIn(ViewModelComponent::class)
 internal abstract class BillingModule {

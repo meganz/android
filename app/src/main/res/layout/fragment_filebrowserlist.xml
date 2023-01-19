@@ -37,6 +37,7 @@
         </RelativeLayout>
 
         <include
+            android:id="@+id/layout_transfer_over_quota_banner"
             layout="@layout/transfer_over_quota_banner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -45,7 +46,7 @@
 			android:id="@+id/relative_layout_recycler"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-            android:layout_below="@id/transfer_over_quota_banner">
+            android:layout_below="@id/layout_transfer_over_quota_banner">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/file_list_view_browser"
@@ -64,6 +65,8 @@
 
     </RelativeLayout>
 
-    <include layout="@layout/general_progress_bar"/>
+    <include
+        android:id="@+id/layout_general_progress_bar"
+        layout="@layout/general_progress_bar"/>
 
 </RelativeLayout>

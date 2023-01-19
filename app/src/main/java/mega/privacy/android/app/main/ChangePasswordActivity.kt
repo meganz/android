@@ -25,6 +25,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChangePasswordBinding
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.ColorUtils.getThemeColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL

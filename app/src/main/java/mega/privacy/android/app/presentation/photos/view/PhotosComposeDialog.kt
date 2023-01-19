@@ -174,6 +174,51 @@ internal fun FilterDialog(
 }
 
 @Composable
+internal fun RemovePhotosFromAlbumDialog(
+    onDialogDismissed: () -> Unit = {},
+    onPositiveButtonClick: () -> Unit = {},
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    MegaDialog(
+        body = {
+            Text(
+                text = stringResource(
+                    id = R.string.photos_album_remove_from_album_confirmation_text
+                )
+            )
+        },
+        onDismissRequest = onDialogDismissed,
+        confirmButton = {
+            TextButton(
+                onClick = onPositiveButtonClick,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.general_remove),
+                    style = MaterialTheme.typography.button,
+                    color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
+                        id = R.color.teal_300
+                    )
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDialogDismissed,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.general_cancel),
+                    style = MaterialTheme.typography.button,
+                    color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
+                        id = R.color.teal_300
+                    )
+                )
+            }
+        },
+    )
+}
+
+@Composable
 private fun Sort.text(): String = when (this) {
     Sort.NEWEST -> stringResource(id = R.string.sortby_date_newest)
     Sort.OLDEST -> stringResource(id = R.string.sortby_date_oldest)

@@ -24,7 +24,7 @@ class DefaultGetFullAccountInfo @Inject constructor(
 ) : GetFullAccountInfo {
     override suspend fun invoke() {
         getPaymentMethod(true)
-        if (monitorStorageStateEvent.storageState.value.storageState == StorageState.Unknown) {
+        if (monitorStorageStateEvent().value.storageState == StorageState.Unknown) {
             getAccountDetails(true)
         } else {
             getSpecificAccountDetail(storage = false, transfer = true, pro = true)

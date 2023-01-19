@@ -10,8 +10,6 @@ import androidx.lifecycle.asFlow
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ShuffleOrder
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -26,7 +24,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -90,17 +87,52 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.getDuration
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.GetPlayingPositionHistories
+import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.GetAudioNodes
+import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
+import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
+import mega.privacy.android.domain.usecase.GetInboxNode
+import mega.privacy.android.domain.usecase.GetLocalFilePath
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetParentNodeByHandle
+import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetRootNode
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetRubbishNode
+import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
+import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetUserNameByEmail
+import mega.privacy.android.domain.usecase.GetVideoNodes
+import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
+import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
+import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStop
+import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
+import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
+import mega.privacy.android.domain.usecase.MegaApiHttpServerStart
+import mega.privacy.android.domain.usecase.MegaApiHttpServerStop
 import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.SavePlayingPositionHistories
+import mega.privacy.android.domain.usecase.MonitorPlaybackTimes
+import mega.privacy.android.domain.usecase.SavePlaybackTimes
+import mega.privacy.android.domain.usecase.TrackPlaybackPosition
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
@@ -122,11 +154,46 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     private val playlistItemMapper: PlaylistItemMapper,
     private val monitorConnectivity: MonitorConnectivity,
-    private val savePlayingPositionHistories: SavePlayingPositionHistories,
-    private val getPlayingPositionHistories: GetPlayingPositionHistories,
+    private val trackPlaybackPositionUseCase: TrackPlaybackPosition,
+    private val monitorPlaybackTimesUseCase: MonitorPlaybackTimes,
+    private val savePlaybackTimesUseCase: SavePlaybackTimes,
+    private val megaApiFolderHttpServerSetMaxBufferSize: MegaApiFolderHttpServerSetMaxBufferSize,
+    private val megaApiFolderHttpServerIsRunning: MegaApiFolderHttpServerIsRunning,
+    private val megaApiFolderHttpServerStart: MegaApiFolderHttpServerStart,
+    private val megaApiFolderHttpServerStop: MegaApiFolderHttpServerStop,
+    private val megaApiHttpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSize,
+    private val megaApiHttpServerIsRunning: MegaApiHttpServerIsRunning,
+    private val megaApiHttpServerStart: MegaApiHttpServerStart,
+    private val megaApiHttpServerStop: MegaApiHttpServerStop,
+    private val areCredentialsNull: AreCredentialsNull,
+    private val getLocalFilePath: GetLocalFilePath,
+    private val getLocalFolderLinkFromMegaApiFolder: GetLocalFolderLinkFromMegaApiFolder,
+    private val getLocalFolderLinkFromMegaApi: GetLocalFolderLinkFromMegaApi,
+    private val getLocalLinkFromMegaApi: GetLocalLinkFromMegaApi,
+    private val getThumbnailFromMegaApi: GetThumbnailFromMegaApi,
+    private val getThumbnailFromMegaApiFolder: GetThumbnailFromMegaApiFolder,
+    private val getInboxNode: GetInboxNode,
+    private val getParentNodeByHandle: GetParentNodeByHandle,
+    private val getParentNodeFromMegaApiFolder: GetParentNodeFromMegaApiFolder,
+    private val getRootNode: GetRootNode,
+    private val getRootNodeFromMegaApiFolder: GetRootNodeFromMegaApiFolder,
+    private val getRubbishNode: GetRubbishNode,
+    private val getUnTypedNodeByHandle: GetUnTypedNodeByHandle,
+    private val getAudioNodesFromPublicLinks: GetAudioNodesFromPublicLinks,
+    private val getVideoNodesFromPublicLinks: GetVideoNodesFromPublicLinks,
+    private val getAudioNodesFromInShares: GetAudioNodesFromInShares,
+    private val getVideoNodesFromInShares: GetVideoNodesFromInShares,
+    private val getAudioNodesFromOutShares: GetAudioNodesFromOutShares,
+    private val getVideoNodesFromOutShares: GetVideoNodesFromOutShares,
+    private val getAudioNodes: GetAudioNodes,
+    private val getVideoNodes: GetVideoNodes,
+    private val getAudioNodesByEmail: GetAudioNodesByEmail,
+    private val getVideoNodesByEmail: GetVideoNodesByEmail,
+    private val getUserNameByEmail: GetUserNameByEmail,
+    private val fileDurationMapper: FileDurationMapper,
+    private val addNodeType: AddNodeType,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -190,8 +257,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     private var cancelToken: MegaCancelToken? = null
 
-    private val playingPositionHistories = mutableMapOf<Long, Long>()
-
     init {
         itemsSelectedCount.value = 0
         setupTransferListener()
@@ -252,9 +317,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
         val firstPlayUri = if (type == FOLDER_LINK_ADAPTER) {
             if (isMegaApiFolder(type)) {
-                mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(firstPlayHandle)
+                getLocalFolderLinkFromMegaApiFolder(firstPlayHandle)
             } else {
-                mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(firstPlayHandle)
+                getLocalFolderLinkFromMegaApi(firstPlayHandle)
             }?.let { url ->
                 Uri.parse(url)
             }
@@ -293,17 +358,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     AUDIO_BROWSE_ADAPTER -> {
                         playlistTitle.postValue(getString(R.string.upload_to_audio))
                         buildPlaySourcesByTypedNodes(type = type,
-                            typedNodes = mediaPlayerRepository.getAudioNodes(
-                                getSortOrderFromIntent(intent)
-                            ),
+                            typedNodes = getAudioNodes(getSortOrderFromIntent(intent)),
                             firstPlayHandle = firstPlayHandle)
                     }
                     VIDEO_BROWSE_ADAPTER -> {
                         playlistTitle.postValue(getString(R.string.sortby_type_video_first))
                         buildPlaySourcesByTypedNodes(type = type,
-                            typedNodes = mediaPlayerRepository.getVideoNodes(
-                                getSortOrderFromIntent(intent)
-                            ),
+                            typedNodes = getVideoNodes(getSortOrderFromIntent(intent)),
                             firstPlayHandle = firstPlayHandle)
                     }
                     FILE_BROWSER_ADAPTER,
@@ -323,10 +384,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (isInRootLinksLevel(type, parentHandle)) {
                             playlistTitle.postValue(getString(R.string.tab_links_shares))
                             buildPlaySourcesByTypedNodes(type = type,
-                                typedNodes = mediaPlayerRepository.getNodesFromPublicLinks(
-                                    isAudio = isAudioPlayer,
-                                    order = order
-                                ),
+                                typedNodes = if (isAudioPlayer) {
+                                    getAudioNodesFromPublicLinks(order)
+                                } else {
+                                    getVideoNodesFromPublicLinks(order)
+                                },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
                         }
@@ -334,10 +396,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                             playlistTitle.postValue(getString(R.string.tab_incoming_shares))
                             buildPlaySourcesByTypedNodes(type = type,
-                                typedNodes = mediaPlayerRepository.getNodesFromPublicLinks(
-                                    isAudio = isAudioPlayer,
-                                    order = order
-                                ),
+                                typedNodes =
+                                if (isAudioPlayer) {
+                                    getAudioNodesFromInShares(order)
+                                } else {
+                                    getVideoNodesFromInShares(order)
+                                },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
                         }
@@ -345,11 +409,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
                             playlistTitle.postValue(getString(R.string.tab_outgoing_shares))
                             buildPlaySourcesByTypedNodes(type = type,
-                                typedNodes = mediaPlayerRepository.getNodesFromOutShares(
-                                    isAudio = isAudioPlayer,
-                                    lastHandle = INVALID_HANDLE,
-                                    order = order
-                                ),
+                                typedNodes = if (isAudioPlayer) {
+                                    getAudioNodesFromOutShares(lastHandle = INVALID_HANDLE,
+                                        order = order)
+                                } else {
+                                    getVideoNodesFromOutShares(lastHandle = INVALID_HANDLE,
+                                        order = order)
+                                },
                                 firstPlayHandle = firstPlayHandle)
                             return@launch
                         }
@@ -357,30 +423,33 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         if (type == CONTACT_FILE_ADAPTER && parentHandle == INVALID_HANDLE) {
                             intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)
                                 ?.let { email ->
-                                    mediaPlayerRepository.getNodesByEmail(isAudioPlayer, email)
-                                        ?.let { nodes ->
-                                            mediaPlayerRepository.getUserNameByEmail(email)?.let {
-                                                getString(R.string.title_incoming_shares_with_explorer)
-                                                    .let { sharesTitle ->
-                                                        playlistTitle.postValue("$sharesTitle $it")
-                                                    }
-                                            }
-                                            buildPlaySourcesByTypedNodes(type = type,
-                                                typedNodes = nodes,
-                                                firstPlayHandle = firstPlayHandle)
+                                    if (isAudioPlayer) {
+                                        getAudioNodesByEmail(email)
+                                    } else {
+                                        getVideoNodesByEmail(email)
+                                    }?.let { nodes ->
+                                        getUserNameByEmail(email)?.let {
+                                            getString(R.string.title_incoming_shares_with_explorer)
+                                                .let { sharesTitle ->
+                                                    playlistTitle.postValue("$sharesTitle $it")
+                                                }
                                         }
+                                        buildPlaySourcesByTypedNodes(type = type,
+                                            typedNodes = nodes,
+                                            firstPlayHandle = firstPlayHandle)
+                                    }
                                 }
                             return@launch
                         }
 
                         if (parentHandle == INVALID_HANDLE) {
                             when (type) {
-                                RUBBISH_BIN_ADAPTER -> mediaPlayerRepository.getRubbishNode()
-                                INBOX_ADAPTER -> mediaPlayerRepository.getInboxNode()
-                                else -> mediaPlayerRepository.getRootNode()
+                                RUBBISH_BIN_ADAPTER -> getRubbishNode()
+                                INBOX_ADAPTER -> getInboxNode()
+                                else -> getRootNode()
                             }
                         } else {
-                            mediaPlayerRepository.getParentNodeByHandle(parentHandle)
+                            getParentNodeByHandle(parentHandle)
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
                                 getString(
@@ -397,9 +466,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             }
                             mediaPlayerRepository.getChildrenByParentHandle(
                                 isAudio = isAudioPlayer,
-                                parentHandle = parent.id.id,
+                                parentHandle = parent.id.longValue,
                                 order = getSortOrderFromIntent(intent))?.let { children ->
-                                buildPlaySourcesByTypedNodes(type, children, firstPlayHandle)
+                                buildPlaySourcesByTypedNodes(type,
+                                    children.map { addNodeType(it) },
+                                    firstPlayHandle)
                             }
                         }
                     }
@@ -419,15 +490,17 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         val order = getSortOrderFromIntent(intent)
 
                         (if (parentHandle == INVALID_HANDLE) {
-                            mediaPlayerRepository.megaApiFolderGetRootNode()
+                            getRootNodeFromMegaApiFolder()
                         } else {
-                            mediaPlayerRepository.megaApiFolderGetParentNode(parentHandle)
+                            getParentNodeFromMegaApiFolder(parentHandle)
                         })?.let { parent ->
                             playlistTitle.postValue(parent.name)
 
                             mediaPlayerRepository.megaApiFolderGetChildrenByParentHandle(
-                                isAudioPlayer, parent.id.id, order)?.let { children ->
-                                buildPlaySourcesByTypedNodes(type, children, firstPlayHandle)
+                                isAudioPlayer, parent.id.longValue, order)?.let { children ->
+                                buildPlaySourcesByTypedNodes(type,
+                                    children.map { addNodeType(it) },
+                                    firstPlayHandle)
                             }
                         }
                     }
@@ -456,8 +529,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         } else {
             playlistItems.clear()
 
-            val node: TypedFileNode? =
-                mediaPlayerRepository.getTypedNodeByHandle(firstPlayHandle) as? TypedFileNode
+            val node: TypedFileNode? = getUnTypedNodeByHandle(firstPlayHandle) as? TypedFileNode
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
                     offlineThumbnailFileWrapper.getThumbnailFile(context,
@@ -471,13 +543,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 }
             }
 
-            playlistItemMapper(firstPlayHandle,
+            val duration = node?.type?.let {
+                fileDurationMapper(it)
+            } ?: 0
+
+            playlistItemMapper(
+                firstPlayHandle,
                 firstPlayNodeName,
                 thumbnail,
                 0,
                 TYPE_PLAYING,
                 node?.size ?: INVALID_SIZE,
-                node?.type?.getDuration() ?: 0)
+                duration,
+            )
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)
                 }
@@ -485,12 +563,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
             recreateAndUpdatePlaylistItems()
 
             if (thumbnail != null && !thumbnail.exists() && node != null) {
-                mediaPlayerRepository.getThumbnail(isAudioPlayer,
-                    node.id.id,
-                    thumbnail.absolutePath
-                ) { nodeHandle ->
-                    if (nodeHandle == playingHandle) {
-                        postPlayingThumbnail()
+                if (isMegaApiFolder(type = type)) {
+                    getThumbnailFromMegaApiFolder(nodeHandle = node.id.longValue,
+                        path = thumbnail.absolutePath)?.let { nodeHandle ->
+                        if (nodeHandle == playingHandle) {
+                            postPlayingThumbnail()
+                        }
+                    }
+                } else {
+                    getThumbnailFromMegaApi(nodeHandle = node.id.longValue,
+                        path = thumbnail.absolutePath)?.let { nodeHandle ->
+                        if (nodeHandle == playingHandle) {
+                            postPlayingThumbnail()
+                        }
                     }
                 }
             } else {
@@ -573,28 +658,26 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
         typedNodes.mapIndexed { currentIndex, typedNode ->
             if (typedNode is TypedFileNode) {
-                mediaPlayerRepository.getLocalFilePath(typedNode).let { localPath ->
+                getLocalFilePath(typedNode).let { localPath ->
                     if (localPath != null && isLocalFile(typedNode, localPath)) {
-                        mediaItemFromFile(File(localPath), typedNode.id.id.toString())
+                        mediaItemFromFile(File(localPath), typedNode.id.longValue.toString())
                     } else {
                         val url =
                             if (type == FOLDER_LINK_ADAPTER) {
                                 if (isMegaApiFolder(type)) {
-                                    mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(
-                                        typedNode.id.id)
+                                    getLocalFolderLinkFromMegaApiFolder(typedNode.id.longValue)
                                 } else {
-                                    mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(
-                                        typedNode.id.id)
+                                    getLocalFolderLinkFromMegaApi(typedNode.id.longValue)
                                 }
                             } else {
-                                mediaPlayerRepository.getLocalLinkFromMegaApi(typedNode.id.id)
+                                getLocalLinkFromMegaApi(typedNode.id.longValue)
                             }
                         if (url == null) {
                             null
                         } else {
                             MediaItem.Builder()
                                 .setUri(Uri.parse(url))
-                                .setMediaId(typedNode.id.id.toString())
+                                .setMediaId(typedNode.id.longValue.toString())
                                 .build()
                         }
                     }?.let {
@@ -602,26 +685,32 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     }
                 }
 
-                if (typedNode.id.id == firstPlayHandle) {
+                if (typedNode.id.longValue == firstPlayHandle) {
                     firstPlayIndex = currentIndex
                 }
                 val thumbnail = typedNode.thumbnailPath?.let { path ->
                     File(path)
                 }
 
-                playlistItemMapper(typedNode.id.id,
+                val duration = typedNode.type.let {
+                    fileDurationMapper(it) ?: 0
+                }
+
+                playlistItemMapper(
+                    typedNode.id.longValue,
                     typedNode.name,
                     thumbnail,
                     currentIndex,
                     TYPE_NEXT,
                     typedNode.size,
-                    typedNode.type.getDuration())
+                    duration,
+                )
                     .let { playlistItem ->
                         playlistItems.add(playlistItem)
                     }
 
                 if (thumbnail != null && !thumbnail.exists()) {
-                    nodesWithoutThumbnail.add(Pair(typedNode.id.id, thumbnail))
+                    nodesWithoutThumbnail.add(Pair(typedNode.id.longValue, thumbnail))
                 }
             }
         }
@@ -629,13 +718,19 @@ class MediaPlayerServiceViewModel @Inject constructor(
         if (nodesWithoutThumbnail.isNotEmpty() && monitorConnectivity().value) {
             sharingScope.launch(ioDispatcher) {
                 nodesWithoutThumbnail.map {
-                    mediaPlayerRepository.getThumbnail(
-                        isMegaApiFolder = isMegaApiFolder(type),
-                        it.first,
-                        it.second.absolutePath
-                    ) { nodeHandle ->
-                        if (nodeHandle == playingHandle) {
-                            postPlayingThumbnail()
+                    if (isMegaApiFolder(type = type)) {
+                        getThumbnailFromMegaApiFolder(nodeHandle = it.first,
+                            path = it.second.absolutePath)?.let { nodeHandle ->
+                            if (nodeHandle == playingHandle) {
+                                postPlayingThumbnail()
+                            }
+                        }
+                    } else {
+                        getThumbnailFromMegaApi(nodeHandle = it.first,
+                            path = it.second.absolutePath)?.let { nodeHandle ->
+                            if (nodeHandle == playingHandle) {
+                                postPlayingThumbnail()
+                            }
                         }
                     }
                 }
@@ -657,7 +752,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
         firstPlayHandle: Long,
     ) {
         buildPlaySourcesByTypedNodes(type = type,
-            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles),
+            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles).map {
+                addNodeType(it)
+            },
             firstPlayHandle = firstPlayHandle)
     }
 
@@ -833,7 +930,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             }
         }
 
-    private fun getSortOrderFromIntent(intent: Intent): Int {
+    private fun getSortOrderFromIntent(intent: Intent): SortOrder {
         val order =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getSerializableExtra(
@@ -845,7 +942,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
                     ?: SortOrder.ORDER_DEFAULT_ASC
             }
-        return sortOrderIntMapper(order)
+        return order
     }
 
     override fun initNewSearch(): MegaCancelToken {
@@ -1133,50 +1230,25 @@ class MediaPlayerServiceViewModel @Inject constructor(
         retry.value = true
     }
 
-    override fun savePlayingPositionHistories(key: String?) {
-        sharingScope.launch {
-            savePlayingPositionHistories(key, Gson().toJson(playingPositionHistories))
+    override suspend fun trackPlayback(getCurrentPlaybackInformation: () -> PlaybackInformation) {
+        if (!isAudioPlayer) {
+            trackPlaybackPositionUseCase(getCurrentPlaybackInformation)
         }
     }
 
-    override fun getPlayingPositionHistoriesFromLocal(key: String?) {
-        runBlocking {
-            playingPositionHistories.clear()
-            getPlayingPositionHistories(key, null).firstOrNull()
-                ?.let { jsonString ->
-                    Gson().fromJson<Map<Long, Long>?>(jsonString,
-                        object : TypeToken<Map<Long, Long>>() {}.type)
-                        ?.let { histories ->
-                            histories.map {
-                                playingPositionHistories[it.key] = it.value
-                            }
-                        }
-                }
-        }
-    }
-
-    override fun putCurrentPlayingPosition(mediaId: Long?, playingPosition: Long, duration: Long) {
-        mediaId?.let {
-            // If the current position is more than 15ms for saving the media item playing history
-            if (playingPosition > 15000) {
-                // When duration minus current playing position less than 2 seconds,
-                // clear current playing position history
-                playingPositionHistories[it] =
-                    if (duration - playingPosition < 2000) 0 else playingPosition
+    override suspend fun monitorPlaybackTimes(
+        mediaId: Long?,
+        seekToPosition: (positionMs: Long) -> Unit,
+    ) {
+        if (!isAudioPlayer) {
+            monitorPlaybackTimesUseCase().firstOrNull()?.get(mediaId)?.currentPosition?.let {
+                seekToPosition(it)
             }
         }
     }
 
-    override fun checkAndSeekToPlayingPositionHistory(
-        currentPlayingHandle: Long,
-        seekToPlayingPosition: (positionMs: Long) -> Unit,
-    ) {
-        if (!isAudioPlayer) {
-            if (playingPositionHistories.containsKey(currentPlayingHandle))
-                playingPositionHistories[currentPlayingHandle]?.let { playingPosition ->
-                    seekToPlayingPosition(playingPosition)
-                }
-        }
+    override suspend fun savePlaybackTimes() {
+        savePlaybackTimesUseCase()
     }
 
     override fun updateItemName(handle: Long, newName: String) =
@@ -1253,14 +1325,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
             compositeDisposable.dispose()
 
             if (needStopStreamingServer) {
-                mediaPlayerRepository.megaApiHttpServerStop()
-                mediaPlayerRepository.megaApiFolderHttpServerStop()
+                megaApiHttpServerStop()
+                megaApiFolderHttpServerStop()
             }
         }
     }
 
     private suspend fun isMegaApiFolder(type: Int) =
-        type == FOLDER_LINK_ADAPTER && mediaPlayerRepository.credentialsIsNull()
+        type == FOLDER_LINK_ADAPTER && areCredentialsNull()
 
     override fun swapItems(current: Int, target: Int) {
         if (playlistItemsChanged.isEmpty()) {
@@ -1343,31 +1415,30 @@ class MediaPlayerServiceViewModel @Inject constructor(
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.getMemoryInfo(memoryInfo)
 
-        with(mediaPlayerRepository) {
-            if (isMegaApiFolder(type)) {
-                if (megaApiFolderHttpServerIsRunning() != 0) {
-                    return false
-                }
-                megaApiFolderHttpServerStart()
-                megaApiFolderHttpServerSetMaxBufferSize(
-                    bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                        Constants.MAX_BUFFER_32MB
-                    else
-                        Constants.MAX_BUFFER_16MB
-                )
-            } else {
-                if (megaApiHttpServerIsRunning() != 0) {
-                    return false
-                }
-                megaApiHttpServerStart()
-                megaApiHttpServerSetMaxBufferSize(
-                    bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
-                        Constants.MAX_BUFFER_32MB
-                    else
-                        Constants.MAX_BUFFER_16MB
-                )
+        if (isMegaApiFolder(type)) {
+            if (megaApiFolderHttpServerIsRunning() != 0) {
+                return false
             }
+            megaApiFolderHttpServerStart()
+            megaApiFolderHttpServerSetMaxBufferSize(
+                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
+                    Constants.MAX_BUFFER_32MB
+                else
+                    Constants.MAX_BUFFER_16MB
+            )
+        } else {
+            if (megaApiHttpServerIsRunning() != 0) {
+                return false
+            }
+            megaApiHttpServerStart()
+            megaApiHttpServerSetMaxBufferSize(
+                bufferSize = if (memoryInfo.totalMem > Constants.BUFFER_COMP)
+                    Constants.MAX_BUFFER_32MB
+                else
+                    Constants.MAX_BUFFER_16MB
+            )
         }
+
         return true
     }
 

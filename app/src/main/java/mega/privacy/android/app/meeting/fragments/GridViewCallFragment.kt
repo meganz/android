@@ -343,12 +343,21 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * @param widthPixels The screen width
      * @param heightPixels The screen height
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun updateLayout(widthPixels: Int, heightPixels: Int) {
         adapterPager.updateOrientation(widthPixels, heightPixels)
 
         val currentItem = viewDataBinding.gridViewPager.currentItem
         viewDataBinding.gridViewPager.adapter = adapterPager
         viewDataBinding.gridViewPager.currentItem = currentItem
+
+        val newData = sliceBy6(participants)
+        adapterPager.apply {
+            setNewData(newData)
+            notifyDataSetChanged()
+        }
+        viewPagerData = newData
+        updateVisibleParticipantsGrid(newData)
     }
 
     /**

@@ -1740,7 +1740,7 @@
     <!-- Message shown when the chat is section is loading the conversations -->
     <string name="recent_chat_loading_conversations">[A]Trwa ładowanie[/A] [B]rozmowy&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
+    <string name="context_empty_incoming">[B]Brak [/B][A]folderów współdzielonych[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
     <string name="context_empty_outgoing">[B]Nie [/B][A]wychodzące foldery współdzielone[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
@@ -4334,29 +4334,31 @@
         <item quantity="other">Albumy zostaną usunięte, ale ich zawartość pozostanie na Twojej Osi czasu.</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Zobacz mniej</string>
     <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <string name="shared_items_verify_credentials_contact_verification_title">Weryfikacja kontaktu</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_outgoing">Chronimy Twoje dane za pomocą szyfrowania z zerową świadomością. Aby zapewnić dodatkowe bezpieczeństwo, prosimy o weryfikację kontaktów, którym udostępniasz informacje, zanim uzyskają one dostęp do udostępnionych katalogów.</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_incoming">Chronimy Twoje dane za pomocą szyfrowania z zerową świadomością. Aby zapewnić dodatkowe bezpieczeństwo, prosimy o weryfikację kontaktów, od których otrzymujesz informacje, zanim uzyskasz dostęp do katalogów współdzielonych.</string>
     <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="shared_items_verify_credentials_information">Aby zweryfikować kontakt, upewnij się, że dane uwierzytelniające, które widzisz powyżej, odpowiadają danym uwierzytelniającym ich konta. Możesz poprosić ich o udostępnienie swoich danych uwierzytelniających.</string>
     <!--Undecrypted folder label-->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Katalog niezaszyfrowany]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Aby uzyskać dostęp do udostępnionego katalogu, osoba, która go udostępniła, również powinna Cię zweryfikować.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Zweryfikuj %s</string>
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Twoje uprawnienia</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Przygotowanie pliku do podglądu</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">Bonus wygasa za %1$d dzień</item>
+        <item quantity="few">Bonus wygasa za %1$d dni</item>
+        <item quantity="many">Bonus wygasa za %1$d dni</item>
+        <item quantity="other">Bonus wygasa za %1$d dni</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Opis</string>

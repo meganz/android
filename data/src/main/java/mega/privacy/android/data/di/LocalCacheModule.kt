@@ -9,6 +9,7 @@ import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.cache.ExpiringCache
 import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
@@ -50,5 +51,11 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     internal fun provideActiveSubscription(): Cache<MegaPurchase> =
+        PermanentCache()
+
+    @FileVersionsOption
+    @Provides
+    @Singleton
+    internal fun provideFileVersionsOptionCache(): Cache<Boolean> =
         PermanentCache()
 }

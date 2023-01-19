@@ -68,9 +68,9 @@ class DefaultPhotosRepositoryTest {
     @Test
     fun `when file is image should return photo with static image file type`() = runTest {
         val nodeId = NodeId(1L)
-        val megaNode = createMegaNode(handle = nodeId.id, name = "file.image")
+        val megaNode = createMegaNode(handle = nodeId.longValue, name = "file.image")
 
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.id))
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -81,9 +81,9 @@ class DefaultPhotosRepositoryTest {
     @Test
     fun `when file is gif should return photo with gif file type`() = runTest {
         val nodeId = NodeId(1L)
-        val megaNode = createMegaNode(handle = nodeId.id, name = "file.gif")
+        val megaNode = createMegaNode(handle = nodeId.longValue, name = "file.gif")
 
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.id))
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -93,9 +93,9 @@ class DefaultPhotosRepositoryTest {
     @Test
     fun `when file is raw should return photo with raw file type`() = runTest {
         val nodeId = NodeId(1L)
-        val megaNode = createMegaNode(handle = nodeId.id, name = "file.raw")
+        val megaNode = createMegaNode(handle = nodeId.longValue, name = "file.raw")
 
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.id))
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -105,9 +105,9 @@ class DefaultPhotosRepositoryTest {
     @Test
     fun `when file is video should return photo with video file type`() = runTest {
         val nodeId = NodeId(1L)
-        val megaNode = createMegaNode(handle = nodeId.id, name = "file.video")
+        val megaNode = createMegaNode(handle = nodeId.longValue, name = "file.video")
 
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.id))
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -117,9 +117,9 @@ class DefaultPhotosRepositoryTest {
     @Test
     fun `when file is neither photo extension should return null result`() = runTest {
         val nodeId = NodeId(1L)
-        val megaNode = createMegaNode(handle = nodeId.id, name = "file.xxx")
+        val megaNode = createMegaNode(handle = nodeId.longValue, name = "file.xxx")
 
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.id))
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -144,6 +144,7 @@ class DefaultPhotosRepositoryTest {
 
     private fun createImage(
         id: Long,
+        albumPhotoId: Long? = null,
         parentId: Long,
         name: String,
         isFavourite: Boolean,
@@ -154,6 +155,7 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo: FileTypeInfo,
     ): Photo.Image = Photo.Image(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,
@@ -166,6 +168,7 @@ class DefaultPhotosRepositoryTest {
 
     private fun createVideo(
         id: Long,
+        albumPhotoId: Long? = null,
         parentId: Long,
         name: String,
         isFavourite: Boolean,
@@ -176,6 +179,7 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo: FileTypeInfo,
     ): Photo.Video = Photo.Video(
         id,
+        albumPhotoId,
         parentId,
         name,
         isFavourite,
@@ -183,21 +187,21 @@ class DefaultPhotosRepositoryTest {
         modificationTime,
         thumbnailFilePath,
         previewFilePath,
-        fileTypeInfo,
+        fileTypeInfo as VideoFileTypeInfo,
     )
 
     private fun mapFileTypeInfo(megaNode: MegaNode): FileTypeInfo {
         val name = megaNode.name
         return if (name.contains("image")) {
-            StaticImageFileTypeInfo(type = "", extension = "image")
+            StaticImageFileTypeInfo(mimeType = "", extension = "image")
         } else if (name.contains("gif")) {
-            GifFileTypeInfo(type = "", extension = "gif")
+            GifFileTypeInfo(mimeType = "", extension = "gif")
         } else if (name.contains("raw")) {
-            return RawFileTypeInfo(type = "", extension = "raw")
+            return RawFileTypeInfo(mimeType = "", extension = "raw")
         } else if (name.contains("video")) {
-            return VideoFileTypeInfo(type = "", extension = "video", duration = 120)
+            return VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120)
         } else {
-            return UnknownFileTypeInfo(type = "", extension = "")
+            return UnknownFileTypeInfo(mimeType = "", extension = "")
         }
     }
 }

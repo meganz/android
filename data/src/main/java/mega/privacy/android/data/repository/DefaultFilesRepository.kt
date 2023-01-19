@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
@@ -20,6 +21,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -30,9 +32,12 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -70,6 +75,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property offlineNodeInformationMapper
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
+ * @property streamingGateway
  */
 internal class DefaultFilesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -87,6 +93,8 @@ internal class DefaultFilesRepository @Inject constructor(
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
+    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
+    private val streamingGateway: StreamingGateway,
 ) : FilesRepository, FileRepository {
 
     override suspend fun copyNode(
@@ -262,8 +270,10 @@ internal class DefaultFilesRepository @Inject constructor(
         withContext(ioDispatcher) {
             getMegaNode(viewerNode)?.let { node ->
                 suspendCoroutine { continuation ->
-                    val file = cacheFolderGateway.getCacheFile(CacheFolderConstant.TEMPORARY_FOLDER,
-                        node.getFileName())
+                    val file = cacheFolderGateway.getCacheFile(
+                        CacheFolderConstant.TEMPORARY_FOLDER,
+                        node.getFileName()
+                    )
                     if (file == null) {
                         continuation.resumeWith(Result.failure(NullFileException()))
                         return@suspendCoroutine
@@ -353,7 +363,7 @@ internal class DefaultFilesRepository @Inject constructor(
         }
 
     override suspend fun getNodeById(nodeId: NodeId) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.id)?.let {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
             nodeMapper(
                 it,
                 cacheFolderGateway::getThumbnailCacheFilePath,
@@ -369,7 +379,7 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
         return withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(folderNode.id.id)?.let { parent ->
+            megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)?.let { parent ->
                 megaApiGateway.getChildrenByNode(parent)
                     .map {
                         nodeMapper(
@@ -415,7 +425,7 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
         withContext(ioDispatcher) {
-            megaLocalStorageGateway.getOfflineInformation(nodeId.id)
+            megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
 
@@ -489,5 +499,50 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
         megaApiGateway.setSecureFlag(enable)
+    }
+
+    override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
+        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
+            ?: fetchFileVersionsOption().also {
+                fileVersionsOptionCache.set(it)
+            }
+
+    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                it.flag
+            }
+            megaApiGateway.getFileVersionsOption(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getLocalFile(fileNode: FileNode) =
+        fileGateway.getLocalFile(
+            fileName = fileNode.name,
+            fileSize = fileNode.size,
+            lastModifiedDate = fileNode.modificationTime,
+        )
+
+    override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
+            streamingGateway.getLocalLink(it)
+        }
+    }
+
+    override suspend fun createTempFile(root: String, syncRecord: SyncRecord) =
+        withContext(ioDispatcher) {
+            val localPath = syncRecord.localPath
+                ?: throw IllegalArgumentException("Source path doesn't exist on sync record: $syncRecord")
+            val destinationPath = syncRecord.newPath
+                ?: throw IllegalArgumentException("Destination path doesn't exist on sync record: $syncRecord")
+            fileGateway.createTempFile(root, localPath, destinationPath)
+            destinationPath
+        }
+
+    override suspend fun removeGPSCoordinates(filePath: String) = withContext(ioDispatcher) {
+        fileGateway.removeGPSCoordinates(filePath)
     }
 }

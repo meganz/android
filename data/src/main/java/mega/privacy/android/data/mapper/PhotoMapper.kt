@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import java.time.LocalDateTime
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime
  */
 typealias ImageMapper = (
     @JvmSuppressWildcards Long,
+    @JvmSuppressWildcards Long?,
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards String,
     @JvmSuppressWildcards Boolean,
@@ -21,6 +23,7 @@ typealias ImageMapper = (
 
 internal fun toImage(
     id: Long,
+    albumPhotoId: Long? = null,
     parentId: Long,
     name: String,
     isFavourite: Boolean,
@@ -31,6 +34,7 @@ internal fun toImage(
     fileTypeInfo: FileTypeInfo,
 ) = Photo.Image(
     id = id,
+    albumPhotoId = albumPhotoId,
     parentId = parentId,
     name = name,
     isFavourite = isFavourite,
@@ -46,6 +50,7 @@ internal fun toImage(
  */
 typealias VideoMapper = (
     @JvmSuppressWildcards Long,
+    @JvmSuppressWildcards Long?,
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards String,
     @JvmSuppressWildcards Boolean,
@@ -58,6 +63,7 @@ typealias VideoMapper = (
 
 internal fun toVideo(
     id: Long,
+    albumPhotoId: Long? = null,
     parentId: Long,
     name: String,
     isFavourite: Boolean,
@@ -68,6 +74,7 @@ internal fun toVideo(
     fileTypeInfo: FileTypeInfo,
 ) = Photo.Video(
     id = id,
+    albumPhotoId = albumPhotoId,
     parentId = parentId,
     name = name,
     isFavourite = isFavourite,
@@ -75,5 +82,5 @@ internal fun toVideo(
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
     previewFilePath = previewFilePath,
-    fileTypeInfo = fileTypeInfo
+    fileTypeInfo = fileTypeInfo as VideoFileTypeInfo
 )

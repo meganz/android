@@ -4355,8 +4355,10 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Подготовка файла к превью</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">Бонус истекает через %1$d день</item>
+        <item quantity="few">Бонус истекает через %1$d дня</item>
+        <item quantity="many">Бонус истекает через %1$d дней</item>
+        <item quantity="other">Бонус истекает через %1$d дня</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Описание</string>

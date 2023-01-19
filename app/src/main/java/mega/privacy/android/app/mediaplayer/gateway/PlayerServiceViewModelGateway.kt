@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import java.io.File
 
 /**
@@ -336,37 +337,22 @@ interface PlayerServiceViewModelGateway {
     fun resetRetryState()
 
     /**
-     * Save the playing position histories to DataStore
+     * Track the playback information
      *
-     * @param key the key of DataStore
+     * @param getCurrentPlaybackInformation get current playback information
      */
-    fun savePlayingPositionHistories(key: String?)
+    suspend fun trackPlayback(getCurrentPlaybackInformation: () -> PlaybackInformation)
 
     /**
-     * Get the playing position histories from local
-     *
-     * @param key the key of DataStore
-     * @return playing position histories
+     * Save the playback times
      */
-    fun getPlayingPositionHistoriesFromLocal(key: String?)
+    suspend fun savePlaybackTimes()
 
     /**
-     * Put current playing position
+     * Monitor playback times
      *
-     * @param mediaId current media item id
-     * @param playingPosition current playing position
-     * @param duration the duration of current playing item
+     * @param mediaId the media id of target media item
+     * @param seekToPosition seed to last playback time
      */
-    fun putCurrentPlayingPosition(mediaId: Long?, playingPosition: Long, duration: Long)
-
-    /**
-     * Check the current item whether includes the playing position history, if yes, seek to playing position history.
-     *
-     * @param currentPlayingHandle the handle of current playing item
-     * @param seekToPlayingPosition the function that seek to playing position
-     */
-    fun checkAndSeekToPlayingPositionHistory(
-        currentPlayingHandle: Long,
-        seekToPlayingPosition: (positionMs: Long) -> Unit,
-    )
+    suspend fun monitorPlaybackTimes(mediaId: Long?, seekToPosition: (positionMs: Long) -> Unit)
 }

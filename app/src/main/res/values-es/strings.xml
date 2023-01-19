@@ -107,7 +107,7 @@
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Cerrar el resto de sesiones</string>
     <!-- Message after kill all opened sessions -->
-    <string name="success_kill_all_sessions">El resto de sesiones se ha cerrado correctamente</string>
+    <string name="success_kill_all_sessions">Se ha cerrado el resto de sesiones</string>
     <!-- Message after kill all opened sessions -->
     <string name="error_kill_all_sessions">Error al cerrar las sesiones abiertas</string>
     <!-- General label for files -->
@@ -1859,7 +1859,7 @@
     <string name="turn_on_notifications_fifth_step">Activa las notificaciones y selecciona tus preferencias</string>
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
-        <item quantity="one">Archivo enviado correctamente</item>
+        <item quantity="one">Archivo enviado</item>
         <item quantity="many">Archivos enviados</item>
         <item quantity="other">Archivos enviados</item>
     </plurals>
@@ -2174,7 +2174,7 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Tu Nube está casi llena. Amplía tu cuenta y obtén hasta %1$s de almacenamiento y %2$s de cuota de transferencia.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Tu Nube está casi llena. Si necesitas más almacenamiento, ponte en contacto con el servicio de asistencia de MEGA para obtener un plan personalizado.</string>
+    <string name="text_almost_full_warning_pro3_account">Tu Nube está casi llena. Si necesitas más almacenamiento, ponte en contacto con el servicio de soporte de MEGA para obtener un plan personalizado.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Tu Nube está llena. Amplía tu cuenta a Pro y obtén hasta %1$s de almacenamiento y %2$s de cuota de transferencia.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
@@ -2574,7 +2574,7 @@
     <!-- Label layout on maps activity indicating nearby places -->
     <string name="nearby_places_label">Lugares cercanos</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
-    <string name="explanation_send_location">Esta ubicación se abrirá utilizando un proveedor de mapas externo a la plataforma MEGA cifrada punto a punto.</string>
+    <string name="explanation_send_location">Esta ubicación se abrirá utilizando un proveedor de mapas externo a la plataforma de MEGA cifrada punto a punto.</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">Enviar esta ubicación</string>
     <!-- Title of the dialog shown when the location is disabled -->
@@ -2874,7 +2874,7 @@
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Error. No se ha podido crear la carpeta %1$s</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">Verifica tu dirección de e-mail</string>
+    <string name="verify_email_label">Verifica tu dirección de correo electrónico</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Tu cuenta ha sido bloqueada temporalmente por seguridad.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
@@ -3146,7 +3146,7 @@
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Envíar la clave de cifrado por separado</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">Exportar enlace y clave de descifrado por separado.</string>
+    <string name="explanation_send_decryption_key_separately">Exportar enlace y clave de cifrado por separado.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">Más info</string>
     <!-- Label key referring to a link decryption key -->
@@ -4245,8 +4245,9 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando archivo para vista previa</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">El bono caducará en %1$d día.</item>
+        <item quantity="many">El bono caducará en %1$d días.</item>
+        <item quantity="other">El bono caducará en %1$d días</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descripción</string>

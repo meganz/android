@@ -30,6 +30,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.DialogRecoveryKeyBinding
 import mega.privacy.android.app.databinding.FragmentTourBinding
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaApiJava

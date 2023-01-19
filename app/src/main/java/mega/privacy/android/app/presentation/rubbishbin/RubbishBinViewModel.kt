@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class RubbishBinViewModel @Inject constructor(
     private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val getRubbishBinParentNodeHandle: GetParentNodeHandle
 ) : ViewModel() {
 
     /**
@@ -34,6 +37,10 @@ class RubbishBinViewModel @Inject constructor(
      */
     val state: StateFlow<RubbishBinState> = _state
 
+    /**
+     * Stack to maintain folder navigation clicks
+     */
+    private val lastPositionStack = Stack<Int>()
 
     /**
      * Get current nodes when [RubbishBinViewModel] gets created
@@ -70,9 +77,44 @@ class RubbishBinViewModel @Inject constructor(
     fun refreshNodes() {
         viewModelScope.launch {
             _state.update {
-                it.copy(nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle)
-                    ?: emptyList())
+                it.copy(
+                    nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle) ?: emptyList(),
+                    parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle))
             }
         }
+    }
+
+    /**
+     * Handles back click of rubbishBinFragment
+     */
+    fun onBackPressed() {
+        _state.value.parentHandle?.let {
+            setRubbishBinHandle(it)
+        }
+    }
+
+    /**
+     * Pop scroll position for previous depth
+     *
+     * @return last position saved
+     */
+    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
+
+    /**
+     * Push lastPosition to stack
+     * @param lastPosition last position to be added to stack
+     */
+    private fun pushPositionOnStack(lastPosition: Int) {
+        lastPositionStack.push(lastPosition)
+    }
+
+    /**
+     * Performs action when folder is clicked from adapter
+     * @param lastFirstVisiblePosition visible position based on listview type
+     * @param handle node handle
+     */
+    fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
+        pushPositionOnStack(lastFirstVisiblePosition)
+        setRubbishBinHandle(handle)
     }
 }

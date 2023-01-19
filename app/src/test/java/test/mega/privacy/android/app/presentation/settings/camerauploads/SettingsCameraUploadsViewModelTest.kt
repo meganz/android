@@ -52,6 +52,8 @@ class SettingsCameraUploadsViewModelTest {
             assertFalse(state.shouldShowBusinessAccountPrompt)
             assertFalse(state.shouldShowBusinessAccountSuspendedPrompt)
             assertFalse(state.shouldTriggerCameraUploads)
+            assertFalse(state.shouldShowMediaPermissionsRationale)
+            assertFalse(state.shouldShowNotificationPermissionRationale)
         }
     }
 
@@ -140,4 +142,46 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that shouldTriggerCameraUploads is false when calling setTriggerCameraUploads with false value`() =
         assertShouldTriggerCameraUploads(false)
+
+    @Test
+    fun `test that shouldShowMediaPermissionsRationale is false when set to false`() = runTest {
+        underTest.setMediaPermissionsRationaleState(false)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertFalse(state.shouldShowMediaPermissionsRationale)
+        }
+    }
+
+    @Test
+    fun `test that shouldShowMediaPermissionsRationale is true when set to true`() = runTest {
+        underTest.setMediaPermissionsRationaleState(true)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertTrue(state.shouldShowMediaPermissionsRationale)
+        }
+    }
+
+    @Test
+    fun `test that shouldShowNotificationPermissionRationale is true when set to true`() =
+        runTest {
+            underTest.setNotificationPermissionRationaleState(true)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertTrue(state.shouldShowNotificationPermissionRationale)
+            }
+        }
+
+    @Test
+    fun `test that shouldShowNotificationPermissionRationale is false when set to false`() =
+        runTest {
+            underTest.setNotificationPermissionRationaleState(false)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertFalse(state.shouldShowNotificationPermissionRationale)
+            }
+        }
 }

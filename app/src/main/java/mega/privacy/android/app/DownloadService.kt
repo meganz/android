@@ -58,7 +58,7 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
-import mega.privacy.android.app.main.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.objects.SDTransfer

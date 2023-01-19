@@ -4025,8 +4025,7 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="other">ボーナスは%1$d日後に有効期限が切れます</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">説明</string>

@@ -50,6 +50,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.data.model.MegaAttributes;
 import nz.mega.sdk.MegaApiAndroid;

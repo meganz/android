@@ -10,17 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
-import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.setRenewalDateForProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.data.qualifier.MegaApi
@@ -97,7 +97,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     }
 
     private fun setupObservers() {
-        viewModel.getVersionsInfo().observe(viewLifecycleOwner, ::refreshVersionsInfo)
+        viewLifecycleOwner.collectFlow(viewModel.state) {
+            refreshVersionsInfo(it.versionsInfo, it.isFileVersioningEnabled)
+        }
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
 
@@ -106,8 +108,8 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
      *
      * @param versionsInfo Text to show as versions info.
      */
-    private fun refreshVersionsInfo(versionsInfo: String) {
-        if (MegaApplication.isDisableFileVersions == 0) {
+    private fun refreshVersionsInfo(versionsInfo: String?, isFileVersioningEnabled: Boolean) {
+        if (isFileVersioningEnabled) {
             binding.rubbishSeparator.isVisible = true
             binding.previousVersionsStorageContainer.isVisible = true
             binding.previousVersionsText.text = versionsInfo

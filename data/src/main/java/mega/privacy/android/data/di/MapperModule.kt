@@ -6,7 +6,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountDetailMapper
+import mega.privacy.android.data.mapper.AccountLevelDetailMapper
+import mega.privacy.android.data.mapper.AccountSessionDetailMapper
+import mega.privacy.android.data.mapper.AccountStorageDetailMapper
+import mega.privacy.android.data.mapper.AccountTransferDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
+import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -24,13 +29,13 @@ import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
@@ -44,16 +49,17 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
+import mega.privacy.android.data.mapper.PaymentPlatformTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
 import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
+import mega.privacy.android.data.mapper.ScannedContactLinkResultMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
-import mega.privacy.android.data.mapper.PaymentPlatformTypeMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeMapper
@@ -76,6 +82,10 @@ import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
+import mega.privacy.android.data.mapper.toAccountLevelDetail
+import mega.privacy.android.data.mapper.toAccountSessionDetail
+import mega.privacy.android.data.mapper.toAccountStorageDetail
+import mega.privacy.android.data.mapper.toAccountTransferDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toAchievementsOverview
 import mega.privacy.android.data.mapper.toChatCall
@@ -92,6 +102,7 @@ import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
+import mega.privacy.android.data.mapper.toDuration
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toLocalPricing
@@ -107,14 +118,15 @@ import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
+import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toRecentActionBucket
 import mega.privacy.android.data.mapper.toRecentActionBucketList
+import mega.privacy.android.data.mapper.toScannedContactLinkResult
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
-import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toSyncRecordType
 import mega.privacy.android.data.mapper.toSyncRecordTypeInt
@@ -129,6 +141,8 @@ import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
+import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaNode
 
 /**
  * Module for providing mapper dependencies
@@ -414,7 +428,34 @@ internal class MapperModule {
      * Provide [AccountDetailMapper] mapper
      */
     @Provides
-    fun provideAccountDetailMapper(): AccountDetailMapper = ::toAccountDetail
+    fun provideAccountDetailMapper(
+        accountStorageDetailMapper: AccountStorageDetailMapper,
+        accountSessionDetailMapper: AccountSessionDetailMapper,
+        accountTransferDetailMapper: AccountTransferDetailMapper,
+        accountLevelDetailMapper: AccountLevelDetailMapper,
+        accountTypeMapper: AccountTypeMapper,
+        subscriptionStatusMapper: SubscriptionStatusMapper,
+    ): AccountDetailMapper = {
+            details: MegaAccountDetails,
+            numDetails: Int,
+            rootNode: MegaNode?,
+            rubbishNode: MegaNode?,
+            inShares: List<MegaNode>,
+        ->
+        toAccountDetail(
+            details,
+            numDetails,
+            rootNode,
+            rubbishNode,
+            inShares,
+            accountStorageDetailMapper,
+            accountSessionDetailMapper,
+            accountTransferDetailMapper,
+            accountLevelDetailMapper,
+            accountTypeMapper,
+            subscriptionStatusMapper,
+        )
+    }
 
     /**
      * Provide chat room mapper
@@ -520,4 +561,45 @@ internal class MapperModule {
     @Provides
     fun provideSubscriptionPlatformTypeMapper(): PaymentPlatformTypeMapper =
         ::toPaymentPlatformType
+
+    /**
+     * Provide account transfer detail mapper
+     */
+    @Provides
+    fun provideAccountTransferDetailMapper(): AccountTransferDetailMapper =
+        ::toAccountTransferDetail
+
+    /**
+     * Provide account session detail mapper
+     */
+    @Provides
+    fun provideAccountSessionDetailMapper(): AccountSessionDetailMapper =
+        ::toAccountSessionDetail
+
+    /**
+     * Provide account storage detail mapper
+     */
+    @Provides
+    fun provideAccountStorageDetailMapper(): AccountStorageDetailMapper =
+        ::toAccountStorageDetail
+
+    /**
+     * Provide account level detail mapper
+     */
+    @Provides
+    fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper =
+        ::toAccountLevelDetail
+
+    /**
+     * Provide file duration mapper
+     */
+    @Provides
+    fun provideFileDurationMapper(): FileDurationMapper = ::toDuration
+
+    /**
+     * Provides scanned contact link result mapper
+     */
+    @Provides
+    fun provideScannedContactLinkResultMapper(): ScannedContactLinkResultMapper =
+        ::toScannedContactLinkResult
 }

@@ -271,4 +271,325 @@ def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
     writeFile file: featureFlagFile, text: result.toString()
 }
 
+/**
+ * Compose the failure message of "deliver_appStore" command, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+String releaseFailureMessage(String lineBreak) {
+    String message = ":x: Android Release Failed!" +
+            "${lineBreak}Branch:\t${gitlabSourceBranch}" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Commit:\t${GIT_COMMIT}"
+    if (env.gitlabActionType == "PUSH") {
+        message += "${lineBreak}Trigger Reason: git PUSH"
+    } else if (env.gitlabActionType == "NOTE") {
+        message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
+    }
+    return message
+}
+
+/**
+ * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+String uploadSymbolFailureMessage(String lineBreak) {
+    return ":x: Android Firebase Crashlytics symbol upload Failed!" +
+            "${lineBreak}Branch:\t${gitlabSourceBranch}" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Commit:\t${GIT_COMMIT}"
+}
+
+/**
+ * compose the success message of "upload_symbol" command, which might be used for Slack or GitLab MR.
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * while GitLab MR uses "<br/>".
+ * @return The success message to be sent
+ */
+String uploadSymbolSuccessMessage(String lineBreak) {
+    return ":rocket: Firebase Crashlytics symbol uploaded successfully!" +
+            "${lineBreak}Version:\t${readAppVersion1()}" +
+            "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
+            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
+            "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
+            "${lineBreak}Author:\t${gitlabUserName}" +
+            "${lineBreak}Commit:\t${GIT_COMMIT}"
+}
+
+String sdkCommitId() {
+    String commitId = sh(
+            script: """
+                cd ${WORKSPACE}/sdk/src/main/jni/mega/sdk
+                git rev-parse HEAD
+                """,
+            returnStdout: true).trim()
+    println("sdk commit id = ${commitId}")
+    return commitId
+}
+
+String appCommitId() {
+    String commitId = sh(
+            script: """
+                cd ${WORKSPACE}
+                git rev-parse HEAD
+                """,
+            returnStdout: true).trim()
+    println("Android commit id = ${commitId}")
+    return commitId
+}
+
+String megaChatSdkCommitId() {
+    String commitId = sh(
+            script: """
+                cd ${WORKSPACE}/sdk/src/main/jni/megachat/sdk
+                git rev-parse HEAD
+                """,
+            returnStdout: true).trim()
+    println("chat sdk commit id = ${commitId}")
+    return commitId
+}
+
+/**
+ * create a build info file with key version information of build.
+ * This file will be uploaded to Artifactory repo.
+ *
+ */
+def createBriefBuildInfoFile() {
+    def content = """
+Version: v${readAppVersion1()}
+Upload Time: ${new Date().toString()}
+Android: branch(${env.gitlabSourceBranch}) - commit(${appCommitId()})
+SDK version: ${readPrebuiltSdkVersion()}
+"""
+    sh "rm -fv ${ARTIFACTORY_BUILD_INFO}"
+    sh "echo \"${content}\" >> ${WORKSPACE}/${ARCHIVE_FOLDER}/${ARTIFACTORY_BUILD_INFO}"
+}
+
+/**
+ * Read SDK versions from MR description and assign the values into environment.
+ */
+void checkSDKVersion() {
+    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
+    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
+
+    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
+    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
+
+    if (!isDefined(SDK_BRANCH)) {
+        SDK_BRANCH = "develop"
+    }
+
+    if (!isDefined(MEGACHAT_BRANCH)) {
+        MEGACHAT_BRANCH = "develop"
+    }
+}
+
+/**
+ * read the version name from source code(build.gradle)
+ * read the version code from environment variable
+ *
+ * @return a tuple of version code and version name
+ */
+def readAppVersion() {
+    String versionCode = APK_VERSION_CODE_FOR_CD
+    String versionName = sh(script: "./gradlew -q printAppVersionName  | tail -n 1", returnStdout: true).trim()
+    String versionNameChannel = sh(script: "./gradlew -q printAppVersionNameChannel | tail -n 1", returnStdout: true).trim()
+    String appGitHash = sh(script: "./gradlew -q printAppGitHash | tail -n 1", returnStdout: true).trim()
+    return [versionName, versionNameChannel, versionCode, appGitHash]
+}
+
+/**
+ * get app version in a format like "7.2(230111014)(5cf9df7410c)"
+ * @return version string
+ */
+String readAppVersion1() {
+    def (versionName, versionNameChannel, versionCode, appGitHash) = readAppVersion()
+    return versionName + versionNameChannel + "(" + versionCode + ")" + "(" + appGitHash + ")"
+}
+
+/**
+ * get app version in a format like "230111014_5cf9df7410c_7_2" (for 7.2(230111014)(5cf9df7410c))
+ * @return version string
+ */
+String readAppVersion2() {
+    def (versionName, versionNameChannel, versionCode, appGitHash) = readAppVersion()
+    return "${versionCode}_${appGitHash}_${versionName.replaceAll("\\.", "_")}${versionNameChannel.replaceAll("-", "_")}"
+}
+
+/**
+ * read the last git commit message
+ * @return last git commit message
+ */
+String lastCommitMessage() {
+    return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
+}
+
+void deleteAllFilesExcept(String folder, String except) {
+    println("Deleting all files except ${except} in folder ${folder}")
+    sh """
+        cd ${folder}
+        mv -v ${except} /tmp/
+        rm -fr *
+        mv -v /tmp/${except} .
+    """
+}
+
+/**
+ * get relative path of artifactory folder
+ * @return relative path.
+ */
+String artifactoryUploadPath() {
+    def (versionName, versionNameChannel, versionCode, appGitHash) = readAppVersion()
+    return "v${versionName}${versionNameChannel.replaceAll("-", "_")}/${versionCode}_${appGitHash}"
+}
+
+/**
+ * clean SDK
+ */
+void cleanSdk() {
+    println("clean SDK")
+    sh """
+        cd $WORKSPACE/sdk/src/main/jni
+        bash build.sh clean
+    """
+}
+
+/**
+ * clean Android project
+ */
+void cleanAndroid() {
+    println("clean Android code")
+    sh """
+        cd $WORKSPACE
+        ./gradlew clean
+    """
+}
+
+/**
+ * print the size of workspace.
+ * @param prompt a prompt message can be printed before the size value.
+ */
+void printWorkspaceSize(String prompt) {
+    println(prompt)
+    sh """
+        cd ${WORKSPACE}
+        du -sh
+    """
+}
+
+
+/**
+ * Get the list of recent changes (release note) json string input
+ * and return a formatted list following below example
+ * [
+ *  [language: 'en-GB', text: "Please test the changes from Jenkins build ${env.BUILD_NUMBER}."],
+ *  [language: 'de-DE', text: "Bitte die Änderungen vom Jenkins Build ${env.BUILD_NUMBER} testen."]
+ * ]
+ *
+ * @param input the json string to parse
+ * @return the list of recent changes formatted
+ */
+def getRecentChangeList(input) {
+    def map = []
+    def languages = new groovy.json.JsonSlurperClassic().parseText(input)
+    def keyList = languages.keySet()
+    keyList.each { language ->
+        def languageMap = [:]
+        languageMap["language"] = "${language}"
+        languageMap["text"] = "${languages[language]}"
+        map.add(languageMap)
+    }
+    return map
+}
+
+/**
+ * Get release notes content from releaseNoteFile
+ * releaseNoteFile should be in json format
+ *
+ * @return a String with the content of releaseNoteFile
+ */
+String releaseNotes(releaseNoteFile) {
+    String release_notes = sh(
+            script: """
+                cd ${WORKSPACE}/jenkinsfile/
+                cat $releaseNoteFile
+                """,
+            returnStdout: true).trim()
+    return release_notes
+}
+
+/**
+ * Get the SDK branch name for report. If build is specified by tag
+ *
+ * @return If SDK is specified by <code>SDK_BRANCH</code>, return the branch name. If SDK is specified
+ *         by <code>SDK_TAG</code>, return the tag name.
+ */
+String sdkBranchName() {
+    if (isDefined(SDK_TAG)) {
+        return SDK_TAG
+    } else {
+        return SDK_BRANCH
+    }
+}
+
+/**
+ * Get the MEGAChat SDK branch name for report. If build is specified by tag
+ *
+ * @return If SDK is specified by <code>MEGACHAT_BRANCH</code>, return the branch name. If SDK is specified
+ *         by <code>MEGACHAT_TAG</code>, return the tag name.
+ */
+String megaChatBranchName() {
+    if (isDefined(MEGACHAT_TAG)) {
+        return MEGACHAT_TAG
+    } else {
+        return MEGACHAT_BRANCH
+    }
+}
+
+/**
+ * check if a certain value is defined by checking the tag value
+ * @param value value of tag
+ * @return true if tag has a value. false if tag is null or zero length
+ */
+boolean isDefined(String value) {
+    return value != null && !value.isEmpty()
+}
+
+/**
+ * Get the value from GitLab MR description by key
+ * @param key the key to check and read
+ * @return actual value of key if key is specified. null otherwise.
+ */
+String getValueInMRDescriptionBy(String key) {
+    if (key == null || key.isEmpty()) return null
+    def description = env.gitlabMergeRequestDescription
+    if (description == null) return null
+    String[] lines = description.split('\n')
+    for (String line : lines) {
+        line = line.trim()
+        if (line.startsWith(key)) {
+            String value = line.substring(key.length() + 1)
+            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
+            return value
+        }
+    }
+    return null
+}
+
+void downloadAndExtractNativeSymbols() {
+    String nativeSymbolLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/native-symbol/${readPrebuiltSdkVersion()}.zip"
+    String targetObjLocalLocation = "sdk/src/main/obj/local"
+    sh """
+        cd ${WORKSPACE}
+        curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} ${nativeSymbolLocation}
+        rm -frv ${targetObjLocalLocation}
+        mkdir -p ${targetObjLocalLocation}
+        unzip ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} -d ${targetObjLocalLocation}
+    """
+}
+
+
 return this

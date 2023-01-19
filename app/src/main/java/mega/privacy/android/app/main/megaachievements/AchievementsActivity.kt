@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -14,9 +15,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
-import mega.privacy.android.app.listeners.GetAchievementsListener.RequestCallback
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -30,11 +31,15 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class AchievementsActivity : PasscodeActivity() {
+
     /**
      * fetcher
      */
     @Inject
+    @Deprecated("This field will be removed in future")
     lateinit var fetcher: GetAchievementsListener
+
+    private val viewModel: AchievementsOverviewViewModel by viewModels()
 
     private val binding: ActivityAchievementsBinding by lazy(LazyThreadSafetyMode.NONE) {
         ActivityAchievementsBinding.inflate(layoutInflater)
@@ -66,13 +71,16 @@ class AchievementsActivity : PasscodeActivity() {
             ft.commitNow()
         }
 
-        fetcher.setRequestCallback(object :
-            RequestCallback {
-            override fun onRequestError() {
-                showSnackbar(getString(R.string.cancel_subscription_error))
-            }
-        })
-        fetcher.fetch()
+        collectFlow(
+            viewModel.state,
+            collectBlock = ::handleEvent
+        )
+    }
+
+    private fun handleEvent(event: AchievementsUIState) {
+        if (event.showError) {
+            showSnackbar(getString(R.string.cancel_subscription_error))
+        }
     }
 
     /**

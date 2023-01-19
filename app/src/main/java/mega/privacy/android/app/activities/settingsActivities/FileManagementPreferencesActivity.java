@@ -4,7 +4,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRE
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
 import static mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE;
@@ -154,16 +153,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private final BroadcastReceiver updateFileVersionsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagement == null)
-                return;
-
-            sttFileManagement.updateEnabledFileVersions();
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,9 +187,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         registerReceiver(updateRBSchedulerReceiver,
                 new IntentFilter(ACTION_UPDATE_RB_SCHEDULER));
 
-        registerReceiver(updateFileVersionsReceiver,
-                new IntentFilter(ACTION_UPDATE_FILE_VERSIONS));
-
         if (savedInstanceState != null && savedInstanceState.getBoolean(CLEAR_OFFLINE_SHOWN, false)) {
             showClearOfflineDialog();
         }
@@ -222,7 +208,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(updateCUSettingsReceiver);
         unregisterReceiver(resetVersionInfoReceiver);
         unregisterReceiver(updateRBSchedulerReceiver);
-        unregisterReceiver(updateFileVersionsReceiver);
 
         AlertDialogUtil.dismissAlertDialogIfExists(clearOfflineDialog);
     }

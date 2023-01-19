@@ -15,7 +15,7 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.main.LoginActivity;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
 

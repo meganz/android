@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 
 data class AlbumPhotosSelectionState(
+    val albumFlow: AlbumFlow = AlbumFlow.Creation,
     val album: Album.UserAlbum? = null,
     val isInvalidAlbum: Boolean = false,
     val albumPhotoIds: Set<Long> = setOf(),
@@ -19,6 +20,11 @@ data class AlbumPhotosSelectionState(
     val isSelectionCompleted: Boolean = false,
     val numCommittedPhotos: Int = 0,
 )
+
+enum class AlbumFlow {
+    Creation,
+    Addition,
+}
 
 typealias PhotoDownload = suspend (
     photo: Photo,

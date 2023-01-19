@@ -12,22 +12,20 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment
+import mega.privacy.android.app.meeting.list.adapter.MeetingAdapterItem
 import mega.privacy.android.app.meeting.list.adapter.MeetingItemDetailsLookup
 import mega.privacy.android.app.meeting.list.adapter.MeetingItemKeyProvider
 import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
@@ -36,8 +34,6 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MeetingListFragment : Fragment() {
@@ -49,9 +45,6 @@ class MeetingListFragment : Fragment() {
         fun newInstance(): MeetingListFragment =
             MeetingListFragment()
     }
-
-    @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     private lateinit var binding: FragmentMeetingListBinding
     private var actionMode: ActionMode? = null
@@ -92,10 +85,6 @@ class MeetingListFragment : Fragment() {
     }
 
     private fun setupView() {
-        lifecycleScope.launch {
-            meetingsAdapter.setScheduleMeetingsEnabled(getFeatureFlag(AppFeatures.ScheduleMeeting))
-        }
-
         binding.list.apply {
             adapter = meetingsAdapter
             setHasFixedSize(true)
@@ -148,12 +137,7 @@ class MeetingListFragment : Fragment() {
 
     private fun setupObservers(savedInstanceState: Bundle?) {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            val currentFirstChat = meetingsAdapter.currentList.firstOrNull()?.id
-            meetingsAdapter.submitList(items) {
-                if (currentFirstChat != items.firstOrNull()?.id) {
-                    binding.list.smoothScrollToPosition(0)
-                }
-
+            meetingsAdapter.submitRoomList(items) {
                 if (savedInstanceState != null && !actionModeRestored) {
                     meetingsAdapter.tracker?.onRestoreInstanceState(savedInstanceState)
                     if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
@@ -220,21 +204,21 @@ class MeetingListFragment : Fragment() {
                 }
 
                 when {
-                    selectedItems.all { it is MeetingItem.Data && it.isMuted } -> {
+                    selectedItems.all { it is MeetingAdapterItem.Data && it.room.isMuted } -> {
                         menu.findItem(R.id.cab_menu_unmute).isVisible = true
                         menu.findItem(R.id.cab_menu_mute).isVisible = false
                     }
-                    selectedItems.all { it is MeetingItem.Data && !it.isMuted } -> {
+                    selectedItems.all { it is MeetingAdapterItem.Data && !it.room.isMuted } -> {
                         menu.findItem(R.id.cab_menu_mute).isVisible = true
                         menu.findItem(R.id.cab_menu_unmute).isVisible = false
                     }
-                    selectedItems.all { it is MeetingItem.Data && it.isActive } -> {
+                    selectedItems.all { it is MeetingAdapterItem.Data && it.room.isActive } -> {
                         menu.findItem(R.id.chat_list_leave_chat_layout).apply {
                             setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
                             isVisible = true
                         }
                     }
-                    selectedItems.all { it is MeetingItem.Data && !it.isActive } -> {
+                    selectedItems.all { it is MeetingAdapterItem.Data && !it.room.isActive } -> {
                         menu.findItem(R.id.chat_list_leave_chat_layout).isVisible = false
                     }
                     else -> {
@@ -328,5 +312,14 @@ class MeetingListFragment : Fragment() {
     fun clearSelections(forceUpdate: Boolean = false) {
         meetingsAdapter.tracker?.clearSelection()
         if (forceUpdate) meetingsAdapter.notifyDataSetChanged()
+    }
+
+    /**
+     * Scroll to the top of the list
+     */
+    fun scrollToTop() {
+        if ((binding.list.adapter?.itemCount ?: 0) > 0) {
+            binding.list.smoothScrollToPosition(0)
+        }
     }
 }

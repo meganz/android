@@ -38,7 +38,7 @@ class DefaultGetFavouriteFolderInfo @Inject constructor(
             children = children,
             name = parent.name,
             currentHandle = parentHandle,
-            parentHandle = parent.parentId.id
+            parentHandle = parent.parentId.longValue
         )
     }
 }

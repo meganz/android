@@ -10,7 +10,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
-import com.anggrayudi.storage.extension.toInt
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -539,13 +538,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         @JvmStatic
         var isEnabledGeoLocation = false
 
-        /**
-         * Is disable file versions
-         */
-        @JvmStatic
-        var isDisableFileVersions = -1
-            private set
-
         private var recentChatVisible = false
 
         /**
@@ -632,16 +624,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         fun setRecentChatVisible(recentChatVisible: Boolean) {
             Timber.d("setRecentChatVisible: %s", recentChatVisible)
             this.recentChatVisible = recentChatVisible
-        }
-
-        /**
-         * Set disable file versions
-         *
-         * @param disableFileVersions
-         */
-        @JvmStatic
-        fun setDisableFileVersions(disableFileVersions: Boolean) {
-            isDisableFileVersions = disableFileVersions.toInt()
         }
 
         /**

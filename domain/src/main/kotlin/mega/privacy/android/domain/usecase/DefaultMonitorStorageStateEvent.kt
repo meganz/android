@@ -16,23 +16,27 @@ import javax.inject.Inject
  * Default implementation of [MonitorStorageStateEvent]
  */
 class DefaultMonitorStorageStateEvent @Inject constructor(
-    notificationsRepository: NotificationsRepository,
+    private val notificationsRepository: NotificationsRepository,
     @ApplicationScope private val scope: CoroutineScope,
 ) : MonitorStorageStateEvent {
 
-    override val storageState: StateFlow<StorageStateEvent> = notificationsRepository
-        .monitorEvent()
-        .filterIsInstance<StorageStateEvent>()
-        .stateIn(
-            scope = scope,
-            started = Eagerly,
-            initialValue = StorageStateEvent(
-                handle = 1L,
-                eventString = "",
-                number = 0L,
-                text = "",
-                type = EventType.Storage,
-                storageState = StorageState.Unknown  // initial state is [StorageState.Unknown]
+    private val events: StateFlow<StorageStateEvent> by lazy {
+        notificationsRepository
+            .monitorEvent()
+            .filterIsInstance<StorageStateEvent>()
+            .stateIn(
+                scope = scope,
+                started = Eagerly,
+                initialValue = StorageStateEvent(
+                    handle = 1L,
+                    eventString = "",
+                    number = 0L,
+                    text = "",
+                    type = EventType.Storage,
+                    storageState = StorageState.Unknown  // initial state is [StorageState.Unknown]
+                )
             )
-        )
+    }
+
+    override fun invoke(): StateFlow<StorageStateEvent> = events
 }

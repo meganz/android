@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity.Companion.ALBUM_FLOW
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.UIPhoto.PhotoItem
@@ -61,8 +62,21 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private var addPhotosJob: Job? = null
 
     init {
+        extractAlbumFlow()
+
         fetchAlbum()
         fetchPhotos()
+    }
+
+    private fun extractAlbumFlow() = savedStateHandle.getStateFlow(ALBUM_FLOW, 0)
+        .onEach(::updateAlbumFlow)
+        .catch { exception -> Timber.e(exception) }
+        .launchIn(viewModelScope)
+
+    private fun updateAlbumFlow(type: Int) {
+        _state.update {
+            it.copy(albumFlow = AlbumFlow.values()[type])
+        }
     }
 
     private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)

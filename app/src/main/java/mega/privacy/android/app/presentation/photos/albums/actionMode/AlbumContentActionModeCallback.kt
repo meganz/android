@@ -49,6 +49,9 @@ class AlbumContentActionModeCallback(
             R.id.cab_menu_remove_favourites -> {
                 fragment.actionRemoveFavourites()
             }
+            R.id.cab_menu_remove_photos -> {
+                fragment.actionShowRemovePhotosFromAlbumDialog()
+            }
         }
         return true
     }
@@ -57,6 +60,9 @@ class AlbumContentActionModeCallback(
         menu?.let {
             if (currentAlbum != Album.FavouriteAlbum) {
                 menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = false
+            }
+            if (currentAlbum !is Album.UserAlbum) {
+                menu.findItem(R.id.cab_menu_remove_photos)?.isVisible = false
             }
             menu.findItem(R.id.cab_menu_select_all)?.isVisible = !fragment.checkSelectAll()
         }

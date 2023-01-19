@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -46,4 +47,7 @@ object TestSharedUseCases {
 
     @Provides
     fun provideGetFullAccountInfo() = mock<GetFullAccountInfo>()
+
+    @Provides
+    fun provideGetFileVersionsOption() = mock<GetFileVersionsOption>()
 }

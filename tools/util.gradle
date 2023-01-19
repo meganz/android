@@ -5,6 +5,98 @@ import groovy.json.JsonSlurperClassic
  */
 
 /**
+ * For Continuous Delivery in Google Play Internal Channel <p/>
+ * For Android builds in CD pipeline, read the environment variable and assign to version code
+ * For local builds, compute string with formatted date and assign to version code
+ * @return app's version code
+ */
+Integer readVersionCode() {
+    def versionCode = System.getenv('APK_VERSION_CODE_FOR_CD')
+    if (versionCode != null && !versionCode.isEmpty()) {
+        // Jenkins build will compute version code using this variable
+        return versionCode.toInteger()
+    } else {
+        // Local build will compute version code using this function
+        return new Date().format("yyDDDHHmm", TimeZone.getTimeZone("GMT")).toInteger()
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution <p/>
+ * For Android builds in CD pipeline, read the environment variable and
+ * add to standard version name, in order to distinguish versions on Firebase.
+ * For normal builds, use default version name format.
+ * @return app's version name tag
+ */
+String readVersionNameTag() {
+    def versionNameTag = System.getenv('APK_VERSION_NAME_TAG_FOR_CD')
+    if (versionNameTag != null && !versionNameTag.isEmpty()) {
+        return versionNameTag
+    } else {
+        return ""
+    }
+}
+
+/**
+ * For Continuous Delivery in Google Play Internal Channel <p/>
+ * For Android builds in CD pipeline, read the environment variable and
+ * add to standard version name, in order to distinguish versions on Internal Channel.
+ * For normal builds, use default version name format.
+ * @return app's version name channel
+ */
+String readVersionNameChannel() {
+    def versionNameChannel = System.getenv('APK_VERSION_NAME_CHANNEL_FOR_CD')
+    if (versionNameChannel != null && !versionNameChannel.isEmpty()) {
+        return versionNameChannel
+    } else {
+        return ""
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution <p/>
+ * Get release note string from environment variable.
+ * @return release note to be shown on Firebase. If environment variable is not set,
+ *         return "Release Note not available"
+ */
+String readReleaseNotes() {
+    def releaseNote = System.getenv('RELEASE_NOTES_FOR_CD')
+    if (releaseNote != null && !releaseNote.isEmpty()) {
+        return releaseNote
+    } else {
+        return "Release Notes not available"
+    }
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get tester list from environment. Tester list should be
+ * comma-separated list of email address.
+ * @returnn tester list or "" if there is no tester
+ */
+String readTesters() {
+    String testers = System.getenv("TESTERS_FOR_CD")
+    if (testers == null || testers.trim().isEmpty()) {
+        testers = ""
+    }
+    return testers
+}
+
+/**
+ * For Continuous Delivery with Firebase AppDistribution
+ * Get tester group list from environment. Tester group list should be
+ * comma-separated list of group names.
+ * @return tester group list or default group list if there is no environment setting
+ */
+String readTesterGroupList() {
+    String groups = System.getenv("TESTER_GROUP_FOR_CD")
+    if (groups == null || groups.trim().isEmpty()) {
+        groups = "internal_qa, internal_dev, external_qa, external_dev, internal_design"
+    }
+    return groups
+}
+
+/**
  * Check whether we should use prebuilt SDK or local sdk module
  *
  * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
@@ -36,6 +128,25 @@ def queryPrebuiltSdkProperty(String property, String version) {
     if (properties != null) {
         commit = properties[property][0]
     }
+    return commit
+}
+
+/**
+ * Get the Git hash for the app.
+ *
+ * @return commit ID of the app
+ */
+def getAppGitHash() {
+    // Read commit ID from local
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        workingDir './'
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    def commit = stdout.toString().trim()
+
+    println("app_commit = $commit")
     return commit
 }
 
@@ -107,7 +218,14 @@ boolean shouldActivateGreeter() {
 }
 
 ext {
+    readVersionCode = this.&readVersionCode
+    readVersionNameTag = this.&readVersionNameTag
+    readVersionNameChannel = this.&readVersionNameChannel
+    readReleaseNotes = this.&readReleaseNotes
+    readTesters = this.&readTesters
+    readTesterGroupList = this.&readTesterGroupList
     shouldUsePrebuiltSdk = this.&shouldUsePrebuiltSdk
+    getAppGitHash = this.&getAppGitHash
     getSdkGitHash = this.&getSdkGitHash
     getChatGitHash = this.&getChatGitHash
     shouldActivateGreeter = this.&shouldActivateGreeter

@@ -1,6 +1,5 @@
 package mega.privacy.android.data.gateway
 
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import java.io.File
 import java.io.IOException
 
@@ -38,13 +37,20 @@ interface FileGateway {
      */
     suspend fun buildDefaultDownloadDir(): File
 
+
     /**
-     * Get the local folder path
+     * Get local file
      *
-     * @param typedFileNode [TypedFileNode]
-     * @return folder path or null
+     * @param fileName
+     * @param fileSize
+     * @param lastModifiedDate
+     * @return local file if it exists
      */
-    suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String?
+    suspend fun getLocalFile(
+        fileName: String,
+        fileSize: Long,
+        lastModifiedDate: Long,
+    ): File?
 
     /**
      * Get offline files root path
@@ -59,4 +65,41 @@ interface FileGateway {
      * @return the root path of inbox offline files
      */
     suspend fun getOfflineFilesInboxRootPath(): String
+
+    /**
+     * remove GPS CoOrdinates from the file
+     */
+    suspend fun removeGPSCoordinates(filePath: String)
+
+    /**
+     * Copies a file from source to dest
+     *
+     * @param source Source file.
+     * @param destination   Final copied file.
+     * @throws IOException if some error happens while copying.
+     */
+    @Throws(IOException::class)
+    suspend fun copyFile(source: File, destination: File)
+
+
+    /**
+     * creating a new temporary file in a root directory by copying the file from local path
+     * to new path
+     *
+     * @param rootPath root path.
+     * @param newPath new path of the file.
+     * @param localPath  local path of the file.
+     * @throws IOException if some error happens while creating.
+     */
+    @Throws(IOException::class)
+    suspend fun createTempFile(rootPath: String, localPath: String, newPath: String)
+
+    /**
+     * check enough storage availability
+     *
+     * @param rootPath new Path of the file.
+     * @param file file to be created.
+     * @return [Boolean] whether enough storage available or not
+     */
+    suspend fun checkIfEnoughStorageAvailable(rootPath: String, file: File): Boolean
 }

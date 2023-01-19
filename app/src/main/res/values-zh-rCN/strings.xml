@@ -2890,7 +2890,7 @@
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">搜索GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">未找到[A]GIFs[/A]</string>
+    <string name="empty_search_giphy">未找到[A]GIF[/A]</string>
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">无可用GIF图案，请稍后再试</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
@@ -4025,8 +4025,7 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在为预览准备文件</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="other">奖励将在%1$d天后到期</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">描述</string>

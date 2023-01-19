@@ -27,8 +27,8 @@ import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
-import mega.privacy.android.app.main.LoginActivity
-import mega.privacy.android.app.main.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
@@ -106,10 +106,6 @@ class GlobalListener @Inject constructor(
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME) && isMyChange) {
                 api.getRubbishBinAutopurgePeriod(GetAttrUserListener(appContext))
-                return@forEach
-            }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
-                api.getFileVersionsOption(GetAttrUserListener(appContext))
                 return@forEach
             }
 

@@ -173,4 +173,22 @@ interface ContactsRepository {
      * @return [AccountCredentials.ContactCredentials]
      */
     suspend fun getContactCredentials(userEmail: String): AccountCredentials.ContactCredentials?
+
+    /**
+     * Get current user first name
+     *
+     * @param forceRefresh If true, force read from backend, refresh cache and return.
+     *                     If false, use value in cache
+     * @return first name
+     */
+    suspend fun getCurrentUserFirstName(forceRefresh: Boolean): String
+
+    /**
+     * Get current user last name
+     *
+     * @param forceRefresh If true, force read from backend, refresh cache and return.
+     *                     If false, use value in cache
+     * @return last name
+     */
+    suspend fun getCurrentUserLastName(forceRefresh: Boolean): String
 }

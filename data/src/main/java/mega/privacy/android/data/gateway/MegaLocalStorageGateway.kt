@@ -388,7 +388,6 @@ interface MegaLocalStorageGateway {
     /**
      * Set first time
      *
-     * @param isFirstTime
      */
     suspend fun setUserHasLoggedIn()
 
@@ -526,4 +525,35 @@ interface MegaLocalStorageGateway {
      * @return OfflineInformation if available, else null
      */
     suspend fun getOfflineInformation(nodeHandle: Long): OfflineInformation?
+
+    /**
+     * Save first name
+     * @param firstName first name
+     */
+    suspend fun saveMyFirstName(firstName: String)
+
+    /**
+     * Save last name
+     * @param lastName last name
+     */
+    suspend fun saveMyLastName(lastName: String)
+
+    /**
+     * Set last public handle
+     *
+     * @param handle
+     */
+    suspend fun setLastPublicHandle(handle: Long)
+
+    /**
+     * Set last public handle time stamp
+     */
+    suspend fun setLastPublicHandleTimeStamp()
+
+    /**
+     * Set last public handle type
+     *
+     * @param type
+     */
+    suspend fun setLastPublicHandleType(type: Int)
 }

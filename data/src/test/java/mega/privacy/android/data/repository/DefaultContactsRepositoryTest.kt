@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -20,6 +21,7 @@ import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.toContactCredentials
+import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
@@ -33,7 +35,10 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultContactsRepositoryTest {
@@ -50,6 +55,7 @@ class DefaultContactsRepositoryTest {
     private val onlineStatusMapper = mock<OnlineStatusMapper>()
     private val contactItemMapper = mock<ContactItemMapper>()
     private val contactDataMapper = mock<ContactDataMapper>()
+    private val localStorageGateway = mock<MegaLocalStorageGateway>()
 
     private val contactCredentialsMapper: ContactCredentialsMapper =
         { credentials: String?, email: String, name: String ->
@@ -83,6 +89,7 @@ class DefaultContactsRepositoryTest {
             contactItemMapper = contactItemMapper,
             contactDataMapper = contactDataMapper,
             contactCredentialsMapper = contactCredentialsMapper,
+            localStorageGateway = localStorageGateway,
         )
 
         whenever(megaApiGateway.handleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
@@ -104,24 +111,18 @@ class DefaultContactsRepositoryTest {
                 on { name }.thenReturn(alias)
             }
             val expectedCredentials = toContactCredentials(
-                validCredentials,
-                userEmail,
-                alias
+                validCredentials, userEmail, alias
             )
 
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.getUserCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    requestCredentials,
-                    success
+                    mock(), requestCredentials, success
                 )
             }
             whenever(megaApiGateway.getUserAlias(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    requestAlias,
-                    success
+                    mock(), requestAlias, success
                 )
             }
             assertThat(underTest.getContactCredentials(userEmail)).isEqualTo(expectedCredentials)
@@ -133,9 +134,7 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.getUserCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    mock(),
-                    error
+                    mock(), mock(), error
                 )
             }
             assertThat(underTest.getContactCredentials(userEmail))
@@ -158,9 +157,7 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.getUserCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    request,
-                    error
+                    mock(), request, error
                 )
             }
             assertThat(underTest.getContactCredentials(userEmail))
@@ -177,9 +174,7 @@ class DefaultContactsRepositoryTest {
 
         whenever(megaApiGateway.getUserAlias(any(), any())).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                request,
-                success
+                mock(), request, success
             )
         }
         assertThat(underTest.getUserAlias(userHandle)).isEqualTo(alias)
@@ -189,34 +184,29 @@ class DefaultContactsRepositoryTest {
     fun `test that get user alias throws a MegaException if api fails with error`() = runTest {
         whenever(megaApiGateway.getUserAlias(any(), any())).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                error
+                mock(), mock(), error
             )
         }
         assertThat(underTest.getUserAlias(userHandle))
     }
 
     @Test
-    fun `test that get user first name returns the name if api returns the first name`() =
-        runTest {
-            val request = mock<MegaRequest> {
-                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
-                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_FIRSTNAME)
-                on { text }.thenReturn(testName)
-            }
-
-            whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    request,
-                    success
-                )
-            }
-            val result = underTest.getUserFirstName(userHandle, true)
-
-            assertThat(result).isEqualTo(testName)
+    fun `test that get user first name returns the name if api returns the first name`() = runTest {
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_FIRSTNAME)
+            on { text }.thenReturn(testName)
         }
+
+        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        val result = underTest.getUserFirstName(userHandle, true)
+
+        assertThat(result).isEqualTo(testName)
+    }
 
     @Test
     fun `test that get user first name returns the name if api returns the first name from cache`() =
@@ -232,9 +222,7 @@ class DefaultContactsRepositoryTest {
     fun `test that get user first name throws a MegaException if api fails with error`() = runTest {
         whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
             ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                error
+                mock(), mock(), error
             )
         }
 
@@ -242,25 +230,22 @@ class DefaultContactsRepositoryTest {
     }
 
     @Test
-    fun `test that get user last name returns the name if api returns the last name`() =
-        runTest {
-            val request = mock<MegaRequest> {
-                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
-                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_LASTNAME)
-                on { text }.thenReturn(testName)
-            }
-
-            whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    request,
-                    success
-                )
-            }
-            val result = underTest.getUserLastName(userHandle, true)
-
-            assertThat(result).isEqualTo(testName)
+    fun `test that get user last name returns the name if api returns the last name`() = runTest {
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_LASTNAME)
+            on { text }.thenReturn(testName)
         }
+
+        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        val result = underTest.getUserLastName(userHandle, true)
+
+        assertThat(result).isEqualTo(testName)
+    }
 
     @Test
     fun `test that get user last name returns the name if api returns the last name from cache`() =
@@ -276,9 +261,7 @@ class DefaultContactsRepositoryTest {
     fun `test that get user last name throws a MegaException if api fails with error`() = runTest {
         whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
             ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                error
+                mock(), mock(), error
             )
         }
 
@@ -286,14 +269,13 @@ class DefaultContactsRepositoryTest {
     }
 
     @Test
-    fun `test that get user full name returns the name if api returns the full name`() =
-        runTest {
-            whenever(megaChatApiGateway.getUserFullNameFromCache(any())).thenReturn(testName)
+    fun `test that get user full name returns the name if api returns the full name`() = runTest {
+        whenever(megaChatApiGateway.getUserFullNameFromCache(any())).thenReturn(testName)
 
-            val result = underTest.getUserFullName(userHandle, false)
+        val result = underTest.getUserFullName(userHandle, false)
 
-            assertThat(result).isEqualTo(testName)
-        }
+        assertThat(result).isEqualTo(testName)
+    }
 
     @Test
     fun `test that are credentials verified returns true if user exists and api returns true`() =
@@ -324,9 +306,7 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.resetCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    mock(),
-                    success
+                    mock(), mock(), success
                 )
             }
             assertThat(underTest.resetCredentials(userEmail))
@@ -338,9 +318,7 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.resetCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    mock(),
-                    error
+                    mock(), mock(), error
                 )
             }
             assertThat(underTest.resetCredentials(userEmail))
@@ -359,9 +337,7 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.verifyCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    mock(),
-                    success
+                    mock(), mock(), success
                 )
             }
             assertThat(underTest.verifyCredentials(userEmail))
@@ -373,9 +349,7 @@ class DefaultContactsRepositoryTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.verifyCredentials(any(), any())).thenAnswer {
                 ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    mock(),
-                    error
+                    mock(), mock(), error
                 )
             }
             assertThat(underTest.verifyCredentials(userEmail))
@@ -386,5 +360,243 @@ class DefaultContactsRepositoryTest {
         runTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(null)
             assertThat(underTest.verifyCredentials(userEmail))
+        }
+
+    @Test
+    fun `test that getCurrentUserFirstName returns correct cache value when database handler has it in cache`() =
+        runTest {
+            val expectedFirstName = "abc"
+            val credentials = UserCredentials(
+                firstName = expectedFirstName,
+                email = null,
+                session = null,
+                lastName = null,
+                myHandle = null,
+            )
+            whenever(localStorageGateway.getUserCredentials()).thenReturn(credentials)
+            assertThat(underTest.getCurrentUserFirstName(forceRefresh = false)).isEqualTo(
+                expectedFirstName
+            )
+        }
+
+    @Test
+    fun `test that getCurrentUserFirstName return correct value when it is not in database handler cache and getUserAttribute is success`() =
+        runTest {
+            val expectedFirstName = "abc"
+            val credentials = UserCredentials(
+                firstName = null,
+                email = null,
+                session = null,
+                lastName = null,
+                myHandle = null,
+            )
+            whenever(localStorageGateway.getUserCredentials()).thenReturn(credentials)
+
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedFirstName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(), request = request, error = success
+                )
+            }
+            assertEquals(expectedFirstName, underTest.getCurrentUserFirstName(forceRefresh = false))
+        }
+
+    @Test
+    fun `test that userFirstName is saved in database handler when it is not in database handler cache and getUserAttribute is success`() =
+        runTest {
+            val expectedFirstName = "abc"
+            val credentials = UserCredentials(
+                firstName = null,
+                email = null,
+                session = null,
+                lastName = null,
+                myHandle = null,
+            )
+            whenever(localStorageGateway.getUserCredentials()).thenReturn(credentials)
+
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedFirstName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+            underTest.getCurrentUserFirstName(forceRefresh = false)
+            verify(localStorageGateway).saveMyFirstName(expectedFirstName)
+        }
+
+    @Test
+    fun `test that getCurrentUserLastName returns correct cache value when database handler has it in cache`() =
+        runTest {
+            val expectedLastName = "abc"
+            val credentials = UserCredentials(
+                firstName = null,
+                email = null,
+                session = null,
+                lastName = expectedLastName,
+                myHandle = null,
+            )
+            whenever(localStorageGateway.getUserCredentials()).thenReturn(credentials)
+            assertThat(underTest.getCurrentUserLastName(forceRefresh = false)).isEqualTo(
+                expectedLastName
+            )
+        }
+
+    @Test
+    fun `test that getCurrentUserLastName return correct value when it is not in database handler cache and getUserAttribute success`() =
+        runTest {
+            val expectedLastName = "cde"
+            val credentials = UserCredentials(
+                email = null,
+                firstName = null,
+                session = null,
+                lastName = null,
+                myHandle = null,
+            )
+            whenever(localStorageGateway.getUserCredentials()).thenReturn(credentials)
+
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedLastName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+            assertEquals(expectedLastName, underTest.getCurrentUserLastName(forceRefresh = false))
+        }
+
+    @Test
+    fun `test that userLastName is saved when it is not in database handler cache and getUserAttribute success`() =
+        runTest {
+            val expectedLastName = "cde"
+            val credentials = UserCredentials(
+                email = null,
+                firstName = null,
+                session = null,
+                lastName = null,
+                myHandle = null,
+            )
+            whenever(localStorageGateway.getUserCredentials()).thenReturn(credentials)
+
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedLastName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+            underTest.getCurrentUserLastName(forceRefresh = false)
+            verify(localStorageGateway).saveMyLastName(expectedLastName)
+        }
+
+    @Test
+    fun `test that cache value of first name is not used when force refresh is enabled`() =
+        runTest {
+
+            val expectedFirstName = "cde"
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedFirstName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+
+            underTest.getCurrentUserFirstName(forceRefresh = true)
+            verify(localStorageGateway, never()).getUserCredentials()
+        }
+
+    @Test
+    fun `test that new first name is saved when force refresh is enabled`() = runTest {
+
+        val expectedFirstName = "cde"
+        val request = mock<MegaRequest> {
+            on { text }.thenReturn(expectedFirstName)
+        }
+        whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+
+        underTest.getCurrentUserFirstName(forceRefresh = true)
+        verify(localStorageGateway).saveMyFirstName(expectedFirstName)
+    }
+
+    @Test
+    fun `test that mega api gateway to get first name is always called when force refresh is enabled`() =
+        runTest {
+
+            val expectedFirstName = "cde"
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedFirstName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+
+            underTest.getCurrentUserFirstName(forceRefresh = true)
+            verify(megaApiGateway).getUserAttribute(any(), any())
+        }
+
+    /////
+    @Test
+    fun `test that cache value of last name is not used when force refresh is enabled`() = runTest {
+
+        val expectedLastName = "cde"
+        val request = mock<MegaRequest> {
+            on { text }.thenReturn(expectedLastName)
+        }
+        whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+
+        underTest.getCurrentUserLastName(forceRefresh = true)
+        verify(localStorageGateway, never()).getUserCredentials()
+    }
+
+    @Test
+    fun `test that new last name is saved when force refresh is enabled`() = runTest {
+
+        val expectedLastName = "cde"
+        val request = mock<MegaRequest> {
+            on { text }.thenReturn(expectedLastName)
+        }
+        whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+
+        underTest.getCurrentUserLastName(forceRefresh = true)
+        verify(localStorageGateway).saveMyLastName(expectedLastName)
+    }
+
+    @Test
+    fun `test that mega api gateway to get last name is always called when force refresh is enabled`() =
+        runTest {
+
+            val expectedLastName = "cde"
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedLastName)
+            }
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+
+            underTest.getCurrentUserLastName(forceRefresh = true)
+            verify(megaApiGateway).getUserAttribute(any(), any())
         }
 }

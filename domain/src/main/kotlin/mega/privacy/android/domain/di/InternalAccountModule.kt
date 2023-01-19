@@ -8,6 +8,7 @@ import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
+import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.DeleteContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
@@ -15,6 +16,8 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
@@ -46,6 +49,13 @@ internal abstract class InternalAccountModule {
      */
     @Binds
     abstract fun provideGetAccountAchievements(implementation: DefaultGetAccountAchievements): GetAccountAchievements
+
+    /**
+     * Binds the Use Case [IsUserLoggedIn] to its implementation [DefaultIsUserLoggedIn]
+     */
+    @Binds
+    abstract fun bindIsUserLoggedIn(useCase: DefaultIsUserLoggedIn): IsUserLoggedIn
+
 
     companion object {
 
@@ -94,5 +104,9 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideDeleteContactLink(accountRepository: AccountRepository): DeleteContactLink =
             DeleteContactLink(accountRepository::deleteContactLink)
+
+        @Provides
+        fun provideMonitorAccountDetail(accountRepository: AccountRepository): MonitorAccountDetail =
+            MonitorAccountDetail(accountRepository::monitorAccountDetail)
     }
 }

@@ -213,7 +213,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
             ?.filterIsInstance<RecentActionItemType.Item>()
             ?.mapIndexed { index, item ->
                 if (item.bucket.nodes.isNotEmpty()
-                    && item.bucket.nodes[0].id.id == handle
+                    && item.bucket.nodes[0].id.longValue == handle
                 ) index
                 else null
             }

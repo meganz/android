@@ -140,8 +140,10 @@ fun AlbumPhotosSelectionScreen(
         floatingActionButton = {
             val album = state.album
             val photos = state.photos
+            val albumFlow = state.albumFlow
+            val selectedPhotoIds = state.selectedPhotoIds
 
-            if (album != null && photos.isNotEmpty()) {
+            if (album != null && photos.isNotEmpty() && (albumFlow == AlbumFlow.Creation || albumFlow == AlbumFlow.Addition && selectedPhotoIds.isNotEmpty())) {
                 FloatingActionButton(
                     onClick = {
                         viewModel.addPhotos(
