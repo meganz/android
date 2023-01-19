@@ -36,6 +36,7 @@ import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -269,8 +270,10 @@ internal class DefaultFilesRepository @Inject constructor(
         withContext(ioDispatcher) {
             getMegaNode(viewerNode)?.let { node ->
                 suspendCoroutine { continuation ->
-                    val file = cacheFolderGateway.getCacheFile(CacheFolderConstant.TEMPORARY_FOLDER,
-                        node.getFileName())
+                    val file = cacheFolderGateway.getCacheFile(
+                        CacheFolderConstant.TEMPORARY_FOLDER,
+                        node.getFileName()
+                    )
                     if (file == null) {
                         continuation.resumeWith(Result.failure(NullFileException()))
                         return@suspendCoroutine
@@ -489,6 +492,20 @@ internal class DefaultFilesRepository @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
             streamingGateway.getLocalLink(it)
         }
+    }
+
+    override suspend fun createTempFile(root: String, syncRecord: SyncRecord) =
+        withContext(ioDispatcher) {
+            val localPath = syncRecord.localPath
+                ?: throw IllegalArgumentException("Source path doesn't exist on sync record: $syncRecord")
+            val destinationPath = syncRecord.newPath
+                ?: throw IllegalArgumentException("Destination path doesn't exist on sync record: $syncRecord")
+            fileGateway.createTempFile(root, localPath, destinationPath)
+            destinationPath
+        }
+
+    override suspend fun removeGPSCoordinates(filePath: String) = withContext(ioDispatcher) {
+        fileGateway.removeGPSCoordinates(filePath)
     }
 
     override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =

@@ -11,12 +11,15 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class ScanCodeViewModelTest {
@@ -53,6 +56,8 @@ class ScanCodeViewModelTest {
             assertThat(initial.inviteResultDialogShown).isFalse()
             assertThat(initial.showInviteDialog).isFalse()
             assertThat(initial.showInviteResultDialog).isFalse()
+            assertThat(initial.finishActivity).isFalse()
+            assertThat(initial.finishActivityOnScanComplete).isFalse()
         }
     }
 
@@ -103,6 +108,16 @@ class ScanCodeViewModelTest {
     }
 
     @Test
+    fun `test that finish activity on scan complete is updated when new value is provided`() =
+        runTest {
+            underTest.state.map { it.finishActivityOnScanComplete }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isFalse()
+                underTest.updateFinishActivityOnScanComplete(true)
+                assertThat(awaitItem()).isTrue()
+            }
+        }
+
+    @Test
     fun `test that when show invite dialog is called values are updated`() = runTest {
         underTest.state.test {
             val oldValue = awaitItem()
@@ -151,4 +166,85 @@ class ScanCodeViewModelTest {
             assertThat(newValue.showInviteResultDialog).isTrue()
         }
     }
+
+    @Test
+    fun `test that on querying contact detail and on result OK email is updated and show invite dialog values are updated`() =
+        runTest {
+            val handle = "1234"
+            val expectedEmail = "abc@gmail.com"
+            val expectedName = "abc"
+            val expectedHandle: Long = 12345
+            val result = ScannedContactLinkResult(
+                expectedName,
+                expectedEmail,
+                expectedHandle,
+                false,
+                QRCodeQueryResults.CONTACT_QUERY_OK
+            )
+
+            whenever(queryScannedContactLink(handle)).thenReturn(result)
+            underTest.state.test {
+                awaitItem()
+                underTest.queryContactLink(handle)
+                val newValue = awaitItem()
+                assertThat(newValue.myEmail).isEqualTo(expectedEmail)
+                assertThat(newValue.contactNameContent).isEqualTo(expectedName)
+                assertThat(newValue.handleContactLink).isEqualTo(expectedHandle)
+                assertThat(newValue.isContact).isFalse()
+                assertThat(newValue.showInviteDialog).isTrue()
+                assertThat(newValue.showInviteResultDialog).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that on querying contact detail and on result EExist email is updated and show invite result dialog values are updated`() =
+        runTest {
+            val handle = "1234"
+            val expectedEmail = "abc@gmail.com"
+            val result = ScannedContactLinkResult(
+                "abc",
+                expectedEmail,
+                12345,
+                false,
+                QRCodeQueryResults.CONTACT_QUERY_EEXIST
+            )
+
+            whenever(queryScannedContactLink(handle)).thenReturn(result)
+            underTest.state.test {
+                awaitItem()
+                underTest.queryContactLink(handle)
+                val newValue = awaitItem()
+                assertThat(newValue.myEmail).isEqualTo(expectedEmail)
+                assertThat(newValue.success).isTrue()
+                assertThat(newValue.printEmail).isTrue()
+                assertThat(newValue.showInviteDialog).isFalse()
+                assertThat(newValue.showInviteResultDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that on querying contact detail and on result Default email is updated and show invite result dialog values are updated`() =
+        runTest {
+            val handle = "1234"
+            val expectedEmail = "abc@gmail.com"
+            val result = ScannedContactLinkResult(
+                "abc",
+                expectedEmail,
+                12345,
+                false,
+                QRCodeQueryResults.CONTACT_QUERY_DEFAULT
+            )
+
+            whenever(queryScannedContactLink(handle)).thenReturn(result)
+            underTest.state.test {
+                awaitItem()
+                underTest.queryContactLink(handle)
+                val newValue = awaitItem()
+                assertThat(newValue.myEmail).isEqualTo(expectedEmail)
+                assertThat(newValue.success).isFalse()
+                assertThat(newValue.printEmail).isFalse()
+                assertThat(newValue.showInviteDialog).isFalse()
+                assertThat(newValue.showInviteResultDialog).isTrue()
+            }
+        }
 }

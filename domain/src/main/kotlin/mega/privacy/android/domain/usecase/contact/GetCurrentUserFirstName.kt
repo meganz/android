@@ -8,6 +8,8 @@ fun interface GetCurrentUserFirstName {
     /**
      * Invoke
      *
+     * @param forceRefresh force to fetch latest first name or get it from cache
+     * @return string
      */
-    suspend operator fun invoke(): String
+    suspend operator fun invoke(forceRefresh: Boolean): String
 }

@@ -61,11 +61,13 @@ import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
+import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
+import mega.privacy.android.domain.usecase.DefaultCreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
@@ -715,4 +717,10 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindRestoreSecondaryTimestamps(defaultRestoreSecondaryTimestamps: DefaultRestoreSecondaryTimestamps): RestoreSecondaryTimestamps
+
+    /**
+     * provide [CreateTempFileAndRemoveCoordinates]
+     */
+    @Binds
+    abstract fun bindCreateTempFileAndRemoveCoordinates(createTempFileAndRemoveCoordinates: DefaultCreateTempFileAndRemoveCoordinates): CreateTempFileAndRemoveCoordinates
 }

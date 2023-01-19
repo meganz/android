@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
@@ -20,7 +21,11 @@ import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.FileNotCreatedException
+import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.repository.FileRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -34,8 +39,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
+@ExperimentalCoroutinesApi
 internal class DefaultFilesRepositoryTest {
-    private lateinit var underTest: DefaultFilesRepository
+    private lateinit var underTest: FileRepository
 
     private val context: Context = mock()
     private val megaApiGateway: MegaApiGateway = mock()
@@ -149,4 +155,111 @@ internal class DefaultFilesRepositoryTest {
 
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that temporary file is created successfully when sync record is valid`() = runTest {
+        val localPath = "/path/to/local"
+        val newPath = "/path/to/new"
+        val rootPath = "/path/to/root"
+        val syncRecord = SyncRecord(
+            id = 0,
+            localPath = localPath,
+            newPath = newPath,
+            originFingerprint = null,
+            newFingerprint = null,
+            timestamp = null,
+            fileName = null,
+            longitude = null,
+            latitude = null,
+            status = 0,
+            type = 0,
+            nodeHandle = null,
+            isCopyOnly = false,
+            isSecondary = false,
+        )
+        whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenReturn(Unit)
+        val actual = underTest.createTempFile(rootPath, syncRecord)
+        assertThat(actual).isEqualTo(newPath)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test that file not found exception is thrown when local path is null`() = runTest {
+        val localPath = "/path/to/local"
+        val newPath = "/path/to/new"
+        val rootPath = "/path/to/root"
+        val syncRecord = SyncRecord(
+            id = 0,
+            localPath = null,
+            newPath = newPath,
+            originFingerprint = null,
+            newFingerprint = null,
+            timestamp = null,
+            fileName = null,
+            longitude = null,
+            latitude = null,
+            status = 0,
+            type = 0,
+            nodeHandle = null,
+            isCopyOnly = false,
+            isSecondary = false,
+        )
+        whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenReturn(Unit)
+        underTest.createTempFile(rootPath, syncRecord)
+    }
+
+    @Test(expected = NotEnoughStorageException::class)
+    fun `test that not enough storage exception is thrown when there is not enough storage`() =
+        runTest {
+            val localPath = "/path/to/local"
+            val newPath = "/path/to/new"
+            val rootPath = "/path/to/root"
+            val syncRecord = SyncRecord(
+                id = 0,
+                localPath = localPath,
+                newPath = newPath,
+                originFingerprint = null,
+                newFingerprint = null,
+                timestamp = null,
+                fileName = null,
+                longitude = null,
+                latitude = null,
+                status = 0,
+                type = 0,
+                nodeHandle = null,
+                isCopyOnly = false,
+                isSecondary = false,
+            )
+            whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenThrow(
+                NotEnoughStorageException()
+            )
+            underTest.createTempFile(rootPath, syncRecord)
+        }
+
+    @Test(expected = FileNotCreatedException::class)
+    fun `test that file not created exception is thrown when file creation is not successful`() =
+        runTest {
+            val localPath = "/path/to/local"
+            val newPath = "/path/to/new"
+            val rootPath = "/path/to/root"
+            val syncRecord = SyncRecord(
+                id = 0,
+                localPath = localPath,
+                newPath = newPath,
+                originFingerprint = null,
+                newFingerprint = null,
+                timestamp = null,
+                fileName = null,
+                longitude = null,
+                latitude = null,
+                status = 0,
+                type = 0,
+                nodeHandle = null,
+                isCopyOnly = false,
+                isSecondary = false,
+            )
+            whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenThrow(
+                FileNotCreatedException()
+            )
+            underTest.createTempFile(rootPath, syncRecord)
+        }
 }

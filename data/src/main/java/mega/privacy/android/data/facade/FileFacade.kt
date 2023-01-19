@@ -5,6 +5,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
+import android.os.StatFs
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATA
 import android.provider.MediaStore.MediaColumns.DATE_MODIFIED
@@ -13,11 +14,18 @@ import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
 import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.domain.exception.FileNotCreatedException
+import mega.privacy.android.domain.exception.NotEnoughStorageException
 import timber.log.Timber
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
 
@@ -172,8 +180,66 @@ class FileFacade @Inject constructor(
     override suspend fun getOfflineFilesInboxRootPath() =
         context.filesDir.absolutePath + File.separator + OFFLINE_DIR + File.separator + "in"
 
-    companion object {
-        private const val DOWNLOAD_DIR = "MEGA Downloads"
-        private const val OFFLINE_DIR = "MEGA Offline"
+    override suspend fun removeGPSCoordinates(filePath: String) {
+        try {
+            val exif = ExifInterface(filePath)
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, LAT_LNG)
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, REF_LAT_LNG)
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, LAT_LNG)
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, REF_LAT_LNG)
+            exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, LAT_LNG)
+            exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF, REF_LAT_LNG)
+            exif.saveAttributes()
+        } catch (e: IOException) {
+            Timber.e(e)
+        }
+    }
+
+    override suspend fun copyFile(source: File, destination: File) {
+        if (source.absolutePath != destination.absolutePath) {
+            withContext(Dispatchers.IO) {
+                val inputStream = FileInputStream(source)
+                val outputStream = FileOutputStream(destination)
+                val inputChannel = inputStream.channel
+                val outputChannel = outputStream.channel
+                outputChannel.transferFrom(inputChannel, 0, inputChannel.size())
+                inputChannel.close()
+                outputChannel.close()
+                inputStream.close()
+                outputStream.close()
+            }
+        }
+    }
+
+    override suspend fun createTempFile(rootPath: String, localPath: String, newPath: String) {
+        val srcFile = File(localPath)
+        if (!srcFile.exists()) {
+            Timber.e("Source File doesn't exist")
+            throw FileNotFoundException()
+        }
+        val hasEnoughSpace = checkIfEnoughStorageAvailable(rootPath, srcFile)
+        if (!hasEnoughSpace) {
+            Timber.e("Not Enough Storage")
+            throw NotEnoughStorageException()
+        }
+        val destinationFile = File(newPath)
+        try {
+            copyFile(srcFile, destinationFile)
+        } catch (e: IOException) {
+            Timber.e(e)
+            throw FileNotCreatedException()
+        }
+    }
+
+    override suspend fun checkIfEnoughStorageAvailable(rootPath: String, file: File) =
+        runCatching { StatFs(rootPath).availableBytes >= file.length() }.onFailure { Timber.e(it) }
+            .getOrDefault(false)
+
+
+    private companion object {
+        const val DOWNLOAD_DIR = "MEGA Downloads"
+        const val OFFLINE_DIR = "MEGA Offline"
+        const val LAT_LNG = "0/1,0/1,0/1000"
+        const val REF_LAT_LNG = "0"
     }
 }
