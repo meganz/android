@@ -20,6 +20,7 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExperimentalCoroutinesApi
 class ScanCodeViewModelTest {
@@ -58,6 +59,8 @@ class ScanCodeViewModelTest {
             assertThat(initial.showInviteResultDialog).isFalse()
             assertThat(initial.finishActivity).isFalse()
             assertThat(initial.finishActivityOnScanComplete).isFalse()
+            assertThat(initial.avatarColor).isNull()
+            assertThat(initial.avatarFile).isNull()
         }
     }
 
@@ -125,13 +128,24 @@ class ScanCodeViewModelTest {
             val contactName = "test"
             val isContact = true
             val handle: Long = 100
+            val avatarFile = File("")
+            val avatarColor = 4043
             assertThat(oldValue.myEmail).isNull()
             assertThat(oldValue.contactNameContent).isNull()
             assertThat(oldValue.isContact).isFalse()
             assertThat(oldValue.handleContactLink).isEqualTo(-1)
             assertThat(oldValue.showInviteResultDialog).isFalse()
             assertThat(oldValue.showInviteDialog).isFalse()
-            underTest.showInviteDialog(contactName, email, isContact, handle)
+            assertThat(oldValue.avatarFile).isNull()
+            assertThat(oldValue.avatarColor).isNull()
+            underTest.showInviteDialog(
+                contactName,
+                email,
+                isContact,
+                handle,
+                avatarFile,
+                avatarColor
+            )
             val newValue = awaitItem()
             assertThat(newValue.myEmail).isEqualTo(email)
             assertThat(newValue.contactNameContent).isEqualTo(contactName)
@@ -139,6 +153,8 @@ class ScanCodeViewModelTest {
             assertThat(newValue.handleContactLink).isEqualTo(handle)
             assertThat(newValue.showInviteDialog).isTrue()
             assertThat(newValue.showInviteResultDialog).isFalse()
+            assertThat(newValue.avatarFile).isEqualTo(avatarFile)
+            assertThat(newValue.avatarColor).isEqualTo(avatarColor)
         }
     }
 
@@ -174,12 +190,16 @@ class ScanCodeViewModelTest {
             val expectedEmail = "abc@gmail.com"
             val expectedName = "abc"
             val expectedHandle: Long = 12345
+            val avatarFile = File("")
+            val avatarColor = 4040
             val result = ScannedContactLinkResult(
                 expectedName,
                 expectedEmail,
                 expectedHandle,
-                false,
-                QRCodeQueryResults.CONTACT_QUERY_OK
+                true,
+                QRCodeQueryResults.CONTACT_QUERY_OK,
+                avatarFile,
+                avatarColor
             )
 
             whenever(queryScannedContactLink(handle)).thenReturn(result)
@@ -190,9 +210,11 @@ class ScanCodeViewModelTest {
                 assertThat(newValue.myEmail).isEqualTo(expectedEmail)
                 assertThat(newValue.contactNameContent).isEqualTo(expectedName)
                 assertThat(newValue.handleContactLink).isEqualTo(expectedHandle)
-                assertThat(newValue.isContact).isFalse()
+                assertThat(newValue.isContact).isTrue()
                 assertThat(newValue.showInviteDialog).isTrue()
                 assertThat(newValue.showInviteResultDialog).isFalse()
+                assertThat(newValue.avatarFile).isEqualTo(avatarFile)
+                assertThat(newValue.avatarColor).isEqualTo(avatarColor)
             }
         }
 

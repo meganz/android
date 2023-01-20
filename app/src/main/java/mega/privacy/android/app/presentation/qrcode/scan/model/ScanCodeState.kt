@@ -1,5 +1,9 @@
 package mega.privacy.android.app.presentation.qrcode.scan.model
 
+import androidx.annotation.ColorInt
+import androidx.annotation.StringRes
+import java.io.File
+
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel]
  *
@@ -17,20 +21,24 @@ package mega.privacy.android.app.presentation.qrcode.scan.model
  * @property showInviteDialog Whether to show dialog
  * @property finishActivityOnScanComplete Whether to finish activity on completing the scan
  * @property finishActivity Finish the current activity
+ * @property avatarFile Avatar of the contact
+ * @property avatarColor Color of the avatar
  */
 data class ScanCodeState(
-    var dialogTitleContent: Int = -1,
-    var dialogTextContent: Int = -1,
-    var contactNameContent: String? = null,
-    var isContact: Boolean = false,
-    var myEmail: String? = null,
-    var handleContactLink: Long = -1,
-    var success: Boolean = true,
-    var printEmail: Boolean = false,
-    var inviteDialogShown: Boolean = false,
-    var inviteResultDialogShown: Boolean = false,
-    var showInviteResultDialog: Boolean = false,
-    var showInviteDialog: Boolean = false,
-    var finishActivityOnScanComplete: Boolean = false,
-    var finishActivity: Boolean = false,
+    @StringRes val dialogTitleContent: Int = -1,
+    @StringRes val dialogTextContent: Int = -1,
+    val contactNameContent: String? = null,
+    val isContact: Boolean = false,
+    val myEmail: String? = null,
+    val handleContactLink: Long = -1,
+    val success: Boolean = true,
+    val printEmail: Boolean = false,
+    val inviteDialogShown: Boolean = false,
+    val inviteResultDialogShown: Boolean = false,
+    val showInviteResultDialog: Boolean = false,
+    val showInviteDialog: Boolean = false,
+    val finishActivityOnScanComplete: Boolean = false,
+    val finishActivity: Boolean = false,
+    val avatarFile: File? = null,
+    @ColorInt val avatarColor: Int? = null,
 )

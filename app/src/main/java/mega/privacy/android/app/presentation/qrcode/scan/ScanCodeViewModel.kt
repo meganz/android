@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.qrcode.scan
 
+import androidx.annotation.ColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import mega.privacy.android.app.presentation.extensions.dialogTitle
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -109,12 +111,14 @@ class ScanCodeViewModel @Inject constructor(
 
                 when (qrCodeQueryResult) {
                     QRCodeQueryResults.CONTACT_QUERY_OK -> {
-                        Timber.d("Contact link query ${handle}_${email}_${contactName}")
+                        Timber.d("Contact link query ${handle}_${email}_${contactName}_${avatarFile}")
                         showInviteDialog(
                             contactName,
                             email,
                             isContact,
-                            handle
+                            handle,
+                            avatarFile,
+                            avatarColor
                         )
                     }
                     QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
@@ -167,7 +171,14 @@ class ScanCodeViewModel @Inject constructor(
      * @param isContact Whether scanned code is already a contact or not
      * @param handle Handle of the scanned qr code
      */
-    fun showInviteDialog(contactName: String, myEmail: String, isContact: Boolean, handle: Long) {
+    fun showInviteDialog(
+        contactName: String,
+        myEmail: String,
+        isContact: Boolean,
+        handle: Long,
+        avatarFile: File?,
+        @ColorInt avatarColor: Int?
+    ) {
         _state.update {
             it.copy(
                 contactNameContent = contactName,
@@ -175,7 +186,9 @@ class ScanCodeViewModel @Inject constructor(
                 isContact = isContact,
                 handleContactLink = handle,
                 showInviteResultDialog = false,
-                showInviteDialog = true
+                showInviteDialog = true,
+                avatarFile = avatarFile,
+                avatarColor = avatarColor
             )
         }
     }

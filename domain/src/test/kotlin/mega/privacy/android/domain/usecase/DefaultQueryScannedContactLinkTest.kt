@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.usecase.qrcode.DefaultQueryScannedContactLink
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
@@ -18,10 +19,11 @@ import org.mockito.kotlin.whenever
 class DefaultQueryScannedContactLinkTest {
     private lateinit var underTest: QueryScannedContactLink
     private val qrCodeRepository = mock<QRCodeRepository>()
+    private val avatarRepository = mock<AvatarRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultQueryScannedContactLink(qrCodeRepository)
+        underTest = DefaultQueryScannedContactLink(qrCodeRepository, avatarRepository)
     }
 
     @Test
@@ -41,34 +43,80 @@ class DefaultQueryScannedContactLinkTest {
     }
 
     @Test
-    fun `test that database fields are not updated when qrCodeQueryResult is EExist`() = runTest {
-        val handle = "1245"
-        val result = ScannedContactLinkResult(
-            contactName = "Abc",
-            email = "abc@gmail.com",
-            handle = 12345,
-            isContact = true,
-            qrCodeQueryResult = QRCodeQueryResults.CONTACT_QUERY_EEXIST
-        )
-        whenever(qrCodeRepository.queryScannedContactLink(handle)).thenReturn(result)
-        underTest(handle)
+    fun `test that user avatar file and color is fetched when contact is existing contact and qrCodeQueryResult is OK`() =
+        runTest {
+            val handle = "1245"
+            val nodeHandle: Long = 12345
+            val result = ScannedContactLinkResult(
+                contactName = "Abc",
+                email = "abc@gmail.com",
+                handle = nodeHandle,
+                isContact = true,
+                qrCodeQueryResult = QRCodeQueryResults.CONTACT_QUERY_OK
+            )
+            whenever(qrCodeRepository.queryScannedContactLink(handle)).thenReturn(result)
+            whenever(avatarRepository.getAvatarColor(nodeHandle)).thenReturn(1234)
+            underTest(handle)
 
-        verify(qrCodeRepository, never()).updateDatabaseOnQueryScannedContactSuccess(result.handle)
-    }
+            verify(avatarRepository).getAvatarFile(result.email)
+            verify(avatarRepository).getAvatarColor(result.handle)
+        }
 
     @Test
-    fun `test that database fields are not updated when qrCodeQueryResult is Default`() = runTest {
-        val handle = "1245"
-        val result = ScannedContactLinkResult(
-            contactName = "Abc",
-            email = "abc@gmail.com",
-            handle = 12345,
-            isContact = false,
-            qrCodeQueryResult = QRCodeQueryResults.CONTACT_QUERY_EEXIST
-        )
-        whenever(qrCodeRepository.queryScannedContactLink(handle)).thenReturn(result)
-        underTest(handle)
+    fun `test that user avatar file and color is not fetched when contact is not existing contact and qrCodeQueryResult is OK`() =
+        runTest {
+            val handle = "1245"
+            val result = ScannedContactLinkResult(
+                contactName = "Abc",
+                email = "abc@gmail.com",
+                handle = 12345,
+                isContact = false,
+                qrCodeQueryResult = QRCodeQueryResults.CONTACT_QUERY_OK
+            )
+            whenever(qrCodeRepository.queryScannedContactLink(handle)).thenReturn(result)
+            underTest(handle)
 
-        verify(qrCodeRepository, never()).updateDatabaseOnQueryScannedContactSuccess(result.handle)
-    }
+            verify(avatarRepository, never()).getAvatarFile(result.email)
+            verify(avatarRepository, never()).getAvatarColor(result.handle)
+        }
+
+    @Test
+    fun `test that database fields are not updated and contact avatar is not fetched when qrCodeQueryResult is EExist`() =
+        runTest {
+            val handle = "1245"
+            val result = ScannedContactLinkResult(
+                contactName = "Abc",
+                email = "abc@gmail.com",
+                handle = 12345,
+                isContact = true,
+                qrCodeQueryResult = QRCodeQueryResults.CONTACT_QUERY_EEXIST
+            )
+            whenever(qrCodeRepository.queryScannedContactLink(handle)).thenReturn(result)
+            underTest(handle)
+
+            verify(qrCodeRepository, never())
+                .updateDatabaseOnQueryScannedContactSuccess(result.handle)
+            verify(avatarRepository, never()).getAvatarFile(result.email)
+            verify(avatarRepository, never()).getAvatarColor(result.handle)
+        }
+
+    @Test
+    fun `test that database fields are not updated and contact avatar file and color is not fetched when qrCodeQueryResult is Default`() =
+        runTest {
+            val handle = "1245"
+            val result = ScannedContactLinkResult(
+                contactName = "Abc",
+                email = "abc@gmail.com",
+                handle = 12345,
+                isContact = false,
+                qrCodeQueryResult = QRCodeQueryResults.CONTACT_QUERY_EEXIST
+            )
+            whenever(qrCodeRepository.queryScannedContactLink(handle)).thenReturn(result)
+            underTest(handle)
+
+            verify(qrCodeRepository, never())
+                .updateDatabaseOnQueryScannedContactSuccess(result.handle)
+            verify(avatarRepository, never()).getAvatarFile(result.email)
+            verify(avatarRepository, never()).getAvatarColor(result.handle)
+        }
 }
