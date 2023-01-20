@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -32,7 +32,7 @@ class DefaultGetPublicLinksTest {
     private val getLinksSortOrder = mock<GetLinksSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
-    private val filesRepository = mock<FilesRepository>()
+    private val megaNodeRepository = mock<MegaNodeRepository>()
 
     @Before
     fun setUp() {
@@ -41,7 +41,7 @@ class DefaultGetPublicLinksTest {
             getChildrenNode,
             getLinksSortOrder,
             getCloudSortOrder,
-            filesRepository
+            megaNodeRepository
         )
     }
 
@@ -50,7 +50,7 @@ class DefaultGetPublicLinksTest {
         runTest {
             underTest(-1L)
 
-            verify(filesRepository).getPublicLinks(getLinksSortOrder())
+            verify(megaNodeRepository).getPublicLinks(getLinksSortOrder())
         }
 
     @Test
@@ -58,7 +58,7 @@ class DefaultGetPublicLinksTest {
         runTest {
             underTest(MegaApiJava.INVALID_HANDLE)
 
-            verify(filesRepository).getPublicLinks(getLinksSortOrder())
+            verify(megaNodeRepository).getPublicLinks(getLinksSortOrder())
         }
 
     @Test

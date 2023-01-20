@@ -48,7 +48,7 @@ import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -358,53 +358,53 @@ abstract class CameraUploadUseCases {
          * Provide the [GetFingerprint] implementation
          */
         @Provides
-        fun provideGetFingerPrint(filesRepository: FilesRepository): GetFingerprint =
-            GetFingerprint(filesRepository::getFingerprint)
+        fun provideGetFingerPrint(megaNodeRepository: MegaNodeRepository): GetFingerprint =
+            GetFingerprint(megaNodeRepository::getFingerprint)
 
         /**
          * Provide the [GetNodesByOriginalFingerprint] implementation
          */
         @Provides
-        fun provideGetNodesByOriginalFingerprint(filesRepository: FilesRepository): GetNodesByOriginalFingerprint =
-            GetNodesByOriginalFingerprint(filesRepository::getNodesByOriginalFingerprint)
+        fun provideGetNodesByOriginalFingerprint(megaNodeRepository: MegaNodeRepository): GetNodesByOriginalFingerprint =
+            GetNodesByOriginalFingerprint(megaNodeRepository::getNodesByOriginalFingerprint)
 
         /**
          * Provide the [GetNodeByFingerprintAndParentNode] implementation
          */
         @Provides
-        fun provideGetNodeByFingerprintAndParentNode(filesRepository: FilesRepository): GetNodeByFingerprintAndParentNode =
-            GetNodeByFingerprintAndParentNode(filesRepository::getNodeByFingerprintAndParentNode)
+        fun provideGetNodeByFingerprintAndParentNode(megaNodeRepository: MegaNodeRepository): GetNodeByFingerprintAndParentNode =
+            GetNodeByFingerprintAndParentNode(megaNodeRepository::getNodeByFingerprintAndParentNode)
 
         /**
          * Provide the [GetNodeByFingerprint] implementation
          */
         @Provides
-        fun provideGetNodeByFingerprint(filesRepository: FilesRepository): GetNodeByFingerprint =
-            GetNodeByFingerprint(filesRepository::getNodeByFingerprint)
+        fun provideGetNodeByFingerprint(megaNodeRepository: MegaNodeRepository): GetNodeByFingerprint =
+            GetNodeByFingerprint(megaNodeRepository::getNodeByFingerprint)
 
         /**
          * Provide the [SetOriginalFingerprint] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [SetOriginalFingerprint]
          */
         @Provides
-        fun provideSetOriginalFingerprint(filesRepository: FilesRepository): SetOriginalFingerprint =
-            SetOriginalFingerprint(filesRepository::setOriginalFingerprint)
+        fun provideSetOriginalFingerprint(megaNodeRepository: MegaNodeRepository): SetOriginalFingerprint =
+            SetOriginalFingerprint(megaNodeRepository::setOriginalFingerprint)
 
         /**
          * Provide the [GetParentMegaNode] implementation
          */
         @Provides
-        fun provideGetParentMegaNode(filesRepository: FilesRepository): GetParentMegaNode =
-            GetParentMegaNode(filesRepository::getParentNode)
+        fun provideGetParentMegaNode(megaNodeRepository: MegaNodeRepository): GetParentMegaNode =
+            GetParentMegaNode(megaNodeRepository::getParentNode)
 
         /**
          * Provide the [GetChildMegaNode] implementation
          */
         @Provides
-        fun provideGetChildMegaNode(filesRepository: FilesRepository): GetChildMegaNode =
-            GetChildMegaNode(filesRepository::getChildNode)
+        fun provideGetChildMegaNode(megaNodeRepository: MegaNodeRepository): GetChildMegaNode =
+            GetChildMegaNode(megaNodeRepository::getChildNode)
 
         /**
          * Provide the [SetPrimarySyncHandle] implementation

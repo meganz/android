@@ -18,7 +18,7 @@ import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
-import mega.privacy.android.data.repository.DefaultFilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGetMeetingsRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
@@ -38,7 +38,7 @@ import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
@@ -150,13 +150,13 @@ internal abstract class RepositoryModule {
     abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
 
     @Binds
-    abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
+    abstract fun bindFilesRepository(repository: MegaNodeRepositoryImpl): MegaNodeRepository
 
     @Binds
-    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileSystemRepository
+    abstract fun bindDomainFilesRepository(repository: MegaNodeRepositoryImpl): FileSystemRepository
 
     @Binds
-    abstract fun bindNodeRepository(repository: DefaultFilesRepository): NodeRepository
+    abstract fun bindNodeRepository(repository: MegaNodeRepositoryImpl): NodeRepository
 
     @Binds
     @Singleton

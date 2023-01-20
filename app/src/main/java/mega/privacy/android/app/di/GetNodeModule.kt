@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
@@ -26,51 +26,51 @@ abstract class GetNodeModule {
         /**
          * Provides the [CopyNode] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [CopyNode]
          */
         @Provides
-        fun provideCopyNode(filesRepository: FilesRepository): CopyNode =
-            CopyNode(filesRepository::copyNode)
+        fun provideCopyNode(megaNodeRepository: MegaNodeRepository): CopyNode =
+            CopyNode(megaNodeRepository::copyNode)
 
         /**
          * Provides the [GetChildrenNode] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [GetChildrenNode]
          */
         @Provides
-        fun provideGetChildrenNode(filesRepository: FilesRepository): GetChildrenNode =
-            GetChildrenNode(filesRepository::getChildrenNode)
+        fun provideGetChildrenNode(megaNodeRepository: MegaNodeRepository): GetChildrenNode =
+            GetChildrenNode(megaNodeRepository::getChildrenNode)
 
         /**
          * Provides the [GetNodeByHandle] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [GetNodeByHandle]
          */
         @Provides
-        fun provideGetNodeByHandle(filesRepository: FilesRepository): GetNodeByHandle =
-            GetNodeByHandle(filesRepository::getNodeByHandle)
+        fun provideGetNodeByHandle(megaNodeRepository: MegaNodeRepository): GetNodeByHandle =
+            GetNodeByHandle(megaNodeRepository::getNodeByHandle)
 
         /**
          * Provides [GetUnverifiedIncomingShares] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [GetUnverifiedIncomingShares]
          */
         @Provides
-        fun provideGetUnVerifiedInComingShares(filesRepository: FilesRepository): GetUnverifiedIncomingShares =
-            GetUnverifiedIncomingShares(filesRepository::getUnVerifiedInComingShares)
+        fun provideGetUnVerifiedInComingShares(megaNodeRepository: MegaNodeRepository): GetUnverifiedIncomingShares =
+            GetUnverifiedIncomingShares(megaNodeRepository::getUnVerifiedInComingShares)
 
         /**
          * Provides [GetUnverifiedOutgoingShares] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [GetUnverifiedOutgoingShares]
          */
         @Provides
-        fun provideGetUnverifiedOutGoingShares(filesRepository: FilesRepository): GetUnverifiedOutgoingShares =
-            GetUnverifiedOutgoingShares(filesRepository::getUnverifiedOutgoingShares)
+        fun provideGetUnverifiedOutGoingShares(megaNodeRepository: MegaNodeRepository): GetUnverifiedOutgoingShares =
+            GetUnverifiedOutgoingShares(megaNodeRepository::getUnverifiedOutgoingShares)
     }
 }

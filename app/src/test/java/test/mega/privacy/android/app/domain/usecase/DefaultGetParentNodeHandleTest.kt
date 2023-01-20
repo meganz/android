@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetParentNodeHandle
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -21,13 +21,13 @@ class DefaultGetParentNodeHandleTest {
     private lateinit var underTest: GetParentNodeHandle
 
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val filesRepository = mock<FilesRepository>()
+    private val megaNodeRepository = mock<MegaNodeRepository>()
 
     @Before
     fun setUp() {
         underTest = DefaultGetParentNodeHandle(
             getNodeByHandle,
-            filesRepository,
+            megaNodeRepository,
         )
     }
 
@@ -53,7 +53,7 @@ class DefaultGetParentNodeHandleTest {
             whenever(getNodeByHandle(any())).thenReturn(node)
             underTest(any())
 
-            verify(filesRepository).getParentNode(node)
+            verify(megaNodeRepository).getParentNode(node)
         }
 
     @Test
@@ -64,7 +64,7 @@ class DefaultGetParentNodeHandleTest {
                 on { handle }.thenReturn(expectedHandle)
             }
             whenever(getNodeByHandle(any())).thenReturn(mock())
-            whenever(filesRepository.getParentNode(any())).thenReturn(parentNode)
+            whenever(megaNodeRepository.getParentNode(any())).thenReturn(parentNode)
 
             assertThat(underTest(any())).isEqualTo(expectedHandle)
         }

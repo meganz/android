@@ -41,7 +41,7 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
-internal class DefaultFilesRepositoryTest {
+internal class MegaNodeRepositoryImplTest {
     private lateinit var underTest: FileSystemRepository
 
     private val context: Context = mock()
@@ -66,7 +66,7 @@ internal class DefaultFilesRepositoryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultFilesRepository(
+        underTest = MegaNodeRepositoryImpl(
             context = context,
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,

@@ -60,7 +60,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Default implementation of [FilesRepository]
+ * Default implementation of [MegaNodeRepository]
  *
  * @property context
  * @property megaApiGateway
@@ -79,7 +79,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
  */
-internal class DefaultFilesRepository @Inject constructor(
+internal class MegaNodeRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
@@ -98,7 +98,7 @@ internal class DefaultFilesRepository @Inject constructor(
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
-) : FilesRepository, FileSystemRepository, NodeRepository {
+) : MegaNodeRepository, FileSystemRepository, NodeRepository {
 
     override suspend fun copyNode(
         nodeToCopy: MegaNode,

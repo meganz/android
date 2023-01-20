@@ -9,10 +9,10 @@ import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaShare
 
 /**
- * Files repository
+ * MegaNode repository
  *
  */
-interface FilesRepository {
+interface MegaNodeRepository {
 
     /**
      * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name
