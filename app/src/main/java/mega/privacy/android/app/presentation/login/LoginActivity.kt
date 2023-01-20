@@ -98,6 +98,24 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
+    private val onFetchNodesFinishedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (viewModel.intentAction) {
+                ACTION_FORCE_RELOAD_ACCOUNT -> {
+                    MegaApplication.isLoggingIn = false
+                    finish()
+                }
+                ACTION_OPEN_APP -> {
+                    if (loginFragment?.isAdded == true) {
+                        loginFragment?.readyToManager()
+                    } else {
+                        finish()
+                    }
+                }
+            }
+        }
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -160,24 +178,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE).apply {
                 addAction(BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE)
             })
-
-        registerReceiver(object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when (viewModel.intentAction) {
-                    ACTION_FORCE_RELOAD_ACCOUNT -> {
-                        MegaApplication.isLoggingIn = false
-                        finish()
-                    }
-                    ACTION_OPEN_APP -> {
-                        if (loginFragment?.isAdded == true) {
-                            loginFragment?.readyToManager()
-                        } else {
-                            finish()
-                        }
-                    }
-                }
-            }
-        }, IntentFilter(ACTION_FETCH_NODES_FINISHED))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -355,6 +355,8 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         super.onResume()
         Util.setAppFontSize(this)
 
+        registerReceiver(onFetchNodesFinishedReceiver, IntentFilter(ACTION_FETCH_NODES_FINISHED))
+
         if (intent == null) return
 
         if (intent?.action != null) {
@@ -365,7 +367,14 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             }
         }
 
+        Intent(ACTION_FETCH_NODES_FINISHED)
+
         intent = null
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(onFetchNodesFinishedReceiver)
     }
 
     private fun showCancelCUWarning() {
