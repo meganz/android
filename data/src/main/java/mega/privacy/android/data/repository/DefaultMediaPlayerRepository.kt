@@ -187,7 +187,27 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getChildrenByParentHandle(
+    override suspend fun getAudioNodesByParentHandle(
+        parentHandle: Long,
+        order: SortOrder
+    ): List<UnTypedNode>? =
+        getChildrenByParentHandle(isAudio = true, parentHandle = parentHandle, order = order)
+
+    override suspend fun getVideoNodesByParentHandle(
+        parentHandle: Long,
+        order: SortOrder
+    ): List<UnTypedNode>? =
+        getChildrenByParentHandle(isAudio = false, parentHandle = parentHandle, order = order)
+
+    /**
+     * Get nodes by parent handle
+     *
+     * @param isAudio true is audio, false is video
+     * @param parentHandle parent handle
+     * @param order [SortOrder]
+     * @return nodes
+     */
+    private suspend fun getChildrenByParentHandle(
         isAudio: Boolean,
         parentHandle: Long,
         order: SortOrder,
@@ -202,7 +222,31 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun megaApiFolderGetChildrenByParentHandle(
+    override suspend fun getAudiosByParentHandleFromMegaApiFolder(
+        parentHandle: Long,
+        order: SortOrder
+    ): List<UnTypedNode>? =
+        getChildrenByParentHandleFromMegaApiFolder(isAudio = true,
+            parentHandle = parentHandle,
+            order = order)
+
+    override suspend fun getVideosByParentHandleFromMegaApiFolder(
+        parentHandle: Long,
+        order: SortOrder
+    ): List<UnTypedNode>? =
+        getChildrenByParentHandleFromMegaApiFolder(isAudio = false,
+            parentHandle = parentHandle,
+            order = order)
+
+    /**
+     * Get nodes by parent handle from mega api folder
+     *
+     * @param isAudio true is audio, false is video
+     * @param parentHandle parent handle
+     * @param order [SortOrder]
+     * @return nodes
+     */
+    private suspend fun getChildrenByParentHandleFromMegaApiFolder(
         isAudio: Boolean,
         parentHandle: Long,
         order: SortOrder,
@@ -343,10 +387,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun getNodesByHandles(
-        isAudio: Boolean,
-        handles: List<Long>,
-    ): List<UnTypedNode> =
+    override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> =
         handles.mapNotNull { handle ->
             megaApi.getMegaNodeByHandle(handle)
         }.map { node ->
@@ -371,9 +412,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun megaApiFolderHttpServerSetMaxBufferSize(bufferSize: Int) =
         megaApiFolder.httpServerSetMaxBufferSize(bufferSize)
-
-    override suspend fun getFingerprint(filePath: String): String? =
-        megaApi.getFingerprint(filePath)
 
     override suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String? =
         typedFileNode?.let {
