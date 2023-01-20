@@ -38,8 +38,10 @@ import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
+import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
@@ -153,10 +155,10 @@ internal abstract class RepositoryModule {
     abstract fun bindFilesRepository(repository: MegaNodeRepositoryImpl): MegaNodeRepository
 
     @Binds
-    abstract fun bindDomainFilesRepository(repository: MegaNodeRepositoryImpl): FileSystemRepository
+    abstract fun bindDomainFilesRepository(repository: FileSystemRepositoryImpl): FileSystemRepository
 
     @Binds
-    abstract fun bindNodeRepository(repository: MegaNodeRepositoryImpl): NodeRepository
+    abstract fun bindNodeRepository(repository: NodeRepositoryImpl): NodeRepository
 
     @Binds
     @Singleton

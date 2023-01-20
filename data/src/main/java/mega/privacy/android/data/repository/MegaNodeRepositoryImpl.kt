@@ -3,20 +3,9 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.extensions.getFileName
-import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
-import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -24,7 +13,6 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -32,25 +20,11 @@ import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FolderVersionInfo
-import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.SyncRecord
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.NullFileException
-import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.NodeRepository
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -95,10 +69,8 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
-    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
-    private val deviceGateway: DeviceGateway,
-) : MegaNodeRepository, FileSystemRepository, NodeRepository {
+) : MegaNodeRepository {
 
     override suspend fun copyNode(
         nodeToCopy: MegaNode,
@@ -242,15 +214,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             megaApiGateway.getIncomingSharesNode(sortOrderIntMapper(order))
         }
 
-    override suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData> =
-        withContext(ioDispatcher) {
-            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
-                .map { megaShareMapper(it) }
-        }
-
-    override suspend fun isNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) } ?: false
-    }
 
     override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
         megaApiFolderGateway.authorizeNode(handle)
@@ -269,255 +232,16 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getInboxNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
 
-    override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
-        withContext(ioDispatcher) {
-            getMegaNode(viewerNode)?.let { node ->
-                suspendCoroutine { continuation ->
-                    val file = cacheFolderGateway.getCacheFile(
-                        CacheFolderConstant.TEMPORARY_FOLDER,
-                        node.getFileName()
-                    )
-                    if (file == null) {
-                        continuation.resumeWith(Result.failure(NullFileException()))
-                        return@suspendCoroutine
-                    }
-
-                    megaApiGateway.startDownload(
-                        node = node,
-                        localPath = file.absolutePath,
-                        fileName = file.name,
-                        appData = APP_DATA_BACKGROUND_TRANSFER,
-                        startFirst = true,
-                        cancelToken = null,
-                        listener = OptionalMegaTransferListenerInterface(
-                            onTransferTemporaryError = { _, error ->
-                                continuation.failWithError(error)
-                            },
-                            onTransferFinish = { _, error ->
-                                if (error.errorCode == MegaError.API_OK) {
-                                    continuation.resumeWith(Result.success(file.absolutePath))
-                                } else {
-                                    continuation.failWithError(error)
-                                }
-                            }
-                        )
-                    )
-                }
-            } ?: throw NullPointerException()
-        }
-
-    suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
-        when (viewerNode) {
-            is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
-            is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
-            is ViewerNode.FolderLinkNode -> getMegaNodeFromFolderLink(viewerNode)
-            is ViewerNode.GeneralNode -> megaApiGateway.getMegaNodeByHandle(viewerNode.id)
-        }
-    }
-
-    private suspend fun getMegaNodeFromChat(chatNode: ViewerNode.ChatNode) =
-        withContext(ioDispatcher) {
-            with(chatNode) {
-                val messageChat = megaChatApiGateway.getMessage(chatId, messageId)
-                    ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-
-                if (messageChat != null) {
-                    val node = messageChat.megaNodeList.get(0)
-                    val chat = megaChatApiGateway.getChatRoom(chatId)
-
-                    if (chat?.isPreview == true) {
-                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
-                    } else {
-                        node
-                    }
-                } else null
-            }
-        }
-
-    private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
-                megaApiFolderGateway.authorizeNode(it)
-            }
-        }
 
     override suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException =
         withContext(ioDispatcher) {
             megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
         }
 
-    override suspend fun getBackupFolderId(): NodeId =
-        withContext(ioDispatcher) {
-            val backupsFolderAttributeIdentifier = MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
-            suspendCancellableCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(backupsFolderAttributeIdentifier,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request, error ->
-                            if (request.paramType == backupsFolderAttributeIdentifier) {
-                                if (error.errorCode == MegaError.API_OK) {
-                                    continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
-                                } else {
-                                    continuation.failWithError(error)
-                                }
-                            }
-                        }
-                    ))
-            }
-        }
-
-    override suspend fun getNodeById(nodeId: NodeId) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-            nodeMapper(
-                it,
-                cacheFolderGateway::getThumbnailCacheFilePath,
-                megaApiGateway::hasVersion,
-                megaApiGateway::getNumChildFolders,
-                megaApiGateway::getNumChildFiles,
-                fileTypeInfoMapper,
-                megaApiGateway::isPendingShare,
-                megaApiGateway::isInRubbish,
-            )
-        }
-    }
-
-    override suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode> {
-        return withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)?.let { parent ->
-                megaApiGateway.getChildrenByNode(parent)
-                    .map {
-                        nodeMapper(
-                            it,
-                            cacheFolderGateway::getThumbnailCacheFilePath,
-                            megaApiGateway::hasVersion,
-                            megaApiGateway::getNumChildFolders,
-                            megaApiGateway::getNumChildFiles,
-                            fileTypeInfoMapper,
-                            megaApiGateway::isPendingShare,
-                            megaApiGateway::isInRubbish,
-                        )
-                    }
-            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
-        }
-    }
-
-    override fun monitorNodeUpdates(): Flow<List<Node>> {
-        return megaApiGateway.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull {
-                it.nodeList?.map { megaNode ->
-                    nodeMapper(
-                        megaNode,
-                        cacheFolderGateway::getThumbnailCacheFilePath,
-                        megaApiGateway::hasVersion,
-                        megaApiGateway::getNumChildFolders,
-                        megaApiGateway::getNumChildFiles,
-                        fileTypeInfoMapper,
-                        megaApiGateway::isPendingShare,
-                        megaApiGateway::isInRubbish,
-                    )
-                }
-            }
-            .flowOn(ioDispatcher)
-    }
-
-    override suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean =
-        withContext(ioDispatcher) {
-            megaApiGateway.getMegaNodeByHandle(nodeHandle)?.let { megaApiGateway.isInRubbish(it) }
-                ?: true
-        }
-
-    override suspend fun getOfflineNodeInformation(nodeId: NodeId) =
-        withContext(ioDispatcher) {
-            megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
-                ?.let { offlineNodeInformationMapper(it) }
-        }
-
-    override suspend fun getOfflinePath() =
-        withContext(ioDispatcher) { fileGateway.getOfflineFilesRootPath() }
-
-    override suspend fun getOfflineInboxPath() =
-        withContext(ioDispatcher) { fileGateway.getOfflineFilesInboxRootPath() }
-
-    override suspend fun createFolder(name: String) = withContext(ioDispatcher) {
-        val megaNode = megaApiGateway.getRootNode()
-        megaNode?.let { parentMegaNode ->
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener { it.nodeHandle }
-                megaApiGateway.createFolder(name, parentMegaNode, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-    }
 
     override suspend fun getUnVerifiedInComingShares(): Int = 3
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
 
     override suspend fun getUnverifiedOutgoingShares(): Int = 5
     //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
-
-    override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
-                chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
-                    megaApiGateway.base64ToHandle(value)
-                        .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
-                }
-            }
-            megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
-        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
-            ?: fetchFileVersionsOption().also {
-                fileVersionsOptionCache.set(it)
-            }
-
-    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
-        return@withContext suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
-                it.flag
-            }
-            megaApiGateway.getFileVersionsOption(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun getLocalFile(fileNode: FileNode) =
-        fileGateway.getLocalFile(
-            fileName = fileNode.name,
-            fileSize = fileNode.size,
-            lastModifiedDate = fileNode.modificationTime,
-        )
-
-    override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
-            streamingGateway.getLocalLink(it)
-        }
-    }
-
-    override suspend fun createTempFile(root: String, syncRecord: SyncRecord) =
-        withContext(ioDispatcher) {
-            val localPath = syncRecord.localPath
-                ?: throw IllegalArgumentException("Source path doesn't exist on sync record: $syncRecord")
-            val destinationPath = syncRecord.newPath
-                ?: throw IllegalArgumentException("Destination path doesn't exist on sync record: $syncRecord")
-            fileGateway.createTempFile(root, localPath, destinationPath)
-            destinationPath
-        }
-
-    override suspend fun removeGPSCoordinates(filePath: String) = withContext(ioDispatcher) {
-        fileGateway.removeGPSCoordinates(filePath)
-    }
-
-    override suspend fun getDiskSpaceBytes(path: String) = withContext(ioDispatcher){
-        deviceGateway.getDiskSpaceBytes(path)
-    }
 }
