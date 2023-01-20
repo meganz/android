@@ -407,7 +407,7 @@ class AlbumDynamicContentFragment : Fragment() {
             )
         }
 
-        LaunchedEffect(true) {
+        LaunchedEffect(message) {
             delay(3000L)
             albumsViewModel.setSnackBarMessage("")
         }
