@@ -54,6 +54,7 @@ import static mega.privacy.android.app.utils.CallUtil.getCallsParticipating;
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isSessionOnHold;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
+import static mega.privacy.android.app.utils.CallUtil.openMeetingRinging;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.CallUtil.returnCall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
@@ -1084,6 +1085,15 @@ public class ChatActivity extends PasscodeActivity
         var enableAudio = audio;
         if (enableAudio) {
             enableAudio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+        }
+
+        if (!enableAudio) {
+            openMeetingRinging(
+                    this,
+                    chatId,
+                    passcodeManagement
+            );
+            return;
         }
 
         var enableVideo = video;

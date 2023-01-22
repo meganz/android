@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
+import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
@@ -127,16 +128,20 @@ class CallNotificationIntentService : Service(),
         if (intent == null) return
 
         intent.extras?.let { extras ->
-            chatIdCurrentCall = extras.getLong(Constants.CHAT_ID_OF_CURRENT_CALL,
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+            chatIdCurrentCall = extras.getLong(
+                Constants.CHAT_ID_OF_CURRENT_CALL,
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
 
             val currentCall = megaChatApi.getChatCall(chatIdCurrentCall)
             if (currentCall != null) {
                 callIdCurrentCall = currentCall.callId
             }
 
-            chatIdIncomingCall = extras.getLong(Constants.CHAT_ID_OF_INCOMING_CALL,
-                MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+            chatIdIncomingCall = extras.getLong(
+                Constants.CHAT_ID_OF_INCOMING_CALL,
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
             megaChatApi.getChatCall(chatIdIncomingCall)?.let { incomingCall ->
                 callIdIncomingCall = incomingCall.callId
                 clearIncomingCallNotification(callIdIncomingCall)
@@ -163,8 +168,10 @@ class CallNotificationIntentService : Service(),
                         answerCall(chatIdIncomingCall)
                     } else {
                         Timber.d("Hanging up current call ... ")
-                        megaChatApi.hangChatCall(callIdCurrentCall,
-                            HangChatCallListener(this, this))
+                        megaChatApi.hangChatCall(
+                            callIdCurrentCall,
+                            HangChatCallListener(this, this)
+                        )
                     }
                 }
                 DECLINE -> {
@@ -183,9 +190,11 @@ class CallNotificationIntentService : Service(),
                     answerCall(chatIdIncomingCall)
                 } else {
                     Timber.d("Putting the current call on hold...")
-                    megaChatApi.setCallOnHold(chatIdCurrentCall,
+                    megaChatApi.setCallOnHold(
+                        chatIdCurrentCall,
                         true,
-                        SetCallOnHoldListener(this, this))
+                        SetCallOnHoldListener(this, this)
+                    )
                 }
                 else -> throw IllegalArgumentException("Unsupported action: $action")
             }
@@ -231,6 +240,17 @@ class CallNotificationIntentService : Service(),
         if (enableAudio) {
             enableAudio =
                 hasPermissions(this@CallNotificationIntentService, Manifest.permission.RECORD_AUDIO)
+        }
+
+        if (!enableAudio) {
+            openMeetingRinging(
+                this@CallNotificationIntentService,
+                chatIdIncomingCall,
+                passcodeManagement
+            )
+            clearIncomingCallNotification(callIdIncomingCall)
+            stopSelf()
+            return
         }
 
         coroutineScope?.launch {
