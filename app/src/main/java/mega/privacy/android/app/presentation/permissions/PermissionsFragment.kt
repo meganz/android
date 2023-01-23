@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
 import mega.privacy.android.app.databinding.PermissionsImageLayoutBinding
 import mega.privacy.android.app.main.ManagerActivity
@@ -31,6 +32,7 @@ import timber.log.Timber
 /**
  * Fragment shown after the first installation to request required permissions.
  */
+@AndroidEntryPoint
 class PermissionsFragment : Fragment() {
 
     private val viewModel: PermissionsViewModel by viewModels()
@@ -101,7 +103,7 @@ class PermissionsFragment : Fragment() {
             add(Pair(Permission.Contacts,
                 hasPermissions(requireActivity(), Manifest.permission.READ_CONTACTS)))
         }
-
+        viewModel.updateFirstTimeLoginStatus()
         viewModel.setData(missingPermission)
     }
 
