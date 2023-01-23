@@ -85,7 +85,7 @@ Default macOS path:  `export JAVA_HOME="/Applications/Android Studio.app/Content
 
 ### 6. Download WEBRTC files
 
-1. Download the link https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs, uncompress it and put the folder `webrtc` in the path `sdk/src/main/jni/megachat/`.Be mindful that the download link of webrtc may varies over time, please keep it in line with the one written in build.sh
+1. Download the link https://mega.nz/file/F0YThaQR#FgoSW-XuxwHVr-9SNmVcP_JWG8B0Q6ogT9By3fEiEDc, uncompress it and put the folder `webrtc` in the path `sdk/src/main/jni/megachat/`.Be mindful that the download link of webrtc may varies over time, please keep it in line with the one written in build.sh
 
 ### 7. Prerequisites of running the build script
 

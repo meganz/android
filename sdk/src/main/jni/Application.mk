@@ -9,5 +9,5 @@ APP_STL := c++_shared
 APP_OPTIM := release
 APP_PIE := false
 
-APP_CPPFLAGS += -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti -std=c++14
+APP_CPPFLAGS += -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti -std=c++17
 APP_LDFLAGS += -v -Wl,-allow-multiple-definition

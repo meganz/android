@@ -159,9 +159,9 @@ FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FI
 FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
 FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
 
-WEBRTC_DOWNLOAD_URL=https://mega.nz/file/A4pxxQoJ#OoAuL0SKIGuWkw6iSrSPHRMF0-Ri7BSF64IDeIWq-qs
+WEBRTC_DOWNLOAD_URL=https://mega.nz/file/F0YThaQR#FgoSW-XuxwHVr-9SNmVcP_JWG8B0Q6ogT9By3fEiEDc
 # Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
-WEBRTC_SHA1=194b94c1eeb3eda1e4d77eb4dd26fc0c3134f102
+WEBRTC_SHA1=a82c138885bfbc6e9c2eb08c6b314ae196a7673f
 
 function setupEnv()
 {
