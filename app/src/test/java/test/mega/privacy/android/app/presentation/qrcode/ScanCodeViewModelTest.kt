@@ -47,10 +47,7 @@ class ScanCodeViewModelTest {
             val initial = awaitItem()
             assertThat(initial.dialogTitleContent).isEqualTo(-1)
             assertThat(initial.dialogTextContent).isEqualTo(-1)
-            assertThat(initial.contactNameContent).isNull()
-            assertThat(initial.isContact).isFalse()
-            assertThat(initial.myEmail).isNull()
-            assertThat(initial.handleContactLink).isEqualTo(-1)
+            assertThat(initial.email).isNull()
             assertThat(initial.success).isTrue()
             assertThat(initial.printEmail).isFalse()
             assertThat(initial.inviteDialogShown).isFalse()
@@ -59,14 +56,13 @@ class ScanCodeViewModelTest {
             assertThat(initial.showInviteResultDialog).isFalse()
             assertThat(initial.finishActivity).isFalse()
             assertThat(initial.finishActivityOnScanComplete).isFalse()
-            assertThat(initial.avatarColor).isNull()
-            assertThat(initial.avatarFile).isNull()
+            assertThat(initial.scannedContactLinkResult).isNull()
         }
     }
 
     @Test
     fun `test that email is updated when new value is provided`() = runTest {
-        underTest.state.map { it.myEmail }.distinctUntilChanged().test {
+        underTest.state.map { it.email }.distinctUntilChanged().test {
             val newValue = "test@gmail.com"
             assertThat(awaitItem()).isNull()
             underTest.updateMyEmail(newValue)
@@ -123,38 +119,27 @@ class ScanCodeViewModelTest {
     @Test
     fun `test that when show invite dialog is called values are updated`() = runTest {
         underTest.state.test {
+            val expectedResult = ScannedContactLinkResult(
+                "test",
+                "test@gmail.com",
+                100,
+                true,
+                QRCodeQueryResults.CONTACT_QUERY_OK,
+                File(""),
+                4043
+            )
+
             val oldValue = awaitItem()
-            val email = "test@gmail.com"
-            val contactName = "test"
-            val isContact = true
-            val handle: Long = 100
-            val avatarFile = File("")
-            val avatarColor = 4043
-            assertThat(oldValue.myEmail).isNull()
-            assertThat(oldValue.contactNameContent).isNull()
-            assertThat(oldValue.isContact).isFalse()
-            assertThat(oldValue.handleContactLink).isEqualTo(-1)
             assertThat(oldValue.showInviteResultDialog).isFalse()
             assertThat(oldValue.showInviteDialog).isFalse()
-            assertThat(oldValue.avatarFile).isNull()
-            assertThat(oldValue.avatarColor).isNull()
-            underTest.showInviteDialog(
-                contactName,
-                email,
-                isContact,
-                handle,
-                avatarFile,
-                avatarColor
-            )
+            assertThat(oldValue.scannedContactLinkResult).isNull()
+
+            underTest.showInviteDialog(expectedResult)
+
             val newValue = awaitItem()
-            assertThat(newValue.myEmail).isEqualTo(email)
-            assertThat(newValue.contactNameContent).isEqualTo(contactName)
-            assertThat(newValue.isContact).isEqualTo(isContact)
-            assertThat(newValue.handleContactLink).isEqualTo(handle)
             assertThat(newValue.showInviteDialog).isTrue()
             assertThat(newValue.showInviteResultDialog).isFalse()
-            assertThat(newValue.avatarFile).isEqualTo(avatarFile)
-            assertThat(newValue.avatarColor).isEqualTo(avatarColor)
+            assertThat(newValue.scannedContactLinkResult).isEqualTo(expectedResult)
         }
     }
 
@@ -207,14 +192,10 @@ class ScanCodeViewModelTest {
                 awaitItem()
                 underTest.queryContactLink(handle)
                 val newValue = awaitItem()
-                assertThat(newValue.myEmail).isEqualTo(expectedEmail)
-                assertThat(newValue.contactNameContent).isEqualTo(expectedName)
-                assertThat(newValue.handleContactLink).isEqualTo(expectedHandle)
-                assertThat(newValue.isContact).isTrue()
+                assertThat(newValue.email).isEqualTo(expectedEmail)
                 assertThat(newValue.showInviteDialog).isTrue()
                 assertThat(newValue.showInviteResultDialog).isFalse()
-                assertThat(newValue.avatarFile).isEqualTo(avatarFile)
-                assertThat(newValue.avatarColor).isEqualTo(avatarColor)
+                assertThat(newValue.scannedContactLinkResult).isEqualTo(result)
             }
         }
 
@@ -236,7 +217,7 @@ class ScanCodeViewModelTest {
                 awaitItem()
                 underTest.queryContactLink(handle)
                 val newValue = awaitItem()
-                assertThat(newValue.myEmail).isEqualTo(expectedEmail)
+                assertThat(newValue.email).isEqualTo(expectedEmail)
                 assertThat(newValue.success).isTrue()
                 assertThat(newValue.printEmail).isTrue()
                 assertThat(newValue.showInviteDialog).isFalse()
@@ -262,7 +243,7 @@ class ScanCodeViewModelTest {
                 awaitItem()
                 underTest.queryContactLink(handle)
                 val newValue = awaitItem()
-                assertThat(newValue.myEmail).isEqualTo(expectedEmail)
+                assertThat(newValue.email).isEqualTo(expectedEmail)
                 assertThat(newValue.success).isFalse()
                 assertThat(newValue.printEmail).isFalse()
                 assertThat(newValue.showInviteDialog).isFalse()

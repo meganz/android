@@ -128,7 +128,7 @@ class ScanCodeFragment : Fragment() {
                 viewModel.state.collect {
                     if (it.finishActivity) {
                         val intent = Intent()
-                        intent.putExtra("mail", it.myEmail)
+                        intent.putExtra("mail", it.email)
                         requireActivity().setResult(Activity.RESULT_OK, intent)
                         requireActivity().finish()
                     } else if (it.showInviteResultDialog) {
@@ -139,7 +139,11 @@ class ScanCodeFragment : Fragment() {
                             it.printEmail
                         )
                     } else if (it.showInviteDialog) {
-                        showInviteDialog(it.myEmail, it.contactNameContent, it.isContact)
+                        showInviteDialog(
+                            it.email,
+                            it.scannedContactLinkResult?.contactName,
+                            it.scannedContactLinkResult?.isContact ?: false
+                        )
                     }
                 }
             }
@@ -188,7 +192,11 @@ class ScanCodeFragment : Fragment() {
 
         uiState.run {
             if (inviteDialogShown) {
-                showInviteDialog(myEmail, contactNameContent, isContact)
+                showInviteDialog(
+                    email,
+                    scannedContactLinkResult?.contactName,
+                    scannedContactLinkResult?.isContact ?: false
+                )
             } else if (inviteResultDialogShown) {
                 this@ScanCodeFragment.showInviteResultDialog(
                     dialogTitleContent,
@@ -251,7 +259,7 @@ class ScanCodeFragment : Fragment() {
 
         if (printEmail) {
             dialogInviteBinding.dialogInviteText.text =
-                requireContext().getFormattedStringOrDefault(text, uiState.myEmail)
+                requireContext().getFormattedStringOrDefault(text, uiState.email)
         } else {
             dialogInviteBinding.dialogInviteText.text =
                 requireContext().getFormattedStringOrDefault(text)
@@ -279,10 +287,10 @@ class ScanCodeFragment : Fragment() {
     private fun sendInvitation() {
         Timber.d("sendInvitation")
         megaApi.inviteContact(
-            uiState.myEmail,
+            uiState.email,
             null,
             MegaContactRequest.INVITE_ACTION_ADD,
-            uiState.handleContactLink,
+            uiState.scannedContactLinkResult?.handle ?: -1,
             activity as QRCodeActivity?
         )
     }
@@ -290,7 +298,7 @@ class ScanCodeFragment : Fragment() {
     /**
      * Method to set scanned contact avatar in the dialog
      */
-    private fun setAvatar() = uiState.avatarFile?.run {
+    private fun setAvatar() = uiState.scannedContactLinkResult?.avatarFile?.run {
         Timber.d("Avatar path: $absolutePath")
         val imBitmap = BitmapFactory.decodeFile(absolutePath, BitmapFactory.Options())
         if (imBitmap == null) {
@@ -317,8 +325,8 @@ class ScanCodeFragment : Fragment() {
         val c = Canvas(defaultAvatar)
         val p = Paint()
         p.isAntiAlias = true
-        p.color =
-            uiState.avatarColor ?: ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
+        p.color = uiState.scannedContactLinkResult?.avatarColor
+            ?: ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
         val radius: Int =
             if (defaultAvatar.width < defaultAvatar.height) defaultAvatar.width / 2 else defaultAvatar.height / 2
         c.drawCircle(
@@ -331,7 +339,8 @@ class ScanCodeFragment : Fragment() {
         val density = resources.displayMetrics.density
         val avatarTextSize = getAvatarTextSize(density)
         Timber.d("DENSITY: $density:::: $avatarTextSize")
-        val fullName: String? = uiState.contactNameContent ?: uiState.myEmail
+        val fullName: String? =
+            uiState.scannedContactLinkResult?.contactName ?: uiState.email
         if (fullName != null && fullName.isNotEmpty()) {
             var firstLetter = fullName[0].toString() + ""
             firstLetter = firstLetter.uppercase(Locale.getDefault())
@@ -410,7 +419,7 @@ class ScanCodeFragment : Fragment() {
                     viewModel.updateInviteShown(false)
                     codeScanner?.releaseResources()
                     inviteAlertDialog?.dismiss()
-                    ContactUtil.openContactInfoActivity(context, uiState.myEmail)
+                    ContactUtil.openContactInfoActivity(context, uiState.email)
                     activity?.finish()
                 }
 

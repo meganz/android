@@ -1,20 +1,19 @@
 package mega.privacy.android.app.presentation.qrcode.scan
 
-import androidx.annotation.ColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
+import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -41,7 +40,7 @@ class ScanCodeViewModel @Inject constructor(
      * @param email The email to update
      */
     fun updateMyEmail(email: String) {
-        _state.update { it.copy(myEmail = email) }
+        _state.update { it.copy(email = email) }
     }
 
     /**
@@ -112,14 +111,7 @@ class ScanCodeViewModel @Inject constructor(
                 when (qrCodeQueryResult) {
                     QRCodeQueryResults.CONTACT_QUERY_OK -> {
                         Timber.d("Contact link query ${handle}_${email}_${contactName}_${avatarFile}")
-                        showInviteDialog(
-                            contactName,
-                            email,
-                            isContact,
-                            handle,
-                            avatarFile,
-                            avatarColor
-                        )
+                        showInviteDialog(this)
                     }
                     QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
                         showInviteResultDialog(
@@ -166,29 +158,14 @@ class ScanCodeViewModel @Inject constructor(
     /**
      * Method to update the Ui State to show dialog after scanning of qr code
      *
-     * @param contactName Name of the scanned contact
-     * @param myEmail Email
-     * @param isContact Whether scanned code is already a contact or not
-     * @param handle Handle of the scanned qr code
+     * @param scannedContactLinkResult Scanned contact details
      */
-    fun showInviteDialog(
-        contactName: String,
-        myEmail: String,
-        isContact: Boolean,
-        handle: Long,
-        avatarFile: File?,
-        @ColorInt avatarColor: Int?
-    ) {
+    fun showInviteDialog(scannedContactLinkResult: ScannedContactLinkResult) {
         _state.update {
             it.copy(
-                contactNameContent = contactName,
-                myEmail = myEmail,
-                isContact = isContact,
-                handleContactLink = handle,
+                scannedContactLinkResult = scannedContactLinkResult,
                 showInviteResultDialog = false,
-                showInviteDialog = true,
-                avatarFile = avatarFile,
-                avatarColor = avatarColor
+                showInviteDialog = true
             )
         }
     }
