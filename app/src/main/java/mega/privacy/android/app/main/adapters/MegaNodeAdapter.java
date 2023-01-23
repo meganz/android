@@ -1088,7 +1088,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     if (isMandatoryFingerprintVerificationNeeded
                             && !unverifiedIncomingNodeHandles.isEmpty()
                             && unverifiedIncomingNodeHandles.contains(node.getHandle())) {
-                        showUnverifiedNodeUi(holder);
+                        showUnverifiedNodeUi(holder, true);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1101,7 +1101,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 if (isMandatoryFingerprintVerificationNeeded
                         && !unverifiedOutgoingNodeHandles.isEmpty()
                         && unverifiedOutgoingNodeHandles.contains(node.getHandle())) {
-                    showUnverifiedNodeUi(holder);
+                    showUnverifiedNodeUi(holder, false);
                 }
             }
         } else {
@@ -1541,10 +1541,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /**
      * Function to show Unverified node UI items accordingly
      *
-     * @param holder [ViewHolderBrowserList]
+     * @param holder         [ViewHolderBrowserList]
+     * @param isIncomingNode boolean to indicate if the node is incoming so that
+     *                       "Undecrypted folder" is displayed instead of node name
      */
-    private void showUnverifiedNodeUi(ViewHolderBrowserList holder) {
-        holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+    private void showUnverifiedNodeUi(ViewHolderBrowserList holder, Boolean isIncomingNode) {
+        if (isIncomingNode) {
+            holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+        }
         holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
         holder.permissionsIcon.setVisibility(View.VISIBLE);
         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
