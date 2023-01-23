@@ -442,20 +442,6 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                     scanCodeViewModel.showInviteResultDialog(R.string.invite_not_sent, R.string.error_own_email_as_contact, true, false);
                 }
             }
-        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (scanCodeFragment == null) {
-                Timber.w("ScanCodeFragment is NULL");
-                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
-            }
-            if (scanCodeFragment.isAdded()) {
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Timber.d("Get user avatar OK");
-                    scanCodeFragment.setAvatar();
-                } else {
-                    Timber.w("Get user avatar FAIL");
-                    scanCodeFragment.setDefaultAvatar();
-                }
-            }
         } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
             if (myCodeFragment == null) {
                 Timber.w("MyCodeFragment is NULL");
