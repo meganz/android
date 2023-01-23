@@ -647,7 +647,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                 }
                             }
 
-                            if (megaApi.rootNode != null) {
+                            if (viewModel.rootNodeExists()) {
                                 var newIntent =
                                     Intent(requireContext(), ManagerActivity::class.java)
 
@@ -719,7 +719,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 }
             }
 
-            if (megaApi.rootNode != null && !isFetchingNodes && !isIsHeartBeatAlive) {
+            if (viewModel.rootNodeExists() && !isFetchingNodes && !isIsHeartBeatAlive) {
                 Timber.d("rootNode != null")
 
                 var intent = Intent(requireContext(), ManagerActivity::class.java)

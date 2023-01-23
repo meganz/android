@@ -367,8 +367,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             }
         }
 
-        Intent(ACTION_FETCH_NODES_FINISHED)
-
         intent = null
     }
 
