@@ -95,6 +95,7 @@ class IncomingSharesViewModel @Inject constructor(
         }
     }
 
+
     /**
      * Refresh incoming shares node
      */
