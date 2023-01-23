@@ -768,6 +768,8 @@ public class ManagerActivity extends TransfersManagementActivity
     int bottomNavigationCurrentItem = -1;
     View chatBadge;
     View callBadge;
+    View pendingActionsBadge;
+    BottomNavigationItemView sharedItemsView;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;

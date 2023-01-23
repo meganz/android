@@ -463,44 +463,6 @@ internal class DefaultFilesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
-        withContext(ioDispatcher) {
-            megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
-                megaShareMapper(it)
-            }
-        }
-
-    override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
-        withContext(ioDispatcher) {
-            megaApiGateway.getUnverifiedOutgoingShares(sortOrderIntMapper(order)).map {
-                megaShareMapper(it)
-            }
-        }
-
-    override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { return@getRequestListener }
-            megaApiGateway.openShareDialog(megaNode, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { return@getRequestListener }
-            megaApiGateway.upgradeSecurity(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
-        megaApiGateway.setSecureFlag(enable)
-    }
-
     override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
         fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
             ?: fetchFileVersionsOption().also {
@@ -544,5 +506,43 @@ internal class DefaultFilesRepository @Inject constructor(
 
     override suspend fun removeGPSCoordinates(filePath: String) = withContext(ioDispatcher) {
         fileGateway.removeGPSCoordinates(filePath)
+    }
+
+    override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
+                megaShareMapper(it)
+            }
+        }
+
+    override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUnverifiedOutgoingShares(sortOrderIntMapper(order)).map {
+                megaShareMapper(it)
+            }
+        }
+
+    override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.openShareDialog(megaNode, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
+        megaApiGateway.setSecureFlag(enable)
     }
 }
