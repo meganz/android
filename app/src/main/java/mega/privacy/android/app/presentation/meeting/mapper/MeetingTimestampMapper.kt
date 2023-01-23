@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter
  */
 typealias MeetingLastTimestampMapper = (
     @JvmSuppressWildcards Long,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards String
 
 /**
@@ -17,6 +18,7 @@ typealias MeetingLastTimestampMapper = (
  */
 typealias ScheduledMeetingTimestampMapper = (
     @JvmSuppressWildcards MeetingRoomItem,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards String?
 
 /**
@@ -25,11 +27,15 @@ typealias ScheduledMeetingTimestampMapper = (
  * @param timeStamp Timestamp
  * @return          String formatted
  */
-internal fun toLastTimeFormatted(timeStamp: Long): String =
-    DateTimeFormatter
-        .ofPattern("dd MMM yyyy HH:mm")
+internal fun toLastTimeFormatted(timeStamp: Long, is24HourFormat: Boolean): String {
+    val instant = Instant.ofEpochSecond(timeStamp)
+    val hourFormatted = getFormattedHour(instant, is24HourFormat)
+    val dateFormatted = DateTimeFormatter
+        .ofPattern("dd MMM yyyy")
         .withZone(ZoneId.systemDefault())
-        .format(Instant.ofEpochSecond(timeStamp))
+        .format(instant)
+    return "$dateFormatted $hourFormatted"
+}
 
 /**
  * Convert scheduled meeting timestamp to readable form
@@ -37,15 +43,24 @@ internal fun toLastTimeFormatted(timeStamp: Long): String =
  * @param meeting   Meeting room item
  * @return          String formatted
  */
-internal fun toScheduledTimeFormatted(meeting: MeetingRoomItem): String? {
+internal fun toScheduledTimeFormatted(meeting: MeetingRoomItem, is24HourFormat: Boolean): String? {
     val startTimestamp = meeting.scheduledStartTimestamp ?: return null
     val endTimestamp = meeting.scheduledEndTimestamp ?: return null
 
-    val hourFormat = DateTimeFormatter
-        .ofPattern("HH:mm")
-        .withZone(ZoneId.systemDefault())
-
-    return hourFormat.format(Instant.ofEpochSecond(startTimestamp)) +
-            " - " +
-            hourFormat.format(Instant.ofEpochSecond(endTimestamp))
+    val startHour = getFormattedHour(Instant.ofEpochSecond(startTimestamp), is24HourFormat)
+    val endHour = getFormattedHour(Instant.ofEpochSecond(endTimestamp), is24HourFormat)
+    return "$startHour - $endHour"
 }
+
+/**
+ * Get hour properly formatted
+ *
+ * @param instant           Time instant to be formatted
+ * @param is24HourFormat    Flag to use 12h or 24h format
+ * @return                  Hour formatted
+ */
+private fun getFormattedHour(instant: Instant, is24HourFormat: Boolean): String =
+    DateTimeFormatter
+        .ofPattern(if (is24HourFormat) "HH:mm" else "hh:mm a")
+        .withZone(ZoneId.systemDefault())
+        .format(instant)

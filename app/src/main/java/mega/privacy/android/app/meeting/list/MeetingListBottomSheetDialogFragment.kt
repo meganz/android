@@ -85,10 +85,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         requireNotNull(room) { "Meeting not found" }
 
         binding.header.txtTitle.text = room.title
-        binding.header.txtTimestamp.setText(if (room.isScheduledMeeting()) {
-            R.string.chat_schedule_meeting
-        } else {
-            R.string.context_meeting
+        binding.header.txtTimestamp.setText(when {
+            room.isRecurring -> R.string.meetings_list_recurring_meeting_label
+            room.isPending -> R.string.meetings_list_one_off_meeting_label
+            else -> R.string.context_meeting
         })
 
         if (room.firstUserChar == null && room.lastUserChar == null) {
@@ -96,7 +96,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.header.imgThumbnail.isVisible = false
         } else {
             val firstUserPlaceholder = getImagePlaceholder(room.firstUserChar.toString(), room.firstUserColor)
-            if (room.isSingleMeeting() || room.lastUserAvatar == null) {
+            if (room.isSingleMeeting()) {
                 binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
                     ScalingUtils.ScaleType.FIT_CENTER
@@ -121,8 +121,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
 
-        binding.btnLeave.isVisible = room.isActive
-        binding.dividerArchive.isVisible = room.isActive
+        binding.btnCancel.isVisible = room.isPending
+        binding.dividerArchive.isVisible = binding.btnCancel.isVisible
 
         binding.btnInfo.setOnClickListener {
             val intent = if (room.isScheduledMeeting() && room.isActive) {
@@ -137,8 +137,6 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
             }
             activity?.startActivity(intent)
-
-
             dismissAllowingStateLoss()
         }
 
@@ -168,26 +166,12 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             dismissAllowingStateLoss()
         }
 
-        binding.btnClearHistory.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.title_properties_chat_clear)
-                .setMessage(R.string.confirmation_clear_chat_history)
-                .setPositiveButton(R.string.general_clear) { _, _ ->
-                    viewModel.clearChatHistory(chatId)
-                    dismissAllowingStateLoss()
-                }
-                .setNegativeButton(R.string.general_cancel, null)
-                .show()
-        }
-        binding.btnClearHistory.isVisible = room.hasPermissions
-        binding.dividerClear.isVisible = binding.btnClearHistory.isVisible
-
         binding.btnArchive.setOnClickListener {
             viewModel.archiveChat(chatId)
             dismissAllowingStateLoss()
         }
 
-        binding.btnLeave.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             showLeaveChatDialog()
             dismissAllowingStateLoss()
         }
@@ -209,7 +193,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable? =
-        if (!letter.isNullOrBlank() && avatarColor != null) {
+        if (!letter.isNullOrBlank()) {
             TextDrawable.builder()
                 .beginConfig()
                 .width(resources.getDimensionPixelSize(R.dimen.image_group_size))
@@ -220,7 +204,9 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 .bold()
                 .toUpperCase()
                 .endConfig()
-                .buildRound(letter, avatarColor)
+                .buildRound(letter,
+                    avatarColor ?: ContextCompat.getColor(requireContext(),
+                        R.color.grey_012_white_012))
         } else {
             null
         }

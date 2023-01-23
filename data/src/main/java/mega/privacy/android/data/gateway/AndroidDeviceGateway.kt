@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.StatFs
 import android.os.SystemClock
 import android.provider.Settings
+import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
@@ -61,4 +62,7 @@ internal class AndroidDeviceGateway @Inject constructor(
     override suspend fun getDiskSpaceBytes(path: String) = with(StatFs(path)) {
         availableBlocksLong * blockSizeLong
     }
+
+    override fun is24HourFormat(): Boolean =
+        DateFormat.is24HourFormat(context)
 }

@@ -53,27 +53,6 @@
                 app:layout_constraintTop_toBottomOf="@id/btn_info" />
 
             <TextView
-                android:id="@+id/btn_clear_history"
-                style="@style/BottomSheetOption"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="@string/title_properties_chat_clear"
-                app:drawableStartCompat="@drawable/ic_clear_history"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider_info" />
-
-            <View
-                android:id="@+id/divider_clear"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="72dp"
-                android:background="@color/grey_012_white_012"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_info" />
-
-            <TextView
                 android:id="@+id/btn_mute"
                 style="@style/BottomSheetOption"
                 android:layout_width="match_parent"
@@ -116,12 +95,12 @@
                 app:layout_constraintTop_toBottomOf="@id/btn_mute" />
 
             <TextView
-                android:id="@+id/btn_leave"
+                android:id="@+id/btn_cancel"
                 style="@style/BottomSheetOption.Red"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/general_leave"
-                app:drawableStartCompat="@drawable/ic_leave_chat"
+                android:text="@string/general_cancel"
+                app:drawableStartCompat="@drawable/ic_trash"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider_ignore" />

@@ -234,7 +234,7 @@ public class TimeUtils implements Comparator<Calendar> {
                         getBestDateTimePattern(getUserLocale(), "d MMM yyyy")
                 );
                 return getString(R.string.tomorrow_date, tomorrowFormat.format(timestampDateTime));
-            } else if (timestampDate.isBefore(todayDate.plusWeeks(1))) {
+            } else if (format != DATE_WEEK_DAY_FORMAT && timestampDate.isBefore(todayDate.plusWeeks(1))) {
                 DateTimeFormatter futureFormat = DateTimeFormatter.ofPattern(
                         getBestDateTimePattern(getUserLocale(), "EEEE, d MMM yyyy")
                 );

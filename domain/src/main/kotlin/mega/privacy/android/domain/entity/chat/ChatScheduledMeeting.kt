@@ -33,4 +33,13 @@ data class ChatScheduledMeeting constructor(
     val flags: ChatScheduledFlags? = null,
     val rules: ChatScheduledRules? = null,
     val changes: ScheduledMeetingChanges? = null,
-)
+) {
+
+    /**
+     * Check if Meeting is pending to be started in the future
+     *
+     * @return  true if it's pending, false otherwise
+     */
+    fun isPending(): Boolean =
+        (startDateTime ?: 0) > (System.currentTimeMillis() / 1000)
+}

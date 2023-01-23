@@ -4134,4 +4134,6 @@
         <item quantity="one">Removed %d item from “%s”</item>
         <item quantity="other">Removed %d items from “%s”</item>
     </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
 </resources>

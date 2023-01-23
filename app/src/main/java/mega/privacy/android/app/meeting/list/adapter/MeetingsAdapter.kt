@@ -96,20 +96,22 @@ class MeetingsAdapter constructor(
 
     @Suppress("UNCHECKED_CAST")
     private fun List<MeetingRoomItem>?.addSectionHeaders(): List<MeetingAdapterItem>? {
-        if (isNullOrEmpty() || none { it.isScheduledMeeting() }) {
-            return this?.map { MeetingAdapterItem.Data(it) }
+        if (isNullOrEmpty() || none(MeetingRoomItem::isPending)) {
+            return this?.map(MeetingAdapterItem::Data)
         }
 
         val itemsWithHeader = mutableListOf<MeetingAdapterItem>()
-        forEachIndexed { index, room ->
+        forEachIndexed { index, item ->
             val previousItem = getOrNull(index - 1)
             when {
-                room.isScheduledMeeting() && !isSameDay(room.scheduledStartTimestamp, previousItem?.scheduledStartTimestamp) ->
-                    itemsWithHeader.add(MeetingAdapterItem.Header(room.scheduledStartTimestamp!!.getHeaderTitle()))
-                !room.isScheduledMeeting() && previousItem?.isScheduledMeeting() == true ->
+                !item.isPending && previousItem?.isPending == true -> {
                     itemsWithHeader.add(MeetingAdapterItem.Header(StringResourcesUtils.getString(R.string.meetings_list_past_header)))
+                }
+                item.isPending && !isSameDay(item.scheduledStartTimestamp, previousItem?.scheduledStartTimestamp) -> {
+                    itemsWithHeader.add(MeetingAdapterItem.Header(item.scheduledStartTimestamp!!.getHeaderTitle()))
+                }
             }
-            itemsWithHeader.add(MeetingAdapterItem.Data(room))
+            itemsWithHeader.add(MeetingAdapterItem.Data(item))
         }
         return itemsWithHeader
     }
@@ -128,5 +130,5 @@ class MeetingsAdapter constructor(
         }
 
     private fun Long.getHeaderTitle(): String =
-        TimeUtils.formatDate(this, TimeUtils.DATE_WEEK_DAY_FORMAT)
+        TimeUtils.formatDate(this, TimeUtils.DATE_WEEK_DAY_FORMAT, true)
 }

@@ -35,14 +35,19 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
     ): Flow<MutableList<MeetingRoomItem>> =
         flow {
             val iterator = items.listIterator()
-            while (iterator.hasNext()) {
+            var hasNext: Boolean
+            do {
                 mutex.withLock {
+                    hasNext = iterator.hasNext()
+                    if (!hasNext) return@withLock
+
                     val item = iterator.next()
                     val updatedItem = getUpdatedMeetingItem(item)
                     iterator.set(updatedItem)
                     emit(items)
+                    hasNext = iterator.hasNext()
                 }
-            }
+            } while (hasNext)
         }
 
     override suspend fun getUpdatedMeetingItem(item: MeetingRoomItem): MeetingRoomItem {
@@ -56,13 +61,12 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
         var lastUserChar: Char? = null
         var lastUserAvatar: String? = null
         var lastUserColor: Int? = null
-        when (participants.size) {
-            0 -> {
-                firstUserChar = myAccount.fullName?.firstOrNull()
-                firstUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
-                firstUserColor = avatarRepository.getAvatarColor(myHandle)
+        when {
+            !item.isActive || participants.isEmpty() -> {
+                firstUserChar = item.title.firstOrNull()
+                firstUserColor = null
             }
-            1 -> {
+            participants.size == 1 -> {
                 firstUserChar = myAccount.fullName?.firstOrNull()
                 firstUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
                 firstUserColor = avatarRepository.getAvatarColor(myHandle)
