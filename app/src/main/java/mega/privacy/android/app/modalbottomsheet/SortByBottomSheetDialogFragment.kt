@@ -232,8 +232,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     sortByHeaderViewModel.setOrderCamera(order).join()
 
                     callManager { manager ->
-                        manager.refreshCUNodes()
-
                         if (manager.isInAlbumContentPage) {
                             val f = manager.albumContentFragment
                             if (f is AlbumContentFragment) {

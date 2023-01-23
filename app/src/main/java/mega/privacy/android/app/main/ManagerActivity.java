@@ -96,7 +96,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
@@ -218,7 +217,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -1128,35 +1126,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 nodeSaver.handleRequestPermissionsResult(requestCode);
                 break;
             }
-
-            case REQUEST_CAMERA_UPLOAD:
-            case REQUEST_CAMERA_ON_OFF:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-                    stopCameraUploadSyncHeartbeatWorkers(this);
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
-                }
-
-                break;
-
-            case REQUEST_CAMERA_ON_OFF_FIRST_TIME:
-                if (permissions.length == 0) {
-                    return;
-                }
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
-                        if (getPhotosFragment() != null) {
-                            photosFragment.onStoragePermissionRefused();
-                        }
-                    } else {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
-                    }
-                }
-
-                break;
 
             case PERMISSIONS_FRAGMENT: {
                 if (getPermissionsFragment() != null) {
@@ -2661,32 +2630,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * If the account is business and not a master user, it shows a warning.
-     * Otherwise proceeds to enable CU.
-     */
-    public void checkIfShouldShowBusinessCUAlert() {
-        if (isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
-            showBusinessCUAlert();
-        } else {
-            enableCUClicked();
-        }
-    }
-
-
-    /**
-     * Proceeds to enable CU action.
-     */
-    private void enableCUClicked() {
-        if (getPhotosFragment() != null) {
-            if (photosFragment.isEnablePhotosViewShown()) {
-                photosFragment.enableCameraUpload();
-            } else {
-                photosFragment.enableCameraUploadClick();
-            }
-        }
-    }
-
-    /**
      * Shows a warning to business users about the risks of enabling CU.
      */
     private void showBusinessCUAlert() {
@@ -2701,7 +2644,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 })
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> {
                     if (getPhotosFragment() != null) {
-                        photosFragment.enableCameraUploadClick();
+                        photosFragment.enableCameraUploads();
                     }
                 })
                 .setCancelable(false)
@@ -3830,12 +3773,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else if (isInFilterPage) {
                     aB.setTitle(getString(R.string.photos_action_filter));
-                } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
-                    setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on));
-                } else {
-                    setFirstNavigationLevel(true);
+                } else if (getPhotosFragment() != null) {
                     aB.setTitle(getString(R.string.sortby_type_photo_first));
+                    setFirstNavigationLevel(!photosFragment.isEnableCameraUploadsViewShown() || !photosFragment.doesAccountHavePhotos());
                 }
 
                 break;
@@ -3904,11 +3844,17 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
                         || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS) {
                     aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                } else if (drawerItem == DrawerItem.PHOTOS) {
+                    setPhotosNavigationToolbarIcon();
                 } else {
                     aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
                 }
             } else {
-                aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                if (drawerItem == DrawerItem.PHOTOS) {
+                    setPhotosNavigationToolbarIcon();
+                } else {
+                    aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                }
             }
         } else {
             if (isFirstNavigationLevel()) {
@@ -3941,6 +3887,30 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.PHOTOS && isInFilterPage) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
+        }
+    }
+
+    /**
+     * When the user is in Photos, this sets the correct Toolbar Icon depending on
+     * certain conditions.
+     *
+     * This is only called when there are no unread notifications
+     */
+    private void setPhotosNavigationToolbarIcon() {
+        if (getPhotosFragment() != null) {
+            // Enable Camera Uploads Page is shown
+            if (photosFragment.isEnableCameraUploadsViewShown()) {
+                if (photosFragment.doesAccountHavePhotos()) {
+                    // Photos has content
+                    aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                } else {
+                    // Photos is in an empty state
+                    aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
+                }
+            } else {
+                // Enable Camera Uploads Page is hidden
+                aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
+            }
         }
     }
 
@@ -4443,7 +4413,6 @@ public class ManagerActivity extends TransfersManagementActivity
         cuViewTypes.setVisibility(View.GONE);
 
         if (getPhotosFragment() != null) {
-            photosFragment.setDefaultView();
             showBottomView();
         }
     }
@@ -4573,7 +4542,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     supportInvalidateOptionsMenu();
                     showFabButton();
                     showHideBottomNavigationView(false);
-                    refreshCUNodes();
                     if (!comesFromNotifications) {
                         bottomNavigationCurrentItem = PHOTOS_BNV;
                     }
@@ -4829,12 +4797,6 @@ public class ManagerActivity extends TransfersManagementActivity
             case HOMEPAGE: {
                 if (fullscreenOfflineFragment != null) {
                     fullscreenOfflineFragment.checkScroll();
-                }
-                break;
-            }
-            case PHOTOS: {
-                if (getPhotosFragment() != null) {
-                    photosFragment.checkScroll();
                 }
                 break;
             }
@@ -5441,7 +5403,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
-                            if (photosFragment.isEnablePhotosViewShown()) {
+                            if (photosFragment.isEnableCameraUploadsViewShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
                             }
@@ -7198,14 +7160,8 @@ public class ManagerActivity extends TransfersManagementActivity
         selectDrawerItem(drawerItem);
     }
 
-    public void skipInitialCUSetup() {
-        viewModel.setIsFirstLogin(false);
-        drawerItem = getStartDrawerItem();
-        selectDrawerItem(drawerItem);
-    }
-
     /**
-     * Refresh PhotosFragment's UI after CU is enabled.
+     * Refresh the UI of the Photos feature
      */
     public void refreshPhotosFragment() {
         if (!isInPhotosPage())
@@ -7503,12 +7459,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshOutgoingShares();
         refreshSharesPageAdapter();
         refreshSearch();
-    }
-
-    public void refreshCUNodes() {
-        if (getPhotosFragment() != null) {
-            photosFragment.loadPhotos();
-        }
     }
 
     public void setFirstNavigationLevel(boolean firstNavigationLevel) {

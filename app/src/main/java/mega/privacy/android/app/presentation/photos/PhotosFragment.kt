@@ -1,11 +1,14 @@
 package mega.privacy.android.app.presentation.photos
 
-import android.Manifest
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -43,10 +46,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.account.CameraUploadsBusinessAlertDialog
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
@@ -74,10 +78,9 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUplo
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setShowProgressBar
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showEnableCUPage
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingSortByDialog
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.skipCUSetup
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateFilterState
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateProgress
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
@@ -85,15 +88,19 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -115,6 +122,17 @@ class PhotosFragment : Fragment() {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: TimelineActionModeCallback
     private lateinit var albumsActionModeCallback: AlbumsActionModeCallback
+
+    private val cameraUploadsPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            with(timelineViewModel) {
+                if (isEnableCameraUploadsViewShown() && doesAccountHavePhotos()) {
+                    shouldEnableCUPage(false)
+                    managerActivity.refreshPhotosFragment()
+                }
+                handlePermissionsResult(permissions)
+            }
+        }
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -159,7 +177,7 @@ class PhotosFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         if (managerActivity.firstLogin) {
-            timelineViewModel.showEnableCUPage(true)
+            timelineViewModel.shouldEnableCUPage(true)
         }
         setUpFlow()
     }
@@ -214,6 +232,7 @@ class PhotosFragment : Fragment() {
                         }
                         handleOptionsMenu(state)
                         handleActionMode(state)
+                        handleActionsForCameraUploads(state)
                     }
                 }
 
@@ -226,6 +245,18 @@ class PhotosFragment : Fragment() {
         }
     }
 
+    /**
+     * Checks whether a rationale is needed for Media Permissions
+     *
+     * @return Boolean value
+     */
+    private fun shouldShowMediaPermissionsRationale() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            shouldShowRequestPermissionRationale(READ_MEDIA_IMAGES) && shouldShowRequestPermissionRationale(
+                READ_MEDIA_VIDEO
+            )
+        } else shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE)
+
     private fun handleActionMode(state: TimelineViewState) {
         if (state.selectedPhotoCount > 0) {
             if (actionMode == null) {
@@ -237,6 +268,28 @@ class PhotosFragment : Fragment() {
             actionMode?.finish()
             actionMode = null
             managerActivity.showHideBottomNavigationView(false)
+        }
+    }
+
+    /**
+     * Decide actions for each Camera Uploads state
+     * @param state [TimelineViewState]
+     */
+    private fun handleActionsForCameraUploads(state: TimelineViewState) {
+        if (state.shouldTriggerCameraUploads) {
+            enableCameraUploads()
+            timelineViewModel.setTriggerCameraUploadsState(shouldTrigger = false)
+        }
+        if (state.shouldShowBusinessAccountSuspendedPrompt) {
+            requireContext().sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+            timelineViewModel.setBusinessAccountSuspendedPromptState(shouldShow = false)
+        }
+        if (state.shouldTriggerMediaPermissionsDeniedLogic) {
+            stopCameraUploadSyncHeartbeatWorkers(requireContext())
+            if (!shouldShowMediaPermissionsRationale()) {
+                requireContext().navigateToAppSettings()
+            }
+            timelineViewModel.setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = false)
         }
     }
 
@@ -346,15 +399,23 @@ class PhotosFragment : Fragment() {
             timelineViewState = timelineViewState,
             albumsViewState = albumsViewState,
         )
-    }
 
+        CameraUploadsBusinessAlertDialog(
+            show = timelineViewState.shouldShowBusinessAccountPrompt,
+            onConfirm = {
+                enableCameraUploads()
+                timelineViewModel.setBusinessAccountPromptState(shouldShow = false)
+            },
+            onDeny = { timelineViewModel.setBusinessAccountPromptState(shouldShow = false) },
+        )
+    }
 
     @Composable
     private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
         photoDownload = photosViewModel::downloadPhoto,
         lazyGridState = timelineLazyGridState,
-        onTextButtonClick = this::enableCameraUploadClick,
+        onTextButtonClick = this::onCameraUploadsButtonClicked,
         onFABClick = this::openFilterFragment,
         onCardClick = timelineViewModel::onCardClick,
         onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
@@ -364,7 +425,7 @@ class PhotosFragment : Fragment() {
             EmptyState(
                 timelineViewState = timelineViewState,
                 onFABClick = this::openFilterFragment,
-                setEnableCUPage = timelineViewModel::showEnableCUPage,
+                setEnableCUPage = timelineViewModel::shouldEnableCUPage,
             )
         }
     )
@@ -408,7 +469,7 @@ class PhotosFragment : Fragment() {
         timelineViewState = timelineViewState,
         onUploadVideosChanged = timelineViewModel::setCUUploadVideos,
         onUseCellularConnectionChanged = timelineViewModel::setCUUseCellularConnection,
-        enableCUClick = this::enableCameraUploadButtonClick,
+        enableCUClick = this::onCameraUploadsButtonClicked,
     )
 
     @Composable
@@ -574,88 +635,81 @@ class PhotosFragment : Fragment() {
         managerActivity.overridePendingTransition(0, 0)
     }
 
-    fun enableCameraUpload() {
+    /**
+     * Enables the Camera Uploads feature
+     */
+    fun enableCameraUploads() {
         timelineViewModel.enableCU(requireContext())
-        managerActivity.setToolbarTitle()
+        managerActivity.refreshPhotosFragment()
     }
 
-    fun enableCameraUploadButtonClick() {
+    /**
+     * Performs actions when the Button to enable Camera Uploads has been clicked
+     */
+    private fun onCameraUploadsButtonClicked() {
         if (managerActivity.firstLogin) {
             timelineViewModel.setInitialPreferences()
             managerActivity.firstLogin = false
         }
-
         MegaApplication.getInstance().sendSignalPresenceActivity()
 
-        val permissions =
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (PermissionUtils.hasPermissions(context, *permissions)) {
-            managerActivity.checkIfShouldShowBusinessCUAlert()
+        // Check and request the needed permissions
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                getNotificationsPermission(),
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion()
+            )
         } else {
-            PermissionUtils.requestPermission(
-                managerActivity,
-                Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME,
-                *permissions
+            arrayOf(
+                getImagePermissionByVersion(),
+                getVideoPermissionByVersion()
             )
         }
-    }
 
-    fun onStoragePermissionRefused() {
-        Util.showSnackbar(context, getString(R.string.on_refuse_storage_permission))
-        skipCUSetup()
-    }
-
-    private fun skipCUSetup() {
-        timelineViewModel.skipCUSetup()
-        managerActivity.isFirstNavigationLevel = false
-        if (managerActivity.firstLogin) {
-            managerActivity.skipInitialCUSetup()
-        } else {
-            timelineViewModel.showEnableCUPage(false)
-            managerActivity.refreshPhotosFragment()
-        }
-    }
-
-    fun enableCameraUploadClick() {
-        MegaApplication.getInstance().sendSignalPresenceActivity()
-        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
         if (PermissionUtils.hasPermissions(context, *permissions)) {
-            timelineViewModel.showEnableCUPage(true)
-            managerActivity.refreshPhotosFragment()
-        } else {
-            PermissionUtils.requestPermission(
-                managerActivity,
-                Constants.REQUEST_CAMERA_ON_OFF,
-                *permissions
-            )
+            with(timelineViewModel) {
+                if (isEnableCameraUploadsViewShown()) {
+                    shouldEnableCUPage(false)
+                    managerActivity.refreshPhotosFragment()
+                }
+                handleEnableCameraUploads()
+            }
+        } else cameraUploadsPermissionsLauncher.launch(permissions)
+    }
+
+    /**
+     * When the user logs in, declines the Onboarding screens and backs out from the
+     * Enable Camera Uploads screen (through Gesture Navigation or the Back Button in Toolbar), this
+     * function gets called to skip the Initial Camera Uploads setup
+     */
+    private fun skipInitialCUSetup() {
+        with(managerActivity) {
+            isFirstNavigationLevel = false
+            firstLogin = false
+            refreshPhotosFragment()
         }
     }
 
-    fun isEnablePhotosViewShown(): Boolean =
+    /**
+     * Checks if the Enable Camera uploads page is shown
+     * @return Boolean value
+     */
+    fun isEnableCameraUploadsViewShown(): Boolean =
         timelineViewModel.state.value.enableCameraUploadPageShowing
 
-    fun shouldUpdateTitle(): Boolean =
-        isEnablePhotosViewShown() &&
-                photosViewModel.state.value.selectedTab !== PhotosTab.Albums &&
-                (timelineViewModel.state.value.currentShowingPhotos.isNotEmpty() ||
-                        managerActivity.firstLogin)
-
-
-    fun setDefaultView() {}
-
-    fun checkScroll() {}
-
     fun onBackPressed(): Int {
-        if (
-            timelineViewModel.state.value.enableCameraUploadPageShowing
-            && timelineViewModel.state.value.currentShowingPhotos.isNotEmpty()
-            || managerActivity.firstLogin
-        ) {
-            skipCUSetup()
-            return 1
+        return if (isEnableCameraUploadsViewShown()) {
+            skipInitialCUSetup()
+            if (doesAccountHavePhotos()) {
+                timelineViewModel.shouldEnableCUPage(false)
+                1
+            } else {
+                0
+            }
+        } else {
+            0
         }
-
-        return 0
     }
 
     fun switchToAlbum() {
@@ -666,14 +720,14 @@ class PhotosFragment : Fragment() {
         handleMenuIcons(!timelineViewModel.state.value.enableCameraUploadPageShowing)
     }
 
-    fun loadPhotos() {}
-
     fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
         resetAlbumContentState(album = album, resetMessage = resetMessage)
         activity?.lifecycleScope?.launch {
-            managerActivity.skipToAlbumContentFragment(AlbumDynamicContentFragment.getInstance(
-                isAccountHasPhotos()))
-
+            managerActivity.skipToAlbumContentFragment(
+                AlbumDynamicContentFragment.getInstance(
+                    doesAccountHavePhotos()
+                )
+            )
         }
     }
 
@@ -684,7 +738,11 @@ class PhotosFragment : Fragment() {
         if (resetMessage) albumsViewModel.setSnackBarMessage("")
     }
 
-    private fun isAccountHasPhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
+    /**
+     * Checks if the account has Photos or not
+     * @return Boolean value
+     */
+    fun doesAccountHavePhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
 
     /**
      * Register Camera Upload Broadcast

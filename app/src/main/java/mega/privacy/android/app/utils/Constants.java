@@ -144,9 +144,6 @@ public class Constants {
 
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
-    public static final int REQUEST_CAMERA_UPLOAD = 10;
-    public static final int REQUEST_CAMERA_ON_OFF = 11;
-    public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
     public static final int WRITE_LOG = 13;
 
     public static final int RECORD_VOICE_CLIP = 11;

@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
 import app.cash.turbine.test
 import com.google.common.truth.Correspondence
+import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -23,7 +25,9 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
@@ -60,11 +64,14 @@ class TimelineViewModelTest {
 
     private val getNodeListByIds = mock<GetNodeListByIds> {
         onBlocking { invoke(any()) }.thenReturn(
-            emptyList())
+            emptyList()
+        )
     }
 
     private val jobUtilWrapper =
         mock<JobUtilWrapper> { on { isOverQuota() }.thenReturn(false) }
+
+    private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
 
     @Before
     fun setUp() {
@@ -80,6 +87,7 @@ class TimelineViewModelTest {
             jobUtilWrapper = jobUtilWrapper,
             ioDispatcher = StandardTestDispatcher(),
             mainDispatcher = StandardTestDispatcher(),
+            checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
         )
     }
 
@@ -132,7 +140,8 @@ class TimelineViewModelTest {
             assertWithMessage("enableSortOption value is incorrect").that(initialState.enableSortOption)
                 .isTrue()
             assertWithMessage("enableCameraUploadButtonShowing value is incorrect").that(
-                initialState.enableCameraUploadButtonShowing).isTrue()
+                initialState.enableCameraUploadButtonShowing
+            ).isTrue()
             assertWithMessage("progressBarShowing value is incorrect").that(initialState.progressBarShowing)
                 .isFalse()
             assertWithMessage("progress value is incorrect").that(initialState.progress)
@@ -148,6 +157,17 @@ class TimelineViewModelTest {
                 .isEqualTo(0)
             assertWithMessage("selectedPhoto value is incorrect").that(initialState.selectedPhoto)
                 .isNull()
+            assertWithMessage("shouldTriggerCameraUploads value is incorrect").that(initialState.shouldTriggerCameraUploads)
+                .isFalse()
+            assertWithMessage("shouldShowBusinessAccountPrompt value is incorrect").that(
+                initialState.shouldShowBusinessAccountPrompt
+            ).isFalse()
+            assertWithMessage("shouldShowBusinessAccountSuspendedPrompt value is incorrect").that(
+                initialState.shouldShowBusinessAccountSuspendedPrompt
+            ).isFalse()
+            assertWithMessage("shouldTriggerMediaPermissionsDeniedLogic value is incorrect").that(
+                initialState.shouldTriggerMediaPermissionsDeniedLogic
+            ).isFalse()
         }
     }
 
@@ -163,8 +183,10 @@ class TimelineViewModelTest {
                 .containsExactly(photo)
             assertWithMessage("Expected photosListItems do not match").that(initialisedState.photosListItems)
                 .containsExactlyElementsIn(
-                    listOf(PhotoListItem.Separator(expectedDate),
-                        PhotoListItem.PhotoGridItem(photo, false))
+                    listOf(
+                        PhotoListItem.Separator(expectedDate),
+                        PhotoListItem.PhotoGridItem(photo, false)
+                    )
                 )
             val hasPhoto =
                 Correspondence.transforming<DateCard, Photo>({ it?.photo }, "contains photo")
@@ -181,7 +203,54 @@ class TimelineViewModelTest {
                 .comparingElementsUsing(hasPhoto)
                 .contains(photo)
 
-            assertWithMessage("Loading is not complete").that(initialisedState.loadPhotosDone).isTrue()
+            assertWithMessage("Loading is not complete").that(initialisedState.loadPhotosDone)
+                .isTrue()
         }
     }
+
+    /**
+     * Mocks the value of [checkEnableCameraUploadsStatus] and calls the ViewModel method
+     *
+     * @param status The [EnableCameraUploadsStatus] to mock the Use Case
+     */
+    private suspend fun handleEnableCameraUploads(status: EnableCameraUploadsStatus) {
+        whenever(checkEnableCameraUploadsStatus()).thenReturn(status)
+        underTest.handleEnableCameraUploads()
+    }
+
+    @Test
+    fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatus returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
+        runTest {
+            handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.shouldShowBusinessAccountPrompt).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldShowBusinessAccountSuspendedPrompt is true when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
+        runTest {
+            handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldTriggerCameraUploads is true when checkEnableCameraUploadsStatus returns CAN_ENABLE_CAMERA_UPLOADS`() =
+        runTest {
+            handleEnableCameraUploads(status = EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.shouldTriggerCameraUploads).isTrue()
+            }
+        }
 }

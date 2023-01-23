@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 
 fun TimelineViewModel.updateZoomLevel(newZoomLevel: ZoomLevel) {
@@ -101,7 +100,7 @@ fun TimelineViewModel.setEnableCUButtonShowing(show: Boolean) {
     }
 }
 
-fun TimelineViewModel.showEnableCUPage(show: Boolean) {
+fun TimelineViewModel.shouldEnableCUPage(show: Boolean) {
     if (show) {
         _state.update {
             it.copy(
@@ -117,16 +116,6 @@ fun TimelineViewModel.showEnableCUPage(show: Boolean) {
         }
         handleEnableZoomAndSortOptions()
     }
-}
-
-fun TimelineViewModel.skipCUSetup() {
-    _state.update {
-        it.copy(
-            enableCameraUploadButtonShowing = true,
-            enableCameraUploadPageShowing = false
-        )
-    }
-    handleEnableZoomAndSortOptions()
 }
 
 fun TimelineViewModel.setCUUploadVideos(onOff: Boolean) {
