@@ -30,6 +30,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -56,7 +57,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Billing facade
@@ -289,18 +289,21 @@ internal class BillingFacade @Inject constructor(
                 .enablePendingPurchases()
                 .setListener(this)
                 .build()
-            return@withLock suspendCoroutine { continuation ->
+            return@withLock suspendCancellableCoroutine { continuation ->
                 val listener = object : BillingClientStateListener {
                     override fun onBillingServiceDisconnected() {
                     }
 
                     override fun onBillingSetupFinished(result: BillingResult) {
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            continuation.resumeWith(Result.success(newClient))
+                            if (continuation.isActive)
+                                continuation.resumeWith(Result.success(newClient))
                         } else {
-                            continuation.resumeWith(Result.failure(ConnectBillingServiceException(
-                                result.responseCode,
-                                result.debugMessage)))
+                            if (continuation.isActive)
+                                continuation.resumeWith(Result.failure(
+                                    ConnectBillingServiceException(
+                                        result.responseCode,
+                                        result.debugMessage)))
                         }
                     }
                 }
