@@ -24,6 +24,7 @@ import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -83,12 +84,16 @@ internal class BillingFacade @Inject constructor(
     private val mutex = Mutex()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable)
+    }
+
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        applicationScope.launch {
+        applicationScope.launch(exceptionHandler) {
             ensureConnect()
         }
     }
@@ -169,7 +174,7 @@ internal class BillingFacade @Inject constructor(
     }
 
     override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
-        applicationScope.launch(ioDispatcher) {
+        applicationScope.launch(ioDispatcher + exceptionHandler) {
             if (result.responseCode == BillingClient.BillingResponseCode.OK
                 && purchases.isNullOrEmpty().not()
             ) {
