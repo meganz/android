@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import nz.mega.sdk.MegaNode
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -70,6 +72,11 @@ class IncomingSharesViewModelTest {
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         initViewModel()
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     private fun initViewModel() {
@@ -241,13 +248,13 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that is invalid handle is set to false when call set incoming tree depth with valid handle`() =
         runTest {
-            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(listOf(mock()))
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
-                    underTest.setIncomingTreeDepth(any(), 123456789L)
+                    underTest.setIncomingTreeDepth(1, 123456789L)
                     assertThat(awaitItem()).isEqualTo(false)
                 }
         }
@@ -255,15 +262,15 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that is invalid handle is set to true when call set incoming tree depth with invalid handle`() =
         runTest {
-            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(listOf(mock()))
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
-                    underTest.setIncomingTreeDepth(any(), 123456789L)
+                    underTest.setIncomingTreeDepth(1, 123456789L)
                     assertThat(awaitItem()).isEqualTo(false)
-                    underTest.setIncomingTreeDepth(any(), -1L)
+                    underTest.setIncomingTreeDepth(1, -1L)
                     assertThat(awaitItem()).isEqualTo(true)
                 }
         }
@@ -272,18 +279,18 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that is invalid handle is set to true when cannot retrieve node`() =
         runTest {
-            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(listOf(mock()))
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem()).isEqualTo(true)
-                    underTest.setIncomingTreeDepth(any(), 123456789L)
+                    underTest.setIncomingTreeDepth(1, 123456789L)
                     assertThat(awaitItem()).isEqualTo(false)
 
                     whenever(getNodeByHandle(any())).thenReturn(null)
 
-                    underTest.setIncomingTreeDepth(any(), 987654321L)
+                    underTest.setIncomingTreeDepth(1, 987654321L)
                     assertThat(awaitItem()).isEqualTo(true)
                 }
         }
