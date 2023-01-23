@@ -1820,7 +1820,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun isCompressorAvailable() = !(videoCompressor?.isRunning ?: false)
+    private fun isCompressorAvailable() = !(videoCompressor?.isVideoDownSamplingRunning() ?: false)
 
     private suspend fun startVideoCompression() {
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
@@ -1829,7 +1829,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         totalUploaded = 0
         totalToUpload = 0
 
-        videoCompressor = VideoCompressor(this, this, getVideoQuality())
+        videoCompressor = VideoCompressor(
+            context = this,
+            callback = this,
+            videoQuality = getVideoQuality(),
+        )
         videoCompressor?.setPendingList(fullList)
         videoCompressor?.setOutputRoot(tempRoot)
         val totalPendingSizeInMB = (videoCompressor?.totalInputSize ?: 0) / (1024 * 1024)

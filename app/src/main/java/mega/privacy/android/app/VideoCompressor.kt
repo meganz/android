@@ -11,15 +11,18 @@ import kotlin.Exception
 /**
  * The class to compress videos
  *
- * @param context The [Context] object
- * @param callback The [VideoCompressionCallback]
- * @param quality The video quality to compress to
+ * @property context The [Context] object
+ * @property callback The [VideoCompressionCallback]
+ * @property videoQuality The video quality to compress to
  */
 class VideoCompressor(
     context: Context,
     private val callback: VideoCompressionCallback,
-    quality: Int,
-) : VideoDownsampling(context) {
+    videoQuality: Int,
+) : VideoDownSampling(
+    context = context,
+    videoQuality = videoQuality,
+) {
     private var pendingList = listOf<SyncRecord>()
     private var outputRoot: String? = null
     private var totalRead = 0L
@@ -39,15 +42,11 @@ class VideoCompressor(
      */
     var currentFileIndex = 0
 
-    init {
-        this.quality = quality
-    }
-
     /**
      * Stops the video compression
      */
     fun stop() {
-        isRunning = false
+        setVideoDownSamplingRunning(false)
         Timber.d("Video compressor stopped")
     }
 
@@ -103,9 +102,9 @@ class VideoCompressor(
      * Starts the video compression
      */
     fun start() {
-        isRunning = true
+        setVideoDownSamplingRunning(true)
         var i = 0
-        while (i < totalCount && isRunning) {
+        while (i < totalCount && isVideoDownSamplingRunning()) {
             currentFileIndex = i + 1
             val record = pendingList[i]
             Timber.d("Video compressor start: %s", record.toString())
@@ -118,10 +117,22 @@ class VideoCompressor(
                     callback.onInsufficientSpace()
                     return
                 }
-                val video = VideoUpload(path, record.newPath, size, -1)
+
+                val newPath = record.newPath
+                if (newPath == null) {
+                    callback.onCompressFailed(record)
+                    return
+                }
+
+                val video = VideoUpload(
+                    originalPath = path,
+                    newPath = newPath,
+                    size = size,
+                    pendingMessageId = -1,
+                )
                 try {
                     prepareAndChangeResolution(video)
-                    if (isRunning) {
+                    if (isVideoDownSamplingRunning()) {
                         callback.onCompressSuccessful(record)
                     }
                 } catch (ex: Exception) {

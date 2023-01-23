@@ -39,7 +39,7 @@ import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.VideoDownsampling
+import mega.privacy.android.app.VideoDownSampling
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
@@ -140,7 +140,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     private var totalUploads = 0
     private var type: String? = ""
     private var parentNode: MegaNode? = null
-    private var videoDownsampling: VideoDownsampling? = null
+    private var videoDownsampling: VideoDownSampling? = null
     private var mBuilder: Notification.Builder? = null
     private var mBuilderCompat: NotificationCompat.Builder? = null
     private var mNotificationManager: NotificationManager? = null
@@ -575,7 +575,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                                 }
                                 mapVideoDownsampling!![outFile.absolutePath] = 0
                                 if (videoDownsampling == null) {
-                                    videoDownsampling = VideoDownsampling(this@ChatUploadService)
+                                    videoDownsampling = VideoDownSampling(this@ChatUploadService)
                                 }
                                 videoDownsampling!!.changeResolution(
                                     file, outFile.absolutePath,
