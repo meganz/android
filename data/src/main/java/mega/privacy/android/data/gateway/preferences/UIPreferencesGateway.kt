@@ -22,6 +22,20 @@ interface UIPreferencesGateway {
     suspend fun setPreferredStartScreen(value: Int)
 
     /**
+     * Monitor the List View type
+     *
+     * @return a [Flow] to observe the List View type
+     */
+    fun monitorListViewType(): Flow<Int?>
+
+    /**
+     * Set the new List View type
+     *
+     * @param value An [Integer] representing a new List View type
+     */
+    suspend fun setListViewType(value: Int)
+
+    /**
      * Monitor start screen login timestamp
      *
      * @return start screen login timestamp

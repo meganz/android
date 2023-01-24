@@ -21,6 +21,7 @@ private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
 private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
 private const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
 private const val MEDIA_DISCOVERY_VIEW = "MEDIA_DISCOVERY_VIEW"
+private const val LIST_VIEW_TYPE = "LIST_VIEW_TYPE"
 private const val uiPreferenceFileName = USER_INTERFACE_PREFERENCES
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = uiPreferenceFileName,
@@ -43,6 +44,7 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val preferredStartScreenKey = intPreferencesKey(PREFERRED_START_SCREEN)
     private val hideRecentActivityKey = booleanPreferencesKey(HIDE_RECENT_ACTIVITY)
     private val mediaDiscoveryViewKey = intPreferencesKey(MEDIA_DISCOVERY_VIEW)
+    private val listViewTypeKey = intPreferencesKey(LIST_VIEW_TYPE)
 
     override fun monitorPreferredStartScreen() = context.uiPreferenceDataStore.data
         .catch { exception ->
@@ -58,6 +60,23 @@ internal class UIPreferencesDatastore @Inject constructor(
     override suspend fun setPreferredStartScreen(value: Int) {
         context.uiPreferenceDataStore.edit {
             it[preferredStartScreenKey] = value
+        }
+    }
+
+    override fun monitorListViewType(): Flow<Int?> = context.uiPreferenceDataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map {
+            it[listViewTypeKey]
+        }
+
+    override suspend fun setListViewType(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[listViewTypeKey] = value
         }
     }
 
@@ -93,7 +112,7 @@ internal class UIPreferencesDatastore @Inject constructor(
             if (exception is IOException)
                 emit(emptyPreferences())
             else
-                throw  exception
+                throw exception
         }.map {
             it[mediaDiscoveryViewKey]
         }
