@@ -4,6 +4,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.Metadata
 
@@ -116,4 +117,45 @@ interface MediaPlayerServiceGateway {
         isAudioPlayer: Boolean = true,
         showShuffleButton: Boolean? = null,
     )
+
+    /**
+     * Update playback position state
+     *
+     * @return Flow<PlaybackPositionState>
+     */
+    fun playbackPositionStateUpdate(): Flow<PlaybackPositionState>
+
+    /**
+     * Set resume playback position history for playing video
+     *
+     * @param playbackPosition playback position history
+     */
+    fun setResumePlaybackPosition(playbackPosition: Long?)
+
+    /**
+     * Set resume playback position history for playing video before build sources
+     *
+     * @param playbackPosition playback position history
+     */
+    fun setResumePlaybackPositionBeforeBuildSources(playbackPosition: Long?)
+
+    /**
+     * Set restart to play video
+     */
+    fun setRestartPlayVideo()
+
+    /**
+     * Set restart to play video before build sources
+     */
+    fun setRestartPlayVideoBeforeBuildSources()
+
+    /**
+     * Cancel playback position dialog
+     */
+    fun cancelPlaybackPositionDialog()
+
+    /**
+     * Cancel playback position dialog before build sources
+     */
+    fun cancelPlaybackPositionDialogBeforeBuildSources()
 }

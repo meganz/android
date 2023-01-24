@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -72,6 +73,8 @@ class MediaPlayerFragment : Fragment() {
     private var videoPlayerView: StyledPlayerView? = null
 
     private var isAudioPlayer = false
+
+    private var playbackPositionDialog: Dialog? = null
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -177,6 +180,11 @@ class MediaPlayerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         playlistObserved = false
+        // Close the dialog after fragment is destroyed to avoid adding dialog view repeatedly after screen is rotated.
+        playbackPositionDialog?.let {
+            if (it.isShowing)
+                it.dismiss()
+        }
     }
 
     override fun onDestroy() {
@@ -189,8 +197,8 @@ class MediaPlayerFragment : Fragment() {
 
     private fun observeFlow() {
         if (view != null) {
-            serviceGateway?.run {
-                metadataUpdate().flowWithLifecycle(
+            serviceGateway?.let { gateway ->
+                gateway.metadataUpdate().flowWithLifecycle(
                     viewLifecycleOwner.lifecycle,
                     Lifecycle.State.RESUMED
                 ).onEach { metadata ->
@@ -200,21 +208,65 @@ class MediaPlayerFragment : Fragment() {
                         videoPlayerVH?.displayMetadata(metadata)
                     }
                 }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+                gateway.playbackPositionStateUpdate().flowWithLifecycle(
+                    viewLifecycleOwner.lifecycle,
+                    Lifecycle.State.RESUMED
+                ).onEach { state ->
+                    if (state.showPlaybackDialog) {
+                        playbackPositionDialog =
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(R.string.video_playback_position_dialog_title)
+                                .setMessage(
+                                    String.format(getString(
+                                        R.string.video_playback_position_dialog_message),
+                                        state.mediaItemName,
+                                        viewModel.formatMillisecondsToString(
+                                            state.playbackPosition ?: 0)))
+                                .setNegativeButton(
+                                    R.string.video_playback_position_dialog_resume_button
+                                ) { _, _ ->
+                                    if (state.isDialogShownBeforeBuildSources)
+                                        gateway.setResumePlaybackPositionBeforeBuildSources(
+                                            state.playbackPosition)
+                                    else
+                                        gateway.setResumePlaybackPosition(state.playbackPosition)
+
+                                }
+                                .setPositiveButton(
+                                    R.string.video_playback_position_dialog_restart_button
+                                ) { _, _ ->
+                                    if (state.isDialogShownBeforeBuildSources)
+                                        gateway.setRestartPlayVideoBeforeBuildSources()
+                                    else
+                                        gateway.setRestartPlayVideo()
+                                }
+                                .setOnCancelListener {
+                                    if (state.isDialogShownBeforeBuildSources) {
+                                        gateway.cancelPlaybackPositionDialogBeforeBuildSources()
+                                    } else {
+                                        gateway.cancelPlaybackPositionDialog()
+                                    }
+                                }.create().apply {
+                                    show()
+                                }
+                    }
+                }.launchIn(viewLifecycleOwner.lifecycleScope)
             }
-            playerServiceViewModelGateway?.run {
+            playerServiceViewModelGateway?.let {
                 if (!playlistObserved) {
                     playlistObserved = true
-                    playlistUpdate().flowWithLifecycle(
+                    it.playlistUpdate().flowWithLifecycle(
                         viewLifecycleOwner.lifecycle,
                         Lifecycle.State.RESUMED
-                    ).onEach {
-                        Timber.d("MediaPlayerService observed playlist ${it.first.size} items")
+                    ).onEach { info ->
+                        Timber.d("MediaPlayerService observed playlist ${info.first.size} items")
 
-                        audioPlayerVH?.togglePlaylistEnabled(requireContext(), it.first)
-                        videoPlayerVH?.togglePlaylistEnabled(it.first)
+                        audioPlayerVH?.togglePlaylistEnabled(requireContext(), info.first)
+                        videoPlayerVH?.togglePlaylistEnabled(info.first)
                     }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                    retryUpdate().flowWithLifecycle(
+                    it.retryUpdate().flowWithLifecycle(
                         viewLifecycleOwner.lifecycle,
                         Lifecycle.State.RESUMED
                     ).onEach { isRetry ->
@@ -243,7 +295,7 @@ class MediaPlayerFragment : Fragment() {
                         }
                     }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-                    mediaPlaybackUpdate().flowWithLifecycle(
+                    it.mediaPlaybackUpdate().flowWithLifecycle(
                         viewLifecycleOwner.lifecycle,
                         Lifecycle.State.RESUMED
                     ).onEach { isPaused ->

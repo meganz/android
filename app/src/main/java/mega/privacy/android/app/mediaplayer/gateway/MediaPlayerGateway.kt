@@ -128,9 +128,9 @@ interface MediaPlayerGateway {
     /**
      * Player seed to playing position
      *
-     * @param positionMs the position ms
+     * @param positionInMs the position ms
      */
-    fun playerSeekToPositionMs(positionMs: Long)
+    fun playerSeekToPositionInMs(positionInMs: Long)
 
     /**
      * Build play sources for player

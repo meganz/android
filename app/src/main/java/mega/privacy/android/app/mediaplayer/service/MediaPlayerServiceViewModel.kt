@@ -1252,12 +1252,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override suspend fun monitorPlaybackTimes(
         mediaId: Long?,
-        seekToPosition: (positionMs: Long) -> Unit,
+        seekToPosition: (positionInMs: Long?) -> Unit,
     ) {
         if (!isAudioPlayer) {
-            monitorPlaybackTimesUseCase().firstOrNull()?.get(mediaId)?.currentPosition?.let {
-                seekToPosition(it)
-            }
+            seekToPosition(monitorPlaybackTimesUseCase().firstOrNull()
+                ?.get(mediaId)?.currentPosition)
         }
     }
 

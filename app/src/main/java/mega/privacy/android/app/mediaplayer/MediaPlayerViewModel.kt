@@ -42,6 +42,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -287,6 +288,36 @@ class MediaPlayerViewModel @Inject constructor(
                 Timber.e("Bitmap is saved error: ${e.message}")
             }
         }
+
+    /**
+     * Format milliseconds to time string
+     * @param milliseconds time value that unit is milliseconds
+     * @return strings of time
+     */
+    fun formatMillisecondsToString(milliseconds: Long): String {
+        val totalSeconds = (milliseconds / 1000).toInt()
+        return formatSecondsToString(seconds = totalSeconds)
+    }
+
+    /**
+     * Format seconds to time string
+     * @param seconds time value that unit is seconds
+     * @return strings of time
+     */
+    private fun formatSecondsToString(seconds: Int): String {
+        val hour = TimeUnit.SECONDS.toHours(seconds.toLong())
+        val minutes =
+            TimeUnit.SECONDS.toMinutes(seconds.toLong()) - TimeUnit.HOURS.toMinutes(hour)
+        val resultSeconds =
+            seconds.toLong() - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(
+                seconds.toLong()))
+
+        return if (hour >= 1) {
+            String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)
+        } else {
+            String.format("%02d:%02d", minutes, resultSeconds)
+        }
+    }
 
     companion object {
         private const val QUALITY_SCREENSHOT = 100

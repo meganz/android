@@ -29,15 +29,15 @@ class MediaMegaPlayer(player: ExoPlayer) : ForwardingPlayer(player) {
         }
     }
 
-    override fun seekTo(positionMs: Long) {
+    override fun seekTo(positionInMs: Long) {
         if (canProceed()) {
-            super.seekTo(positionMs)
+            super.seekTo(positionInMs)
         }
     }
 
-    override fun seekTo(windowIndex: Int, positionMs: Long) {
+    override fun seekTo(windowIndex: Int, positionInMs: Long) {
         if (canProceed()) {
-            super.seekTo(windowIndex, positionMs)
+            super.seekTo(windowIndex, positionInMs)
         }
     }
 
