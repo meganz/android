@@ -1081,13 +1081,13 @@ public class ChatActivity extends PasscodeActivity
      * @param speaker True, speaker ON. False, speaker OFF.
      */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
-        callInProgressLayout.setEnabled(false);
         var enableAudio = audio;
+        var hasAudioPermissions = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
         if (enableAudio) {
-            enableAudio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+            enableAudio = hasAudioPermissions;
         }
 
-        if (!enableAudio) {
+        if (!hasAudioPermissions) {
             openMeetingRinging(
                     this,
                     chatId,
@@ -1101,6 +1101,7 @@ public class ChatActivity extends PasscodeActivity
             enableVideo = hasPermissions(this, Manifest.permission.CAMERA);
         }
 
+        callInProgressLayout.setEnabled(false);
         viewModel.onAnswerCall(chatId, enableVideo, enableAudio, speaker);
     }
 
