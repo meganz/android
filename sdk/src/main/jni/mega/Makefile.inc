@@ -32,6 +32,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/pubkeyaction.cpp \
     sdk/src/request.cpp \
     sdk/src/serialize64.cpp \
+    sdk/src/nodemanager.cpp \
     sdk/src/share.cpp \
     sdk/src/sharenodekeys.cpp \
     sdk/src/sync.cpp \
@@ -88,6 +89,7 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/pubkeyaction.h \
 	    sdk/include/mega/request.h \
 	    sdk/include/mega/serialize64.h \
+	    sdk/include/mega/nodemanager.h \
 	    sdk/include/mega/share.h \
 	    sdk/include/mega/sharenodekeys.h \
 	    sdk/include/mega/sync.h \
