@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.ListViewTypeMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
@@ -140,6 +141,7 @@ import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.preference.ListViewType
 import mega.privacy.android.domain.entity.preference.StartScreen
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaNode
@@ -179,6 +181,14 @@ internal class MapperModule {
      */
     @Provides
     fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
+
+    /**
+     * Provide list view type mapper
+     *
+     * @return [ListViewTypeMapper]
+     */
+    @Provides
+    fun provideListViewTypeMapper(): ListViewTypeMapper = { ListViewType(it) }
 
     /**
      * Provide user last green mapper
