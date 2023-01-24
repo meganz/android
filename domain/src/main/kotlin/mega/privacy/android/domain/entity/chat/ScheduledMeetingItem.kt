@@ -15,10 +15,10 @@ import java.time.ZonedDateTime
  * @property isPast                     True, the scheduled meeting has passed. False, otherwise.
  */
 data class ScheduledMeetingItem constructor(
-    val chatId: Long,
-    val scheduledMeetingId: Long,
+    val chatId: Long = -1,
+    val scheduledMeetingId: Long = -1,
     val title: String? = "",
-    val description: String? = null,
+    val description: String? = "",
     val date: String? = "",
     val startDate: ZonedDateTime? = null,
     val endDate: ZonedDateTime? = null,

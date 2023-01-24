@@ -152,8 +152,10 @@ fun ScheduledMeetingInfoView(
             onDismiss = { onDismiss() },
             onInvite = { onInviteParticipantsDialog() })
 
-        LazyColumn(state = listState,
-            modifier = Modifier.padding(paddingValues)) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.padding(paddingValues)
+        ) {
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
 
             items(state.buttons) { button ->
@@ -163,8 +165,10 @@ fun ScheduledMeetingInfoView(
             item(key = "Participants") { ParticipantsHeader(state = state) }
 
             item(key = "Add participants") {
-                AddParticipantsButton(state = state,
-                    onAddParticipantsClicked = onAddParticipantsClicked)
+                AddParticipantsButton(
+                    state = state,
+                    onAddParticipantsClicked = onAddParticipantsClicked
+                )
             }
 
             item(key = "Participants list") {
@@ -173,14 +177,18 @@ fun ScheduledMeetingInfoView(
                         val isLastOne =
                             (i < 4 && i == state.participantItemList.size - 1) || (i >= 4 && i == 3)
 
-                        ParticipantItemView(participant = state.participantItemList[i],
-                            !isLastOne, onParticipantClicked = onParticipantClicked)
+                        ParticipantItemView(
+                            participant = state.participantItemList[i],
+                            !isLastOne, onParticipantClicked = onParticipantClicked
+                        )
                     }
                 }
 
                 if (state.participantItemList.size > 4) {
-                    SeeMoreOrLessParticipantsButton(state,
-                        onSeeMoreOrLessClicked = onSeeMoreOrLessClicked)
+                    SeeMoreOrLessParticipantsButton(
+                        state,
+                        onSeeMoreOrLessClicked = onSeeMoreOrLessClicked
+                    )
                 }
             }
 
@@ -206,8 +214,10 @@ fun ScheduledMeetingInfoView(
                 }
 
             LaunchedEffect(scaffoldState.snackbarHostState) {
-                val s = scaffoldState.snackbarHostState.showSnackbar(message = msg,
-                    duration = SnackbarDuration.Short)
+                val s = scaffoldState.snackbarHostState.showSnackbar(
+                    message = msg,
+                    duration = SnackbarDuration.Short
+                )
 
                 if (s == SnackbarResult.Dismissed) {
                     onSnackbarShown()
@@ -243,7 +253,8 @@ private fun LeaveGroupAlertDialog(
             shouldDismissOnBackPress = true,
             shouldDismissOnClickOutside = true,
             onDismiss = onDismiss,
-            onConfirmButton = onLeave)
+            onConfirmButton = onLeave
+        )
     }
 }
 
@@ -270,7 +281,8 @@ private fun AddParticipantsAlertDialog(
             shouldDismissOnBackPress = true,
             shouldDismissOnClickOutside = true,
             onDismiss = onDismiss,
-            onConfirmButton = onInvite)
+            onConfirmButton = onInvite
+        )
     }
 
     if (state.addParticipantsNoContactsLeftToAddDialog) {
@@ -282,7 +294,8 @@ private fun AddParticipantsAlertDialog(
             shouldDismissOnBackPress = true,
             shouldDismissOnClickOutside = true,
             onDismiss = onDismiss,
-            onConfirmButton = onInvite)
+            onConfirmButton = onInvite
+        )
     }
 }
 
@@ -309,15 +322,19 @@ private fun ScheduledMeetingInfoAppBar(
 
     TopAppBar(
         title = {
-            Text(text = stringResource(id = titleId),
+            Text(
+                text = stringResource(id = titleId),
                 style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium)
+                fontWeight = FontWeight.Medium
+            )
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
-                Icon(imageVector = Icons.Filled.ArrowBack,
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
-                    tint = iconColor)
+                    tint = iconColor
+                )
             }
         },
         actions = {
@@ -356,17 +373,23 @@ private fun ScheduledMeetingInfoAppBar(
 private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
     val isLight = MaterialTheme.colors.isLight
     Column {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 24.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier
-                .size(40.dp)
-                .background(Color.Transparent)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.Transparent)
+            ) {
                 MeetingAvatar(state = state)
             }
-            Column(modifier = Modifier
-                .padding(start = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     state.scheduledMeeting?.let {
                         it.title?.let { title ->
@@ -381,9 +404,11 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                 }
                 state.scheduledMeeting?.let {
                     if (it.isPast) {
-                        Text(text = pluralStringResource(R.plurals.subtitle_of_group_chat,
+                        Text(text = pluralStringResource(
+                            R.plurals.subtitle_of_group_chat,
                             state.numOfParticipants,
-                            state.numOfParticipants),
+                            state.numOfParticipants
+                        ),
                             style = MaterialTheme.typography.subtitle2,
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             fontWeight = FontWeight.Normal,
@@ -403,7 +428,7 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
             }
         }
 
-        divider(withStartPadding = false)
+        CustomDivider(withStartPadding = false)
     }
 }
 
@@ -453,8 +478,10 @@ private fun DefaultAvatar(title: String) {
         modifier = Modifier
             .fillMaxSize()
             .clip(CircleShape)
-            .background(color = Color(AvatarUtil.getSpecificAvatarColor(Constants.AVATAR_GROUP_CHAT_COLOR)),
-                shape = CircleShape)
+            .background(
+                color = white_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: grey_alpha_012,
+                shape = CircleShape
+            )
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
                 val currentHeight = placeable.height
@@ -486,8 +513,10 @@ fun OneParticipantAvatar(firstUser: ChatParticipant) {
         modifier = Modifier
             .fillMaxSize()
             .clip(CircleShape)
-            .background(color = Color(firstUser.defaultAvatarColor),
-                shape = CircleShape)
+            .background(
+                color = Color(firstUser.defaultAvatarColor),
+                shape = CircleShape
+            )
             .layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
                 val currentHeight = placeable.height
@@ -507,11 +536,13 @@ fun OneParticipantAvatar(firstUser: ChatParticipant) {
                 style = MaterialTheme.typography.subtitle1
             )
         } else {
-            Image(modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape),
+            Image(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape),
                 painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
-                contentDescription = "User avatar")
+                contentDescription = "User avatar"
+            )
         }
     }
 }
@@ -531,14 +562,17 @@ fun SeveralParticipantsAvatar(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Box(contentAlignment = Alignment.Center,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(28.dp)
                 .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.BottomEnd)
-                .background(color = Color(lastUser.defaultAvatarColor),
-                    shape = CircleShape)
+                .background(
+                    color = Color(lastUser.defaultAvatarColor),
+                    shape = CircleShape
+                )
         ) {
             if (lastUser.data.avatarUri == null) {
                 Text(
@@ -548,22 +582,27 @@ fun SeveralParticipantsAvatar(
                     style = MaterialTheme.typography.subtitle1
                 )
             } else {
-                Image(modifier = Modifier
-                    .size(28.dp)
-                    .clip(CircleShape),
+                Image(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape),
                     painter = rememberAsyncImagePainter(model = lastUser.data.avatarUri),
-                    contentDescription = "User avatar")
+                    contentDescription = "User avatar"
+                )
             }
         }
 
-        Box(contentAlignment = Alignment.Center,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(28.dp)
                 .border(width = 1.dp, color = Color.White, shape = CircleShape)
                 .clip(CircleShape)
                 .align(Alignment.TopStart)
-                .background(color = Color(firstUser.defaultAvatarColor),
-                    shape = CircleShape)
+                .background(
+                    color = Color(firstUser.defaultAvatarColor),
+                    shape = CircleShape
+                )
         ) {
             if (firstUser.data.avatarUri == null) {
                 Text(
@@ -573,11 +612,13 @@ fun SeveralParticipantsAvatar(
                     style = MaterialTheme.typography.subtitle1
                 )
             } else {
-                Image(modifier = Modifier
-                    .size(28.dp)
-                    .clip(CircleShape),
+                Image(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape),
                     painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
-                    contentDescription = "User avatar")
+                    contentDescription = "User avatar"
+                )
             }
         }
     }
@@ -611,70 +652,85 @@ private fun ActionButton(
                 if (state.isPublic && state.enabledMeetingLinkOption) {
                     if (action == ScheduledMeetingInfoAction.ShareMeetingLink && state.isHost) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(modifier = Modifier.padding(start = 72.dp,
-                                end = 16.dp,
-                                top = 16.dp,
-                                bottom = 16.dp),
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 72.dp,
+                                    end = 16.dp,
+                                    top = 16.dp,
+                                    bottom = 16.dp
+                                ),
                                 style = MaterialTheme.typography.button,
                                 text = stringResource(id = action.title),
-                                color = MaterialTheme.colors.secondary)
+                                color = MaterialTheme.colors.secondary
+                            )
                         }
-                        divider(withStartPadding = true)
+                        CustomDivider(withStartPadding = true)
                     } else if (action == ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts && !state.isHost) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             ActionOption(
                                 state = state,
                                 action = action,
                                 isEnabled = true,
-                                hasSwitch = false)
+                                hasSwitch = false
+                            )
                         }
-                        divider(withStartPadding = false)
+                        CustomDivider(withStartPadding = false)
                     }
                 }
             }
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
                 if (state.isHost && state.isPublic) {
-                    Text(modifier = Modifier.padding(start = 14.dp,
-                        end = 16.dp,
-                        top = 18.dp),
+                    Text(
+                        modifier = Modifier.padding(
+                            start = 14.dp,
+                            end = 16.dp,
+                            top = 18.dp
+                        ),
                         style = MaterialTheme.typography.button,
                         text = stringResource(id = action.title),
-                        color = MaterialTheme.colors.secondary)
+                        color = MaterialTheme.colors.secondary
+                    )
 
                     action.description?.let { description ->
-                        Text(modifier = Modifier.padding(start = 14.dp,
+                        Text(modifier = Modifier.padding(
+                            start = 14.dp,
                             end = 16.dp,
                             top = 10.dp,
-                            bottom = 8.dp),
+                            bottom = 8.dp
+                        ),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
-                    divider(withStartPadding = false)
+                    CustomDivider(withStartPadding = false)
                 }
             }
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation,
             -> {
                 if (state.isHost && !state.isPublic) {
-                    Text(modifier = Modifier.padding(start = 14.dp,
+                    Text(modifier = Modifier.padding(
+                        start = 14.dp,
                         end = 16.dp,
-                        top = 18.dp),
+                        top = 18.dp
+                    ),
                         style = MaterialTheme.typography.subtitle1,
                         text = stringResource(id = action.title),
                         color = black.takeIf { isLight } ?: white)
 
                     action.description?.let { description ->
-                        Text(modifier = Modifier.padding(start = 14.dp,
+                        Text(modifier = Modifier.padding(
+                            start = 14.dp,
                             end = 16.dp,
                             top = 10.dp,
-                            bottom = 8.dp),
+                            bottom = 8.dp
+                        ),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
-                    divider(withStartPadding = false)
+                    CustomDivider(withStartPadding = false)
                 }
             }
             ScheduledMeetingInfoAction.MeetingLink,
@@ -683,13 +739,10 @@ private fun ActionButton(
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled =
-                        if (action == ScheduledMeetingInfoAction.MeetingLink)
-                            state.enabledMeetingLinkOption
-                        else
-                            state.enabledAllowNonHostAddParticipantsOption,
-                        hasSwitch = true)
-                    divider(withStartPadding = true)
+                        isEnabled = state.enabledMeetingLinkOption,
+                        hasSwitch = true
+                    )
+                    CustomDivider(withStartPadding = true)
                 }
             }
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
@@ -698,8 +751,9 @@ private fun ActionButton(
                         state = state,
                         action = action,
                         isEnabled = state.enabledAllowNonHostAddParticipantsOption,
-                        hasSwitch = true)
-                    divider(withStartPadding = true)
+                        hasSwitch = true
+                    )
+                    CustomDivider(withStartPadding = true)
                 }
             }
             ScheduledMeetingInfoAction.ManageChatHistory -> {
@@ -708,8 +762,9 @@ private fun ActionButton(
                         state = state,
                         action = action,
                         isEnabled = true,
-                        hasSwitch = false)
-                    divider(withStartPadding = true)
+                        hasSwitch = false
+                    )
+                    CustomDivider(withStartPadding = true)
 
                 }
             }
@@ -718,16 +773,18 @@ private fun ActionButton(
                     state = state,
                     action = action,
                     isEnabled = state.dndSeconds == null,
-                    hasSwitch = true)
-                divider(withStartPadding = true)
+                    hasSwitch = true
+                )
+                CustomDivider(withStartPadding = true)
             }
             ScheduledMeetingInfoAction.ShareFiles -> {
                 ActionOption(
                     state = state,
                     action = action,
                     isEnabled = true,
-                    hasSwitch = false)
-                divider(withStartPadding = true)
+                    hasSwitch = false
+                )
+                CustomDivider(withStartPadding = true)
             }
         }
     }
@@ -740,10 +797,12 @@ private fun ActionButton(
  */
 @Composable
 private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
-    Text(modifier = Modifier.padding(start = 16.dp,
+    Text(modifier = Modifier.padding(
+        start = 16.dp,
         top = 17.dp,
         end = 16.dp,
-        bottom = 12.dp),
+        bottom = 12.dp
+    ),
         text = stringResource(id = R.string.participants_number, state.participantItemList.size),
         style = MaterialTheme.typography.body2,
         fontWeight = FontWeight.Medium,
@@ -765,23 +824,29 @@ private fun AddParticipantsButton(
         Row(modifier = Modifier
             .clickable { onAddParticipantsClicked() }
             .fillMaxWidth()) {
-            Row(modifier = Modifier
-                .padding(bottom = 18.dp, top = 18.dp)
-                .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically) {
-                Icon(modifier = Modifier.padding(start = 24.dp, end = 24.dp),
+            Row(
+                modifier = Modifier
+                    .padding(bottom = 18.dp, top = 18.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp),
                     imageVector = ImageVector.vectorResource(id = R.drawable.add_participants),
                     contentDescription = "Add participants Icon",
-                    tint = MaterialTheme.colors.secondary)
+                    tint = MaterialTheme.colors.secondary
+                )
 
-                Text(modifier = Modifier.padding(end = 16.dp),
+                Text(
+                    modifier = Modifier.padding(end = 16.dp),
                     style = MaterialTheme.typography.button,
                     text = stringResource(id = R.string.add_participants_menu_item),
-                    color = MaterialTheme.colors.secondary)
+                    color = MaterialTheme.colors.secondary
+                )
             }
         }
         if (state.participantItemList.isNotEmpty()) {
-            divider(withStartPadding = true)
+            CustomDivider(withStartPadding = true)
         }
     }
 }
@@ -800,19 +865,25 @@ private fun SeeMoreOrLessParticipantsButton(
     Row(modifier = Modifier
         .clickable { onSeeMoreOrLessClicked() }
         .fillMaxWidth()) {
-        Row(modifier = Modifier
-            .padding(top = 16.dp, bottom = 24.dp)
-            .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically) {
-            Icon(modifier = Modifier.padding(start = 24.dp, end = 24.dp),
+        Row(
+            modifier = Modifier
+                .padding(top = 16.dp, bottom = 24.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp),
                 imageVector = ImageVector.vectorResource(id = if (state.seeMoreVisible) R.drawable.ic_chevron_down else R.drawable.ic_chevron_up),
                 contentDescription = "See more Icon",
-                tint = MaterialTheme.colors.secondary)
+                tint = MaterialTheme.colors.secondary
+            )
 
-            Text(modifier = Modifier.padding(end = 16.dp),
+            Text(
+                modifier = Modifier.padding(end = 16.dp),
                 style = MaterialTheme.typography.button,
                 text = stringResource(id = if (state.seeMoreVisible) R.string.meetings_scheduled_meeting_info_see_more_participants_label else R.string.meetings_scheduled_meeting_info_see_less_participants_label),
-                color = MaterialTheme.colors.secondary)
+                color = MaterialTheme.colors.secondary
+            )
         }
     }
 }
@@ -826,7 +897,7 @@ private fun SeeMoreOrLessParticipantsButton(
 private fun LeaveGroupButton(
     onLeaveGroupClicked: () -> Unit,
 ) {
-    divider(withStartPadding = false)
+    CustomDivider(withStartPadding = false)
     Row(modifier = Modifier
         .clickable { onLeaveGroupClicked() }
         .padding(top = 36.dp, bottom = 18.dp)
@@ -851,13 +922,19 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
 
     state.scheduledMeeting?.let { schedMeet ->
         schedMeet.description?.let { description ->
-            divider(withStartPadding = false)
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 16.dp,
+            CustomDivider(withStartPadding = false)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(
+                    start = 16.dp,
                     end = 16.dp,
-                    bottom = 16.dp)) {
-                Row(modifier = Modifier
-                    .weight(1f)) {
+                    bottom = 16.dp
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
                     Box(
                         modifier = Modifier
                             .padding(top = 22.dp)
@@ -870,9 +947,11 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
                             tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                     }
 
-                    Column(modifier = Modifier
-                        .padding(top = 14.dp)
-                        .fillMaxSize()) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 14.dp)
+                            .fillMaxSize()
+                    ) {
                         Text(modifier = Modifier
                             .padding(start = 32.dp, bottom = 6.dp),
                             style = MaterialTheme.typography.subtitle1,
@@ -897,10 +976,12 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
  * @param withStartPadding True, if has start padding. False, if not
  */
 @Composable
-fun divider(withStartPadding: Boolean) {
+fun CustomDivider(withStartPadding: Boolean) {
     Divider(
-        modifier = if (withStartPadding) Modifier.padding(start = 72.dp,
-            end = 0.dp) else Modifier.padding(start = 0.dp, end = 0.dp),
+        modifier = if (withStartPadding) Modifier.padding(
+            start = 72.dp,
+            end = 0.dp
+        ) else Modifier.padding(start = 0.dp, end = 0.dp),
         color = grey_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_012,
         thickness = 1.dp)
 }
@@ -920,10 +1001,14 @@ private fun ActionOption(
     isEnabled: Boolean,
     hasSwitch: Boolean,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)) {
-        Row(modifier = Modifier
-            .weight(1f)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .weight(1f)
+        ) {
             Box(
                 modifier = Modifier
                     .clip(RectangleShape)
@@ -938,29 +1023,34 @@ private fun ActionOption(
                 }
             }
 
-            Column(modifier = Modifier
-                .fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 ActionText(actionText = action.title)
 
                 state.retentionTimeSeconds?.let { time ->
                     if (action == ScheduledMeetingInfoAction.ManageChatHistory) {
-                        manageChatHistorySubtitle(seconds = time)
+                        ManageChatHistorySubtitle(seconds = time)
                     }
                 }
 
                 state.dndSeconds?.let { time ->
                     if (action == ScheduledMeetingInfoAction.ChatNotifications) {
-                        chatNotificationSubtitle(seconds = time)
+                        ChatNotificationSubtitle(seconds = time)
                     }
                 }
             }
         }
 
         if (hasSwitch) {
-            Box(modifier = Modifier
-                .wrapContentSize(Alignment.CenterEnd)
-                .size(40.dp)) {
-                Switch(modifier = Modifier.align(Alignment.Center),
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.CenterEnd)
+                    .size(40.dp)
+            ) {
+                Switch(
+                    modifier = Modifier.align(Alignment.Center),
                     checked = isEnabled,
                     onCheckedChange = null,
                     colors = switchColors()
@@ -1032,9 +1122,11 @@ private fun ParticipantItemView(
             .fillMaxWidth()
             .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            Row(modifier = Modifier
-                .weight(1f)
-                .height(72.dp)) {
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(72.dp)
+            ) {
                 Box {
                     if (participant.fileUpdated) {
                         ParticipantAvatar(participant = participant)
@@ -1048,21 +1140,28 @@ private fun ParticipantItemView(
                                 .align(Alignment.TopEnd)
                                 .padding(10.dp),
                             painter = painterResource(id = R.drawable.ic_verified),
-                            contentDescription = "Verified user")
+                            contentDescription = "Verified user"
+                        )
                     }
                 }
-                Column(modifier = Modifier
-                    .align(Alignment.CenterVertically)) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         val contactName =
                             participant.data.alias ?: participant.data.fullName
                             ?: participant.email
 
-                        Text(text = if (participant.isMe) stringResource(R.string.chat_me_text_bracket,
-                            contactName) else contactName,
+                        Text(
+                            text = if (participant.isMe) stringResource(
+                                R.string.chat_me_text_bracket,
+                                contactName
+                            ) else contactName,
                             style = MaterialTheme.typography.subtitle1,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis)
+                            overflow = TextOverflow.Ellipsis
+                        )
 
                         if (participant.status != UserStatus.Invalid) {
                             ContactStatus(status = participant.status)
@@ -1085,10 +1184,12 @@ private fun ParticipantItemView(
                 }
             }
 
-            Box(modifier = Modifier
-                .wrapContentSize(Alignment.CenterEnd)) {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.CenterEnd)
+            ) {
                 Row(modifier = Modifier.align(Alignment.Center)) {
-                    participantsPermissionView(participant)
+                    ParticipantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
                         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
@@ -1111,7 +1212,7 @@ private fun ParticipantItemView(
  * @param participant [ChatParticipant]
  */
 @Composable
-private fun participantsPermissionView(participant: ChatParticipant) {
+private fun ParticipantsPermissionView(participant: ChatParticipant) {
     val isLight = MaterialTheme.colors.isLight
     when (participant.privilege) {
         ChatRoomPermission.Moderator -> {
@@ -1143,7 +1244,7 @@ private fun participantsPermissionView(participant: ChatParticipant) {
  * @param seconds  Retention time seconds
  */
 @Composable
-private fun manageChatHistorySubtitle(seconds: Long) {
+private fun ManageChatHistorySubtitle(seconds: Long) {
     var text = transformSecondsInString(seconds)
     if (text.isNotEmpty()) {
         text =
@@ -1159,7 +1260,7 @@ private fun manageChatHistorySubtitle(seconds: Long) {
  * @param seconds  Dnd seconds
  */
 @Composable
-private fun chatNotificationSubtitle(seconds: Long) {
+private fun ChatNotificationSubtitle(seconds: Long) {
     val text = if (seconds == 0L) {
         stringResource(R.string.mute_chatroom_notification_option_off)
     } else {
@@ -1189,33 +1290,41 @@ fun transformSecondsInString(seconds: Long): String {
     val months = seconds % Constants.SECONDS_IN_MONTH_30
     if (months == 0L) {
         val month = (seconds / Constants.SECONDS_IN_MONTH_30).toInt()
-        return pluralStringResource(R.plurals.subtitle_properties_manage_chat_label_months,
+        return pluralStringResource(
+            R.plurals.subtitle_properties_manage_chat_label_months,
             month,
-            month)
+            month
+        )
     }
 
     val weeks = seconds % Constants.SECONDS_IN_WEEK
     if (weeks == 0L) {
         val week = (seconds / Constants.SECONDS_IN_WEEK).toInt()
-        return pluralStringResource(R.plurals.subtitle_properties_manage_chat_label_weeks,
+        return pluralStringResource(
+            R.plurals.subtitle_properties_manage_chat_label_weeks,
             week,
-            week)
+            week
+        )
     }
 
     val days = seconds % Constants.SECONDS_IN_DAY
     if (days == 0L) {
         val day = (seconds / Constants.SECONDS_IN_DAY).toInt()
-        return pluralStringResource(R.plurals.label_time_in_days_full,
+        return pluralStringResource(
+            R.plurals.label_time_in_days_full,
             day,
-            day)
+            day
+        )
     }
 
     val hours = seconds % Constants.SECONDS_IN_HOUR
     if (hours == 0L) {
         val hour = (seconds / Constants.SECONDS_IN_HOUR).toInt()
-        return pluralStringResource(R.plurals.subtitle_properties_manage_chat_label_hours,
+        return pluralStringResource(
+            R.plurals.subtitle_properties_manage_chat_label_hours,
             hour,
-            hour)
+            hour
+        )
     }
     return ""
 }
@@ -1239,14 +1348,20 @@ fun getStringForDndTime(seconds: Long): String {
     calTomorrow.add(Calendar.DATE, +1)
 
     val df =
-        SimpleDateFormat(android.text.format.DateFormat.getBestDateTimePattern(Locale.getDefault(),
-            "HH:mm"), Locale.getDefault())
+        SimpleDateFormat(
+            android.text.format.DateFormat.getBestDateTimePattern(
+                Locale.getDefault(),
+                "HH:mm"
+            ), Locale.getDefault()
+        )
     val tz = cal.timeZone
 
     df.timeZone = tz
 
-    return pluralStringResource(R.plurals.chat_notifications_muted_until_specific_time,
-        cal[Calendar.HOUR_OF_DAY], df.format(cal.time))
+    return pluralStringResource(
+        R.plurals.chat_notifications_muted_until_specific_time,
+        cal[Calendar.HOUR_OF_DAY], df.format(cal.time)
+    )
 }
 
 /**
@@ -1265,9 +1380,11 @@ private fun ParticipantAvatar(
     if (participant.data.avatarUri != null) {
         UriAvatar(modifier = modifier, uri = participant.data.avatarUri.toString())
     } else {
-        DefaultContactAvatar(modifier = modifier,
+        DefaultContactAvatar(
+            modifier = modifier,
             color = Color(participant.defaultAvatarColor),
-            content = participant.getAvatarFirstLetter())
+            content = participant.getAvatarFirstLetter()
+        )
     }
 }
 
@@ -1280,10 +1397,13 @@ private fun ParticipantAvatar(
 fun PreviewActionButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ActionButton(state = ScheduledMeetingInfoState(
-            scheduledMeeting = ScheduledMeetingItem(chatId = -1,
+            scheduledMeeting = ScheduledMeetingItem(
+                chatId = -1,
                 scheduledMeetingId = -1,
                 date = "date",
-                description = "description")),
+                description = "description"
+            )
+        ),
             action = ScheduledMeetingInfoAction.MeetingLink,
             onButtonClicked = {})
     }
@@ -1298,10 +1418,13 @@ fun PreviewActionButton() {
 fun PreviewAddParticipantsButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         AddParticipantsButton(state = ScheduledMeetingInfoState(
-            scheduledMeeting = ScheduledMeetingItem(chatId = -1,
+            scheduledMeeting = ScheduledMeetingItem(
+                chatId = -1,
                 scheduledMeetingId = -1,
                 date = "date",
-                description = "description")), onAddParticipantsClicked = {})
+                description = "description"
+            )
+        ), onAddParticipantsClicked = {})
     }
 }
 
@@ -1315,10 +1438,13 @@ fun PreviewScheduledMeetingInfoView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
             state = ScheduledMeetingInfoState(
-                scheduledMeeting = ScheduledMeetingItem(chatId = -1,
+                scheduledMeeting = ScheduledMeetingItem(
+                    chatId = -1,
                     scheduledMeetingId = -1,
                     date = "date",
-                    description = "description")),
+                    description = "description"
+                )
+            ),
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},
