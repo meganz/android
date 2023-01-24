@@ -107,6 +107,16 @@ boolean shouldUsePrebuiltSdk() {
 }
 
 /**
+ * Check whether we should use combine lint reports into a single file
+ *
+ * @return true if environment variable "USE_PREBUILT_SDK" is true. Otherwise return false.
+ */
+boolean shouldCombineLintReports() {
+    String combineLintReports = System.getenv("COMBINE_LINT_REPORTS")
+    return combineLintReports != null && combineLintReports == "true"
+}
+
+/**
  *
  * @param property the property to query. possible value: 'sdk-commit', 'chat-commit'
  * @param version version of the pre-built SDK. It can be read at the value of megaSdkVersion in
@@ -225,6 +235,7 @@ ext {
     readTesters = this.&readTesters
     readTesterGroupList = this.&readTesterGroupList
     shouldUsePrebuiltSdk = this.&shouldUsePrebuiltSdk
+    shouldCombineLintReports = this.&shouldCombineLintReports
     getAppGitHash = this.&getAppGitHash
     getSdkGitHash = this.&getSdkGitHash
     getChatGitHash = this.&getChatGitHash
