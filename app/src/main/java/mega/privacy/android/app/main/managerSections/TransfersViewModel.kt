@@ -242,6 +242,7 @@ class TransfersViewModel @Inject constructor(
         if (index != INVALID_POSITION) {
             megaApiGateway.getTransfersByTag(tag)?.let { transfer ->
                 Timber.d("The transfer with index : $index has been paused/resumed, left: ${activeTransfers.size}")
+                updateActiveTransfer(index, transfer)
                 _activeState.update {
                     ActiveTransfersState.TransferChangeStatusUpdated(index, transfer)
                 }
@@ -284,12 +285,14 @@ class TransfersViewModel @Inject constructor(
     fun completedTransferRemoved(transfer: AndroidCompletedTransfer, isRemovedCache: Boolean) =
         viewModelScope.launch(ioDispatcher) {
             if (isRemovedCache) {
-                File(transfer.originalPath).let { cacheFile ->
-                    if (cacheFile.exists()) {
-                        if (cacheFile.delete()) {
-                            Timber.d("Deleted success, path is $cacheFile")
-                        } else {
-                            Timber.d("Deleted failed, path is $cacheFile")
+                transfer.originalPath?.let {
+                    File(it).let { cacheFile ->
+                        if (cacheFile.exists()) {
+                            if (cacheFile.delete()) {
+                                Timber.d("Deleted success, path is $cacheFile")
+                            } else {
+                                Timber.d("Deleted failed, path is $cacheFile")
+                            }
                         }
                     }
                 }
@@ -344,7 +347,7 @@ class TransfersViewModel @Inject constructor(
     fun clearCompletedTransfers() = viewModelScope.launch(ioDispatcher) {
         dbH.failedOrCancelledTransfers.mapNotNull { transfer ->
             transfer?.let {
-                File(it.originalPath)
+                it.originalPath?.let { path -> File(path) }
             }
         }.forEach { cacheFile ->
             if (cacheFile.exists()) {
