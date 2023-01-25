@@ -1,9 +1,7 @@
-package mega.privacy.android.app.imageviewer.data
-
-import android.net.Uri
+package mega.privacy.android.domain.entity.imageviewer
 
 /**
- * Data object that encapsulates an image result coming from GetImageUseCase.
+ * Domain entity that encapsulates an image result coming from GetImageUseCase.
  *
  * @property thumbnailUri       Image thumbnail Uri.
  * @property previewUri         Image preview Uri.
@@ -15,9 +13,9 @@ import android.net.Uri
  * @property transferredBytes   Transferred bytes
  */
 data class ImageResult constructor(
-    var thumbnailUri: Uri? = null,
-    var previewUri: Uri? = null,
-    var fullSizeUri: Uri? = null,
+    var thumbnailUri: String? = null,
+    var previewUri: String? = null,
+    var fullSizeUri: String? = null,
     var transferTag: Int? = null,
     var isVideo: Boolean = false,
     var isFullyLoaded: Boolean = false,
@@ -30,7 +28,7 @@ data class ImageResult constructor(
      *
      * @return  Image Uri or null.
      */
-    fun getHighestResolutionAvailableUri(): Uri? =
+    fun getHighestResolutionAvailableUri(): String? =
         fullSizeUri ?: previewUri ?: thumbnailUri
 
     /**
@@ -38,7 +36,7 @@ data class ImageResult constructor(
      *
      * @return  Image Uri or null.
      */
-    fun getLowestResolutionAvailableUri(): Uri? =
+    fun getLowestResolutionAvailableUri(): String? =
         thumbnailUri ?: previewUri ?: fullSizeUri
 
     /**

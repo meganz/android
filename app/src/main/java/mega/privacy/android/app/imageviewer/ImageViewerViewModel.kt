@@ -2,6 +2,7 @@ package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -23,7 +24,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.imageviewer.data.ImageResult
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.NEXT
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
@@ -689,13 +690,13 @@ class ImageViewerViewModel @Inject constructor(
                     )
             }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
-                Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri)
+                Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri.toUri())
             }
         }
     }
 
     fun onLowMemory() {
-        getCurrentImageItem()?.imageResult?.fullSizeUri?.lastPathSegment?.let { fileName ->
+        getCurrentImageItem()?.imageResult?.fullSizeUri?.toUri()?.lastPathSegment?.let { fileName ->
             Fresco.getImagePipeline()?.bitmapMemoryCache?.removeAll {
                 !it.uriString.contains(fileName)
             }

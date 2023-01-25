@@ -29,7 +29,6 @@ import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.imageviewer.data.ImageResult
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -57,6 +56,7 @@ import mega.privacy.android.app.utils.RxUtil.tryOnNext
 import mega.privacy.android.app.utils.RxUtil.tryOnSuccess
 import mega.privacy.android.app.utils.StringUtils.encodeBase64
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -185,9 +185,9 @@ class GetImageUseCase @Inject constructor(
 
                     val image = ImageResult(
                         isVideo = node.isVideo(),
-                        thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
-                        previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
-                        fullSizeUri = if (fullFile.exists()) fullFile.toUri() else null
+                        thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri().toString() else null,
+                        previewUri = if (previewFile?.exists() == true) previewFile.toUri().toString() else null,
+                        fullSizeUri = if (fullFile.exists()) fullFile.toUri().toString() else null
                     )
 
                     if (image.isVideo && fullFile.exists() && previewFile == null) {
@@ -210,7 +210,7 @@ class GetImageUseCase @Inject constructor(
                     if (thumbnailFile != null && !thumbnailFile.exists()) {
                         getThumbnailImage(node, thumbnailFile.absolutePath).subscribeBy(
                             onComplete = {
-                                image.thumbnailUri = thumbnailFile.toUri()
+                                image.thumbnailUri = thumbnailFile.toUri().toString()
                                 emitter.tryOnNext(image)
                             },
                             onError = Timber::w
@@ -220,7 +220,7 @@ class GetImageUseCase @Inject constructor(
                     if (previewFile != null && !previewFile.exists()) {
                         getPreviewImage(node, previewFile.absolutePath).subscribeBy(
                             onComplete = {
-                                image.previewUri = previewFile.toUri()
+                                image.previewUri = previewFile.toUri().toString()
                                 if (fullSizeRequired) {
                                     emitter.tryOnNext(image)
                                 } else {
@@ -251,14 +251,14 @@ class GetImageUseCase @Inject constructor(
 
                                 when (val megaException = error.toMegaException()) {
                                     is SuccessMegaException -> {
-                                        image.fullSizeUri = fullFile.toUri()
+                                        image.fullSizeUri = fullFile.toUri().toString()
                                         image.isFullyLoaded = true
                                         emitter.tryOnNext(image)
                                         emitter.tryOnComplete()
                                     }
                                     is ResourceAlreadyExistsMegaException -> {
                                         if (megaApi.checkValidNodeFile(node, fullFile)) {
-                                            image.fullSizeUri = fullFile.toUri()
+                                            image.fullSizeUri = fullFile.toUri().toString()
                                             image.isFullyLoaded = true
                                             emitter.tryOnNext(image)
                                             emitter.tryOnComplete()
@@ -386,19 +386,22 @@ class GetImageUseCase @Inject constructor(
             var previewFile = CacheFolderManager.buildPreviewFile(context, thumbnailFileName)
             if (previewFile?.exists() != true) {
                 previewFile = if (isVideo) {
-                    getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toFile()
+                    getVideoThumbnail(thumbnailFileName, file.toUri()).blockingGetOrNull()?.toUri()
+                        ?.toFile()
                 } else {
                     getImageThumbnail(thumbnailFileName,
                         file.toUri(),
-                        highPriority).blockingGetOrNull()?.toFile()
+                        highPriority).blockingGetOrNull()?.toUri()?.toFile()
                 }
             }
 
             ImageResult(
                 isVideo = isVideo,
-                thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
-                previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
-                fullSizeUri = file.toUri(),
+                thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri()
+                    .toString() else null,
+                previewUri = if (previewFile?.exists() == true) previewFile.toUri()
+                    .toString() else null,
+                fullSizeUri = file.toUri().toString(),
                 isFullyLoaded = true
             )
         }
@@ -424,8 +427,8 @@ class GetImageUseCase @Inject constructor(
                 }
 
                 ImageResult(
-                    previewUri = previewUri,
-                    fullSizeUri = file.toUri(),
+                    previewUri = previewUri.toString(),
+                    fullSizeUri = file.toUri().toString(),
                     isVideo = isVideo,
                     isFullyLoaded = true
                 )
@@ -442,7 +445,7 @@ class GetImageUseCase @Inject constructor(
      * @return          Single with generated file uri
      */
     @Suppress("deprecation")
-    fun getVideoThumbnail(fileName: String, videoUri: Uri): Single<Uri> =
+    fun getVideoThumbnail(fileName: String, videoUri: Uri): Single<String> =
         Single.fromCallable {
             val videoFile = videoUri.toFile()
             require(videoFile.exists())
@@ -450,7 +453,7 @@ class GetImageUseCase @Inject constructor(
             val previewFile = CacheFolderManager.buildPreviewFile(context, fileName)
             requireNotNull(previewFile)
 
-            if (previewFile.exists()) return@fromCallable previewFile.toUri()
+            if (previewFile.exists()) return@fromCallable previewFile.toUri().toString()
 
             val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ThumbnailUtils.createVideoThumbnail(videoFile, context.getScreenSize(), null)
@@ -466,7 +469,7 @@ class GetImageUseCase @Inject constructor(
             }
             bitmap.recycle()
 
-            previewFile.toUri()
+            previewFile.toUri().toString()
         }
 
     /**
@@ -477,7 +480,7 @@ class GetImageUseCase @Inject constructor(
      * @param highPriority  Flag to request image with high priority.
      * @return              Single with generated file uri
      */
-    fun getImageThumbnail(fileName: String, imageUri: Uri, highPriority: Boolean): Single<Uri> =
+    fun getImageThumbnail(fileName: String, imageUri: Uri, highPriority: Boolean): Single<String> =
         Single.create { emitter ->
             val imageFile = imageUri.toFile()
             require(imageFile.exists())
@@ -487,7 +490,7 @@ class GetImageUseCase @Inject constructor(
             requireNotNull(previewFile)
 
             if (previewFile.exists()) {
-                emitter.tryOnSuccess(previewFile.toUri())
+                emitter.tryOnSuccess(previewFile.toUri().toString())
                 return@create
             }
 
@@ -508,7 +511,7 @@ class GetImageUseCase @Inject constructor(
                                 this)
                             close()
                         }
-                        emitter.tryOnSuccess(previewFile.toUri())
+                        emitter.tryOnSuccess(previewFile.toUri().toString())
                     } else {
                         emitter.tryOnError(NullPointerException())
                     }
