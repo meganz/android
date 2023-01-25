@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
+import mega.privacy.android.domain.usecase.contact.InviteContact
 
 /**
  * Contacts module.
@@ -94,4 +95,8 @@ class ContactsModule {
     @Provides
     fun provideGetCurrentUserLastName(contactsRepository: ContactsRepository): GetCurrentUserLastName =
         GetCurrentUserLastName(contactsRepository::getCurrentUserLastName)
+
+    @Provides
+    fun provideInviteContact(contactsRepository: ContactsRepository): InviteContact =
+        InviteContact(contactsRepository::inviteContact)
 }
