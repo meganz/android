@@ -27,6 +27,7 @@ import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
@@ -36,6 +37,7 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
@@ -68,6 +70,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property contactItemMapper        [ContactItemMapper]
  * @property contactDataMapper        [ContactDataMapper]
  * @property contactCredentialsMapper [ContactCredentialsMapper]
+ * @property inviteContactRequestMapper [InviteContactRequestMapper]
  * @property localStorageGateway      [MegaLocalStorageGateway]
  */
 internal class DefaultContactsRepository @Inject constructor(
@@ -83,6 +86,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val contactItemMapper: ContactItemMapper,
     private val contactDataMapper: ContactDataMapper,
     private val contactCredentialsMapper: ContactCredentialsMapper,
+    private val inviteContactRequestMapper: InviteContactRequestMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
 ) : ContactsRepository {
 
@@ -585,6 +589,23 @@ internal class DefaultContactsRepository @Inject constructor(
                         .also { localStorageGateway.saveMyLastName(it) }
             }
         }
+
+    override suspend fun inviteContact(
+        email: String,
+        handle: Long,
+        message: String?,
+    ): InviteContactRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            megaApiGateway.inviteContact(email,
+                handle,
+                message,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _: MegaRequest, error: MegaError ->
+                        continuation.resumeWith(Result.success(inviteContactRequestMapper(error)))
+                    }
+                ))
+        }
+    }
 
     private suspend fun getCurrentUserNameAttribute(attribute: Int): String =
         withContext(ioDispatcher) {

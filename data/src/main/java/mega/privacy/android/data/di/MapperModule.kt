@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.ListViewTypeMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
@@ -106,6 +107,7 @@ import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toDuration
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toInviteContactRequest
 import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
@@ -612,4 +614,10 @@ internal class MapperModule {
     @Provides
     fun provideScannedContactLinkResultMapper(): ScannedContactLinkResultMapper =
         ::toScannedContactLinkResult
+
+    /**
+     * Provides invite contact request mapper
+     */
+    @Provides
+    fun provideInviteContactRequestMapper(): InviteContactRequestMapper = ::toInviteContactRequest
 }

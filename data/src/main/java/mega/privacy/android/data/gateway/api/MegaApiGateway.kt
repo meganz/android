@@ -1183,6 +1183,21 @@ interface MegaApiGateway {
     fun inviteContact(email: String, listener: MegaRequestListenerInterface)
 
     /**
+     * Invite contact
+     *
+     * @param email     User email
+     * @param message   Message
+     * @param handle    User handle
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun inviteContact(
+        email: String,
+        handle: Long,
+        message: String?,
+        listener: MegaRequestListenerInterface
+    )
+
+    /**
      * Get outgoing contact requests
      *
      * @return list of [MegaContactRequest]

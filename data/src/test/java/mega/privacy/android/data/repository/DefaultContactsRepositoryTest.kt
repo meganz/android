@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactDataMapper
 import mega.privacy.android.data.mapper.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
+import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
@@ -23,6 +24,7 @@ import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -34,6 +36,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -55,6 +58,7 @@ class DefaultContactsRepositoryTest {
     private val onlineStatusMapper = mock<OnlineStatusMapper>()
     private val contactItemMapper = mock<ContactItemMapper>()
     private val contactDataMapper = mock<ContactDataMapper>()
+    private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
 
     private val contactCredentialsMapper: ContactCredentialsMapper =
@@ -89,6 +93,7 @@ class DefaultContactsRepositoryTest {
             contactItemMapper = contactItemMapper,
             contactDataMapper = contactDataMapper,
             contactCredentialsMapper = contactCredentialsMapper,
+            inviteContactRequestMapper = inviteContactRequestMapper,
             localStorageGateway = localStorageGateway,
         )
 
@@ -599,4 +604,72 @@ class DefaultContactsRepositoryTest {
             underTest.getCurrentUserLastName(forceRefresh = true)
             verify(megaApiGateway).getUserAttribute(any(), any())
         }
+
+    @Test
+    fun `test that successful invite contact returns Sent enum value`() = runTest {
+
+        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+        val expectedResult = InviteContactRequest.Sent
+
+        whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), mock(), megaError
+            )
+        }
+        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+
+        val result = underTest.inviteContact(userEmail, userHandle, null)
+        assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `test that inviting existing contact returns AlreadyContact enum value`() = runTest {
+
+        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }
+        val expectedResult = InviteContactRequest.AlreadyContact
+
+        whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), mock(), megaError
+            )
+        }
+        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+
+        val result = underTest.inviteContact(userEmail, userHandle, null)
+        assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `test that inviting contact with self email returns InvalidEmail enum value`() = runTest {
+
+        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
+        val expectedResult = InviteContactRequest.InvalidEmail
+
+        whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), mock(), megaError
+            )
+        }
+        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+
+        val result = underTest.inviteContact(userEmail, userHandle, null)
+        assertThat(result).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `test that error on inviting contact returns InvalidStatus enum value`() = runTest {
+
+        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EACCESS) }
+        val expectedResult = InviteContactRequest.InvalidStatus
+
+        whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), mock(), megaError
+            )
+        }
+        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+
+        val result = underTest.inviteContact(userEmail, userHandle, null)
+        assertThat(result).isEqualTo(expectedResult)
+    }
 }

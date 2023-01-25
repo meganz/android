@@ -677,6 +677,19 @@ internal class MegaApiFacade @Inject constructor(
     override fun inviteContact(email: String, listener: MegaRequestListenerInterface) =
         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, listener)
 
+    override fun inviteContact(
+        email: String,
+        handle: Long,
+        message: String?,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.inviteContact(
+        email,
+        message,
+        MegaContactRequest.INVITE_ACTION_ADD,
+        handle,
+        listener
+    )
+
     override fun outgoingContactRequests(): ArrayList<MegaContactRequest> =
         megaApi.outgoingContactRequests
 

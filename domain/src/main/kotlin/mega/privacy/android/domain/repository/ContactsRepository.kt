@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -191,4 +192,13 @@ interface ContactsRepository {
      * @return last name
      */
     suspend fun getCurrentUserLastName(forceRefresh: Boolean): String
+
+    /**
+     * Invite a new contact
+     *
+     * @param email Email of the new contact
+     * @param handle Handle of the contact
+     * @param message Message for the user (can be NULL)
+     */
+    suspend fun inviteContact(email: String, handle: Long, message: String?): InviteContactRequest
 }
