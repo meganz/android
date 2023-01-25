@@ -1245,7 +1245,7 @@ private fun ParticipantsPermissionView(participant: ChatParticipant) {
  */
 @Composable
 private fun ManageChatHistorySubtitle(seconds: Long) {
-    var text = transformSecondsInString(seconds)
+    var text = formatRetentionTimeInSecondsToString(seconds)
     if (text.isNotEmpty()) {
         text =
             stringResource(R.string.subtitle_properties_manage_chat) + " " + text
@@ -1273,12 +1273,12 @@ private fun ChatNotificationSubtitle(seconds: Long) {
 /**
  * Get appropriate String from the seconds of retention time.
  *
- * @param seconds   The retention time in seconds
- * @return          The right text
+ * @param seconds  The retention time in seconds
+ * @return         The formatted text
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun transformSecondsInString(seconds: Long): String {
+fun formatRetentionTimeInSecondsToString(seconds: Long): String {
     if (seconds == Constants.DISABLED_RETENTION_TIME)
         return ""
 

@@ -3,10 +3,12 @@ package test.mega.privacy.android.app.presentation.meeting
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
+import mega.privacy.android.app.presentation.meeting.view.formatRetentionTimeInSecondsToString
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import org.junit.Rule
 import org.junit.Test
@@ -253,6 +255,94 @@ class ScheduledMeetingInfoViewTest {
         )
         composeRule.onNodeWithText(R.string.add_participants_menu_item)
             .assertExists()
+    }
+
+    @Test
+    fun `test that format retention time 0 seconds`() {
+        val seconds: Long = 0
+        val expectedResult = ""
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 60 seconds`() {
+        val seconds: Long = 60
+        val expectedResult = ""
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 3600 seconds`() {
+        val seconds: Long = 3600
+        val expectedResult = "1 hour"
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 86400 seconds`() {
+        val seconds: Long = 86400
+        val expectedResult = "1 day"
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 604800 seconds`() {
+        val seconds: Long = 604800
+        val expectedResult = "1 week"
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 1209600 seconds`() {
+        val seconds: Long = 1209600
+        val expectedResult = "2 weeks"
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 2592000 seconds`() {
+        val seconds: Long = 2592000
+        val expectedResult = "1 month"
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
+    }
+
+    @Test
+    fun `test that format retention time 31536000 seconds`() {
+        val seconds: Long = 31536000
+        val expectedResult = "1 year"
+        composeRule.setContent {
+            formatRetentionTimeInSecondsToString(seconds = seconds).let {
+                Truth.assertThat(it).isEqualTo(expectedResult)
+            }
+        }
     }
 
     private fun getScheduledMeetingItem(): ScheduledMeetingItem =
