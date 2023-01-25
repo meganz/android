@@ -4134,6 +4134,8 @@
         <item quantity="one">Removed %d item from “%s”</item>
         <item quantity="other">Removed %d items from “%s”</item>
     </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Resume video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -4142,6 +4144,4 @@
     <string name="video_playback_position_dialog_resume_button">Resume</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Restart</string>
-    <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
 </resources>

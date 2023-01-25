@@ -119,10 +119,10 @@
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
     <plurals name="general_num_shared_with">
-        <item quantity="one">Отправлено %1$s контакту</item>
-        <item quantity="few">Отправлено %1$d контактам</item>
-        <item quantity="many">Отправлено %1$d контактам</item>
-        <item quantity="other">Отправлено %1$d контактам</item>
+        <item quantity="one">Доступно %1$d контакту</item>
+        <item quantity="few">Доступно %1$d контактам</item>
+        <item quantity="many">Доступно %1$d контактам</item>
+        <item quantity="other">Доступно %1$d контактам</item>
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file">%s будет скачан.</string>
@@ -143,7 +143,7 @@
     <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
     <string name="abc">АБВ</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
-    <string name="new_to_mega">Впервые на MEGA?</string>
+    <string name="new_to_mega">Впервые в MEGA?</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account">Зарегистрироваться</string>
     <!-- when the user tries to log in MEGA without typing the email -->
@@ -1574,8 +1574,6 @@
     <string name="result_paragraph_info_achievement_add_phone">Вы получили %1$s места на диске за подтверждение телефонного номера.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">При регистрации вы получаете %1$s места на диске в качестве бонуса.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Бонус истекает через %1$d д.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Поделиться папкой</item>
@@ -3779,22 +3777,6 @@
     <string name="payment_methods">Способы оплаты</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Продолжить</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">ежемесячный Pro&#160;Lite</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">ежегодный Pro&#160;Lite</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">ежемесячный Pro&#160;I</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">ежегодный Pro&#160;I</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">ежемесячный Pro&#160;II</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">ежегодный Pro&#160;II</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">ежемесячный Pro&#160;III</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">ежегодный Pro&#160;III</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Лишить прав организатора</string>
     <!-- Title message of existing subscription dialog -->
@@ -4362,4 +4344,28 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Описание</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Удалить из альбома?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Чтобы включить загрузку из камеры, предоставьте MEGA доступ к фотографиям и другим медиафайлам на вашем устройстве.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Открыть доступ</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Не разрешать</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">Из «%s» удалён # элемент</item>
+        <item quantity="few">Из «%s» удалено %d элемента</item>
+        <item quantity="many">Из «%s» удалено %d элементов</item>
+        <item quantity="other">Из «%s» удалено %d элемента</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Продожить видео?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s продолжится с %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Продолжить</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Перезапуск</string>
 </resources>

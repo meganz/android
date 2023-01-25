@@ -1540,8 +1540,6 @@
     <string name="result_paragraph_info_achievement_add_phone">Vous avez reçu %1$s d’espace de stockage pour avoir confirmé votre numéro de téléphone.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Vous avez reçu %1$s d’espace de stockage comme prime gratuite d’inscription.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">La prime arrivera à expiration dans %1$d jours</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Partager un dossier</item>
@@ -3681,22 +3679,6 @@
     <string name="payment_methods">Modes de paiement</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Procéder au paiement</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">mensuel Pro&#160;Lite</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">annuel Pro&#160;Lite</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">mensuel Pro&#160;I</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">annuel Pro&#160;I</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">mensuel Pro&#160;II</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">annuel Pro&#160;II</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">mensuel Pro&#160;III</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">annuel Pro&#160;III</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Supprimer comme hôte</string>
     <!-- Title message of existing subscription dialog -->
@@ -4228,9 +4210,9 @@
     <!--Title of the fingerprint verification screen-->
     <string name="shared_items_verify_credentials_contact_verification_title">Confirmation du contact</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Grâce au chiffrement à connaissance nulle, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts avec qui vous partagez des renseignements avant qu’ils n’accèdent aux dossiers partagés.</string>
+    <string name="shared_items_verify_credentials_header_outgoing">Grâce au chiffrement à divulgation nulle de connaissance, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts avec qui vous partagez des renseignements avant qu’ils n’accèdent aux dossiers partagés.</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">Grâce au chiffrement à connaissance nulle, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts dont vous recevez des renseignements avant que vous n’accédiez aux dossiers partagés.</string>
+    <string name="shared_items_verify_credentials_header_incoming">Grâce au chiffrement à divulgation nulle de connaissance, nous protégeons vos données. Pour garantir une protection supplémentaire, nous vous demandons de confirmer les contacts dont vous recevez des renseignements avant que vous n’accédiez aux dossiers partagés.</string>
     <!--Header message located at the top of "My credentials" section-->
     <string name="shared_items_verify_credentials_information">Pour confirmer un contact, assurez-vous que le numéro d’identification que vous voyez ci-dessus correspond au numéro d’identification de leur compte. Vous pouvez demander à votre contact de partager son numéro d’identification avec vous.</string>
     <!--Undecrypted folder label-->
@@ -4251,4 +4233,27 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Description</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Supprimer de l’album ?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Pour activer les Téléversements de l’appareil photo, veuillez accorder à MEGA l’accès à vos photos et aux autres médias de votre appareil.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Accorder l’accès</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Ne pas accorder</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">%d&#160;élément a été supprimé de «&#160;%s&#160;»</item>
+        <item quantity="many">%d d’éléments ont été supprimés de «&#160;%s&#160;»</item>
+        <item quantity="other">%d&#160;éléments ont été supprimés de «&#160;%s&#160;»</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">Réunion unique</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Reprendre la vidéo ?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s reprendra à %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Reprendre</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Redémarrer</string>
 </resources>

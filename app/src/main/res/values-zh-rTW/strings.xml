@@ -187,7 +187,7 @@
     <!-- Warning dialog -->
     <string name="error_enter_userlastname">請輸入您的姓氏。</string>
     <!-- when creating the account -->
-    <string name="error_passwords_dont_match">密碼不匹配</string>
+    <string name="error_passwords_dont_match">密碼不相符</string>
     <!-- when creating the account -->
     <string name="error_email_registered">此電子郵件已在MEGA註冊過</string>
     <!--  -->
@@ -305,7 +305,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_cancel">請輕觸以取消</string>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_show">查看傳輸</string>
+    <string name="download_touch_to_show">檢視傳輸</string>
     <!-- Warning message -->
     <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。因此您的下載可能會失敗。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -383,7 +383,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">重新發送邀請</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">邀請已成功發送給%s。可在已發送邀請分頁查看。</string>
+    <string name="context_contact_request_sent">邀請已成功發送給%s。可在已發送邀請分頁中檢視。</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">聯絡人已移除</string>
     <!-- error message -->
@@ -523,9 +523,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">允許收到MEGA來電通知</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">請授權MEGA於通話時顯示在其它應用程式上層的權限。</string>
+    <string name="ask_for_display_over_msg">請授予MEGA於通話時顯示在其它應用程式上層的權限。</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">您仍然可以在裝置設定裡手動允許權限。</string>
+    <string name="ask_for_display_over_explain">您仍然可以在裝置設定裡手動授予權限。</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">只在WiFi連線</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -854,7 +854,7 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">刪除照片</string>
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">您所填寫的金鑰與此帳戶不相符。請確認您所使用的還原金鑰是正確的，並再試一次。</string>
+    <string name="incorrect_MK">您提供的金鑰與此帳戶不相符。請確認您所使用的還原金鑰是正確的，並再試一次。</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">無效的還原金鑰</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
@@ -1267,13 +1267,13 @@
         <item quantity="other">%1$d個檔案</item>
     </plurals>
     <!-- Menu option -->
-    <string name="general_view">查看檔案</string>
+    <string name="general_view">檢視檔案</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">匯入</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">新增至雲端硬碟</string>
     <!-- Menu option -->
-    <string name="general_view_contacts">查看聯絡人</string>
+    <string name="general_view_contacts">檢視聯絡人</string>
     <!-- Menu option -->
     <string name="import_success_error">發生錯誤，無法新增至雲端硬碟</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1379,7 +1379,7 @@
     <!-- Confirmation before deleting one attachment -->
     <string name="confirmation_delete_one_attachment">要移除附加檔案嗎？</string>
     <!-- Menu option -->
-    <string name="general_view_with_revoke">查看檔案（%1$d已刪除）</string>
+    <string name="general_view_with_revoke">檢視檔案（%1$d已刪除）</string>
     <!-- Error message when the attachment cannot be sent -->
     <string name="error_attaching_node_from_cloud">發生錯誤。未能發送檔案</string>
     <!-- Error message when the attachment cannot be revoked -->
@@ -1419,13 +1419,13 @@
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">對話訊息通知</string>
     <!-- title of the section for achievements -->
-    <string name="achievements_title">成就</string>
+    <string name="achievements_title">獎勵</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀請朋友以獲得獎勵</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">每一筆成功的推薦邀請可獲得%1$s儲存空間。有效期為365天。</string>
+    <string name="figures_achievements_text_referrals">每一筆成功的推薦邀請可獲得%1$s儲存空間。有效期限365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s儲存空間。有效期為365天。</string>
+    <string name="figures_achievements_text">%1$s儲存空間。有效期限365天。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">已解鎖的獎勵</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1472,8 +1472,6 @@
     <string name="result_paragraph_info_achievement_add_phone">您已經因為驗證您的手機號碼而獲得%1$s儲存空間獎勵。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">獎勵將在%1$d天過期</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">共享資料夾</item>
@@ -1976,7 +1974,7 @@
     <!-- When the user tries to reproduce a file through streaming and ocurred an error creating it -->
     <string name="error_streaming">嘗試建立串流時發生錯誤</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
-    <string name="context_restore">恢復</string>
+    <string name="context_restore">還原</string>
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">恢復至%s</string>
     <!-- error message when a node was restore from Rubbish bin -->
@@ -2390,7 +2388,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">啟用通話</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">開啟對您通訊錄的存取權限</string>
+    <string name="allow_acces_contact_title">授予對您通訊錄的存取權限</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">輕易的在您通訊錄中找到有在使用MEGA的聯絡人。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2780,7 +2778,7 @@
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">總是儲存在此位置？</string>
     <!-- Action to show any file in its location -->
-    <string name="view_in_folder_label">在資料夾中查看</string>
+    <string name="view_in_folder_label">在資料夾中檢視</string>
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">瀏覽檔案</string>
     <!-- Title of the File Provider activity -->
@@ -3122,7 +3120,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">在背景中播放</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">自動備份相片與影片到您的MEGA雲端硬碟。</string>
+    <string name="enable_cu_subtitle">自動將您的相片與影片備份到您的雲端硬碟。</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">全部</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3144,9 +3142,9 @@
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">變更伺服器</string>
     <!-- Show line numbers action -->
-    <string name="action_show_line_numbers">顯示行號</string>
+    <string name="action_show_line_numbers">顯示行數</string>
     <!-- Hide line numbers action -->
-    <string name="action_hide_line_numbers">隱藏行號</string>
+    <string name="action_hide_line_numbers">隱藏行數</string>
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
@@ -3454,7 +3452,7 @@
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_action_confirm">請輸入“%1s”確認此操作</string>
     <!-- when checking the input -->
-    <string name="error_backup_confirm_dont_match">輸入的文字不符</string>
+    <string name="error_backup_confirm_dont_match">輸入的文字不相符</string>
     <!-- The title of confirm dialog for adding item to "My backup" -->
     <string name="backup_add_confirm_title">新增項目到“%1s”</string>
     <!-- The title of warning dialog for adding item to "My backup" -->
@@ -3485,22 +3483,6 @@
     <string name="payment_methods">付款方式</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">繼續</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite月方案</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite年方案</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I月方案</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I年方案</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II月方案</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II年方案</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III月方案</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III年方案</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人權限</string>
     <!-- Title message of existing subscription dialog -->
@@ -3988,7 +3970,7 @@
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
     <string name="cloud_drive_media_discovery_banner_ok">好的，明白了</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_share_meeting_link_panel_title">知道此連結的任何人都可以加入會議並查看會議對話。</string>
+    <string name="scheduled_meetings_share_meeting_link_panel_title">知道此連結的任何人都可以加入會議並檢視會議對話。</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
     <string name="scheduled_meetings_meeting_link_copied">連結已複製到剪貼簿</string>
     <!-- Message after selected albums are deleted. -->
@@ -4012,7 +3994,7 @@
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
     <string name="shared_items_verify_credentials_header_incoming">我們使用零知識加密保護您的資料。為確保額外的安全性，我們要求您驗證您從之接收資訊的聯絡人，然後您才能存取共享資料夾。</string>
     <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相匹配。您可以要求對方分享他們的憑證給您。</string>
+    <string name="shared_items_verify_credentials_information">若要驗證您的聯絡人，請確定您在上面看到的憑證與他們的帳戶憑證相符。您可以要求對方分享他們的憑證給您。</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未解密資料夾]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
@@ -4025,9 +4007,29 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">正在準備檔案預覽</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="other">獎勵將在%1$d天後到期</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">說明</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">要從相簿中移除嗎？</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">若要啟用相機上傳，請授予MEGA存取您裝置上的相片和其它媒體的權限。</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">授予權限</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">不要授予</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="other">已從「%s」移除%d個項目</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">一次性會議</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">繼續觀看</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s將從%2$s繼續播放</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">繼續</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">重頭播放</string>
 </resources>

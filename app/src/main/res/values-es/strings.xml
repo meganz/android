@@ -1540,8 +1540,6 @@
     <string name="result_paragraph_info_achievement_add_phone">Has obtenido %1$s de espacio de almacenamiento por verificar tu número de teléfono.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Has obtenido %1$s de espacio de almacenamiento por haberte registrado.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">El bono caducará en %1$d días</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Compartir carpeta</item>
@@ -2116,7 +2114,7 @@
     <!-- Title of the screen New Group -->
     <string name="title_new_group">Nuevo grupo</string>
     <!-- Subtitle of the screen New Group -->
-    <string name="subtitle_new_group">Escribe el nombre del grupo</string>
+    <string name="subtitle_new_group">Introducir el nombre del grupo</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
     <string name="hint_type_group">Nombra tu grupo</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -2734,7 +2732,7 @@
     <!-- Explanation of the dialog shown to share a chat link -->
     <string name="copy_link_explanation">Las personas pueden unirse a tu grupo usando este enlace.</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
-    <string name="enter_group_name">Escribe el nombre del grupo</string>
+    <string name="enter_group_name">Introducir el nombre del grupo</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
     <string name="alert_enter_group_name">Para crear un enlace del chat, debes ponerle nombre al grupo.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
@@ -3681,22 +3679,6 @@
     <string name="payment_methods">Métodos de pago</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Continuar</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite mensual</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite anual</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I mensual</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I anual</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II mensual</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II anual</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III mensual</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III anual</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Desasignar como anfitrión</string>
     <!-- Title message of existing subscription dialog -->
@@ -4134,7 +4116,7 @@
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]Fecha de renovación:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
-    <string name="photos_album_creation_dialog_title">Escribe el nombre del álbum</string>
+    <string name="photos_album_creation_dialog_title">Introduce el nombre del álbum</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">Nuevo álbum</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
@@ -4251,4 +4233,27 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descripción</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">¿Eliminar del álbum?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Para activar las subidas desde la cámara, permite a MEGA acceder a tus fotos y vídeos entu dispositivo.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Permitir acceso</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">No permitir</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">Se ha eliminado %d elemento de “%s”</item>
+        <item quantity="many">Se han eliminado %d elementos de “%s”</item>
+        <item quantity="other">Se han eliminado %d elementos de “%s”</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Resume video?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Reanudar</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Reiniciar</string>
 </resources>
