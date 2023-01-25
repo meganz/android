@@ -1418,9 +1418,9 @@ class FileBrowserFragment : RotatableFragment() {
     private fun selectNewlyAddedNodes() {
         val positions =
             (requireActivity() as ManagerActivity).getPositionsList(fileBrowserViewModel.state.value.nodes)
-                .takeUnless { it.isEmpty() }
+                .takeUnless { it.isEmpty() } ?: return
         activateActionMode()
-        positions?.forEach {
+        positions.forEach {
             if (isMultipleselect) {
                 adapter?.toggleSelection(it)
             }
@@ -1429,7 +1429,7 @@ class FileBrowserFragment : RotatableFragment() {
         if (selectedNodes?.isNotEmpty() == true) {
             updateActionModeTitle()
         }
-        recyclerView?.scrollToPosition(positions?.minOrNull() ?: 0)
+        recyclerView?.scrollToPosition(positions.minOrNull() ?: 0)
     }
 
     private var nodePosition = 0
