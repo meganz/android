@@ -142,22 +142,21 @@ class MeetingDataViewHolder(
         }
     }
 
-    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable? =
-        if (!letter.isNullOrBlank()) {
-            TextDrawable.builder()
-                .beginConfig()
-                .width(itemView.resources.getDimensionPixelSize(R.dimen.image_group_size))
-                .height(itemView.resources.getDimensionPixelSize(R.dimen.image_group_size))
-                .fontSize(itemView.resources.getDimensionPixelSize(R.dimen.image_group_text_size))
-                .withBorder(itemView.resources.getDimensionPixelSize(R.dimen.image_group_border_size))
-                .borderColor(ContextCompat.getColor(itemView.context, R.color.white_dark_grey))
-                .bold()
-                .toUpperCase()
-                .endConfig()
-                .buildRound(letter, avatarColor ?: defaultAvatarColor)
-        } else {
-            null
-        }
+    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable =
+        TextDrawable.builder()
+            .beginConfig()
+            .width(itemView.resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .height(itemView.resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .fontSize(itemView.resources.getDimensionPixelSize(R.dimen.image_group_text_size))
+            .withBorder(itemView.resources.getDimensionPixelSize(R.dimen.image_group_border_size))
+            .borderColor(ContextCompat.getColor(itemView.context, R.color.white_dark_grey))
+            .bold()
+            .toUpperCase()
+            .endConfig()
+            .buildRound(
+                if (letter.isNullOrEmpty()) "U" else letter,
+                avatarColor ?: defaultAvatarColor
+            )
 
     fun getItemDetails(): ItemDetailsLookup.ItemDetails<Long> =
         object : ItemDetailsLookup.ItemDetails<Long>() {

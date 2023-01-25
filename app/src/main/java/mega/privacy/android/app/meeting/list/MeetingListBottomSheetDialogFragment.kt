@@ -48,6 +48,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
     }
 
+    private val defaultAvatarColor by lazy {
+        ContextCompat.getColor(requireContext(), R.color.grey_012_white_012)
+    }
+
     private lateinit var binding: BottomSheetMeetingDetailBinding
 
     private val chatId by lazy {
@@ -192,24 +196,21 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             .show()
     }
 
-    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable? =
-        if (!letter.isNullOrBlank()) {
-            TextDrawable.builder()
-                .beginConfig()
-                .width(resources.getDimensionPixelSize(R.dimen.image_group_size))
-                .height(resources.getDimensionPixelSize(R.dimen.image_group_size))
-                .fontSize(resources.getDimensionPixelSize(R.dimen.image_group_text_size))
-                .withBorder(resources.getDimensionPixelSize(R.dimen.image_group_border_size))
-                .borderColor(ContextCompat.getColor(requireContext(), R.color.white_dark_grey))
-                .bold()
-                .toUpperCase()
-                .endConfig()
-                .buildRound(letter,
-                    avatarColor ?: ContextCompat.getColor(requireContext(),
-                        R.color.grey_012_white_012))
-        } else {
-            null
-        }
+    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable =
+        TextDrawable.builder()
+            .beginConfig()
+            .width(resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .height(resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .fontSize(resources.getDimensionPixelSize(R.dimen.image_group_text_size))
+            .withBorder(resources.getDimensionPixelSize(R.dimen.image_group_border_size))
+            .borderColor(ContextCompat.getColor(requireContext(), R.color.white_dark_grey))
+            .bold()
+            .toUpperCase()
+            .endConfig()
+            .buildRound(
+                if (letter.isNullOrEmpty()) "U" else letter,
+                avatarColor ?: defaultAvatarColor
+            )
 
     /**
      * Custom show method to avoid showing the same dialog multiple times
