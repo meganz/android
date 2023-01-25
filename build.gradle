@@ -71,7 +71,7 @@ ext {
     compileSdkVersion = 33
     minSdkVersion = 24
     targetSdkVersion = 33
-    buildToolsVerion = '31.0.0'
+    buildToolsVerion = '33.0.1'
 
     // Prebuilt MEGA SDK version
     megaSdkVersion = '20230125.021304-rel'
