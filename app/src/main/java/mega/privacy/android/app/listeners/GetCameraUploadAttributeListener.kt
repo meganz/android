@@ -60,6 +60,7 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
         if (request.type == MegaRequest.TYPE_GET_ATTR_USER
             || request.paramType == MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER
         ) {
+            Timber.d("onRequestFinish errorCode: ${error.errorCode}")
             when (error.errorCode) {
                 MegaError.API_OK -> {
                     val handles = getCUHandles(request)
@@ -72,7 +73,7 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
                 }
                 MegaError.API_ENOENT -> {
                     // Happens when both Primary and Secondary folders are not set
-                    Timber.d("First time setting Camera Upload Attributes")
+                    Timber.w("First time setting Camera Upload Attributes")
                     CameraUploadUtil.initCUFolderFromScratch(context, false)
                     // TODO Move call here after this class is use case
                     (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(
@@ -81,7 +82,7 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
                     )
                 }
                 else -> {
-                    Timber.w("Get Camera Upload Attributes FAIL, Error Code: ${error.errorCode}, ${error.errorString}")
+                    Timber.e("Get Camera Upload Attributes Failed, Error Code: ${error.errorCode}, ${error.errorString}. Stopping Camera Uploads")
                     JobUtil.fireStopCameraUploadJob(context)
                 }
             }
@@ -119,28 +120,33 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
      * @param isSecondary Is the handle Secondary
      */
     private fun handle(handle: Long, isSecondary: Boolean) {
+        Timber.d("Handle: $handle, isSecondary = $isSecondary")
         var shouldStopCameraUpload = false
         if (isNodeInRubbishOrDeleted(handle)) {
-            Timber.d("Folder in rubbish bin, is secondary: %s", isSecondary)
+            Timber.w("Folder in rubbish bin, is secondary: %s", isSecondary)
             CameraUploadUtil.initCUFolderFromScratch(context, isSecondary)
         } else {
             shouldStopCameraUpload =
                 CameraUploadUtil.compareAndUpdateLocalFolderAttribute(handle, isSecondary)
             // stop CameraUpload if destination has changed
             if (shouldStopCameraUpload) {
+                Timber.e("Camera Uploads folder destination has changed. Stopping Camera Uploads")
                 JobUtil.fireStopCameraUploadJob(context)
             }
             CameraUploadUtil.forceUpdateCameraUploadFolderIcon(isSecondary, handle)
         }
         if (!shouldStopCameraUpload) {
+            Timber.d("Camera Uploads should not be stopped")
             if (!isSecondary) {
                 // Primary is set first, camera upload will not get started, do not call a start service worker
                 // TODO Move call here after this class is use case
+                Timber.d("Call onGetPrimaryFolderAttribute with handle: $handle")
                 (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(handle, false)
             } else {
                 // Secondary is set after primary, camera upload will get started
                 // TODO pass isPrimaryHandleSynced = true as intent extra and call start service worker
                 // TODO Move call here after this class is use case
+                Timber.d("Call onGetSecondaryFolderAttribute with handle $handle")
                 (context as? CameraUploadsService)?.onGetSecondaryFolderAttribute(handle)
             }
         }

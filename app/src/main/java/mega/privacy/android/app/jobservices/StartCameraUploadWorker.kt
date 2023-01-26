@@ -2,6 +2,7 @@ package mega.privacy.android.app.jobservices
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Worker
@@ -13,6 +14,9 @@ import mega.privacy.android.app.jobservices.CameraUploadsService.Companion.EXTRA
 import mega.privacy.android.app.utils.JobUtil.IS_PRIMARY_HANDLE_SYNC_DONE
 import mega.privacy.android.app.utils.JobUtil.SHOULD_IGNORE_ATTRIBUTES
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import timber.log.Timber
 
@@ -21,7 +25,7 @@ import timber.log.Timber
  * Starts if:
  * 1. The service is not already running
  * 2. The storage is not over quota
- * 3. The app has READ_EXTERNAL_STORAGE permission
+ * 3. The app has denied the Media Permissions
  */
 @HiltWorker
 class StartCameraUploadWorker @AssistedInject constructor(
@@ -43,13 +47,21 @@ class StartCameraUploadWorker @AssistedInject constructor(
         val isPrimaryHandleSynced = inputData.getBoolean(IS_PRIMARY_HANDLE_SYNC_DONE, false)
         return try {
             val isOverQuota = jobUtilWrapper.isOverQuota()
-            val permissions = arrayOf(
-                permissionUtilWrapper.getImagePermissionByVersion(),
-                permissionUtilWrapper.getVideoPermissionByVersion()
-            )
-            val hasReadPermission = permissionUtilWrapper.hasPermissions(appContext, *permissions)
-            Timber.d("isOverQuota: $isOverQuota, hasStoragePermission: $hasReadPermission, isRunning: ${cameraUploadsServiceWrapper.isServiceRunning()}, ignoreAttributes: $ignoreAttributes")
-            if (!cameraUploadsServiceWrapper.isServiceRunning() && !isOverQuota && hasReadPermission) {
+            val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                arrayOf(
+                    getNotificationsPermission(),
+                    getImagePermissionByVersion(),
+                    getVideoPermissionByVersion()
+                )
+            } else {
+                arrayOf(
+                    getImagePermissionByVersion(),
+                    getVideoPermissionByVersion()
+                )
+            }
+            val hasMediaPermissions = permissionUtilWrapper.hasPermissions(appContext, *permissions)
+            Timber.d("isOverQuota: $isOverQuota, hasMediaPermissions: $hasMediaPermissions, isRunning: ${cameraUploadsServiceWrapper.isServiceRunning()}, ignoreAttributes: $ignoreAttributes")
+            if (!cameraUploadsServiceWrapper.isServiceRunning() && !isOverQuota && hasMediaPermissions) {
                 val newIntent = Intent(appContext, CameraUploadsService::class.java)
                 newIntent.putExtra(EXTRA_IGNORE_ATTR_CHECK, ignoreAttributes)
                 newIntent.putExtra(EXTRA_PRIMARY_SYNC_SUCCESS, isPrimaryHandleSynced)
