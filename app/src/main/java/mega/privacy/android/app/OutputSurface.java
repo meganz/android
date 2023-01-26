@@ -13,6 +13,8 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
+import mega.privacy.android.data.compression.video.TextureRender;
+
 /**
  * Holds state associated with a Surface used for MediaCodec decoder output.
  * <p>
