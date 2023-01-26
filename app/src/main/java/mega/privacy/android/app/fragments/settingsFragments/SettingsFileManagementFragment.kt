@@ -225,13 +225,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
      * Method for reset the version information.
      */
     fun resetVersionsInfo() {
-        val text = StringResourcesUtils.getQuantityString(
-            R.plurals.settings_file_management_file_versions_subtitle,
-            0,
-            0,
-            "0 B"
-        )
-        fileVersionsFileManagement?.summary = text
+        viewModel.resetVersionsInfo()
         clearVersionsFileManagement?.let {
             preferenceScreen.removePreference(it)
         }
