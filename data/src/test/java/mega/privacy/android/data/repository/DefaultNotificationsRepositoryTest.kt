@@ -8,8 +8,11 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.NodeProvider
+import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
 import mega.privacy.android.data.mapper.UserAlertContactProvider
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -39,12 +42,13 @@ class DefaultNotificationsRepositoryTest {
     private lateinit var underTest: NotificationsRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val eventMapper = mock<EventMapper>()
     private val userHandle = 12L
     private val email = "email"
 
     private val userAlertsMapper: UserAlertMapper =
-        { alert: MegaUserAlert, contactProvider: UserAlertContactProvider, _: NodeProvider ->
+        { alert: MegaUserAlert, contactProvider: UserAlertContactProvider, _: UserAlertScheduledMeetingProvider, _: NodeProvider ->
             val contact = contactProvider(userHandle, alert.email)
             ContactChangeContactEstablishedAlert(
                 id = 12L,
@@ -55,14 +59,17 @@ class DefaultNotificationsRepositoryTest {
             )
         }
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
+    private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
 
     @Before
     fun setUp() {
         underTest = DefaultNotificationsRepository(
             megaApiGateway = megaApiGateway,
+            megaChatApiGateway = megaChatApiGateway,
             userAlertsMapper = userAlertsMapper,
             eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
+            chatScheduledMeetingMapper = chatScheduledMeetingMapper,
             dispatcher = UnconfinedTestDispatcher(),
         )
     }

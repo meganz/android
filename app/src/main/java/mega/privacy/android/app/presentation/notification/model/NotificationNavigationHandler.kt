@@ -31,4 +31,11 @@ interface NotificationNavigationHandler {
      *
      */
     fun navigateToContactRequests()
+
+    /**
+     * Navigate to chat section
+     *
+     * @param chatId
+     */
+    fun moveToChatSection(chatId: Long)
 }

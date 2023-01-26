@@ -4893,6 +4893,7 @@ public class ManagerActivity extends TransfersManagementActivity
         navigateToSettingsActivity(TargetPreference.StartScreen.INSTANCE);
     }
 
+    @Override
     public void moveToChatSection(long idChat) {
         if (idChat != -1) {
             Intent intent = new Intent(this, ChatActivity.class);

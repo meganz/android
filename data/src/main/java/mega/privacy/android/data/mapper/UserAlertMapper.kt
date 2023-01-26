@@ -5,10 +5,12 @@ import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.ContactChangeDeletedYouAlert
+import mega.privacy.android.domain.entity.DeletedScheduledMeetingAlert
 import mega.privacy.android.domain.entity.DeletedShareAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactCancelledAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactReminderAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
+import mega.privacy.android.domain.entity.NewScheduledMeetingAlert
 import mega.privacy.android.domain.entity.NewShareAlert
 import mega.privacy.android.domain.entity.NewSharedNodesAlert
 import mega.privacy.android.domain.entity.PaymentFailedAlert
@@ -24,20 +26,34 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAle
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 /**
  * Map [MegaUserAlert] to [UserAlert]
  */
-typealias UserAlertMapper = @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaUserAlert, @JvmSuppressWildcards UserAlertContactProvider, @JvmSuppressWildcards NodeProvider) -> @JvmSuppressWildcards UserAlert
+typealias UserAlertMapper = @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaUserAlert, @JvmSuppressWildcards UserAlertContactProvider, @JvmSuppressWildcards UserAlertScheduledMeetingProvider, @JvmSuppressWildcards NodeProvider) -> @JvmSuppressWildcards UserAlert
 
 
 /**
  * Provide the [Contact] associated with an alert
  */
 typealias UserAlertContactProvider = suspend (@JvmSuppressWildcards Long, @JvmSuppressWildcards String?) -> @JvmSuppressWildcards Contact
+
+/**
+ * Provide the Scheduled meeting associated with an alert
+ */
+typealias UserAlertScheduledMeetingProvider = suspend (@JvmSuppressWildcards Long, @JvmSuppressWildcards Long) -> @JvmSuppressWildcards ChatScheduledMeeting?
 
 
 typealias NodeProvider = suspend (@JvmSuppressWildcards Long) -> @JvmSuppressWildcards MegaNode?
@@ -52,6 +68,7 @@ typealias NodeProvider = suspend (@JvmSuppressWildcards Long) -> @JvmSuppressWil
 internal suspend fun toUserAlert(
     megaUserAlert: MegaUserAlert,
     contactProvider: UserAlertContactProvider,
+    scheduledMeetingProvider: UserAlertScheduledMeetingProvider,
     nodeProvider: NodeProvider,
 ): UserAlert {
     val createdTimeIndex: Long = 0
@@ -286,6 +303,125 @@ internal suspend fun toUserAlert(
                 path = megaUserAlert.path,
             )
         }
+        MegaUserAlert.TYPE_SCHEDULEDMEETING_NEW -> {
+            val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
+            NewScheduledMeetingAlert(
+                id = megaUserAlert.id,
+                seen = megaUserAlert.seen,
+                createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                isOwnChange = megaUserAlert.isOwnChange,
+                chatId = megaUserAlert.nodeHandle,
+                title = meeting?.title ?: megaUserAlert.title,
+                email = megaUserAlert.email,
+                startDate = meeting?.startDateTime,
+                endDate = meeting?.endDateTime,
+            )
+        }
+        MegaUserAlert.TYPE_SCHEDULEDMEETING_DELETED -> {
+            val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
+            DeletedScheduledMeetingAlert(
+                id = megaUserAlert.id,
+                seen = megaUserAlert.seen,
+                createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                isOwnChange = megaUserAlert.isOwnChange,
+                chatId = megaUserAlert.nodeHandle,
+                title = meeting?.title ?: megaUserAlert.title,
+                email = megaUserAlert.email,
+                startDate = meeting?.startDateTime,
+                endDate = meeting?.endDateTime,
+            )
+        }
+        MegaUserAlert.TYPE_SCHEDULEDMEETING_UPDATED -> {
+            val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
+            when {
+                megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_TITLE) -> {
+                    UpdatedScheduledMeetingTitleAlert(
+                        id = megaUserAlert.id,
+                        seen = megaUserAlert.seen,
+                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                        isOwnChange = megaUserAlert.isOwnChange,
+                        chatId = megaUserAlert.nodeHandle,
+                        title = megaUserAlert.updatedTitle[1],
+                        email = megaUserAlert.email,
+                        startDate = meeting?.startDateTime,
+                        endDate = meeting?.endDateTime,
+                        oldTitle = megaUserAlert.updatedTitle[0]
+                    )
+                }
+                megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_DESCRIPTION) -> {
+                    UpdatedScheduledMeetingDescriptionAlert(
+                        id = megaUserAlert.id,
+                        seen = megaUserAlert.seen,
+                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                        isOwnChange = megaUserAlert.isOwnChange,
+                        chatId = megaUserAlert.nodeHandle,
+                        title = meeting?.title ?: megaUserAlert.title,
+                        email = megaUserAlert.email,
+                        startDate = meeting?.startDateTime,
+                        endDate = meeting?.endDateTime,
+                    )
+                }
+                megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_STARTDATE) or
+                        megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_ENDDATE) -> {
+                    val dateTimeChanges = megaUserAlert.getDateTimeChanges()
+                    UpdatedScheduledMeetingDateTimeAlert(
+                        id = megaUserAlert.id,
+                        seen = megaUserAlert.seen,
+                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                        isOwnChange = megaUserAlert.isOwnChange,
+                        chatId = megaUserAlert.nodeHandle,
+                        title = meeting?.title ?: megaUserAlert.title,
+                        email = megaUserAlert.email,
+                        startDate = megaUserAlert.updatedStartDate?.get(1)
+                            ?: meeting?.startDateTime,
+                        endDate = megaUserAlert.updatedEndDate?.get(1)
+                            ?: meeting?.endDateTime,
+                        hasDateChanged = dateTimeChanges.first,
+                        hasTimeChanged = dateTimeChanges.second,
+                    )
+                }
+                megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_CANCELLED) -> {
+                    UpdatedScheduledMeetingCancelAlert(
+                        id = megaUserAlert.id,
+                        seen = megaUserAlert.seen,
+                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                        isOwnChange = megaUserAlert.isOwnChange,
+                        chatId = megaUserAlert.nodeHandle,
+                        title = meeting?.title ?: megaUserAlert.title,
+                        email = megaUserAlert.email,
+                        startDate = meeting?.startDateTime,
+                        endDate = meeting?.endDateTime,
+                    )
+                }
+                megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_RULES) or
+                        megaUserAlert.hasSchedMeetingChanged(MegaUserAlert.SM_CHANGE_TYPE_TIMEZONE) -> {
+                    UpdatedScheduledMeetingFieldsAlert(
+                        id = megaUserAlert.id,
+                        seen = megaUserAlert.seen,
+                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                        isOwnChange = megaUserAlert.isOwnChange,
+                        chatId = megaUserAlert.nodeHandle,
+                        title = meeting?.title ?: megaUserAlert.title,
+                        email = megaUserAlert.email,
+                        startDate = meeting?.startDateTime,
+                        endDate = meeting?.endDateTime,
+                    )
+                }
+                else -> {
+                    UpdatedScheduledMeetingFieldsAlert(
+                        id = megaUserAlert.id,
+                        seen = megaUserAlert.seen,
+                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                        isOwnChange = megaUserAlert.isOwnChange,
+                        chatId = megaUserAlert.nodeHandle,
+                        title = meeting?.title ?: megaUserAlert.title,
+                        email = megaUserAlert.email,
+                        startDate = meeting?.startDateTime,
+                        endDate = meeting?.endDateTime,
+                    )
+                }
+            }
+        }
         else -> {
             UnknownAlert(
                 id = megaUserAlert.id,
@@ -313,7 +449,6 @@ private suspend fun getRootNodeId(
         if (it.isFile) it.parentHandle else it.handle
     }
 
-
 private fun getChildNodes(megaUserAlert: MegaUserAlert) =
     mutableListOf<Long>().apply {
         var i = 0L
@@ -325,3 +460,18 @@ private fun getChildNodes(megaUserAlert: MegaUserAlert) =
     }
 
 private fun Long.isValid() = this != -1L
+
+private fun MegaUserAlert.getDateTimeChanges(): Pair<Boolean, Boolean> {
+    val oldStartDateTime = updatedStartDate?.get(0)?.toZonedDateTime() ?: return false to false
+    val oldEndDateTime = updatedEndDate?.get(0)?.toZonedDateTime() ?: return false to false
+    val newStartDateTime = updatedStartDate.get(1).toZonedDateTime()
+    val newEndDateTime = updatedEndDate.get(1).toZonedDateTime()
+    val hasDateChanged = !newStartDateTime.toLocalDate().isEqual(oldStartDateTime.toLocalDate()) ||
+            !newEndDateTime.toLocalDate().isEqual(oldEndDateTime.toLocalDate())
+    val hasTimeChanged = newStartDateTime.toLocalTime() != oldStartDateTime.toLocalTime() ||
+            newEndDateTime.toLocalTime() != oldEndDateTime.toLocalTime()
+    return hasDateChanged to hasTimeChanged
+}
+
+private fun Long.toZonedDateTime(): ZonedDateTime =
+    ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)

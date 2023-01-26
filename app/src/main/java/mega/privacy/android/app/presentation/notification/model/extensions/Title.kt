@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
 import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
+import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
 import mega.privacy.android.domain.entity.UnknownAlert
@@ -160,6 +161,9 @@ internal fun UserAlert.title(): (Context) -> CharSequence = when (this) {
             this.contact.getNicknameStringOrEmail(context),
             this.itemCount
         ).spanABTextFontColour(context)
+    }
+    is ScheduledMeetingAlert -> { _ ->
+        this.title
     }
     is UnknownAlert -> { _ ->
         this.title ?: ""

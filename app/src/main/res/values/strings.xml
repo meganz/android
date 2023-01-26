@@ -3915,8 +3915,6 @@
     <string name="chat_recent_list_empty_action">Start chatting now</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat securely and privately, with anyone and on any device, knowing that no one can read your chats, not even MEGA.</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Archive meeting</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Start meeting now</string>
     <!-- Label for call option on settings -->
@@ -4009,8 +4007,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]Renewal date:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Enter album name</string>
     <!-- Album creation input name placeholder -->
@@ -4144,4 +4140,18 @@
     <string name="video_playback_position_dialog_resume_button">Resume</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Restart</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s [/A][B]cancelled the meeting scheduled for:[/B]</string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s [/A][B]updated the meeting name from “%s” to [/B]“[A]%s[/A]“</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s [/A][B]updated the meeting date[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s [/A][B]updated the meeting time[/B]</string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s [/A][B]updated the meeting description[/B]</string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s [/A][B]updated the meeting details scheduled for:[/B]</string>
 </resources>

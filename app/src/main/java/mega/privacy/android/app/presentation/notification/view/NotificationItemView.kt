@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,13 +63,17 @@ internal fun NotificationItemView(
 
         NotificationSectionRow(notification)
 
-        val showDescription = notification.description(LocalContext.current) != null
+        val showDescription = !notification.description(LocalContext.current).isNullOrBlank()
         NotificationTitleRow(showDescription, notification)
 
         if (showDescription) {
             NotificationDescription(notification)
         }
 
+        val chatDateText = notification.chatDateText(LocalContext.current)
+        if (!chatDateText.isNullOrBlank()) {
+            NotificationChatDate(chatDateText)
+        }
         NotificationDate(notification)
 
         val horizontalPadding =
@@ -201,6 +206,19 @@ private fun NotificationDescription(
 }
 
 @Composable
+private fun NotificationChatDate(dateText: AnnotatedString) {
+    Text(text = dateText,
+        modifier = Modifier
+            .padding(start = 16.dp, top = 2.dp)
+            .testTag("ChatDateText"),
+        color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
+        style = MaterialTheme.typography.caption,
+        fontSize = 12.sp,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis)
+}
+
+@Composable
 private fun NotificationDate(
     notification: Notification,
 ) {
@@ -213,7 +231,6 @@ private fun NotificationDate(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis)
 }
-
 
 @Composable
 private fun NotificationDivider(horizontalPadding: Int) {
@@ -239,6 +256,7 @@ private fun PreviewNotificationItemView() {
         titleMaxWidth = { 200 },
         description = { "xyz@gmail.com is now a contact" },
         descriptionMaxWidth = { 300 },
+        chatDateText = { AnnotatedString("Tue, 30 Jun, 2022 • 10:00 - 11:00") },
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,
         backgroundColor = { "#D3D3D3" },

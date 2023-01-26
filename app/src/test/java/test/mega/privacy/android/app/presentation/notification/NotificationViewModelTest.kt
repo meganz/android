@@ -82,6 +82,7 @@ class NotificationViewModelTest {
             backgroundColor = { "#D3D3D3" },
             separatorMargin = { 0 },
             onClick = {},
+            chatDateText = { null },
         )
 
         val alert = mock<UserAlert>()
@@ -114,6 +115,7 @@ class NotificationViewModelTest {
             backgroundColor = { "#D3D3D3" },
             separatorMargin = { 0 },
             onClick = {},
+            chatDateText = { null },
         )
         val newNotification = initialNotification.copy(title = {"New title"})
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)

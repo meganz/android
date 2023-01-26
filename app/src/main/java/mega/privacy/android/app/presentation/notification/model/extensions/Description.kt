@@ -10,22 +10,33 @@ import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.ContactChangeDeletedYouAlert
+import mega.privacy.android.domain.entity.DeletedScheduledMeetingAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactCancelledAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactReminderAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
+import mega.privacy.android.domain.entity.NewScheduledMeetingAlert
+import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
 
 /**
  * Description
  *
  */
-internal fun UserAlert.description() =
-    (this as? ContactAlert)?.getDescriptionFunction() ?: { null }
+internal fun UserAlert.description(): (Context) -> CharSequence? =
+    when (this) {
+        is ContactAlert -> getDescriptionFunction()
+        is ScheduledMeetingAlert -> getDescriptionFunction()
+        else -> { _ -> null }
+    }
 
 /**
  * Get description id
@@ -57,5 +68,63 @@ private fun ContactAlert.getDescriptionFunction(): (Context) -> CharSequence? =
         this.getDescriptionId()?.let {
             context.getFormattedStringOrDefault(it,
                 this.contact.getNicknameStringOrEmail(context)).spanABTextFontColour(context)
+        }
+    }
+
+/**
+ * Get description function
+ *
+ */
+private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSequence? =
+    { context ->
+        when (this) {
+            is NewScheduledMeetingAlert -> {
+                context.getFormattedStringOrDefault(
+                    R.string.notification_subtitle_scheduled_meeting_new,
+                    email
+                ).spanABTextFontColour(context)
+            }
+            is DeletedScheduledMeetingAlert -> {
+                context.getFormattedStringOrDefault(
+                    R.string.notification_subtitle_scheduled_meeting_canceled,
+                    email
+                ).spanABTextFontColour(context)
+            }
+            is UpdatedScheduledMeetingTitleAlert -> {
+                context.getFormattedStringOrDefault(
+                    R.string.notification_subtitle_scheduled_meeting_updated_title,
+                    email,
+                    oldTitle,
+                    title
+                ).spanABTextFontColour(context)
+            }
+            is UpdatedScheduledMeetingDescriptionAlert -> {
+                context.getFormattedStringOrDefault(
+                    R.string.notification_subtitle_scheduled_meeting_updated_description,
+                    email
+                ).spanABTextFontColour(context)
+            }
+            is UpdatedScheduledMeetingDateTimeAlert -> {
+                if (hasDateChanged) {
+                    context.getFormattedStringOrDefault(
+                        R.string.notification_subtitle_scheduled_meeting_updated_date,
+                        email
+                    ).spanABTextFontColour(context)
+                } else {
+                    context.getFormattedStringOrDefault(
+                        R.string.notification_subtitle_scheduled_meeting_updated_time,
+                        email
+                    ).spanABTextFontColour(context)
+                }
+            }
+            is UpdatedScheduledMeetingFieldsAlert -> {
+                context.getFormattedStringOrDefault(
+                    R.string.notification_subtitle_scheduled_meeting_updated_multiple,
+                    email
+                ).spanABTextFontColour(context)
+            }
+            else -> {
+                null
+            }
         }
     }
