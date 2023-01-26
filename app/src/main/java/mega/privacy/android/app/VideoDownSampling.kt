@@ -11,6 +11,7 @@ import android.media.MediaMuxer
 import android.view.Surface
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
+import mega.privacy.android.data.compression.video.InputSurface
 import mega.privacy.android.domain.entity.VideoQuality
 import timber.log.Timber
 import java.io.File
