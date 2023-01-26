@@ -392,11 +392,25 @@ interface MegaLocalStorageGateway {
     suspend fun setUserHasLoggedIn()
 
     /**
+     * Get always ask for storage state
+     *
+     * @return isStorageAskAlways as [Boolean]
+     */
+    suspend fun getStorageAskAlways(): Boolean
+
+    /**
      * Set to always ask for storage
      *
      * @param isStorageAskAlways
      */
     suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+
+    /**
+     * Get storage download location
+     *
+     * @return storageDownloadLocation path as [String]
+     */
+    suspend fun getStorageDownloadLocation(): String?
 
     /**
      * Set storage download location

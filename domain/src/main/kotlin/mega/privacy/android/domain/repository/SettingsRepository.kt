@@ -124,6 +124,13 @@ interface SettingsRepository {
     suspend fun setChargingOnSize(size: Int)
 
     /**
+     * Get always ask for storage value
+     *
+     * @return isStorageAskAlways as [Boolean]
+     */
+    suspend fun getStorageDownloadAskAlways(): Boolean
+
+    /**
      * Set to always ask for storage
      *
      * @param isStorageAskAlways
@@ -134,6 +141,13 @@ interface SettingsRepository {
      * Set the default storage download location
      */
     suspend fun setDefaultStorageDownloadLocation()
+
+    /**
+     * Get Storage download location
+     *
+     * @return storageDownloadLocation as File Path
+     */
+    suspend fun getStorageDownloadLocation(): String?
 
     /**
      * Set Storage download location

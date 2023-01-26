@@ -214,6 +214,10 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setChargingOnSize(size)
     }
 
+    override suspend fun getStorageDownloadAskAlways(): Boolean {
+        return megaLocalStorageGateway.getStorageAskAlways()
+    }
+
     override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) =
         megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
 
@@ -223,6 +227,9 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
     }
 
+    override suspend fun getStorageDownloadLocation(): String? {
+        return megaLocalStorageGateway.getStorageDownloadLocation()
+    }
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =
         megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
