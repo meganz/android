@@ -142,7 +142,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         }
         intent?.extras?.let { extras ->
             if (nodeHandle == MegaApiJava.INVALID_HANDLE) {
-                nodeHandle = extras.getLong("handle")
+                nodeHandle = extras.getLong(Constants.HANDLE)
             }
             node = megaApi.getNodeByHandle(nodeHandle)
             node?.let {

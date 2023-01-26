@@ -153,6 +153,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     public static final String EXTRA_CONTACT_TYPE = "contactType";
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
     public static final String EXTRA_IS_START_CONVERSATION = "isStartConversation";
+    public static final String EXTRA_MULTISELECT = "MULTISELECT";
 
     private DisplayMetrics outMetrics;
 
@@ -1548,7 +1549,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             onlyCreateGroup = getIntent().getBooleanExtra(EXTRA_ONLY_CREATE_GROUP, false);
             isStartConversation = getIntent().getBooleanExtra(EXTRA_IS_START_CONVERSATION, false);
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
-                multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
+                multipleSelectIntent = getIntent().getIntExtra(EXTRA_MULTISELECT, -1);
                 if (multipleSelectIntent == 0) {
                     nodeHandle = getIntent().getLongExtra(EXTRA_NODE_HANDLE, -1);
                 } else if (multipleSelectIntent == 1) {
@@ -3099,10 +3100,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contactsSelected);
         if (multipleSelectIntent == 0) {
             intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
-            intent.putExtra("MULTISELECT", 0);
+            intent.putExtra(EXTRA_MULTISELECT, 0);
         } else if (multipleSelectIntent == 1) {
             intent.putExtra(EXTRA_NODE_HANDLE, nodeHandles);
-            intent.putExtra("MULTISELECT", 1);
+            intent.putExtra(EXTRA_MULTISELECT, 1);
         }
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
