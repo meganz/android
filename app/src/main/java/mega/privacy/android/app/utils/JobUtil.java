@@ -62,8 +62,6 @@ public class JobUtil {
 
     private static final String CANCEL_UPLOADS_TAG = "CANCEL_UPLOADS_TAG";
 
-    private static final String HANDLE_ATTRIBUTES_TAG = "HANDLE_ATTRIBUTES_TAG";
-
     /**
      * Schedule job of camera upload
      *
@@ -206,6 +204,32 @@ public class JobUtil {
             Timber.d("JobUtil: rescheduleCameraUpload()");
             scheduleCameraUploadJob(context);
         }, CU_RESCHEDULE_INTERVAL);
+    }
+
+    /**
+     * Restart Camera Uploads by executing {@link StopCameraUploadWorker} and {@link StartCameraUploadWorker}
+     * sequentially through Work Chaining
+     *
+     * @param context The Context to enqueue work
+     * @param shouldIgnoreAttributes Whether to start Camera Uploads without checking User Attributes
+     */
+    public static synchronized void fireRestartCameraUploadJob(Context context, Boolean shouldIgnoreAttributes) {
+        OneTimeWorkRequest stopCameraUploadRequest = new OneTimeWorkRequest.Builder(StopCameraUploadWorker.class)
+                .addTag(STOP_CAMERA_UPLOAD_TAG)
+                .build();
+        OneTimeWorkRequest startCameraUploadRequest = new OneTimeWorkRequest.Builder(StartCameraUploadWorker.class)
+                .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                .setInputData(new Data.Builder()
+                        .putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes)
+                        .putBoolean(IS_PRIMARY_HANDLE_SYNC_DONE, false)
+                        .build()
+                )
+                .build();
+
+        WorkManager.getInstance(context)
+                .beginWith(stopCameraUploadRequest)
+                .then(startCameraUploadRequest)
+                .enqueue();
     }
 
     /**

@@ -16,13 +16,13 @@ class DefaultSetupPrimaryFolderTest {
     private lateinit var underTest: SetupPrimaryFolder
     private val invalidHandle = -1L
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>() {
+    private val cameraUploadRepository = mock<CameraUploadRepository> {
         onBlocking {
             getInvalidHandle()
         }.thenReturn(invalidHandle)
     }
-    private val startCameraUpload = mock<StartCameraUpload>()
     private val stopCameraUpload = mock<StopCameraUpload>()
+    private val restartCameraUpload = mock<RestartCameraUpload>()
     private val resetPrimaryTimeline = mock<ResetPrimaryTimeline>()
     private val updateFolderIconBroadcast = mock<UpdateFolderIconBroadcast>()
     private val updateFolderDestinationBroadcast = mock<UpdateFolderDestinationBroadcast>()
@@ -31,8 +31,8 @@ class DefaultSetupPrimaryFolderTest {
     fun setUp() {
         underTest = DefaultSetupPrimaryFolder(
             cameraUploadRepository = cameraUploadRepository,
-            startCameraUpload = startCameraUpload,
             stopCameraUpload = stopCameraUpload,
+            restartCameraUpload = restartCameraUpload,
             resetPrimaryTimeline = resetPrimaryTimeline,
             updateFolderIconBroadcast = updateFolderIconBroadcast,
             updateFolderDestinationBroadcast = updateFolderDestinationBroadcast
@@ -49,8 +49,7 @@ class DefaultSetupPrimaryFolderTest {
             verify(cameraUploadRepository).setPrimaryFolderHandle(result)
             verify(cameraUploadRepository).setPrimarySyncHandle(result)
             verify(updateFolderIconBroadcast).invoke(result, false)
-            verify(stopCameraUpload).invoke()
-            verify(startCameraUpload).invoke(true)
+            verify(restartCameraUpload).invoke(shouldIgnoreAttributes = true)
             verify(updateFolderDestinationBroadcast).invoke(result, false)
         }
 

@@ -774,9 +774,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         runCatching {
             val state = canRunCameraUploads()
             if (state == StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS) {
+                Timber.d("Calling startWorker() successful. Starting Camera Uploads")
                 hideLocalFolderPathNotifications()
                 startCameraUploads()
             } else {
+                Timber.w("Calling startWorker() failed. Proceed to handle error")
                 handleFailedStartCameraUploadsState(state)
             }
         }.onFailure { exception ->
@@ -838,6 +840,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * @param state The failing [StartCameraUploadsState]
      */
     private suspend fun handleFailedStartCameraUploadsState(state: StartCameraUploadsState) {
+        Timber.w("Start Camera Uploads Error state: $state")
         when (state) {
             StartCameraUploadsState.MISSING_PREFERENCES,
             StartCameraUploadsState.DISABLED_SYNC,
@@ -846,23 +849,29 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             StartCameraUploadsState.MISSING_LOCAL_PATH,
             StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT,
             -> {
+                Timber.e("Stop Camera Uploads due to $state")
                 endService()
             }
             StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER -> {
+                Timber.e("Local Primary Folder is disabled. Stop Camera Uploads")
                 handleLocalPrimaryFolderDisabled()
                 endService()
             }
             StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER -> {
+                Timber.e("Local Secondary Folder is disabled. Stop Camera Uploads")
                 handleLocalSecondaryFolderDisabled()
                 endService()
             }
             StartCameraUploadsState.LOGGED_OUT_USER -> {
+                Timber.w("User is logged out. Perform a Complete Fast Login")
                 performCompleteFastLogin()
             }
             StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
+                Timber.w("Handle the missing Camera Uploads user attribute")
                 handleMissingCameraUploadsUserAttribute()
             }
             StartCameraUploadsState.UNESTABLISHED_FOLDERS -> {
+                Timber.w("Primary and/or Secondary Folders do not exist. Establish the folders")
                 establishFolders()
             }
             else -> Unit
@@ -905,9 +914,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      *
      * @return true if the User is online, and false if otherwise
      */
+    @Suppress("DEPRECATION")
     private fun isUserOnline(): Boolean =
         Util.isOnline(applicationContext).also {
-            if (!it) Timber.w("User is not online")
+            if (!it) Timber.w("User is offline")
         }
 
     /**
@@ -917,7 +927,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun hasCameraUploadsLocalPath(): Boolean =
         !localPath().isNullOrBlank().also {
-            if (!it) Timber.w("Camera Uploads local path is empty")
+            if (it) Timber.w("Camera Uploads local path is empty")
         }
 
     /**
@@ -1286,9 +1296,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         val transfer = globalTransfer.transfer
         val error = globalTransfer.error
 
-        Timber.d("Image Sync Finished, Error Code: ${error.errorCode}, " +
-                "Image Handle: ${transfer.nodeHandle}, " +
-                "Image Size: ${transfer.transferredBytes}"
+        Timber.d(
+            "Image Sync Finished, Error Code: ${error.errorCode}, " +
+                    "Image Handle: ${transfer.nodeHandle}, " +
+                    "Image Size: ${transfer.transferredBytes}"
         )
         try {
             coroutineScope?.launch {
@@ -1454,7 +1465,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             Timber.d("Start CameraUploadsService")
             startWorker()
         } else {
-            Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}")
+            Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}. Stop CameraUploadsService")
             endService()
         }
     }
@@ -1525,6 +1536,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private suspend fun setupPrimaryFolder() {
         val primaryHandle = getPrimaryFolderHandle().also {
+            Timber.d("Primary Handle retrieved from getPrimaryFolderHandle(): $it ")
             setPrimarySyncHandle(it)
         }
         // isCreatingPrimary is a flag that prevents creating a duplicate Primary Folder
@@ -1551,6 +1563,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun createAndSetupPrimaryUploadFolder() {
         primaryFolderCreationJob = coroutineScope?.launch {
             createCameraUploadFolder(getString(R.string.section_photo_sync))?.let {
+                Timber.d("Primary Folder successfully created with handle $it. Setting up Primary Folder")
                 setupPrimaryFolder(it)
             } ?: endService()
         }
@@ -1641,7 +1654,11 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     fun onGetPrimaryFolderAttribute(handle: Long, shouldStart: Boolean) {
         isPrimaryHandleSynced = true
         coroutineScope?.launch {
-            if (getPrimarySyncHandle() != handle) {
+            Timber.d("Current Handle: $handle, Should Start Camera Uploads Worker: $shouldStart")
+            val primarySyncHandle = getPrimarySyncHandle()
+            Timber.d("Primary Sync Handle: $primarySyncHandle")
+            if (primarySyncHandle != handle) {
+                Timber.w("Current and Primary Sync Handles are not equal. Set Primary Sync Handle to Current Handle $handle")
                 setPrimarySyncHandle(handle)
             }
             if (shouldStart) {
@@ -1704,9 +1721,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
                 node?.let { nonNullNode ->
-                    onUploadSuccess(node = nonNullNode, isSecondary = record.isSecondary)
-                    handleSetOriginalFingerprint(node = nonNullNode,
-                        originalFingerprint = record.originFingerprint.orEmpty())
+                    onUploadSuccess(
+                        node = nonNullNode,
+                        isSecondary = record.isSecondary,
+                    )
+                    handleSetOriginalFingerprint(
+                        node = nonNullNode,
+                        originalFingerprint = record.originFingerprint.orEmpty(),
+                    )
                     record.latitude?.let { latitude ->
                         record.longitude?.let { longitude ->
                             megaApi.setNodeCoordinates(
@@ -2007,7 +2029,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             message = getString(R.string.download_preparing_files)
         } else {
             val inProgress = if (pendingTransfers == 0) {
-                totalTransfers - pendingTransfers
+                totalTransfers
             } else {
                 totalTransfers - pendingTransfers + 1
             }

@@ -125,6 +125,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -228,6 +229,25 @@ abstract class CameraUploadUseCases {
             jobUtilWrapper.fireCameraUploadJob(
                 context,
                 shouldIgnoreAttributes
+            )
+        }
+
+        /**
+         * Provides the [RestartCameraUpload] implementation
+         *
+         * @param jobUtilWrapper [JobUtilWrapper]
+         * @param context [Context]
+         *
+         * @return [RestartCameraUpload]
+         */
+        @Provides
+        fun provideRestartCameraUpload(
+            jobUtilWrapper: JobUtilWrapper,
+            @ApplicationContext context: Context,
+        ): RestartCameraUpload = RestartCameraUpload { shouldIgnoreAttributes ->
+            jobUtilWrapper.fireRestartCameraUploadJob(
+                context = context,
+                shouldIgnoreAttributes = shouldIgnoreAttributes,
             )
         }
 
