@@ -27,7 +27,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
@@ -89,27 +88,28 @@ class DefaultAlbumRepositoryTest {
     }
 
     @Test
-    fun `test that addPhotosToAlbum invokes the createSetElement api function for each photoID`() =
+    fun `test that addPhotosToAlbum triggers adding sharing progress`() =
         runTest {
             val testAlbumId = AlbumId(1L)
             val testPhotos = listOf(NodeId(1L), NodeId(2L))
 
+            whenever(megaApiGateway.createSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock {
+                        on { errorCode }.thenReturn(MegaError.API_OK)
+                    }
+                )
+            }
+
             underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
-            for (photo in testPhotos) {
-                verify(megaApiGateway).createSetElement(testAlbumId.id, photo.longValue)
+            underTest.observeAlbumPhotosAddingProgress(testAlbumId).test {
+                val progress = awaitItem()
+                assertThat(progress?.isProgressing).isEqualTo(false)
+                assertThat(progress?.totalAddedPhotos).isEqualTo(testPhotos.size)
             }
-        }
-
-    @Test
-    fun `test that addPhotosToAlbum does not invokes the createSetElement api function if the photos list is empty`() =
-        runTest {
-            val testAlbumId = AlbumId(1L)
-            val testPhoto = emptyList<NodeId>()
-
-            underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhoto)
-
-            verify(megaApiGateway, never()).createSetElement(any(), any())
         }
 
     @Test

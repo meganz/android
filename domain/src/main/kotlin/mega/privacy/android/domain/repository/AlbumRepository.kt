@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
+import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.set.UserSet
 
 /**
@@ -78,4 +79,19 @@ interface AlbumRepository {
      * @return throw exception if the operation fails
      */
     suspend fun removeAlbums(albumIds: List<AlbumId>)
+
+    /**
+     * Observe album photos adding progress
+     *
+     * @param albumId the album id to be observed its photos adding progress
+     * @return a flow of progress
+     */
+    fun observeAlbumPhotosAddingProgress(albumId: AlbumId): Flow<AlbumPhotosAddingProgress?>
+
+    /**
+     * Update to acknowledge album photos adding progress is completed
+     *
+     * @param albumId the album id to be observed its photos adding progress
+     */
+    suspend fun updateAlbumPhotosAddingProgressCompleted(albumId: AlbumId)
 }

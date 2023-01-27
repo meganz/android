@@ -1008,8 +1008,9 @@ interface MegaApiGateway {
      *
      * @param sid the ID of the set
      * @param node the node handle of the node which will be assigned as the set's new element
+     * @param listener MegaRequestListener to track this request
      */
-    suspend fun createSetElement(sid: Long, node: Long)
+    fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface)
 
     /**
      * Remove an element from a set
