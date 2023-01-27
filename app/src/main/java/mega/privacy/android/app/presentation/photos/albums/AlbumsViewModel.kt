@@ -317,12 +317,13 @@ class AlbumsViewModel @Inject constructor(
     }
 
 
-    private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
-        albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
-
-    internal fun getCurrentUIAlbum(): UIAlbum? {
-        val currentAlbum = _state.value.currentAlbum
-        return _state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+    private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? {
+        val currentAlbum = _state.value.currentAlbum ?: return null
+        return if (currentAlbum !is Album.UserAlbum) {
+            albums.find { album -> album.id == currentAlbum }?.id
+        } else {
+            albums.find { album -> (album.id as? Album.UserAlbum)?.id == currentAlbum.id }?.id
+        }
     }
 
     /**

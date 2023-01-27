@@ -239,24 +239,20 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) {
-        addPhotosJob?.cancel()
-        addPhotosJob = viewModelScope.launch {
-            val photoIds = withContext(defaultDispatcher) {
-                val albumPhotoIds = _state.value.albumPhotoIds
-                selectedPhotoIds - albumPhotoIds
-            }
+    fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) = viewModelScope.launch {
+        _state.update {
+            it.copy(isSelectionCompleted = true)
+        }
+
+        val photoIds = withContext(defaultDispatcher) {
+            val albumPhotoIds = _state.value.albumPhotoIds
+            selectedPhotoIds - albumPhotoIds
+        }
+        if (photoIds.isNotEmpty()) {
             addPhotosToAlbum(
                 albumId = album.id,
                 photoIds = photoIds.map { NodeId(it) },
             )
-
-            _state.update {
-                it.copy(
-                    isSelectionCompleted = true,
-                    numCommittedPhotos = photoIds.size,
-                )
-            }
         }
     }
 }

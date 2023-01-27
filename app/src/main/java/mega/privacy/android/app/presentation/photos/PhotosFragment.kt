@@ -600,16 +600,8 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
-        val message =
-            result.data?.getStringExtra(AlbumPhotosSelectionActivity.MESSAGE) // Added 5 items to "Color ️‍🌈"
-        message?.let {
-            if (message.isNotEmpty()) {
-                albumsViewModel.setSnackBarMessage(snackBarMessage = message)
-                albumsViewModel.getCurrentUIAlbum()?.let { UIAlbum ->
-                    openAlbum(album = UIAlbum, resetMessage = false)
-                }
-            }
-        }
+        val uiAlbum = albumsViewModel.state.value.currentUIAlbum ?: return
+        openAlbum(uiAlbum, resetMessage = false)
     }
 
 
