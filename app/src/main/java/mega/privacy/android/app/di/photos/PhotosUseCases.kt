@@ -24,8 +24,10 @@ import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
+import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.DefaultRemoveAlbums
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
+import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
@@ -42,9 +44,11 @@ import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.impl.DefaultRemovePhotosFromAlbumUseCase
 
 @Module
@@ -104,6 +108,12 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindRemovePhotosFromAlbum(useCase: DefaultRemovePhotosFromAlbumUseCase): RemovePhotosFromAlbumUseCase
+
+    @Binds
+    abstract fun bindObserveAlbumPhotosAddingProgress(useCase: DefaultObserveAlbumPhotosAddingProgress): ObserveAlbumPhotosAddingProgress
+
+    @Binds
+    abstract fun bindUpdateAlbumPhotosAddingProgressCompleted(useCase: DefaultUpdateAlbumPhotosAddingProgressCompleted): UpdateAlbumPhotosAddingProgressCompleted
 
     companion object {
         @Provides
