@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultGetVideosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultTrackPlaybackPosition
+import mega.privacy.android.domain.usecase.DeletePlaybackInformation
 import mega.privacy.android.domain.usecase.GetAudioNodes
 import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandle
@@ -194,6 +195,13 @@ abstract class MediaPlayerUseCases {
         @Provides
         fun provideSavePlaybackTimes(mediaPlayerRepository: MediaPlayerRepository): SavePlaybackTimes =
             SavePlaybackTimes(mediaPlayerRepository::savePlaybackTimes)
+
+        /**
+         * Provide implementation for [DeletePlaybackInformation]
+         */
+        @Provides
+        fun provideDeletePlaybackInformation(mediaPlayerRepository: MediaPlayerRepository): DeletePlaybackInformation =
+            DeletePlaybackInformation(mediaPlayerRepository::deletePlaybackInformation)
 
         /**
          * Provide implementation for [GetLocalFolderLinkFromMegaApiFolder]
