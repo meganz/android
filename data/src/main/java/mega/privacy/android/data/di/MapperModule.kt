@@ -33,7 +33,6 @@ import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
-import mega.privacy.android.data.mapper.ListViewTypeMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
@@ -75,6 +74,7 @@ import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.ViewTypeMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -143,8 +143,8 @@ import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
-import mega.privacy.android.domain.entity.preference.ListViewType
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaNode
 
@@ -185,12 +185,12 @@ internal class MapperModule {
     fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
 
     /**
-     * Provide list view type mapper
+     * Provide view type mapper
      *
-     * @return [ListViewTypeMapper]
+     * @return [ViewTypeMapper]
      */
     @Provides
-    fun provideListViewTypeMapper(): ListViewTypeMapper = { ListViewType(it) }
+    fun provideViewTypeMapper(): ViewTypeMapper = { ViewType(it) }
 
     /**
      * Provide user last green mapper

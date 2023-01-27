@@ -41,6 +41,7 @@ import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
@@ -61,6 +62,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -216,5 +218,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindStreamingServerRepository(implementation: StreamingServerRepositoryImpl): StreamingServerRepository
+
+    @Binds
+    abstract fun bindViewTypeRepository(implementation: ViewTypeRepositoryImpl): ViewTypeRepository
 
 }
