@@ -96,6 +96,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.DeletePlaybackInformation
 import mega.privacy.android.domain.usecase.GetAudioNodes
 import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandle
@@ -162,6 +163,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val trackPlaybackPositionUseCase: TrackPlaybackPosition,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimes,
     private val savePlaybackTimesUseCase: SavePlaybackTimes,
+    private val deletePlaybackInformationUseCase: DeletePlaybackInformation,
     private val megaApiFolderHttpServerSetMaxBufferSize: MegaApiFolderHttpServerSetMaxBufferSize,
     private val megaApiFolderHttpServerIsRunning: MegaApiFolderHttpServerIsRunning,
     private val megaApiFolderHttpServerStart: MegaApiFolderHttpServerStart,
@@ -1260,9 +1262,10 @@ class MediaPlayerServiceViewModel @Inject constructor(
         }
     }
 
-    override suspend fun savePlaybackTimes() {
-        savePlaybackTimesUseCase()
-    }
+    override suspend fun savePlaybackTimes() = savePlaybackTimesUseCase()
+
+    override suspend fun deletePlaybackInformation(mediaId: Long) =
+        deletePlaybackInformationUseCase(mediaId)
 
     override fun updateItemName(handle: Long, newName: String) =
         playlistItemsFlow.update {

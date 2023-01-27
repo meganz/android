@@ -150,8 +150,13 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                                         positionInMs?.let { position ->
                                             mediaPlayerGateway.playerSeekToPositionInMs(position)
                                         }
-                                    VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG,
-                                    -> {
+                                    VIDEO_TYPE_RESTART_PLAYBACK_POSITION -> {
+                                        // Remove current playback history, if video type is restart
+                                        lifecycleScope.launch {
+                                            viewModelGateway.deletePlaybackInformation(it.toLong())
+                                        }
+                                    }
+                                    VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG -> {
                                         // Detect the media item whether is transition by comparing
                                         // currentPlayingHandle if is parameter handle
                                         if (currentPlayingHandle != it.toLong()
@@ -172,6 +177,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                                             // If currentPlayHandle is parameter handle and there is
                                             // no playback history, the video is playing after ready
                                             isPlayingAfterReady = true
+                                            // Set playWhenReady to be true to ensure the video is playing after ready
+                                            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                                                setPlayWhenReady(true)
+                                            }
                                         }
                                     }
                                 }
@@ -552,15 +561,19 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     override fun playbackPositionStateUpdate() = showPlaybackPositionDialogUpdate
 
     override fun setRestartPlayVideo() {
-        updateDialogShownStateAndVideoPlayType(VIDEO_PLAY_TYPE_DEFAULT)
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
         // Set playWhenReady to be true, making the video is playing after the restart button is clicked
         if (!mediaPlayerGateway.getPlayWhenReady()) {
             setPlayWhenReady(true)
         }
+        // If the restart button is clicked, remove playback information of current item
+        lifecycleScope.launch {
+            viewModelGateway.deletePlaybackInformation(viewModelGateway.getCurrentPlayingHandle())
+        }
     }
 
     override fun setRestartPlayVideoBeforeBuildSources() {
-        updateDialogShownStateAndVideoPlayType(VIDEO_PLAY_TYPE_DEFAULT)
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
         // Initial video sources after the restart button is clicked
         initVideoSources(mediaPlayerIntent)
     }
@@ -585,18 +598,13 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun cancelPlaybackPositionDialog() {
         updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
-        // Set isPlayingAfterReady to be true, making the video is playing after dialog is dismissed
-        isPlayingAfterReady = true
-        // Set playWhenReady to be true, making the video is playing after the video has been paused
-        if (!mediaPlayerGateway.getPlayWhenReady()) {
-            setPlayWhenReady(true)
-        }
     }
 
     override fun cancelPlaybackPositionDialogBeforeBuildSources() {
         updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
-        isPlayingAfterReady = true
         initVideoSources(mediaPlayerIntent)
+        // If the dialog is cancelled, set PlayWhenReady to be false to paused video after build sources.
+        setPlayWhenReady(false)
     }
 
     /**
@@ -627,8 +635,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         private const val RESUME_DELAY_MS = 500L
 
         private const val VIDEO_TYPE_RESUME_PLAYBACK_POSITION = 123
-        private const val VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG = 124
-        private const val VIDEO_PLAY_TYPE_DEFAULT = 125
+        private const val VIDEO_TYPE_RESTART_PLAYBACK_POSITION = 124
+        private const val VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG = 125
 
         /**
          * The minimum size of single playlist

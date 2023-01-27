@@ -349,6 +349,13 @@ interface PlayerServiceViewModelGateway {
     suspend fun savePlaybackTimes()
 
     /**
+     * Delete playback information
+     *
+     * @param mediaId the media id of deleted item
+     */
+    suspend fun deletePlaybackInformation(mediaId: Long)
+
+    /**
      * Monitor playback times
      *
      * @param mediaId the media id of target media item
