@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -36,6 +37,10 @@ class DefaultMonitorUserUpdatesTest {
         )
     }
 
+    private val isUserLoggedIn = mock<IsUserLoggedIn> {
+        onBlocking { invoke() }.thenReturn(true)
+    }
+
     private val accountRepository = mock<AccountRepository>()
 
     @Before
@@ -43,6 +48,7 @@ class DefaultMonitorUserUpdatesTest {
         underTest = DefaultMonitorUserUpdates(
             getAccountDetails = getAccountDetails,
             accountRepository = accountRepository,
+            isUserLoggedIn = isUserLoggedIn
         )
     }
 
@@ -51,7 +57,8 @@ class DefaultMonitorUserUpdatesTest {
         val expected = UserChanges.Alias
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
-                UserUpdate(mapOf(currentUserId to listOf(expected))
+                UserUpdate(
+                    mapOf(currentUserId to listOf(expected))
                 )
             )
         )
@@ -67,7 +74,8 @@ class DefaultMonitorUserUpdatesTest {
         val expected = UserChanges.Alias
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
-                UserUpdate(mapOf(UserId(currentUserId.id + 1) to listOf(expected))
+                UserUpdate(
+                    mapOf(UserId(currentUserId.id + 1) to listOf(expected))
                 )
             )
         )
@@ -86,7 +94,8 @@ class DefaultMonitorUserUpdatesTest {
         )
         whenever(accountRepository.monitorUserUpdates()).thenReturn(
             flowOf(
-                UserUpdate(mapOf(currentUserId to expected)
+                UserUpdate(
+                    mapOf(currentUserId to expected)
                 )
             )
         )
@@ -100,7 +109,7 @@ class DefaultMonitorUserUpdatesTest {
     }
 
     @Test
-    fun `test that multiple items from multiple events are all returned`() = runTest{
+    fun `test that multiple items from multiple events are all returned`() = runTest {
         val expected1 = listOf(
             UserChanges.Alias,
             UserChanges.CameraUploadsFolder,
@@ -124,6 +133,18 @@ class DefaultMonitorUserUpdatesTest {
                 assertThat(awaitItem()).isEqualTo(it)
             }
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test when user is logged off user info is not returned`() {
+        isUserLoggedIn.stub {
+            onBlocking { invoke() }.thenReturn(false)
+        }
+        runTest {
+            underTest().test {
+                awaitComplete()
+            }
         }
     }
 }
