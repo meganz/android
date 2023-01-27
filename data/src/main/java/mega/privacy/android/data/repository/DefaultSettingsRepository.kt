@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
@@ -358,7 +359,8 @@ internal class DefaultSettingsRepository @Inject constructor(
                 camSyncTimeStamp?.toString(),
                 camVideoSyncTimeStamp?.toString(),
                 secSyncTimeStamp?.toString(),
-                secVideoSyncTimeStamp?.toString())
+                secVideoSyncTimeStamp?.toString()
+            )
         }
     }
 
@@ -412,5 +414,9 @@ internal class DefaultSettingsRepository @Inject constructor(
                 apiFacade.removeRequestListener(listener)
             }
         }
+    }
+
+    override suspend fun buildDefaultDownloadDir(): File {
+        return cacheFolderGateway.buildDefaultDownloadDir()
     }
 }

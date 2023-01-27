@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
+import java.io.File
 
 /**
  * Settings repository - class for handling all calls relating to settings
@@ -405,4 +406,10 @@ interface SettingsRepository {
      * @param enabled
      */
     suspend fun enableFileVersionsOption(enabled: Boolean)
+
+    /**
+     * create a default download location file
+     * @return File path as [File]
+     */
+    suspend fun buildDefaultDownloadDir(): File
 }

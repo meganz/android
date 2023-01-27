@@ -113,8 +113,10 @@ class DownloadSettingsFragment : PreferenceFragmentCompat(),
     private fun toSelectFolder() {
         val intent = Intent(context, FileStorageActivity::class.java)
         intent.action = FileStorageActivity.Mode.PICK_FOLDER.action
-        intent.putExtra(FileStorageActivity.PICK_FOLDER_TYPE,
-            FileStorageActivity.PickFolderType.DOWNLOAD_FOLDER.folderType)
+        intent.putExtra(
+            FileStorageActivity.PICK_FOLDER_TYPE,
+            FileStorageActivity.PickFolderType.DOWNLOAD_FOLDER.folderType
+        )
         startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER)
     }
 }
