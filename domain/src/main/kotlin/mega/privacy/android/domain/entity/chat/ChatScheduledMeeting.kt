@@ -36,10 +36,12 @@ data class ChatScheduledMeeting constructor(
 ) {
 
     /**
-     * Check if Meeting is pending to be started in the future
+     * Check if Meeting is pending to be started or finished
      *
      * @return  true if it's pending, false otherwise
      */
-    fun isPending(): Boolean =
-        (startDateTime ?: 0) > (System.currentTimeMillis() / 1000)
+    fun isPending(): Boolean {
+        val now = System.currentTimeMillis() / 1000
+        return (startDateTime ?: 0) > now || (endDateTime ?: 0) > now
+    }
 }

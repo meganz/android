@@ -101,14 +101,17 @@ class DefaultGetMeetings @Inject constructor(
                 apply {
                     val chatRoom = chatRepository.getCombinedChatRoom(chatCall.chatId) ?: return@apply
                     val currentItemIndex = indexOfFirst { it.chatId == chatCall.chatId }
-                    val updatedItem = get(currentItemIndex).copy(
+                    val currentItem = get(currentItemIndex)
+                    val updatedItem = currentItem.copy(
                         highlight = chatRoom.unreadCount > 0 || chatRoom.isCallInProgress
                                 || chatRoom.lastMessageType == ChatRoomLastMessage.CallStarted,
                         lastTimestamp = chatRoom.lastTimestamp
                     )
 
-                    mutex.withLock { set(currentItemIndex, updatedItem) }
-                    sortMeetings(mutex)
+                    if (currentItem != updatedItem) {
+                        mutex.withLock { set(currentItemIndex, updatedItem) }
+                        sortMeetings(mutex)
+                    }
                 }
             }
 
@@ -137,11 +140,15 @@ class DefaultGetMeetings @Inject constructor(
 
                     val newUpdatedItem = getScheduledMeetingItem(newItem) ?: newItem
                     if (currentItemIndex != -1) {
-                        mutex.withLock { set(currentItemIndex, newUpdatedItem) }
+                        val currentItem = get(currentItemIndex)
+                        if (currentItem != newUpdatedItem) {
+                            mutex.withLock { set(currentItemIndex, newUpdatedItem) }
+                            sortMeetings(mutex)
+                        }
                     } else {
                         mutex.withLock { add(newUpdatedItem) }
+                        sortMeetings(mutex)
                     }
-                    sortMeetings(mutex)
                 }
             }
 
@@ -160,8 +167,10 @@ class DefaultGetMeetings @Inject constructor(
                         isRecurring = currentItem.isRecurring,
                         isPending = isPending,
                     )
-                    mutex.withLock { set(currentItemIndex, updatedItem) }
-                    sortMeetings(mutex)
+                    if (currentItem != updatedItem) {
+                        mutex.withLock { set(currentItemIndex, updatedItem) }
+                        sortMeetings(mutex)
+                    }
                 }
             }
 
@@ -190,21 +199,22 @@ class DefaultGetMeetings @Inject constructor(
         mutex.withLock {
             sortWith(
                 compareByDescending(MeetingRoomItem::isPending)
-                    .thenComparing { meeting1, meeting2 ->
+                    .thenComparing { firstMeeting, secondMeeting ->
                         when {
-                            meeting1.isPending && !meeting2.isPending -> 1
-                            meeting1.isPending && meeting2.isPending -> {
-                                if (meeting1.scheduledStartTimestamp!! > meeting2.scheduledStartTimestamp!!)
-                                    1
-                                else
-                                    -1
-                            }
-                            !meeting1.isPending && !meeting2.isPending -> {
+                            firstMeeting.isPending && !secondMeeting.isPending -> 1
+                            firstMeeting.isPending && secondMeeting.isPending -> {
                                 when {
-                                    meeting1.highlight && !meeting2.highlight -> -1
-                                    !meeting1.highlight && meeting2.highlight -> 1
-                                    meeting1.lastTimestamp > meeting2.lastTimestamp -> -1
-                                    meeting1.lastTimestamp < meeting2.lastTimestamp -> 1
+                                    firstMeeting.scheduledStartTimestamp!! > secondMeeting.scheduledStartTimestamp!! -> 1
+                                    firstMeeting.scheduledStartTimestamp < secondMeeting.scheduledStartTimestamp -> -1
+                                    else -> 0
+                                }
+                            }
+                            !firstMeeting.isPending && !secondMeeting.isPending -> {
+                                when {
+                                    firstMeeting.highlight && !secondMeeting.highlight -> -1
+                                    !firstMeeting.highlight && secondMeeting.highlight -> 1
+                                    firstMeeting.lastTimestamp > secondMeeting.lastTimestamp -> -1
+                                    firstMeeting.lastTimestamp < secondMeeting.lastTimestamp -> 1
                                     else -> 0
                                 }
                             }
