@@ -9,9 +9,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
+import mega.privacy.android.app.presentation.extensions.printEmail
+import mega.privacy.android.app.presentation.extensions.success
 import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScanCodeViewModel @Inject constructor(
     private val queryScannedContactLink: QueryScannedContactLink,
+    private val inviteContact: InviteContact,
 ) : ViewModel() {
 
     /**
@@ -130,6 +134,22 @@ class ScanCodeViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Send invitation to new contact
+     */
+    fun sendInvite() {
+        viewModelScope.launch {
+            val requestStatus = inviteContact(
+                state.value.email ?: "",
+                state.value.scannedContactLinkResult?.handle ?: -1,
+                null
+            )
+            requestStatus.run {
+                showInviteResultDialog(dialogTitle, dialogContent, success, printEmail)
             }
         }
     }

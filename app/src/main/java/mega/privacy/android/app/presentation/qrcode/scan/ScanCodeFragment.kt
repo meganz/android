@@ -32,16 +32,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogAcceptContactBinding
 import mega.privacy.android.app.databinding.DialogInviteBinding
 import mega.privacy.android.app.databinding.FragmentScanCodeBinding
-import mega.privacy.android.app.main.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaContactRequest
 import timber.log.Timber
 import java.util.Locale
-import javax.inject.Inject
 
 /**
  * ScanCodeFragment
@@ -68,10 +63,6 @@ class ScanCodeFragment : Fragment() {
         get() = viewModel.state.value
 
     private var handler: Handler? = null
-
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
@@ -284,17 +275,6 @@ class ScanCodeFragment : Fragment() {
         }
     }
 
-    private fun sendInvitation() {
-        Timber.d("sendInvitation")
-        megaApi.inviteContact(
-            uiState.email,
-            null,
-            MegaContactRequest.INVITE_ACTION_ADD,
-            uiState.scannedContactLinkResult?.handle ?: -1,
-            activity as QRCodeActivity?
-        )
-    }
-
     /**
      * Method to set scanned contact avatar in the dialog
      */
@@ -409,7 +389,7 @@ class ScanCodeFragment : Fragment() {
 
                 acceptContactInvite.setOnClickListener {
                     viewModel.updateInviteShown(false)
-                    sendInvitation()
+                    viewModel.sendInvite()
                     if (inviteAlertDialog != null) {
                         inviteAlertDialog?.dismiss()
                     }

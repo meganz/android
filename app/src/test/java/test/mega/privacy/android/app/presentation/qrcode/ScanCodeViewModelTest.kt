@@ -11,13 +11,17 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -27,6 +31,7 @@ class ScanCodeViewModelTest {
 
     private lateinit var underTest: ScanCodeViewModel
     private val queryScannedContactLink = mock<QueryScannedContactLink>()
+    private val inviteContact = mock<InviteContact>()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -38,7 +43,7 @@ class ScanCodeViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = ScanCodeViewModel(queryScannedContactLink)
+        underTest = ScanCodeViewModel(queryScannedContactLink, inviteContact)
     }
 
     @Test
@@ -244,6 +249,72 @@ class ScanCodeViewModelTest {
                 underTest.queryContactLink(handle)
                 val newValue = awaitItem()
                 assertThat(newValue.email).isEqualTo(expectedEmail)
+                assertThat(newValue.success).isFalse()
+                assertThat(newValue.printEmail).isFalse()
+                assertThat(newValue.showInviteDialog).isFalse()
+                assertThat(newValue.showInviteResultDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that on sending invite and on result Sent show invite result dialog values are updated`() =
+        runTest {
+            whenever(inviteContact(any(), any(), anyOrNull())).thenReturn(InviteContactRequest.Sent)
+            underTest.state.test {
+                awaitItem()
+                underTest.sendInvite()
+                val newValue = awaitItem()
+                assertThat(newValue.success).isTrue()
+                assertThat(newValue.printEmail).isFalse()
+                assertThat(newValue.showInviteDialog).isFalse()
+                assertThat(newValue.showInviteResultDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that on sending invite and on result InvalidEmail show invite result dialog values are updated`() =
+        runTest {
+            whenever(inviteContact(any(), any(), anyOrNull()))
+                .thenReturn(InviteContactRequest.InvalidEmail)
+
+            underTest.state.test {
+                awaitItem()
+                underTest.sendInvite()
+                val newValue = awaitItem()
+                assertThat(newValue.success).isTrue()
+                assertThat(newValue.printEmail).isFalse()
+                assertThat(newValue.showInviteDialog).isFalse()
+                assertThat(newValue.showInviteResultDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that on sending invite and on result AlreadyContact show invite result dialog values are updated`() =
+        runTest {
+            whenever(inviteContact(any(), any(), anyOrNull()))
+                .thenReturn(InviteContactRequest.AlreadyContact)
+
+            underTest.state.test {
+                awaitItem()
+                underTest.sendInvite()
+                val newValue = awaitItem()
+                assertThat(newValue.success).isTrue()
+                assertThat(newValue.printEmail).isTrue()
+                assertThat(newValue.showInviteDialog).isFalse()
+                assertThat(newValue.showInviteResultDialog).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that on sending invite and on result InvalidStatus show invite result dialog values are updated`() =
+        runTest {
+            whenever(inviteContact(any(), any(), anyOrNull()))
+                .thenReturn(InviteContactRequest.InvalidStatus)
+
+            underTest.state.test {
+                awaitItem()
+                underTest.sendInvite()
+                val newValue = awaitItem()
                 assertThat(newValue.success).isFalse()
                 assertThat(newValue.printEmail).isFalse()
                 assertThat(newValue.showInviteDialog).isFalse()

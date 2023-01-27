@@ -49,13 +49,11 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
-import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel;
 import mega.privacy.android.app.presentation.settings.SettingsActivity;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -81,7 +79,6 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
     private TabLayout tabLayoutQRCode;
     private ViewPager viewPagerQRCode;
 
-    private ScanCodeFragment scanCodeFragment;
     private MyCodeFragment myCodeFragment;
 
     private ScanCodeViewModel scanCodeViewModel;
@@ -424,25 +421,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         Timber.d("onRequestFinish ");
-        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT && request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
-            if (scanCodeFragment == null) {
-                Timber.w("ScanCodeFragment is NULL");
-                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
-            }
-            if (scanCodeFragment.isAdded()) {
-                scanCodeViewModel.updateMyEmail(request.getEmail());
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Timber.d("OK INVITE CONTACT: %s", request.getEmail());
-                    scanCodeViewModel.showInviteResultDialog(R.string.invite_sent, R.string.invite_sent_text, true, false);
-                } else if (e.getErrorCode() == MegaError.API_EACCESS) {
-                    scanCodeViewModel.showInviteResultDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_error, false, false);
-                } else if (e.getErrorCode() == MegaError.API_EEXIST) {
-                    scanCodeViewModel.showInviteResultDialog(R.string.invite_not_sent, R.string.invite_not_sent_text_already_contact, true, true);
-                } else if (e.getErrorCode() == MegaError.API_EARGS) {
-                    scanCodeViewModel.showInviteResultDialog(R.string.invite_not_sent, R.string.error_own_email_as_contact, true, false);
-                }
-            }
-        } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
+        if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
             if (myCodeFragment == null) {
                 Timber.w("MyCodeFragment is NULL");
                 myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
