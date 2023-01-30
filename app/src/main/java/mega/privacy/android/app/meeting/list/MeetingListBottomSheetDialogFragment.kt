@@ -128,6 +128,13 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.btnCancel.isVisible = room.isPending
         binding.dividerArchive.isVisible = binding.btnCancel.isVisible
 
+        binding.btnRecurringMeeting.isVisible = room.isRecurring
+        binding.dividerRecurringMeeting.isVisible = room.isRecurring
+
+        binding.btnRecurringMeeting.setOnClickListener {
+            dismissAllowingStateLoss()
+        }
+
         binding.btnInfo.setOnClickListener {
             val intent = if (room.isScheduledMeeting() && room.isActive) {
                 Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
