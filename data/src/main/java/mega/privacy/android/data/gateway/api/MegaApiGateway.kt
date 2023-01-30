@@ -1067,6 +1067,51 @@ interface MegaApiGateway {
     fun removeSet(sid: Long, listener: MegaRequestListenerInterface)
 
     /**
+     * Request to update the name of a Set
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be updated
+     * - MegaRequest::getText - Returns new name of the Set
+     * - MegaRequest::getParamType - Returns OPTION_SET_NAME
+     *
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set with the given id could not be found (before or after the request).
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid      the id of the Set to be updated
+     * @param name     the new name that should be given to the Set
+     * @param listener MegaRequestListener to track this request
+     */
+    fun updateSetName(sid: Long, name: String?, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Request to update the name of a Set
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be updated
+     * - MegaRequest::getText - Returns new name of the Set
+     * - MegaRequest::getParamType - Returns OPTION_SET_NAME
+     *
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set with the given id could not be found (before or after the request).
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid  the id of the Set to be updated
+     * @param name the new name that should be given to the Set
+     */
+    fun updateSetName(sid: Long, name: String?)
+
+    /**
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
@@ -1195,7 +1240,7 @@ interface MegaApiGateway {
         email: String,
         handle: Long,
         message: String?,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     )
 
     /**

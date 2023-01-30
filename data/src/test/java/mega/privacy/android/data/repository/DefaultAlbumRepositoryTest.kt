@@ -299,6 +299,33 @@ class DefaultAlbumRepositoryTest {
         }
     }
 
+    @Test
+    fun `test that rename album then returns the new album name`() = runTest {
+        val api = mock<MegaApiJava>()
+
+        val newName = "newAlbum"
+
+        val request = mock<MegaRequest> {
+            on { text }.thenReturn(newName)
+        }
+
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.updateSetName(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        val actualName = underTest.updateAlbumName(AlbumId(1L), newName)
+
+        assertEquals(newName, actualName)
+    }
+
     private fun createUserSet(
         id: Long,
         name: String,

@@ -94,4 +94,15 @@ interface AlbumRepository {
      * @param albumId the album id to be observed its photos adding progress
      */
     suspend fun updateAlbumPhotosAddingProgressCompleted(albumId: AlbumId)
+
+    /**
+     * Update album name
+     *
+     * @param albumId the album id
+     * @param newName new album name
+     */
+    suspend fun updateAlbumName(
+        albumId: AlbumId,
+        newName: String,
+    ): String
 }

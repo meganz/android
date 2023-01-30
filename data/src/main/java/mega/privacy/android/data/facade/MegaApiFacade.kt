@@ -611,6 +611,12 @@ internal class MegaApiFacade @Inject constructor(
     override fun removeSet(sid: Long, listener: MegaRequestListenerInterface) =
         megaApi.removeSet(sid, listener)
 
+    override fun updateSetName(sid: Long, name: String?, listener: MegaRequestListenerInterface?) =
+        megaApi.updateSetName(sid, name, listener)
+
+    override fun updateSetName(sid: Long, name: String?) =
+        megaApi.updateSetName(sid, name)
+
     override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApi.removeRequestListener(listener)
 
@@ -681,7 +687,7 @@ internal class MegaApiFacade @Inject constructor(
         email: String,
         handle: Long,
         message: String?,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.inviteContact(
         email,
         message,
@@ -760,6 +766,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun cancelTransferByTag(transferTag: Int, listener: MegaRequestListenerInterface?) {
         megaApi.cancelTransferByTag(transferTag, listener)
     }
+
     override fun getContactLink(handle: Long, listener: MegaRequestListenerInterface) {
         megaApi.contactLinkQuery(handle, listener)
     }

@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -167,6 +169,23 @@ internal class DefaultAlbumRepository @Inject constructor(
     override suspend fun updateAlbumPhotosAddingProgressCompleted(albumId: AlbumId) {
         val progressFlow = getAlbumPhotosAddingProgressFlow(albumId)
         progressFlow.tryEmit(null)
+    }
+
+    override suspend fun updateAlbumName(
+        albumId: AlbumId,
+        newName: String,
+    ): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener it.text
+            }
+            megaApiGateway.updateSetName(
+                sid = albumId.id,
+                name = newName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
     }
 
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
