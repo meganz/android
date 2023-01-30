@@ -54,14 +54,17 @@ import mega.privacy.android.core.ui.theme.white
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateNewAlbumDialog(
+    titleResID: Int,
+    positiveButtonTextResID: Int,
     onDismissRequest: () -> Unit = {},
     onDialogPositiveButtonClicked: (name: String, proscribedString: List<String>) -> Unit,
     onDialogInputChange: (Boolean) -> Unit = {},
+    initialInputText: () -> String = { "" },
     inputPlaceHolderText: () -> String = { "" },
     errorMessage: Int? = null,
     isInputValid: () -> Boolean = { true },
 ) {
-    var textState by rememberSaveable { mutableStateOf("") }
+    var textState by rememberSaveable { mutableStateOf(initialInputText()) }
     val isEnabled by remember { mutableStateOf(true) }
     val isError by remember { mutableStateOf(false) }
     val singleLine = true
@@ -119,9 +122,11 @@ fun CreateNewAlbumDialog(
 
     MegaDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        modifier = Modifier.padding(horizontal = 40.dp).widthIn(max = 280.dp),
+        modifier = Modifier
+            .padding(horizontal = 40.dp)
+            .widthIn(max = 280.dp),
         onDismissRequest = onDismissRequest,
-        titleString = stringResource(id = R.string.photos_album_creation_dialog_title),
+        titleString = stringResource(id = titleResID),
         body = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 BasicTextField(
@@ -233,7 +238,7 @@ fun CreateNewAlbumDialog(
                 ),
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_create),
+                    text = stringResource(id = positiveButtonTextResID),
                     color = teal_300
                 )
             }

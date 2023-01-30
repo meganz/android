@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property showDeleteAlbumsConfirmation
  * @property selectedAlbumIds
  * @property showAlbums
+ * @property showRenameDialog
  */
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
@@ -45,6 +46,7 @@ data class AlbumsViewState(
     val showDeleteAlbumsConfirmation: Boolean = false,
     val selectedAlbumIds: Set<AlbumId> = setOf(),
     val showAlbums: Boolean = false,
+    val showRenameDialog: Boolean = false,
 ) {
     val currentUIAlbum: UIAlbum?
         get() {

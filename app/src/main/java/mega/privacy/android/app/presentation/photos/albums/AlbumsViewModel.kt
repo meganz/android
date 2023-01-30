@@ -28,7 +28,6 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
@@ -39,6 +38,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
+import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,6 +59,7 @@ class AlbumsViewModel @Inject constructor(
     private val createAlbum: CreateAlbum,
     private val removeAlbums: RemoveAlbums,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
+    private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -316,6 +317,29 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun updateAlbumName(title: String, proscribedStrings: List<String>) {
+        viewModelScope.launch {
+            try {
+                val finalTitle = title.trim()
+                if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                    val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
+                    updateAlbumNameUseCase(currentAlbumId, finalTitle)
+                    _state.update {
+                        it.copy(
+                            showRenameDialog = false,
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                Timber.e(exception)
+                _state.update {
+                    it.copy(
+                        showRenameDialog = false,
+                    )
+                }
+            }
+        }
+    }
 
     private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? {
         val currentAlbum = _state.value.currentAlbum ?: return null
@@ -496,4 +520,11 @@ class AlbumsViewModel @Inject constructor(
             it.copy(showFilterDialog = showFilterDialog)
         }
     }
+
+    fun showRenameDialog(showRenameDialog: Boolean) {
+        _state.update {
+            it.copy(showRenameDialog = showRenameDialog)
+        }
+    }
+
 }

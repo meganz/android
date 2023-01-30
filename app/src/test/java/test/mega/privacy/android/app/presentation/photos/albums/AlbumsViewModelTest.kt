@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
+import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -60,6 +61,7 @@ class AlbumsViewModelTest {
     private val createAlbum = mock<CreateAlbum>()
     private val removeAlbums = mock<RemoveAlbums>()
     private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
+    private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
 
@@ -79,6 +81,7 @@ class AlbumsViewModelTest {
             createAlbum = createAlbum,
             removeAlbums = removeAlbums,
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
+            updateAlbumNameUseCase = updateAlbumNameUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }

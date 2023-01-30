@@ -69,6 +69,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
+import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -195,6 +196,9 @@ class AlbumDynamicContentFragment : Fragment() {
                                 photos.isNotEmpty()
                         }
                     }
+                    if (!state.showRenameDialog){
+                        managerActivity.setToolbarTitle(getCurrentAlbumTitle())
+                    }
                 }
             }
         }
@@ -284,7 +288,9 @@ class AlbumDynamicContentFragment : Fragment() {
                 }
             }
 
-            Column(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+            Column(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()) {
                 val userAlbum = uiState.currentUserAlbum
                 if (userAlbum != null && contentState.isAddingPhotosProgressCompleted) {
                     val message = pluralStringResource(
@@ -384,6 +390,24 @@ class AlbumDynamicContentFragment : Fragment() {
                     }
                 )
             }
+
+            if (uiState.showRenameDialog) {
+                CreateNewAlbumDialog(
+                    titleResID = R.string.context_rename,
+                    positiveButtonTextResID = R.string.context_rename,
+                    onDismissRequest = {
+                        albumsViewModel.showRenameDialog(showRenameDialog = false)
+                        albumsViewModel.setNewAlbumNameValidity(true)
+                    },
+                    onDialogPositiveButtonClicked = albumsViewModel::updateAlbumName,
+                    onDialogInputChange = albumsViewModel::setNewAlbumNameValidity,
+                    initialInputText = { (uiState.currentAlbum as Album.UserAlbum).title },
+                    errorMessage = uiState.createDialogErrorMessage,
+                ) {
+                    uiState.isInputNameValid
+                }
+            }
+
         }
     }
 
@@ -531,7 +555,8 @@ class AlbumDynamicContentFragment : Fragment() {
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
+        val intent =
+            AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
 
@@ -615,8 +640,7 @@ class AlbumDynamicContentFragment : Fragment() {
                 handleAlbumDeletion()
             }
             R.id.action_menu_rename -> {
-                //TODO
-                Toast.makeText(activity, "Rename is developing...", Toast.LENGTH_SHORT).show()
+                albumsViewModel.showRenameDialog(showRenameDialog = true)
             }
         }
         return super.onOptionsItemSelected(item)
