@@ -73,7 +73,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
     private val expectedFileMegaNode = createMegaNode(false)
     private val expectedFolderMegaNode = createMegaNode(true)
-
+    private val isNodeKetDecrypted = false
     private val expectedMediaId: Long = 1234567
     private val expectedTotalDuration: Long = 200000
     private val expectedCurrentPosition: Long = 16000
@@ -290,7 +290,8 @@ class DefaultMediaPlayerRepositoryTest {
         isIncomingShare = expectedIncomingShare,
         isShared = expectedInShared,
         isPendingShare = expectedIsPendingShare,
-        device = expectedDevice
+        device = expectedDevice,
+        isNodeKeyDecrypted = isNodeKetDecrypted,
     )
 
     private fun createTypedFileNode() = DefaultFileNode(
@@ -308,7 +309,8 @@ class DefaultMediaPlayerRepositoryTest {
         modificationTime = expectedModificationTime,
         fingerprint = expectedFingerprint,
         thumbnailPath = expectedThumbnailPath,
-        type = expectedType
+        type = expectedType,
+        isNodeKeyDecrypted = isNodeKetDecrypted,
     )
 
     private suspend fun initTestConditions(megaNode: MegaNode, typeInfo: FileTypeInfo) {
