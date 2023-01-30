@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -195,9 +197,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
         return@withContext suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
-                it.flag
-            }
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> continuation.resumeWith(Result.success(request.flag))
+                        MegaError.API_ENOENT -> continuation.resumeWith(Result.success(true))
+                        else -> continuation.failWithError(error)
+                    }
+                }
+            )
             megaApiGateway.getFileVersionsOption(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
