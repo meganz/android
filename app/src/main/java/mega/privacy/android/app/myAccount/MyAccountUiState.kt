@@ -5,8 +5,10 @@ package mega.privacy.android.app.myAccount
  *
  * @property isFileVersioningEnabled
  * @property versionsInfo
+ * @property name
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
     val versionsInfo: String? = null,
+    val name: String = ""
 )

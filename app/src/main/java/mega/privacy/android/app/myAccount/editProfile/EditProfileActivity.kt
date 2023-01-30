@@ -24,11 +24,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
@@ -269,8 +269,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
             .observe(this) { setupPhoneNumber() }
 
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java).observe(this) {
-            binding.headerLayout.firstLineToolbar.text = viewModel.getName()
+        collectFlow(viewModel.state) { state ->
+            binding.headerLayout.firstLineToolbar.text = state.name
         }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
@@ -296,7 +296,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
      */
     private fun updateName(success: Boolean) {
         binding.progressBar.isVisible = false
-        binding.headerLayout.firstLineToolbar.text = viewModel.getName()
 
         showSnackbar(
             StringResourcesUtils.getString(
@@ -439,7 +438,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         firstLineTextMaxWidthExpanded = outMetrics.widthPixels - dp2px(108f, outMetrics)
         binding.headerLayout.firstLineToolbar.apply {
             setMaxWidthEmojis(firstLineTextMaxWidthExpanded)
-            text = viewModel.getName()
             textSize = NAME_SIZE
         }
 

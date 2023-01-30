@@ -16,10 +16,14 @@ class DefaultGetCurrentUserFullName @Inject constructor(
     private val accountRepository: AccountRepository,
 ) : GetCurrentUserFullName {
 
-    override suspend fun invoke(defaultFirstName: String, defaultLastName: String): String =
+    override suspend fun invoke(
+        forceRefresh: Boolean,
+        defaultFirstName: String,
+        defaultLastName: String
+    ): String =
         withContext(ioDispatcher) {
-            val firstName = contactsRepository.getCurrentUserFirstName(forceRefresh = true)
-            val lastName = contactsRepository.getCurrentUserLastName(forceRefresh = true)
+            val firstName = contactsRepository.getCurrentUserFirstName(forceRefresh = forceRefresh)
+            val lastName = contactsRepository.getCurrentUserLastName(forceRefresh = forceRefresh)
 
             var fullName: String = if (firstName.isBlank()) {
                 lastName
