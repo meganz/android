@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.login.model
 
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.account.AccountSession
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.login.LoginFragment].
  *
  * @property isFirstFetchNodesUpdate True while there was not any fetch nodes update, false otherwise.
- * @property userCredentials         [UserCredentials]
+ * @property accountSession          [AccountSession]
  * @property password                Typed password.
  * @property accountConfirmationLink Link for confirming a new account.
  * @property isFetchingNodes         True if it is fetching nodes, false otherwise.
@@ -26,7 +26,7 @@ import mega.privacy.android.data.model.UserCredentials
  */
 data class LoginState(
     val isFirstFetchNodesUpdate: Boolean = true,
-    val userCredentials: UserCredentials? = null,
+    val accountSession: AccountSession? = null,
     val password: String? = null,
     val accountConfirmationLink: String? = null,
     val isFetchingNodes: Boolean = false,

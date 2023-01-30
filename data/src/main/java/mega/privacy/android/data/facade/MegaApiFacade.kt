@@ -124,6 +124,8 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.accountAuth
     override val myCredentials: String?
         get() = megaApi.myCredentials
+    override val dumpSession: String?
+        get() = megaApi.dumpSession()
 
     override suspend fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||

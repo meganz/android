@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -216,4 +217,11 @@ interface AccountRepository {
      * Checks if User is Logged In
      */
     suspend fun isUserLoggedIn(): Boolean
+
+    /**
+     * Saves the UserCredentials of the current logged in account and clears ephemeral.
+     *
+     * @return [AccountSession]
+     */
+    suspend fun saveAccountCredentials(): AccountSession
 }

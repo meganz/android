@@ -161,6 +161,11 @@ interface MegaApiGateway {
     val myCredentials: String?
 
     /**
+     * Current session key.
+     */
+    val dumpSession: String?
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean

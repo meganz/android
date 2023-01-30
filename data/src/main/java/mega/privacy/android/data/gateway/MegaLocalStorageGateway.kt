@@ -583,4 +583,16 @@ interface MegaLocalStorageGateway {
      * @param chatSettings [ChatSettings]
      */
     suspend fun setChatSettings(chatSettings: ChatSettings)
+
+    /**
+     * Saves the user credentials of the current logged in account.
+     *
+     * @param userCredentials [UserCredentials]
+     */
+    suspend fun saveCredentials(userCredentials: UserCredentials)
+
+    /**
+     * Clears ephemeral.
+     */
+    suspend fun clearEphemeral()
 }

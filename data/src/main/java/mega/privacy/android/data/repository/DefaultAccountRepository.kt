@@ -28,9 +28,11 @@ import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -206,10 +208,12 @@ internal class DefaultAccountRepository @Inject constructor(
                         onRequestFinish = { request, error ->
                             if (request.type == MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS) {
                                 when (error.errorCode) {
-                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(
-                                        Unit))
-                                    MegaChatError.ERROR_ACCESS -> continuation.resumeWith(Result.failure(
-                                        ChatNotInitializedException()))
+                                    MegaChatError.ERROR_OK -> continuation.resumeWith(
+                                        Result.success(Unit)
+                                    )
+                                    MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
+                                        Result.failure(ChatNotInitializedException())
+                                    )
                                     else -> continuation.failWithError(error)
                                 }
                             }
@@ -229,10 +233,11 @@ internal class DefaultAccountRepository @Inject constructor(
                 megaApiGateway.getPricing(OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(subscriptionOptionListMapper(
-                                request,
-                                currencyMapper,
-                            )))
+                            continuation.resumeWith(
+                                Result.success(
+                                    subscriptionOptionListMapper(request, currencyMapper)
+                                )
+                            )
                         } else {
                             continuation.failWithError(error)
                         }
@@ -251,18 +256,24 @@ internal class DefaultAccountRepository @Inject constructor(
     ): MegaAchievement =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
-                megaApiGateway.getAccountAchievements(OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(megaAchievementMapper(
-                                request.megaAchievementsDetails,
-                                achievementType,
-                                awardIndex
-                            )))
-                        } else {
-                            continuation.failWithError(error)
-                        }
-                    }))
+                megaApiGateway.getAccountAchievements(
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(
+                                    Result.success(
+                                        megaAchievementMapper(
+                                            request.megaAchievementsDetails,
+                                            achievementType,
+                                            awardIndex
+                                        )
+                                    )
+                                )
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        })
+                )
             }
         }
 
@@ -386,9 +397,10 @@ internal class DefaultAccountRepository @Inject constructor(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
                             continuation.resumeWith(
-                                Result.success(achievementsOverviewMapper(
-                                    request.megaAchievementsDetails,
-                                )))
+                                Result.success(
+                                    achievementsOverviewMapper(request.megaAchievementsDetails)
+                                )
+                            )
                         } else {
                             continuation.failWithError(error)
                         }
@@ -422,4 +434,31 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.isUserLoggedIn() > 0
         }
+
+    override suspend fun saveAccountCredentials() = withContext(ioDispatcher) {
+        var myUserHandle: Long? = null
+        var email: String? = null
+
+        megaApiGateway.myUser?.let { myUser ->
+            email = myUser.email
+            myUserHandle = myUser.handle
+        }
+
+        val session = megaApiGateway.dumpSession
+
+        with(localStorageGateway) {
+            saveCredentials(
+                UserCredentials(
+                    email,
+                    session,
+                    "",
+                    "",
+                    myUserHandle.toString()
+                )
+            )
+            clearEphemeral()
+        }
+
+        AccountSession(email = email, session = session, myHandle = myUserHandle ?: -1)
+    }
 }

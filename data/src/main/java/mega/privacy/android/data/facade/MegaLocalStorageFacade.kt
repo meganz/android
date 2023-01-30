@@ -354,6 +354,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.chatSettings = chatSettings
     }
 
+    override suspend fun saveCredentials(userCredentials: UserCredentials) =
+        dbHandler.saveCredentials(userCredentials)
+
+    override suspend fun clearEphemeral() = dbHandler.clearEphemeral()
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }

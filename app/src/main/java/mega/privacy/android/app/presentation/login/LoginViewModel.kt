@@ -15,15 +15,14 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.model.UserCredentials
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
-import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
 /**
@@ -39,9 +38,9 @@ class LoginViewModel @Inject constructor(
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val loggingSettings: LegacyLoggingSettings,
     private val resetChatSettings: ResetChatSettings,
+    private val saveAccountCredentials: SaveAccountCredentials,
     private val getSession: GetSession,
     private val dbH: DatabaseHandler,
-    @MegaApi private val megaApi: MegaApiAndroid,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -70,12 +69,14 @@ class LoginViewModel @Inject constructor(
      */
     fun setupInitialState() {
         viewModelScope.launch {
+            val session = getSession()
             _state.update {
                 it.copy(
+                    accountSession = AccountSession(session = session),
                     is2FAEnabled = false,
                     isAccountConfirmed = false,
                     pressedBackWhileLogin = false,
-                    isAlreadyLoggedIn = getSession() != null
+                    isAlreadyLoggedIn = session != null
                 )
             }
         }
@@ -179,20 +180,16 @@ class LoginViewModel @Inject constructor(
      */
     fun updateEmailAndSession() =
         dbH.credentials?.let { credentials ->
-            val userCredentials = state.value.userCredentials
+            val accountSession = state.value.accountSession
             _state.update {
                 it.copy(
-                    userCredentials = userCredentials?.copy(
+                    accountSession = accountSession?.copy(
                         email = credentials.email,
                         session = credentials.session
+                    ) ?: AccountSession(
+                        email = credentials.email,
+                        credentials.session,
                     )
-                        ?: UserCredentials(
-                            email = credentials.email,
-                            credentials.session,
-                            null,
-                            null,
-                            null
-                        )
                 )
             }
             true
@@ -202,12 +199,12 @@ class LoginViewModel @Inject constructor(
      * Updates email and password values in state.
      */
     fun updateCredentials(email: String?, password: String?) {
-        val userCredentials = state.value.userCredentials
+        val accountSession = state.value.accountSession
 
         _state.update {
             it.copy(
-                userCredentials = userCredentials?.copy(email = email)
-                    ?: UserCredentials(email = email, null, null, null, null),
+                accountSession = accountSession?.copy(email = email)
+                    ?: AccountSession(email = email),
                 password = password
             )
         }
@@ -237,20 +234,8 @@ class LoginViewModel @Inject constructor(
     /**
      * Saves credentials
      */
-    fun saveCredentials() {
-        val session = megaApi.dumpSession()
-        var myUserHandle: String? = null
-        var email: String? = null
-
-        megaApi.myUser?.let { myUser ->
-            email = myUser.email
-            myUserHandle = myUser.handle.toString()
-        }
-
-        with(dbH) {
-            saveCredentials(UserCredentials(email, session, "", "", myUserHandle))
-            clearEphemeral()
-        }
+    fun saveCredentials() = viewModelScope.launch {
+        _state.update { it.copy(accountSession = saveAccountCredentials()) }
     }
 
     /**

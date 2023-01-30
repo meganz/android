@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
 
@@ -66,7 +67,10 @@ object TestAccountModule {
 
     @Provides
     fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()
-    
+
     @Provides
     fun provideIsUserLoggedIn() = isUserLoggedIn
+
+    @Provides
+    fun provideSaveAccountCredentials() = mock<SaveAccountCredentials>()
 }

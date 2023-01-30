@@ -491,7 +491,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
             Timber.d("et_user.getText(): %s", binding.loginEmailText.text)
 
-            if (uiState.userCredentials?.session != null && !LoginActivity.isBackFromLoginPage) {
+            if (uiState.isAlreadyLoggedIn && !LoginActivity.isBackFromLoginPage) {
                 Timber.d("Credentials NOT null")
 
                 intentAction?.let { action ->
@@ -865,7 +865,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             isLoggingIn = true
             with(uiState) {
                 megaApi.multiFactorAuthLogin(
-                    userCredentials?.email,
+                    accountSession?.email,
                     password,
                     twoFAPin,
                     this@LoginFragment
@@ -923,7 +923,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (!isLoggingIn) {
             isLoggingIn = true
-            val gSession = uiState.userCredentials?.session
+            val gSession = uiState.accountSession?.session
             ChatUtil.initMegaChatApi(
                 gSession,
                 ChatLogoutListener(requireActivity(), loggingSettings)
@@ -980,7 +980,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         Timber.d("Generating keys")
 
         with(uiState) {
-            onKeysGenerated(userCredentials?.email, password)
+            onKeysGenerated(accountSession?.email, password)
         }
     }
 
@@ -1488,7 +1488,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 startActivity(intent)
                 getChatManagement().pendingJoinLink = null
                 loginActivity.finish()
-            } else if (uiState.userCredentials?.session != null) {
+            } else if (uiState.isAlreadyLoggedIn) {
                 startActivity(Intent(loginActivity, ChooseAccountActivity::class.java))
                 loginActivity.finish()
             }
@@ -1814,7 +1814,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             if (error.errorCode == MegaError.API_OK) {
                 Timber.d("fastConfirm finished - OK")
                 with(uiState) {
-                    onKeysGeneratedLogin(userCredentials?.email, password)
+                    onKeysGeneratedLogin(accountSession?.email, password)
                 }
             } else {
                 with(binding) {
