@@ -36,7 +36,6 @@ class RecentsBucketViewModel @Inject constructor(
     private val updateRecentAction: UpdateRecentAction,
     private val getRecentActionNodes: GetRecentActionNodes,
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val areCredentialsVerifiedUseCase: AreCredentialsVerified,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -69,9 +68,7 @@ class RecentsBucketViewModel @Inject constructor(
      */
     val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
 
-    private val _areCredentialsVerified: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    val areCredentialsVerified: LiveData<Boolean> = _areCredentialsVerified
+    private val _areCredentialsVerified: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     /**
      * True if the parent of the bucket is an incoming shares
@@ -97,10 +94,6 @@ class RecentsBucketViewModel @Inject constructor(
                 updateCurrentBucket()
                 clearSelection()
             }
-        }
-
-        viewModelScope.launch {
-            _areCredentialsVerified.postValue(areCredentialsVerifiedUseCase.invoke(megaApi.myUser.email))
         }
     }
 

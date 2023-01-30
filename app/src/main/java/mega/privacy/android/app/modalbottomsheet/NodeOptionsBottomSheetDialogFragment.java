@@ -728,7 +728,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             ViewExtensionsKt.collectFlow(requireActivity(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
                         && mMode == SHARED_ITEMS_MODE
-                        && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
+                        && isIncomingNodeVerified()) {
                     setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
                     hideNodeActions();
                 }
@@ -922,6 +922,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private boolean isNodeUnverified(List<Long> shareDataList) {
         return shareDataList.contains(node.getHandle());
+    }
+
+    private boolean isIncomingNodeVerified() {
+        return !node.isNodeKeyDecrypted() && !megaApi.areCredentialsVerified(megaApi.getMyUser());
     }
 
     @SuppressLint("NonConstantResourceId")

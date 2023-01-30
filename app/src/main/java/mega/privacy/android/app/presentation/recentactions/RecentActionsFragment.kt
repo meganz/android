@@ -130,7 +130,7 @@ class RecentActionsFragment : Fragment() {
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
 
-            if (!item.bucket.nodes[0].isNodeKeyDecrypted && !megaApi.areCredentialsVerified(megaApi.myUser)) {
+            if (!item.bucket.nodes[0].isNodeKeyDecrypted && !viewModel.state.value.areUserCredentialsVerified) {
                 Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
                     putExtra(Constants.EMAIL, item.bucket.userEmail)
                     requireActivity().startActivity(this)
@@ -176,7 +176,13 @@ class RecentActionsFragment : Fragment() {
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         listView.clipToPadding = false
         listView.itemAnimator = DefaultItemAnimator()
-        adapter.setIsUserVerified(megaApi.areCredentialsVerified(megaApi.myUser))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    adapter.setAreUserCredentialsVerified(it.areUserCredentialsVerified)
+                }
+            }
+        }
     }
 
     /**
