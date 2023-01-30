@@ -4126,6 +4126,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Grant access</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don’t grant</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="one">Removed %d item from “%s”</item>
         <item quantity="other">Removed %d items from “%s”</item>
@@ -4154,4 +4155,12 @@
     <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s [/A][B]updated the meeting description[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
     <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s [/A][B]updated the meeting details scheduled for:[/B]</string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">Access Denied</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
 </resources>

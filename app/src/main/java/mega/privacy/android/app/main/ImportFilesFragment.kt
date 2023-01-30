@@ -4,17 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter.OnImportFilesAdapterFooterListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ShareTextInfo
 
 /**
@@ -27,6 +32,23 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     private val viewModel: FileExplorerViewModel by activityViewModels()
 
     private var adapter: ImportFilesAdapter? = null
+    private var uploadFragment: Int = -1
+
+    private val permissions = arrayOf(
+        PermissionUtils.getImagePermissionByVersion(),
+        PermissionUtils.getAudioPermissionByVersion(),
+        PermissionUtils.getVideoPermissionByVersion()
+    )
+
+    private val permissionsLauncher: ActivityResultLauncher<Array<String>> =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
+            val notGrantedPermissions = map.filter { !it.value }
+            if (notGrantedPermissions.isNotEmpty()) {
+                showAccessDeniedDialog()
+            } else {
+                confirmImport(uploadFragment)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,8 +97,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
         val headerText: String = if (info.isUrl) {
             StringResourcesUtils.getString(R.string.file_properties_shared_folder_public_link_name)
         } else {
-            StringResourcesUtils.getQuantityString(R.plurals.general_num_files,
-                1)
+            StringResourcesUtils.getQuantityString(R.plurals.general_num_files, 1)
         }
 
         setupAdapter(setNames, headerText)
@@ -133,6 +154,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
      */
     private fun confirmImport(fragment: Int) {
         adapter?.updateCurrentFocusPosition(binding.fileListView)
+        uploadFragment = -1
 
         val nameFiles = nameFiles
         var emptyNames = 0
@@ -155,8 +177,10 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
                     StringResourcesUtils.getQuantityString(R.plurals.empty_names, emptyNames)
                 }
                 else -> {
-                    StringResourcesUtils.getString(R.string.invalid_characters_defined,
-                        INVALID_CHARACTERS)
+                    StringResourcesUtils.getString(
+                        R.string.invalid_characters_defined,
+                        INVALID_CHARACTERS
+                    )
                 }
             }
 
@@ -172,18 +196,55 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     fun changeActionBarElevation() {
         (requireActivity() as FileExplorerActivity).changeActionBarElevation(
             binding.scrollContainerImport.canScrollVertically(Constants.SCROLLING_UP_DIRECTION),
-            FileExplorerActivity.IMPORT_FRAGMENT)
+            FileExplorerActivity.IMPORT_FRAGMENT
+        )
     }
 
     private val nameFiles: HashMap<String, String>
         get() = viewModel.fileNames.value!!
 
+    /**
+     * Handle clicking cloud drive option
+     */
     override fun onClickCloudDriveButton() {
-        confirmImport(FileExplorerActivity.CLOUD_FRAGMENT)
+        if (checkPermission())
+            confirmImport(FileExplorerActivity.CLOUD_FRAGMENT)
+        else
+            uploadFragment = FileExplorerActivity.CLOUD_FRAGMENT
     }
 
+    /**
+     * Handle clicking chat option
+     */
     override fun onClickChatButton() {
-        confirmImport(FileExplorerActivity.CHAT_FRAGMENT)
+        if (checkPermission())
+            confirmImport(FileExplorerActivity.CHAT_FRAGMENT)
+        else
+            uploadFragment = FileExplorerActivity.CHAT_FRAGMENT
+    }
+
+    private fun checkPermission(): Boolean {
+        val readStorageGranted = PermissionUtils.hasPermissions(requireContext(), *permissions)
+        if (!readStorageGranted) {
+            permissionsLauncher.launch(permissions)
+        }
+        return readStorageGranted
+    }
+
+    private fun showAccessDeniedDialog() {
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        builder.apply {
+            setTitle(R.string.dialog_title_media_permissions_denied)
+            setMessage(R.string.dialog_content_media_permissions_denied)
+            setPositiveButton(R.string.dialog_positive_button_allow_permission) { dialog, _ ->
+                requireContext().navigateToAppSettings()
+                dialog.dismiss()
+            }
+            setNegativeButton(R.string.dialog_negative_button_do_not_allow) { dialog, _ ->
+                dialog.dismiss()
+            }
+            show()
+        }
     }
 
     companion object {
