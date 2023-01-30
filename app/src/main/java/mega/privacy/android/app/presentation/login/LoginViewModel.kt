@@ -15,7 +15,6 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -38,6 +38,7 @@ class LoginViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExists,
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val loggingSettings: LegacyLoggingSettings,
+    private val resetChatSettings: ResetChatSettings,
     private val getSession: GetSession,
     private val dbH: DatabaseHandler,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -79,20 +80,13 @@ class LoginViewModel @Inject constructor(
             }
         }
 
-        resetChatSettings()
+        initChatSettings()
     }
 
     /**
      * Reset chat settings.
      */
-    fun resetChatSettings() {
-        viewModelScope.launch {
-            //Need to be migrated to a use case
-            if (dbH.chatSettings == null) {
-                dbH.chatSettings = ChatSettings()
-            }
-        }
-    }
+    fun initChatSettings() = viewModelScope.launch { resetChatSettings() }
 
     /**
      * Updates state with a new intentAction.

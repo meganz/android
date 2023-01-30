@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.UserCredentials
@@ -570,4 +571,16 @@ interface MegaLocalStorageGateway {
      * @param type
      */
     suspend fun setLastPublicHandleType(type: Int)
+
+    /**
+     * Gets chat settings.
+     */
+    suspend fun getChatSettings(): ChatSettings?
+
+    /**
+     * Sets chat settings.
+     *
+     * @param chatSettings [ChatSettings]
+     */
+    suspend fun setChatSettings(chatSettings: ChatSettings)
 }

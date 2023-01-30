@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.UserCredentials
@@ -345,6 +346,12 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setLastPublicHandleType(type: Int) {
         dbHandler.lastPublicHandleType = type
+    }
+
+    override suspend fun getChatSettings(): ChatSettings? = dbHandler.chatSettings
+
+    override suspend fun setChatSettings(chatSettings: ChatSettings) {
+        dbHandler.chatSettings = chatSettings
     }
 
     companion object {

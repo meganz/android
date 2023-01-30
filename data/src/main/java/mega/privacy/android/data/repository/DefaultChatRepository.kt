@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
+import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -455,4 +456,10 @@ internal class DefaultChatRepository @Inject constructor(
         .catch { Timber.e(it) }
         .flowOn(ioDispatcher)
         .shareIn(sharingScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    override suspend fun resetChatSettings() = withContext(ioDispatcher) {
+        if (localStorageGateway.getChatSettings() == null) {
+            localStorageGateway.setChatSettings(ChatSettings())
+        }
+    }
 }

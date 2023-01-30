@@ -597,10 +597,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
                                 newIntent.action = intentAction
 
-                                if (intentDataString != null) {
-                                    newIntent.data = Uri.parse(intentDataString)
-                                }
-
+                                intentDataString?.let { newIntent.data = Uri.parse(it) }
                                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
                                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -660,10 +657,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         }
 
                         newIntent.action = action
-
-                        if (intentDataString != null) {
-                            newIntent.data = Uri.parse(intentDataString)
-                        }
+                        intentDataString?.let { newIntent.data = Uri.parse(it) }
                     }
 
                     newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -1455,7 +1449,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                     )
                                 }
                                 intent.action = intentAction
-                                intent.data = Uri.parse(intentDataString)
+                                intentDataString?.let { intent?.data = Uri.parse(it) }
                             } else {
                                 Timber.w("The intent action is NULL")
                             }
@@ -1464,7 +1458,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             intent = Intent(requireContext(), ManagerActivity::class.java)
                             Timber.d("The action is: %s", intentAction)
                             intent.action = intentAction
-                            intent.data = Uri.parse(intentDataString)
+                            intentDataString?.let { intent.data = Uri.parse(it) }
                         }
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }
@@ -1599,7 +1593,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                 (requireActivity() as LoginActivity).showSnackbar(errorMessage)
                             }
                         }
-                        viewModel.resetChatSettings()
+                        viewModel.initChatSettings()
                     }
                 }
                 returnToLogin()
@@ -1756,7 +1750,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     return
                 }
 
-                viewModel.resetChatSettings()
+                viewModel.initChatSettings()
             }
         } else if (request.type == MegaRequest.TYPE_QUERY_SIGNUP_LINK) {
             Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")

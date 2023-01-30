@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 
 /**
  * Chats module.
@@ -210,5 +211,12 @@ abstract class ChatModule {
         @Provides
         fun provideSetMyChatFilesFolder(fileSystemRepository: FileSystemRepository): SetMyChatFilesFolder =
             SetMyChatFilesFolder(fileSystemRepository::setMyChatFilesFolder)
+
+        /**
+         * Provides the Use case [ResetChatSettings]
+         */
+        @Provides
+        fun provideResetChatSettings(chatRepository: ChatRepository): ResetChatSettings =
+            ResetChatSettings(chatRepository::resetChatSettings)
     }
 }
