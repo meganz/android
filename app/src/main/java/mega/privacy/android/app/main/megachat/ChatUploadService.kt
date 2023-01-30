@@ -431,7 +431,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                                 && path == pendingMsg.getFilePath()
                                 && fingerprint == pendingMsg.getFingerprint()
                             ) {
-                                pendingMessageSingles.add(pendingMsg)
+                                if (!pendingMessageSingles.contains(pendingMsg)) {
+                                    pendingMessageSingles.add(pendingMsg)
+                                }
 
                                 if (onlyOneChat) {
                                     if (snackbarChatHandle == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
@@ -623,7 +625,11 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         idPendingMessage: Long, type: String?, fileName: String?,
         localPath: String, pendingMsgs: ArrayList<PendingMessageSingle>,
     ) {
-        pendingMessages!!.addAll(pendingMsgs)
+        for (msg in pendingMsgs) {
+            if (!(pendingMessages ?: return).contains(msg)) {
+                pendingMessages?.add(msg)
+            }
+        }
         startUpload(idPendingMessage, type, fileName, localPath)
     }
 

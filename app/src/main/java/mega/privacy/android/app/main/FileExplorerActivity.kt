@@ -2205,6 +2205,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
         when (v.id) {
             R.id.fab_file_explorer -> {
+                v.isEnabled = false
                 chatExplorer = chatExplorerFragment
                 chatExplorer?.let { getChatAdded(it.addedChats ?: return) }
             }
