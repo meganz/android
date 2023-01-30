@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.clouddrive
+package mega.privacy.android.app.presentation.fileinfo
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

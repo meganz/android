@@ -51,7 +51,7 @@ import mega.privacy.android.app.imageviewer.util.shouldShowRubbishBinOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
-import mega.privacy.android.app.main.FileInfoActivity
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment

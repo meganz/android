@@ -354,7 +354,7 @@
         <activity
             android:name=".main.ContactInfoActivity" />
         <activity
-            android:name=".main.FileInfoActivity" />
+            android:name=".presentation.fileinfo.FileInfoActivity" />
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:launchMode="singleTop" />

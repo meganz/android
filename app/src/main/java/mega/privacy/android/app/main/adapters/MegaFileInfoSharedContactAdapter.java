@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.FileInfoActivity;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
