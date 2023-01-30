@@ -33,6 +33,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getInt
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -128,24 +129,32 @@ class RecentActionsFragment : Fragment() {
      */
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
-            // If only one element in the bucket
-            if (item.bucket.nodes.size == 1) {
-                lifecycleScope.launch {
-                    val node = item.bucket.nodes[0]
-                    viewModel.getMegaNode(node.id.longValue)?.let {
-                        openFile(position, it)
+
+            if (!item.bucket.nodes[0].isNodeKeyDecrypted && !megaApi.areCredentialsVerified(megaApi.myUser)) {
+                Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
+                    putExtra(Constants.EMAIL, item.bucket.userEmail)
+                    requireActivity().startActivity(this)
+                }
+            } else {
+                // If only one element in the bucket
+                if (item.bucket.nodes.size == 1) {
+                    lifecycleScope.launch {
+                        val node = item.bucket.nodes[0]
+                        viewModel.getMegaNode(node.id.longValue)?.let {
+                            openFile(position, it)
+                        }
                     }
                 }
-            }
-            // If more element in the bucket
-            else {
-                viewModel.select(item)
-                val currentDestination =
-                    Navigation.findNavController(requireView()).currentDestination
-                if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
-                    Navigation.findNavController(requireView())
-                        .navigate(HomepageFragmentDirections.actionHomepageToRecentBucket(),
-                            NavOptions.Builder().build())
+                // If more element in the bucket
+                else {
+                    viewModel.select(item)
+                    val currentDestination =
+                        Navigation.findNavController(requireView()).currentDestination
+                    if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
+                        Navigation.findNavController(requireView())
+                            .navigate(HomepageFragmentDirections.actionHomepageToRecentBucket(),
+                                NavOptions.Builder().build())
+                    }
                 }
             }
         }
@@ -167,6 +176,7 @@ class RecentActionsFragment : Fragment() {
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         listView.clipToPadding = false
         listView.itemAnimator = DefaultItemAnimator()
+        adapter.setIsUserVerified(megaApi.areCredentialsVerified(megaApi.myUser))
     }
 
     /**
