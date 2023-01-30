@@ -354,7 +354,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      *
      * @param areCredentialsVerified
      */
-    fun setIsUserVerified(areCredentialsVerified: Boolean) {
+    fun setAreUserCredentialsVerified(areCredentialsVerified: Boolean) {
         areUserCredentialsVerified = areCredentialsVerified
     }
 }

@@ -1093,8 +1093,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
 
                     if (isMandatoryFingerprintVerificationNeeded
-                            && !unverifiedIncomingNodeHandles.isEmpty()
-                            && unverifiedIncomingNodeHandles.contains(node.getHandle())) {
+                            && !node.isNodeKeyDecrypted()
+                            && !megaApi.areCredentialsVerified(megaApi.getMyUser())) {
                         showUnverifiedNodeUi(holder, true);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);

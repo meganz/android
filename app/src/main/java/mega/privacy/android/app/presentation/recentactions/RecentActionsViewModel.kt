@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
@@ -19,7 +18,9 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSh
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
@@ -35,6 +36,7 @@ import javax.inject.Inject
  * @param getVisibleContacts
  * @param setHideRecentActivity
  * @param monitorNodeUpdates
+ * @param areCredentialsVerified
  */
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
@@ -47,6 +49,7 @@ class RecentActionsViewModel @Inject constructor(
     private val getParentMegaNode: GetParentMegaNode,
     monitorHideRecentActivity: MonitorHideRecentActivity,
     monitorNodeUpdates: MonitorNodeUpdates,
+    val areCredentialsVerified: AreCredentialsVerified,
 ) : ViewModel() {
 
     private var _buckets = listOf<RecentActionBucket>()
@@ -80,6 +83,14 @@ class RecentActionsViewModel @Inject constructor(
         viewModelScope.launch {
             monitorHideRecentActivity().collectLatest {
                 setUiHideRecentActivity(it)
+            }
+        }
+    }
+
+    fun checkIfUserCredentialsAreVerified(userEmail: String) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(areUserCredentialsVerified = areCredentialsVerified(userEmail))
             }
         }
     }
