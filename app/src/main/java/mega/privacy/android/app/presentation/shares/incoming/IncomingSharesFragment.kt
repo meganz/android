@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares.incoming
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
@@ -26,6 +28,7 @@ import mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
+import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
@@ -81,27 +84,38 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
 
-        when {
-            // select mode
-            adapter?.isMultipleSelect == true -> {
-                adapter?.toggleSelection(position)
-                val selectedNodes = adapter?.selectedNodes
-                if ((selectedNodes?.size ?: 0) > 0)
-                    updateActionModeTitle()
+        if (!state().nodes[actualPosition].isNodeKeyDecrypted &&
+            !megaApi.areCredentialsVerified(megaApi.myUser)
+        ) {
+            Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
+                putExtra(Constants.EMAIL,
+                    ContactUtil.getContactEmailDB(state().nodes[actualPosition].owner))
+                requireActivity().startActivity(this)
             }
+        } else {
+            when {
+                // select mode
+                adapter?.isMultipleSelect == true -> {
+                    adapter?.toggleSelection(position)
+                    val selectedNodes = adapter?.selectedNodes
+                    if ((selectedNodes?.size ?: 0) > 0)
+                        updateActionModeTitle()
+                }
 
-            // click on a folder
-            state().nodes[actualPosition].isFolder ->
-                navigateToFolder(state().nodes[actualPosition])
+                // click on a folder
+                state().nodes[actualPosition].isFolder ->
+                    navigateToFolder(state().nodes[actualPosition])
 
-            // click on a file
-            else ->
-                openFile(
-                    state().nodes[actualPosition],
-                    Constants.INCOMING_SHARES_ADAPTER,
-                    actualPosition
-                )
+                // click on a file
+                else ->
+                    openFile(
+                        state().nodes[actualPosition],
+                        Constants.INCOMING_SHARES_ADAPTER,
+                        actualPosition
+                    )
+            }
         }
+
     }
 
     override fun navigateToFolder(node: MegaNode) {
