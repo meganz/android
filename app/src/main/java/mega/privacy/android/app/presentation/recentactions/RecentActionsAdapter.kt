@@ -72,6 +72,8 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      */
     private var headerColor: Int = 0
 
+    private var areUserCredentialsVerified: Boolean = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
@@ -191,10 +193,18 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        binding.firstLineText.text =
-                            context.getFormattedStringOrDefault(R.string.title_bucket,
-                                node.name,
-                                nodeList.size - 1)
+                        if (!node.isNodeKeyDecrypted && !areUserCredentialsVerified) {
+                            binding.firstLineText.text =
+                                context.getQuantityStringOrDefault(R.plurals.cloud_drive_undecrypted_file,
+                                    nodeList.size)
+                            binding.nameText.text =
+                                context.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
+                        } else {
+                            binding.firstLineText.text =
+                                context.getFormattedStringOrDefault(R.string.title_bucket,
+                                    node.name,
+                                    nodeList.size - 1)
+                        }
                     }
                 }
 
@@ -338,4 +348,13 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      */
     inner class RecentActionViewHolder(val binding: ItemBucketBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    /**
+     * Function to check if user credentials are verified from MegaApi & set areUserCredentialsVerified
+     *
+     * @param areCredentialsVerified
+     */
+    fun setIsUserVerified(areCredentialsVerified: Boolean) {
+        areUserCredentialsVerified = areCredentialsVerified
+    }
 }

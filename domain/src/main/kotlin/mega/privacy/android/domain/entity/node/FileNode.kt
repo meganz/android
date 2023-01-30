@@ -30,4 +30,9 @@ interface FileNode : UnTypedNode {
      * Fingerprint
      */
     val fingerprint: String?
+
+    /**
+     * Is node key decrypted by verification from owner
+     */
+    val isNodeKeyDecrypted: Boolean
 }

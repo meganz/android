@@ -54,6 +54,7 @@ internal suspend fun toNode(
         isShared = megaNode.isOutShare,
         isPendingShare = isPendingShare(megaNode),
         device = megaNode.deviceId,
+        isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
     )
 } else {
     DefaultFileNode(
@@ -72,5 +73,6 @@ internal suspend fun toNode(
         isTakenDown = megaNode.isTakenDown,
         isIncomingShare = megaNode.isInShare,
         fingerprint = megaNode.fingerprint,
+        isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
     )
 }

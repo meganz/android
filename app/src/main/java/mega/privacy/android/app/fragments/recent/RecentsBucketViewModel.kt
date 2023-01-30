@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -35,6 +36,7 @@ class RecentsBucketViewModel @Inject constructor(
     private val updateRecentAction: UpdateRecentAction,
     private val getRecentActionNodes: GetRecentActionNodes,
     monitorNodeUpdates: MonitorNodeUpdates,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerified,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -67,6 +69,10 @@ class RecentsBucketViewModel @Inject constructor(
      */
     val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
 
+    private val _areCredentialsVerified: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    val areCredentialsVerified: LiveData<Boolean> = _areCredentialsVerified
+
     /**
      * True if the parent of the bucket is an incoming shares
      */
@@ -91,6 +97,10 @@ class RecentsBucketViewModel @Inject constructor(
                 updateCurrentBucket()
                 clearSelection()
             }
+        }
+
+        viewModelScope.launch {
+            _areCredentialsVerified.postValue(areCredentialsVerifiedUseCase.invoke(megaApi.myUser.email))
         }
     }
 
