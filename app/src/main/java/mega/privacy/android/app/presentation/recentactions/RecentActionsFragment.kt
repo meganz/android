@@ -47,7 +47,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -188,11 +187,6 @@ class RecentActionsFragment : Fragment() {
      */
     private fun setRecentActions(recentActionItems: List<RecentActionItemType>) {
         adapter.setItems(recentActionItems)
-        adapter.setAreUserCredentialsVerified(
-            megaApi.areCredentialsVerified(
-                megaApi.getContact(getUserEmail(recentActionItems))
-            )
-        )
         listView.layoutManager =
             TopSnappedStickyLayoutManager(requireContext()) { recentActionItems }
     }

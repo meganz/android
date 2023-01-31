@@ -26,6 +26,7 @@ sealed class RecentActionItemType(val timestamp: Long) {
         val parentFolderName: String = "",
         val parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
         val currentUserIsOwner: Boolean = false,
+        val areCredentialsVerified: Boolean = false,
     ) : RecentActionItemType(timestamp = bucket.timestamp)
 
     /**
