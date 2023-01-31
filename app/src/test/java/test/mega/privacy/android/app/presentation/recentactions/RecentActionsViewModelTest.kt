@@ -69,6 +69,8 @@ class RecentActionsViewModelTest {
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
+    private val areCredentialsVerified = mock<AreCredentialsVerified>()
+
     private val node: TypedFileNode = mock {
         on { id }.thenReturn(NodeId(123))
     }
@@ -114,6 +116,7 @@ class RecentActionsViewModelTest {
             getParentMegaNode,
             monitorHideRecentActivity,
             monitorNodeUpdates,
+            areCredentialsVerified,
         )
     }
 
