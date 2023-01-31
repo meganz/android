@@ -388,7 +388,7 @@ class AlbumsViewModel @Inject constructor(
         } else if (title in getAllUserAlbumsNames()) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_duplicate
-        } else if ("[*/:<>?\"|]".toRegex().containsMatchIn(title)) {
+        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
             isTitleValid = false
             errorMessage = R.string.invalid_characters_defined
         }
