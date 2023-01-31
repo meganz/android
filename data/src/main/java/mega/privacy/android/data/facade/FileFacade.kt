@@ -235,6 +235,14 @@ class FileFacade @Inject constructor(
         runCatching { StatFs(rootPath).availableBytes >= file.length() }.onFailure { Timber.e(it) }
             .getOrDefault(false)
 
+    override suspend fun deleteFile(file: File): Boolean {
+        return try {
+            file.delete()
+        } catch (e: Exception) {
+            Timber.e(e)
+            false
+        }
+    }
 
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"

@@ -38,6 +38,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import java.io.File
 import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
@@ -242,5 +243,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getDiskSpaceBytes(path: String) = withContext(ioDispatcher) {
         deviceGateway.getDiskSpaceBytes(path)
+    }
+
+    override suspend fun deleteFile(file: File) = withContext(ioDispatcher) {
+        fileGateway.deleteFile(file)
     }
 }

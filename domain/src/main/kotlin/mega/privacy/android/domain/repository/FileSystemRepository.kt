@@ -91,4 +91,12 @@ interface FileSystemRepository {
      * @return disk space at path in bytes
      */
     suspend fun getDiskSpaceBytes(path: String): Long
+
+    /**
+     * Delete File
+     *
+     * @param file
+     * @return [Boolean]
+     */
+    suspend fun deleteFile(file: File): Boolean
 }
