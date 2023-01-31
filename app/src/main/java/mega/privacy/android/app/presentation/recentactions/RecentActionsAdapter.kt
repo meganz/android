@@ -193,7 +193,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        if (!node.isNodeKeyDecrypted && !areUserCredentialsVerified) {
+                        if (!node.isNodeKeyDecrypted || !areUserCredentialsVerified) {
                             binding.firstLineText.text =
                                 context.getQuantityStringOrDefault(R.plurals.cloud_drive_undecrypted_file,
                                     nodeList.size)
