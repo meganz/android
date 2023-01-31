@@ -167,6 +167,7 @@ class RecentActionsViewModel @Inject constructor(
 
             val parentNode = getNodeByHandle(bucket.parentHandle)
             val sharesType = getParentSharesType(parentNode)
+            val areUserCredentialsVerified = areCredentialsVerified(bucket.userEmail)
             if (!bucket.nodes[0].isNodeKeyDecrypted) {
                 recentItemList.add(RecentActionItemType.Item(
                     bucket,
@@ -174,7 +175,7 @@ class RecentActionsViewModel @Inject constructor(
                     parentNode?.name ?: "",
                     sharesType,
                     currentUserIsOwner,
-                    areCredentialsVerified(bucket.userEmail),
+                    areUserCredentialsVerified,
                 ))
             } else {
                 recentItemList.add(RecentActionItemType.Item(
