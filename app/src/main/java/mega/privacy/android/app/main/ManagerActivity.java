@@ -422,7 +422,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
-import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;

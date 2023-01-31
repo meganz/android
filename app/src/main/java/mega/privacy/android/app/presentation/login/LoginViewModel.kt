@@ -14,8 +14,8 @@ import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -39,8 +39,8 @@ class LoginViewModel @Inject constructor(
     private val loggingSettings: LegacyLoggingSettings,
     private val resetChatSettings: ResetChatSettings,
     private val saveAccountCredentials: SaveAccountCredentials,
+    private val getAccountCredentials: GetAccountCredentials,
     private val getSession: GetSession,
-    private val dbH: DatabaseHandler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -178,8 +178,8 @@ class LoginViewModel @Inject constructor(
     /**
      * Updates email and session values in state.
      */
-    fun updateEmailAndSession() =
-        dbH.credentials?.let { credentials ->
+    fun updateEmailAndSession(): Boolean = runBlocking {
+        getAccountCredentials()?.let { credentials ->
             val accountSession = state.value.accountSession
             _state.update {
                 it.copy(
@@ -194,6 +194,7 @@ class LoginViewModel @Inject constructor(
             }
             true
         } ?: false
+    }
 
     /**
      * Updates email and password values in state.

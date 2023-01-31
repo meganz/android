@@ -142,7 +142,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
-import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;

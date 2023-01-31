@@ -3,7 +3,7 @@ package mega.privacy.android.data.gateway
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord

@@ -1,4 +1,4 @@
-package mega.privacy.android.data.model
+package mega.privacy.android.domain.entity.user
 
 /**
  * User credentials

@@ -22,7 +22,7 @@ import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.toContactCredentials
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.ContactDoesNotExistException

@@ -709,4 +709,11 @@ class DefaultAccountRepositoryTest {
         assertThat(underTest.saveAccountCredentials())
             .isEqualTo(accountSessionMapper(email, session, handle))
     }
+
+    @Test
+    fun `test that MegaLocalStorageGateway is invoked for getting account credentials`() =
+        runTest {
+            underTest.getAccountCredentials()
+            verify(localStorageGateway).getUserCredentials()
+        }
 }

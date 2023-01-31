@@ -20,7 +20,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.SyncRecord
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS

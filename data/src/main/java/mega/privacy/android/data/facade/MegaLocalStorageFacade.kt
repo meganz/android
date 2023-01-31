@@ -5,7 +5,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality

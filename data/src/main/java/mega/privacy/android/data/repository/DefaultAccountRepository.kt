@@ -459,4 +459,6 @@ internal class DefaultAccountRepository @Inject constructor(
 
         accountSessionMapper(email, session, myUserHandle)
     }
+
+    override suspend fun getAccountCredentials() = localStorageGateway.getUserCredentials()
 }

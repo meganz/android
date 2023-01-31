@@ -84,7 +84,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment;
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment;
 import mega.privacy.android.app.main.providers.ProviderPageAdapter;
