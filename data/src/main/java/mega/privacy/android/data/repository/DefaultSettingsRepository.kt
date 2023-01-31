@@ -21,6 +21,7 @@ import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -73,6 +74,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val startScreenMapper: StartScreenMapper,
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
     private val videoQualityIntMapper: VideoQualityIntMapper,
+    private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
 ) : SettingsRepository {
     init {
         runBlocking {
@@ -418,5 +420,9 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun buildDefaultDownloadDir(): File {
         return cacheFolderGateway.buildDefaultDownloadDir()
+    }
+
+    override suspend fun isMobileDataAllowed() = withContext(ioDispatcher) {
+        fileManagementPreferencesGateway.isMobileDataAllowed()
     }
 }

@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
@@ -28,7 +29,7 @@ import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalContracts::class)
-internal class DefaultSettingRepositoryTest {
+internal class DefaultSettingsRepositoryTest {
     private lateinit var underTest: DefaultSettingsRepository
 
     private val databaseHandler: DatabaseHandler = mock {
@@ -46,6 +47,7 @@ internal class DefaultSettingRepositoryTest {
     private val startScreenMapper: StartScreenMapper = mock()
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway = mock()
     private val videoQualityIntMapper: VideoQualityIntMapper = mock()
+    private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
 
     @Before
     fun setUp() {
@@ -63,6 +65,7 @@ internal class DefaultSettingRepositoryTest {
             startScreenMapper,
             cameraTimestampsPreferenceGateway,
             videoQualityIntMapper,
+            fileManagementPreferencesGateway,
         )
     }
 

@@ -412,4 +412,12 @@ interface SettingsRepository {
      * @return File path as [File]
      */
     suspend fun buildDefaultDownloadDir(): File
+
+
+    /**
+     * File Management Preference whether to use Mobile data to preview Hi-res images
+     *
+     * @return [Boolean]
+     */
+    suspend fun isMobileDataAllowed(): Boolean
 }
