@@ -193,7 +193,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        if (!node.isNodeKeyDecrypted || !areUserCredentialsVerified) {
+                        if (!node.isNodeKeyDecrypted || !item.areCredentialsVerified) {
                             binding.firstLineText.text =
                                 context.getQuantityStringOrDefault(R.plurals.cloud_drive_undecrypted_file,
                                     nodeList.size)
@@ -348,13 +348,4 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      */
     inner class RecentActionViewHolder(val binding: ItemBucketBinding) :
         RecyclerView.ViewHolder(binding.root)
-
-    /**
-     * Function to check if user credentials are verified from MegaApi & set areUserCredentialsVerified
-     *
-     * @param areCredentialsVerified
-     */
-    fun setAreUserCredentialsVerified(areCredentialsVerified: Boolean) {
-        areUserCredentialsVerified = areCredentialsVerified
-    }
 }
