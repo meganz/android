@@ -321,7 +321,7 @@ class AlbumsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val finalTitle = title.trim()
-                if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                if (checkTitleValidity(finalTitle, proscribedStrings, showEmptyError = true)) {
                     val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
                     updateAlbumNameUseCase(currentAlbumId, finalTitle)
                     _state.update {
@@ -371,11 +371,18 @@ class AlbumsViewModel @Inject constructor(
         it.id is Album.UserAlbum
     }.map { it.title }
 
-    private fun checkTitleValidity(title: String, proscribedStrings: List<String>): Boolean {
+    private fun checkTitleValidity(
+        title: String,
+        proscribedStrings: List<String>,
+        showEmptyError: Boolean = false,
+    ): Boolean {
         var errorMessage: Int? = null
         var isTitleValid = true
 
-        if (title.isEmpty() || title.lowercase() in proscribedStrings.map { it.lowercase() }) {
+        if (showEmptyError && title.isEmpty()) {
+            isTitleValid = false
+            errorMessage = R.string.invalid_string
+        } else if (title.isEmpty() || proscribedStrings.any { it.equals(title, true) }) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_systems_album
         } else if (title in getAllUserAlbumsNames()) {

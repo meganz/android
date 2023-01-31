@@ -176,7 +176,7 @@ fun CreateNewAlbumDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentWidth()
-                            .padding(horizontal = 24.dp, vertical = 4.dp),
+                            .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         errorMessage?.let {
