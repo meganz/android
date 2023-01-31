@@ -35,6 +35,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMycodeBinding
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CacheFolderManager.buildQrFile
@@ -67,6 +68,9 @@ class MyCodeFragment : Fragment(), View.OnClickListener {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var myAccountInfo: MyAccountInfo
 
     private var _binding: FragmentMycodeBinding? = null
     private val binding get() = _binding!!
@@ -308,7 +312,7 @@ class MyCodeFragment : Fragment(), View.OnClickListener {
         val credentials = dbH.credentials
 
         fullName = credentials?.firstName ?: credentials?.lastName
-                ?: (requireActivity() as QRCodeActivity?)?.name
+                ?: myAccountInfo.fullName
                 ?: myEmail
 
         return AvatarUtil.getDefaultAvatar(AvatarUtil.getColorAvatar(myUser),

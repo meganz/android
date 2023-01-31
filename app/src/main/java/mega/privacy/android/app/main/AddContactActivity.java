@@ -10,6 +10,7 @@ import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT;
 import static mega.privacy.android.app.utils.Constants.MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
 import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_CONTACT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE;
@@ -2881,7 +2882,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     public void initScanQR() {
         Intent intent = new Intent(this, QRCodeActivity.class);
-        intent.putExtra("inviteContacts", true);
+        intent.putExtra(INVITE_CONTACT, true);
         startActivityForResult(intent, SCAN_QR_FOR_ADD_CONTACTS);
     }
 
