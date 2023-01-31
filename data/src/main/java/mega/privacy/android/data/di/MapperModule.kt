@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountLevelDetailMapper
 import mega.privacy.android.data.mapper.AccountSessionDetailMapper
+import mega.privacy.android.data.mapper.AccountSessionMapper
 import mega.privacy.android.data.mapper.AccountStorageDetailMapper
 import mega.privacy.android.data.mapper.AccountTransferDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
@@ -68,6 +69,7 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
@@ -85,6 +87,7 @@ import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountLevelDetail
+import mega.privacy.android.data.mapper.toAccountSession
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
@@ -136,6 +139,7 @@ import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
+import mega.privacy.android.data.mapper.toUserCredentialsMapper
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
@@ -620,4 +624,16 @@ internal class MapperModule {
      */
     @Provides
     fun provideInviteContactRequestMapper(): InviteContactRequestMapper = ::toInviteContactRequest
+
+    /**
+     * Provides user credentials mapper
+     */
+    @Provides
+    fun provideUserCredentialsMapper(): UserCredentialsMapper = ::toUserCredentialsMapper
+
+    /**
+     * Provides account session mapper
+     */
+    @Provides
+    fun provideAccountSessionMapper(): AccountSessionMapper = ::toAccountSession
 }

@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
+import mega.privacy.android.data.mapper.AccountSessionMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
@@ -26,13 +27,12 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
+import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.data.model.UserCredentials
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -68,6 +68,9 @@ import kotlin.coroutines.suspendCoroutine
  * @property subscriptionOptionListMapper [SubscriptionOptionListMapper]
  * @property megaAchievementMapper        [MegaAchievementMapper]
  * @property myAccountCredentialsMapper   [MyAccountCredentialsMapper]
+ * @property accountDetailMapper          [AccountDetailMapper]
+ * @property userCredentialsMapper        [UserCredentialsMapper]
+ * @property accountSessionMapper         [AccountSessionMapper]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -86,6 +89,8 @@ internal class DefaultAccountRepository @Inject constructor(
     private val achievementsOverviewMapper: AchievementsOverviewMapper,
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
     private val accountDetailMapper: AccountDetailMapper,
+    private val userCredentialsMapper: UserCredentialsMapper,
+    private val accountSessionMapper: AccountSessionMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -445,20 +450,13 @@ internal class DefaultAccountRepository @Inject constructor(
         }
 
         val session = megaApiGateway.dumpSession
+        val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
 
         with(localStorageGateway) {
-            saveCredentials(
-                UserCredentials(
-                    email,
-                    session,
-                    "",
-                    "",
-                    myUserHandle.toString()
-                )
-            )
+            saveCredentials(credentials)
             clearEphemeral()
         }
 
-        AccountSession(email = email, session = session, myHandle = myUserHandle ?: -1)
+        accountSessionMapper(email, session, myUserHandle)
     }
 }
