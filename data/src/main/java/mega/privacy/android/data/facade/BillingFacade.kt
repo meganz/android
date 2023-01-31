@@ -128,7 +128,10 @@ internal class BillingFacade @Inject constructor(
         val oldSku = oldSubscription?.sku
         val purchaseToken = oldSubscription?.token
         val skuDetails = skusCache.get()?.find { it.sku == productId }
-            ?: throw ProductNotFoundException()
+            ?: run {
+                Timber.w("Can't find sku with id: %s", productId)
+                throw ProductNotFoundException()
+            }
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
@@ -254,6 +257,7 @@ internal class BillingFacade @Inject constructor(
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
                 // Acknowledge the purchase if it hasn't already been acknowledged.
                 if (!purchase.isAcknowledged) {
+                    Timber.d("new purchase added, %s", purchase.originalJson)
                     val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(purchase.purchaseToken)
                         .build()
@@ -269,6 +273,7 @@ internal class BillingFacade @Inject constructor(
         val validMegaPurchases = validPurchases.map { megaPurchaseMapper(it) }
         // legacy support, we still need to save into MyAccountInfo, will remove after refactoring
         updateAccountInfo(validMegaPurchases)
+        Timber.d("total purchased are: %d", validMegaPurchases.size)
         return validMegaPurchases
     }
 
@@ -295,6 +300,7 @@ internal class BillingFacade @Inject constructor(
                     }
 
                     override fun onBillingSetupFinished(result: BillingResult) {
+                        Timber.d("Response code is: %s", result.responseCode)
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                             if (continuation.isActive)
                                 continuation.resumeWith(Result.success(newClient))
