@@ -70,10 +70,13 @@ class RecentActionsViewModelTest {
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
 
-    private val areCredentialsVerified = mock<AreCredentialsVerified>()
+    private val areCredentialsVerified = mock<AreCredentialsVerified> {
+        onBlocking { invoke(any()) }.thenReturn(false)
+    }
 
     private val node: TypedFileNode = mock {
         on { id }.thenReturn(NodeId(123))
+        on { isNodeKeyDecrypted }.thenReturn(false)
     }
 
     private val megaRecentActionBucket = mock<RecentActionBucket> {
@@ -300,6 +303,7 @@ class RecentActionsViewModelTest {
             val expected = "Cloud drive"
             val parentNode = mock<MegaNode> {
                 on { name }.thenReturn(expected)
+                on { isNodeKeyDecrypted }.thenReturn(false)
             }
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(any())).thenReturn(parentNode)
@@ -372,7 +376,7 @@ class RecentActionsViewModelTest {
                 on { isOutShare }.thenReturn(false)
             }
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(any())).thenReturn(parentNode)
+            whenever(getNodeByHandle(1)).thenReturn(parentNode)
             whenever(isPendingShare(parentNode.handle)).thenReturn(false)
             whenever(getParentMegaNode(parentNode)).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
