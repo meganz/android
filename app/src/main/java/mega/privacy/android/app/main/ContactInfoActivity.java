@@ -14,6 +14,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
+import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
