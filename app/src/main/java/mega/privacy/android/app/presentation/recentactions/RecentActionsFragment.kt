@@ -130,7 +130,7 @@ class RecentActionsFragment : Fragment() {
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
 
-            if (!item.bucket.nodes[0].isNodeKeyDecrypted && !viewModel.state.value.areUserCredentialsVerified) {
+            if (!item.bucket.nodes[0].isNodeKeyDecrypted || !megaApi.areCredentialsVerified(megaApi.myUser)) {
                 Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
                     putExtra(Constants.EMAIL, item.bucket.userEmail)
                     requireActivity().startActivity(this)
@@ -179,7 +179,7 @@ class RecentActionsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
-                    adapter.setAreUserCredentialsVerified(it.areUserCredentialsVerified)
+                    adapter.setAreUserCredentialsVerified(megaApi.areCredentialsVerified(megaApi.myUser))
                 }
             }
         }

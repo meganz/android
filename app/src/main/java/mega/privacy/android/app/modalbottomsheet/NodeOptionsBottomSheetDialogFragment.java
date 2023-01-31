@@ -925,7 +925,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     }
 
     private boolean isIncomingNodeVerified() {
-        return !node.isNodeKeyDecrypted() && !megaApi.areCredentialsVerified(megaApi.getMyUser());
+        return !node.isNodeKeyDecrypted() || !megaApi.areCredentialsVerified(megaApi.getMyUser());
     }
 
     @SuppressLint("NonConstantResourceId")
