@@ -84,7 +84,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
 
-        if (!state().nodes[actualPosition].isNodeKeyDecrypted &&
+        if (!state().nodes[actualPosition].isNodeKeyDecrypted ||
             !megaApi.areCredentialsVerified(megaApi.myUser)
         ) {
             Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {

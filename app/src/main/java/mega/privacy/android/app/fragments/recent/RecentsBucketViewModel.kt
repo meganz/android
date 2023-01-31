@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.RecentActionBucket
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -67,8 +66,6 @@ class RecentsBucketViewModel @Inject constructor(
      * True if the fragment needs to be closed
      */
     val shouldCloseFragment: LiveData<Boolean> = _shouldCloseFragment
-
-    private val _areCredentialsVerified: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     /**
      * True if the parent of the bucket is an incoming shares
