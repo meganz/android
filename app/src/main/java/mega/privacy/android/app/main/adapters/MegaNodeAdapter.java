@@ -97,6 +97,7 @@ import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragm
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -1093,7 +1094,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
 
                     if (isMandatoryFingerprintVerificationNeeded) {
-                        if (!node.isNodeKeyDecrypted() || !megaApi.areCredentialsVerified(megaApi.getMyUser())) {
+                        if (!node.isNodeKeyDecrypted() || !megaApi.areCredentialsVerified(megaApi.getContact(String.valueOf(node.getOwner())))) {
                             showUnverifiedNodeUi(holder, true);
                         }
                     }

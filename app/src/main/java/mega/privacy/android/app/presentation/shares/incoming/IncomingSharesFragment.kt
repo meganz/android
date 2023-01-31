@@ -99,7 +99,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         val actualPosition = position - 1
 
         if (!state().nodes[actualPosition].isNodeKeyDecrypted ||
-            !megaApi.areCredentialsVerified(megaApi.myUser)
+            !megaApi.areCredentialsVerified(megaApi.getContact(state().nodes[actualPosition].owner.toString()))
         ) {
             Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
                 putExtra(Constants.EMAIL,

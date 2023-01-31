@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -130,7 +131,9 @@ class RecentActionsFragment : Fragment() {
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
 
-            if (!item.bucket.nodes[0].isNodeKeyDecrypted || !megaApi.areCredentialsVerified(megaApi.myUser)) {
+            if (!item.bucket.nodes[0].isNodeKeyDecrypted ||
+                !megaApi.areCredentialsVerified(megaApi.getContact(item.bucket.nodes[0].id.longValue.toString()))
+            ) {
                 Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
                     putExtra(Constants.EMAIL, item.bucket.userEmail)
                     requireActivity().startActivity(this)
@@ -176,13 +179,6 @@ class RecentActionsFragment : Fragment() {
         listView.addItemDecoration(HeaderItemDecoration(requireContext()))
         listView.clipToPadding = false
         listView.itemAnimator = DefaultItemAnimator()
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    adapter.setAreUserCredentialsVerified(megaApi.areCredentialsVerified(megaApi.myUser))
-                }
-            }
-        }
     }
 
     /**
@@ -192,8 +188,27 @@ class RecentActionsFragment : Fragment() {
      */
     private fun setRecentActions(recentActionItems: List<RecentActionItemType>) {
         adapter.setItems(recentActionItems)
+        adapter.setAreUserCredentialsVerified(
+            megaApi.areCredentialsVerified(
+                megaApi.getContact(getUserEmail(recentActionItems))
+            )
+        )
         listView.layoutManager =
             TopSnappedStickyLayoutManager(requireContext()) { recentActionItems }
+    }
+
+    /**
+     * Function to get user email from the adapter data set only if it contains bucket otherwise returns blank
+     *
+     * @param recentActionItems List of [RecentActionItemType] which is provided to adapter
+     */
+    private fun getUserEmail(recentActionItems: List<RecentActionItemType>): String {
+        for (itemType: RecentActionItemType in recentActionItems) {
+            if (itemType is RecentActionItemType.Item) {
+                return itemType.bucket.userEmail
+            }
+        }
+        return ""
     }
 
     /**
