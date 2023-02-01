@@ -11,10 +11,7 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -33,9 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -44,10 +39,10 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
-import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -92,7 +87,6 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -117,7 +111,6 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
-import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -136,7 +129,6 @@ import timber.log.Timber
 import java.io.File
 import java.util.Locale
 import javax.inject.Inject
-import kotlin.math.abs
 
 /**
  * Activity for showing file and folder info.
@@ -254,32 +246,24 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
     private var nodeVersions: ArrayList<MegaNode>? = null
-    private var upArrow: Drawable? = null
-    private var drawableRemoveLink: Drawable? = null
-    private var drawableLink: Drawable? = null
-    private var drawableShare: Drawable? = null
-    private var drawableDots: Drawable? = null
-    private var drawableDownload: Drawable? = null
-    private var drawableLeave: Drawable? = null
-    private var drawableCopy: Drawable? = null
-    private var drawableChat: Drawable? = null
+    private val menuHelper by lazy {
+        FileInfoToolbarHelper(
+            context = this,
+            appBar = binding.appBar,
+            toolbar = binding.toolbar,
+            collapsingToolbarLayout = binding.fileInfoCollapseToolbar,
+            supportActionBar = supportActionBar,
+            fileInfoImageLayout = binding.fileInfoImageLayout,
+            fileInfoToolbarImage = binding.fileInfoToolbarImage,
+            fileInfoIconLayout = binding.fileInfoIconLayout,
+        )
+    }
+
     private var isShareContactExpanded = false
     private var owner = true
     private var typeExport = -1
     private var sl: ArrayList<MegaShare>? = null
     private var mOffDelete: MegaOffline? = null
-    private var downloadMenuItem: MenuItem? = null
-    private var shareMenuItem: MenuItem? = null
-    private var getLinkMenuItem: MenuItem? = null
-    private var editLinkMenuItem: MenuItem? = null
-    private var removeLinkMenuItem: MenuItem? = null
-    private var renameMenuItem: MenuItem? = null
-    private var moveMenuItem: MenuItem? = null
-    private var copyMenuItem: MenuItem? = null
-    private var rubbishMenuItem: MenuItem? = null
-    private var deleteMenuItem: MenuItem? = null
-    private var leaveMenuItem: MenuItem? = null
-    private var sendToChatMenuItem: MenuItem? = null
     private lateinit var node: MegaNode
     private var availableOfflineBoolean = false
     private var cC: ContactController? = null
@@ -314,7 +298,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var versionsRemoved = 0
     private var errorVersionRemove = 0
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
-    private var currentColorFilter = 0
     private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             intent?.let {
@@ -360,7 +343,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     override fun finishRenameActionWithSuccess(newName: String) {
         node = megaApi.getNodeByHandle((node).handle) ?: return
-        binding.fileInfoCollapseToolbar.title = node.name
+        menuHelper.setNodeName(node.name)
     }
 
     override fun actionConfirmed() {
@@ -556,61 +539,16 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun setupView() {
         binding = ActivityFileInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        getActionBarDrawables()
         with(binding) {
             setSupportActionBar(toolbar)
-            filePropertiesPermissionInfo.isVisible = false
-            val params = fileInfoIconLayout.layoutParams as CollapsingToolbarLayout.LayoutParams
             val rect = Rect()
             window.decorView.getWindowVisibleDisplayFrame(rect)
-            params.setMargins(Util.dp2px(16f), Util.dp2px(90f) + rect.top, 0, Util.dp2px(14f))
-            fileInfoIconLayout.layoutParams = params
-            fileInfoImageLayout.isVisible = false
-            val statusBarColor =
-                getColorForElevation(
-                    this@FileInfoActivity,
-                    resources.getDimension(R.dimen.toolbar_elevation)
-                )
-            fileInfoCollapseToolbar.setStatusBarScrimColor(statusBarColor)
-            if (Util.isDarkMode(this@FileInfoActivity)) {
-                fileInfoCollapseToolbar.setContentScrimColor(statusBarColor)
-            }
-            if (node.hasPreview() || node.hasThumbnail()) {
-                appBar.addOnOffsetChangedListener { appBar: AppBarLayout, offset: Int ->
-                    val collapsed = offset < 0 && abs(offset) >= appBar.totalScrollRange / 2
-                    setActionBarDrawablesColorFilter(
-                        resources.getColor(
-                            if (collapsed) R.color.grey_087_white_087 else R.color.white_alpha_087,
-                            null
-                        )
-                    )
-                }
-                fileInfoCollapseToolbar.setCollapsedTitleTextColor(
-                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
-                )
-                fileInfoCollapseToolbar.setExpandedTitleColor(
-                    resources.getColor(R.color.white_alpha_087, null)
-                )
-            } else {
-                setActionBarDrawablesColorFilter(
-                    resources.getColor(
-                        R.color.grey_087_white_087,
-                        null
-                    )
-                )
-            }
-            supportActionBar?.apply {
-                bindingContent.nestedLayout.setOnScrollChangeListener { v: NestedScrollView, _: Int, _: Int, _: Int, _: Int ->
-                    Util.changeViewElevation(
-                        this,
-                        v.canScrollVertically(-1) && v.visibility == View.VISIBLE,
-                        outMetrics
-                    )
-                }
-                setDisplayShowTitleEnabled(false)
-                setHomeButtonEnabled(true)
-                setDisplayHomeAsUpEnabled(true)
-            }
+            menuHelper.setupToolbar(
+                isCollapsable = node.hasPreview() || node.hasThumbnail(),
+                nestedView = bindingContent.nestedLayout,
+                visibleTop = rect.top
+            )
+            filePropertiesPermissionInfo.isVisible = false
         }
 
         with(bindingContent) {
@@ -712,8 +650,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             } else {
                 filePropertiesCreatedLayout.isVisible = true
             }
-            val name = node.name
-            binding.fileInfoCollapseToolbar.title = name
+            menuHelper.setNodeName(node.name)
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
             filePropertiesTextNumberVersions.setOnClickListener {
@@ -756,27 +693,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             })
     }
 
-    private fun getActionBarDrawables() {
-        drawableDots = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_dots_vertical_white)?.mutate()
-
-        upArrow = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_arrow_back_white)?.mutate()
-        drawableRemoveLink = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_remove_link)?.mutate()
-        drawableLink = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_link_white)?.mutate()
-        drawableShare = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_share)?.mutate()
-        drawableDownload = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_download_white)?.mutate()
-        drawableLeave = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_leave_share_w)?.mutate()
-        drawableCopy = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_copy_white)?.mutate()
-        drawableChat = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_send_to_contact)?.mutate()
-    }
 
     private fun setOwnerState(userHandle: Long) =
         ChatUtil.setContactStatus(
@@ -790,143 +706,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.file_info_action, menu)
-        downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download)
-        shareMenuItem = menu.findItem(R.id.cab_menu_file_info_share_folder)
-        getLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_get_link)
-        getLinkMenuItem?.title = getQuantityStringOrDefault(R.plurals.get_links, 1)
-        editLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_edit_link)
-        removeLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_remove_link)
-        renameMenuItem = menu.findItem(R.id.cab_menu_file_info_rename)
-        moveMenuItem = menu.findItem(R.id.cab_menu_file_info_move)
-        copyMenuItem = menu.findItem(R.id.cab_menu_file_info_copy)
-        rubbishMenuItem = menu.findItem(R.id.cab_menu_file_info_rubbish)
-        deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete)
-        leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave)
-        sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat)
-        setIconsColorFilter()
-        megaApi.getNodeByHandle(node.handle)?.apply {
-            val parent = megaApi.getRootParentNode(this)
-
-            if (parent.handle == megaApi.rubbishNode.handle) {
-                deleteMenuItem?.isVisible = true
-            } else {
-                setDefaultOptionsToolbar()
-            }
-            // Check if read-only properties should be applied on MenuItems
-            shouldApplyMenuItemReadOnlyState(parent)
+        with(megaApi.getRootParentNode(megaApi.getNodeByHandle(node.handle))) {
+            val isInRubbish = this == megaApi.rubbishNode
+            val isInInbox = isNodeInInbox(this)
+            menuHelper.setupOptionsMenu(
+                menu = menu,
+                node = this,
+                isInInbox = isInInbox,
+                isInRubbish = isInRubbish,
+                fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
+                firstIncomingLevel = firstIncomingLevel,
+                nodeAccess = megaApi.getAccess(node),
+            )
         }
         return super.onCreateOptionsMenu(menu)
-    }
-
-    /**
-     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
-     * if the MegaNode is a Backup node.
-     *
-     * @param node The Mega Node
-     */
-    private fun shouldApplyMenuItemReadOnlyState(node: MegaNode) {
-        if (isNodeInInbox(node)) {
-            renameMenuItem?.isVisible = false
-            moveMenuItem?.isVisible = false
-            rubbishMenuItem?.isVisible = false
-        }
-    }
-
-    /**
-     * Sets up the default items to be displayed on the Toolbar Menu
-     */
-    private fun setDefaultOptionsToolbar() {
-        if (!node.isTakenDown && !node.isFolder) {
-            sendToChatMenuItem?.isVisible = true
-            sendToChatMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-        }
-        if (from == Constants.FROM_INCOMING_SHARES) {
-            if (!node.isTakenDown) {
-                downloadMenuItem?.isVisible = true
-                downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                leaveMenuItem?.isVisible = firstIncomingLevel
-                leaveMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                copyMenuItem?.isVisible = true
-            }
-            when (megaApi.getAccess(node)) {
-                MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
-                    rubbishMenuItem?.isVisible = !firstIncomingLevel
-                    renameMenuItem?.isVisible = true
-                }
-                MegaShare.ACCESS_READ -> copyMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-            }
-        } else {
-            if (!node.isTakenDown) {
-                downloadMenuItem?.isVisible = true
-                downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                if (node.isFolder) {
-                    shareMenuItem?.isVisible = true
-                    shareMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                }
-                if (node.isExported) {
-                    editLinkMenuItem?.isVisible = true
-                    removeLinkMenuItem?.isVisible = true
-                    removeLinkMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                } else {
-                    getLinkMenuItem?.isVisible = true
-                    getLinkMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                }
-                copyMenuItem?.isVisible = true
-            }
-            rubbishMenuItem?.isVisible = true
-            renameMenuItem?.isVisible = true
-            moveMenuItem?.isVisible = true
-        }
-    }
-
-    /**
-     * Changes the drawables color in ActionBar depending on the color received.
-     *
-     * @param color Can be Color.WHITE or Color.WHITE.
-     */
-    private fun setActionBarDrawablesColorFilter(color: Int) {
-        if (currentColorFilter == color || supportActionBar == null) {
-            return
-        }
-        currentColorFilter = color
-        upArrow?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-        supportActionBar?.setHomeAsUpIndicator(upArrow)
-        drawableDots?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-        binding.toolbar.overflowIcon = drawableDots
-        setIconsColorFilter()
-    }
-
-    /**
-     * Sets the toolbar icons color.
-     */
-    private fun setIconsColorFilter() {
-        if (removeLinkMenuItem == null || getLinkMenuItem == null || downloadMenuItem == null
-            || shareMenuItem == null || leaveMenuItem == null || copyMenuItem == null
-            || sendToChatMenuItem == null
-        ) {
-            return
-        }
-        drawableRemoveLink?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        removeLinkMenuItem?.icon = drawableRemoveLink
-        drawableLink?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        getLinkMenuItem?.icon = drawableLink
-        drawableDownload?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        downloadMenuItem?.icon = drawableDownload
-        drawableShare?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        shareMenuItem?.icon = drawableShare
-        drawableLeave?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        leaveMenuItem?.icon = drawableLeave
-        drawableCopy?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        copyMenuItem?.icon = drawableCopy
-        drawableChat?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        sendToChatMenuItem?.icon = drawableChat
     }
 
     /**
@@ -1225,42 +1018,22 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 bindingContent.filePropertiesInfoDataAdded.text = ""
                 bindingContent.filePropertiesInfoDataCreated.text = ""
             }
-            var thumb: Bitmap?
-            var preview: Bitmap?
-            thumb = ThumbnailUtils.getThumbnailFromCache(node)
-            if (thumb != null) {
-                binding.fileInfoToolbarImage.setImageBitmap(thumb)
-                binding.fileInfoImageLayout.isVisible = true
-                binding.fileInfoIconLayout.isVisible = false
-            } else {
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, this)
-                if (thumb != null) {
-                    binding.fileInfoToolbarImage.setImageBitmap(thumb)
-                    binding.fileInfoImageLayout.isVisible = true
-                    binding.fileInfoIconLayout.isVisible = false
+
+            val preview = PreviewUtils.getPreviewFromCache(node)
+                ?: PreviewUtils.getPreviewFromFolder(node, this)
+            if (preview == null) {
+                if (node.hasPreview()) {
+                    val previewFile =
+                        File(PreviewUtils.getPreviewFolder(this), "${node.base64Handle}.jpg")
+                    megaApi.getPreview(node, previewFile.absolutePath, megaRequestListener)
                 }
             }
-            preview = PreviewUtils.getPreviewFromCache(node)
-            if (preview != null) {
-                PreviewUtils.previewCache.put(node.handle, preview)
-                binding.fileInfoToolbarImage.setImageBitmap(preview)
-                binding.fileInfoImageLayout.isVisible = true
-                binding.fileInfoIconLayout.isVisible = false
-            } else {
-                preview = PreviewUtils.getPreviewFromFolder(node, this)
-                if (preview != null) {
-                    PreviewUtils.previewCache.put(node.handle, preview)
-                    binding.fileInfoToolbarImage.setImageBitmap(preview)
-                    binding.fileInfoImageLayout.isVisible = true
-                    binding.fileInfoIconLayout.isVisible = false
-                } else {
-                    if (node.hasPreview()) {
-                        val previewFile =
-                            File(PreviewUtils.getPreviewFolder(this), node.base64Handle + ".jpg")
-                        megaApi.getPreview(node, previewFile.absolutePath, megaRequestListener)
-                    }
+            preview ?: ThumbnailUtils.getThumbnailFromCache(node)
+            ?: ThumbnailUtils.getThumbnailFromFolder(node, this)
+                ?.let {
+                    menuHelper.setPreview(it)
                 }
-            }
+
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
             if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
@@ -1617,11 +1390,10 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 val preview = File(previewDir, node.base64Handle + ".jpg")
                 if (preview.exists()) {
                     if (preview.length() > 0) {
-                        val bitmap = PreviewUtils.getBitmapForCache(preview, this)
-                        PreviewUtils.previewCache.put(node.handle, bitmap)
-                        binding.fileInfoToolbarImage.setImageBitmap(bitmap)
-                        binding.fileInfoImageLayout.isVisible = true
-                        binding.fileInfoIconLayout.isVisible = false
+                        PreviewUtils.getBitmapForCache(preview, this)?.also { bitmap ->
+                            PreviewUtils.previewCache.put(node.handle, bitmap)
+                            menuHelper.setPreview(bitmap)
+                        }
                     }
                 }
             }
@@ -2137,15 +1909,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         super.onDestroy()
         megaApi.removeGlobalListener(megaGlobalListener)
         megaApi.removeRequestListener(megaRequestListener)
-        if (upArrow != null) upArrow?.colorFilter = null
-        if (drawableRemoveLink != null) drawableRemoveLink?.colorFilter = null
-        if (drawableLink != null) drawableLink?.colorFilter = null
-        if (drawableShare != null) drawableShare?.colorFilter = null
-        if (drawableDots != null) drawableDots?.colorFilter = null
-        if (drawableDownload != null) drawableDownload?.colorFilter = null
-        if (drawableLeave != null) drawableLeave?.colorFilter = null
-        if (drawableCopy != null) drawableCopy?.colorFilter = null
-        if (drawableChat != null) drawableChat?.colorFilter = null
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(manageShareReceiver)
         nodeSaver.destroy()
