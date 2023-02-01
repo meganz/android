@@ -249,6 +249,11 @@ interface MegaLocalStorageGateway {
     suspend fun doPreferencesExist(): Boolean
 
     /**
+     * Do camera upload sync preference exist
+     */
+    suspend fun doesSyncEnabledExist(): Boolean
+
+    /**
      * Is camera upload sync enabled
      */
     suspend fun isSyncEnabled(): Boolean

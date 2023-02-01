@@ -173,6 +173,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
 
+    override suspend fun doesSyncEnabledExist() = dbHandler.preferences?.camSyncEnabled != null
+
     override suspend fun isSyncEnabled(): Boolean =
         dbHandler.preferences?.camSyncEnabled.toBoolean()
 

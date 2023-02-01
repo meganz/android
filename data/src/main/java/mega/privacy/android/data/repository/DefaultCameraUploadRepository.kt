@@ -220,6 +220,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.doPreferencesExist()
     }
 
+    override suspend fun doesSyncEnabledExist(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.doesSyncEnabledExist()
+    }
+
     override suspend fun isSyncEnabled(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.isSyncEnabled()
     }

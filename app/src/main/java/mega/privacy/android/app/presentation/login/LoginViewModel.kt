@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -18,6 +21,9 @@ import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
+import mega.privacy.android.domain.usecase.HasPreferences
+import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.RootNodeExists
@@ -41,6 +47,9 @@ class LoginViewModel @Inject constructor(
     private val saveAccountCredentials: SaveAccountCredentials,
     private val getAccountCredentials: GetAccountCredentials,
     private val getSession: GetSession,
+    private val hasPreferences: HasPreferences,
+    private val hasCameraSyncEnabled: HasCameraSyncEnabled,
+    private val isCameraSyncEnabled: IsCameraSyncEnabled,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -69,15 +78,29 @@ class LoginViewModel @Inject constructor(
      */
     fun setupInitialState() {
         viewModelScope.launch {
-            val session = getSession()
-            _state.update {
-                it.copy(
-                    accountSession = AccountSession(session = session),
-                    is2FAEnabled = false,
-                    isAccountConfirmed = false,
-                    pressedBackWhileLogin = false,
-                    isAlreadyLoggedIn = session != null
-                )
+            merge(
+                flowOf(getSession()).map { session ->
+                    { state: LoginState ->
+                        state.copy(
+                            accountSession = AccountSession(session = session),
+                            is2FAEnabled = false,
+                            isAccountConfirmed = false,
+                            pressedBackWhileLogin = false,
+                            isAlreadyLoggedIn = session != null
+                        )
+                    }
+                },
+                flowOf(hasPreferences()).map { hasPreferences ->
+                    { state: LoginState -> state.copy(hasPreferences = hasPreferences) }
+                },
+                flowOf(hasCameraSyncEnabled()).map { hasCameraSyncEnabled ->
+                    { state: LoginState -> state.copy(hasCUSetting = hasCameraSyncEnabled) }
+                },
+                flowOf(isCameraSyncEnabled()).map { isCameraSyncEnabled ->
+                    { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
+                }
+            ).collect {
+                _state.update(it)
             }
         }
 

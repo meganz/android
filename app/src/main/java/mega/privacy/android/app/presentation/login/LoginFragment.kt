@@ -107,7 +107,6 @@ import javax.inject.Inject
  * @property megaApi              [MegaApiAndroid]
  * @property megaApiFolder        [MegaApiAndroid] used for folder links management.
  * @property megaChatApi          [MegaChatApiAndroid]
- * @property dbH                  [DatabaseHandler]
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment(), MegaRequestListenerInterface {
@@ -132,9 +131,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
-
-    @Inject
-    lateinit var dbH: DatabaseHandler
 
     private val viewModel: LoginViewModel by activityViewModels()
 
@@ -600,10 +596,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                 intentDataString?.let { newIntent.data = Uri.parse(it) }
                                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
-                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    startCameraUploadService(false, 5 * 60 * 1000)
-                                }
-
+                                startCameraUploadService(false, 5 * 60 * 1000)
                                 startActivity(newIntent)
                                 requireActivity().finish()
                             } else {
@@ -662,12 +655,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
                     newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
-                    dbH.preferences?.let { preferences ->
-                        preferences.camSyncEnabled?.let { enabled ->
-                            if (enabled.toBoolean() && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                startCameraUploadService(false, 30 * 1000)
-                            }
-                        }
+                    if (uiState.isCUSettingEnabled) {
+                        startCameraUploadService(false, 30 * 1000)
                     }
 
                     this.startActivity(newIntent)
@@ -1394,18 +1383,13 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         }
                     } else {
                         var initialCam = false
-                        val prefs = dbH.preferences
-                        if (prefs != null) {
-                            if (prefs.camSyncEnabled != null) {
-                                if (java.lang.Boolean.parseBoolean(prefs.camSyncEnabled)) {
-                                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                        startCameraUploadService(false, 30 * 1000)
-                                    }
+                        if (uiState.hasPreferences) {
+                            if (uiState.hasCUSetting) {
+                                if (uiState.isCUSettingEnabled) {
+                                    startCameraUploadService(false, 30 * 1000)
                                 }
                             } else {
-                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    startCameraUploadService(true, 30 * 1000)
-                                }
+                                startCameraUploadService(true, 30 * 1000)
                                 initialCam = true
                             }
                         } else {
@@ -2195,6 +2179,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * @param time
      */
     private fun startCameraUploadService(firstTimeCam: Boolean, time: Int) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return
+        }
+
         Timber.d("firstTimeCam: $firstTimeCam: $time")
 
         with(requireActivity()) {

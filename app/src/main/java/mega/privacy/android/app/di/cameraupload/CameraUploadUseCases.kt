@@ -105,6 +105,7 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
+import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
@@ -162,6 +163,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideHasPreferences(cameraUploadRepository: CameraUploadRepository): HasPreferences =
             HasPreferences(cameraUploadRepository::doPreferencesExist)
+
+        /**
+         * Provide the [HasCameraSyncEnabled] implementation
+         */
+        @Provides
+        fun provideHasCameraSyncEnabled(cameraUploadRepository: CameraUploadRepository): HasCameraSyncEnabled =
+            HasCameraSyncEnabled(cameraUploadRepository::doesSyncEnabledExist)
 
         /**
          * Provide the [IsCameraUploadSyncEnabled] implementation
