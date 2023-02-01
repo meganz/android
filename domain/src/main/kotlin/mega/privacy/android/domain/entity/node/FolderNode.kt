@@ -34,9 +34,4 @@ interface FolderNode : UnTypedNode {
      * Number of child files
      */
     val childFileCount: Int
-
-    /**
-     * Is node key decrypted by verification from owner
-     */
-    val isNodeKeyDecrypted: Boolean
 }

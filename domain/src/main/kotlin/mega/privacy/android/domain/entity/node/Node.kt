@@ -55,5 +55,10 @@ interface Node {
      * Is the node an incoming share
      */
     val isIncomingShare: Boolean
+
+    /**
+     * Is node key decrypted by verification from owner
+     */
+    val isNodeKeyDecrypted: Boolean
 }
 
