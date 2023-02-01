@@ -33,7 +33,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -2205,6 +2205,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
         when (v.id) {
             R.id.fab_file_explorer -> {
+                v.isEnabled = false
                 chatExplorer = chatExplorerFragment
                 chatExplorer?.let { getChatAdded(it.addedChats ?: return) }
             }

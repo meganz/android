@@ -4,10 +4,12 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -216,4 +218,18 @@ interface AccountRepository {
      * Checks if User is Logged In
      */
     suspend fun isUserLoggedIn(): Boolean
+
+    /**
+     * Saves the UserCredentials of the current logged in account and clears ephemeral.
+     *
+     * @return [AccountSession]
+     */
+    suspend fun saveAccountCredentials(): AccountSession
+
+    /**
+     * Gets the credentials of the current logged in account.
+     *
+     * @return [UserCredentials]
+     */
+    suspend fun getAccountCredentials(): UserCredentials?
 }

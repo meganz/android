@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
+import android.Manifest
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,9 +29,13 @@ import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
@@ -56,6 +62,7 @@ import javax.inject.Inject
  * @property jobUtilWrapper
  * @property ioDispatcher
  * @property mainDispatcher
+ * @property checkEnableCameraUploadsStatus
  */
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
@@ -69,6 +76,7 @@ class TimelineViewModel @Inject constructor(
     private val jobUtilWrapper: JobUtilWrapper,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
+    private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -92,6 +100,81 @@ class TimelineViewModel @Inject constructor(
                     )
                 }
         }
+    }
+
+    /**
+     * Handle specific behavior when permissions are granted / denied
+     *
+     * @param permissions A [Map] of permissions that were requested
+     */
+    fun handlePermissionsResult(permissions: Map<String, Boolean>) {
+        if (areMediaPermissionsGranted(permissions)) handleEnableCameraUploads()
+        else setTriggerMediaPermissionsDeniedLogicState(shouldTrigger = true)
+    }
+
+    /**
+     * Checks whether the Media Permissions have been granted. For devices running Android 13 and
+     * above, Granular Permissions are checked
+     *
+     * @param permissions A [Map] of permissions that were requested
+     *
+     * @return Boolean value
+     */
+    private fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions[Manifest.permission.READ_MEDIA_IMAGES] == true && permissions[Manifest.permission.READ_MEDIA_VIDEO] == true
+        } else {
+            permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
+        }
+
+    /**
+     * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
+     * determined by the Use Case [checkEnableCameraUploadsStatus]
+     */
+    fun handleEnableCameraUploads() = viewModelScope.launch {
+        when (checkEnableCameraUploadsStatus.invoke()) {
+            CAN_ENABLE_CAMERA_UPLOADS -> {
+                setTriggerCameraUploadsState(shouldTrigger = true)
+            }
+            SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
+                setBusinessAccountPromptState(shouldShow = true)
+            }
+            SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
+                setBusinessAccountSuspendedPromptState(shouldShow = true)
+            }
+        }
+    }
+
+    /**
+     * Sets the value of [TimelineViewState.shouldTriggerMediaPermissionsDeniedLogic]
+     * @param shouldTrigger The new state value
+     */
+    fun setTriggerMediaPermissionsDeniedLogicState(shouldTrigger: Boolean) {
+        _state.update { it.copy(shouldTriggerMediaPermissionsDeniedLogic = shouldTrigger) }
+    }
+
+    /**
+     * Sets the value of [TimelineViewState.shouldTriggerCameraUploads]
+     * @param shouldTrigger The new state value
+     */
+    fun setTriggerCameraUploadsState(shouldTrigger: Boolean) {
+        _state.update { it.copy(shouldTriggerCameraUploads = shouldTrigger) }
+    }
+
+    /**
+     * Sets the value of [TimelineViewState.shouldShowBusinessAccountPrompt]
+     * @param shouldShow The new state value
+     */
+    fun setBusinessAccountPromptState(shouldShow: Boolean) {
+        _state.update { it.copy(shouldShowBusinessAccountPrompt = shouldShow) }
+    }
+
+    /**
+     * Sets the value of [TimelineViewState.shouldShowBusinessAccountSuspendedPrompt]
+     * @param shouldShow The new state value
+     */
+    fun setBusinessAccountSuspendedPromptState(shouldShow: Boolean) {
+        _state.update { it.copy(shouldShowBusinessAccountSuspendedPrompt = shouldShow) }
     }
 
     internal fun handleAndUpdatePhotosUIState(
@@ -181,8 +264,10 @@ class TimelineViewModel @Inject constructor(
 
     fun sortByOrder() {
         viewModelScope.launch {
-            handleAndUpdatePhotosUIState(_state.value.photos,
-                _state.value.currentShowingPhotos)
+            handleAndUpdatePhotosUIState(
+                _state.value.photos,
+                _state.value.currentShowingPhotos
+            )
         }
     }
 

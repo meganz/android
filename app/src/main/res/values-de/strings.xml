@@ -1506,8 +1506,6 @@
     <string name="result_paragraph_info_achievement_add_phone">Sie haben %1$s Speicherplatz für die Bestätigung Ihrer Telefonnummer erhalten.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Sie haben %1$s Speicherplatz als Bonus für Ihre Anmeldung erhalten.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Bonus läuft in %1$d Tagen ab</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Ordner freigeben</item>
@@ -3583,22 +3581,6 @@
     <string name="payment_methods">Zahlungsmethoden</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Fortfahren</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite (monatliche Abrechnung)</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite (jährliche Abrechnung)</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I (monatliche Abrechnung)</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I (jährliche Abrechnung)</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II (monatliche Abrechnung)</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II (jährliche Abrechnung)</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III (monatliche Abrechnung)</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III (jährliche Abrechnung)</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Gastgeberstatus entziehen</string>
     <!-- Title message of existing subscription dialog -->
@@ -4140,4 +4122,26 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Beschreibung</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Aus Album entfernen?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Um Kamera-Uploads zu ermöglichen, gewähren Sie MEGA Zugriff auf Fotos und andere Medien auf Ihrem Gerät.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Zugriff gewähren</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Nicht gewähren</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">%d Element wurde aus „%s“ entfernt</item>
+        <item quantity="other">%d Elemente wurden aus „%s“ entfernt</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">Einmaliges Meeting</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Video fortsetzen?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s wird bei %2$s fortgesetzt</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Fortsetzen</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Neustart</string>
 </resources>

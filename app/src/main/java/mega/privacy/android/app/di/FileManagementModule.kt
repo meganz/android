@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.domain.usecase.DownloadBackgroundFile
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 
 /**
  * File management module.
@@ -17,6 +17,6 @@ import mega.privacy.android.domain.repository.FileRepository
 class FileManagementModule {
 
     @Provides
-    fun provideDownloadBackgroundFile(fileRepository: FileRepository): DownloadBackgroundFile =
-        DownloadBackgroundFile(fileRepository::downloadBackgroundFile)
+    fun provideDownloadBackgroundFile(fileSystemRepository: FileSystemRepository): DownloadBackgroundFile =
+        DownloadBackgroundFile(fileSystemRepository::downloadBackgroundFile)
 }

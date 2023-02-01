@@ -203,7 +203,7 @@ class DefaultMediaPlayerRepositoryTest {
 
         underTest.updatePlaybackInformation(expectedPlaybackInfo)
         whenever(appPreferencesGateway.monitorString(anyOrNull(),
-            anyOrNull())).thenReturn(flowOf(null))
+            anyOrNull())).thenReturn(flowOf("{}"))
         val actual = underTest.monitorPlaybackTimes().firstOrNull()
 
         assertThat(actual?.get(expectedMediaId)?.mediaId).isEqualTo(expectedMediaId)

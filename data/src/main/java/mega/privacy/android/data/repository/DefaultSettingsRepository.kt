@@ -21,6 +21,7 @@ import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -37,6 +38,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
@@ -72,6 +74,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val startScreenMapper: StartScreenMapper,
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
     private val videoQualityIntMapper: VideoQualityIntMapper,
+    private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
 ) : SettingsRepository {
     init {
         runBlocking {
@@ -214,6 +217,10 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setChargingOnSize(size)
     }
 
+    override suspend fun getStorageDownloadAskAlways(): Boolean {
+        return megaLocalStorageGateway.getStorageAskAlways()
+    }
+
     override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) =
         megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
 
@@ -223,6 +230,9 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
     }
 
+    override suspend fun getStorageDownloadLocation(): String? {
+        return megaLocalStorageGateway.getStorageDownloadLocation()
+    }
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =
         megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
@@ -351,7 +361,8 @@ internal class DefaultSettingsRepository @Inject constructor(
                 camSyncTimeStamp?.toString(),
                 camVideoSyncTimeStamp?.toString(),
                 secSyncTimeStamp?.toString(),
-                secVideoSyncTimeStamp?.toString())
+                secVideoSyncTimeStamp?.toString()
+            )
         }
     }
 
@@ -405,5 +416,13 @@ internal class DefaultSettingsRepository @Inject constructor(
                 apiFacade.removeRequestListener(listener)
             }
         }
+    }
+
+    override suspend fun buildDefaultDownloadDir(): File {
+        return cacheFolderGateway.buildDefaultDownloadDir()
+    }
+
+    override suspend fun isMobileDataAllowed() = withContext(ioDispatcher) {
+        fileManagementPreferencesGateway.isMobileDataAllowed()
     }
 }

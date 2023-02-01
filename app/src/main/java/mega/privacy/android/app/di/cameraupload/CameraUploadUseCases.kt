@@ -48,11 +48,12 @@ import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
@@ -104,6 +105,7 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
+import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
@@ -124,6 +126,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -160,6 +163,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideHasPreferences(cameraUploadRepository: CameraUploadRepository): HasPreferences =
             HasPreferences(cameraUploadRepository::doPreferencesExist)
+
+        /**
+         * Provide the [HasCameraSyncEnabled] implementation
+         */
+        @Provides
+        fun provideHasCameraSyncEnabled(cameraUploadRepository: CameraUploadRepository): HasCameraSyncEnabled =
+            HasCameraSyncEnabled(cameraUploadRepository::doesSyncEnabledExist)
 
         /**
          * Provide the [IsCameraUploadSyncEnabled] implementation
@@ -227,6 +237,25 @@ abstract class CameraUploadUseCases {
             jobUtilWrapper.fireCameraUploadJob(
                 context,
                 shouldIgnoreAttributes
+            )
+        }
+
+        /**
+         * Provides the [RestartCameraUpload] implementation
+         *
+         * @param jobUtilWrapper [JobUtilWrapper]
+         * @param context [Context]
+         *
+         * @return [RestartCameraUpload]
+         */
+        @Provides
+        fun provideRestartCameraUpload(
+            jobUtilWrapper: JobUtilWrapper,
+            @ApplicationContext context: Context,
+        ): RestartCameraUpload = RestartCameraUpload { shouldIgnoreAttributes ->
+            jobUtilWrapper.fireRestartCameraUploadJob(
+                context = context,
+                shouldIgnoreAttributes = shouldIgnoreAttributes,
             )
         }
 
@@ -357,53 +386,53 @@ abstract class CameraUploadUseCases {
          * Provide the [GetFingerprint] implementation
          */
         @Provides
-        fun provideGetFingerPrint(filesRepository: FilesRepository): GetFingerprint =
-            GetFingerprint(filesRepository::getFingerprint)
+        fun provideGetFingerPrint(megaNodeRepository: MegaNodeRepository): GetFingerprint =
+            GetFingerprint(megaNodeRepository::getFingerprint)
 
         /**
          * Provide the [GetNodesByOriginalFingerprint] implementation
          */
         @Provides
-        fun provideGetNodesByOriginalFingerprint(filesRepository: FilesRepository): GetNodesByOriginalFingerprint =
-            GetNodesByOriginalFingerprint(filesRepository::getNodesByOriginalFingerprint)
+        fun provideGetNodesByOriginalFingerprint(megaNodeRepository: MegaNodeRepository): GetNodesByOriginalFingerprint =
+            GetNodesByOriginalFingerprint(megaNodeRepository::getNodesByOriginalFingerprint)
 
         /**
          * Provide the [GetNodeByFingerprintAndParentNode] implementation
          */
         @Provides
-        fun provideGetNodeByFingerprintAndParentNode(filesRepository: FilesRepository): GetNodeByFingerprintAndParentNode =
-            GetNodeByFingerprintAndParentNode(filesRepository::getNodeByFingerprintAndParentNode)
+        fun provideGetNodeByFingerprintAndParentNode(megaNodeRepository: MegaNodeRepository): GetNodeByFingerprintAndParentNode =
+            GetNodeByFingerprintAndParentNode(megaNodeRepository::getNodeByFingerprintAndParentNode)
 
         /**
          * Provide the [GetNodeByFingerprint] implementation
          */
         @Provides
-        fun provideGetNodeByFingerprint(filesRepository: FilesRepository): GetNodeByFingerprint =
-            GetNodeByFingerprint(filesRepository::getNodeByFingerprint)
+        fun provideGetNodeByFingerprint(megaNodeRepository: MegaNodeRepository): GetNodeByFingerprint =
+            GetNodeByFingerprint(megaNodeRepository::getNodeByFingerprint)
 
         /**
          * Provide the [SetOriginalFingerprint] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [SetOriginalFingerprint]
          */
         @Provides
-        fun provideSetOriginalFingerprint(filesRepository: FilesRepository): SetOriginalFingerprint =
-            SetOriginalFingerprint(filesRepository::setOriginalFingerprint)
+        fun provideSetOriginalFingerprint(megaNodeRepository: MegaNodeRepository): SetOriginalFingerprint =
+            SetOriginalFingerprint(megaNodeRepository::setOriginalFingerprint)
 
         /**
          * Provide the [GetParentMegaNode] implementation
          */
         @Provides
-        fun provideGetParentMegaNode(filesRepository: FilesRepository): GetParentMegaNode =
-            GetParentMegaNode(filesRepository::getParentNode)
+        fun provideGetParentMegaNode(megaNodeRepository: MegaNodeRepository): GetParentMegaNode =
+            GetParentMegaNode(megaNodeRepository::getParentNode)
 
         /**
          * Provide the [GetChildMegaNode] implementation
          */
         @Provides
-        fun provideGetChildMegaNode(filesRepository: FilesRepository): GetChildMegaNode =
-            GetChildMegaNode(filesRepository::getChildNode)
+        fun provideGetChildMegaNode(megaNodeRepository: MegaNodeRepository): GetChildMegaNode =
+            GetChildMegaNode(megaNodeRepository::getChildNode)
 
         /**
          * Provide the [SetPrimarySyncHandle] implementation
@@ -423,8 +452,8 @@ abstract class CameraUploadUseCases {
          * Provide the [IsNodeInRubbish] implementation
          */
         @Provides
-        fun provideIsNodeInRubbish(fileRepository: FileRepository): IsNodeInRubbish =
-            IsNodeInRubbish(fileRepository::isNodeInRubbish)
+        fun provideIsNodeInRubbish(nodeRepository: NodeRepository): IsNodeInRubbish =
+            IsNodeInRubbish(nodeRepository::isNodeInRubbish)
 
         /**
          * Provide the [ClearCacheDirectory] implementation
@@ -451,8 +480,8 @@ abstract class CameraUploadUseCases {
          * Provide the [IsNodeInRubbishOrDeleted] implementation
          */
         @Provides
-        fun provideIsNodeInRubbishOrDeleted(fileRepository: FileRepository): IsNodeInRubbishOrDeleted =
-            IsNodeInRubbishOrDeleted(fileRepository::isNodeInRubbishOrDeleted)
+        fun provideIsNodeInRubbishOrDeleted(nodeRepository: NodeRepository): IsNodeInRubbishOrDeleted =
+            IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation
@@ -472,8 +501,8 @@ abstract class CameraUploadUseCases {
          * Provide the [CreateCameraUploadFolder] implementation
          */
         @Provides
-        fun provideCreateCameraUploadFolder(fileRepository: FileRepository): CreateCameraUploadFolder =
-            CreateCameraUploadFolder(fileRepository::createFolder)
+        fun provideCreateCameraUploadFolder(fileSystemRepository: FileSystemRepository): CreateCameraUploadFolder =
+            CreateCameraUploadFolder(fileSystemRepository::createFolder)
 
         /**
          * Provide the [GetNumberOfPendingUploads] implementation

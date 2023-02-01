@@ -9,15 +9,18 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.AccountSessionMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
+import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.model.GlobalUpdate
@@ -63,6 +66,7 @@ class DefaultAccountRepositoryTest {
         mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
+    private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val userAccountMapper = ::UserAccount
     private val accountTypeMapper = mock<AccountTypeMapper>()
     private val currencyMapper = ::Currency
@@ -71,6 +75,8 @@ class DefaultAccountRepositoryTest {
     private val achievementsOverviewMapper = mock<AchievementsOverviewMapper>()
     private val dbHandler = mock<DatabaseHandler>()
     private val isUserLoggedIn = mock<IsUserLoggedIn>()
+    private val userCredentialsMapper = mock<UserCredentialsMapper>()
+    private val accountSessionMapper = mock<AccountSessionMapper>()
 
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
         { credentials: String? ->
@@ -109,7 +115,7 @@ class DefaultAccountRepositoryTest {
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) },
-            localStorageGateway = mock(),
+            localStorageGateway = localStorageGateway,
             userAccountMapper = userAccountMapper,
             accountTypeMapper = accountTypeMapper,
             currencyMapper = currencyMapper,
@@ -118,7 +124,9 @@ class DefaultAccountRepositoryTest {
             achievementsOverviewMapper = achievementsOverviewMapper,
             dbHandler = dbHandler,
             myAccountCredentialsMapper = myAccountCredentialsMapper,
-            accountDetailMapper = mock()
+            accountDetailMapper = mock(),
+            userCredentialsMapper = userCredentialsMapper,
+            accountSessionMapper = accountSessionMapper,
         )
 
         whenever(megaChatApiGateway.getMyEmail()).thenReturn("my@email.com")
@@ -672,4 +680,40 @@ class DefaultAccountRepositoryTest {
         underTest.isUserLoggedIn()
         verify(megaApiGateway).isUserLoggedIn()
     }
+
+    @Test
+    fun `test that MegaApiGateway is invoked for getting current user and session while saving credentials`() =
+        runTest {
+            underTest.saveAccountCredentials()
+            verify(megaApiGateway).myUser
+            verify(megaApiGateway).dumpSession
+        }
+
+    @Test
+    fun `test that MegaLocalStorageGateway is invoked for saving credentials and clearing ephemeral while saving credentials`() =
+        runTest {
+            val credentials =
+                userCredentialsMapper("test@mega.nz", "AFasdffW456sdfg", null, null, "1536456")
+
+            underTest.saveAccountCredentials()
+            verify(localStorageGateway).saveCredentials(credentials)
+            verify(localStorageGateway).clearEphemeral()
+        }
+
+    @Test
+    fun `test that account session is returned while saving credentials`() = runTest {
+        val email = "test@mega.nz"
+        val session = "AFasdffW456sdfg"
+        val handle = 1536456L
+
+        assertThat(underTest.saveAccountCredentials())
+            .isEqualTo(accountSessionMapper(email, session, handle))
+    }
+
+    @Test
+    fun `test that MegaLocalStorageGateway is invoked for getting account credentials`() =
+        runTest {
+            underTest.getAccountCredentials()
+            verify(localStorageGateway).getUserCredentials()
+        }
 }

@@ -209,6 +209,13 @@ interface CameraUploadRepository {
     suspend fun doPreferencesExist(): Boolean
 
     /**
+     * Do preferences exist
+     *
+     * @return true if preferences exist
+     */
+    suspend fun doesSyncEnabledExist(): Boolean
+
+    /**
      * Is camera upload sync enabled
      *
      * @return true if camera upload sync enabled

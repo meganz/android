@@ -22,16 +22,19 @@ import javax.inject.Inject
 internal class DefaultMonitorUserUpdates @Inject constructor(
     private val getAccountDetails: GetAccountDetails,
     private val accountRepository: AccountRepository,
+    private val isUserLoggedIn: IsUserLoggedIn,
 ) : MonitorUserUpdates {
     override fun invoke(): Flow<UserChanges> {
         return flow {
-            val loggedInUser = getAccountDetails(false).userId
-            emitAll(
-                accountRepository.monitorUserUpdates()
-                    .flatMapConcat { it.changes.entries.asFlow() }
-                    .filter { it.key == loggedInUser }
-                    .flatMapConcat { it.value.asFlow() }
-            )
+            if (isUserLoggedIn()) {
+                val loggedInUser = getAccountDetails(false).userId
+                emitAll(
+                    accountRepository.monitorUserUpdates()
+                        .flatMapConcat { it.changes.entries.asFlow() }
+                        .filter { it.key == loggedInUser }
+                        .flatMapConcat { it.value.asFlow() }
+                )
+            }
         }
     }
 }

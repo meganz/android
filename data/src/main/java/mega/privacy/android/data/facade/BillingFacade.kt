@@ -24,11 +24,13 @@ import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchasesAsync
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -55,7 +57,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Billing facade
@@ -83,12 +84,16 @@ internal class BillingFacade @Inject constructor(
     private val mutex = Mutex()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e(throwable)
+    }
+
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        applicationScope.launch {
+        applicationScope.launch(exceptionHandler) {
             ensureConnect()
         }
     }
@@ -123,7 +128,10 @@ internal class BillingFacade @Inject constructor(
         val oldSku = oldSubscription?.sku
         val purchaseToken = oldSubscription?.token
         val skuDetails = skusCache.get()?.find { it.sku == productId }
-            ?: throw ProductNotFoundException()
+            ?: run {
+                Timber.w("Can't find sku with id: %s", productId)
+                throw ProductNotFoundException()
+            }
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
@@ -169,7 +177,7 @@ internal class BillingFacade @Inject constructor(
     }
 
     override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
-        applicationScope.launch(ioDispatcher) {
+        applicationScope.launch(ioDispatcher + exceptionHandler) {
             if (result.responseCode == BillingClient.BillingResponseCode.OK
                 && purchases.isNullOrEmpty().not()
             ) {
@@ -249,6 +257,7 @@ internal class BillingFacade @Inject constructor(
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
                 // Acknowledge the purchase if it hasn't already been acknowledged.
                 if (!purchase.isAcknowledged) {
+                    Timber.d("new purchase added, %s", purchase.originalJson)
                     val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(purchase.purchaseToken)
                         .build()
@@ -264,6 +273,7 @@ internal class BillingFacade @Inject constructor(
         val validMegaPurchases = validPurchases.map { megaPurchaseMapper(it) }
         // legacy support, we still need to save into MyAccountInfo, will remove after refactoring
         updateAccountInfo(validMegaPurchases)
+        Timber.d("total purchased are: %d", validMegaPurchases.size)
         return validMegaPurchases
     }
 
@@ -284,18 +294,22 @@ internal class BillingFacade @Inject constructor(
                 .enablePendingPurchases()
                 .setListener(this)
                 .build()
-            return@withLock suspendCoroutine { continuation ->
+            return@withLock suspendCancellableCoroutine { continuation ->
                 val listener = object : BillingClientStateListener {
                     override fun onBillingServiceDisconnected() {
                     }
 
                     override fun onBillingSetupFinished(result: BillingResult) {
+                        Timber.d("Response code is: %s", result.responseCode)
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            continuation.resumeWith(Result.success(newClient))
+                            if (continuation.isActive)
+                                continuation.resumeWith(Result.success(newClient))
                         } else {
-                            continuation.resumeWith(Result.failure(ConnectBillingServiceException(
-                                result.responseCode,
-                                result.debugMessage)))
+                            if (continuation.isActive)
+                                continuation.resumeWith(Result.failure(
+                                    ConnectBillingServiceException(
+                                        result.responseCode,
+                                        result.debugMessage)))
                         }
                     }
                 }

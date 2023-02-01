@@ -85,7 +85,7 @@ import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactFileListFragment;
-import mega.privacy.android.app.main.ContactSharedFolderFragment;
+import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;

@@ -1472,8 +1472,6 @@
     <string name="result_paragraph_info_achievement_add_phone">Anda telah menerima %1$sruang penyimpanan untuk memverifikasi nomor telepon anda.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Anda telah menerima ruang penyimpanan %1$s sebagai  bonus pendaftaran gratis anda.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Bonus akan berakhir dalam %1$d hari</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">Bagikan folder</item>
@@ -3485,22 +3483,6 @@
     <string name="payment_methods">Metode pembayaran</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Melanjutkan</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite bulanan</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite tahunan</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I bulanan</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I tahunan</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II bulanan</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II tahunan</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III bulanan</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III tahunan</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Hapus sebagai tuan rumah</string>
     <!-- Title message of existing subscription dialog -->
@@ -4001,34 +3983,53 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one">Album will be deleted but its contents will stay in your Timeline.</item>
-        <item quantity="other">Albums will be deleted but their contents will stay in your Timeline.</item>
+        <item quantity="other">Album akan dihapus tetapi kontennya akan tetap ada di Timeline anda.</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Lihat lebih sedikit</string>
     <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <string name="shared_items_verify_credentials_contact_verification_title">Verifikasi kontak</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_outgoing">Kami melindungi data anda dengan enkripsi tanpa pengetahuan. Untuk memastikan keamanan ekstra, kami meminta anda untuk memverifikasi kontak yang anda bagikan informasi sebelum mereka dapat mengakses folder bersama.</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_incoming">Kami melindungi data anda dengan enkripsi tanpa pengetahuan. Untuk memastikan keamanan ekstra, kami meminta anda memverifikasi kontak tempat anda menerima informasi sebelum anda dapat mengakses folder bersama.</string>
     <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="shared_items_verify_credentials_information">Untuk memverifikasi kontak anda, pastikan kredensial yang anda lihat di atas cocok dengan kredensial akun mereka. Anda dapat meminta mereka untuk membagikan kredensial mereka dengan anda.</string>
     <!--Undecrypted folder label-->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Folder tidak terdekripsi]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">Untuk mengakses folder bersama, orang yang membagikannya dengan anda juga harus memverifikasi anda.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verifikasi %s</string>
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Kredensial anda</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Mempersiapkan file untuk pratinjau</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="other">Bonus kedaluwarsa dalam %1$d hari</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Deskripsi</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Hapus dari album?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Untuk mengaktifkan unggahan kamera, beri MEGA akses ke foto anda dan media lain di perangkat anda.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Berikan akses</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Jangan berikan</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="other">Menghapus %d item dari “%s”</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Lanjutkan video?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Lanjutkan</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Restart</string>
 </resources>

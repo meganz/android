@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountLevelDetailMapper
 import mega.privacy.android.data.mapper.AccountSessionDetailMapper
+import mega.privacy.android.data.mapper.AccountSessionMapper
 import mega.privacy.android.data.mapper.AccountStorageDetailMapper
 import mega.privacy.android.data.mapper.AccountTransferDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
@@ -32,6 +33,7 @@ import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
+import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
@@ -67,12 +69,14 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.ViewTypeMapper
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -83,6 +87,7 @@ import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
 import mega.privacy.android.data.mapper.toAccountLevelDetail
+import mega.privacy.android.data.mapper.toAccountSession
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
@@ -105,6 +110,7 @@ import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toDuration
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
+import mega.privacy.android.data.mapper.toInviteContactRequest
 import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
@@ -133,6 +139,7 @@ import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
+import mega.privacy.android.data.mapper.toUserCredentialsMapper
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
@@ -141,6 +148,7 @@ import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaNode
 
@@ -179,6 +187,14 @@ internal class MapperModule {
      */
     @Provides
     fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
+
+    /**
+     * Provide view type mapper
+     *
+     * @return [ViewTypeMapper]
+     */
+    @Provides
+    fun provideViewTypeMapper(): ViewTypeMapper = { ViewType(it) }
 
     /**
      * Provide user last green mapper
@@ -602,4 +618,22 @@ internal class MapperModule {
     @Provides
     fun provideScannedContactLinkResultMapper(): ScannedContactLinkResultMapper =
         ::toScannedContactLinkResult
+
+    /**
+     * Provides invite contact request mapper
+     */
+    @Provides
+    fun provideInviteContactRequestMapper(): InviteContactRequestMapper = ::toInviteContactRequest
+
+    /**
+     * Provides user credentials mapper
+     */
+    @Provides
+    fun provideUserCredentialsMapper(): UserCredentialsMapper = ::toUserCredentialsMapper
+
+    /**
+     * Provides account session mapper
+     */
+    @Provides
+    fun provideAccountSessionMapper(): AccountSessionMapper = ::toAccountSession
 }

@@ -23,7 +23,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,7 +33,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,9 +49,6 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
@@ -61,6 +56,9 @@ import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -97,7 +95,6 @@ fun AlbumPhotosSelectionScreen(
     handleAddPhotosCompletion(
         album = state.album,
         isSelectionCompleted = state.isSelectionCompleted,
-        numCommittedPhotos = state.numCommittedPhotos,
         onCompletion = onCompletion,
     )
 
@@ -383,21 +380,11 @@ private fun SelectLocationDialog(
 private fun handleAddPhotosCompletion(
     album: Album.UserAlbum?,
     isSelectionCompleted: Boolean,
-    numCommittedPhotos: Int,
     onCompletion: (albumId: AlbumId, message: String) -> Unit,
 ) {
     val albumId = album?.id
     if (albumId != null && isSelectionCompleted) {
-        val message = "".takeIf { numCommittedPhotos <= 0 } ?: pluralStringResource(
-            id = R.plurals.photos_album_selection_added,
-            count = numCommittedPhotos,
-            numCommittedPhotos,
-            album.title,
-        )
-
-        LaunchedEffect(Unit) {
-            onCompletion(album.id, message)
-        }
+        onCompletion(album.id, "")
     }
 }
 

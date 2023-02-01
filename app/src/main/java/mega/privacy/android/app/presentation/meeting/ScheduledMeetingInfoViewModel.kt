@@ -70,7 +70,7 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /**
- * StartConversationFragment view model.
+ * ScheduledMeetingInfoActivity view model.
  *
  * @property getChatRoom                    [GetChatRoom]
  * @property getChatParticipants            [GetChatParticipants]

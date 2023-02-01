@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.DeleteContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
+import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 
 /**
@@ -108,5 +110,13 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideMonitorAccountDetail(accountRepository: AccountRepository): MonitorAccountDetail =
             MonitorAccountDetail(accountRepository::monitorAccountDetail)
+
+        @Provides
+        fun provideSaveAccountCredentials(accountRepository: AccountRepository): SaveAccountCredentials =
+            SaveAccountCredentials(accountRepository::saveAccountCredentials)
+
+        @Provides
+        fun provideGetAccountCredentials(accountRepository: AccountRepository): GetAccountCredentials =
+            GetAccountCredentials(accountRepository::getAccountCredentials)
     }
 }

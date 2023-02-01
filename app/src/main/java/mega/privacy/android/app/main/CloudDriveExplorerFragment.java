@@ -8,7 +8,6 @@ import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,9 +50,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
-import mega.privacy.android.data.database.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
@@ -67,6 +63,9 @@ import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.data.qualifier.MegaApi;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaCancelToken;
@@ -82,10 +81,13 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
     @Inject
     DatabaseHandler dbH;
 
+    @Inject
+    @MegaApi
+    MegaApiAndroid megaApi;
+
     private Context context;
-    private MegaApiAndroid megaApi;
-    private ArrayList<MegaNode> nodes;
-    private ArrayList<MegaNode> searchNodes;
+    private List<MegaNode> nodes;
+    private List<MegaNode> searchNodes;
 
     private long parentHandle = -1;
 
@@ -131,8 +133,8 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
     public void activateActionMode() {
         Timber.d("activateActionMode");
 
-        if (!adapter.isMultipleSelect()) {
-            adapter.setMultipleSelect(true);
+        if (!adapter.getMultipleSelected()) {
+            adapter.setMultipleSelected(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
 
             if (isMultiselect()) {
@@ -191,7 +193,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
                 setNodes(nodes);
             }
             clearSelections();
-            adapter.setMultipleSelect(false);
+            adapter.setMultipleSelected(false);
             checkScroll();
         }
 
@@ -244,9 +246,6 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
         if (megaApi.getRootNode() == null) {
             return;
         }
@@ -270,7 +269,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 
         ((FileExplorerActivity) context).changeActionBarElevation(
                 recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION)
-                        || (adapter != null && adapter.isMultipleSelect()),
+                        || (adapter != null && adapter.getMultipleSelected()),
                 CLOUD_FRAGMENT);
     }
 
@@ -402,9 +401,8 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
 
         if (adapter == null) {
             adapter = new MegaExplorerAdapter(context, this, nodes, parentHandle,
-                    recyclerView, selectFile, sortByHeaderViewModel);
+                    recyclerView, selectFile, sortByHeaderViewModel, megaApi);
         } else {
-            adapter.setListFragment(recyclerView);
             adapter.setParentHandle(parentHandle);
             adapter.setSelectFile(selectFile);
         }
@@ -554,7 +552,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
     public void itemClick(View view, int position) {
         Timber.d("Position: %s", position);
 
-        ArrayList<MegaNode> clickNodes;
+        List<MegaNode> clickNodes;
 
         if (searchNodes != null) {
             clickNodes = searchNodes;
@@ -573,7 +571,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
             searchNodes = null;
             ((FileExplorerActivity) context).setShouldRestartSearch(false);
 
-            if (selectFile && ((FileExplorerActivity) context).isMultiselect() && adapter.isMultipleSelect()) {
+            if (selectFile && ((FileExplorerActivity) context).isMultiselect() && adapter.getMultipleSelected()) {
                 hideMultipleSelect();
             }
 
@@ -647,7 +645,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
         Timber.d("onBackPressed");
         if (selectFile) {
             if (((FileExplorerActivity) context).isMultiselect()) {
-                if (adapter.isMultipleSelect()) {
+                if (adapter.getMultipleSelected()) {
                     hideMultipleSelect();
                 }
             }
@@ -718,10 +716,11 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
         ((FileExplorerActivity) context).changeTitle();
     }
 
-    public void setNodes(ArrayList<MegaNode> nodes) {
+    public void setNodes(List<MegaNode> nodes) {
         this.nodes = nodes;
         if (adapter != null) {
             adapter.setNodes(nodes);
+            this.nodes = adapter.getNodes();
             showEmptyScreen();
         }
     }
@@ -740,7 +739,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
      * Clear all selected items
      */
     private void clearSelections() {
-        if (adapter.isMultipleSelect()) {
+        if (adapter.getMultipleSelected()) {
             adapter.clearSelections();
         }
         if (modeCloud == FileExplorerActivity.SELECT) {
@@ -796,7 +795,7 @@ public class CloudDriveExplorerFragment extends RotatableFragment implements
      */
     public void hideMultipleSelect() {
         Timber.d("hideMultipleSelect");
-        adapter.setMultipleSelect(false);
+        adapter.setMultipleSelected(false);
         adapter.clearSelections();
         if (actionMode != null) {
             actionMode.finish();

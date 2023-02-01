@@ -1,6 +1,6 @@
 package mega.privacy.android.app.main;
 
-import static mega.privacy.android.app.main.FileInfoActivity.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert;
@@ -134,6 +134,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
@@ -141,7 +142,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
-import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;

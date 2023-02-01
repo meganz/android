@@ -16,6 +16,7 @@ import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
@@ -49,6 +50,7 @@ class MeetingListFragment : Fragment() {
     private lateinit var binding: FragmentMeetingListBinding
     private var actionMode: ActionMode? = null
     private var actionModeRestored = false
+    private var scrolled = false
 
     private val viewModel by viewModels<MeetingListViewModel>()
     private val meetingsAdapter by lazy { MeetingsAdapter(::onItemClick, ::onItemMoreClick) }
@@ -94,6 +96,11 @@ class MeetingListFragment : Fragment() {
                     super.onScrolled(recyclerView, dx, dy)
                     checkElevation()
                 }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!scrolled && newState == SCROLL_STATE_DRAGGING) scrolled = true
+                }
             })
 
             meetingsAdapter.tracker = SelectionTracker.Builder(
@@ -138,6 +145,10 @@ class MeetingListFragment : Fragment() {
     private fun setupObservers(savedInstanceState: Bundle?) {
         viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
             meetingsAdapter.submitRoomList(items) {
+                if (!scrolled && items.isNotEmpty()) {
+                    binding.list.scrollToPosition(0)
+                }
+
                 if (savedInstanceState != null && !actionModeRestored) {
                     meetingsAdapter.tracker?.onRestoreInstanceState(savedInstanceState)
                     if (savedInstanceState.getBoolean(STATE_ACTION_MODE)) {
@@ -295,8 +306,6 @@ class MeetingListFragment : Fragment() {
             putExtra(Constants.CHAT_ID, chatId)
         }
         startActivity(intent)
-
-        (activity as? ManagerActivity?)?.closeSearchView()
     }
 
     private fun onItemMoreClick(chatId: Long) {

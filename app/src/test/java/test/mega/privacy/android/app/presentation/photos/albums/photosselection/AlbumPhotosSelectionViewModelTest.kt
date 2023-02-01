@@ -182,7 +182,6 @@ class AlbumPhotosSelectionViewModelTest {
         underTest?.state?.drop(1)?.test {
             val state = awaitItem()
             assertThat(state.isSelectionCompleted).isTrue()
-            assertThat(state.numCommittedPhotos).isEqualTo(photoIds.size)
         }
     }
 

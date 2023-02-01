@@ -7,17 +7,17 @@ import android.view.animation.AnimationUtils;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.FileInfoActivity;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
 
 public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
 
-    public MegaFileInfoSharedContactAdapter(Context _context, MegaNode node, ArrayList<MegaShare> _shareList, RecyclerView _lv) {
+    public MegaFileInfoSharedContactAdapter(Context _context, MegaNode node, List<MegaShare> _shareList, RecyclerView _lv) {
         super(_context, node, _shareList, _lv);
     }
 

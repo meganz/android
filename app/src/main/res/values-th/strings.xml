@@ -1472,8 +1472,6 @@
     <string name="result_paragraph_info_achievement_add_phone">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการตรวจสอบหมายเลขโทรศัพท์ของคุณ</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">คุณได้รับพื้นที่เก็บข้อมูลขนาด %1$s เป็นโบนัสการลงทะเบียนฟรีของคุณ</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">โบนัสหมดอายุภายใน %1$d วัน</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">แชร์โฟลเดอร์</item>
@@ -3485,22 +3483,6 @@
     <string name="payment_methods">วิธีการชำระเงิน</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">ดำเนินการต่อ</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite แบบรายเดือน</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite แบบรายปี</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I แบบรายเดือน</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I แบบรายปี</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II แบบรายเดือน</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II แบบรายปี</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III แบบรายเดือน</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III แบบรายปี</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">ถอนสิทธิ์การเป็นผู้จัดการประชุม</string>
     <!-- Title message of existing subscription dialog -->
@@ -3803,7 +3785,7 @@
     </plurals>
     <!-- Number of participants in the call in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
-        <item quantity="other">จำนวนผู้เข้าร่วม: %d</item>
+        <item quantity="other">จำนวนผู้เข้าร่วม: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A][B] ถูกเปลี่ยนเป็นอ่านอย่างเดียวโดย [/B][A]%2$s[/A]</string>
@@ -4029,4 +4011,25 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">รายละเอียด</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">นำออกจากอัลบั้มหรือไม่</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">หากต้องการเปิดใช้งานการอัปโหลดจากกล้อง ต้องให้สิทธิ์ MEGA เข้าถึงรูปภาพและสื่ออื่น ๆ บนอุปกรณ์ของคุณ</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">ให้สิทธิ์เข้าถึง</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">ไม่ต้องให้สิทธิ์</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="other">ลบ %d รายการออกจาก “%s” แล้ว</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">เล่นวิดีโอต่อจากก่อนหน้านี้หรือไม่</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">ไฟล์ %1$s จะเริ่มเล่นต่อจาก %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">ต่อ</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">รีสตาร์ท</string>
 </resources>

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -18,13 +18,13 @@ import org.mockito.kotlin.whenever
 class DefaultMonitorBackupFolderTest {
     private lateinit var underTest: MonitorBackupFolder
 
-    private val fileRepository = mock<FileRepository>()
+    private val nodeRepository = mock<NodeRepository>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
 
     @Before
     fun setUp() {
         underTest = DefaultMonitorBackupFolder(
-            fileRepository = fileRepository,
+            nodeRepository = nodeRepository,
             monitorUserUpdates = monitorUserUpdates,
         )
     }
@@ -32,7 +32,7 @@ class DefaultMonitorBackupFolderTest {
     @Test
     fun `test that current backup folder id is returned`() = runTest {
         val expected = Result.success(NodeId(1L))
-        fileRepository.stub {
+        nodeRepository.stub {
             onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow())
         }
 
@@ -50,7 +50,7 @@ class DefaultMonitorBackupFolderTest {
             val expectedUpdates =
                 List(updates.size) { index -> Result.success(NodeId(index.toLong())) }
 
-            fileRepository.stub {
+            nodeRepository.stub {
                 onBlocking { getBackupFolderId() }.thenReturn(
                     expected.getOrThrow(),
                     *expectedUpdates.map { it.getOrThrow() }.toTypedArray()
@@ -73,7 +73,7 @@ class DefaultMonitorBackupFolderTest {
             val updates = UserChanges.values().filterNot { it == UserChanges.MyBackupsFolder }
             val expected = Result.success(NodeId(1L))
             val notExpected = NodeId(2L)
-            fileRepository.stub {
+            nodeRepository.stub {
                 onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow(), notExpected)
             }
             whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
@@ -87,7 +87,7 @@ class DefaultMonitorBackupFolderTest {
     @Test
     fun `test that an error from the repository returns a failed result`() = runTest {
 
-        fileRepository.stub {
+        nodeRepository.stub {
             onBlocking { getBackupFolderId() }.thenAnswer {
                 throw Throwable()
             }

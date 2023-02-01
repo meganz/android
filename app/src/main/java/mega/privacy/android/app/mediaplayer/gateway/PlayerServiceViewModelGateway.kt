@@ -349,10 +349,18 @@ interface PlayerServiceViewModelGateway {
     suspend fun savePlaybackTimes()
 
     /**
+     * Delete playback information
+     *
+     * @param mediaId the media id of deleted item
+     */
+    suspend fun deletePlaybackInformation(mediaId: Long)
+
+    /**
      * Monitor playback times
      *
      * @param mediaId the media id of target media item
-     * @param seekToPosition seed to last playback time
+     * @param seekToPosition the callback for seek to playback position history. If the current item contains the playback history,
+     * then invoke the callback and the playback position history is parameter
      */
-    suspend fun monitorPlaybackTimes(mediaId: Long?, seekToPosition: (positionMs: Long) -> Unit)
+    suspend fun monitorPlaybackTimes(mediaId: Long?, seekToPosition: (positionInMs: Long?) -> Unit)
 }

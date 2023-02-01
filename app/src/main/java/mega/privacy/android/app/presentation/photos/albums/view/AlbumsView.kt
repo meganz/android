@@ -292,6 +292,8 @@ fun AlbumsView(
         if (!albumsViewState.isAlbumCreatedSuccessfully) {
             if (openDialog.value) {
                 CreateNewAlbumDialog(
+                    titleResID = R.string.photos_album_creation_dialog_title,
+                    positiveButtonTextResID = R.string.general_create,
                     onDismissRequest = {
                         openDialog.value = false
                         setInputValidity(true)

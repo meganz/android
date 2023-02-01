@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,19 +15,19 @@ import org.mockito.kotlin.stub
 class DefaultHasAncestorTest {
     private lateinit var underTest: HasAncestor
 
-    private val fileRepository = mock<FileRepository>()
+    private val nodeRepository = mock<NodeRepository>()
     private val targetNode = NodeId(12L)
 
     @Before
     fun setUp() {
-        underTest = DefaultHasAncestor(fileRepository = fileRepository)
+        underTest = DefaultHasAncestor(nodeRepository = nodeRepository)
     }
 
     @Test
     fun `test that true is returned if the ids are the same`() = runTest {
         val Node = mock<Node> { on { id }.thenReturn(targetNode) }
 
-        fileRepository.stub {
+        nodeRepository.stub {
             onBlocking { getNodeById(targetNode) }.thenReturn(Node)
         }
 
@@ -41,7 +41,7 @@ class DefaultHasAncestorTest {
         val Node = mock<Node> { on { parentId }.thenReturn(ancestor) }
         val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
-        fileRepository.stub {
+        nodeRepository.stub {
             onBlocking { getNodeById(targetNode) }.thenReturn(Node)
             onBlocking { getNodeById(ancestor) }.thenReturn(ancestorNode)
         }
@@ -51,7 +51,7 @@ class DefaultHasAncestorTest {
 
     @Test
     fun `test that false is returned if the target node is null`() = runTest {
-        fileRepository.stub {
+        nodeRepository.stub {
             onBlocking { getNodeById(targetNode) }.thenReturn(null)
         }
         val actual = underTest(targetNode, targetNode)
@@ -67,7 +67,7 @@ class DefaultHasAncestorTest {
             val directParent = mock<Node> { on { parentId }.thenReturn(ancestor) }
             val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
-            fileRepository.stub {
+            nodeRepository.stub {
                 onBlocking { getNodeById(targetNode) }.thenReturn(Node)
                 onBlocking { getNodeById(directParentId) }.thenReturn(directParent)
                 onBlocking { getNodeById(ancestor) }.thenReturn(ancestorNode)
@@ -90,7 +90,7 @@ class DefaultHasAncestorTest {
         }
         val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
-        fileRepository.stub {
+        nodeRepository.stub {
             onBlocking { getNodeById(targetNode) }.thenReturn(Node)
             onBlocking { getNodeById(directParentId) }.thenReturn(directParent)
             onBlocking { getNodeById(ancestor) }.thenReturn(ancestorNode)

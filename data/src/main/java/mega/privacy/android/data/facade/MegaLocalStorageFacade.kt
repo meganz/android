@@ -2,9 +2,10 @@ package mega.privacy.android.data.facade
 
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
@@ -172,6 +173,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
 
+    override suspend fun doesSyncEnabledExist() = dbHandler.preferences?.camSyncEnabled != null
+
     override suspend fun isSyncEnabled(): Boolean =
         dbHandler.preferences?.camSyncEnabled.toBoolean()
 
@@ -245,8 +248,15 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setFirstTime(false)
     }
 
+    override suspend fun getStorageAskAlways(): Boolean =
+        dbHandler.preferences?.storageAskAlways?.toBoolean() ?: true
+
     override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) {
         dbHandler.setStorageAskAlways(isStorageAskAlways)
+    }
+
+    override suspend fun getStorageDownloadLocation(): String? {
+        return dbHandler.preferences?.storageDownloadLocation
     }
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) {
@@ -339,6 +349,17 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setLastPublicHandleType(type: Int) {
         dbHandler.lastPublicHandleType = type
     }
+
+    override suspend fun getChatSettings(): ChatSettings? = dbHandler.chatSettings
+
+    override suspend fun setChatSettings(chatSettings: ChatSettings) {
+        dbHandler.chatSettings = chatSettings
+    }
+
+    override suspend fun saveCredentials(userCredentials: UserCredentials) =
+        dbHandler.saveCredentials(userCredentials)
+
+    override suspend fun clearEphemeral() = dbHandler.clearEphemeral()
 
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200

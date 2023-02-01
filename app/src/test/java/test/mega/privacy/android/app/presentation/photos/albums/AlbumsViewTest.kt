@@ -130,6 +130,8 @@ class AlbumsViewTest {
         val onDialogPositiveButtonClicked = mock<(String, List<String>) -> Unit>()
         composeRule.setContent {
             CreateNewAlbumDialog(
+                titleResID = R.string.photos_album_creation_dialog_title,
+                positiveButtonTextResID = R.string.general_create,
                 onDismissRequest = onDismissRequest,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked
             )
@@ -147,6 +149,8 @@ class AlbumsViewTest {
 
         composeRule.setContent {
             CreateNewAlbumDialog(
+                titleResID = R.string.photos_album_creation_dialog_title,
+                positiveButtonTextResID = R.string.general_create,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDismissRequest = onDismissRequest,
             )
@@ -165,6 +169,8 @@ class AlbumsViewTest {
         val onDismissRequest = mock<() -> Unit>()
         composeRule.setContent {
             CreateNewAlbumDialog(
+                titleResID = R.string.photos_album_creation_dialog_title,
+                positiveButtonTextResID = R.string.general_create,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDismissRequest = onDismissRequest,
                 inputPlaceHolderText = { fromId(inputPlaceholderText) }

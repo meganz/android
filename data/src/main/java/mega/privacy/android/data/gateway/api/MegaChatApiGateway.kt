@@ -396,7 +396,7 @@ interface MegaChatApiGateway {
      *
      * @return My full name
      */
-    fun getMyFullname(): String
+    fun getMyFullname(): String?
 
     /**
      * Get my email

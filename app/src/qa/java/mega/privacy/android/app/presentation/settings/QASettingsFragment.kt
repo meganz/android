@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.settings
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
@@ -45,7 +47,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
                 true
             }
             saveLogsPreferenceKey -> {
-                viewModel.exportLogs(::sendSaveLogFileIntent)
+                viewModel.exportLogs(::sendViewLogFileIntent)
                 true
             }
             featureFlagsPreferenceKey -> {
@@ -68,20 +70,31 @@ class QASettingsFragment : PreferenceFragmentCompat() {
         startActivity(Intent.createChooser(it, null))
     }
 
-    private fun sendSaveLogFileIntent(logFile: File) {
-        val data = FileProvider.getUriForFile(requireContext(),
-            AUTHORITY_STRING_FILE_PROVIDER, logFile)
+    private fun sendViewLogFileIntent(logFile: File) {
+        val data = FileProvider.getUriForFile(
+            requireContext(),
+            AUTHORITY_STRING_FILE_PROVIDER, logFile
+        )
         val type = MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(logFile.extension)
-        requireContext().grantUriPermission(requireContext().packageName,
+        requireContext().grantUriPermission(
+            requireContext().packageName,
             data,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
 
         Intent(Intent.ACTION_VIEW)
             .setDataAndType(data, type)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             .let {
-                startActivity(it)
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    it.addCategory(Intent.CATEGORY_LAUNCHER)
+                }
+                try {
+                    startActivity(it)
+                } catch (e: ActivityNotFoundException) {
+                    sendShareLogFileIntent(logFile)
+                }
             }
 
     }

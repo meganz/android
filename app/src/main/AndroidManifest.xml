@@ -40,6 +40,9 @@
         android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -351,7 +354,7 @@
         <activity
             android:name=".main.ContactInfoActivity" />
         <activity
-            android:name=".main.FileInfoActivity" />
+            android:name=".presentation.fileinfo.FileInfoActivity" />
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:launchMode="singleTop" />
@@ -693,6 +696,11 @@
 
         <activity
             android:name="mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 

@@ -118,6 +118,11 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     private fun answerCall(enableVideo: Boolean) {
         val audio =
             PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+
+        if (!audio) {
+            showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
+            return
+        }
         var video = enableVideo
         if (video) {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)

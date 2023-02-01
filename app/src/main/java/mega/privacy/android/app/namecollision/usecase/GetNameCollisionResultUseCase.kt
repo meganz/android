@@ -341,7 +341,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
      */
     private fun String.getPossibleRenameName(): String {
         var extension = MimeTypeList.typeForName(this).extension
-        val pointIndex = lastIndexOf(extension) - 1
+        val pointIndex = (lastIndexOf(extension) - 1).coerceAtLeast(0)
         val name = substring(0, pointIndex)
         extension = substring(pointIndex, length)
         val pattern = "\\(\\d+\\)".toRegex()

@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
+import java.io.File
 
 /**
  * Mega api gateway
@@ -159,6 +160,11 @@ interface MegaApiGateway {
      * Fingerprint of the signing key of the current account
      */
     val myCredentials: String?
+
+    /**
+     * Current session key.
+     */
+    val dumpSession: String?
 
     /**
      * Are transfers paused (downloads and uploads)
@@ -699,6 +705,21 @@ interface MegaApiGateway {
     )
 
     /**
+     * Get Full image from server
+     *
+     * @param node
+     * @param fullFile
+     * @param highPriority
+     * @param listener
+     */
+    fun getFullImage(
+        node: MegaNode,
+        fullFile: File,
+        highPriority: Boolean,
+        listener: MegaTransferListenerInterface,
+    )
+
+    /**
      * Check is megaNode in Rubbish bin
      *
      * @param node MegaNode
@@ -1008,8 +1029,9 @@ interface MegaApiGateway {
      *
      * @param sid the ID of the set
      * @param node the node handle of the node which will be assigned as the set's new element
+     * @param listener MegaRequestListener to track this request
      */
-    suspend fun createSetElement(sid: Long, node: Long)
+    fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface)
 
     /**
      * Remove an element from a set
@@ -1064,6 +1086,51 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun removeSet(sid: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Request to update the name of a Set
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be updated
+     * - MegaRequest::getText - Returns new name of the Set
+     * - MegaRequest::getParamType - Returns OPTION_SET_NAME
+     *
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set with the given id could not be found (before or after the request).
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid      the id of the Set to be updated
+     * @param name     the new name that should be given to the Set
+     * @param listener MegaRequestListener to track this request
+     */
+    fun updateSetName(sid: Long, name: String?, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Request to update the name of a Set
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be updated
+     * - MegaRequest::getText - Returns new name of the Set
+     * - MegaRequest::getParamType - Returns OPTION_SET_NAME
+     *
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set with the given id could not be found (before or after the request).
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid  the id of the Set to be updated
+     * @param name the new name that should be given to the Set
+     */
+    fun updateSetName(sid: Long, name: String?)
 
     /**
      * Remove request listener
@@ -1181,6 +1248,21 @@ interface MegaApiGateway {
      * @param listener  MegaRequestListener to track this request
      */
     fun inviteContact(email: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Invite contact
+     *
+     * @param email     User email
+     * @param message   Message
+     * @param handle    User handle
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun inviteContact(
+        email: String,
+        handle: Long,
+        message: String?,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Get outgoing contact requests
@@ -1396,6 +1478,8 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
+
+    fun checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean
 
     /**
      * Function to get unverified incoming shares from [MegaApi]

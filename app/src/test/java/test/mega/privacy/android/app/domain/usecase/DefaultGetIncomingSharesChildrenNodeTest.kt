@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
@@ -33,7 +33,7 @@ class DefaultGetIncomingSharesChildrenNodeTest {
     private val getOthersSortOrder = mock<GetOthersSortOrder> {
         onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
-    private val filesRepository = mock<FilesRepository>()
+    private val megaNodeRepository = mock<MegaNodeRepository>()
 
     @Before
     fun setUp() {
@@ -42,7 +42,7 @@ class DefaultGetIncomingSharesChildrenNodeTest {
             getChildrenNode,
             getCloudSortOrder,
             getOthersSortOrder,
-            filesRepository,
+            megaNodeRepository,
         )
     }
 
@@ -51,7 +51,7 @@ class DefaultGetIncomingSharesChildrenNodeTest {
         runTest {
             underTest(-1L)
 
-            verify(filesRepository).getIncomingSharesNode(getOthersSortOrder())
+            verify(megaNodeRepository).getIncomingSharesNode(getOthersSortOrder())
         }
 
     @Test
@@ -59,7 +59,7 @@ class DefaultGetIncomingSharesChildrenNodeTest {
         runTest {
             underTest(MegaApiJava.INVALID_HANDLE)
 
-            verify(filesRepository).getIncomingSharesNode(getOthersSortOrder())
+            verify(megaNodeRepository).getIncomingSharesNode(getOthersSortOrder())
         }
 
     @Test

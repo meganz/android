@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.notification.model
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 
 /**
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.Dp
  * @property titleMaxWidth
  * @property description
  * @property descriptionMaxWidth
+ * @property chatDateText
  * @property dateText
  * @property isNew
  * @property backgroundColor
@@ -23,7 +25,7 @@ import androidx.compose.ui.unit.Dp
  * @property onClick
  * @constructor Create empty Notification
  */
-data class Notification(
+data class Notification constructor(
     val sectionTitle: (Context) -> String,
     @ColorRes val sectionColour: Int,
     @DrawableRes val sectionIcon: Int?,
@@ -32,6 +34,7 @@ data class Notification(
     val titleMaxWidth: (Context) -> Int?,
     val description: (Context) -> CharSequence?,
     val descriptionMaxWidth: (Context) -> Int?,
+    val chatDateText: (Context) -> AnnotatedString?,
     val dateText: (Context) -> String,
     val isNew: Boolean,
     val backgroundColor: (Context) -> String,

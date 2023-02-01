@@ -342,7 +342,7 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun getMyUserHandle(): Long = chatApi.myUserHandle
 
-    override fun getMyFullname(): String = chatApi.myFullname
+    override fun getMyFullname(): String? = chatApi.myFullname
 
     override fun getMyEmail(): String = chatApi.myEmail
 

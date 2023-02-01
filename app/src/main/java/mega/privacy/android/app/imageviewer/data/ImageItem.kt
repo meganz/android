@@ -3,6 +3,7 @@ package mega.privacy.android.app.imageviewer.data
 import android.net.Uri
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 
 /**
  * Data object that encapsulates an item representing an Image.

@@ -144,9 +144,6 @@ public class Constants {
 
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
-    public static final int REQUEST_CAMERA_UPLOAD = 10;
-    public static final int REQUEST_CAMERA_ON_OFF = 11;
-    public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
     public static final int WRITE_LOG = 13;
 
     public static final int RECORD_VOICE_CLIP = 11;
@@ -196,7 +193,6 @@ public class Constants {
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
-    public static final String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
     public static final String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
     public static final String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
     public static final String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
@@ -614,6 +610,7 @@ public class Constants {
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
+    public static final String INVITE_CONTACT = "INVITE_CONTACT";
     public static final String TYPE_CAMERA = "TYPE_CAMERA";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
     public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";

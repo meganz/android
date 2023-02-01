@@ -525,7 +525,7 @@
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_msg">통화를 위해 MEGA에 다른 앱 위에 표시 권한을 허용해주세요.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">기기 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
+    <string name="ask_for_display_over_explain">장치 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">와이파이 전용</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -702,7 +702,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">대하여</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">개인정보 보호정책</string>
+    <string name="settings_about_privacy_policy">개인정보 보호 정책</string>
     <!--  -->
     <string name="settings_about_terms_of_service">이용 약관</string>
     <!-- App means “Application” -->
@@ -1472,8 +1472,6 @@
     <string name="result_paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">당신은 무료 가입 보너스로 %1$s의 저장 공간을 받았습니다.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">%1$d일 후 보너스 만료</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">폴더 공유</item>
@@ -1493,7 +1491,7 @@
     <!-- mail body -->
     <string name="setting_feedback_body">여기에 의견을 적으세요:</string>
     <!-- mail body -->
-    <string name="settings_feedback_body_device_model">기기 모델</string>
+    <string name="settings_feedback_body_device_model">장치 모델</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">안드로이드 버전</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
@@ -1762,7 +1760,7 @@
     <!-- The subtitle of fragment Turn on Notifications -->
     <string name="turn_on_notifications_subtitle">이 방법으로, 새 메시지를 Android 휴대 전화에서\n바로 볼 수 있습니다.</string>
     <!-- First step to turn on notifications -->
-    <string name="turn_on_notifications_first_step">Android 기기 [A]설정[/A]을 엽니다</string>
+    <string name="turn_on_notifications_first_step">Android 장치 [A]설정[/A]을 엽니다</string>
     <!-- Second step to turn on notifications -->
     <string name="turn_on_notifications_second_step">[A]앱과 알림[/A] 열기</string>
     <!-- Third step to turn on notifications -->
@@ -2394,7 +2392,7 @@
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">MEGA에서 당신의 주소록에 있는 지인들을 쉽게 찾으세요.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
-    <string name="allow_access_contact_explanation">MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호 작용하지 않을 것입니다.</string>
+    <string name="allow_access_contact_explanation">MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호작용하지 않을 것입니다.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
@@ -2462,9 +2460,9 @@
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
-    <string name="on_permanently_denied">기기 설정에서 MEGA 권한을 허용할 수 있습니다</string>
+    <string name="on_permanently_denied">장치 설정에서 MEGA 권한을 허용할 수 있습니다</string>
     <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">MEGA가 당신의 주소록에 접근할 수 있도록 해주면, 당신은 더 쉽게 당신의 지인들을 찾을 수 있습니다. MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호 작용하지 않을 것입니다.</string>
+    <string name="explanation_for_contacts_permission">MEGA가 당신의 주소록에 접근할 수 있도록 해주면, 당신은 더 쉽게 당신의 지인들을 찾을 수 있습니다. MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호작용하지 않을 것입니다.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="other">전달된 메시지</item>
@@ -3214,7 +3212,7 @@
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">전화번호 추가</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
-    <string name="denied_write_permissions">진행하려면 MEGA에 기기 저장소에 쓰기 권한이 필요합니다.</string>
+    <string name="denied_write_permissions">진행하려면 MEGA에 장치 저장소에 쓰기 권한이 필요합니다.</string>
     <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
     <string name="tomorrow_date">내일, %1$s</string>
     <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
@@ -3485,22 +3483,6 @@
     <string name="payment_methods">결제 수단</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">진행</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite monthly</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite yearly</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I monthly</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I yearly</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II monthly</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II yearly</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III monthly</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III yearly</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">주최자에서 해임</string>
     <!-- Title message of existing subscription dialog -->
@@ -3803,7 +3785,7 @@
     </plurals>
     <!-- Number of participants in the call in the meeting info bottom panel -->
     <plurals name="meeting_call_screen_meeting_info_bottom_panel_num_of_participants">
-        <item quantity="other">참여자: %d</item>
+        <item quantity="other">참여자: %s</item>
     </plurals>
     <!-- Chat log message when the permissions for a user has been changed to read-onl -->
     <string name="chat_chat_room_message_permissions_changed_to_read_only">[A]%1$s[/A]님이 [A]%2$s[/A]님에 의해 [B]읽기만 가능하게 변경되었습니다[/B]</string>
@@ -3922,7 +3904,7 @@
     <!-- Message of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_left_to_add_message">이미 이 대화에 모든 연락처를 추가하였습니다. 만약 더 많은 참여자를 원한다면, 먼저 당신의 연락처 목록에 초대하세요.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
-    <string name="media_player_video_snackbar_screenshot_saved">기기 갤러리에 이미지 저장됨</string>
+    <string name="media_player_video_snackbar_screenshot_saved">장치 갤러리에 이미지 저장됨</string>
     <!-- Title of renewal date for my account usage page. -->
     <string name="account_info_renewal_date">[A]갱신일:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
@@ -4025,9 +4007,29 @@
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">파일 미리보기 준비 중</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="other">%1$d일 내에 보너스가 만료됩니다</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">설명</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">사진첩에서 제거할까요?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">카메라 업로드를 활성화 하려면, MEGA가 당신의 장치의 사진과 다른 미디어에 접근할 수 있도록 허용해주세요.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">접근 허가</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">허용하지 않음</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="other">“%s”에서 %d개 항목 제거함</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">일회성 회의</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">이어서 볼까요?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s은/는 %2$s부터 재개됩니다</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">재개</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">재시작</string>
 </resources>

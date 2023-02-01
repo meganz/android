@@ -97,6 +97,8 @@
         </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_file_info_activity" />
+    <include
+        android:id="@+id/content_file_info_activity"
+        layout="@layout/content_file_info_activity" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

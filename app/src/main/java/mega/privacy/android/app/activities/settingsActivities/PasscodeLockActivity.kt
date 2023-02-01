@@ -345,7 +345,7 @@ class PasscodeLockActivity : BaseActivity() {
                     }
                 }
 
-                setEt(binding.passFirstInput)
+                previousDigitEditText = binding.passFirstInput
             }
 
 
@@ -358,7 +358,7 @@ class PasscodeLockActivity : BaseActivity() {
                     }
                 }
 
-                setEt(binding.passSecondInput)
+                previousDigitEditText = binding.passSecondInput
             }
 
             binding.passFourthInput.apply {
@@ -379,7 +379,7 @@ class PasscodeLockActivity : BaseActivity() {
                     }
                 }
 
-                setEt(binding.passThirdInput)
+                previousDigitEditText = binding.passThirdInput
             }
 
             val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
@@ -405,7 +405,7 @@ class PasscodeLockActivity : BaseActivity() {
                         }
                     }
 
-                    setEt(binding.passFourthInput)
+                    previousDigitEditText = binding.passFourthInput
                 }
 
                 binding.passSixthInput.apply {
@@ -422,7 +422,7 @@ class PasscodeLockActivity : BaseActivity() {
                         }
                     }
 
-                    setEt(binding.passFifthInput)
+                    previousDigitEditText = binding.passFifthInput
                 }
             }
 

@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -20,7 +20,7 @@ class DefaultGetOfflineFileTest {
     private val offlinePath = "Offline path"
     private val offlineInboxPath = "Offline inbox path"
 
-    private val fileRepository = mock<FileRepository> {
+    private val fileSystemRepository = mock<FileSystemRepository> {
         onBlocking { getOfflinePath() }.thenReturn(offlinePath)
         onBlocking { getOfflineInboxPath() }.thenReturn(offlineInboxPath)
     }
@@ -28,7 +28,7 @@ class DefaultGetOfflineFileTest {
     @Before
     fun setUp() {
         underTest = DefaultGetOfflineFile(
-            fileRepository = fileRepository
+            fileSystemRepository = fileSystemRepository
         )
     }
 

@@ -1,14 +1,14 @@
 package mega.privacy.android.app.presentation.qrcode.scan.model
 
+import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel]
  *
  * @property dialogTitleContent Id of string resource for dialog title
  * @property dialogTextContent Id of string resource fot dialog content
- * @property contactNameContent Name of the scanned qr code
- * @property isContact Whether scanned code is of existing contact
- * @property myEmail Email
- * @property handleContactLink Handle of the scanned qr code
+ * @property email Email
  * @property success Whether to clos the activity on dismissing the dialog
  * @property printEmail Whether to show email in the dialog content
  * @property inviteDialogShown Whether dialog is shown or not
@@ -17,20 +17,19 @@ package mega.privacy.android.app.presentation.qrcode.scan.model
  * @property showInviteDialog Whether to show dialog
  * @property finishActivityOnScanComplete Whether to finish activity on completing the scan
  * @property finishActivity Finish the current activity
+ * @property scannedContactLinkResult Scanned contact details
  */
 data class ScanCodeState(
-    var dialogTitleContent: Int = -1,
-    var dialogTextContent: Int = -1,
-    var contactNameContent: String? = null,
-    var isContact: Boolean = false,
-    var myEmail: String? = null,
-    var handleContactLink: Long = -1,
-    var success: Boolean = true,
-    var printEmail: Boolean = false,
-    var inviteDialogShown: Boolean = false,
-    var inviteResultDialogShown: Boolean = false,
-    var showInviteResultDialog: Boolean = false,
-    var showInviteDialog: Boolean = false,
-    var finishActivityOnScanComplete: Boolean = false,
-    var finishActivity: Boolean = false,
+    @StringRes val dialogTitleContent: Int = -1,
+    @StringRes val dialogTextContent: Int = -1,
+    val email: String? = null,
+    val success: Boolean = true,
+    val printEmail: Boolean = false,
+    val inviteDialogShown: Boolean = false,
+    val inviteResultDialogShown: Boolean = false,
+    val showInviteResultDialog: Boolean = false,
+    val showInviteDialog: Boolean = false,
+    val finishActivityOnScanComplete: Boolean = false,
+    val finishActivity: Boolean = false,
+    val scannedContactLinkResult: ScannedContactLinkResult? = null,
 )

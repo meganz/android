@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,7 +31,7 @@ import com.google.firebase.perf.FirebasePerformance
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
-import mega.privacy.android.app.imageviewer.data.ImageResult
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
@@ -208,8 +209,8 @@ class ImageViewerPageFragment : Fragment() {
     private fun showPreviewImage(
         imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult,
     ) {
-        val previewImageRequest = imageResult?.previewUri?.toImageRequest(false)
-        val thumbnailImageRequest = imageResult?.thumbnailUri?.toImageRequest(false)
+        val previewImageRequest = imageResult?.previewUri?.toUri()?.toImageRequest(false)
+        val thumbnailImageRequest = imageResult?.thumbnailUri?.toUri()?.toImageRequest(false)
         if (previewImageRequest == null && thumbnailImageRequest == null) return
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
@@ -241,12 +242,12 @@ class ImageViewerPageFragment : Fragment() {
     private fun showFullImage(
         imageResult: ImageResult? = viewModel.getImageItem(itemId)?.imageResult,
     ) {
-        val fullImageRequest = imageResult?.fullSizeUri?.toImageRequest(true) ?: run {
+        val fullImageRequest = imageResult?.fullSizeUri?.toUri()?.toImageRequest(true) ?: run {
             showPreviewImage(imageResult)
             return
         }
         val previewImageRequest =
-            (imageResult.previewUri ?: imageResult.thumbnailUri)?.toImageRequest(false)
+            (imageResult.previewUri ?: imageResult.thumbnailUri)?.toUri()?.toImageRequest(false)
 
         val newControllerBuilder = Fresco.newDraweeControllerBuilder()
             .setImageRequest(fullImageRequest)
@@ -294,7 +295,7 @@ class ImageViewerPageFragment : Fragment() {
             val imageResult = viewModel.getImageItem(itemId)?.imageResult ?: return
             binding.image.hierarchy.setFailureImage(R.drawable.ic_error, ScaleType.FIT_CENTER)
             binding.image.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(imageResult.previewUri?.toImageRequest(false))
+                .setImageRequest(imageResult.previewUri?.toUri()?.toImageRequest(false))
                 .build()
 
             if (imageResult.isFullyLoaded) {

@@ -1642,8 +1642,6 @@
     <string name="result_paragraph_info_achievement_add_phone">لقد تلقيت %1$s مساحة تخزين لقيامك بالتحقق من رقم هاتفك.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">لقد تلقيت %1$s من مساحة تخزين كمكافأة تسجيل مجانية.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">تنتهي المكافأة في %1$d يوم</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="zero">مجلد مشارك</item>
@@ -3975,22 +3973,6 @@
     <string name="payment_methods">طرق الدفع</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">تابع</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">برو لايت Pro&#160;Lite شهرياً</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">برو لايت Pro&#160;Lite سنوياً</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">برو Pro&#160;I شهرياً</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">برو  Pro&#160;I سنوياً</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">برو Pro&#160;II شهرياً</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">برو Pro&#160;II سنوياً</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">برو Pro&#160;III شهرياً</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">برو Pro&#160;III سنوياً</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">إزالة كمضيف</string>
     <!-- Title message of existing subscription dialog -->
@@ -4554,30 +4536,60 @@
         <item quantity="other">سيتم حذف الألبومات ولكن محتوياتها ستبقى في جدولك الزمني.</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">مشاهدة أقل</string>
     <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <string name="shared_items_verify_credentials_contact_verification_title">التحقق من جهة الاتصال</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_outgoing">نحن نحمي بياناتك عن طريق تشفير المعرفة الصفرية. لضمان أمان إضافي نطلب منك التحقق من جهات الاتصال التي تشارك المعلومات معها قبل أن يتمكنوا من الوصول إلى المجلدات المشاركة.</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
+    <string name="shared_items_verify_credentials_header_incoming">نحن نحمي بياناتك عن طريق تشفير المعرفة الصفرية. لضمان أمان إضافي نطلب منك التحقق من جهات الاتصال التي تستقبل المعلومات منها قبل أن تتمكن من الوصول إلى المجلدات المشاركة.</string>
     <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <string name="shared_items_verify_credentials_information">للتحقق من جهة الاتصال الخاصة بك، تأكد من أن بيانات الاعتماد التي تراها أعلاه تطابق بيانات اعتماد حسابهم. يمكنك أن تطلب منهم مشاركة بيانات اعتمادهم معك.</string>
     <!--Undecrypted folder label-->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[مجلد غير مشفر]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
-    <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
+    <string name="shared_items_verify_credentials_verify_person_banner_label">للوصول إلى المجلد المشارك يجب على الشخص الذي شاركه معك التحقق منك أيضًا.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">تحقق من %s</string>
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">بيانات الاعتماد الخاصة بك</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">تحضير الملف للعرض</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="zero">تنتهي صلاحية المكافأة في %1$d يوم</item>
+        <item quantity="one">تنتهي صلاحية المكافأة في %1$d يوم</item>
+        <item quantity="two">تنتهي صلاحية المكافأة في %1$d يومين</item>
+        <item quantity="few">تنتهي صلاحية المكافأة في %1$d أيام</item>
+        <item quantity="many">تنتهي صلاحية المكافأة في %1$d يوماً</item>
+        <item quantity="other">تنتهي صلاحية المكافأة في %1$d يوم</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">الوصف</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">إزالة من الألبوم؟</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">لتمكين ترفيعات الكاميرا، امنح ميغا MEGA إمكانية الوصول إلى صورك والوسائط الأخرى على جهازك.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">منح اذن الوصول</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">لا تمنح</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="zero">تم إزالة %d عنصر من ”%s“</item>
+        <item quantity="one">تم إزالة %d عنصر من ”%s“</item>
+        <item quantity="two">تم إزالة %d عنصرين من ”%s“</item>
+        <item quantity="few">تم إزالة %d عناصر من ”%s“</item>
+        <item quantity="many">تم إزالة %d عناصراً من ”%s“</item>
+        <item quantity="other">تم إزالة %d عنصر من ”%s“</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">اجتماع لمرة واحدة</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">استئناف الفيديو؟</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">سيتم استئناف %1$s من عند %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">استئناف</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">إعادة تشغيل</string>
 </resources>

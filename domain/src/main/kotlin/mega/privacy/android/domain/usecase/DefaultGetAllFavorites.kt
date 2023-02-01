@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 
@@ -16,12 +16,12 @@ import javax.inject.Inject
  * Default get all favorites
  *
  * @property favouritesRepository
- * @property fileRepository
+ * @property nodeRepository
  * @property addNodeType
  */
 class DefaultGetAllFavorites @Inject constructor(
     private val favouritesRepository: FavouritesRepository,
-    private val fileRepository: FileRepository,
+    private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
 ) : GetAllFavorites {
 
@@ -29,7 +29,7 @@ class DefaultGetAllFavorites @Inject constructor(
     override fun invoke(): Flow<List<TypedNode>> =
         flow {
             emit(favouritesRepository.getAllFavorites())
-            emitAll(fileRepository.monitorNodeUpdates()
+            emitAll(nodeRepository.monitorNodeUpdates()
                 .mapLatest { favouritesRepository.getAllFavorites() })
         }.mapLatest { list ->
             list.map { addNodeType(it) }

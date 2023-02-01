@@ -158,14 +158,21 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                         if (shouldOpen) {
                             viewModel.removeAddContact()
                             Timber.d("Open Invite participants screen")
-                            addContactLauncher.launch(Intent(this@ScheduledMeetingInfoActivity,
-                                AddContactActivity::class.java)
-                                .putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                    Constants.CONTACT_TYPE_MEGA)
-                                .putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                                .putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
-                                .putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                    getString(R.string.add_participants_menu_item))
+                            addContactLauncher.launch(
+                                Intent(
+                                    this@ScheduledMeetingInfoActivity,
+                                    AddContactActivity::class.java
+                                )
+                                    .putExtra(
+                                        INTENT_EXTRA_KEY_CONTACT_TYPE,
+                                        Constants.CONTACT_TYPE_MEGA
+                                    )
+                                    .putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                                    .putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                                    .putExtra(
+                                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                                        getString(R.string.add_participants_menu_item)
+                                    )
                             )
                         }
                     }
@@ -173,9 +180,13 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        viewModel.setChatId(newChatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE),
-            newScheduledMeetingId = intent.getLongExtra(SCHEDULED_MEETING_ID,
-                MEGACHAT_INVALID_HANDLE))
+        viewModel.setChatId(
+            newChatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE),
+            newScheduledMeetingId = intent.getLongExtra(
+                SCHEDULED_MEETING_ID,
+                MEGACHAT_INVALID_HANDLE
+            )
+        )
 
         setContent { ScheduledMeetingInfoView() }
 
@@ -215,9 +226,11 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         else
             DateTimeFormatter.ofPattern("hh:mm a").withZone(ZoneId.systemDefault())
 
-        viewModel.setScheduledMeetingDate("${dateFormatter.format(startDateTime)} - ${
-            hourFormatter.format(endDateTime)
-        }")
+        viewModel.setScheduledMeetingDate(
+            "${dateFormatter.format(startDateTime)} - ${
+                hourFormatter.format(endDateTime)
+            }"
+        )
     }
 
     /**
@@ -281,7 +294,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      *
      * @param currentPermission [ChatRoomPermission] current permission
      */
-    fun showChangePermissionsDialog(currentPermission: ChatRoomPermission) {
+    private fun showChangePermissionsDialog(currentPermission: ChatRoomPermission) {
         var dialog: AlertDialog? = null
 
         val dialogView = this.layoutInflater.inflate(R.layout.change_permissions_dialog, null)
@@ -367,13 +380,16 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun onChatNotificationsTap() {
         if (enabledChatNotification) {
-            createMuteNotificationsAlertDialogOfAChat(this@ScheduledMeetingInfoActivity,
-                chatRoomId)
+            createMuteNotificationsAlertDialogOfAChat(
+                this@ScheduledMeetingInfoActivity,
+                chatRoomId
+            )
         } else {
             MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
                 this@ScheduledMeetingInfoActivity,
                 Constants.NOTIFICATIONS_ENABLED,
-                chatRoomId)
+                chatRoomId
+            )
         }
     }
 
@@ -412,8 +428,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * Open manage chat history
      */
     private fun openManageChatHistory() {
-        val intentManageChat = Intent(this@ScheduledMeetingInfoActivity,
-            ManageChatHistoryActivity::class.java)
+        val intentManageChat = Intent(
+            this@ScheduledMeetingInfoActivity,
+            ManageChatHistoryActivity::class.java
+        )
         intentManageChat.putExtra(CHAT_ID, chatRoomId)
         intentManageChat.putExtra(Constants.IS_FROM_CONTACTS, true)
         startActivity(intentManageChat)
@@ -432,7 +450,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
         AndroidTheme(isDark = isDark) {
-            ScheduledMeetingInfoView(state = uiState,
+            ScheduledMeetingInfoView(
+                state = uiState,
                 onButtonClicked = ::onActionTap,
                 onEditClicked = { viewModel::onEditTap },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
@@ -447,7 +466,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     openInviteContact()
                     viewModel.dismissDialog()
                 },
-                onSnackbarShown = viewModel::snackbarShown)
+                onSnackbarShown = viewModel::snackbarShown
+            )
         }
     }
 

@@ -1061,31 +1061,20 @@ class DownloadService : Service(), MegaRequestListenerInterface {
                         totalTransfers)
                 }
             }
-            val intent: Intent
-            val pendingIntent: PendingIntent
             val info = Util.getProgressSize(this@DownloadService,
                 totalSizeTransferred,
                 totalSizePendingTransfer)
             var notification: Notification? = null
-            var contentText = ""
-            if (dbH.credentials == null) {
-                contentText = getString(R.string.download_touch_to_cancel)
-                intent = Intent(this@DownloadService, LoginActivity::class.java)
-                intent.action = Constants.ACTION_CANCEL_DOWNLOAD
-                pendingIntent = PendingIntent.getActivity(this@DownloadService,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            } else {
-                contentText = getString(R.string.download_touch_to_show)
-                intent = Intent(this@DownloadService, ManagerActivity::class.java)
-                intent.action = Constants.ACTION_SHOW_TRANSFERS
-                intent.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-                pendingIntent = PendingIntent.getActivity(this@DownloadService,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            }
+            val contentText = getString(R.string.download_touch_to_show)
+            val intent = Intent(this@DownloadService, ManagerActivity::class.java)
+            intent.action = Constants.ACTION_SHOW_TRANSFERS
+            intent.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+            val pendingIntent: PendingIntent = PendingIntent.getActivity(
+                this@DownloadService,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
             notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,

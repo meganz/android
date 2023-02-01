@@ -4,24 +4,24 @@ import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import java.io.File
 import javax.inject.Inject
 
-class DefaultGetOfflineFile @Inject constructor(private val fileRepository: FileRepository) : GetOfflineFile {
+class DefaultGetOfflineFile @Inject constructor(private val fileSystemRepository: FileSystemRepository) : GetOfflineFile {
     override suspend fun invoke(offlineInformation: OfflineNodeInformation): File {
         return when (offlineInformation) {
             is InboxOfflineNodeInformation -> getFile(
-                fileRepository.getOfflineInboxPath(),
+                fileSystemRepository.getOfflineInboxPath(),
                 offlineInformation.path,
                 offlineInformation.name)
             is IncomingShareOfflineNodeInformation -> getFile(
-                fileRepository.getOfflinePath(),
+                fileSystemRepository.getOfflinePath(),
                 offlineInformation.incomingHandle,
                 offlineInformation.path,
                 offlineInformation.name)
             is OtherOfflineNodeInformation -> getFile(
-                fileRepository.getOfflinePath(),
+                fileSystemRepository.getOfflinePath(),
                 offlineInformation.path,
                 offlineInformation.name)
         }

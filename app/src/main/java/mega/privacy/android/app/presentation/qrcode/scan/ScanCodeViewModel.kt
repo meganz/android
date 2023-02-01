@@ -6,11 +6,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
+import mega.privacy.android.app.presentation.extensions.printEmail
+import mega.privacy.android.app.presentation.extensions.success
+import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
+import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScanCodeViewModel @Inject constructor(
     private val queryScannedContactLink: QueryScannedContactLink,
+    private val inviteContact: InviteContact,
 ) : ViewModel() {
 
     /**
@@ -39,7 +44,7 @@ class ScanCodeViewModel @Inject constructor(
      * @param email The email to update
      */
     fun updateMyEmail(email: String) {
-        _state.update { it.copy(myEmail = email) }
+        _state.update { it.copy(email = email) }
     }
 
     /**
@@ -109,13 +114,8 @@ class ScanCodeViewModel @Inject constructor(
 
                 when (qrCodeQueryResult) {
                     QRCodeQueryResults.CONTACT_QUERY_OK -> {
-                        Timber.d("Contact link query ${handle}_${email}_${contactName}")
-                        showInviteDialog(
-                            contactName,
-                            email,
-                            isContact,
-                            handle
-                        )
+                        Timber.d("Contact link query ${handle}_${email}_${contactName}_${avatarFile}")
+                        showInviteDialog(this)
                     }
                     QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
                         showInviteResultDialog(
@@ -134,6 +134,22 @@ class ScanCodeViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Send invitation to new contact
+     */
+    fun sendInvite() {
+        viewModelScope.launch {
+            val requestStatus = inviteContact(
+                state.value.email ?: "",
+                state.value.scannedContactLinkResult?.handle ?: -1,
+                null
+            )
+            requestStatus.run {
+                showInviteResultDialog(dialogTitle, dialogContent, success, printEmail)
             }
         }
     }
@@ -162,18 +178,12 @@ class ScanCodeViewModel @Inject constructor(
     /**
      * Method to update the Ui State to show dialog after scanning of qr code
      *
-     * @param contactName Name of the scanned contact
-     * @param myEmail Email
-     * @param isContact Whether scanned code is already a contact or not
-     * @param handle Handle of the scanned qr code
+     * @param scannedContactLinkResult Scanned contact details
      */
-    fun showInviteDialog(contactName: String, myEmail: String, isContact: Boolean, handle: Long) {
+    fun showInviteDialog(scannedContactLinkResult: ScannedContactLinkResult) {
         _state.update {
             it.copy(
-                contactNameContent = contactName,
-                myEmail = myEmail,
-                isContact = isContact,
-                handleContactLink = handle,
+                scannedContactLinkResult = scannedContactLinkResult,
                 showInviteResultDialog = false,
                 showInviteDialog = true
             )

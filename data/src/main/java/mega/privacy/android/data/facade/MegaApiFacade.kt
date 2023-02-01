@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
+import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -35,6 +36,7 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -124,6 +126,8 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.accountAuth
     override val myCredentials: String?
         get() = megaApi.myCredentials
+    override val dumpSession: String?
+        get() = megaApi.dumpSession()
 
     override suspend fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
@@ -450,6 +454,23 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getPreview(node, previewFilePath, listener)
 
+    override fun getFullImage(
+        node: MegaNode,
+        fullFile: File,
+        highPriority: Boolean,
+        listener: MegaTransferListenerInterface,
+    ) {
+        megaApi.startDownload(
+            node,
+            fullFile.absolutePath,
+            fullFile.name,
+            APP_DATA_BACKGROUND_TRANSFER,
+            highPriority,
+            null,
+            listener
+        )
+    }
+
     override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
 
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
@@ -596,8 +617,8 @@ internal class MegaApiFacade @Inject constructor(
     override fun createSet(name: String, listener: MegaRequestListenerInterface) =
         megaApi.createSet(name, listener)
 
-    override suspend fun createSetElement(sid: Long, node: Long) =
-        megaApi.createSetElement(sid, node)
+    override fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface) =
+        megaApi.createSetElement(sid, node, "", listener)
 
     override suspend fun removeSetElement(sid: Long, eid: Long) =
         megaApi.removeSetElement(sid, eid)
@@ -610,6 +631,12 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun removeSet(sid: Long, listener: MegaRequestListenerInterface) =
         megaApi.removeSet(sid, listener)
+
+    override fun updateSetName(sid: Long, name: String?, listener: MegaRequestListenerInterface?) =
+        megaApi.updateSetName(sid, name, listener)
+
+    override fun updateSetName(sid: Long, name: String?) =
+        megaApi.updateSetName(sid, name)
 
     override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApi.removeRequestListener(listener)
@@ -676,6 +703,19 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun inviteContact(email: String, listener: MegaRequestListenerInterface) =
         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD, listener)
+
+    override fun inviteContact(
+        email: String,
+        handle: Long,
+        message: String?,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.inviteContact(
+        email,
+        message,
+        MegaContactRequest.INVITE_ACTION_ADD,
+        handle,
+        listener
+    )
 
     override fun outgoingContactRequests(): ArrayList<MegaContactRequest> =
         megaApi.outgoingContactRequests
@@ -747,9 +787,14 @@ internal class MegaApiFacade @Inject constructor(
     override fun cancelTransferByTag(transferTag: Int, listener: MegaRequestListenerInterface?) {
         megaApi.cancelTransferByTag(transferTag, listener)
     }
+
     override fun getContactLink(handle: Long, listener: MegaRequestListenerInterface) {
         megaApi.contactLinkQuery(handle, listener)
     }
+
+    override fun checkValidNodeFile(node: MegaNode, nodeFile: File?) =
+        nodeFile?.canRead() == true && nodeFile.length() == node.size
+                && node.fingerprint == megaApi.getFingerprint(nodeFile.absolutePath)
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)

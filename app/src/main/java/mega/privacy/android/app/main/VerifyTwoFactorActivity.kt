@@ -189,7 +189,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 if (index == 0) {
                     requestFocus()
                 } else {
-                    setEt(getEditTextPINByIndex(index - 1))
+                    previousDigitEditText = getEditTextPINByIndex(index - 1)
                 }
 
                 imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)

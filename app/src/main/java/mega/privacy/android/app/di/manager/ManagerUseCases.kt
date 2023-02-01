@@ -26,9 +26,9 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -71,35 +71,35 @@ abstract class ManagerUseCases {
 
     companion object {
         @Provides
-        fun provideMonitorNodeUpdates(filesRepository: FileRepository): MonitorNodeUpdates =
-            MonitorNodeUpdates(filesRepository::monitorNodeUpdates)
+        fun provideMonitorNodeUpdates(nodeRepository: NodeRepository): MonitorNodeUpdates =
+            MonitorNodeUpdates(nodeRepository::monitorNodeUpdates)
 
         @Provides
-        fun provideGetRootFolder(filesRepository: FilesRepository): GetRootFolder =
-            GetRootFolder(filesRepository::getRootNode)
+        fun provideGetRootFolder(megaNodeRepository: MegaNodeRepository): GetRootFolder =
+            GetRootFolder(megaNodeRepository::getRootNode)
 
         @Provides
-        fun provideGetRubbishBinFolder(filesRepository: FilesRepository): GetRubbishBinFolder =
-            GetRubbishBinFolder(filesRepository::getRubbishBinNode)
+        fun provideGetRubbishBinFolder(megaNodeRepository: MegaNodeRepository): GetRubbishBinFolder =
+            GetRubbishBinFolder(megaNodeRepository::getRubbishBinNode)
 
         @Provides
         fun provideGetNumUnreadUserAlerts(accountRepository: AccountRepository): GetNumUnreadUserAlerts =
             GetNumUnreadUserAlerts(accountRepository::getNumUnreadUserAlerts)
 
         @Provides
-        fun provideHasInboxChildren(filesRepository: FilesRepository): HasInboxChildren =
-            HasInboxChildren(filesRepository::hasInboxChildren)
+        fun provideHasInboxChildren(megaNodeRepository: MegaNodeRepository): HasInboxChildren =
+            HasInboxChildren(megaNodeRepository::hasInboxChildren)
 
         @Provides
         fun provideMonitorUserAlerts(notificationsRepository: NotificationsRepository): MonitorUserAlertUpdates =
             MonitorUserAlertUpdates(notificationsRepository::monitorUserAlerts)
 
         @Provides
-        fun provideAuthorizeNode(filesRepository: FilesRepository): AuthorizeNode =
-            AuthorizeNode(filesRepository::authorizeNode)
+        fun provideAuthorizeNode(megaNodeRepository: MegaNodeRepository): AuthorizeNode =
+            AuthorizeNode(megaNodeRepository::authorizeNode)
 
         @Provides
-        fun provideGetInboxNode(filesRepository: FilesRepository): GetInboxNode =
-            GetInboxNode(filesRepository::getInboxNode)
+        fun provideGetInboxNode(megaNodeRepository: MegaNodeRepository): GetInboxNode =
+            GetInboxNode(megaNodeRepository::getInboxNode)
     }
 }

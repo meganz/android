@@ -8,8 +8,8 @@ import javax.inject.Inject
  */
 class DefaultSetupPrimaryFolder @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val startCameraUpload: StartCameraUpload,
     private val stopCameraUpload: StopCameraUpload,
+    private val restartCameraUpload: RestartCameraUpload,
     private val resetPrimaryTimeline: ResetPrimaryTimeline,
     private val updateFolderIconBroadcast: UpdateFolderIconBroadcast,
     private val updateFolderDestinationBroadcast: UpdateFolderDestinationBroadcast,
@@ -23,8 +23,7 @@ class DefaultSetupPrimaryFolder @Inject constructor(
                 cameraUploadRepository.setPrimaryFolderHandle(newPrimaryHandle)
                 cameraUploadRepository.setPrimarySyncHandle(newPrimaryHandle)
                 updateFolderIconBroadcast(newPrimaryHandle, false)
-                stopCameraUpload()
-                startCameraUpload(true)
+                restartCameraUpload(shouldIgnoreAttributes = true)
                 updateFolderDestinationBroadcast(newPrimaryHandle, false)
             }
         }.onFailure {

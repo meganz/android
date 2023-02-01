@@ -57,7 +57,7 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
 
     Context context;
     int positionClicked;
-    ArrayList<MegaShare> shareList;
+    List<MegaShare> shareList;
     MegaNode node;
 
     MegaApiAndroid megaApi;
@@ -150,7 +150,7 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
         }
     }
 
-    public MegaSharedFolderAdapter(Context _context, MegaNode node, ArrayList<MegaShare> _shareList, RecyclerView _lv) {
+    public MegaSharedFolderAdapter(Context _context, MegaNode node, List<MegaShare> _shareList, RecyclerView _lv) {
         this.context = _context;
         this.node = node;
         this.shareList = _shareList;
@@ -382,7 +382,7 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
         }
     }
 
-    public void setShareList(ArrayList<MegaShare> shareList) {
+    public void setShareList(List<MegaShare> shareList) {
         Timber.d("setShareList");
         this.shareList = shareList;
         positionClicked = -1;

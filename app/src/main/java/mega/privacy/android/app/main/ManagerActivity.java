@@ -24,7 +24,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
 import static mega.privacy.android.app.constants.IntentConstants.ACTION_OPEN_ACHIEVEMENTS;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ACCOUNT_TYPE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ASK_PERMISSIONS;
@@ -33,7 +32,7 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOU
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
-import static mega.privacy.android.app.main.FileInfoActivity.NODE_HANDLE;
+import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -96,7 +95,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
@@ -218,7 +216,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -329,6 +326,7 @@ import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
@@ -357,6 +355,7 @@ import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
+import mega.privacy.android.app.presentation.manager.UserInfoViewModel;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.manager.model.Tab;
 import mega.privacy.android.app.presentation.manager.model.TransfersTab;
@@ -424,7 +423,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
-import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
@@ -518,6 +517,7 @@ public class ManagerActivity extends TransfersManagementActivity
     public LinksViewModel linksViewModel;
     public RubbishBinViewModel rubbishBinViewModel;
     private SearchViewModel searchViewModel;
+    private UserInfoViewModel userInfoViewModel;
 
     @Inject
     CheckPasswordReminderUseCase checkPasswordReminderUseCase;
@@ -1130,35 +1130,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
             }
 
-            case REQUEST_CAMERA_UPLOAD:
-            case REQUEST_CAMERA_ON_OFF:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-                    stopCameraUploadSyncHeartbeatWorkers(this);
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
-                }
-
-                break;
-
-            case REQUEST_CAMERA_ON_OFF_FIRST_TIME:
-                if (permissions.length == 0) {
-                    return;
-                }
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
-                        if (getPhotosFragment() != null) {
-                            photosFragment.onStoragePermissionRefused();
-                        }
-                    } else {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
-                    }
-                }
-
-                break;
-
             case PERMISSIONS_FRAGMENT: {
                 if (getPermissionsFragment() != null) {
                     permissionsFragment.setNextPermission();
@@ -1327,6 +1298,7 @@ public class ManagerActivity extends TransfersManagementActivity
         linksViewModel = new ViewModelProvider(this).get(LinksViewModel.class);
         rubbishBinViewModel = new ViewModelProvider(this).get(RubbishBinViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        userInfoViewModel = new ViewModelProvider(this).get(UserInfoViewModel.class);
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
                     updateUsers(users);
@@ -2114,11 +2086,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             dbH.setInvalidateSdkCache(false);
             MegaMessageService.getToken(this);
-            nVEmail.setVisibility(View.VISIBLE);
-            nVEmail.setText(megaApi.getMyEmail());
-            megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
-            megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
-
+            userInfoViewModel.getUserInfo();
 
             this.setProfileAvatar();
 
@@ -2572,6 +2540,13 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             return Unit.INSTANCE;
         });
+
+        ViewExtensionsKt.collectFlow(this, userInfoViewModel.getState(), Lifecycle.State.STARTED, state -> {
+            updateUserNameNavigationView(state.getFullName());
+            nVEmail.setVisibility(View.VISIBLE);
+            nVEmail.setText(state.getEmail());
+            return Unit.INSTANCE;
+        });
     }
 
     /**
@@ -2678,32 +2653,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
-     * If the account is business and not a master user, it shows a warning.
-     * Otherwise proceeds to enable CU.
-     */
-    public void checkIfShouldShowBusinessCUAlert() {
-        if (isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
-            showBusinessCUAlert();
-        } else {
-            enableCUClicked();
-        }
-    }
-
-
-    /**
-     * Proceeds to enable CU action.
-     */
-    private void enableCUClicked() {
-        if (getPhotosFragment() != null) {
-            if (photosFragment.isEnablePhotosViewShown()) {
-                photosFragment.enableCameraUpload();
-            } else {
-                photosFragment.enableCameraUploadClick();
-            }
-        }
-    }
-
-    /**
      * Shows a warning to business users about the risks of enabling CU.
      */
     private void showBusinessCUAlert() {
@@ -2718,7 +2667,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 })
                 .setPositiveButton(R.string.general_enable, (dialog, which) -> {
                     if (getPhotosFragment() != null) {
-                        photosFragment.enableCameraUploadClick();
+                        photosFragment.enableCameraUploads();
                     }
                 })
                 .setCancelable(false)
@@ -3847,12 +3796,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else if (isInFilterPage) {
                     aB.setTitle(getString(R.string.photos_action_filter));
-                } else if (getPhotosFragment() != null && photosFragment.shouldUpdateTitle()) {
-                    setFirstNavigationLevel(false);
-                    aB.setTitle(getString(R.string.settings_camera_upload_on));
-                } else {
-                    setFirstNavigationLevel(true);
+                } else if (getPhotosFragment() != null) {
                     aB.setTitle(getString(R.string.sortby_type_photo_first));
+                    setFirstNavigationLevel(!photosFragment.isEnableCameraUploadsViewShown() || !photosFragment.doesAccountHavePhotos());
                 }
 
                 break;
@@ -3921,11 +3867,17 @@ public class ManagerActivity extends TransfersManagementActivity
                 if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
                         || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS) {
                     aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                } else if (drawerItem == DrawerItem.PHOTOS) {
+                    setPhotosNavigationToolbarIcon();
                 } else {
                     aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
                 }
             } else {
-                aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                if (drawerItem == DrawerItem.PHOTOS) {
+                    setPhotosNavigationToolbarIcon();
+                } else {
+                    aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                }
             }
         } else {
             if (isFirstNavigationLevel()) {
@@ -3958,6 +3910,30 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (drawerItem == DrawerItem.PHOTOS && isInFilterPage) {
             aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_close_white));
+        }
+    }
+
+    /**
+     * When the user is in Photos, this sets the correct Toolbar Icon depending on
+     * certain conditions.
+     *
+     * This is only called when there are no unread notifications
+     */
+    private void setPhotosNavigationToolbarIcon() {
+        if (getPhotosFragment() != null) {
+            // Enable Camera Uploads Page is shown
+            if (photosFragment.isEnableCameraUploadsViewShown()) {
+                if (photosFragment.doesAccountHavePhotos()) {
+                    // Photos has content
+                    aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
+                } else {
+                    // Photos is in an empty state
+                    aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
+                }
+            } else {
+                // Enable Camera Uploads Page is hidden
+                aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_menu_white));
+            }
         }
     }
 
@@ -4437,7 +4413,6 @@ public class ManagerActivity extends TransfersManagementActivity
         cuViewTypes.setVisibility(View.GONE);
 
         if (getPhotosFragment() != null) {
-            photosFragment.setDefaultView();
             showBottomView();
         }
     }
@@ -4567,7 +4542,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     supportInvalidateOptionsMenu();
                     showFabButton();
                     showHideBottomNavigationView(false);
-                    refreshCUNodes();
                     if (!comesFromNotifications) {
                         bottomNavigationCurrentItem = PHOTOS_BNV;
                     }
@@ -4826,12 +4800,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 break;
             }
-            case PHOTOS: {
-                if (getPhotosFragment() != null) {
-                    photosFragment.checkScroll();
-                }
-                break;
-            }
             case INBOX: {
                 inboxFragment = (InboxFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
                 if (inboxFragment != null) {
@@ -4925,6 +4893,7 @@ public class ManagerActivity extends TransfersManagementActivity
         navigateToSettingsActivity(TargetPreference.StartScreen.INSTANCE);
     }
 
+    @Override
     public void moveToChatSection(long idChat) {
         if (idChat != -1) {
             Intent intent = new Intent(this, ChatActivity.class);
@@ -5435,7 +5404,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         }
                     } else if (drawerItem == DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
-                            if (photosFragment.isEnablePhotosViewShown()) {
+                            if (photosFragment.isEnableCameraUploadsViewShown()) {
                                 photosFragment.onBackPressed();
                                 return true;
                             }
@@ -7192,14 +7161,8 @@ public class ManagerActivity extends TransfersManagementActivity
         selectDrawerItem(drawerItem);
     }
 
-    public void skipInitialCUSetup() {
-        viewModel.setIsFirstLogin(false);
-        drawerItem = getStartDrawerItem();
-        selectDrawerItem(drawerItem);
-    }
-
     /**
-     * Refresh PhotosFragment's UI after CU is enabled.
+     * Refresh the UI of the Photos feature
      */
     public void refreshPhotosFragment() {
         if (!isInPhotosPage())
@@ -7497,12 +7460,6 @@ public class ManagerActivity extends TransfersManagementActivity
         refreshOutgoingShares();
         refreshSharesPageAdapter();
         refreshSearch();
-    }
-
-    public void refreshCUNodes() {
-        if (getPhotosFragment() != null) {
-            photosFragment.loadPhotos();
-        }
     }
 
     public void setFirstNavigationLevel(boolean firstNavigationLevel) {
@@ -9163,11 +9120,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
-                updateMyData(true, request.getText(), e);
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_LASTNAME) {
-                updateMyData(false, request.getText(), e);
-            } else if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
+            if (request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION) {
 
                 if (e.getErrorCode() == MegaError.API_OK) {
                     Timber.d("Attribute USER_ATTR_GEOLOCATION enabled");
@@ -9406,19 +9359,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             }
         }
-    }
-
-    /**
-     * Updates own firstName/lastName and fullName data in UI and DB.
-     *
-     * @param firstName True if the update makes reference to the firstName, false it to the lastName.
-     * @param newName   New firstName/lastName text.
-     * @param e         MegaError of the request.
-     */
-    private void updateMyData(boolean firstName, String newName, MegaError e) {
-        myAccountInfo.updateMyData(firstName, newName, e);
-        updateUserNameNavigationView(myAccountInfo.getFullName());
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean.class).post(true);
     }
 
     @Override

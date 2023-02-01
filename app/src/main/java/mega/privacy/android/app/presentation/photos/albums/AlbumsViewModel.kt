@@ -28,7 +28,6 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
@@ -39,6 +38,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
+import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,6 +59,7 @@ class AlbumsViewModel @Inject constructor(
     private val createAlbum: CreateAlbum,
     private val removeAlbums: RemoveAlbums,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
+    private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -316,13 +317,37 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun updateAlbumName(title: String, proscribedStrings: List<String>) {
+        viewModelScope.launch {
+            try {
+                val finalTitle = title.trim()
+                if (checkTitleValidity(finalTitle, proscribedStrings, showEmptyError = true)) {
+                    val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
+                    updateAlbumNameUseCase(currentAlbumId, finalTitle)
+                    _state.update {
+                        it.copy(
+                            showRenameDialog = false,
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                Timber.e(exception)
+                _state.update {
+                    it.copy(
+                        showRenameDialog = false,
+                    )
+                }
+            }
+        }
+    }
 
-    private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? =
-        albums.find { uiAlbum -> uiAlbum.id == _state.value.currentAlbum }?.id
-
-    internal fun getCurrentUIAlbum(): UIAlbum? {
-        val currentAlbum = _state.value.currentAlbum
-        return _state.value.albums.find { UIAlbum -> UIAlbum.id == currentAlbum }
+    private fun checkCurrentAlbumExists(albums: List<UIAlbum>): Album? {
+        val currentAlbum = _state.value.currentAlbum ?: return null
+        return if (currentAlbum !is Album.UserAlbum) {
+            albums.find { album -> album.id == currentAlbum }?.id
+        } else {
+            albums.find { album -> (album.id as? Album.UserAlbum)?.id == currentAlbum.id }?.id
+        }
     }
 
     /**
@@ -346,17 +371,24 @@ class AlbumsViewModel @Inject constructor(
         it.id is Album.UserAlbum
     }.map { it.title }
 
-    private fun checkTitleValidity(title: String, proscribedStrings: List<String>): Boolean {
+    private fun checkTitleValidity(
+        title: String,
+        proscribedStrings: List<String>,
+        showEmptyError: Boolean = false,
+    ): Boolean {
         var errorMessage: Int? = null
         var isTitleValid = true
 
-        if (title.isEmpty() || title.lowercase() in proscribedStrings.map { it.lowercase() }) {
+        if (showEmptyError && title.isEmpty()) {
+            isTitleValid = false
+            errorMessage = R.string.invalid_string
+        } else if (title.isEmpty() || proscribedStrings.any { it.equals(title, true) }) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_systems_album
         } else if (title in getAllUserAlbumsNames()) {
             isTitleValid = false
             errorMessage = R.string.photos_create_album_error_message_duplicate
-        } else if ("[*/:<>?\"|]".toRegex().containsMatchIn(title)) {
+        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
             isTitleValid = false
             errorMessage = R.string.invalid_characters_defined
         }
@@ -495,4 +527,11 @@ class AlbumsViewModel @Inject constructor(
             it.copy(showFilterDialog = showFilterDialog)
         }
     }
+
+    fun showRenameDialog(showRenameDialog: Boolean) {
+        _state.update {
+            it.copy(showRenameDialog = showRenameDialog)
+        }
+    }
+
 }

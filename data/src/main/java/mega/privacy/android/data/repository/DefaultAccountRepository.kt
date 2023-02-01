@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
+import mega.privacy.android.data.mapper.AccountSessionMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
@@ -26,6 +27,7 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
+import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
@@ -66,6 +68,9 @@ import kotlin.coroutines.suspendCoroutine
  * @property subscriptionOptionListMapper [SubscriptionOptionListMapper]
  * @property megaAchievementMapper        [MegaAchievementMapper]
  * @property myAccountCredentialsMapper   [MyAccountCredentialsMapper]
+ * @property accountDetailMapper          [AccountDetailMapper]
+ * @property userCredentialsMapper        [UserCredentialsMapper]
+ * @property accountSessionMapper         [AccountSessionMapper]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -84,6 +89,8 @@ internal class DefaultAccountRepository @Inject constructor(
     private val achievementsOverviewMapper: AchievementsOverviewMapper,
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper,
     private val accountDetailMapper: AccountDetailMapper,
+    private val userCredentialsMapper: UserCredentialsMapper,
+    private val accountSessionMapper: AccountSessionMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -206,10 +213,12 @@ internal class DefaultAccountRepository @Inject constructor(
                         onRequestFinish = { request, error ->
                             if (request.type == MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS) {
                                 when (error.errorCode) {
-                                    MegaChatError.ERROR_OK -> continuation.resumeWith(Result.success(
-                                        Unit))
-                                    MegaChatError.ERROR_ACCESS -> continuation.resumeWith(Result.failure(
-                                        ChatNotInitializedException()))
+                                    MegaChatError.ERROR_OK -> continuation.resumeWith(
+                                        Result.success(Unit)
+                                    )
+                                    MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
+                                        Result.failure(ChatNotInitializedException())
+                                    )
                                     else -> continuation.failWithError(error)
                                 }
                             }
@@ -229,10 +238,11 @@ internal class DefaultAccountRepository @Inject constructor(
                 megaApiGateway.getPricing(OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(subscriptionOptionListMapper(
-                                request,
-                                currencyMapper,
-                            )))
+                            continuation.resumeWith(
+                                Result.success(
+                                    subscriptionOptionListMapper(request, currencyMapper)
+                                )
+                            )
                         } else {
                             continuation.failWithError(error)
                         }
@@ -251,18 +261,24 @@ internal class DefaultAccountRepository @Inject constructor(
     ): MegaAchievement =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
-                megaApiGateway.getAccountAchievements(OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(megaAchievementMapper(
-                                request.megaAchievementsDetails,
-                                achievementType,
-                                awardIndex
-                            )))
-                        } else {
-                            continuation.failWithError(error)
-                        }
-                    }))
+                megaApiGateway.getAccountAchievements(
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(
+                                    Result.success(
+                                        megaAchievementMapper(
+                                            request.megaAchievementsDetails,
+                                            achievementType,
+                                            awardIndex
+                                        )
+                                    )
+                                )
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        })
+                )
             }
         }
 
@@ -386,9 +402,10 @@ internal class DefaultAccountRepository @Inject constructor(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
                             continuation.resumeWith(
-                                Result.success(achievementsOverviewMapper(
-                                    request.megaAchievementsDetails,
-                                )))
+                                Result.success(
+                                    achievementsOverviewMapper(request.megaAchievementsDetails)
+                                )
+                            )
                         } else {
                             continuation.failWithError(error)
                         }
@@ -422,4 +439,26 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.isUserLoggedIn() > 0
         }
+
+    override suspend fun saveAccountCredentials() = withContext(ioDispatcher) {
+        var myUserHandle: Long? = null
+        var email: String? = null
+
+        megaApiGateway.myUser?.let { myUser ->
+            email = myUser.email
+            myUserHandle = myUser.handle
+        }
+
+        val session = megaApiGateway.dumpSession
+        val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
+
+        with(localStorageGateway) {
+            saveCredentials(credentials)
+            clearEphemeral()
+        }
+
+        accountSessionMapper(email, session, myUserHandle)
+    }
+
+    override suspend fun getAccountCredentials() = localStorageGateway.getUserCredentials()
 }

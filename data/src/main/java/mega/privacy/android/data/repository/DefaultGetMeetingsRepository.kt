@@ -34,13 +34,23 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
         mutex: Mutex,
     ): Flow<MutableList<MeetingRoomItem>> =
         flow {
-            val iterator = items.listIterator()
-            while (iterator.hasNext()) {
-                mutex.withLock {
-                    val item = iterator.next()
-                    val updatedItem = getUpdatedMeetingItem(item)
-                    iterator.set(updatedItem)
-                    emit(items)
+            items.toList().forEach { item ->
+                getUpdatedMeetingItem(item).let { updatedItem ->
+                    mutex.withLock {
+                        val newIndex = items.indexOfFirst { updatedItem.chatId == it.chatId }
+                        if (newIndex != -1) {
+                            val newUpdatedItem = items[newIndex].copy(
+                                firstUserChar = updatedItem.firstUserChar,
+                                firstUserAvatar = updatedItem.firstUserAvatar,
+                                firstUserColor = updatedItem.firstUserColor,
+                                lastUserChar = updatedItem.lastUserChar,
+                                lastUserAvatar = updatedItem.lastUserAvatar,
+                                lastUserColor = updatedItem.lastUserColor,
+                            )
+                            items[newIndex] = newUpdatedItem
+                            emit(items)
+                        }
+                    }
                 }
             }
         }
@@ -56,13 +66,12 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
         var lastUserChar: Char? = null
         var lastUserAvatar: String? = null
         var lastUserColor: Int? = null
-        when (participants.size) {
-            0 -> {
-                firstUserChar = myAccount.fullName?.firstOrNull()
-                firstUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
-                firstUserColor = avatarRepository.getAvatarColor(myHandle)
+        when {
+            !item.isActive || participants.isEmpty() -> {
+                firstUserChar = item.title.firstOrNull()
+                firstUserColor = null
             }
-            1 -> {
+            participants.size == 1 -> {
                 firstUserChar = myAccount.fullName?.firstOrNull()
                 firstUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
                 firstUserColor = avatarRepository.getAvatarColor(myHandle)

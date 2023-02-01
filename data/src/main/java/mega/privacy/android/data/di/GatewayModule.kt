@@ -14,6 +14,7 @@ import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
+import mega.privacy.android.data.facade.FileManagementPreferencesFacade
 import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
@@ -50,6 +51,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
@@ -186,5 +188,9 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindStreamingGateway(implementation: DefaultStreamingGateway): StreamingGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindFileManagementPreferencesGateway(implementation: FileManagementPreferencesFacade): FileManagementPreferencesGateway
 
 }

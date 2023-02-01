@@ -57,7 +57,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             val myParticipant = ChatParticipant(
                 handle = megaChatApiGateway.getMyUserHandle(),
                 data = ContactData(
-                    fullName = myName.ifEmpty { myEmail },
+                    fullName = myName?.ifEmpty { myEmail },
                     alias = null,
                     avatarUri = null),
                 email = myEmail,

@@ -22,9 +22,9 @@ import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
@@ -33,9 +33,9 @@ import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.ActiveFragment
-import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -130,7 +130,6 @@ class MyAccountFragment : Fragment(), Scrollable {
             findNavController().navigate(R.id.action_my_account_to_edit_profile)
         }
 
-        binding.nameText.text = viewModel.getName()
         binding.emailText.text = viewModel.getEmail()
 
         setupPhoneNumber()
@@ -161,9 +160,9 @@ class MyAccountFragment : Fragment(), Scrollable {
                     setupAvatar(true)
                 }
         }
-
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .observe(viewLifecycleOwner) { binding.nameText.text = viewModel.getName() }
+        viewLifecycleOwner.collectFlow(viewModel.state) { state ->
+            binding.nameText.text = state.name
+        }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .observe(viewLifecycleOwner) { binding.emailText.text = viewModel.getEmail() }

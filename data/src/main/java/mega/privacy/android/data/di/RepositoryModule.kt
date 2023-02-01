@@ -18,7 +18,7 @@ import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
-import mega.privacy.android.data.repository.DefaultFilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGetMeetingsRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
@@ -38,8 +38,11 @@ import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.FileSystemRepositoryImpl
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
+import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
+import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.AccountRepository
@@ -55,13 +58,15 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -149,10 +154,13 @@ internal abstract class RepositoryModule {
     abstract fun bindGetImageRepository(repository: DefaultImageRepository): ImageRepository
 
     @Binds
-    abstract fun bindFilesRepository(repository: DefaultFilesRepository): FilesRepository
+    abstract fun bindFilesRepository(repository: MegaNodeRepositoryImpl): MegaNodeRepository
 
     @Binds
-    abstract fun bindDomainFilesRepository(repository: DefaultFilesRepository): FileRepository
+    abstract fun bindDomainFilesRepository(repository: FileSystemRepositoryImpl): FileSystemRepository
+
+    @Binds
+    abstract fun bindNodeRepository(repository: NodeRepositoryImpl): NodeRepository
 
     @Binds
     @Singleton
@@ -210,5 +218,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindStreamingServerRepository(implementation: StreamingServerRepositoryImpl): StreamingServerRepository
+
+    @Binds
+    abstract fun bindViewTypeRepository(implementation: ViewTypeRepositoryImpl): ViewTypeRepository
 
 }

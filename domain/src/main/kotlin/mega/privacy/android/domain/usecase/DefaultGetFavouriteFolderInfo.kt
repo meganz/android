@@ -8,15 +8,15 @@ import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.ParentNotAFolderException
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
  * The use case implementation class to get children nodes by node
- * @param fileRepository FileRepository
+ * @param nodeRepository NodeRepository
  */
 class DefaultGetFavouriteFolderInfo @Inject constructor(
-    private val fileRepository: FileRepository,
+    private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
 ) : GetFavouriteFolderInfo {
 
@@ -24,15 +24,15 @@ class DefaultGetFavouriteFolderInfo @Inject constructor(
     override fun invoke(parentHandle: Long) =
         flow {
             emit(getFavouriteFolderInfo(parentHandle))
-            emitAll(fileRepository.monitorNodeUpdates().mapLatest {
+            emitAll(nodeRepository.monitorNodeUpdates().mapLatest {
                 getFavouriteFolderInfo(parentHandle)
             })
         }
 
     private suspend fun getFavouriteFolderInfo(parentHandle: Long): FavouriteFolderInfo {
-        val parent = fileRepository.getNodeById(NodeId(parentHandle)) as? FolderNode
+        val parent = nodeRepository.getNodeById(NodeId(parentHandle)) as? FolderNode
             ?: throw ParentNotAFolderException("Attempted to fetch favourite folder info for node: $parentHandle")
-        val children = fileRepository.getNodeChildren(parent)
+        val children = nodeRepository.getNodeChildren(parent)
             .map { addNodeType(it) }
         return FavouriteFolderInfo(
             children = children,

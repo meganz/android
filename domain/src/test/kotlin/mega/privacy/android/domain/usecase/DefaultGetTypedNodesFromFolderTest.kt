@@ -11,7 +11,8 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.ParentNotAFolderException
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -23,24 +24,24 @@ import org.mockito.kotlin.whenever
 class DefaultGetTypedNodesFromFolderTest {
     lateinit var underTest: GetTypedNodesFromFolder
 
-    private val fileRepository = mock<FileRepository>()
+    private val nodeRepository = mock<NodeRepository>()
 
     private val addNodeType = mock<AddNodeType> { onBlocking { invoke(any()) }.thenReturn(mock()) }
 
     @Before
     fun setUp() {
         underTest = DefaultGetTypedNodesFromFolder(
-            fileRepository = fileRepository,
+            nodeRepository = nodeRepository,
             addNodeType = addNodeType
         )
-        whenever(fileRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(emptyFlow())
     }
 
     @Test
     fun `test that a non folder node throws an exception`() = runTest {
         val fileNode = mock<FileNode>()
         val nodeId = NodeId(1)
-        whenever(fileRepository.getNodeById(nodeId)).thenReturn(fileNode)
+        whenever(nodeRepository.getNodeById(nodeId)).thenReturn(fileNode)
         underTest(nodeId).test {
             val error = awaitError()
             assertThat(error).isInstanceOf(ParentNotAFolderException::class.java)
@@ -54,11 +55,11 @@ class DefaultGetTypedNodesFromFolderTest {
             val nodeId = NodeId(1)
             val fileNodeId = NodeId(2)
             val childNode = mock<FileNode> { on { id }.thenReturn(fileNodeId) }
-            whenever(fileRepository.getNodeById(nodeId)).thenReturn(folderNode)
-            whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(
+            whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
+            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
                 listOf(childNode)
             )
-            whenever(fileRepository.monitorNodeUpdates()).thenReturn(
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
                 flowOf(listOf(childNode))
             )
             underTest(nodeId).test {
@@ -74,8 +75,8 @@ class DefaultGetTypedNodesFromFolderTest {
             val list = listOf(mock<UnTypedNode> { on { id }.thenReturn(NodeId(22L)) })
             val folderNode = mock<FolderNode>()
             val nodeId = NodeId(1)
-            whenever(fileRepository.getNodeById(nodeId)).thenReturn(folderNode)
-            whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(list)
+            whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
+            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(list)
             underTest(nodeId).test {
                 assertThat(awaitItem()).isNotEmpty()
                 cancelAndIgnoreRemainingEvents()
@@ -88,8 +89,8 @@ class DefaultGetTypedNodesFromFolderTest {
         runTest {
             val folderNode = mock<FolderNode>()
             val nodeId = NodeId(1)
-            whenever(fileRepository.getNodeById(nodeId)).thenReturn(folderNode)
-            whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(emptyList())
+            whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)
+            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(emptyList())
             underTest(nodeId).test {
                 assertThat(awaitItem()).isEmpty()
                 cancelAndIgnoreRemainingEvents()
@@ -103,11 +104,11 @@ class DefaultGetTypedNodesFromFolderTest {
         val folderNode = mock<FolderNode> { on { id }.thenReturn(folderId) }
         val fileNodeId = NodeId(2)
         val childNode = mock<FileNode> { on { id }.thenReturn(fileNodeId) }
-        whenever(fileRepository.getNodeById(folderId)).thenReturn(folderNode)
-        whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(
+        whenever(nodeRepository.getNodeById(folderId)).thenReturn(folderNode)
+        whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
             listOf(childNode)
         )
-        whenever(fileRepository.monitorNodeUpdates()).thenReturn(
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
             flowOf(listOf(folderNode))
         )
         underTest(folderId).test {
@@ -124,11 +125,11 @@ class DefaultGetTypedNodesFromFolderTest {
             val folderNode = mock<FolderNode> { on { id }.thenReturn(folderId) }
             val fileNodeId = NodeId(2)
             val childNode = mock<FileNode> { on { id }.thenReturn(fileNodeId) }
-            whenever(fileRepository.getNodeById(folderId)).thenReturn(folderNode)
-            whenever(fileRepository.getNodeChildren(folderNode)).thenReturn(
+            whenever(nodeRepository.getNodeById(folderId)).thenReturn(folderNode)
+            whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
                 emptyList()
             )
-            whenever(fileRepository.monitorNodeUpdates()).thenReturn(
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
                 flowOf(listOf(childNode))
             )
             underTest(folderId).test {

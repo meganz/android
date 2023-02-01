@@ -10,21 +10,24 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
 import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
-import mega.privacy.android.app.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
 import mega.privacy.android.app.usecase.meeting.GetLastMessageUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetMeetings
@@ -37,26 +40,29 @@ import javax.inject.Inject
  * @property archiveChatUseCase
  * @property leaveChatUseCase
  * @property signalChatPresenceUseCase
- * @property clearChatHistoryUseCase
  * @property getMeetingsUseCase
  * @property getLastMessageUseCase
  * @property dispatcher
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
     private val signalChatPresenceUseCase: SignalChatPresenceUseCase,
-    private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
     private val getMeetingsUseCase: GetMeetings,
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
     private val scheduledMeetingTimestampMapper: ScheduledMeetingTimestampMapper,
+    private val deviceGateway: DeviceGateway,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     private var queryString: String? = null
     private val meetings: MutableLiveData<List<MeetingRoomItem>> = MutableLiveData(emptyList())
+    private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
+
+    private val mutex = Mutex()
 
     init {
         retrieveMeetings()
@@ -65,19 +71,24 @@ class MeetingListViewModel @Inject constructor(
 
     private fun retrieveMeetings() {
         viewModelScope.launch(dispatcher) {
-            getMeetingsUseCase()
+            getMeetingsUseCase(mutex)
                 .mapLatest { items ->
-                    items.map { item ->
-                        item.copy(
-                            lastMessage = getLastMessageUseCase.get(item.chatId).blockingGetOrNull(),
-                            lastTimestampFormatted = meetingLastTimestampMapper(item.lastTimestamp),
-                            scheduledTimestampFormatted = scheduledMeetingTimestampMapper(item)
-                        )
+                    mutex.withLock {
+                        items.map { item ->
+                            item.copy(
+                                lastMessage = getLastMessageUseCase.get(item.chatId)
+                                    .blockingGetOrNull(),
+                                lastTimestampFormatted = meetingLastTimestampMapper
+                                    (item.lastTimestamp, is24HourFormat),
+                                scheduledTimestampFormatted = scheduledMeetingTimestampMapper
+                                    (item, is24HourFormat)
+                            )
+                        }
                     }
                 }
                 .flowOn(dispatcher)
                 .catch { Timber.e(it) }
-                .collectLatest { items -> meetings.postValue(items) }
+                .collectLatest(meetings::postValue)
         }
     }
 
@@ -166,18 +177,6 @@ class MeetingListViewModel @Inject constructor(
      */
     fun leaveChats(chatIds: List<Long>) {
         chatIds.forEach(::leaveChat)
-    }
-
-    /**
-     * Clear chat history
-     *
-     * @param chatId    Chat id to leave
-     */
-    fun clearChatHistory(chatId: Long) {
-        clearChatHistoryUseCase.clear(chatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = Timber::e)
     }
 
     /**

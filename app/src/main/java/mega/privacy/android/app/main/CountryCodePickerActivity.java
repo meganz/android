@@ -36,7 +36,7 @@ import timber.log.Timber;
 
 public class CountryCodePickerActivity extends PasscodeActivity implements CountryListAdapter.CountrySelectedCallback {
     private final String SAVED_QUERY_STRING = "SAVED_QUERY_STRING";
-    private static List<Country> countries;
+    private List<Country> countries;
 
     private List<Country> selectedCountries = new ArrayList<>();
 
@@ -67,9 +67,7 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        if (countries == null) {
-            countries = loadCountries();
-        }
+        countries = loadCountries();
 
         abL = findViewById(R.id.app_bar_layout);
         countryList = findViewById(R.id.country_list);
@@ -201,6 +199,7 @@ public class CountryCodePickerActivity extends PasscodeActivity implements Count
                 }
             }
         }
+        countryCodeList.sort(Comparator.comparing(Country::getName));
         return countryCodeList;
     }
 

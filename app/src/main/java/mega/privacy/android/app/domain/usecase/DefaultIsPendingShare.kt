@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import javax.inject.Inject
 
 /**
@@ -8,10 +8,10 @@ import javax.inject.Inject
  */
 class DefaultIsPendingShare @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
-    private val filesRepository: FilesRepository,
+    private val megaNodeRepository: MegaNodeRepository,
 ) : IsPendingShare {
 
     override suspend fun invoke(handle: Long): Boolean =
         if (handle == -1L) false
-        else getNodeByHandle(handle)?.let { filesRepository.isPendingShare(it) } ?: false
+        else getNodeByHandle(handle)?.let { megaNodeRepository.isPendingShare(it) } ?: false
 }

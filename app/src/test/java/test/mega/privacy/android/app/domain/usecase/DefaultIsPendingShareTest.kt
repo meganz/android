@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultIsPendingShare
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.IsPendingShare
-import mega.privacy.android.data.repository.FilesRepository
+import mega.privacy.android.data.repository.MegaNodeRepository
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +22,7 @@ class DefaultIsPendingShareTest {
     private val getNodeByHandle = mock<GetNodeByHandle> {
         onBlocking { invoke(any()) }.thenReturn(null)
     }
-    private val filesRepository = mock<FilesRepository> {
+    private val megaNodeRepository = mock<MegaNodeRepository> {
         onBlocking { isPendingShare(any()) }.thenReturn(false)
     }
 
@@ -30,7 +30,7 @@ class DefaultIsPendingShareTest {
     fun setUp() {
         underTest = DefaultIsPendingShare(
             getNodeByHandle,
-            filesRepository,
+            megaNodeRepository,
         )
     }
 
@@ -56,7 +56,7 @@ class DefaultIsPendingShareTest {
             whenever(getNodeByHandle(handle)).thenReturn(node)
 
             underTest(handle)
-            verify(filesRepository).isPendingShare(node)
+            verify(megaNodeRepository).isPendingShare(node)
         }
 
     @Test
@@ -77,7 +77,7 @@ class DefaultIsPendingShareTest {
             whenever(getNodeByHandle(handle)).thenReturn(node)
 
             val expected = true
-            whenever(filesRepository.isPendingShare(node)).thenReturn(expected)
+            whenever(megaNodeRepository.isPendingShare(node)).thenReturn(expected)
             Truth.assertThat(underTest(handle)).isEqualTo(expected)
         }
 }

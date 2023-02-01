@@ -11,6 +11,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -554,13 +555,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
             R.id.action_share -> {
                 val imageItem = viewModel.getCurrentImageItem()
+                val file =
+                    imageItem?.imageResult?.fullSizeUri?.toUri()?.toFile()?.takeIf { it.exists() }
                 when {
                     imageItem == null ->
                         Timber.w("Image Item is null")
                     imageItem is ImageItem.OfflineNode ->
                         OfflineUtils.shareOfflineNode(this, imageItem.nodeItem!!.handle)
-                    imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
-                        FileUtil.shareFile(this, imageItem.imageResult!!.fullSizeUri!!.toFile())
+                    file != null -> FileUtil.shareFile(this, file)
                     imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
                     imageItem.nodeItem?.node != null ->
@@ -632,7 +634,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
-        val existingFile = imageItem.imageResult?.fullSizeUri?.toFile()
+        val existingFile = imageItem.imageResult?.fullSizeUri?.toUri()?.toFile()
         if (existingFile?.exists() == true && existingFile.canRead()) {
             val localPath = existingFile.absolutePath ?: return
             FileUtil.setLocalIntentParams(this, nodeName, intent, localPath, false, this)

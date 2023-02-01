@@ -250,7 +250,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     private fun setupFlow() {
         viewModel.activeState.flowWithLifecycle(
             viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
+            Lifecycle.State.CREATED
         ).onEach { transfersState ->
             when (transfersState) {
                 is ActiveTransfersState.TransfersUpdated -> {
@@ -293,9 +293,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                     }
                 }
                 is ActiveTransfersState.TransferChangeStatusUpdated -> {
-                    val index = transfersState.index
-                    viewModel.updateActiveTransfer(index, transfersState.transfer)
-                    adapter?.notifyItemChanged(index)
+                    adapter?.updateItemState(transfersState.transfer, transfersState.index)
                 }
                 else -> {}
             }

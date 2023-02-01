@@ -32,17 +32,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogAcceptContactBinding
 import mega.privacy.android.app.databinding.DialogInviteBinding
 import mega.privacy.android.app.databinding.FragmentScanCodeBinding
-import mega.privacy.android.app.main.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaContactRequest
 import timber.log.Timber
-import java.io.File
 import java.util.Locale
-import javax.inject.Inject
 
 /**
  * ScanCodeFragment
@@ -65,12 +59,10 @@ class ScanCodeFragment : Fragment() {
     private var requestedAlertDialog: AlertDialog? = null
 
     private val viewModel: ScanCodeViewModel by activityViewModels()
+    private val uiState: ScanCodeState
+        get() = viewModel.state.value
 
     private var handler: Handler? = null
-
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
@@ -119,13 +111,6 @@ class ScanCodeFragment : Fragment() {
     }
 
     /**
-     * Retrieves the UI state from [ScanCodeViewModel]
-     *
-     * @return the UI State
-     */
-    private fun state() = viewModel.state.value
-
-    /**
      * Observes changes to the UI State from [ScanCodeViewModel]
      */
     private fun observeUiState() {
@@ -134,7 +119,7 @@ class ScanCodeFragment : Fragment() {
                 viewModel.state.collect {
                     if (it.finishActivity) {
                         val intent = Intent()
-                        intent.putExtra("mail", it.myEmail)
+                        intent.putExtra("mail", it.email)
                         requireActivity().setResult(Activity.RESULT_OK, intent)
                         requireActivity().finish()
                     } else if (it.showInviteResultDialog) {
@@ -145,7 +130,11 @@ class ScanCodeFragment : Fragment() {
                             it.printEmail
                         )
                     } else if (it.showInviteDialog) {
-                        showInviteDialog(it.myEmail, it.contactNameContent, it.isContact)
+                        showInviteDialog(
+                            it.email,
+                            it.scannedContactLinkResult?.contactName,
+                            it.scannedContactLinkResult?.isContact ?: false
+                        )
                     }
                 }
             }
@@ -192,9 +181,13 @@ class ScanCodeFragment : Fragment() {
             }
         }
 
-        state().run {
+        uiState.run {
             if (inviteDialogShown) {
-                showInviteDialog(myEmail, contactNameContent, isContact)
+                showInviteDialog(
+                    email,
+                    scannedContactLinkResult?.contactName,
+                    scannedContactLinkResult?.isContact ?: false
+                )
             } else if (inviteResultDialogShown) {
                 this@ScanCodeFragment.showInviteResultDialog(
                     dialogTitleContent,
@@ -244,7 +237,7 @@ class ScanCodeFragment : Fragment() {
                 viewModel.updateInviteResultDialogShown(false)
                 codeScanner?.releaseResources()
                 requestedAlertDialog?.dismiss()
-                if (state().success) {
+                if (uiState.success) {
                     activity?.finish()
                 } else {
                     codeScanner?.startPreview()
@@ -257,7 +250,7 @@ class ScanCodeFragment : Fragment() {
 
         if (printEmail) {
             dialogInviteBinding.dialogInviteText.text =
-                requireContext().getFormattedStringOrDefault(text, state().myEmail)
+                requireContext().getFormattedStringOrDefault(text, uiState.email)
         } else {
             dialogInviteBinding.dialogInviteText.text =
                 requireContext().getFormattedStringOrDefault(text)
@@ -282,79 +275,27 @@ class ScanCodeFragment : Fragment() {
         }
     }
 
-    private fun sendInvitation() {
-        Timber.d("sendInvitation")
-        megaApi.inviteContact(
-            state().myEmail,
-            null,
-            MegaContactRequest.INVITE_ACTION_ADD,
-            state().handleContactLink,
-            activity as QRCodeActivity?
-        )
-    }
-
     /**
      * Method to set scanned contact avatar in the dialog
      */
-    fun setAvatar() {
-        Timber.d("updateAvatar")
-        if (!state().isContact) {
-            Timber.d("Is not Contact")
+    private fun setAvatar() = uiState.scannedContactLinkResult?.avatarFile?.run {
+        Timber.d("Avatar path: $absolutePath")
+        val imBitmap = BitmapFactory.decodeFile(absolutePath, BitmapFactory.Options())
+        if (imBitmap == null) {
+            Timber.d("Show default avatar")
+            delete()
             setDefaultAvatar()
         } else {
-            Timber.d("Is Contact")
-            val myEmail = state().myEmail
-            val avatar: File? = if (context != null) {
-                Timber.d("Context is not null")
-                buildAvatarFile(requireContext(), "$myEmail.jpg")
-            } else {
-                Timber.w("Context is null!!!")
-                if (activity != null) {
-                    Timber.d("getActivity is not null")
-                    buildAvatarFile(requireActivity(), "$myEmail.jpg")
-                } else {
-                    Timber.w("getActivity is ALSO null")
-                    return
-                }
-            }
-            avatar?.let {
-                setProfileAvatar(it)
-            } ?: run {
-                setDefaultAvatar()
-            }
+            Timber.d("Show my avatar")
+            dialogAcceptContactBinding.acceptContactAvatar.setImageBitmap(imBitmap)
+            dialogAcceptContactBinding.acceptContactInitialLetter.visibility = View.GONE
         }
-    }
-
-    private fun setProfileAvatar(avatar: File) {
-        Timber.d("setProfileAvatar")
-        if (avatar.exists()) {
-            Timber.d("Avatar path: ${avatar.absolutePath}")
-            if (avatar.length() > 0) {
-                Timber.d("My avatar exists!")
-                val imBitmap =
-                    BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
-                if (imBitmap == null) {
-                    avatar.delete()
-                    Timber.d("Call to getUserAvatar")
-                    setDefaultAvatar()
-                } else {
-                    Timber.d("Show my avatar")
-                    dialogAcceptContactBinding.acceptContactAvatar.setImageBitmap(imBitmap)
-                    dialogAcceptContactBinding.acceptContactInitialLetter.visibility = View.GONE
-                }
-            }
-        } else {
-            Timber.d("My avatar NOT exists!")
-            Timber.d("Call to getUserAvatar")
-            Timber.d("DO NOT Retry!")
-            megaApi.getUserAvatar(state().myEmail, avatar.path, activity as QRCodeActivity?)
-        }
-    }
+    } ?: setDefaultAvatar()
 
     /**
      * Method to set a default avatar
      */
-    fun setDefaultAvatar() {
+    private fun setDefaultAvatar() {
         Timber.d("setDefaultAvatar")
         val defaultAvatar = Bitmap.createBitmap(
             DEFAULT_AVATAR_WIDTH_HEIGHT,
@@ -364,19 +305,8 @@ class ScanCodeFragment : Fragment() {
         val c = Canvas(defaultAvatar)
         val p = Paint()
         p.isAntiAlias = true
-        if (state().isContact) {
-            val color =
-                megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(state().handleContactLink))
-            if (color != null) {
-                Timber.d("The color to set the avatar is $color")
-                p.color = Color.parseColor(color)
-            } else {
-                Timber.d("Default color to the avatar")
-                p.color = ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
-            }
-        } else {
-            p.color = ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
-        }
+        p.color = uiState.scannedContactLinkResult?.avatarColor
+            ?: ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
         val radius: Int =
             if (defaultAvatar.width < defaultAvatar.height) defaultAvatar.width / 2 else defaultAvatar.height / 2
         c.drawCircle(
@@ -389,7 +319,8 @@ class ScanCodeFragment : Fragment() {
         val density = resources.displayMetrics.density
         val avatarTextSize = getAvatarTextSize(density)
         Timber.d("DENSITY: $density:::: $avatarTextSize")
-        val fullName: String? = state().contactNameContent ?: state().myEmail
+        val fullName: String? =
+            uiState.scannedContactLinkResult?.contactName ?: uiState.email
         if (fullName != null && fullName.isNotEmpty()) {
             var firstLetter = fullName[0].toString() + ""
             firstLetter = firstLetter.uppercase(Locale.getDefault())
@@ -458,7 +389,7 @@ class ScanCodeFragment : Fragment() {
 
                 acceptContactInvite.setOnClickListener {
                     viewModel.updateInviteShown(false)
-                    sendInvitation()
+                    viewModel.sendInvite()
                     if (inviteAlertDialog != null) {
                         inviteAlertDialog?.dismiss()
                     }
@@ -468,7 +399,7 @@ class ScanCodeFragment : Fragment() {
                     viewModel.updateInviteShown(false)
                     codeScanner?.releaseResources()
                     inviteAlertDialog?.dismiss()
-                    ContactUtil.openContactInfoActivity(context, state().myEmail)
+                    ContactUtil.openContactInfoActivity(context, uiState.email)
                     activity?.finish()
                 }
 

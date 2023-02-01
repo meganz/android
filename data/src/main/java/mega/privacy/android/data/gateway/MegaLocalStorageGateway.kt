@@ -1,8 +1,9 @@
 package mega.privacy.android.data.gateway
 
+import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
-import mega.privacy.android.data.model.UserCredentials
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
@@ -248,6 +249,11 @@ interface MegaLocalStorageGateway {
     suspend fun doPreferencesExist(): Boolean
 
     /**
+     * Do camera upload sync preference exist
+     */
+    suspend fun doesSyncEnabledExist(): Boolean
+
+    /**
      * Is camera upload sync enabled
      */
     suspend fun isSyncEnabled(): Boolean
@@ -392,11 +398,25 @@ interface MegaLocalStorageGateway {
     suspend fun setUserHasLoggedIn()
 
     /**
+     * Get always ask for storage state
+     *
+     * @return isStorageAskAlways as [Boolean]
+     */
+    suspend fun getStorageAskAlways(): Boolean
+
+    /**
      * Set to always ask for storage
      *
      * @param isStorageAskAlways
      */
     suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+
+    /**
+     * Get storage download location
+     *
+     * @return storageDownloadLocation path as [String]
+     */
+    suspend fun getStorageDownloadLocation(): String?
 
     /**
      * Set storage download location
@@ -556,4 +576,28 @@ interface MegaLocalStorageGateway {
      * @param type
      */
     suspend fun setLastPublicHandleType(type: Int)
+
+    /**
+     * Gets chat settings.
+     */
+    suspend fun getChatSettings(): ChatSettings?
+
+    /**
+     * Sets chat settings.
+     *
+     * @param chatSettings [ChatSettings]
+     */
+    suspend fun setChatSettings(chatSettings: ChatSettings)
+
+    /**
+     * Saves the user credentials of the current logged in account.
+     *
+     * @param userCredentials [UserCredentials]
+     */
+    suspend fun saveCredentials(userCredentials: UserCredentials)
+
+    /**
+     * Clears ephemeral.
+     */
+    suspend fun clearEphemeral()
 }

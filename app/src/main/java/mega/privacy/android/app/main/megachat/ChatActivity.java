@@ -54,6 +54,7 @@ import static mega.privacy.android.app.utils.CallUtil.getCallsParticipating;
 import static mega.privacy.android.app.utils.CallUtil.isMeetingEnded;
 import static mega.privacy.android.app.utils.CallUtil.isSessionOnHold;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
+import static mega.privacy.android.app.utils.CallUtil.openMeetingRinging;
 import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.CallUtil.returnCall;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationInACall;
@@ -1080,10 +1081,19 @@ public class ChatActivity extends PasscodeActivity
      * @param speaker True, speaker ON. False, speaker OFF.
      */
     private void answerCall(long chatId, Boolean video, Boolean audio, Boolean speaker) {
-        callInProgressLayout.setEnabled(false);
         var enableAudio = audio;
+        var hasAudioPermissions = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
         if (enableAudio) {
-            enableAudio = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+            enableAudio = hasAudioPermissions;
+        }
+
+        if (!hasAudioPermissions) {
+            openMeetingRinging(
+                    this,
+                    chatId,
+                    passcodeManagement
+            );
+            return;
         }
 
         var enableVideo = video;
@@ -1091,6 +1101,7 @@ public class ChatActivity extends PasscodeActivity
             enableVideo = hasPermissions(this, Manifest.permission.CAMERA);
         }
 
+        callInProgressLayout.setEnabled(false);
         viewModel.onAnswerCall(chatId, enableVideo, enableAudio, speaker);
     }
 

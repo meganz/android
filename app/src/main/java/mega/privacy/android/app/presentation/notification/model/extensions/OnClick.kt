@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.NewSharedNodesAlert
 import mega.privacy.android.domain.entity.PaymentFailedAlert
 import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
+import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAlert
@@ -77,6 +78,9 @@ internal fun UserAlert.onClick(): (NotificationNavigationHandler) -> Unit {
             } else {
                 Timber.d("Do not navigate: ${this.javaClass.name}")
             }
+        }
+        is ScheduledMeetingAlert -> { handler ->
+            handler.moveToChatSection(chatId)
         }
         else -> { _ ->
             Timber.d("Do not navigate: ${this.javaClass.name}")

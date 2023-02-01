@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -46,6 +47,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     putLong(CHAT_ID, chatId)
                 }
             }
+    }
+
+    private val defaultAvatarColor by lazy {
+        ContextCompat.getColor(requireContext(), R.color.grey_012_white_012)
     }
 
     private lateinit var binding: BottomSheetMeetingDetailBinding
@@ -85,10 +90,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         requireNotNull(room) { "Meeting not found" }
 
         binding.header.txtTitle.text = room.title
-        binding.header.txtTimestamp.setText(if (room.isScheduledMeeting()) {
-            R.string.chat_schedule_meeting
-        } else {
-            R.string.context_meeting
+        binding.header.txtTimestamp.setText(when {
+            room.isRecurring -> R.string.meetings_list_recurring_meeting_label
+            room.isPending -> R.string.meetings_list_one_off_meeting_label
+            else -> R.string.context_meeting
         })
 
         if (room.firstUserChar == null && room.lastUserChar == null) {
@@ -96,7 +101,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.header.imgThumbnail.isVisible = false
         } else {
             val firstUserPlaceholder = getImagePlaceholder(room.firstUserChar.toString(), room.firstUserColor)
-            if (room.isSingleMeeting() || room.lastUserAvatar == null) {
+            if (room.isSingleMeeting()) {
                 binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
                     ScalingUtils.ScaleType.FIT_CENTER
@@ -121,8 +126,23 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
 
-        binding.btnLeave.isVisible = room.isActive
-        binding.dividerArchive.isVisible = room.isActive
+        binding.btnCancel.isVisible = room.isPending
+        binding.dividerArchive.isVisible = binding.btnCancel.isVisible
+
+        binding.btnRecurringMeeting.isVisible = room.isRecurring
+        binding.dividerRecurringMeeting.isVisible = room.isRecurring
+
+        binding.btnRecurringMeeting.setOnClickListener {
+            activity?.startActivity(
+                Intent(
+                    context,
+                    RecurringMeetingInfoActivity::class.java
+                ).apply {
+                    putExtra(CHAT_ID, chatId)
+                    putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
+                })
+            dismissAllowingStateLoss()
+        }
 
         binding.btnInfo.setOnClickListener {
             val intent = if (room.isScheduledMeeting() && room.isActive) {
@@ -137,8 +157,6 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
             }
             activity?.startActivity(intent)
-
-
             dismissAllowingStateLoss()
         }
 
@@ -168,26 +186,12 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             dismissAllowingStateLoss()
         }
 
-        binding.btnClearHistory.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.title_properties_chat_clear)
-                .setMessage(R.string.confirmation_clear_chat_history)
-                .setPositiveButton(R.string.general_clear) { _, _ ->
-                    viewModel.clearChatHistory(chatId)
-                    dismissAllowingStateLoss()
-                }
-                .setNegativeButton(R.string.general_cancel, null)
-                .show()
-        }
-        binding.btnClearHistory.isVisible = room.hasPermissions
-        binding.dividerClear.isVisible = binding.btnClearHistory.isVisible
-
         binding.btnArchive.setOnClickListener {
             viewModel.archiveChat(chatId)
             dismissAllowingStateLoss()
         }
 
-        binding.btnLeave.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             showLeaveChatDialog()
             dismissAllowingStateLoss()
         }
@@ -208,22 +212,21 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             .show()
     }
 
-    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable? =
-        if (!letter.isNullOrBlank() && avatarColor != null) {
-            TextDrawable.builder()
-                .beginConfig()
-                .width(resources.getDimensionPixelSize(R.dimen.image_group_size))
-                .height(resources.getDimensionPixelSize(R.dimen.image_group_size))
-                .fontSize(resources.getDimensionPixelSize(R.dimen.image_group_text_size))
-                .withBorder(resources.getDimensionPixelSize(R.dimen.image_group_border_size))
-                .borderColor(ContextCompat.getColor(requireContext(), R.color.white_dark_grey))
-                .bold()
-                .toUpperCase()
-                .endConfig()
-                .buildRound(letter, avatarColor)
-        } else {
-            null
-        }
+    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable =
+        TextDrawable.builder()
+            .beginConfig()
+            .width(resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .height(resources.getDimensionPixelSize(R.dimen.image_group_size))
+            .fontSize(resources.getDimensionPixelSize(R.dimen.image_group_text_size))
+            .withBorder(resources.getDimensionPixelSize(R.dimen.image_group_border_size))
+            .borderColor(ContextCompat.getColor(requireContext(), R.color.white_dark_grey))
+            .bold()
+            .toUpperCase()
+            .endConfig()
+            .buildRound(
+                if (letter.isNullOrEmpty()) "U" else letter,
+                avatarColor ?: defaultAvatarColor
+            )
 
     /**
      * Custom show method to avoid showing the same dialog multiple times

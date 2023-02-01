@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
@@ -33,6 +34,7 @@ class DefaultGetPendingUploadList @Inject constructor(
     private val shouldCompressVideo: ShouldCompressVideo,
     private val getGPSCoordinates: GetGPSCoordinates,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
+    private val isNodeInRubbish: IsNodeInRubbish,
 ) : GetPendingUploadList {
 
     override suspend fun invoke(
@@ -98,7 +100,7 @@ class DefaultGetPendingUploadList @Inject constructor(
                 pendingList.add(record)
             } else {
                 Timber.d("Possible node with same fingerprint with handle: ${nodeExists.handle}")
-                if (getParentMegaNode(nodeExists)?.handle != parentNodeHandle) {
+                if (!isNodeInRubbish(nodeExists.handle) && getParentMegaNode(nodeExists)?.handle != parentNodeHandle) {
                     val record = SyncRecord(
                         0,
                         media.filePath,

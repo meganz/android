@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.util.Size
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -32,3 +33,9 @@ internal fun Context.registerReceiverAsFlow(
         unregisterReceiver(receiver)
     }
 }.buffer(capacity = Channel.UNLIMITED)
+
+/**
+ * Get the Screen size
+ */
+fun Context.getScreenSize() =
+    Size(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)

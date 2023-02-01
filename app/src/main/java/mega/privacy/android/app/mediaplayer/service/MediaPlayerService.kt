@@ -21,6 +21,8 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
@@ -30,6 +32,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.utils.CallUtil
@@ -38,10 +41,12 @@ import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.abandonAudioFocus
 import mega.privacy.android.app.utils.ChatUtil.getAudioFocus
 import mega.privacy.android.app.utils.ChatUtil.getRequest
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -68,6 +73,12 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     private val metadata = MutableLiveData<Metadata>()
     private val orientationUpdate = MutableLiveData<Pair<Int, Int>>()
+
+    private var mediaPlayerIntent: Intent? = null
+    private var videoPlayType = VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
+    private var isPlayingAfterReady = false
+    private var currentPlayingHandle: Long? = null
+    private val showPlaybackPositionDialogUpdate = MutableStateFlow(PlaybackPositionState())
 
     private var needPlayWhenGoForeground = false
     private var needPlayWhenReceiveResumeCommand = false
@@ -133,14 +144,53 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                     handle?.let {
                         setCurrentPlayingHandle(it.toLong())
                         lifecycleScope.launch {
-                            viewModelGateway.monitorPlaybackTimes(it.toLong()) { positionMs ->
-                                mediaPlayerGateway.playerSeekToPositionMs(positionMs)
+                            viewModelGateway.monitorPlaybackTimes(it.toLong()) { positionInMs ->
+                                when (videoPlayType) {
+                                    VIDEO_TYPE_RESUME_PLAYBACK_POSITION ->
+                                        positionInMs?.let { position ->
+                                            mediaPlayerGateway.playerSeekToPositionInMs(position)
+                                        }
+                                    VIDEO_TYPE_RESTART_PLAYBACK_POSITION -> {
+                                        // Remove current playback history, if video type is restart
+                                        lifecycleScope.launch {
+                                            viewModelGateway.deletePlaybackInformation(it.toLong())
+                                        }
+                                    }
+                                    VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG -> {
+                                        // Detect the media item whether is transition by comparing
+                                        // currentPlayingHandle if is parameter handle
+                                        if (currentPlayingHandle != it.toLong()
+                                            && positionInMs != null && positionInMs > 0
+                                        ) {
+                                            // If the dialog is not showing before build sources,
+                                            // the video is paused before the dialog is dismissed.
+                                            isPlayingAfterReady = false
+                                            showPlaybackPositionDialogUpdate.update { info ->
+                                                info.copy(
+                                                    showPlaybackDialog = true,
+                                                    mediaItemName = getPlaylistItem(it)?.nodeName,
+                                                    playbackPosition = positionInMs,
+                                                    isDialogShownBeforeBuildSources = false
+                                                )
+                                            }
+                                        } else {
+                                            // If currentPlayHandle is parameter handle and there is
+                                            // no playback history, the video is playing after ready
+                                            isPlayingAfterReady = true
+                                            // Set playWhenReady to be true to ensure the video is playing after ready
+                                            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                                                setPlayWhenReady(true)
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         if (isUpdateName) {
                             val nodeName = getPlaylistItem(it)?.nodeName ?: ""
                             metadata.value = Metadata(null, null, null, nodeName)
                         }
+                        currentPlayingHandle = handle.toLong()
                     }
                 }
 
@@ -169,7 +219,23 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
                             setPaused(true)
                         }
-                        state == MEDIA_PLAYER_STATE_READY && isPaused() && mediaPlayerGateway.getPlayWhenReady() -> {
+                        !isAudioPlayer() && state == MEDIA_PLAYER_STATE_READY -> {
+                            // This case is only for video player
+                            if (isPaused() && mediaPlayerGateway.getPlayWhenReady()) {
+                                setPaused(false)
+                            } else {
+                                // Detect videoPlayType and isPlayingAfterReady after video is ready
+                                // If videoPlayType is VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG, and
+                                // isPlayingAfterReady is false, the video is paused after it's ready
+                                if (videoPlayType == VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
+                                    && !isPlayingAfterReady
+                                ) {
+                                    setPlayWhenReady(false)
+                                }
+                            }
+                        }
+                        state == MEDIA_PLAYER_STATE_READY && isPaused()
+                                && mediaPlayerGateway.getPlayWhenReady() -> {
                             setPaused(false)
                         }
                     }
@@ -256,27 +322,56 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             else -> {
                 if (MediaPlayerActivity.isAudioPlayer(intent)) {
                     createPlayerControlNotification()
-                }
-                lifecycleScope.launch {
-                    if (viewModelGateway.buildPlayerSource(intent)) {
-                        if (viewModelGateway.isAudioPlayer()) {
-                            MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                    lifecycleScope.launch {
+                        if (viewModelGateway.buildPlayerSource(intent)) {
+                            if (viewModelGateway.isAudioPlayer()) {
+                                MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                            }
                         }
                     }
-                }
-
-                lifecycleScope.launch {
-                    viewModelGateway.trackPlayback {
-                        PlaybackInformation(
-                            mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
-                            mediaPlayerGateway.getCurrentItemDuration(),
-                            mediaPlayerGateway.getCurrentPlayingPosition()
-                        )
+                } else {
+                    lifecycleScope.launch {
+                        currentPlayingHandle =
+                            intent?.getLongExtra(Constants.INTENT_EXTRA_KEY_HANDLE,
+                                MegaApiJava.INVALID_HANDLE)
+                        viewModelGateway.monitorPlaybackTimes(currentPlayingHandle) { positionInMs ->
+                            // If the first video contains playback history, show dialog before build sources
+                            if (positionInMs != null && positionInMs > 0) {
+                                mediaPlayerIntent = intent
+                                showPlaybackPositionDialogUpdate.update { info ->
+                                    info.copy(
+                                        showPlaybackDialog = true,
+                                        mediaItemName = intent?.getStringExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME),
+                                        playbackPosition = positionInMs
+                                    )
+                                }
+                            } else {
+                                initVideoSources(intent)
+                            }
+                        }
                     }
                 }
             }
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun initVideoSources(intent: Intent?) {
+        lifecycleScope.launch {
+            if (viewModelGateway.buildPlayerSource(intent)) {
+                if (viewModelGateway.isAudioPlayer()) {
+                    MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                }
+            }
+
+            viewModelGateway.trackPlayback {
+                PlaybackInformation(
+                    mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
+                    mediaPlayerGateway.getCurrentItemDuration(),
+                    mediaPlayerGateway.getCurrentPlayingPosition()
+                )
+            }
+        }
     }
 
     private fun observeData() {
@@ -463,6 +558,68 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()
 
+    override fun playbackPositionStateUpdate() = showPlaybackPositionDialogUpdate
+
+    override fun setRestartPlayVideo() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
+        // Set playWhenReady to be true, making the video is playing after the restart button is clicked
+        if (!mediaPlayerGateway.getPlayWhenReady()) {
+            setPlayWhenReady(true)
+        }
+        // If the restart button is clicked, remove playback information of current item
+        lifecycleScope.launch {
+            viewModelGateway.deletePlaybackInformation(viewModelGateway.getCurrentPlayingHandle())
+        }
+    }
+
+    override fun setRestartPlayVideoBeforeBuildSources() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESTART_PLAYBACK_POSITION)
+        // Initial video sources after the restart button is clicked
+        initVideoSources(mediaPlayerIntent)
+    }
+
+    override fun setResumePlaybackPosition(playbackPosition: Long?) {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESUME_PLAYBACK_POSITION)
+        // Seek to playback position history after the resume button is clicked
+        playbackPosition?.let {
+            mediaPlayerGateway.playerSeekToPositionInMs(it)
+        }
+        // Set playWhenReady to be true, making the video is playing after the resume button is clicked
+        if (!mediaPlayerGateway.getPlayWhenReady()) {
+            setPlayWhenReady(true)
+        }
+    }
+
+    override fun setResumePlaybackPositionBeforeBuildSources(playbackPosition: Long?) {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_RESUME_PLAYBACK_POSITION)
+        // Initial video sources after the resume button is clicked
+        initVideoSources(mediaPlayerIntent)
+    }
+
+    override fun cancelPlaybackPositionDialog() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
+    }
+
+    override fun cancelPlaybackPositionDialogBeforeBuildSources() {
+        updateDialogShownStateAndVideoPlayType(VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG)
+        initVideoSources(mediaPlayerIntent)
+        // If the dialog is cancelled, set PlayWhenReady to be false to paused video after build sources.
+        setPlayWhenReady(false)
+    }
+
+    /**
+     * Update dialog shon state and video play type
+     *
+     * @param type video play type
+     */
+    private fun updateDialogShownStateAndVideoPlayType(type: Int) {
+        // Set showDialog to be false, avoid the dialog is shown repeatedly when screen is rotated
+        showPlaybackPositionDialogUpdate.update {
+            it.copy(showPlaybackDialog = false)
+        }
+        videoPlayType = type
+    }
+
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1
 
@@ -476,6 +633,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         private const val MEDIA_PLAYER_STATE_READY = 3
 
         private const val RESUME_DELAY_MS = 500L
+
+        private const val VIDEO_TYPE_RESUME_PLAYBACK_POSITION = 123
+        private const val VIDEO_TYPE_RESTART_PLAYBACK_POSITION = 124
+        private const val VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG = 125
 
         /**
          * The minimum size of single playlist

@@ -51,7 +51,7 @@ import mega.privacy.android.app.imageviewer.util.shouldShowRubbishBinOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
-import mega.privacy.android.app.main.FileInfoActivity
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
@@ -165,7 +165,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 imgThumbnail.post {
                     imgThumbnail.controller = Fresco.newDraweeControllerBuilder()
                         .setImageRequest(
-                            ImageRequestBuilder.newBuilderWithSource(imageUri)
+                            ImageRequestBuilder.newBuilderWithSource(imageUri.toUri())
                                 .setRotationOptions(RotationOptions.autoRotate())
                                 .setResizeOptions(
                                     ResizeOptions.forSquareSize(imgThumbnail.width)
@@ -325,11 +325,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Share
             optionShare.isVisible = imageItem.shouldShowShareOption()
             optionShare.setOnClickListener {
+                val file =
+                    imageItem.imageResult?.fullSizeUri?.toUri()?.toFile()?.takeIf { it.exists() }
                 when {
                     imageItem is ImageItem.OfflineNode ->
                         OfflineUtils.shareOfflineNode(context, imageItem.handle)
-                    imageItem.imageResult?.fullSizeUri?.toFile()?.exists() == true ->
-                        FileUtil.shareFile(context, imageItem.imageResult!!.fullSizeUri!!.toFile())
+                    file != null -> FileUtil.shareFile(context, file)
                     imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
                     node != null ->

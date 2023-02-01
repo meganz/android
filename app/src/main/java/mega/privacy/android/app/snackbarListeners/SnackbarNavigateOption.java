@@ -20,7 +20,7 @@ import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.DrawerItem;
-import mega.privacy.android.app.main.FileInfoActivity;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.controllers.ContactController;

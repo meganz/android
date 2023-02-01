@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 /**
  * Launches a new coroutine and repeats `collectBlock` every time the Fragment's viewLifecycleOwner
@@ -15,7 +16,7 @@ inline fun <T> LifecycleOwner.collectFlow(
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
     crossinline collectBlock: (T) -> Unit
 ) {
-    this.lifecycleScope.launchWhenStarted {
+    this.lifecycleScope.launch {
         targetFlow.flowWithLifecycle(this@collectFlow.lifecycle, minActiveState)
             .collect {
                 collectBlock(it)

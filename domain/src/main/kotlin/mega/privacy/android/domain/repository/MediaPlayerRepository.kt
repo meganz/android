@@ -130,29 +130,49 @@ interface MediaPlayerRepository {
     suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode?
 
     /**
-     * Get children by parent node handle
+     * Get audio children by parent node handle
      *
-     * @param isAudio true is audio player, otherwise is false
      * @param parentHandle parent node handle
      * @param order list order
      * @return List<[UnTypedNode]>?
      */
-    suspend fun getChildrenByParentHandle(
-        isAudio: Boolean,
+    suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,
     ): List<UnTypedNode>?
 
     /**
-     * MegaApiFolder gets children by parent node handle
+     * Get video children by parent node handle
      *
-     * @param isAudio true is audio player, otherwise is false
      * @param parentHandle parent node handle
      * @param order list order
      * @return List<[UnTypedNode]>?
      */
-    suspend fun megaApiFolderGetChildrenByParentHandle(
-        isAudio: Boolean,
+    suspend fun getVideoNodesByParentHandle(
+        parentHandle: Long,
+        order: SortOrder,
+    ): List<UnTypedNode>?
+
+    /**
+     * Get audio children by parent handle from MegaApiFolder
+     *
+     * @param parentHandle parent node handle
+     * @param order list order
+     * @return List<[UnTypedNode]>?
+     */
+    suspend fun getAudiosByParentHandleFromMegaApiFolder(
+        parentHandle: Long,
+        order: SortOrder,
+    ): List<UnTypedNode>?
+
+    /**
+     * Get video children by parent handle from MegaApiFolder
+     *
+     * @param parentHandle parent node handle
+     * @param order list order
+     * @return List<[UnTypedNode]>?
+     */
+    suspend fun getVideosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
     ): List<UnTypedNode>?
@@ -200,7 +220,7 @@ interface MediaPlayerRepository {
     suspend fun getVideoNodesFromOutShares(lastHandle: Long, order: SortOrder): List<UnTypedNode>
 
     /**
-     * Get nodes by email
+     * Get audio nodes by email
      *
      * @param email email of account
      * @return List<[UnTypedNode]>?
@@ -208,7 +228,7 @@ interface MediaPlayerRepository {
     suspend fun getAudioNodesByEmail(email: String): List<UnTypedNode>?
 
     /**
-     * Get nodes by email
+     * Get video nodes by email
      *
      * @param email email of account
      * @return List<[UnTypedNode]>?
@@ -229,7 +249,7 @@ interface MediaPlayerRepository {
      * @param handles handle list
      * @return List<[UnTypedNode]>
      */
-    suspend fun getNodesByHandles(isAudio: Boolean, handles: List<Long>): List<UnTypedNode>
+    suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode>
 
     /**
      * MegaApi http server stop
@@ -284,14 +304,6 @@ interface MediaPlayerRepository {
      *                   internal default value
      */
     suspend fun megaApiFolderHttpServerSetMaxBufferSize(bufferSize: Int)
-
-    /**
-     * Get the fingerprint of a file by path
-     *
-     * @param filePath file path
-     * @return fingerprint
-     */
-    suspend fun getFingerprint(filePath: String): String?
 
     /**
      * Get the local folder path

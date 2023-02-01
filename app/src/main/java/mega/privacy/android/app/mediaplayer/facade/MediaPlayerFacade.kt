@@ -234,7 +234,7 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun playerSeekTo(index: Int) = player.seekTo(index, 0)
 
-    override fun playerSeekToPositionMs(positionMs: Long) = player.seekTo(positionMs)
+    override fun playerSeekToPositionInMs(positionInMs: Long) = player.seekTo(positionInMs)
 
     override fun buildPlaySources(mediaPlaySources: MediaPlaySources) {
         with(mediaPlaySources) {

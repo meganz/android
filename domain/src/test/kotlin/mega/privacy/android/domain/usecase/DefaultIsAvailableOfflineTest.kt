@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import mega.privacy.android.domain.repository.FileRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -30,7 +30,7 @@ class DefaultIsAvailableOfflineTest {
         on { id }.thenReturn(nodeId)
     }
     private val offlineNodeInformation = mock<OfflineNodeInformation>()
-    private val fileRepository = mock<FileRepository>{
+    private val nodeRepository = mock<NodeRepository> {
         onBlocking { getOfflineNodeInformation(nodeId) }.thenReturn(
             offlineNodeInformation)
     }
@@ -41,7 +41,7 @@ class DefaultIsAvailableOfflineTest {
     @Before
     fun setUp() {
         underTest = DefaultIsAvailableOffline(
-            fileRepository = fileRepository,
+            nodeRepository = nodeRepository,
             getOfflineFile = getOfflineFile,
         )
     }
@@ -72,7 +72,7 @@ class DefaultIsAvailableOfflineTest {
         }
 
     @Test
-    fun `test that true is returned if local file exists and the node is a folder`() = runTest{
+    fun `test that true is returned if local file exists and the node is a folder`() = runTest {
         whenever(file.exists()).thenReturn(true)
 
         assertThat(underTest(folderNode)).isTrue()

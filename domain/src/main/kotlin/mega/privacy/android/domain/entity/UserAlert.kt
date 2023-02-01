@@ -43,6 +43,23 @@ sealed interface IncomingShareAlert {
 }
 
 /**
+ * Scheduled meeting alert
+ *
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ */
+sealed interface ScheduledMeetingAlert {
+    val chatId: Long
+    val title: String
+    val email: String
+    val startDate: Long?
+    val endDate: Long?
+}
+
+/**
  * Unknown alert
  *
  * @property id
@@ -473,3 +490,182 @@ data class TakeDownReinstatedAlert(
     val path: String?,
 ) : UserAlert, CustomAlert {}
 
+/**
+ * New scheduled meeting alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ */
+data class NewScheduledMeetingAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+) : UserAlert, ScheduledMeetingAlert {}
+
+/**
+ * Deleted scheduled meeting alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ */
+data class DeletedScheduledMeetingAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+) : UserAlert, ScheduledMeetingAlert {}
+
+/**
+ * Updated scheduled meeting title alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property oldTitle
+ */
+data class UpdatedScheduledMeetingTitleAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+    val oldTitle: String,
+) : UserAlert, ScheduledMeetingAlert {}
+
+/**
+ * Updated scheduled meeting description alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ */
+data class UpdatedScheduledMeetingDescriptionAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+) : UserAlert, ScheduledMeetingAlert {}
+
+/**
+ * Updated scheduled meeting date time alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ * @property hasDateChanged
+ * @property hasTimeChanged
+ */
+data class UpdatedScheduledMeetingDateTimeAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+    val hasDateChanged: Boolean,
+    val hasTimeChanged: Boolean,
+) : UserAlert, ScheduledMeetingAlert {}
+
+/**
+ * Updated scheduled meeting cancel alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ */
+data class UpdatedScheduledMeetingCancelAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+) : UserAlert, ScheduledMeetingAlert {}
+
+/**
+ * Updated scheduled meeting fields alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ */
+data class UpdatedScheduledMeetingFieldsAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+) : UserAlert, ScheduledMeetingAlert {}

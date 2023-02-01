@@ -89,7 +89,7 @@ public class OfflineUtils {
         } catch (Exception ex) {
         }
 
-        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+        Map<MegaNode, String> dlFiles = new HashMap<>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             Timber.d("Is Folder");
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
@@ -186,7 +186,7 @@ public class OfflineUtils {
     public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList, LegacyDatabaseHandler dbH) {
 
         Timber.d("deleteChildenDB");
-        MegaOffline mOffDelete = null;
+        MegaOffline mOffDelete;
 
         for (int i = 0; i < mOffList.size(); i++) {
 
@@ -341,7 +341,12 @@ public class OfflineUtils {
                 break;
             }
             default: {
-                path = path + OFFLINE_DIR;
+                MegaNode parentNode = MegaNodeUtil.getRootParentNode(megaApi, node);
+                if (parentNode.isInShare()) {
+                    path = path + OFFLINE_DIR + File.separator + findIncomingParentHandle(node, megaApi);
+                } else {
+                    path = path + OFFLINE_DIR;
+                }
             }
         }
 
@@ -385,7 +390,7 @@ public class OfflineUtils {
         Timber.d("Destination absolute path: %s", destination.getAbsolutePath());
         Timber.d("Handle to save for offline: %s", node.getHandle());
 
-        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+        Map<MegaNode, String> dlFiles = new HashMap<>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             Timber.d("Is Folder");
             MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
@@ -394,17 +399,13 @@ public class OfflineUtils {
             dlFiles.put(node, destination.getAbsolutePath());
         }
 
-        ArrayList<MegaNode> nodesToDB = new ArrayList<MegaNode>();
+        ArrayList<MegaNode> nodesToDB = new ArrayList<>();
 
         for (MegaNode document : dlFiles.keySet()) {
             nodesToDB.add(document);
         }
 
-        if (path.contains(OFFLINE_INBOX_DIR)) {
-            insertDB(context, megaApi, dbH, nodesToDB, true);
-        } else {
-            insertDB(context, megaApi, dbH, nodesToDB, false);
-        }
+        insertDB(context, megaApi, dbH, nodesToDB, path.contains(OFFLINE_INBOX_DIR));
     }
 
     public static void saveOfflineChatFile(LegacyDatabaseHandler dbH, MegaTransfer transfer) {
@@ -435,11 +436,11 @@ public class OfflineUtils {
     private static void insertDB(Context context, MegaApiAndroid megaApi, LegacyDatabaseHandler dbH, ArrayList<MegaNode> nodesToDB, boolean fromInbox) {
         Timber.d("insertDB");
 
-        MegaNode parentNode = null;
-        MegaNode nodeToInsert = null;
+        MegaNode parentNode;
+        MegaNode nodeToInsert;
         String path;
-        MegaOffline mOffParent = null;
-        MegaOffline mOffNode = null;
+        MegaOffline mOffParent;
+        MegaOffline mOffNode;
 
         for (int i = nodesToDB.size() - 1; i >= 0; i--) {
             nodeToInsert = nodesToDB.get(i);
@@ -524,7 +525,7 @@ public class OfflineUtils {
         Timber.d("insertIncomingParentDB");
 
         String fileOrFolder = isFileOrFolder(parentNode);
-        MegaOffline mOffParentParent = null;
+        MegaOffline mOffParentParent;
         String path = getNodePath(context, parentNode);
         MegaNode parentparentNode = megaApi.getParentNode(parentNode);
         int parentId = -1;
@@ -570,7 +571,7 @@ public class OfflineUtils {
 
         String fileOrFolder = isFileOrFolder(parentNode);
         int origin = comesFromInbox(fromInbox);
-        MegaOffline mOffParentParent = null;
+        MegaOffline mOffParentParent;
         String path = getNodePath(context, parentNode);
         MegaNode parentparentNode = megaApi.getParentNode(parentNode);
         int parentId = -1;

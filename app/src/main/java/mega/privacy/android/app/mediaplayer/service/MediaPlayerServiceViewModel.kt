@@ -31,6 +31,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
+import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -94,19 +95,21 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.AreCredentialsNull
+import mega.privacy.android.domain.usecase.DeletePlaybackInformation
 import mega.privacy.android.domain.usecase.GetAudioNodes
 import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
+import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandle
 import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
+import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetInboxNode
 import mega.privacy.android.domain.usecase.GetLocalFilePath
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApi
+import mega.privacy.android.domain.usecase.GetNodesByHandles
 import mega.privacy.android.domain.usecase.GetParentNodeByHandle
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRootNode
@@ -118,9 +121,11 @@ import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
 import mega.privacy.android.domain.usecase.GetUserNameByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodes
 import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
+import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandle
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
+import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -149,7 +154,6 @@ import javax.inject.Inject
  */
 class MediaPlayerServiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val mediaPlayerRepository: MediaPlayerRepository,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
     private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
@@ -159,6 +163,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val trackPlaybackPositionUseCase: TrackPlaybackPosition,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimes,
     private val savePlaybackTimesUseCase: SavePlaybackTimes,
+    private val deletePlaybackInformationUseCase: DeletePlaybackInformation,
     private val megaApiFolderHttpServerSetMaxBufferSize: MegaApiFolderHttpServerSetMaxBufferSize,
     private val megaApiFolderHttpServerIsRunning: MegaApiFolderHttpServerIsRunning,
     private val megaApiFolderHttpServerStart: MegaApiFolderHttpServerStart,
@@ -192,8 +197,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getAudioNodesByEmail: GetAudioNodesByEmail,
     private val getVideoNodesByEmail: GetVideoNodesByEmail,
     private val getUserNameByEmail: GetUserNameByEmail,
+    private val getAudiosByParentHandleFromMegaApiFolder: GetAudiosByParentHandleFromMegaApiFolder,
+    private val getVideosByParentHandleFromMegaApiFolder: GetVideosByParentHandleFromMegaApiFolder,
+    private val getAudioNodesByParentHandle: GetAudioNodesByParentHandle,
+    private val getVideoNodesByParentHandle: GetVideoNodesByParentHandle,
+    private val getNodesByHandles: GetNodesByHandles,
+    private val getFingerprint: GetFingerprint,
     private val fileDurationMapper: FileDurationMapper,
-    private val addNodeType: AddNodeType,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -464,13 +474,16 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             }.let { title ->
                                 playlistTitle.postValue(title)
                             }
-                            mediaPlayerRepository.getChildrenByParentHandle(
-                                isAudio = isAudioPlayer,
-                                parentHandle = parent.id.longValue,
-                                order = getSortOrderFromIntent(intent))?.let { children ->
-                                buildPlaySourcesByTypedNodes(type,
-                                    children.map { addNodeType(it) },
-                                    firstPlayHandle)
+                            if (isAudioPlayer) {
+                                getAudioNodesByParentHandle(parentHandle = parent.id.longValue,
+                                    order = getSortOrderFromIntent(intent))
+                            } else {
+                                getVideoNodesByParentHandle(parentHandle = parent.id.longValue,
+                                    order = getSortOrderFromIntent(intent))
+                            }?.let { children ->
+                                buildPlaySourcesByTypedNodes(type = type,
+                                    typedNodes = children,
+                                    firstPlayHandle = firstPlayHandle)
                             }
                         }
                     }
@@ -496,11 +509,16 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         })?.let { parent ->
                             playlistTitle.postValue(parent.name)
 
-                            mediaPlayerRepository.megaApiFolderGetChildrenByParentHandle(
-                                isAudioPlayer, parent.id.longValue, order)?.let { children ->
-                                buildPlaySourcesByTypedNodes(type,
-                                    children.map { addNodeType(it) },
-                                    firstPlayHandle)
+                            if (isAudioPlayer) {
+                                getAudiosByParentHandleFromMegaApiFolder(parentHandle = parent.id.longValue,
+                                    order = order)
+                            } else {
+                                getVideosByParentHandleFromMegaApiFolder(parentHandle = parent.id.longValue,
+                                    order = order)
+                            }?.let { children ->
+                                buildPlaySourcesByTypedNodes(type = type,
+                                    typedNodes = children,
+                                    firstPlayHandle = firstPlayHandle)
                             }
                         }
                     }
@@ -752,9 +770,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         firstPlayHandle: Long,
     ) {
         buildPlaySourcesByTypedNodes(type = type,
-            typedNodes = mediaPlayerRepository.getNodesByHandles(isAudioPlayer, handles).map {
-                addNodeType(it)
-            },
+            typedNodes = getNodesByHandles(handles),
             firstPlayHandle = firstPlayHandle)
     }
 
@@ -1238,18 +1254,18 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override suspend fun monitorPlaybackTimes(
         mediaId: Long?,
-        seekToPosition: (positionMs: Long) -> Unit,
+        seekToPosition: (positionInMs: Long?) -> Unit,
     ) {
         if (!isAudioPlayer) {
-            monitorPlaybackTimesUseCase().firstOrNull()?.get(mediaId)?.currentPosition?.let {
-                seekToPosition(it)
-            }
+            seekToPosition(monitorPlaybackTimesUseCase().firstOrNull()
+                ?.get(mediaId)?.currentPosition)
         }
     }
 
-    override suspend fun savePlaybackTimes() {
-        savePlaybackTimesUseCase()
-    }
+    override suspend fun savePlaybackTimes() = savePlaybackTimesUseCase()
+
+    override suspend fun deletePlaybackInformation(mediaId: Long) =
+        deletePlaybackInformationUseCase(mediaId)
 
     override fun updateItemName(handle: Long, newName: String) =
         playlistItemsFlow.update {
@@ -1446,7 +1462,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         node.fingerprint.let { fingerprint ->
             localPath != null &&
                     (isOnMegaDownloads(node) || (fingerprint != null
-                            && fingerprint == mediaPlayerRepository.getFingerprint(localPath)))
+                            && fingerprint == getFingerprint(localPath)))
         }
 
     private fun isOnMegaDownloads(node: TypedFileNode): Boolean =

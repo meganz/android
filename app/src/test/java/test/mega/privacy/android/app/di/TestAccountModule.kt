@@ -8,12 +8,14 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.usecase.GetAccountAchievements
+import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
 
@@ -66,7 +68,13 @@ object TestAccountModule {
 
     @Provides
     fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()
-    
+
     @Provides
     fun provideIsUserLoggedIn() = isUserLoggedIn
+
+    @Provides
+    fun provideSaveAccountCredentials() = mock<SaveAccountCredentials>()
+
+    @Provides
+    fun provideGetAccountCredentials() = mock<GetAccountCredentials>()
 }

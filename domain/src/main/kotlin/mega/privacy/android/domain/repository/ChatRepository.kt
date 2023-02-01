@@ -296,4 +296,8 @@ interface ChatRepository {
      */
     fun monitorMyName(): Flow<String?>
 
+    /**
+     * Reset chat settings if not initialized yet.
+     */
+    suspend fun resetChatSettings()
 }

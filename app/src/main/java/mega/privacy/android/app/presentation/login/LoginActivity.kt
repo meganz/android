@@ -36,7 +36,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -94,6 +93,24 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 waitingForConfirmAccount = false
                 visibleFragment = Constants.LOGIN_FRAGMENT
                 showFragment(visibleFragment)
+            }
+        }
+    }
+
+    private val onFetchNodesFinishedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (viewModel.state.value.intentAction) {
+                ACTION_FORCE_RELOAD_ACCOUNT -> {
+                    MegaApplication.isLoggingIn = false
+                    finish()
+                }
+                ACTION_OPEN_APP -> {
+                    if (loginFragment?.isAdded == true) {
+                        loginFragment?.readyToManager()
+                    } else {
+                        finish()
+                    }
+                }
             }
         }
     }
@@ -160,24 +177,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE).apply {
                 addAction(BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE)
             })
-
-        registerReceiver(object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when (viewModel.intentAction) {
-                    ACTION_FORCE_RELOAD_ACCOUNT -> {
-                        MegaApplication.isLoggingIn = false
-                        finish()
-                    }
-                    ACTION_OPEN_APP -> {
-                        if (loginFragment?.isAdded == true) {
-                            loginFragment?.readyToManager()
-                        } else {
-                            finish()
-                        }
-                    }
-                }
-            }
-        }, IntentFilter(ACTION_FETCH_NODES_FINISHED))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -216,8 +215,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 }
 
                 if (passwdTemp != null && emailTemp != null) {
-                    loginFragment?.emailTemp = emailTemp
-                    loginFragment?.passwdTemp = passwdTemp
+                    viewModel.setTemporalCredentials(email = emailTemp, password = passwdTemp)
                 }
 
                 supportFragmentManager.beginTransaction()
@@ -305,19 +303,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     override fun shouldSetStatusBarTextColor() = false
 
     /**
-     * Shows a warning informing the Recovery Key is not correct.
-     */
-    fun showAlertIncorrectRK() {
-        Timber.d("showAlertIncorrectRK")
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getFormattedStringOrDefault(R.string.incorrect_MK_title))
-            .setMessage(getFormattedStringOrDefault(R.string.incorrect_MK))
-            .setCancelable(false)
-            .setPositiveButton(getFormattedStringOrDefault(R.string.general_ok), null)
-            .show()
-    }
-
-    /**
      * Shows a warning informing the account has been logged out.
      */
     fun showAlertLoggedOut() {
@@ -333,39 +318,28 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
-    /**
-     * Shows a confirmation dialog for cancelling transfers.
-     */
-    fun showConfirmationCancelAllTransfers() {
-        Timber.d("showConfirmationCancelAllTransfers")
-        intent = null
-
-        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setMessage(getFormattedStringOrDefault(R.string.cancel_all_transfer_confirmation))
-            .setPositiveButton(R.string.cancel_all_action) { _, _ ->
-                Timber.d("Pressed button positive to cancel transfer")
-                megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
-                megaApiFolder.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
-            }.setNegativeButton(R.string.general_dismiss, null)
-            .show()
-    }
-
     public override fun onResume() {
         Timber.d("onResume")
         super.onResume()
         Util.setAppFontSize(this)
+
+        registerReceiver(onFetchNodesFinishedReceiver, IntentFilter(ACTION_FETCH_NODES_FINISHED))
 
         if (intent == null) return
 
         if (intent?.action != null) {
             when (intent.action) {
                 Constants.ACTION_CANCEL_CAM_SYNC -> showCancelCUWarning()
-                Constants.ACTION_CANCEL_DOWNLOAD -> showConfirmationCancelAllTransfers()
                 Constants.ACTION_OVERQUOTA_TRANSFER -> showGeneralTransferOverQuotaWarning()
             }
         }
 
         intent = null
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(onFetchNodesFinishedReceiver)
     }
 
     private fun showCancelCUWarning() {
@@ -383,12 +357,10 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     }
 
     public override fun showConfirmationEnableLogsKarere() {
-        loginFragment?.numberOfClicksKarere = 0
         super.showConfirmationEnableLogsKarere()
     }
 
     public override fun showConfirmationEnableLogsSDK() {
-        loginFragment?.numberOfClicksSDK = 0
         super.showConfirmationEnableLogsSDK()
     }
 

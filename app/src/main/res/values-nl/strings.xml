@@ -1506,8 +1506,6 @@
     <string name="result_paragraph_info_achievement_add_phone">U heeft %1$s opslagruimte ontvangen voor het verifiëren van uw telefoonnummer.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslag ruimte ontvangen als uw gratis registratie bonus.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Bonus verloopt over %1$d dagen</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Gedeelde map</item>
@@ -2966,9 +2964,9 @@
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Zoek GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">Geen [A]GIFs[/A] gevonden</string>
+    <string name="empty_search_giphy">Geen [A]GIF[/A] gevonden</string>
     <!-- Label indicating there is not available GIFs due to down server -->
-    <string name="server_down_giphy">Geen beschikbare GIF’s. Probeer het later opnieuw</string>
+    <string name="server_down_giphy">Geen beschikbare GIF. Probeer het later opnieuw</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]Eind van[/A] resultaten</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
@@ -3583,22 +3581,6 @@
     <string name="payment_methods">Betalingsmethoden</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Doorgaan</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite maandelijks</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite jaarlijks</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I maandelijks</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I jaarlijks</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II maandelijks</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II jaarlijks</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III maandelijks</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III jaarlijks</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Verwijderen als gastvrouw/gastheer</string>
     <!-- Title message of existing subscription dialog -->
@@ -4014,7 +3996,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Toestaan ​​dat non-hosts deelnemers kan toevoegen</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIFs</string>
+    <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
@@ -4140,4 +4122,26 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Omschrijving</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Verwijderen van album?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Om camera uploads in te schakelen, geef MEGA toegang tot uw foto\’s en andere media op uw apparaat.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Toegang verlenen</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Niet toestaan</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="one">%d item verwijderd van “%s”</item>
+        <item quantity="other">%d items verwijderd van “%s”</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">Éénmalige vergadering</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Video hervatten?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s wordt hervat van %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Hervatten</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Herstarten</string>
 </resources>

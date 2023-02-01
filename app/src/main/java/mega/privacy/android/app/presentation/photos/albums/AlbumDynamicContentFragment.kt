@@ -19,10 +19,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
@@ -33,17 +36,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -63,6 +69,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
+import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -81,6 +88,7 @@ import mega.privacy.android.core.ui.controls.MegaEmptyView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import javax.inject.Inject
 
@@ -92,6 +100,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     internal val albumsViewModel: AlbumsViewModel by activityViewModels()
     private val photosViewModel: PhotosViewModel by activityViewModels()
+    private val albumContentViewModel: AlbumContentViewModel by viewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -138,7 +147,7 @@ class AlbumDynamicContentFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    AlbumContentBody(albumsViewModel)
+                    AlbumContentBody(albumsViewModel, albumContentViewModel)
                 }
             }
         }
@@ -149,6 +158,12 @@ class AlbumDynamicContentFragment : Fragment() {
         setHasOptionsMenu(true)
         setupFlow()
         setupParentActivityUI()
+        observePhotosAddingProgress()
+    }
+
+    private fun observePhotosAddingProgress() {
+        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        albumContentViewModel.observePhotosAddingProgress(albumId = album.id)
     }
 
     /**
@@ -181,16 +196,22 @@ class AlbumDynamicContentFragment : Fragment() {
                                 photos.isNotEmpty()
                         }
                     }
+                    if (!state.showRenameDialog){
+                        managerActivity.setToolbarTitle(getCurrentAlbumTitle())
+                    }
                 }
             }
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun AlbumContentBody(
         viewModel: AlbumsViewModel = viewModel(),
+        contentViewModel: AlbumContentViewModel = viewModel(),
     ) {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val contentState by contentViewModel.state.collectAsStateWithLifecycle()
         val configuration = LocalConfiguration.current
         val smallWidth = remember(configuration) {
             (configuration.screenWidthDp.dp - 1.dp) / 3
@@ -229,6 +250,22 @@ class AlbumDynamicContentFragment : Fragment() {
                     onLongPress = this@AlbumDynamicContentFragment::onLongPress,
                     selectedPhotos = uiState.selectedPhotos
                 )
+
+                if (contentState.isAddingPhotos) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp),
+                        color = teal_300,
+                    )
+                }
+            } else if (contentState.isAddingPhotos) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .align(Alignment.Center),
+                    color = teal_300,
+                )
             } else {
                 when (uiState.currentAlbum) {
                     Album.FavouriteAlbum -> MegaEmptyView(
@@ -251,7 +288,32 @@ class AlbumDynamicContentFragment : Fragment() {
                 }
             }
 
-            Column(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+            Column(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()) {
+                val userAlbum = uiState.currentUserAlbum
+                if (userAlbum != null && contentState.isAddingPhotosProgressCompleted) {
+                    val message = pluralStringResource(
+                        id = R.plurals.photos_album_selection_added,
+                        count = contentState.totalAddedPhotos,
+                        contentState.totalAddedPhotos,
+                        userAlbum.title,
+                    )
+                    Snackbar(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(8.dp),
+                        backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
+                    ) {
+                        Text(text = message)
+                    }
+
+                    LaunchedEffect(message) {
+                        delay(3000L)
+                        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    }
+                }
+
                 if (uiState.snackBarMessage.isNotEmpty()) {
                     SnackBar(
                         message = uiState.snackBarMessage,
@@ -269,7 +331,7 @@ class AlbumDynamicContentFragment : Fragment() {
                     Spacer(modifier = Modifier.padding(top = 16.dp))
                 }
 
-                if (showAddFabButton(uiState)) {
+                if (showAddFabButton(uiState) && !contentState.isAddingPhotos) {
                     AddFabButton(
                         modifier = Modifier
                             .align(Alignment.End)
@@ -328,6 +390,24 @@ class AlbumDynamicContentFragment : Fragment() {
                     }
                 )
             }
+
+            if (uiState.showRenameDialog) {
+                CreateNewAlbumDialog(
+                    titleResID = R.string.context_rename,
+                    positiveButtonTextResID = R.string.context_rename,
+                    onDismissRequest = {
+                        albumsViewModel.showRenameDialog(showRenameDialog = false)
+                        albumsViewModel.setNewAlbumNameValidity(true)
+                    },
+                    onDialogPositiveButtonClicked = albumsViewModel::updateAlbumName,
+                    onDialogInputChange = albumsViewModel::setNewAlbumNameValidity,
+                    initialInputText = { (uiState.currentAlbum as Album.UserAlbum).title },
+                    errorMessage = uiState.createDialogErrorMessage,
+                ) {
+                    uiState.isInputNameValid
+                }
+            }
+
         }
     }
 
@@ -407,7 +487,7 @@ class AlbumDynamicContentFragment : Fragment() {
             )
         }
 
-        LaunchedEffect(true) {
+        LaunchedEffect(message) {
             delay(3000L)
             albumsViewModel.setSnackBarMessage("")
         }
@@ -472,14 +552,11 @@ class AlbumDynamicContentFragment : Fragment() {
             ::handleAlbumPhotosSelectionResult,
         )
 
-    private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
-        val message =
-            result.data?.getStringExtra(AlbumPhotosSelectionActivity.MESSAGE) // Added 5 items to "Color ️‍🌈"
-        albumsViewModel.setSnackBarMessage(snackBarMessage = message ?: "")
-    }
+    private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent = AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
+        val intent =
+            AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
 
@@ -563,15 +640,14 @@ class AlbumDynamicContentFragment : Fragment() {
                 handleAlbumDeletion()
             }
             R.id.action_menu_rename -> {
-                //TODO
-                Toast.makeText(activity, "Rename is developing...", Toast.LENGTH_SHORT).show()
+                albumsViewModel.showRenameDialog(showRenameDialog = true)
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun handleAlbumDeletion() {
-        val photos = albumsViewModel.getCurrentUIAlbum()?.photos.orEmpty()
+        val photos = albumsViewModel.state.value.currentUIAlbum?.photos.orEmpty()
         if (photos.isEmpty()) {
             deleteAlbum()
         } else {
@@ -597,11 +673,24 @@ class AlbumDynamicContentFragment : Fragment() {
      * Get current page title
      */
     fun getCurrentAlbumTitle(): String {
-        val currentUIAlbum = albumsViewModel.getCurrentUIAlbum()
+        val currentUIAlbum = albumsViewModel.state.value.currentUIAlbum
         return if (context != null && currentUIAlbum != null) {
             currentUIAlbum.title
         } else {
             getString(R.string.tab_title_album)
         }
+    }
+
+    override fun onPause() {
+        ackPhotosAddingProgressCompleted()
+        super.onPause()
+    }
+
+    private fun ackPhotosAddingProgressCompleted() {
+        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        val isProgressCompleted = albumContentViewModel.state.value.isAddingPhotosProgressCompleted
+
+        if (!isProgressCompleted) return
+        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = album.id)
     }
 }

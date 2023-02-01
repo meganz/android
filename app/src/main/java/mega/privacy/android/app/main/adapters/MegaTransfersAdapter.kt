@@ -181,6 +181,7 @@ class MegaTransfersAdapter(
                 STATE_PAUSED -> {
                     holder.progressText.text = getProgress(transfer)
                     holder.speedText.text = context.getString(R.string.transfer_paused)
+                    holder.speedText.isVisible = true
 
                     if (!isMultipleSelect()) {
                         holder.optionPause.setImageResource(R.drawable.ic_play_grey)
@@ -280,6 +281,19 @@ class MegaTransfersAdapter(
     fun addItemData(transfers: List<MegaTransfer>, position: Int) {
         transferList = transfers
         notifyItemInserted(position)
+    }
+
+    /**
+     * Update the transfer item
+     *
+     * @param transfer updated transfer item
+     * @param position position of the transfer in the adapter.
+     */
+    fun updateItemState(transfer: MegaTransfer, position: Int) {
+        transferList = transferList.toMutableList().also { transfers ->
+            transfers[position] = transfer
+        }
+        notifyItemChanged(position)
     }
 
     /**
@@ -415,8 +429,7 @@ class MegaTransfersAdapter(
                 val selected = it.keyAt(i)
                 if (selected < 0 || selected >= transferList.size) {
                     continue
-                }
-                if (selected >= 0 && selected < transferList.size) {
+                } else {
                     selectedTransfers.add(transferList[selected])
                 }
             }

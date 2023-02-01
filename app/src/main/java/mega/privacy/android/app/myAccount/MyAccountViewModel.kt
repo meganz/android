@@ -1,6 +1,7 @@
 package mega.privacy.android.app.myAccount
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
@@ -11,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -29,7 +32,6 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController
@@ -47,6 +49,7 @@ import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -73,11 +76,14 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -94,7 +100,9 @@ import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
+@SuppressLint("StaticFieldLeak")
 class MyAccountViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
@@ -117,6 +125,8 @@ class MyAccountViewModel @Inject constructor(
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val getPaymentMethod: GetPaymentMethod,
+    private val getCurrentUserFullName: GetCurrentUserFullName,
+    private val monitorUserUpdates: MonitorUserUpdates,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -161,6 +171,28 @@ class MyAccountViewModel @Inject constructor(
 
     init {
         refreshNumberOfSubscription(false)
+        refreshUserName(false)
+        viewModelScope.launch {
+            monitorUserUpdates()
+                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname }
+                .collect {
+                    refreshUserName(true)
+                }
+        }
+    }
+
+    private fun refreshUserName(forceRefresh: Boolean) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    name = getCurrentUserFullName(
+                        forceRefresh = forceRefresh,
+                        defaultFirstName = context.getString(R.string.first_name_text),
+                        defaultLastName = context.getString(R.string.lastname_text),
+                    )
+                )
+            }
+        }
     }
 
     /**
@@ -277,11 +309,7 @@ class MyAccountViewModel @Inject constructor(
 
     private var confirmationLink: String? = null
 
-    fun getFirstName(): String = myAccountInfo.getFirstNameText()
-
-    fun getLastName(): String = myAccountInfo.getLastNameText()
-
-    fun getName(): String = myAccountInfo.fullName
+    fun getName(): String = state.value.name
 
     fun getEmail(): String? = megaApi.myEmail
 
@@ -732,43 +760,43 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Changes the name of the account.
      *
+     * @param oldFirstName
+     * @param oldLastName
      * @param newFirstName New first name if changed, same as current one if not.
      * @param newLastName  New last name if changed, same as current one if not.
      * @param action       Action to perform after change name.
      * @return True if something changed, false otherwise.
      */
-    fun changeName(newFirstName: String, newLastName: String, action: (Boolean) -> Unit): Boolean {
-        val shouldUpdateLastName = newLastName != myAccountInfo.getLastNameText()
+    fun changeName(
+        oldFirstName: String,
+        oldLastName: String,
+        newFirstName: String,
+        newLastName: String,
+        action: (Boolean) -> Unit,
+    ): Boolean {
+        val shouldUpdateFirstName = newFirstName != oldFirstName
+        val shouldUpdateLastName = newLastName != oldLastName
 
-        return when {
-            newFirstName != myAccountInfo.getFirstNameText() -> {
-                if (shouldUpdateLastName) {
-                    updateMyUserAttributesUseCase.updateFirstAndLastName(newFirstName, newLastName)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy { result -> action.invoke(result) }
-                        .addTo(composite)
-                } else {
-                    updateMyUserAttributesUseCase.updateFirstName(newFirstName)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy { result -> action.invoke(result) }
-                        .addTo(composite)
-                }
-
-                true
-            }
-            shouldUpdateLastName -> {
-                updateMyUserAttributesUseCase.updateLastName(newLastName)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy { result -> action.invoke(result) }
-                    .addTo(composite)
-
-                true
-            }
-            else -> false
+        when {
+            shouldUpdateFirstName && shouldUpdateLastName -> updateMyUserAttributesUseCase.updateFirstAndLastName(
+                newFirstName,
+                newLastName
+            ).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> action.invoke(result) }
+                .addTo(composite)
+            shouldUpdateFirstName -> updateMyUserAttributesUseCase.updateFirstName(newFirstName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> action.invoke(result) }
+                .addTo(composite)
+            shouldUpdateLastName -> updateMyUserAttributesUseCase.updateLastName(newLastName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> action.invoke(result) }
+                .addTo(composite)
         }
+        return shouldUpdateFirstName || shouldUpdateLastName
     }
 
     /**

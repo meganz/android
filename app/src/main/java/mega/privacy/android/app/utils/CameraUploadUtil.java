@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
-import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
@@ -175,13 +174,11 @@ public class CameraUploadUtil {
         // disable both primary and secondary.
         dbH.setCamSyncEnabled(false);
         dbH.setSecondaryUploadEnabled(false);
-        fireStopCameraUploadJob(app);
     }
 
     public static void disableMediaUploadProcess() {
         resetMUTimestampsAndCache();
         dbH.setSecondaryUploadEnabled(false);
-        fireStopCameraUploadJob(app);
     }
 
     /**

@@ -74,6 +74,19 @@ class FilePreferencesViewModel @Inject constructor(
     }
 
     /**
+     * Reset versions info
+     *
+     */
+    fun resetVersionsInfo() {
+        _state.update {
+            it.copy(
+                numberOfPreviousVersions = 0,
+                sizeOfPreviousVersionsInBytes = 0
+            )
+        }
+    }
+
+    /**
      * Enable file version option
      *
      * @param enable

@@ -1472,8 +1472,6 @@
     <string name="result_paragraph_info_achievement_add_phone">Bạn đã nhận được %1$s không gian lưu trữ từ việc xác thực số điện thoại thành công.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Bạn đã nhận được %1$s không gian lưu trữ từ việc đăng ký tài khoản.</string>
-    <!-- info paragraph about the completed achievement registration -->
-    <string name="expiration_date_for_achievements">Phần thưởng hết hạn trong %1$d ngày</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">Chia sẻ thư mục</item>
@@ -1485,7 +1483,7 @@
     <!-- Menu item -->
     <string name="settings_help">Trợ Giúp</string>
     <!-- Settings preference title for help centre -->
-    <string name="settings_help_centre">Thư Viện Hướng Dẫn</string>
+    <string name="settings_help_centre">Trung&#160;Tâm Hướng&#160;Dẫn</string>
     <!-- Settings preference title for send feedback -->
     <string name="settings_help_preference">Gửi phản hồi</string>
     <!-- mail subject -->
@@ -3485,22 +3483,6 @@
     <string name="payment_methods">Phương thức thanh toán</string>
     <!-- Button to proceed with a payment -->
     <string name="proceed">Tiến hành</string>
-    <!-- Pro Lite monthly subscription -->
-    <string name="pro_lite_monthly">Pro&#160;Lite hằng tháng</string>
-    <!-- Pro Lite yearly subscription -->
-    <string name="pro_lite_yearly">Pro&#160;Lite thường niên</string>
-    <!-- Pro I monthly subscription -->
-    <string name="pro_i_monthly">Pro&#160;I hằng tháng</string>
-    <!-- Pro I yearly subscription -->
-    <string name="pro_i_yearly">Pro&#160;I thường niên</string>
-    <!-- Pro II monthly subscription -->
-    <string name="pro_ii_monthly">Pro&#160;II hằng tháng</string>
-    <!-- Pro II yearly subscription -->
-    <string name="pro_ii_yearly">Pro&#160;II thường niên</string>
-    <!-- Pro III monthly subscription -->
-    <string name="pro_iii_monthly">Pro&#160;III hằng tháng</string>
-    <!-- Pro III yearly subscription -->
-    <string name="pro_iii_yearly">Pro&#160;III thường niên</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Loại bỏ chức người chủ trì</string>
     <!-- Title message of existing subscription dialog -->
@@ -4029,4 +4011,25 @@
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Chi tiết</string>
+    <!-- Dialog confirmation text for removing photos in an album -->
+    <string name="photos_album_remove_from_album_confirmation_text">Loại bỏ khỏi album?</string>
+    <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
+    <string name="settings_camera_uploads_grant_media_permissions_body">Để bật đăng&#160;tải camêra, cấp&#160;quyền cho MEGA truy&#160;cập vào kho hình&#160;ảnh và các nội&#160;dung phương&#160;tiện khác có trong thiết&#160;bị của&#160;bạn.</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cấp quyền</string>
+    <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Không cấp quyền</string>
+    <plurals name="photos_album_photos_removal_snackbar_message">
+        <item quantity="other">Đã loại&#160;bỏ %d mục khỏi “%s”</item>
+    </plurals>
+    <!-- Label to describe one off meetings -->
+    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <!--Title of playback position dialog that is displayed when video has playback position history. -->
+    <string name="video_playback_position_dialog_title">Tiếp&#160;tục phát video?</string>
+    <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
+    <string name="video_playback_position_dialog_message">%1$s sẽ tiếp&#160;tục phát tại %2$s</string>
+    <!--Resume of playback position dialog for playing video from the playback position history. -->
+    <string name="video_playback_position_dialog_resume_button">Tiếp tục truyền</string>
+    <!--Resume of playback position dialog for playing video from beginning. -->
+    <string name="video_playback_position_dialog_restart_button">Khởi động lại</string>
 </resources>

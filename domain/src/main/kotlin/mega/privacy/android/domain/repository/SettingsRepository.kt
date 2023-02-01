@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
+import java.io.File
 
 /**
  * Settings repository - class for handling all calls relating to settings
@@ -124,6 +125,13 @@ interface SettingsRepository {
     suspend fun setChargingOnSize(size: Int)
 
     /**
+     * Get always ask for storage value
+     *
+     * @return isStorageAskAlways as [Boolean]
+     */
+    suspend fun getStorageDownloadAskAlways(): Boolean
+
+    /**
      * Set to always ask for storage
      *
      * @param isStorageAskAlways
@@ -134,6 +142,13 @@ interface SettingsRepository {
      * Set the default storage download location
      */
     suspend fun setDefaultStorageDownloadLocation()
+
+    /**
+     * Get Storage download location
+     *
+     * @return storageDownloadLocation as File Path
+     */
+    suspend fun getStorageDownloadLocation(): String?
 
     /**
      * Set Storage download location
@@ -391,4 +406,18 @@ interface SettingsRepository {
      * @param enabled
      */
     suspend fun enableFileVersionsOption(enabled: Boolean)
+
+    /**
+     * create a default download location file
+     * @return File path as [File]
+     */
+    suspend fun buildDefaultDownloadDir(): File
+
+
+    /**
+     * File Management Preference whether to use Mobile data to preview Hi-res images
+     *
+     * @return [Boolean]
+     */
+    suspend fun isMobileDataAllowed(): Boolean
 }

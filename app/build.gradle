@@ -198,10 +198,17 @@ android {
     }
     lint {
         checkReleaseBuilds false
+        if (shouldCombineLintReports()) {
+            checkDependencies true
+            htmlReport true
+            htmlOutput file("build/reports/combined.html")
+        }
     }
     lintOptions {
         abortOnError false
         xmlOutput = file("build/reports/lint-results.xml")
+
+
     }
     packagingOptions {
         resources {

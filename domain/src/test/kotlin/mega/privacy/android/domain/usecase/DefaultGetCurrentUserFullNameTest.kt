@@ -40,7 +40,7 @@ class DefaultGetCurrentUserFullNameTest {
         whenever(contactsRepository.getCurrentUserLastName(any())).thenReturn(expectedLastName)
 
         assertThat(
-            underTest(defaultFirstName, defaultLastName)
+            underTest(true, defaultFirstName, defaultLastName)
         ).isEqualTo(expectedLastName)
     }
 
@@ -52,7 +52,7 @@ class DefaultGetCurrentUserFullNameTest {
         whenever(contactsRepository.getCurrentUserLastName(any())).thenReturn(expectedLastName)
 
         assertThat(
-            underTest(defaultFirstName, defaultLastName)
+            underTest(true, defaultFirstName, defaultLastName)
         ).isEqualTo("$expectedFirstName $expectedLastName")
     }
 
@@ -63,7 +63,7 @@ class DefaultGetCurrentUserFullNameTest {
         whenever(accountRepository.accountEmail).thenReturn("abc@mega.co.nz")
 
         assertThat(
-            underTest(defaultFirstName, defaultLastName)
+            underTest(true, defaultFirstName, defaultLastName)
         ).isEqualTo("abc")
     }
 
@@ -75,7 +75,7 @@ class DefaultGetCurrentUserFullNameTest {
             whenever(accountRepository.accountEmail).thenReturn(null)
 
             assertThat(
-                underTest(defaultFirstName, defaultLastName)
+                underTest(true, defaultFirstName, defaultLastName)
             ).isEqualTo("$defaultFirstName $defaultLastName")
         }
 }

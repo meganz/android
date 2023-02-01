@@ -96,7 +96,11 @@ class BillingViewModel @Inject constructor(
      */
     fun startPurchase(activity: Activity, productId: String) {
         viewModelScope.launch {
-            launchPurchaseFlow(activity, productId)
+            runCatching {
+                launchPurchaseFlow(activity, productId)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

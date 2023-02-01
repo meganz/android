@@ -105,4 +105,6 @@ internal class DefaultNetworkRepository @Inject constructor(
     }.flowOn(ioDispatcher).shareIn(applicationScope, SharingStarted.Lazily)
 
     override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
+
+    override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
 }

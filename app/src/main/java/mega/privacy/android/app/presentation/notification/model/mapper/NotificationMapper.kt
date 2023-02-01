@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.notification.model.mapper
 
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.extensions.backgroundColor
+import mega.privacy.android.app.presentation.notification.model.extensions.chatDateText
 import mega.privacy.android.app.presentation.notification.model.extensions.dateText
 import mega.privacy.android.app.presentation.notification.model.extensions.description
 import mega.privacy.android.app.presentation.notification.model.extensions.descriptionMaxWidth
@@ -33,6 +34,7 @@ internal fun getNotification(alert: UserAlert) = Notification(
     titleMaxWidth = alert.titleMaxWidth(),
     description = alert.description(),
     descriptionMaxWidth = alert.descriptionMaxWidth(),
+    chatDateText = alert.chatDateText(),
     dateText = alert.dateText(),
     isNew = !alert.seen,
     backgroundColor = alert.backgroundColor(),

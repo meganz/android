@@ -84,7 +84,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.data.model.UserCredentials;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment;
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment;
 import mega.privacy.android.app.main.providers.ProviderPageAdapter;
@@ -714,15 +714,15 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        secondPin.setEt(firstPin);
+        secondPin.setPreviousDigitEditText(firstPin);
 
-        thirdPin.setEt(secondPin);
+        thirdPin.setPreviousDigitEditText(secondPin);
 
-        fourthPin.setEt(thirdPin);
+        fourthPin.setPreviousDigitEditText(thirdPin);
 
-        fifthPin.setEt(fourthPin);
+        fifthPin.setPreviousDigitEditText(fourthPin);
 
-        sixthPin.setEt(fifthPin);
+        sixthPin.setPreviousDigitEditText(fifthPin);
     }
 
     void permitVerify() {

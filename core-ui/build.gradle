@@ -36,6 +36,11 @@ android {
         suppressWarnings = isCiBuild()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
+
+    lint {
+        abortOnError false
+        xmlOutput = file("build/reports/lint-results.xml")
+    }
 }
 
 dependencies {

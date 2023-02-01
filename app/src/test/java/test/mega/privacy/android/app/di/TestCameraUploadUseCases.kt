@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
+import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
@@ -72,6 +73,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -102,10 +104,16 @@ object TestCameraUploadUseCases {
     fun provideStopCameraUpload() = mock<StopCameraUpload>()
 
     @Provides
+    fun provideRestartCameraUpload() = mock<RestartCameraUpload>()
+
+    @Provides
     fun provideHasCredentials() = mock<HasCredentials>()
 
     @Provides
     fun provideHasPreferences() = mock<HasPreferences>()
+
+    @Provides
+    fun provideHasCameraSyncEnabled() = mock<HasCameraSyncEnabled>()
 
     @Provides
     fun provideIsCameraUploadSyncEnabled() = mock<IsCameraUploadSyncEnabled>()

@@ -24,6 +24,7 @@ package mega.privacy.android.domain.entity.chat
  * @property lastUserColor
  * @property schedId
  * @property isRecurring
+ * @property isPending
  * @property scheduledStartTimestamp
  * @property scheduledEndTimestamp
  * @property scheduledTimestampFormatted
@@ -50,6 +51,7 @@ data class MeetingRoomItem constructor(
     val lastUserColor: Int? = null,
     val schedId: Long? = null,
     val isRecurring: Boolean = false,
+    val isPending: Boolean = false,
     val scheduledStartTimestamp: Long? = null,
     val scheduledEndTimestamp: Long? = null,
     val scheduledTimestampFormatted: String? = null
