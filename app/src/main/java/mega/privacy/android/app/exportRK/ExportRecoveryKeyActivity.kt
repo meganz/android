@@ -7,31 +7,26 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import com.google.android.material.button.MaterialButton
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.ERROR_NO_SPACE
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.GENERAL_ERROR
 import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.showAlert
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import timber.log.Timber
 
 /**
  * Activity to export or backup the Recovery Key
  */
+@AndroidEntryPoint
 class ExportRecoveryKeyActivity : PasscodeActivity() {
-
-    companion object {
-        /**
-         * Request code value indicating app is requesting `WRITE_EXTERNAL_STORAGE` permission
-         * in order to save the Recovery Key
-         */
-        const val WRITE_STORAGE_TO_SAVE_RK = 1
-    }
-
     private val viewModel by viewModels<ExportRecoveryKeyViewModel>()
 
     private lateinit var binding: ActivityExportRecoveryKeyBinding
@@ -68,7 +63,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         }
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            viewModel.saveRK(this)
+            AccountController.saveRkToFileSystem(this)
         } else {
             showSnackbar(StringResourcesUtils.getString(R.string.denied_write_permissions))
         }
@@ -83,7 +78,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      *                    result came from.
      * @param resultCode The integer result code returned by the child activity
      *                   through its setResult().
-     * @param data An Intent, which can return result data to the caller
+     * @param intent An Intent, which can return result data to the caller
      *             (various data can be attached to Intent "extras").
      */
     @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
@@ -91,7 +86,24 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
 
-        viewModel.manageActivityResult(this, requestCode, resultCode, intent)
+        if (requestCode != Constants.REQUEST_DOWNLOAD_FOLDER || resultCode != RESULT_OK || intent == null) {
+            Timber.w("Wrong activity result.")
+            return
+        }
+
+        val exportedRK = viewModel.exportRK()
+
+        onRKExported(
+            when {
+                exportedRK.isNullOrEmpty() -> GENERAL_ERROR
+                FileUtil.saveTextOnContentUri(
+                    this@ExportRecoveryKeyActivity.contentResolver,
+                    intent.data,
+                    exportedRK
+                ) -> RK_EXPORTED
+                else -> GENERAL_ERROR
+            }
+        )
     }
 
     private fun setUpView() {
@@ -104,20 +116,25 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         binding.printMKButton.setOnClickListener { AccountController(this).printRK() }
 
         binding.copyMKButton.setOnClickListener {
-            viewModel.copyRK(this) { copiedRK ->
-                recoveryKeyCopied(
-                    copiedRK
-                )
-            }
+            copyRK()
         }
 
         binding.saveMKButton.setOnClickListener {
-            viewModel.checkPermissionsBeforeSaveRK(this) { exportedRK ->
-                recoveryKeyExported(exportedRK)
-            }
+            onSaveButtonClick()
         }
     }
 
+    private fun onSaveButtonClick() {
+        if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            AccountController.saveRkToFileSystem(this)
+        } else {
+            PermissionUtils.requestPermission(
+                this,
+                WRITE_STORAGE_TO_SAVE_RK,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        }
+    }
 
     /**
      * Determines if one of those buttons show the content in more than one line.
@@ -162,12 +179,14 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      *
      * @param copiedRK Message to show as copy RK action result.
      */
-    private fun recoveryKeyCopied(copiedRK: String?) {
+    private fun onRKCopied(copiedRK: String?) {
         showAlert(
-            this, StringResourcesUtils.getString(
+            this,
+            StringResourcesUtils.getString(
                 if (isTextEmpty(copiedRK)) R.string.general_text_error
                 else R.string.copy_MK_confirmation
-            ), null
+            ),
+            null
         )
     }
 
@@ -176,7 +195,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      *
      * @param exportedRK Message to show as export RK action result.
      */
-    private fun recoveryKeyExported(exportedRK: String) {
+    private fun onRKExported(exportedRK: String) {
         showSnackbar(
             StringResourcesUtils.getString(
                 when (exportedRK) {
@@ -188,7 +207,31 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         )
     }
 
+    /**
+     * Copy the recovery key to Clipboard.
+     */
+    private fun copyRK() {
+        val textRK = viewModel.exportRK()
+
+        if (!isTextEmpty(textRK)) {
+            TextUtil.copyToClipboard(this, textRK)
+        }
+
+        onRKCopied(textRK)
+    }
+
     private fun showSnackbar(text: String) {
         showSnackbar(binding.exportMKFragmentContainer, text)
+    }
+
+    companion object {
+        /**
+         * Request code value indicating app is requesting `WRITE_EXTERNAL_STORAGE` permission
+         * in order to save the Recovery Key
+         */
+        const val WRITE_STORAGE_TO_SAVE_RK = 1
+        const val ERROR_NO_SPACE = "ERROR_NO_SPACE"
+        const val GENERAL_ERROR = "GENERAL_ERROR"
+        const val RK_EXPORTED = "RK_EXPORTED"
     }
 }
