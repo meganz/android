@@ -1491,21 +1491,18 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
-
-        if (!viewModel.isConnected() && megaApi.getRootNode() == null) {
-            finish();
-            return;
-        }
 
         if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 
-        shouldRefreshSessionDueToSDK();
+        if (viewModel.isConnected()) {
+            shouldRefreshSessionDueToSDK();
+        }
 
         handler = new Handler();
 

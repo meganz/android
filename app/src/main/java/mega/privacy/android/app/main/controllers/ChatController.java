@@ -320,7 +320,7 @@ public class ChatController {
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
             Timber.d("ALTER PARTICIPANT MESSAGE!!");
 
-            if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
+            if (megaApi.getMyUser() != null && message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
                 Timber.d("Me alter participant");
 
                 StringBuilder builder = new StringBuilder();
@@ -360,7 +360,7 @@ public class ChatController {
                 String textToShow = "";
                 if (privilege != MegaChatRoom.PRIV_RM) {
                     Timber.d("Participant was added");
-                    if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
+                    if (megaApi.getMyUser() != null && message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                         Timber.d("By me");
                         textToShow = String.format(context.getString(R.string.non_format_message_add_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
@@ -371,7 +371,7 @@ public class ChatController {
                 }//END participant was added
                 else {
                     Timber.d("Participant was removed or left");
-                    if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
+                    if (megaApi.getMyUser() != null && message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                         textToShow = String.format(context.getString(R.string.non_format_message_remove_participant), fullNameTitle, megaChatApi.getMyFullname());
                     } else {
 
@@ -397,8 +397,8 @@ public class ChatController {
             Timber.d("Privilege of the user: %s", privilege);
 
             StringBuilder builder = new StringBuilder();
-            String participantsNameWhoMadeTheAction = message.getHandleOfAction() == megaApi.getMyUser().getHandle() ? megaChatApi.getMyFullname() : getParticipantFullName(message.getHandleOfAction());
-            String participantsNameWhosePermissionsWereChanged = message.getUserHandle() == megaApi.getMyUser().getHandle() ? megaChatApi.getMyFullname() : getParticipantFullName(message.getUserHandle());
+            String participantsNameWhoMadeTheAction = (megaApi.getMyUser() != null && message.getHandleOfAction() == megaApi.getMyUser().getHandle()) ? megaChatApi.getMyFullname() : getParticipantFullName(message.getHandleOfAction());
+            String participantsNameWhosePermissionsWereChanged = (megaApi.getMyUser() != null && message.getUserHandle() == megaApi.getMyUser().getHandle()) ? megaChatApi.getMyFullname() : getParticipantFullName(message.getUserHandle());
 
             String textToShow = "";
             switch (privilege) {
