@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
+import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -35,6 +36,7 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -452,6 +454,23 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getPreview(node, previewFilePath, listener)
 
+    override fun getFullImage(
+        node: MegaNode,
+        fullFile: File,
+        highPriority: Boolean,
+        listener: MegaTransferListenerInterface,
+    ) {
+        megaApi.startDownload(
+            node,
+            fullFile.absolutePath,
+            fullFile.name,
+            APP_DATA_BACKGROUND_TRANSFER,
+            highPriority,
+            null,
+            listener
+        )
+    }
+
     override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
 
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
@@ -772,4 +791,8 @@ internal class MegaApiFacade @Inject constructor(
     override fun getContactLink(handle: Long, listener: MegaRequestListenerInterface) {
         megaApi.contactLinkQuery(handle, listener)
     }
+
+    override fun checkValidNodeFile(node: MegaNode, nodeFile: File?) =
+        nodeFile?.canRead() == true && nodeFile.length() == node.size
+                && node.fingerprint == megaApi.getFingerprint(nodeFile.absolutePath)
 }

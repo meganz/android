@@ -28,4 +28,11 @@ interface NetworkRepository {
      * @param enabled
      */
     fun setUseHttps(enabled: Boolean)
+
+    /**
+     * Is Metered Connection
+     *
+     * @return [Boolean]
+     */
+    fun isMeteredConnection(): Boolean?
 }

@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
+import java.io.File
 
 /**
  * Mega api gateway
@@ -701,6 +702,21 @@ interface MegaApiGateway {
         node: MegaNode,
         previewFilePath: String,
         listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Get Full image from server
+     *
+     * @param node
+     * @param fullFile
+     * @param highPriority
+     * @param listener
+     */
+    fun getFullImage(
+        node: MegaNode,
+        fullFile: File,
+        highPriority: Boolean,
+        listener: MegaTransferListenerInterface,
     )
 
     /**
@@ -1462,4 +1478,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
+
+    fun checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean
 }
