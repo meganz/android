@@ -18,9 +18,12 @@ import androidx.lifecycle.LifecycleService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
@@ -1119,6 +1122,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         finalList: List<SyncRecord>,
         isCompressedVideo: Boolean,
     ) {
+        val copyFileAsyncList = mutableListOf<Deferred<Unit>>()
         // If the Service detects that all upload transfers are paused when turning on
         // Camera Uploads, update the Primary and Secondary Folder Backup States to
         // BackupState.PAUSE_UPLOADS
@@ -1196,15 +1200,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
             if (file.isCopyOnly) {
                 Timber.d("Copy from node, file timestamp is: %s", file.timestamp)
-                totalToUpload++
                 file.nodeHandle?.let { nodeHandle ->
-                    getNodeByHandle(nodeHandle)?.let { nodeToCopy ->
-                        handleCopyNode(
-                            nodeToCopy = nodeToCopy,
-                            newNodeParent = parent,
-                            newNodeName = file.fileName.orEmpty(),
-                        )
+                    coroutineScope?.let { scope ->
+                        getNodeByHandle(nodeHandle)?.let { nodeToCopy ->
+                            totalToUpload++
+                            copyFileAsyncList.add(scope.async {
+                                handleCopyNode(
+                                    nodeToCopy = nodeToCopy,
+                                    newNodeParent = parent,
+                                    newNodeName = file.fileName.orEmpty(),
+                                )
+                            })
+                        }
+
                     }
+
                 }
             } else {
                 val toUpload = path?.let { File(it) }
@@ -1250,7 +1260,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 }
             }
         }
-
+        if (copyFileAsyncList.isNotEmpty()) {
+            updateUpload()
+            copyFileAsyncList.joinAll()
+        }
         if (totalToUpload == totalUploaded) {
             if (compressedVideoPending() && !canceled && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress.")
