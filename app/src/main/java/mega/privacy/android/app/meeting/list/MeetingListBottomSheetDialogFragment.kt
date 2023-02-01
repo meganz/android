@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -132,6 +133,14 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.dividerRecurringMeeting.isVisible = room.isRecurring
 
         binding.btnRecurringMeeting.setOnClickListener {
+            activity?.startActivity(
+                Intent(
+                    context,
+                    RecurringMeetingInfoActivity::class.java
+                ).apply {
+                    putExtra(CHAT_ID, chatId)
+                    putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
+                })
             dismissAllowingStateLoss()
         }
 

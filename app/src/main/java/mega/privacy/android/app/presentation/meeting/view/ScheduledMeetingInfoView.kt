@@ -175,7 +175,7 @@ fun ScheduledMeetingInfoView(
                 state.participantItemList.indices.forEach { i ->
                     if (i < 4 || !state.seeMoreVisible) {
                         val isLastOne =
-                            (i < 4 && i == state.participantItemList.size - 1) || (i >= 4 && i == 3)
+                            state.participantItemList.size <= 4 && i == state.participantItemList.size - 1
 
                         ParticipantItemView(
                             participant = state.participantItemList[i],
