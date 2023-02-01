@@ -130,9 +130,7 @@ class RecentActionsFragment : Fragment() {
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
 
-            if (!item.bucket.nodes[0].isNodeKeyDecrypted ||
-                !megaApi.areCredentialsVerified(megaApi.getContact(item.bucket.nodes[0].id.longValue.toString()))
-            ) {
+            if (!item.isKeyVerified) {
                 Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
                     putExtra(Constants.EMAIL, item.bucket.userEmail)
                     requireActivity().startActivity(this)
@@ -189,20 +187,6 @@ class RecentActionsFragment : Fragment() {
         adapter.setItems(recentActionItems)
         listView.layoutManager =
             TopSnappedStickyLayoutManager(requireContext()) { recentActionItems }
-    }
-
-    /**
-     * Function to get user email from the adapter data set only if it contains bucket otherwise returns blank
-     *
-     * @param recentActionItems List of [RecentActionItemType] which is provided to adapter
-     */
-    private fun getUserEmail(recentActionItems: List<RecentActionItemType>): String {
-        for (itemType: RecentActionItemType in recentActionItems) {
-            if (itemType is RecentActionItemType.Item) {
-                return itemType.bucket.userEmail
-            }
-        }
-        return ""
     }
 
     /**

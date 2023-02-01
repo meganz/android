@@ -19,6 +19,7 @@ sealed class RecentActionItemType(val timestamp: Long) {
      *  @property parentFolderName the name of the parent folder containing the nodes
      *  @property parentFolderSharesType the share type of the parent folder
      *  @property currentUserIsOwner true if the current user is the owner of the recent actions
+     *  @property isKeyVerified true if node.isNodeKeyDecrypted & areCredentialsVerified returns true
      */
     class Item(
         val bucket: RecentActionBucket,
@@ -26,7 +27,7 @@ sealed class RecentActionItemType(val timestamp: Long) {
         val parentFolderName: String = "",
         val parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
         val currentUserIsOwner: Boolean = false,
-        val areCredentialsVerified: Boolean = false,
+        val isKeyVerified: Boolean = false,
     ) : RecentActionItemType(timestamp = bucket.timestamp)
 
     /**
