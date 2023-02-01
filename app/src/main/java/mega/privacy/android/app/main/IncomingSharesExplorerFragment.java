@@ -55,8 +55,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
-import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
@@ -71,6 +69,8 @@ import mega.privacy.android.app.search.callback.SearchCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.data.qualifier.MegaApi;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaCancelToken;
@@ -85,11 +85,14 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
     @Inject
     SearchNodesUseCase searchNodesUseCase;
 
+    @Inject
+    @MegaApi
+    MegaApiAndroid megaApi;
+
     private DisplayMetrics outMetrics;
     private Context context;
-    private MegaApiAndroid megaApi;
-    private ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
-    private ArrayList<MegaNode> searchNodes = null;
+    private List<MegaNode> nodes = new ArrayList<>();
+    private List<MegaNode> searchNodes = null;
 
     private long parentHandle = -1;
 
@@ -136,8 +139,8 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
 
     @Override
     public void activateActionMode() {
-        if (!adapter.isMultipleSelect()) {
-            adapter.setMultipleSelect(true);
+        if (!adapter.getMultipleSelected()) {
+            adapter.setMultipleSelected(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
 
             if (isMultiselect()) {
@@ -194,7 +197,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
                 setNodes(nodes);
             }
             clearSelections();
-            adapter.setMultipleSelect(false);
+            adapter.setMultipleSelected(false);
             checkScroll();
         }
 
@@ -235,10 +238,6 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-
         if (megaApi.getRootNode() == null) {
             return;
         }
@@ -262,7 +261,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
 
         ((FileExplorerActivity) context).changeActionBarElevation(
                 recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION)
-                        || (adapter != null && adapter.isMultipleSelect()),
+                        || (adapter != null && adapter.getMultipleSelected()),
                 FileExplorerActivity.INCOMING_FRAGMENT);
     }
 
@@ -357,9 +356,8 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
 
         if (adapter == null) {
             adapter = new MegaExplorerAdapter(context, this, nodes, parentHandle,
-                    recyclerView, selectFile, sortByHeaderViewModel);
+                    recyclerView, selectFile, sortByHeaderViewModel, megaApi);
         } else {
-            adapter.setListFragment(recyclerView);
             adapter.setParentHandle(parentHandle);
             adapter.setSelectFile(selectFile);
         }
@@ -490,10 +488,10 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
     }
 
 
-    private void sortByMailDescending(ArrayList<MegaNode> nodes) {
+    private void sortByMailDescending(List<MegaNode> nodes) {
         Timber.d("sortByNameDescending");
-        ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
-        ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+        List<MegaNode> folderNodes = new ArrayList<>();
+        List<MegaNode> fileNodes = new ArrayList<>();
 
         for (int i = 0; i < nodes.size(); i++) {
             if (nodes.get(i) == null) {
@@ -588,7 +586,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
     }
 
     public void itemClick(View view, int position) {
-        ArrayList<MegaNode> clickNodes;
+        List<MegaNode> clickNodes;
 
         if (searchNodes != null) {
             clickNodes = searchNodes;
@@ -606,7 +604,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
             ((FileExplorerActivity) context).hideTabs(true, INCOMING_FRAGMENT);
             ((FileExplorerActivity) context).setShouldRestartSearch(false);
 
-            if (selectFile && ((FileExplorerActivity) context).isMultiselect() && adapter.isMultipleSelect()) {
+            if (selectFile && ((FileExplorerActivity) context).isMultiselect() && adapter.getMultipleSelected()) {
                 hideMultipleSelect();
             }
             ((FileExplorerActivity) context).increaseDeepBrowserTree();
@@ -749,10 +747,11 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
         ((FileExplorerActivity) context).changeTitle();
     }
 
-    private void setNodes(ArrayList<MegaNode> nodes) {
+    private void setNodes(List<MegaNode> nodes) {
         this.nodes = nodes;
         if (adapter != null) {
             adapter.setNodes(nodes);
+            this.nodes = adapter.getNodes();
             showEmptyScreen();
         }
 
@@ -781,7 +780,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
     }
 
     private void clearSelections() {
-        if (adapter.isMultipleSelect()) {
+        if (adapter.getMultipleSelected()) {
             adapter.clearSelections();
         }
         if (modeCloud == FileExplorerActivity.SELECT) {
@@ -829,7 +828,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
      * Disable selection
      */
     public void hideMultipleSelect() {
-        adapter.setMultipleSelect(false);
+        adapter.setMultipleSelected(false);
         adapter.clearSelections();
         if (actionMode != null) {
             actionMode.finish();
