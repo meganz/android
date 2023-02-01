@@ -1,14 +1,14 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Use case to reset QR Code
+ * Use case to reset contact link
  */
-fun interface ResetQRCode {
+fun interface ResetContactLink {
 
     /**
      * invoke method
      *
-     * @return new QR code
+     * @return new contact link
      */
     suspend operator fun invoke(): String
 }

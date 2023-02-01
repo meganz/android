@@ -12,7 +12,7 @@ import mega.privacy.android.domain.usecase.DefaultDeleteQRCode
 import mega.privacy.android.domain.usecase.DefaultGetCurrentUserFullName
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
-import mega.privacy.android.domain.usecase.DefaultResetQRCode
+import mega.privacy.android.domain.usecase.DefaultResetContactLink
 import mega.privacy.android.domain.usecase.DeleteQRCode
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.GetQRFile
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.IsExtendedAccountDetailStale
-import mega.privacy.android.domain.usecase.ResetQRCode
+import mega.privacy.android.domain.usecase.ResetContactLink
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.impl.DefaultGetFullAccountInfo
 import mega.privacy.android.domain.usecase.impl.DefaultIsExtendedAccountDetailStale
@@ -63,7 +63,7 @@ internal abstract class InternalSharedUseCaseModule {
     abstract fun bindDeleteQRCode(implementation: DefaultDeleteQRCode): DeleteQRCode
 
     @Binds
-    abstract fun bindResetQRCode(implementation: DefaultResetQRCode): ResetQRCode
+    abstract fun bindResetContactLink(implementation: DefaultResetContactLink): ResetContactLink
 
     @Binds
     abstract fun bindGetCurrentUserFullName(implementation: DefaultGetCurrentUserFullName)

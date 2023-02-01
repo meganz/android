@@ -11,14 +11,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultResetQRCodeTest {
+class DefaultResetContactLinkTest {
 
-    private lateinit var underTest: DefaultResetQRCode
+    private lateinit var underTest: DefaultResetContactLink
     private val accountRepository: AccountRepository = mock()
 
     @Before
     fun setup() {
-        underTest = DefaultResetQRCode(
+        underTest = DefaultResetContactLink(
             accountRepository = accountRepository,
             ioDispatcher = UnconfinedTestDispatcher()
         )

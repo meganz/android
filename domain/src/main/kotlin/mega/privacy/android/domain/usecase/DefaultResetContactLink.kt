@@ -7,12 +7,12 @@ import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
- * Implementation of [ResetQRCode]
+ * Implementation of [ResetContactLink]
  */
-class DefaultResetQRCode @Inject constructor(
+class DefaultResetContactLink @Inject constructor(
     private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ResetQRCode {
+) : ResetContactLink {
     override suspend fun invoke(): String = withContext(ioDispatcher) {
         accountRepository.createContactLink(renew = true)
     }
