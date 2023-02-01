@@ -72,8 +72,6 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      */
     private var headerColor: Int = 0
 
-    private var areUserCredentialsVerified: Boolean = false
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
@@ -193,7 +191,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        if (!node.isNodeKeyDecrypted || !item.areCredentialsVerified) {
+                        if (!item.isKeyVerified) {
                             binding.firstLineText.text =
                                 context.getQuantityStringOrDefault(R.plurals.cloud_drive_undecrypted_file,
                                     nodeList.size)
