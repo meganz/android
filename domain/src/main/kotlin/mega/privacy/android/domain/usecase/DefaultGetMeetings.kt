@@ -58,23 +58,24 @@ class DefaultGetMeetings @Inject constructor(
 
     private suspend fun MutableList<MeetingRoomItem>.addScheduledMeetings(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
         flow {
-            val iterator = listIterator()
-            var hasNext: Boolean
-            do {
-                mutex.withLock {
-                    hasNext = iterator.hasNext()
-                    if (!hasNext) return@withLock
-
-                    val item = iterator.next()
-                    val updatedItem = getScheduledMeetingItem(item)
-                    if (updatedItem != null) {
-                        iterator.set(updatedItem)
-                        emit(this@addScheduledMeetings)
+            toList().forEach { item ->
+                getScheduledMeetingItem(item)?.let { updatedItem ->
+                    mutex.withLock {
+                        val newIndex = indexOfFirst { updatedItem.chatId == it.chatId }
+                        if (newIndex != -1) {
+                            val newUpdatedItem = get(newIndex).copy(
+                                schedId = updatedItem.schedId,
+                                scheduledStartTimestamp = updatedItem.scheduledStartTimestamp,
+                                scheduledEndTimestamp = updatedItem.scheduledEndTimestamp,
+                                isRecurring = updatedItem.isRecurring,
+                                isPending = updatedItem.isPending,
+                            )
+                            set(newIndex, newUpdatedItem)
+                            emit(this@addScheduledMeetings)
+                        }
                     }
-                    hasNext = iterator.hasNext()
                 }
-            } while (hasNext)
-
+            }
             sortMeetings(mutex)
             emit(this@addScheduledMeetings)
         }
@@ -197,31 +198,28 @@ class DefaultGetMeetings @Inject constructor(
 
     private suspend fun MutableList<MeetingRoomItem>.sortMeetings(mutex: Mutex) {
         mutex.withLock {
-            sortWith(
-                compareByDescending(MeetingRoomItem::isPending)
-                    .thenComparing { firstMeeting, secondMeeting ->
+            sortWith { firstMeeting, secondMeeting ->
+                when {
+                    firstMeeting.isPending && secondMeeting.isPending -> {
                         when {
-                            firstMeeting.isPending && !secondMeeting.isPending -> 1
-                            firstMeeting.isPending && secondMeeting.isPending -> {
-                                when {
-                                    firstMeeting.scheduledStartTimestamp!! > secondMeeting.scheduledStartTimestamp!! -> 1
-                                    firstMeeting.scheduledStartTimestamp < secondMeeting.scheduledStartTimestamp -> -1
-                                    else -> 0
-                                }
-                            }
-                            !firstMeeting.isPending && !secondMeeting.isPending -> {
-                                when {
-                                    firstMeeting.highlight && !secondMeeting.highlight -> -1
-                                    !firstMeeting.highlight && secondMeeting.highlight -> 1
-                                    firstMeeting.lastTimestamp > secondMeeting.lastTimestamp -> -1
-                                    firstMeeting.lastTimestamp < secondMeeting.lastTimestamp -> 1
-                                    else -> 0
-                                }
-                            }
+                            firstMeeting.scheduledStartTimestamp!! > secondMeeting.scheduledStartTimestamp!! -> 1
+                            firstMeeting.scheduledStartTimestamp < secondMeeting.scheduledStartTimestamp -> -1
                             else -> 0
                         }
                     }
-            )
+                    !firstMeeting.isPending && !secondMeeting.isPending -> {
+                        when {
+                            firstMeeting.highlight && !secondMeeting.highlight -> -1
+                            !firstMeeting.highlight && secondMeeting.highlight -> 1
+                            firstMeeting.lastTimestamp > secondMeeting.lastTimestamp -> -1
+                            firstMeeting.lastTimestamp < secondMeeting.lastTimestamp -> 1
+                            else -> 0
+                        }
+                    }
+                    firstMeeting.isPending && !secondMeeting.isPending -> -1
+                    else -> 1
+                }
+            }
         }
     }
 }

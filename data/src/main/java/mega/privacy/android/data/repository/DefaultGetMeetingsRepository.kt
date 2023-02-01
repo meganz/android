@@ -34,20 +34,25 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
         mutex: Mutex,
     ): Flow<MutableList<MeetingRoomItem>> =
         flow {
-            val iterator = items.listIterator()
-            var hasNext: Boolean
-            do {
-                mutex.withLock {
-                    hasNext = iterator.hasNext()
-                    if (!hasNext) return@withLock
-
-                    val item = iterator.next()
-                    val updatedItem = getUpdatedMeetingItem(item)
-                    iterator.set(updatedItem)
-                    emit(items)
-                    hasNext = iterator.hasNext()
+            items.toList().forEach { item ->
+                getUpdatedMeetingItem(item).let { updatedItem ->
+                    mutex.withLock {
+                        val newIndex = items.indexOfFirst { updatedItem.chatId == it.chatId }
+                        if (newIndex != -1) {
+                            val newUpdatedItem = items[newIndex].copy(
+                                firstUserChar = updatedItem.firstUserChar,
+                                firstUserAvatar = updatedItem.firstUserAvatar,
+                                firstUserColor = updatedItem.firstUserColor,
+                                lastUserChar = updatedItem.lastUserChar,
+                                lastUserAvatar = updatedItem.lastUserAvatar,
+                                lastUserColor = updatedItem.lastUserColor,
+                            )
+                            items[newIndex] = newUpdatedItem
+                            emit(items)
+                        }
+                    }
                 }
-            } while (hasNext)
+            }
         }
 
     override suspend fun getUpdatedMeetingItem(item: MeetingRoomItem): MeetingRoomItem {
