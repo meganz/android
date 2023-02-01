@@ -342,11 +342,11 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
-        pinSecondLogin.setEt(pinFirstLogin)
-        pinThirdLogin.setEt(pinSecondLogin)
-        pinFourthLogin.setEt(pinThirdLogin)
-        pinFifthLogin.setEt(pinFourthLogin)
-        pinSixthLogin.setEt(pinFifthLogin)
+        pinSecondLogin.previousDigitEditText = pinFirstLogin
+        pinThirdLogin.previousDigitEditText = pinSecondLogin
+        pinFourthLogin.previousDigitEditText = pinThirdLogin
+        pinFifthLogin.previousDigitEditText = pinFourthLogin
+        pinSixthLogin.previousDigitEditText = pinFifthLogin
 
         if (viewModel.areThereValidTemporalCredentials()) {
             submitFormConfirmAccount()

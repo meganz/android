@@ -714,15 +714,15 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        secondPin.setEt(firstPin);
+        secondPin.setPreviousDigitEditText(firstPin);
 
-        thirdPin.setEt(secondPin);
+        thirdPin.setPreviousDigitEditText(secondPin);
 
-        fourthPin.setEt(thirdPin);
+        fourthPin.setPreviousDigitEditText(thirdPin);
 
-        fifthPin.setEt(fourthPin);
+        fifthPin.setPreviousDigitEditText(fourthPin);
 
-        sixthPin.setEt(fifthPin);
+        sixthPin.setPreviousDigitEditText(fifthPin);
     }
 
     void permitVerify() {

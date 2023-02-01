@@ -363,7 +363,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         textParams = (LinearLayout.LayoutParams) secondPin.getLayoutParams();
         textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         secondPin.setLayoutParams(textParams);
-        secondPin.setEt(firstPin);
+        secondPin.setPreviousDigitEditText(firstPin);
 
         thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
@@ -376,7 +376,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         textParams = (LinearLayout.LayoutParams) thirdPin.getLayoutParams();
         textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
         thirdPin.setLayoutParams(textParams);
-        thirdPin.setEt(secondPin);
+        thirdPin.setPreviousDigitEditText(secondPin);
 
         fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
@@ -389,7 +389,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         textParams = (LinearLayout.LayoutParams) fourthPin.getLayoutParams();
         textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         fourthPin.setLayoutParams(textParams);
-        fourthPin.setEt(thirdPin);
+        fourthPin.setPreviousDigitEditText(thirdPin);
 
         fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
@@ -402,7 +402,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         textParams = (LinearLayout.LayoutParams) fifthPin.getLayoutParams();
         textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
         fifthPin.setLayoutParams(textParams);
-        fifthPin.setEt(fourthPin);
+        fifthPin.setPreviousDigitEditText(fourthPin);
 
         sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
@@ -415,7 +415,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
         textParams = (LinearLayout.LayoutParams) sixthPin.getLayoutParams();
         textParams.setMargins(0, 0, 0, 0);
         sixthPin.setLayoutParams(textParams);
-        sixthPin.setEt(fifthPin);
+        sixthPin.setPreviousDigitEditText(fifthPin);
     }
 
     @Override
