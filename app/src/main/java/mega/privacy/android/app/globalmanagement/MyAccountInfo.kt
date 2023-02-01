@@ -1,24 +1,16 @@
 package mega.privacy.android.app.globalmanagement
 
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate
-import mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,7 +22,6 @@ import javax.inject.Singleton
 @Singleton
 class MyAccountInfo @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler,
 ) {
 
     companion object {
@@ -65,11 +56,6 @@ class MyAccountInfo @Inject constructor(
     var isAccountDetailsFinished = false
     var isBusinessAlertShown = false
     private var wasBusinessAlertAlreadyShown = false
-
-    private var firstNameText = ""
-    private var lastNameText = ""
-    private var firstLetter: String? = null
-    var fullName = ""
 
     var lastSessionFormattedDate: String? = null
     var createSessionTimeStamp = INVALID_VALUE.toLong()
@@ -111,11 +97,6 @@ class MyAccountInfo @Inject constructor(
         isAccountDetailsFinished = false
         isBusinessAlertShown = false
         wasBusinessAlertAlreadyShown = false
-
-        firstNameText = ""
-        lastNameText = ""
-        firstLetter = null
-        fullName = ""
 
         lastSessionFormattedDate = null
         createSessionTimeStamp = INVALID_VALUE.toLong()
@@ -238,93 +219,6 @@ class MyAccountInfo @Inject constructor(
                 }
             }
         ))
-    }
-
-    /**
-     * Updates own firstName/lastName and fullName data.
-     *
-     * @param firstName True if the update makes reference to the firstName, false it to the lastName.
-     * @param newName   New firstName/lastName text.
-     * @param e         MegaError of the request.
-     */
-    fun updateMyData(firstName: Boolean, newName: String?, e: MegaError) {
-        if (e.errorCode != MegaError.API_OK || newName == null) {
-            Timber.e("ERROR - request.getText(): $newName")
-
-            if (firstName) {
-                setFirstNameText("")
-            } else {
-                setLastNameText("")
-            }
-
-            return
-        }
-
-        Timber.d("request.getText(): $newName")
-
-        val handle = megaApi.myUser?.handle ?: MegaApiJava.INVALID_HANDLE
-
-        if (firstName) {
-            setFirstNameText(newName)
-            dbH.saveMyFirstName(newName)
-
-            if (handle != MegaApiJava.INVALID_HANDLE) {
-                notifyFirstNameUpdate(MegaApplication.getInstance(), handle)
-            }
-        } else {
-            setLastNameText(newName)
-            dbH.saveMyLastName(newName)
-
-            if (handle != MegaApiJava.INVALID_HANDLE) {
-                notifyLastNameUpdate(MegaApplication.getInstance(), handle)
-            }
-        }
-    }
-
-    fun getFirstNameText(): String = firstNameText
-
-    fun setFirstNameText(firstName: String) {
-        firstNameText = firstName
-        setFullName()
-    }
-
-    fun getLastNameText(): String = lastNameText
-
-    fun setLastNameText(firstName: String) {
-        lastNameText = firstName
-        setFullName()
-    }
-
-    private fun setFullName() {
-        Timber.d("setFullName")
-
-        fullName = if (firstNameText.trim().isEmpty()) {
-            lastNameText
-        } else {
-            "$firstNameText $lastNameText"
-        }
-
-        if (fullName.trim().isEmpty()) {
-            Timber.d("Put email as fullname")
-
-            var email = ""
-            val user = megaApi.myUser
-
-            if (user != null) {
-                email = user.email
-            }
-
-            val splitEmail = email.split("[@._]".toRegex()).toTypedArray()
-            fullName = splitEmail[0]
-        }
-
-        if (fullName.trim().isEmpty()) {
-            fullName = getString(R.string.name_text) + " " + getString(R.string.lastname_text)
-            Timber.d("Full name set by default: $fullName")
-        }
-
-        firstLetter = fullName[0].toString() + ""
-        firstLetter = firstLetter?.uppercase(Locale.getDefault())
     }
 
     fun getFormattedPreviousVersionsSize(): String? {

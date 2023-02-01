@@ -24,7 +24,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
 import static mega.privacy.android.app.constants.IntentConstants.ACTION_OPEN_ACHIEVEMENTS;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ACCOUNT_TYPE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ASK_PERMISSIONS;

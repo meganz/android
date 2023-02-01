@@ -33,9 +33,9 @@ import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMycodeBinding
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CacheFolderManager.buildQrFile
@@ -46,6 +46,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -63,14 +64,14 @@ import javax.inject.Inject
 class MyCodeFragment : Fragment(), View.OnClickListener {
 
     @Inject
+    lateinit var getCurrentUserFullName: GetCurrentUserFullName
+
+    @Inject
     lateinit var dbH: DatabaseHandler
 
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
-
-    @Inject
-    lateinit var myAccountInfo: MyAccountInfo
 
     private var _binding: FragmentMycodeBinding? = null
     private val binding get() = _binding!!
@@ -312,8 +313,14 @@ class MyCodeFragment : Fragment(), View.OnClickListener {
         val credentials = dbH.credentials
 
         fullName = credentials?.firstName ?: credentials?.lastName
-                ?: myAccountInfo.fullName
-                ?: myEmail
+                ?: runBlocking {
+            // temporary remove reference to MyAccountInfo.full name, it will be refactor when we create MyQRCodeViewModel
+            getCurrentUserFullName(
+                false,
+                getString(R.string.first_name_text),
+                getString(R.string.lastname_text)
+            )
+        }
 
         return AvatarUtil.getDefaultAvatar(AvatarUtil.getColorAvatar(myUser),
             fullName,
