@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +33,7 @@ import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -189,13 +191,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
-        order: SortOrder
+        order: SortOrder,
     ): List<UnTypedNode>? =
         getChildrenByParentHandle(isAudio = true, parentHandle = parentHandle, order = order)
 
     override suspend fun getVideoNodesByParentHandle(
         parentHandle: Long,
-        order: SortOrder
+        order: SortOrder,
     ): List<UnTypedNode>? =
         getChildrenByParentHandle(isAudio = false, parentHandle = parentHandle, order = order)
 
@@ -224,7 +226,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun getAudiosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
-        order: SortOrder
+        order: SortOrder,
     ): List<UnTypedNode>? =
         getChildrenByParentHandleFromMegaApiFolder(isAudio = true,
             parentHandle = parentHandle,
@@ -232,7 +234,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun getVideosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
-        order: SortOrder
+        order: SortOrder,
     ): List<UnTypedNode>? =
         getChildrenByParentHandleFromMegaApiFolder(isAudio = false,
             parentHandle = parentHandle,
@@ -440,18 +442,25 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         appPreferencesGateway.monitorString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
             null).map { jsonString ->
             jsonString?.let {
-                Gson().fromJson<Map<Long, PlaybackInformation>?>(it,
-                    object : TypeToken<Map<Long, PlaybackInformation>>() {}.type)
-            }
-        }.map { infoMap ->
-            infoMap?.let {
-                // If the playbackInfoMap is empty, using the local information
-                // else using the current playbackInfoMap
-                if (playbackInfoMap.isEmpty()) {
-                    playbackInfoMap.putAll(it)
+                runCatching {
+                    Gson().fromJson<Map<Long, PlaybackInformation>?>(it,
+                        object : TypeToken<Map<Long, PlaybackInformation>>() {}.type)
+                        .let { infoMap ->
+                            // If the playbackInfoMap is empty, using the local information
+                            // else using the current playbackInfoMap
+                            if (playbackInfoMap.isEmpty()) {
+                                playbackInfoMap.putAll(infoMap)
+                            }
+                        }
+                }.onFailure {
+                    // Log the error jsonString and clear it.
+                    Timber.d(it, "The error jsonString: $jsonString")
+                    playbackInfoMap.clear()
+                    appPreferencesGateway.putString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
+                        Gson().toJson(playbackInfoMap))
                 }
+                playbackInfoMap
             }
-            playbackInfoMap
         }
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
