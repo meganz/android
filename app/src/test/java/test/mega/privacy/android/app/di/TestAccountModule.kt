@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
+import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
 
@@ -77,4 +78,7 @@ object TestAccountModule {
 
     @Provides
     fun provideGetAccountCredentials() = mock<GetAccountCredentials>()
+
+    @Provides
+    fun provideChangeEmail() = mock<ChangeEmail>()
 }

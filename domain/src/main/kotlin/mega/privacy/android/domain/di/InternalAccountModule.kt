@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
+import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 
 /**
@@ -118,5 +119,9 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideGetAccountCredentials(accountRepository: AccountRepository): GetAccountCredentials =
             GetAccountCredentials(accountRepository::getAccountCredentials)
+
+        @Provides
+        fun provideChangeEmail(accountRepository: AccountRepository): ChangeEmail =
+            ChangeEmail(accountRepository::changeEmail)
     }
 }
