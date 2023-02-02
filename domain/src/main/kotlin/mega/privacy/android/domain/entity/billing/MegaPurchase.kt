@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.account.Skus
 /**
  * Generic purchase object, used to unify corresponding platform dependent purchase object.
  *
- * In HMS, it's InAppPurchaseData.
  * In GMS, it's Purchase.
  */
 data class MegaPurchase(
