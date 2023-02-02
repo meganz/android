@@ -20,7 +20,6 @@ class DefaultSetupPrimaryFolder @Inject constructor(
         }.onSuccess { newPrimaryHandle ->
             if (newPrimaryHandle != cameraUploadRepository.getInvalidHandle()) {
                 resetPrimaryTimeline()
-                cameraUploadRepository.setPrimaryFolderHandle(newPrimaryHandle)
                 cameraUploadRepository.setPrimarySyncHandle(newPrimaryHandle)
                 updateFolderIconBroadcast(newPrimaryHandle, false)
                 restartCameraUpload(shouldIgnoreAttributes = true)

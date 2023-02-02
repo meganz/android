@@ -46,7 +46,6 @@ class DefaultSetupPrimaryFolderTest {
             whenever(cameraUploadRepository.setupPrimaryFolder(any())).thenReturn(69L)
             underTest(any())
             verify(resetPrimaryTimeline).invoke()
-            verify(cameraUploadRepository).setPrimaryFolderHandle(result)
             verify(cameraUploadRepository).setPrimarySyncHandle(result)
             verify(updateFolderIconBroadcast).invoke(result, false)
             verify(restartCameraUpload).invoke(shouldIgnoreAttributes = true)

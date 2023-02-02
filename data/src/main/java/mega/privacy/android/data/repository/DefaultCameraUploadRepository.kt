@@ -78,7 +78,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun setSecondarySyncHandle(secondaryHandle: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setMegaHandleSecondaryFolder(secondaryHandle)
+        localStorageGateway.setCamSyncSecondaryHandle(secondaryHandle)
     }
 
     override suspend fun isSyncByWifi() = withContext(ioDispatcher) {
@@ -246,15 +246,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun setSecondaryFolderPath(secondaryFolderPath: String) =
         withContext(ioDispatcher) {
             localStorageGateway.setSecondaryFolderPath(secondaryFolderPath)
-        }
-
-    override suspend fun setPrimaryFolderHandle(primaryHandle: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setPrimaryFolderHandle(primaryHandle)
-    }
-
-    override suspend fun setSecondaryFolderHandle(secondaryHandle: Long) =
-        withContext(ioDispatcher) {
-            localStorageGateway.setSecondaryFolderHandle(secondaryHandle)
         }
 
     override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =

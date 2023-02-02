@@ -37,10 +37,12 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setCamSyncHandle(primaryHandle: Long) {
         dbHandler.preferences?.camSyncHandle = primaryHandle.toString()
+        setPrimaryFolderHandle(primaryHandle)
     }
 
-    override suspend fun setMegaHandleSecondaryFolder(secondaryHandle: Long) {
+    override suspend fun setCamSyncSecondaryHandle(secondaryHandle: Long) {
         dbHandler.preferences?.megaHandleSecondaryFolder = secondaryHandle.toString()
+        setSecondaryFolderHandle(secondaryHandle)
     }
 
     override suspend fun getCloudSortOrder(): Int =
@@ -255,9 +257,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setStorageAskAlways(isStorageAskAlways)
     }
 
-    override suspend fun getStorageDownloadLocation(): String? {
-        return dbHandler.preferences?.storageDownloadLocation
-    }
+    override suspend fun getStorageDownloadLocation(): String? =
+        dbHandler.preferences?.storageDownloadLocation
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) {
         dbHandler.setStorageDownloadLocation(storageDownloadLocation)
@@ -281,11 +282,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
         }
     }
 
-    override suspend fun setPrimaryFolderHandle(primaryHandle: Long) {
+    private fun setPrimaryFolderHandle(primaryHandle: Long) {
         dbHandler.setCamSyncHandle(primaryHandle)
     }
 
-    override suspend fun setSecondaryFolderHandle(secondaryHandle: Long) {
+    private fun setSecondaryFolderHandle(secondaryHandle: Long) {
         dbHandler.setSecondaryFolderHandle(secondaryHandle)
     }
 

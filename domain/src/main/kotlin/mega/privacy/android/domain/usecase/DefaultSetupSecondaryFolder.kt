@@ -20,7 +20,6 @@ class DefaultSetupSecondaryFolder @Inject constructor(
         }.onSuccess { newSecondaryHandle ->
             if (newSecondaryHandle != cameraUploadRepository.getInvalidHandle()) {
                 resetSecondaryTimeline()
-                cameraUploadRepository.setSecondaryFolderHandle(newSecondaryHandle)
                 cameraUploadRepository.setSecondarySyncHandle(newSecondaryHandle)
                 updateFolderIconBroadcast(newSecondaryHandle, true)
                 stopCameraUpload()

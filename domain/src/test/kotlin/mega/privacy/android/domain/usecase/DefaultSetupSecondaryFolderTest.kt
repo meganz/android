@@ -46,7 +46,6 @@ class DefaultSetupSecondaryFolderTest {
             whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(69L)
             underTest(any())
             verify(resetSecondaryTimeline).invoke()
-            verify(cameraUploadRepository).setSecondaryFolderHandle(result)
             verify(cameraUploadRepository).setSecondarySyncHandle(result)
             verify(updateFolderIconBroadcast).invoke(result, true)
             verify(stopCameraUpload).invoke()

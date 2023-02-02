@@ -71,7 +71,6 @@ class DefaultResetCameraUploadTimelinesTest {
             val existingHandle = 69L
             whenever(getUploadFolderHandle(any())).thenReturn(existingHandle)
             val result = underTest(1337L, false)
-            verify(cameraUploadRepository, times(1)).setPrimaryFolderHandle(any())
             verify(resetPrimaryTimeline, times(1)).invoke()
             assertThat(result).isTrue()
         }
@@ -82,7 +81,6 @@ class DefaultResetCameraUploadTimelinesTest {
             val existingHandle = 69L
             whenever(getUploadFolderHandle(any())).thenReturn(existingHandle)
             val result = underTest(1337L, true)
-            verify(cameraUploadRepository, times(1)).setSecondaryFolderHandle(any())
             verify(resetSecondaryTimeline, times(1)).invoke()
             assertThat(result).isTrue()
         }
