@@ -22,7 +22,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MimeTypeList.typeForName
+import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
