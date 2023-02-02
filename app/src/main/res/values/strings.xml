@@ -790,7 +790,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Save</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">The Recovery key has been successfully copied</string>
+    <string name="copy_MK_confirmation">Recovery key copied to clipboard. Save it to a safe place where you can easily access later.</string>
     <!-- Button to change the password -->
     <string name="change_pass">Change</string>
     <!-- Positive button to perform a general action -->
@@ -4061,7 +4061,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Recurring meeting</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s weekly</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s Weekly</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Media discovery view</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4144,17 +4144,25 @@
     <!-- User Alert notification for new scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s [/A][B]cancelled the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s [/A][B]updated the meeting name from “%s” to [/B]“[A]%s[/A]“</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated the meeting name[/A][B] from “%s” to [/B]“[A]%s[/A]“</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s [/A][B]updated the meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s [/A][B]updated the meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s updated[/A][B] the meeting time[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s [/A][B]updated the meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s [/A][B]updated the meeting details scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the meeting details scheduled for:[/B]</string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">Access denied</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">Occurrences</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
@@ -4165,12 +4173,24 @@
     <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Occurs monthly</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">See more occurrences</string>
-    <!-- Title of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_title_media_permissions_denied">Access Denied</string>
-    <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
-    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Allow permission</string>
-    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label">%s Monthly</string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label">%s Daily</string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]invited you to a recurring meeting scheduled for:[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s updated[/A][B] the recurring meeting description[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the recurring meeting details scheduled for:[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s updated[/A][B] the recurring meeting time[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency">[A]%s updated[/A][B] the recurring meeting frequency[/B]</string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
 </resources>

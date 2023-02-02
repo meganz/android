@@ -22,7 +22,7 @@ internal fun UserAlert.sectionTitle(): (Context) -> String = when (this) {
             .uppercase(Locale.getDefault())
     }
     is ScheduledMeetingAlert -> { context ->
-        context.getString(R.string.chat_tab_meetings_title).uppercase(Locale.getDefault())
+        context.getString(R.string.chat_tab_meetings_title)
     }
     is CustomAlert -> { _ ->
         heading?.uppercase(Locale.getDefault()) ?: ""

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAle
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
@@ -84,7 +85,7 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                     email
                 ).spanABTextFontColour(context)
             }
-            is DeletedScheduledMeetingAlert -> {
+            is UpdatedScheduledMeetingCancelAlert, is DeletedScheduledMeetingAlert -> {
                 context.getFormattedStringOrDefault(
                     R.string.notification_subtitle_scheduled_meeting_canceled,
                     email
