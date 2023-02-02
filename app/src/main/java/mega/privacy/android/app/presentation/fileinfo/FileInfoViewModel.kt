@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
@@ -23,6 +24,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
     private val monitorConnectivity: MonitorConnectivity,
     private val getFileHistoryNumVersions: GetFileHistoryNumVersions,
+    private val isNodeInInbox: IsNodeInInbox,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -43,7 +45,14 @@ class FileInfoViewModel @Inject constructor(
      */
     fun updateNode(node: MegaNode) {
         this.node = node
-        updateHistoryNumVersions()
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    historyVersions = getFileHistoryNumVersions(node.handle),
+                    isNodeInInbox = isNodeInInbox(node.handle),
+                )
+            }
+        }
     }
 
     /**
@@ -58,11 +67,7 @@ class FileInfoViewModel @Inject constructor(
         get() = monitorConnectivity().value
 
     /**
-     * checks the history num versions an updates the view state accordingly
+     * returns if the node is in the inbox or not
      */
-    fun updateHistoryNumVersions() = viewModelScope.launch {
-        _uiState.update {
-            it.copy(historyVersions = getFileHistoryNumVersions(node.handle))
-        }
-    }
+    fun isNodeInInbox() = _uiState.value.isNodeInInbox
 }

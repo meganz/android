@@ -438,7 +438,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 menu.findItem(R.id.cab_menu_unselect_all).isVisible = false
             }
             val changePermissionsMenuItem = menu.findItem(R.id.action_file_contact_list_permissions)
-            if (isNodeInInbox(viewModel.node)) {
+            if (viewModel.isNodeInInbox()) {
                 // If the node came from Backups, hide the Change Permissions option from the Action Bar
                 changePermissionsMenuItem.isVisible = false
                 changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
@@ -518,22 +518,22 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     private fun collectUIState() {
-        this.collectFlow(viewModel.uiState) {
+        this.collectFlow(viewModel.uiState) { viewState ->
             with(bindingContent) {
                 // If the Node belongs to Backups or has no versions, then hide
                 // the Versions layout
-                if (isNodeInInbox(viewModel.node) || it.historyVersions == 0) {
-                    filePropertiesVersionsLayout.isVisible = false
-                    separatorVersions.isVisible = false
-                } else {
+                if (viewState.showHistoryVersions) {
                     filePropertiesVersionsLayout.isVisible = true
                     val text = getQuantityStringOrDefault(
                         R.plurals.number_of_versions,
-                        it.historyVersions,
-                        it.historyVersions
+                        viewState.historyVersions,
+                        viewState.historyVersions
                     )
                     filePropertiesTextNumberVersions.text = text
                     separatorVersions.isVisible = true
+                } else {
+                    filePropertiesVersionsLayout.isVisible = false
+                    separatorVersions.isVisible = false
                 }
             }
         }
@@ -679,7 +679,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             filePropertiesTextNumberVersions.setOnClickListener {
                 versionHistoryLauncher.launch(viewModel.node.handle)
             }
-            viewModel.updateHistoryNumVersions()
         }
         setIconResource()
     }
@@ -719,7 +718,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         menuInflater.inflate(R.menu.file_info_action, menu)
         with(megaApi.getRootParentNode(megaApi.getNodeByHandle(viewModel.node.handle))) {
             val isInRubbish = this == megaApi.rubbishNode
-            val isInInbox = isNodeInInbox(this)
+            val isInInbox = viewModel.isNodeInInbox()
             menuHelper.setupOptionsMenu(
                 menu = menu,
                 node = this,
@@ -732,16 +731,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         }
         return super.onCreateOptionsMenu(menu)
     }
-
-    /**
-     * Checks whether the provided Node exists in the Inbox or not
-     *
-     * @param node The Provided Node
-     *
-     * @return true if the provided Node exists in the Inbox, and false if otherwise
-     */
-    private fun isNodeInInbox(node: MegaNode?) = node != null && megaApi.isInInbox(node)
-
 
     /**
      * performs the action corresponding to the menu item selected
@@ -1061,8 +1050,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
-            viewModel.updateHistoryNumVersions()
-            if (!isNodeInInbox(viewModel.node) && megaApi.hasVersions(viewModel.node)) {
+            if (!viewModel.isNodeInInbox() && megaApi.hasVersions(viewModel.node)) {
                 nodeVersions = megaApi.getVersions(viewModel.node)
             }
         } else if (viewModel.node.isFolder) {
@@ -1416,7 +1404,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         } else if (request.type == MegaRequest.TYPE_FOLDER_INFO) {
 
             // If the Folder belongs to Backups, hide all Folder Version layouts
-            if (isNodeInInbox(viewModel.node)) {
+            if (viewModel.isNodeInInbox()) {
                 bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = false
@@ -1901,7 +1889,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesInfoDataCreated.text = ""
         }
 
-        viewModel.updateHistoryNumVersions()
         refresh()
     }
 

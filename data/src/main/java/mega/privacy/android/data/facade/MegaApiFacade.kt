@@ -475,6 +475,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
 
+    override suspend fun isInInbox(node: MegaNode): Boolean = megaApi.isInInbox(node)
+
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
 

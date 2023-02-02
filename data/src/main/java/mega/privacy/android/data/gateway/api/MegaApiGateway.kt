@@ -733,6 +733,14 @@ interface MegaApiGateway {
     suspend fun isInRubbish(node: MegaNode): Boolean
 
     /**
+     * Check is megaNode in Inbox
+     *
+     * @param node MegaNode
+     * @return True in, else not in
+     */
+    suspend fun isInInbox(node: MegaNode): Boolean
+
+    /**
      * Move a transfer to the top of the transfer queue
      *
      * @param transfer Transfer to move

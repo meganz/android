@@ -31,6 +31,13 @@ interface NodeRepository {
     suspend fun isNodeInRubbish(handle: Long): Boolean
 
     /**
+     * check whether the node is in inbox or not
+     *
+     * @return Boolean
+     */
+    suspend fun isNodeInInbox(handle: Long): Boolean
+
+    /**
      * Get the current backup folder node id
      */
     suspend fun getBackupFolderId(): NodeId

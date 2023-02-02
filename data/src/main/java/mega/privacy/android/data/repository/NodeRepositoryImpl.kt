@@ -89,6 +89,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) } ?: false
     }
 
+    override suspend fun isNodeInInbox(handle: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInInbox(it) } ?: false
+    }
 
     override suspend fun getBackupFolderId(): NodeId =
         withContext(ioDispatcher) {
