@@ -270,6 +270,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
+    override suspend fun getNumVersions(node: MegaNode): Int = megaApi.getNumVersions(node)
+
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
     override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =

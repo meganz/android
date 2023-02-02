@@ -144,6 +144,16 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getNodeHistoryNumVersions(handle: Long): Int = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let {
+            if (megaApiGateway.hasVersion(it)) {
+                megaApiGateway.getNumVersions(it)
+            } else {
+                0
+            }
+        } ?: 0
+    }
+
     override fun monitorNodeUpdates(): Flow<List<Node>> {
         return megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()

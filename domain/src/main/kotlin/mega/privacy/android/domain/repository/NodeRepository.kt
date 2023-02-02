@@ -3,14 +3,11 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import java.io.File
 
 /**
  * Node repository
@@ -53,6 +50,13 @@ interface NodeRepository {
      * @return
      */
     suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode>
+
+    /**
+     * Get the number of versions in node's history
+     * @param handle the handle of the node
+     * @return the number of history versions or 0 if the file is not found or has no versions
+     */
+    suspend fun getNodeHistoryNumVersions(handle: Long): Int
 
     /**
      * Monitor node updates

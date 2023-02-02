@@ -309,6 +309,11 @@ interface MegaApiGateway {
     suspend fun hasVersion(node: MegaNode): Boolean
 
     /**
+     * Get node history num versions
+     */
+    suspend fun getNumVersions(node: MegaNode): Int
+
+    /**
      * Get children nodes by node
      * @param parentNode parent node
      * @param order order for the returned list, if null the default order is applied
