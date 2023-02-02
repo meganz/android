@@ -113,8 +113,6 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      * @param playlistItems the new playlist
      */
     fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
-        binding.playerView.setShowNextButton(
-            playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE)
         playlist.visibility =
             if (playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE)
                 View.VISIBLE
