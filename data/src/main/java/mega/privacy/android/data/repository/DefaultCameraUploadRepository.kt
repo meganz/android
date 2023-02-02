@@ -34,7 +34,6 @@ import timber.log.Timber
 import java.io.IOException
 import java.util.Queue
 import javax.inject.Inject
-import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
 
 /**
@@ -49,7 +48,6 @@ import kotlin.coroutines.Continuation
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher CoroutineDispatcher
  */
-@OptIn(ExperimentalContracts::class)
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
@@ -105,6 +103,15 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun getVideoQuality(): String = withContext(ioDispatcher) {
         localStorageGateway.getVideoQuality()
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                " * provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    override suspend fun resetTotalUploads() = withContext(ioDispatcher) {
+        megaApiGateway.resetTotalUploads()
     }
 
     override suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType) =
@@ -480,7 +487,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             }
         }
 
-    @Deprecated("Function related to statistics will be reviewed in future updates to\n" +
-            "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                " * provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
     override fun getNumberOfPendingUploads() = megaApiGateway.numberOfPendingUploads
 }

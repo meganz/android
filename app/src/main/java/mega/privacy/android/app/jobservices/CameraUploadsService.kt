@@ -103,7 +103,6 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.HasPendingUploads
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
@@ -113,6 +112,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -467,12 +467,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var cancelAllUploadTransfers: CancelAllUploadTransfers
 
     /**
-     * Has Pending Uploads
-     */
-    @Inject
-    lateinit var hasPendingUploads: HasPendingUploads
-
-    /**
      * Copy Node
      */
     @Inject
@@ -507,6 +501,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var setupSecondaryFolder: SetupSecondaryFolder
+
+    /**
+     * Reset Total Uploads
+     */
+    @Inject
+    lateinit var resetTotalUploads: ResetTotalUploads
 
     /**
      * Coroutine Scope for camera upload work
@@ -673,7 +673,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     /**
      * Cancels a pending [MegaTransfer] through [CancelTransfer],
-     * and call [resetTotalUploads] afterwards
+     * and call [ResetTotalUploads] after every cancellation to reset the total uploads if
+     * there are no more pending uploads
      *
      * @param transfer the [MegaTransfer] to be cancelled
      */
@@ -688,7 +689,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     /**
      * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfers],
-     * and call [resetTotalUploads] afterwards
+     * and call [ResetTotalUploads] afterwards
      */
     private suspend fun cancelAllPendingTransfers() {
         runCatching { cancelAllUploadTransfers() }
@@ -697,17 +698,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 resetTotalUploads()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
-    }
-
-    /**
-     * Checks [HasPendingUploads] and resets the overall upload count
-     * if there are no pending transfers
-     */
-    private suspend fun resetTotalUploads() {
-        if (!hasPendingUploads()) {
-            @Suppress("DEPRECATION")
-            megaApi.resetTotalUploads()
-        }
     }
 
     /**

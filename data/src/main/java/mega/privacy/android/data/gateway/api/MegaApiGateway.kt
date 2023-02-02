@@ -1479,6 +1479,14 @@ interface MegaApiGateway {
      */
     fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
 
+    /**
+     * Check valid node file
+     *
+     * @param node The [MegaNode] to check
+     * @param nodeFile The [File] to check
+     *
+     * @return True if the [MegaNode] File is valid
+     */
     fun checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean
 
     /**
@@ -1501,4 +1509,14 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun changeEmail(email: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reset the number of total uploads
+     * This function resets the number returned by MegaApi::getTotalUploads
+     */
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                "provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    fun resetTotalUploads()
 }

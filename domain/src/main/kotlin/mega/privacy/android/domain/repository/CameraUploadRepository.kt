@@ -346,6 +346,11 @@ interface CameraUploadRepository {
     suspend fun getVideoQuality(): String
 
     /**
+     * Reset total uploads
+     */
+    suspend fun resetTotalUploads()
+
+    /**
      * Convert on charging
      *
      * @return true if conversion on charging
@@ -497,7 +502,9 @@ interface CameraUploadRepository {
     /**
      * number of pending uploads
      */
-    @Deprecated("Function related to statistics will be reviewed in future updates to\n" +
-            "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                " * provide more data and avoid race conditions. They could change or be removed in the current form.",
+    )
     fun getNumberOfPendingUploads(): Int
 }
