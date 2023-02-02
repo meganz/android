@@ -20,25 +20,35 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingOut
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TourImageAdapter
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.DialogRecoveryKeyBinding
 import mega.privacy.android.app.databinding.FragmentTourBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Tour Fragment.
  */
+@AndroidEntryPoint
 class TourFragment : Fragment() {
 
     private var _binding: FragmentTourBinding? = null
@@ -46,6 +56,13 @@ class TourFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>
+
+    @Inject
+    @MegaApi
+    lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
 
     private val selectedCircle by lazy {
         ContextCompat.getDrawable(requireContext(), R.drawable.selection_circle_page_adapter)
@@ -81,9 +98,7 @@ class TourFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupView()
-
         arguments?.getString(EXTRA_RECOVERY_KEY_URL, null)?.let { recoveryKeyUrl ->
             Timber.d("Link to resetPass: $recoveryKeyUrl")
             showRecoveryKeyDialog(recoveryKeyUrl)
@@ -138,6 +153,10 @@ class TourFragment : Fragment() {
                     }
                 }
             })
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            megaApi.setSecureFlag(getFeatureFlagValue(AppFeatures.SetSecureFlag))
         }
     }
 

@@ -20,6 +20,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     AndroidSync("Enable a synchronization between folders on local storage and folders on MEGA cloud",
         false),
 
+
+    /**
+     * Sets the MegaApi::setSecureFlag
+     */
+    SetSecureFlag("Sets the secure flag value for MegaApi", false),
+
     /**
      * Indicates if the user is cryptographically secure
      */
