@@ -84,4 +84,9 @@ interface NodeRepository {
      * @return Offline node information if found
      */
     suspend fun getOfflineNodeInformation(nodeId: NodeId): OfflineNodeInformation?
+
+    /**
+     * Convert Base 64 string to handle
+     */
+    suspend fun convertBase64ToHandle(base64: String): Long
 }

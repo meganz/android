@@ -441,10 +441,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.deleteAllSecondarySyncRecords()
     }
 
-    override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
-        megaApiGateway.base64ToHandle(base64)
-    }
-
     override fun monitorCameraUploadPauseState() = appEventGateway.monitorCameraUploadPauseState
 
     override suspend fun broadcastUploadPauseState() = appEventGateway.broadcastUploadPauseState()

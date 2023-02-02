@@ -34,7 +34,8 @@ class DefaultQRCodeRepository @Inject constructor(
 ) : QRCodeRepository {
 
     override suspend fun getQRFile(fileName: String): File? = withContext(defaultDispatcher) {
-        cacheFolderGateway.getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
+        cacheFolderGateway
+            .getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
     }
 
     override suspend fun queryScannedContactLink(scannedHandle: String) =

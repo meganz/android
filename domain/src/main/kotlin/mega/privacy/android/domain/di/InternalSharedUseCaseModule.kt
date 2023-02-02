@@ -7,24 +7,18 @@ import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.QRCodeRepository
-import mega.privacy.android.domain.usecase.DefaultDeleteQRCode
 import mega.privacy.android.domain.usecase.DefaultGetCurrentUserFullName
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
-import mega.privacy.android.domain.usecase.DefaultResetContactLink
-import mega.privacy.android.domain.usecase.DeleteQRCode
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.GetQRFile
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.IsExtendedAccountDetailStale
-import mega.privacy.android.domain.usecase.ResetContactLink
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.impl.DefaultGetFullAccountInfo
 import mega.privacy.android.domain.usecase.impl.DefaultIsExtendedAccountDetailStale
@@ -60,12 +54,6 @@ internal abstract class InternalSharedUseCaseModule {
             : GetExtendedAccountDetail
 
     @Binds
-    abstract fun bindDeleteQRCode(implementation: DefaultDeleteQRCode): DeleteQRCode
-
-    @Binds
-    abstract fun bindResetContactLink(implementation: DefaultResetContactLink): ResetContactLink
-
-    @Binds
     abstract fun bindGetCurrentUserFullName(implementation: DefaultGetCurrentUserFullName)
             : GetCurrentUserFullName
 
@@ -85,9 +73,6 @@ internal abstract class InternalSharedUseCaseModule {
         @Provides
         fun provideGetNumberOfSubscription(repository: BillingRepository) =
             GetNumberOfSubscription(repository::getNumberOfSubscription)
-
-        @Provides
-        fun provideBuildQRCodeFile(repository: QRCodeRepository) = GetQRFile(repository::getQRFile)
 
         @Provides
         fun provideGetFileVersionsOption(repository: FileSystemRepository) =

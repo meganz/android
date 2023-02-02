@@ -188,4 +188,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
+
+    override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
+        megaApiGateway.base64ToHandle(base64)
+    }
 }
