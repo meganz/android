@@ -6,7 +6,6 @@ import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME
 import nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
 
@@ -77,19 +76,5 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
             megaApi.setUserAttribute(USER_ATTR_FIRSTNAME, firstName, listener)
             megaApi.setUserAttribute(USER_ATTR_LASTNAME, lastName, listener)
         }
-    }
-
-    /**
-     * Launches a request to set a new email for the current account.
-     *
-     * @return Single<Boolean> True if action finished with success, false otherwise.
-     */
-    fun updateEmail(email: String): Single<MegaError> = Single.create { emitter ->
-        megaApi.changeEmail(
-            email,
-            OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                emitter.onSuccess(error)
-            })
-        )
     }
 }

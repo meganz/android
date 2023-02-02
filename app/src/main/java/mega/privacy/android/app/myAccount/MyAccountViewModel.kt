@@ -84,11 +84,11 @@ import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EARGS
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaUtilsAndroid
@@ -127,6 +127,7 @@ class MyAccountViewModel @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getCurrentUserFullName: GetCurrentUserFullName,
     private val monitorUserUpdates: MonitorUserUpdates,
+    private val changeEmail: ChangeEmail,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -818,7 +819,7 @@ class MyAccountViewModel @Inject constructor(
      * @param action   Action to perform after change the email.
      * @return An error string if something wrong happened, CHECKING_2FA if checking 2FA or null otherwise
      */
-    fun changeEmail(context: Context, newEmail: String, action: (MegaError) -> Unit): String? {
+    fun changeEmail(context: Context, newEmail: String): String? {
         return when {
             newEmail == getEmail() -> getString(R.string.mail_same_as_old)
             !EMAIL_ADDRESS.matcher(newEmail).matches() -> getString(R.string.error_invalid_email)
@@ -832,12 +833,10 @@ class MyAccountViewModel @Inject constructor(
                 CHECKING_2FA
             }
             else -> {
-                updateMyUserAttributesUseCase.updateEmail(newEmail)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy { result -> action.invoke(result) }
-                    .addTo(composite)
-
+                viewModelScope.launch {
+                    val changeEmailResult = runCatching { changeEmail(newEmail) }
+                    _state.update { it.copy(changeEmailResult = changeEmailResult) }
+                }
                 null
             }
         }
@@ -1031,5 +1030,13 @@ class MyAccountViewModel @Inject constructor(
                 transactions = false)
             getPaymentMethod(false)
         }
+    }
+
+    /**
+     * Mark handle change email result
+     *
+     */
+    fun markHandleChangeEmailResult() {
+        _state.update { it.copy(changeEmailResult = null) }
     }
 }

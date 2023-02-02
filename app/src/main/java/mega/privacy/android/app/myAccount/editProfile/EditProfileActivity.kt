@@ -64,11 +64,8 @@ import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.domain.exception.ChangeEmailException
 import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_EACCESS
-import nz.mega.sdk.MegaError.API_EEXIST
-import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import java.io.File
 
@@ -271,6 +268,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         collectFlow(viewModel.state) { state ->
             binding.headerLayout.firstLineToolbar.text = state.name
+            state.changeEmailResult?.let {
+                showChangeEmailResult(it)
+                viewModel.markHandleChangeEmailResult()
+            }
         }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
@@ -308,23 +309,23 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     /**
      * Shows the result of an email change.
      *
-     * @param error Error result of the email change.
+     * @param result result of the email change.
      */
-    private fun showChangeEmailResult(error: MegaError) {
+    private fun showChangeEmailResult(result: Result<String>) {
         binding.progressBar.isVisible = false
         val firstMessageId: Int
         val secondMessageId: Int
 
-        when (error.errorCode) {
-            API_OK -> {
+        when {
+            result.isSuccess -> {
                 firstMessageId = R.string.email_verification_text_change_mail
                 secondMessageId = R.string.email_verification_title
             }
-            API_EACCESS -> {
+            result.exceptionOrNull() is ChangeEmailException.EmailInUse -> {
                 firstMessageId = R.string.mail_already_used
                 secondMessageId = R.string.email_verification_title
             }
-            API_EEXIST -> {
+            result.exceptionOrNull() is ChangeEmailException.AlreadyRequested -> {
                 firstMessageId = R.string.mail_changed_confirm_requested
                 secondMessageId = R.string.email_verification_title
             }
@@ -650,7 +651,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                         val error = viewModel.changeEmail(
                             this@EditProfileActivity,
                             dialogBinding.emailField.text.toString()
-                        ) { result -> showChangeEmailResult(result) }
+                        )
 
                         binding.progressBar.isVisible = error == null
 
