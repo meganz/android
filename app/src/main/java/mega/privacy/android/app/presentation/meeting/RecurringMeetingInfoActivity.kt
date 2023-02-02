@@ -14,7 +14,8 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
-import timber.log.Timber
+import mega.privacy.android.app.utils.Constants
+import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
 /**
@@ -33,6 +34,12 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.setChatId(
+            newChatId = intent.getLongExtra(
+                Constants.CHAT_ID,
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+        )
         setContent { View() }
     }
 

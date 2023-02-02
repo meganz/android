@@ -1,13 +1,19 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -26,7 +32,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,10 +44,14 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
+import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.meeting.OccurrenceItem
 import mega.privacy.android.domain.entity.meeting.OccursType
 
 /**
@@ -50,7 +62,7 @@ fun RecurringMeetingInfoView(
     state: RecurringMeetingInfoState,
     onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
-    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit = {},
+    onOccurrenceClicked: (OccurrenceItem) -> Unit = {},
     onSeeMoreClicked: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -58,7 +70,6 @@ fun RecurringMeetingInfoView(
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
-
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
@@ -75,20 +86,18 @@ fun RecurringMeetingInfoView(
             )
         }
     ) { paddingValues ->
-
         LazyColumn(
             state = listState,
             modifier = Modifier.padding(paddingValues)
         ) {
-
             item(key = "Occurrences list") {
                 state.occurrencesList.indices.forEach { i ->
                     OccurrenceItemView(
+                        state = state,
                         occurrence = state.occurrencesList[i],
                         onOccurrenceClicked = onOccurrenceClicked
                     )
                 }
-
                 if (state.occurrencesList.size > 10) {
                     SeeMoreOccurrencesButton(
                         onSeeMoreClicked = onSeeMoreClicked
@@ -97,11 +106,9 @@ fun RecurringMeetingInfoView(
             }
         }
     }
-
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
     onScrollChange(!firstItemVisible)
 }
-
 
 /**
  * Recurring meeting info App bar view
@@ -117,19 +124,19 @@ private fun RecurringMeetingInfoAppBar(
     elevation: Boolean,
 ) {
     val isLight = MaterialTheme.colors.isLight
-
     val iconColor = black.takeIf { isLight } ?: white
-
     TopAppBar(
         title = {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = state.schedTitle,
-                        style = MaterialTheme.typography.subtitle1,
-                        color = black.takeIf { isLight } ?: white,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis)
+                    state.schedTitle?.let { title ->
+                        Text(text = title,
+                            style = MaterialTheme.typography.subtitle1,
+                            color = black.takeIf { isLight } ?: white,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis)
+                    }
                 }
                 Text(text = when (state.typeOccurs) {
                     OccursType.Daily -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_daily_subtitle)
@@ -158,30 +165,154 @@ private fun RecurringMeetingInfoAppBar(
     )
 }
 
-
 /**
  * View of a occurrence in the list
  *
- * @param occurrence               [ChatScheduledMeetingOccurr]
+ * @param state                    [RecurringMeetingInfoState]
+ * @param occurrence               [OccurrenceItem]
  * @param onOccurrenceClicked      Detect when a occurrence is clicked
  */
 @Composable
 private fun OccurrenceItemView(
-    occurrence: ChatScheduledMeetingOccurr,
-    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit = {},
+    modifier: Modifier = Modifier,
+    state: RecurringMeetingInfoState,
+    occurrence: OccurrenceItem,
+    onOccurrenceClicked: (OccurrenceItem) -> Unit = {},
 ) {
+    val isLight = MaterialTheme.colors.isLight
     Column {
-        Row(modifier = Modifier
-            .clickable {
-                onOccurrenceClicked(occurrence)
+        occurrence.dateFormatted?.let { date ->
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(36.dp)
+                    .padding(start = 16.dp, end = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = date,
+                    style = MaterialTheme.typography.body2,
+                    color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
+                    fontWeight = FontWeight.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
             }
-            .fillMaxWidth()
-            .padding(end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically) {
         }
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = modifier
+                    .weight(1f)
+                    .height(72.dp)
+            ) {
+                Column(
+                    modifier = modifier
+                        .padding(start = 17.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Box(
+                        modifier
+                            .size(40.dp)
+                            .background(Color.Transparent)
+                    ) {
+                        RecurringMeetingAvatar(state = state)
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(start = 17.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        state.schedTitle?.let { title ->
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.subtitle1,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                    occurrence.timeFormatted?.let { time ->
+                        Text(text = time,
+                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            style = MaterialTheme.typography.subtitle2)
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.CenterEnd)
+            ) {
+                Row(modifier = Modifier.align(Alignment.Center)) {
+                    Icon(modifier = Modifier.padding(start = 30.dp, end = 20.dp),
+                        painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                        contentDescription = "Three dots icon",
+                        tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
+                }
+            }
+        }
+
+        Divider(modifier = Modifier.padding(start = 16.dp),
+            color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
+            thickness = 1.dp)
     }
 }
 
+/**
+ * Create meeting avatar view
+ *
+ * @param state     [RecurringMeetingInfoState]
+ */
+@Composable
+private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
+    if (state.isEmptyMeeting()) {
+        state.schedTitle?.let {
+            DefaultMeetingAvatarView(
+                title = it,
+                colorBackground = grey_alpha_012.takeIf { MaterialTheme.colors.isLight }
+                    ?: white_alpha_012)
+        }
+    } else if (state.isSingleMeeting()) {
+        state.firstParticipant?.let {
+            if (it.fileUpdated) {
+                ParticipantAvatarView(participant = it)
+            } else {
+                ParticipantAvatarView(participant = it)
+            }
+        }
+    } else {
+        state.firstParticipant?.let { first ->
+            state.secondParticipant?.let { second ->
+                if (first.fileUpdated) {
+                    ParticipantsAvatarView(
+                        firstParticipant = first,
+                        secondParticipant = second
+                    )
+                } else {
+                    ParticipantsAvatarView(
+                        firstParticipant = first,
+                        secondParticipant = second
+                    )
+                }
+                if (second.fileUpdated) {
+                    ParticipantsAvatarView(
+                        firstParticipant = first,
+                        secondParticipant = second
+                    )
+                } else {
+                    ParticipantsAvatarView(
+                        firstParticipant = first,
+                        secondParticipant = second
+                    )
+                }
+            }
+        }
+    }
+}
 
 /**
  * See more occurrences in the list button view
@@ -207,7 +338,6 @@ private fun SeeMoreOccurrencesButton(
                 contentDescription = "See more Icon",
                 tint = MaterialTheme.colors.secondary
             )
-
             Text(
                 modifier = Modifier.padding(end = 16.dp),
                 style = MaterialTheme.typography.button,
