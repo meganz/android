@@ -13,6 +13,13 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * Android Sync toggle
+     */
+    AndroidSync("Enable a synchronization between folders on local storage and folders on MEGA cloud",
+        false),
+
     /**
      * Indicates if the user is cryptographically secure
      */
