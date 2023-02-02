@@ -81,7 +81,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
@@ -1367,9 +1366,11 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 } else {
                     var intent: Intent?
                     if (uiState.isAlreadyLoggedIn) {
-                        Timber.d("First time")
                         intent = Intent(requireContext(), ManagerActivity::class.java)
-                        intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                        if (uiState.isFirstTime) {
+                            Timber.d("First time")
+                            intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+                        }
                         setStartScreenTimeStamp(requireContext())
                         if (intentAction != null) {
                             Timber.d("Action not NULL")

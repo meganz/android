@@ -86,6 +86,7 @@ class LoginViewModel @Inject constructor(
                             is2FAEnabled = false,
                             isAccountConfirmed = false,
                             pressedBackWhileLogin = false,
+                            isFirstTime = session == null,
                             isAlreadyLoggedIn = session != null
                         )
                     }
