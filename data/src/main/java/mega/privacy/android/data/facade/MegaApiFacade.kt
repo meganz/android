@@ -795,4 +795,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun checkValidNodeFile(node: MegaNode, nodeFile: File?) =
         nodeFile?.canRead() == true && nodeFile.length() == node.size
                 && node.fingerprint == megaApi.getFingerprint(nodeFile.absolutePath)
+
+    override fun changeEmail(email: String, listener: MegaRequestListenerInterface) =
+        megaApi.changeEmail(email, listener)
 }

@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
@@ -56,6 +57,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
@@ -715,5 +717,86 @@ class DefaultAccountRepositoryTest {
         runTest {
             underTest.getAccountCredentials()
             verify(localStorageGateway).getUserCredentials()
+        }
+
+    @Test
+    fun `test that changeEmail return new email when API returns success`() = runTest {
+        val expectedEmail = "myEmail"
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val megaRequest = mock<MegaRequest> {
+            on { email }.thenReturn(expectedEmail)
+        }
+        whenever(megaApiGateway.changeEmail(any(), any())).thenAnswer {
+            ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError
+            ))
+        }
+        val actualEmail = underTest.changeEmail(expectedEmail)
+        assertEquals(expectedEmail, actualEmail)
+    }
+
+    @Test(expected = ChangeEmailException.EmailInUse::class)
+    fun `test that changeEmail throw EmailInUse exception when API returns API_EACCESS error code`() =
+        runTest {
+            val expectedEmail = "myEmail"
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EACCESS)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { email }.thenReturn(expectedEmail)
+            }
+            whenever(megaApiGateway.changeEmail(any(), any())).thenAnswer {
+                ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                ))
+            }
+            underTest.changeEmail(expectedEmail)
+        }
+
+
+    @Test(expected = ChangeEmailException.AlreadyRequested::class)
+    fun `test that changeEmail throw AlreadyRequested exception when API returns API_EEXIST error code`() =
+        runTest {
+            val expectedEmail = "myEmail"
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXIST)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { email }.thenReturn(expectedEmail)
+            }
+            whenever(megaApiGateway.changeEmail(any(), any())).thenAnswer {
+                ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                ))
+            }
+            underTest.changeEmail(expectedEmail)
+        }
+
+    @Test(expected = ChangeEmailException.Unknown::class)
+    fun `test that changeEmail throw Unknown exception when API returns common error code`() =
+        runTest {
+            val expectedEmail = "myEmail"
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EAGAIN)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { email }.thenReturn(expectedEmail)
+            }
+            whenever(megaApiGateway.changeEmail(any(), any())).thenAnswer {
+                ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError
+                ))
+            }
+            underTest.changeEmail(expectedEmail)
         }
 }

@@ -1480,4 +1480,25 @@ interface MegaApiGateway {
     fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
 
     fun checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean
+
+    /**
+     * Initialize the change of the email address associated to the account.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_CHANGE_EMAIL_LINK.
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getEmail - Returns the email for the account
+     *
+     *
+     * If this request succeeds, a change-email link will be sent to the specified email address.
+     * If no user is logged in, you will get the error code MegaError::API_EACCESS in onRequestFinish().
+     *
+     *
+     * If the MEGA account is a sub-user business account, onRequestFinish will
+     * be called with the error code MegaError::API_EMASTERONLY.
+     *
+     * @param email    The new email to be associated to the account.
+     * @param listener MegaRequestListener to track this request
+     */
+    fun changeEmail(email: String, listener: MegaRequestListenerInterface)
 }
