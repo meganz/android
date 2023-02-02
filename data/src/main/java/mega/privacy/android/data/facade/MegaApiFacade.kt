@@ -813,4 +813,10 @@ internal class MegaApiFacade @Inject constructor(
     override fun resetTotalUploads() {
         megaApi.resetTotalUploads()
     }
+
+    override fun confirmAccount(
+        confirmationLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.confirmAccount(confirmationLink, password, listener)
 }

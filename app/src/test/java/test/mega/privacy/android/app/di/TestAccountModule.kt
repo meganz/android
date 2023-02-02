@@ -7,6 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.domain.usecase.ConfirmAccount
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
@@ -81,4 +82,7 @@ object TestAccountModule {
 
     @Provides
     fun provideChangeEmail() = mock<ChangeEmail>()
+
+    @Provides
+    fun provideConfirmAccount() = mock<ConfirmAccount>()
 }

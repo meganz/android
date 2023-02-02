@@ -1532,4 +1532,17 @@ interface MegaApiGateway {
                 "provide more data and avoid race conditions. They could change or be removed in the current form."
     )
     fun resetTotalUploads()
+
+    /**
+     * Confirms a new account.
+     *
+     * @param confirmationLink Confirmation link
+     * @param password         Password of the account
+     * @param listener         MegaRequestListener to track this request
+     */
+    fun confirmAccount(
+        confirmationLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    )
 }

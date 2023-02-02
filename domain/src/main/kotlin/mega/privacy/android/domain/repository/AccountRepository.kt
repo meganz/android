@@ -240,4 +240,12 @@ interface AccountRepository {
      * @return new user email from sdk
      */
     suspend fun changeEmail(email: String): String
+
+    /**
+     * Confirms a new account.
+     *
+     * @param confirmationLink Confirmation link of the new account.
+     * @param password         Password of the new account.
+     */
+    suspend fun confirmAccount(confirmationLink: String, password: String)
 }

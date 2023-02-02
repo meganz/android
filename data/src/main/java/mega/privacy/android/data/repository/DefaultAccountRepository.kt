@@ -488,4 +488,17 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun confirmAccount(confirmationLink: String, password: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener { return@getRequestListener }
+
+                megaApiGateway.confirmAccount(confirmationLink, password, listener)
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }
