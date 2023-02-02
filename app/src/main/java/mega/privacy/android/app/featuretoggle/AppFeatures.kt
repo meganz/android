@@ -13,6 +13,12 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * Sets the MegaApi::setSecureFlag
+     */
+    SetSecureFlag("Sets the secure flag value for MegaApi", false),
+
     /**
      * Indicates if the user is cryptographically secure
      */
