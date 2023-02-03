@@ -1086,10 +1086,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if (isMandatoryFingerprintVerificationNeeded) {
-                        if (!node.isNodeKeyDecrypted() || !megaApi.areCredentialsVerified(megaApi.getContact(String.valueOf(node.getOwner())))) {
-                            showUnverifiedNodeUi(holder, true);
-                        }
+                    if (isMandatoryFingerprintVerificationNeeded
+                            && !unverifiedIncomingNodeHandles.isEmpty()
+                            && unverifiedIncomingNodeHandles.contains(node.getHandle())) {
+                        showUnverifiedNodeUi(holder, true);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {

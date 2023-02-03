@@ -728,7 +728,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             ViewExtensionsKt.collectFlow(requireActivity(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
                         && mMode == SHARED_ITEMS_MODE
-                        && isIncomingNodeVerified()) {
+                        && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
                     hideNodeActions();
                 }
@@ -924,10 +924,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         return shareDataList.contains(node.getHandle());
     }
 
-    private boolean isIncomingNodeVerified() {
-        return !node.isNodeKeyDecrypted() || !megaApi.areCredentialsVerified(megaApi.getContact(String.valueOf(node.getOwner())));
-    }
-
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
@@ -1007,7 +1003,23 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                showShareFolderOptions();
+                if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
+                        &&
+                (!node.isNodeKeyDecrypted() ||
+                        !megaApi.areCredentialsVerified(
+                                megaApi.getContact(String.valueOf(node.getOwner())))
+                        )
+                ) {
+                    megaApi.openShareDialog(node, new OptionalMegaRequestListenerInterface() {
+                        @Override
+                        public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
+                            super.onRequestFinish(api, request, error);
+                            showShareFolderOptions();
+                        }
+                    });
+                } else {
+                    showShareFolderOptions();
+                }
                 break;
 
             case R.id.clear_share_option:
