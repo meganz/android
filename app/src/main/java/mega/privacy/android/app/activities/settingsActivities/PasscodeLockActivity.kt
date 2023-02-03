@@ -330,8 +330,11 @@ class PasscodeLockActivity : BaseActivity() {
                 requestFocus()
 
                 doAfterTextChanged {
-                    if (this.text.toString().isNotEmpty()) {
+                    isEnabled = if (this.text.toString().isNotEmpty()) {
                         binding.passSecondInput.requestFocus()
+                        false
+                    } else {
+                        true
                     }
                 }
             }
@@ -340,8 +343,11 @@ class PasscodeLockActivity : BaseActivity() {
                 isVisible = true
 
                 doAfterTextChanged {
-                    if (this.text.toString().isNotEmpty()) {
+                    isEnabled = if (this.text.toString().isNotEmpty()) {
                         binding.passThirdInput.requestFocus()
+                        false
+                    } else {
+                        true
                     }
                 }
 
@@ -353,8 +359,11 @@ class PasscodeLockActivity : BaseActivity() {
                 isVisible = true
 
                 doAfterTextChanged {
-                    if (this.text.toString().isNotEmpty()) {
+                    isEnabled = if (this.text.toString().isNotEmpty()) {
                         binding.passFourthInput.requestFocus()
+                        false
+                    } else {
+                        true
                     }
                 }
 
@@ -365,16 +374,21 @@ class PasscodeLockActivity : BaseActivity() {
                 isVisible = true
 
                 doAfterTextChanged {
-                    if (this.text.toString().isNotEmpty()) {
-                        if (passcodeType == PIN_4) {
+                    if (passcodeType == PIN_4) {
+                        if (this.text.toString().isNotEmpty()) {
                             binding.passFirstInput.apply {
                                 isCursorVisible = false
                                 requestFocus()
                             }
 
                             checkPasscode()
-                        } else {
+                        }
+                    } else {
+                        isEnabled = if (this.text.toString().isNotEmpty()) {
                             binding.passFifthInput.requestFocus()
+                            false
+                        } else {
+                            true
                         }
                     }
                 }
@@ -400,8 +414,11 @@ class PasscodeLockActivity : BaseActivity() {
                     isVisible = true
 
                     doAfterTextChanged {
-                        if (this.text.toString().isNotEmpty()) {
+                        isEnabled = if (this.text.toString().isNotEmpty()) {
                             binding.passSixthInput.requestFocus()
+                            false
+                        } else {
+                            true
                         }
                     }
 
