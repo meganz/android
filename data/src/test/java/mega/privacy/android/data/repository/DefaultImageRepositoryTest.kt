@@ -1,12 +1,15 @@
 package mega.privacy.android.data.repository
 
+import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaApiJava
@@ -26,17 +29,23 @@ import java.io.File
 class DefaultImageRepositoryTest {
     private lateinit var underTest: ImageRepository
 
+    private val context: Context = mock()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val cacheGateway = mock<CacheGateway>()
+    private val fileManagementPreferencesGateway = mock<FileManagementPreferencesGateway>()
+    private val fileGateway = mock<FileGateway>()
 
     private val cacheDir = File("cache")
 
     @Before
     fun setUp() {
         underTest = DefaultImageRepository(
+            context = context,
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            cacheGateway = cacheGateway
+            cacheGateway = cacheGateway,
+            fileManagementPreferencesGateway = fileManagementPreferencesGateway,
+            fileGateway = fileGateway,
         )
     }
 
@@ -100,6 +109,50 @@ class DefaultImageRepositoryTest {
             }
 
             underTest.getThumbnailFromServer(1L)
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test that getImageByNodeHandle throws exception if node is null`() {
+        runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(null)
+            underTest.getImageByNodeHandle(
+                nodeHandle = 1L,
+                fullSize = false,
+                highPriority = false,
+                isMeteredConnection = false
+            )
+        }
+    }
+
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test that getImageByNodeHandle throws exception if node is not file`() {
+        runTest {
+            val node = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
+            whenever(node.isFile).thenReturn(false)
+            underTest.getImageByNodeHandle(
+                nodeHandle = 1L,
+                fullSize = false,
+                highPriority = false,
+                isMeteredConnection = false
+            )
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test that getImageByNodeHandle throws exception if full image file is null`() {
+        runTest {
+            val node = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(node)
+            whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(null)
+            underTest.getImageByNodeHandle(
+                nodeHandle = 1L,
+                fullSize = false,
+                highPriority = false,
+                isMeteredConnection = false
+            )
         }
     }
 }

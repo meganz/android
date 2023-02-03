@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
@@ -52,4 +54,19 @@ interface ImageRepository {
      * @param callback is download success
      */
     suspend fun downloadPreview(handle: Long, callback: (success: Boolean) -> Unit)
+
+    /**
+     * Get Image Result given Node Handle
+     * @param nodeHandle    Image Node handle to request.
+     * @param fullSize      Flag to request full size image despite data/size requirements.
+     * @param highPriority  Flag to request image with high priority.
+     * @param isMeteredConnection   Boolean indicating if network connection is metered
+     * @return Flow<ImageResult>
+     */
+    suspend fun getImageByNodeHandle(
+        nodeHandle: Long,
+        fullSize: Boolean,
+        highPriority: Boolean,
+        isMeteredConnection: Boolean,
+    ): Flow<ImageResult>
 }
