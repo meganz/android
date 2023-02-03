@@ -118,9 +118,6 @@ class CreateFolderListener @JvmOverloads constructor(
                     }
                 }
 
-                is CameraUploadsService -> {
-                    context.onCreateFolder(e.errorCode == MegaError.API_OK)
-                }
             }
 
             if (e.errorCode != MegaError.API_OK) {

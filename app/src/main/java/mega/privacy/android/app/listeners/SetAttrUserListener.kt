@@ -107,12 +107,8 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                             databaseHandler.setCamSyncHandle(nodeHandle)
                             prefs.camSyncHandle = nodeHandle.toString()
                             CameraUploadUtil.forceUpdateCameraUploadFolderIcon(false, nodeHandle)
-                            Timber.d("Trigger on onSetFolderAttribute by set primary.")
-                            (context as? CameraUploadsService)?.onSetFolderAttribute() ?: run {
-                                Timber.d("Start CU by set primary, try to start CU, true.")
-                                JobUtil.fireStopCameraUploadJob(context)
-                                JobUtil.fireCameraUploadJob(context, true)
-                            }
+                            Timber.d("Start CU by set primary, try to start CU, true.")
+                            JobUtil.fireRestartCameraUploadJob(context, true)
                         }
                         if (parentHandle != MegaApiJava.INVALID_HANDLE) {
                             CameraUploadUtil.resetSecondaryTimeline()
@@ -123,11 +119,8 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                                 parentHandle
                             )
                             //make sure to start the process once secondary is enabled
-                            (context as? CameraUploadsService)?.onSetFolderAttribute() ?: run {
-                                Timber.d("Start CU by set primary, try to start CU, true.")
-                                JobUtil.fireStopCameraUploadJob(context)
-                                JobUtil.fireCameraUploadJob(context, true)
-                            }
+                            Timber.d("Start CU by set primary, try to start CU, true.")
+                            JobUtil.fireRestartCameraUploadJob(context, true)
                         }
                         Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).run {
                             if (nodeHandle != MegaApiJava.INVALID_HANDLE) {

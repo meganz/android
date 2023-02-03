@@ -8,26 +8,18 @@ import javax.inject.Inject
  */
 class DefaultSetupSecondaryFolder @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val startCameraUpload: StartCameraUpload,
-    private val stopCameraUpload: StopCameraUpload,
     private val resetSecondaryTimeline: ResetSecondaryTimeline,
     private val updateFolderIconBroadcast: UpdateFolderIconBroadcast,
     private val updateFolderDestinationBroadcast: UpdateFolderDestinationBroadcast,
 ) : SetupSecondaryFolder {
     override suspend fun invoke(secondaryHandle: Long) {
-        runCatching {
-            cameraUploadRepository.setupSecondaryFolder(secondaryHandle)
-        }.onSuccess { newSecondaryHandle ->
-            if (newSecondaryHandle != cameraUploadRepository.getInvalidHandle()) {
+        cameraUploadRepository.setupSecondaryFolder(secondaryHandle)
+            .takeIf { it != cameraUploadRepository.getInvalidHandle() }
+            ?.let {
                 resetSecondaryTimeline()
-                cameraUploadRepository.setSecondarySyncHandle(newSecondaryHandle)
-                updateFolderIconBroadcast(newSecondaryHandle, true)
-                stopCameraUpload()
-                startCameraUpload(true)
-                updateFolderDestinationBroadcast(newSecondaryHandle, true)
+                cameraUploadRepository.setSecondarySyncHandle(it)
+                updateFolderIconBroadcast(it, true)
+                updateFolderDestinationBroadcast(it, true)
             }
-        }.onFailure {
-            stopCameraUpload()
-        }
     }
 }
