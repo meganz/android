@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.meeting.view
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -49,7 +48,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -60,7 +58,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.ContactStatus
@@ -74,7 +71,6 @@ import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
-import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
@@ -440,185 +436,31 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
 @Composable
 private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
-        DefaultAvatar(title = state.chatTitle)
+        DefaultMeetingAvatarView(
+            title = state.chatTitle,
+            colorBackground = grey_alpha_012.takeIf { MaterialTheme.colors.isLight }
+                ?: white_alpha_012)
     } else if (state.isSingleMeeting()) {
         state.firstParticipant?.let {
             if (it.fileUpdated) {
-                OneParticipantAvatar(firstUser = it)
+                ParticipantAvatarView(participant = it)
             } else {
-                OneParticipantAvatar(firstUser = it)
+                ParticipantAvatarView(participant = it)
             }
         }
     } else {
         state.firstParticipant?.let { first ->
-            state.lastParticipant?.let { last ->
+            state.secondParticipant?.let { last ->
                 if (first.fileUpdated) {
-                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
                 } else {
-                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
                 }
                 if (last.fileUpdated) {
-                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
                 } else {
-                    SeveralParticipantsAvatar(firstUser = first, lastUser = last)
+                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
                 }
-            }
-        }
-    }
-}
-
-/**
- * Create default avatar of a meeting
- *
- * @param title Title of the meeting
- */
-@Composable
-private fun DefaultAvatar(title: String) {
-    Box(contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(CircleShape)
-            .background(
-                color = white_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: grey_alpha_012,
-                shape = CircleShape
-            )
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val currentHeight = placeable.height
-                var heightCircle = currentHeight
-                if (placeable.width > heightCircle)
-                    heightCircle = placeable.width
-
-                layout(heightCircle, heightCircle) {
-                    placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
-                }
-            }) {
-        Text(
-            text = AvatarUtil.getFirstLetter(title),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-            style = MaterialTheme.typography.h6
-        )
-    }
-}
-
-/**
- * Meeting avatar with one participant view
- *
- * @param firstUser [ChatParticipant]
- */
-@Composable
-fun OneParticipantAvatar(firstUser: ChatParticipant) {
-    Box(contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(CircleShape)
-            .background(
-                color = Color(firstUser.defaultAvatarColor),
-                shape = CircleShape
-            )
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val currentHeight = placeable.height
-                var heightCircle = currentHeight
-                if (placeable.width > heightCircle)
-                    heightCircle = placeable.width
-
-                layout(heightCircle, heightCircle) {
-                    placeable.placeRelative(0, (heightCircle - currentHeight) / 2)
-                }
-            }) {
-        if (firstUser.data.avatarUri == null) {
-            Text(
-                text = firstUser.getAvatarFirstLetter(),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.subtitle1
-            )
-        } else {
-            Image(
-                modifier = Modifier
-                    .size(28.dp)
-                    .clip(CircleShape),
-                painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
-                contentDescription = "User avatar"
-            )
-        }
-    }
-}
-
-/**
- * Meeting avatar with several participants view
- *
- * @param firstUser [ChatParticipant]
- * @param lastUser  [ChatParticipant]
- */
-@Composable
-fun SeveralParticipantsAvatar(
-    firstUser: ChatParticipant,
-    lastUser: ChatParticipant,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(28.dp)
-                .border(width = 1.dp, color = Color.White, shape = CircleShape)
-                .clip(CircleShape)
-                .align(Alignment.BottomEnd)
-                .background(
-                    color = Color(lastUser.defaultAvatarColor),
-                    shape = CircleShape
-                )
-        ) {
-            if (lastUser.data.avatarUri == null) {
-                Text(
-                    text = lastUser.getAvatarFirstLetter(),
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    style = MaterialTheme.typography.subtitle1
-                )
-            } else {
-                Image(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape),
-                    painter = rememberAsyncImagePainter(model = lastUser.data.avatarUri),
-                    contentDescription = "User avatar"
-                )
-            }
-        }
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(28.dp)
-                .border(width = 1.dp, color = Color.White, shape = CircleShape)
-                .clip(CircleShape)
-                .align(Alignment.TopStart)
-                .background(
-                    color = Color(firstUser.defaultAvatarColor),
-                    shape = CircleShape
-                )
-        ) {
-            if (firstUser.data.avatarUri == null) {
-                Text(
-                    text = firstUser.getAvatarFirstLetter(),
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
-                    style = MaterialTheme.typography.subtitle1
-                )
-            } else {
-                Image(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape),
-                    painter = rememberAsyncImagePainter(model = firstUser.data.avatarUri),
-                    contentDescription = "User avatar"
-                )
             }
         }
     }

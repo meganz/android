@@ -38,7 +38,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property buttons                                    List of available action buttons.
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
- * @property lastParticipant                            Last participant in the chat room.
+ * @property secondParticipant                          Second participant in the chat room.
  * @property numOfParticipants                          Number of participants.
  */
 data class ScheduledMeetingInfoState(
@@ -70,7 +70,7 @@ data class ScheduledMeetingInfoState(
     val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = null,
-    val lastParticipant: ChatParticipant? = null,
+    val secondParticipant: ChatParticipant? = null,
     val numOfParticipants: Int = 0,
 ) {
 
@@ -87,7 +87,7 @@ data class ScheduledMeetingInfoState(
      * @return  true if its single, false otherwise
      */
     fun isSingleMeeting(): Boolean =
-        lastParticipant == null
+        secondParticipant == null
 
     /**
      * ScheduledMeetingItem DiffCallback
