@@ -22,9 +22,9 @@ import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.toContactCredentials
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
@@ -39,6 +39,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
@@ -672,4 +673,48 @@ class DefaultContactsRepositoryTest {
         val result = underTest.inviteContact(userEmail, userHandle, null)
         assertThat(result).isEqualTo(expectedResult)
     }
+
+    @Test
+    fun `test that updateCurrentUserFirstName return correct value when calling API returns success`() =
+        runTest {
+            val expectedNewFirstName = "myNewName"
+
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedNewFirstName)
+            }
+            whenever(megaApiGateway.setUserAttribute(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(), request = request, error = success
+                )
+            }
+
+            assertEquals(
+                expectedNewFirstName,
+                underTest.updateCurrentUserFirstName(expectedNewFirstName)
+            )
+
+            verify(localStorageGateway, times(1)).saveMyFirstName(expectedNewFirstName)
+        }
+
+    @Test
+    fun `test that updateCurrentUserLastName return correct value when calling API returns success`() =
+        runTest {
+            val expectedNewLastName = "myNewName"
+
+            val request = mock<MegaRequest> {
+                on { text }.thenReturn(expectedNewLastName)
+            }
+            whenever(megaApiGateway.setUserAttribute(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(), request = request, error = success
+                )
+            }
+
+            assertEquals(
+                expectedNewLastName,
+                underTest.updateCurrentUserLastName(expectedNewLastName)
+            )
+
+            verify(localStorageGateway, times(1)).saveMyLastName(expectedNewLastName)
+        }
 }

@@ -6,6 +6,7 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import timber.log.Timber
 import kotlin.coroutines.Continuation
 
 /**
@@ -57,6 +58,7 @@ fun <T> Continuation<T>.failWithError(
  * get a request Listener
  */
 fun <T> Continuation<T>.getRequestListener(
+    methodName: String? = null,
     block: (request: MegaRequest) -> T,
 ): MegaRequestListenerInterface {
     val listener = OptionalMegaRequestListenerInterface(
@@ -64,6 +66,10 @@ fun <T> Continuation<T>.getRequestListener(
             if (error.errorCode == MegaError.API_OK) {
                 this.resumeWith(Result.success(block(request)))
             } else {
+                // log the error code when calling SDK api, it helps us easy to find the cause
+                methodName?.let {
+                    Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                }
                 this.failWithError(error)
             }
         }

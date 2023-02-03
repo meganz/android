@@ -825,4 +825,10 @@ internal class MegaApiFacade @Inject constructor(
     override fun setMasterKeyExported(listener: MegaRequestListenerInterface?) {
         megaApi.masterKeyExported(listener)
     }
+
+    override fun setUserAttribute(
+        type: Int,
+        value: String,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.setUserAttribute(type, value, listener)
 }

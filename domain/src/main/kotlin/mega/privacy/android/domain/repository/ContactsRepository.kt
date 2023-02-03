@@ -194,6 +194,22 @@ interface ContactsRepository {
     suspend fun getCurrentUserLastName(forceRefresh: Boolean): String
 
     /**
+     * Update user first name
+     *
+     * @param value new user first name
+     * @return
+     */
+    suspend fun updateCurrentUserFirstName(value: String): String
+
+    /**
+     * Update user last name
+     *
+     * @param value new user last name
+     * @return
+     */
+    suspend fun updateCurrentUserLastName(value: String): String
+
+    /**
      * Invite a new contact
      *
      * @param email Email of the new contact

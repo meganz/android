@@ -1557,4 +1557,35 @@ interface MegaApiGateway {
      * @param listener as [MegaRequestListenerInterface]
      */
     fun setMasterKeyExported(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Set a public attribute of the current user
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type
+     * - MegaRequest::getText - Returns the new value for the attribute
+     *
+     * @param type     Attribute type
+     * Valid values are:
+     * MegaApi::USER_ATTR_FIRSTNAME = 1
+     * Set the firstname of the user (public)
+     * MegaApi::USER_ATTR_LASTNAME = 2
+     * Set the lastname of the user (public)
+     * MegaApi::USER_ATTR_ED25519_PUBLIC_KEY = 5
+     * Set the public key Ed25519 of the user (public)
+     * MegaApi::USER_ATTR_CU25519_PUBLIC_KEY = 6
+     * Set the public key Cu25519 of the user (public)
+     * MegaApi::USER_ATTR_RUBBISH_TIME = 19
+     * Set number of days for rubbish-bin cleaning scheduler (private non-encrypted)
+     *
+     *
+     * If the MEGA account is a sub-user business account, and the value of the parameter
+     * type is equal to MegaApi::USER_ATTR_FIRSTNAME or MegaApi::USER_ATTR_LASTNAME
+     * onRequestFinish will be called with the error code MegaError::API_EMASTERONLY.
+     * @param value    New attribute value
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setUserAttribute(type: Int, value: String, listener: MegaRequestListenerInterface)
 }
