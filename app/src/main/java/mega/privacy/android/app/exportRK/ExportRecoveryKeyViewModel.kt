@@ -7,9 +7,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.domain.usecase.GetExportMasterKey
+import mega.privacy.android.domain.usecase.SetMasterKeyExported
 import javax.inject.Inject
 
 /**
@@ -18,7 +17,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ExportRecoveryKeyViewModel @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    private val getExportMasterKey: GetExportMasterKey,
+    private val setMasterKeyExported: SetMasterKeyExported,
 ) : BaseRxViewModel() {
     private val _uiState = MutableSharedFlow<RecoveryKeyUIState>()
 
@@ -31,28 +31,26 @@ class ExportRecoveryKeyViewModel @Inject constructor(
     /**
      * Exports the Recovery Key
      */
-    private fun exportRK(): String? {
-        val textRK = megaApi.exportMasterKey()
-
-        if (!isTextEmpty(textRK)) {
-            megaApi.masterKeyExported(null)
+    private suspend fun exportRecoveryKey(): String? {
+        return getExportMasterKey().also { key ->
+            if (key.isNullOrBlank().not()) {
+                setMasterKeyExported()
+            }
         }
-
-        return textRK
     }
 
     /**
      * Triggers when user clicks the copy button to copy the recovery key
      */
     fun onCopyRecoveryKey() = viewModelScope.launch {
-        _uiState.emit(RecoveryKeyUIState.CopyRecoveryKey(exportRK()))
+        _uiState.emit(RecoveryKeyUIState.CopyRecoveryKey(exportRecoveryKey()))
     }
 
     /**
      * Triggers when user finish choosing the location where to store the recovery key
      */
     fun onExportRecoveryKey() = viewModelScope.launch {
-        _uiState.emit(RecoveryKeyUIState.ExportRecoveryKey(exportRK()))
+        _uiState.emit(RecoveryKeyUIState.ExportRecoveryKey(exportRecoveryKey()))
     }
 
     /**
