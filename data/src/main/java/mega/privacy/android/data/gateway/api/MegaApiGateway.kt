@@ -1545,4 +1545,16 @@ interface MegaApiGateway {
         password: String,
         listener: MegaRequestListenerInterface,
     )
+
+
+    /**
+     * Get Export Master Key
+     */
+    suspend fun getExportMasterKey(): String?
+
+    /**
+     * Set master key exported
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun setMasterKeyExported(listener: MegaRequestListenerInterface?)
 }

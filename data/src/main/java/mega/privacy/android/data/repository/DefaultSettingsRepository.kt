@@ -425,4 +425,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun isMobileDataAllowed() = withContext(ioDispatcher) {
         fileManagementPreferencesGateway.isMobileDataAllowed()
     }
+
+    override suspend fun getExportMasterKey(): String? = withContext(ioDispatcher) {
+        apiFacade.getExportMasterKey()
+    }
+
+    override suspend fun setMasterKeyExported() = withContext(ioDispatcher) {
+        apiFacade.setMasterKeyExported(null)
+    }
 }

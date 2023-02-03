@@ -819,4 +819,10 @@ internal class MegaApiFacade @Inject constructor(
         password: String,
         listener: MegaRequestListenerInterface,
     ) = megaApi.confirmAccount(confirmationLink, password, listener)
+
+    override suspend fun getExportMasterKey(): String? = megaApi.exportMasterKey()
+
+    override fun setMasterKeyExported(listener: MegaRequestListenerInterface?) {
+        megaApi.masterKeyExported(listener)
+    }
 }
