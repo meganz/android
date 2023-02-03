@@ -115,23 +115,20 @@ internal class DefaultAlbumRepository @Inject constructor(
                 )
             )
 
-            suspendCoroutine { continuation ->
-                val listener = CreateSetElementListenerInterface(
-                    target = photoIDs.size,
-                    onCompletion = { success, _ ->
-                        progressFlow.tryEmit(
-                            AlbumPhotosAddingProgress(
-                                isProgressing = false,
-                                totalAddedPhotos = success,
-                            )
+            val listener = CreateSetElementListenerInterface(
+                target = photoIDs.size,
+                onCompletion = { success, _ ->
+                    progressFlow.tryEmit(
+                        AlbumPhotosAddingProgress(
+                            isProgressing = false,
+                            totalAddedPhotos = success,
                         )
-                        continuation.resumeWith(Result.success(Unit))
-                    }
-                )
-
-                for (photoID in photoIDs) {
-                    megaApiGateway.createSetElement(albumID.id, photoID.longValue, listener)
+                    )
                 }
+            )
+
+            for (photoID in photoIDs) {
+                megaApiGateway.createSetElement(albumID.id, photoID.longValue, listener)
             }
         }
 

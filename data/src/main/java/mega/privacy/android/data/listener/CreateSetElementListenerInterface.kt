@@ -19,12 +19,14 @@ internal class CreateSetElementListenerInterface(
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, error: MegaError) {
         total++
-        if (error.errorCode == MegaError.API_OK) success++
+        if (error.errorCode == MegaError.API_OK) {
+            success++
+        }
 
         if (total == target) {
             onCompletion(success, total - success)
         }
     }
 
-    override fun onRequestTemporaryError(api: MegaApiJava, p1: MegaRequest, p2: MegaError) {}
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, error: MegaError) {}
 }

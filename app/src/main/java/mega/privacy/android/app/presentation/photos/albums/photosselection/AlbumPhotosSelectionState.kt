@@ -18,6 +18,7 @@ data class AlbumPhotosSelectionState(
     val isLocationDetermined: Boolean = false,
     val showFilterMenu: Boolean = false,
     val isSelectionCompleted: Boolean = false,
+    val numCommittedPhotos: Int = 0,
 )
 
 enum class AlbumFlow {

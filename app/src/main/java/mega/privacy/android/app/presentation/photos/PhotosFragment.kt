@@ -600,7 +600,14 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
-        val uiAlbum = albumsViewModel.state.value.currentUIAlbum ?: return
+        val numPhotos = result.data?.getIntExtra(AlbumPhotosSelectionActivity.NUM_PHOTOS, 0)
+        if (numPhotos == 0) return
+
+        val albumId = result.data?.getLongExtra(AlbumPhotosSelectionActivity.ALBUM_ID, -1) ?: -1
+        val uiAlbum = albumsViewModel.state.value.let { state ->
+            state.currentUIAlbum ?: state.findUIAlbum(AlbumId(albumId))
+        } ?: return
+
         openAlbum(uiAlbum, resetMessage = false)
     }
 

@@ -54,10 +54,14 @@ data class AlbumsViewState(
             return if (currentAlbum !is Album.UserAlbum) {
                 albums.find { uiAlbum -> uiAlbum.id == currentAlbum }
             } else {
-                albums.find { uiAlbum -> (uiAlbum.id as? Album.UserAlbum)?.id == currentAlbum.id }
+                findUIAlbum(currentAlbum.id)
             }
         }
 
     val currentUserAlbum: Album.UserAlbum?
         get() = currentUIAlbum?.id as? Album.UserAlbum
+
+    fun findUIAlbum(albumId: AlbumId): UIAlbum? {
+        return albums.find { uiAlbum -> (uiAlbum.id as? Album.UserAlbum)?.id == albumId }
+    }
 }
