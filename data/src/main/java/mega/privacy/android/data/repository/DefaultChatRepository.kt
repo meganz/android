@@ -236,13 +236,16 @@ internal class DefaultChatRepository @Inject constructor(
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
                             if (error.errorCode == MegaChatError.ERROR_OK) {
-                                val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                request.megaChatScheduledMeetingOccurrList.apply {
-                                    for (i in 0..size()) {
-                                        occurrences.add(chatScheduledMeetingOccurrMapper(at(i)))
+                                request.megaChatScheduledMeetingOccurrList?.let { list ->
+                                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                                    val size = list.size() - 1
+
+                                    for (i in 0..size) {
+                                        occurrences.add(chatScheduledMeetingOccurrMapper(list.at(i)))
                                     }
+                                    continuation.resumeWith(Result.success(occurrences))
                                 }
-                                continuation.resumeWith(Result.success(occurrences))
+                                continuation.failWithError(error)
                             } else {
                                 continuation.failWithError(error)
                             }

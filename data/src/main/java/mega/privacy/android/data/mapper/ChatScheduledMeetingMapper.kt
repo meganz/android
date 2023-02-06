@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import nz.mega.sdk.MegaChatScheduledFlags
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledRules
@@ -32,10 +33,22 @@ internal fun toChatScheduledMeeting(megaChatScheduledMeeting: MegaChatScheduledM
     )
 
 private fun MegaChatScheduledFlags.mapFlags(): ChatScheduledFlags =
-    ChatScheduledFlags(emailsDisabled())
+    ChatScheduledFlags(emailsDisabled(), isEmpty)
 
 private fun MegaChatScheduledRules.mapRules(): ChatScheduledRules =
-    ChatScheduledRules(freq(), interval(), until())
+    ChatScheduledRules(
+        mapToOccurrenceFreq(freq()),
+        interval(),
+        until()
+    )
+
+private fun mapToOccurrenceFreq(freq: Int): OccurrenceFrequencyType =
+    when (freq) {
+        MegaChatScheduledRules.FREQ_DAILY -> OccurrenceFrequencyType.Daily
+        MegaChatScheduledRules.FREQ_WEEKLY -> OccurrenceFrequencyType.Weekly
+        MegaChatScheduledRules.FREQ_MONTHLY -> OccurrenceFrequencyType.Monthly
+        else -> OccurrenceFrequencyType.Invalid
+    }
 
 private fun MegaChatScheduledMeeting.mapChanges(): ScheduledMeetingChanges = when {
     hasChanged(MegaChatScheduledMeeting.SC_NEW_SCHED.toLong()) -> ScheduledMeetingChanges.NewScheduledMeeting

@@ -1,9 +1,14 @@
 package mega.privacy.android.domain.entity.meeting
 
 /**
- * Types of occurrences of recurring meeting
+ * Types of frequency of the recurring scheduled meeting
  */
-enum class OccursType {
+enum class OccurrenceFrequencyType {
+    /**
+     * Invalid value
+     */
+    Invalid,
+
     /**
      * Occurs daily
      */
