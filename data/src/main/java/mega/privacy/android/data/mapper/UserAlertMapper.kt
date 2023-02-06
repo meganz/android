@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingRulesAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -306,17 +307,26 @@ internal suspend fun toUserAlert(
         }
         MegaUserAlert.TYPE_SCHEDULEDMEETING_NEW -> {
             val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
-            NewScheduledMeetingAlert(
-                id = megaUserAlert.id,
-                seen = megaUserAlert.seen,
-                createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                isOwnChange = megaUserAlert.isOwnChange,
-                chatId = megaUserAlert.nodeHandle,
-                title = meeting?.title ?: megaUserAlert.title,
-                email = megaUserAlert.email,
-                startDate = meeting?.startDateTime,
-                endDate = meeting?.endDateTime,
-            )
+            if (megaUserAlert.pcrHandle != null && megaUserAlert.pcrHandle != -1L) {
+                NewScheduledMeetingAlert(
+                    id = megaUserAlert.id,
+                    seen = megaUserAlert.seen,
+                    createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
+                    isOwnChange = megaUserAlert.isOwnChange,
+                    chatId = megaUserAlert.nodeHandle,
+                    title = meeting?.title ?: megaUserAlert.title,
+                    email = megaUserAlert.email,
+                    startDate = meeting?.startDateTime,
+                    endDate = meeting?.endDateTime,
+                    isRecurring = meeting?.rules != null,
+                    isOccurrence = meeting?.parentSchedId != null && meeting.parentSchedId != -1L
+                )
+            } else { // Updated Occurrence
+                megaUserAlert.getUpdatedMeetingAlert(
+                    megaUserAlert.getTimestamp(createdTimeIndex),
+                    scheduledMeetingProvider
+                )
+            }
         }
         MegaUserAlert.TYPE_SCHEDULEDMEETING_DELETED -> {
             val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
@@ -330,120 +340,15 @@ internal suspend fun toUserAlert(
                 email = megaUserAlert.email,
                 startDate = meeting?.startDateTime,
                 endDate = meeting?.endDateTime,
+                isRecurring = meeting?.rules != null,
+                isOccurrence = meeting?.parentSchedId != null && meeting.parentSchedId != -1L
             )
         }
         MegaUserAlert.TYPE_SCHEDULEDMEETING_UPDATED -> {
-            val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
-            val changes = megaUserAlert.getScheduledMeetingChanges()
-            if (changes.size == 1) {
-                when (changes.first()) {
-                    ScheduledMeetingChangeType.Title -> {
-                        UpdatedScheduledMeetingTitleAlert(
-                            id = megaUserAlert.id,
-                            seen = megaUserAlert.seen,
-                            createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                            isOwnChange = megaUserAlert.isOwnChange,
-                            chatId = megaUserAlert.nodeHandle,
-                            title = megaUserAlert.updatedTitle[1],
-                            email = megaUserAlert.email,
-                            startDate = meeting?.startDateTime,
-                            endDate = meeting?.endDateTime,
-                            oldTitle = megaUserAlert.updatedTitle[0]
-                        )
-                    }
-                    ScheduledMeetingChangeType.Description -> {
-                        UpdatedScheduledMeetingDescriptionAlert(
-                            id = megaUserAlert.id,
-                            seen = megaUserAlert.seen,
-                            createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                            isOwnChange = megaUserAlert.isOwnChange,
-                            chatId = megaUserAlert.nodeHandle,
-                            title = meeting?.title ?: megaUserAlert.title,
-                            email = megaUserAlert.email,
-                            startDate = meeting?.startDateTime,
-                            endDate = meeting?.endDateTime,
-                        )
-                    }
-                    ScheduledMeetingChangeType.StartDate, ScheduledMeetingChangeType.EndDate -> {
-                        val dateTimeChanges = megaUserAlert.getDateTimeChanges()
-                        UpdatedScheduledMeetingDateTimeAlert(
-                            id = megaUserAlert.id,
-                            seen = megaUserAlert.seen,
-                            createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                            isOwnChange = megaUserAlert.isOwnChange,
-                            chatId = megaUserAlert.nodeHandle,
-                            title = meeting?.title ?: megaUserAlert.title,
-                            email = megaUserAlert.email,
-                            startDate = megaUserAlert.updatedStartDate?.get(1)
-                                ?: meeting?.startDateTime,
-                            endDate = megaUserAlert.updatedEndDate?.get(1)
-                                ?: meeting?.endDateTime,
-                            hasDateChanged = dateTimeChanges.first,
-                            hasTimeChanged = dateTimeChanges.second,
-                        )
-                    }
-                    ScheduledMeetingChangeType.Canceled -> {
-                        UpdatedScheduledMeetingCancelAlert(
-                            id = megaUserAlert.id,
-                            seen = megaUserAlert.seen,
-                            createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                            isOwnChange = megaUserAlert.isOwnChange,
-                            chatId = megaUserAlert.nodeHandle,
-                            title = meeting?.title ?: megaUserAlert.title,
-                            email = megaUserAlert.email,
-                            startDate = meeting?.startDateTime,
-                            endDate = meeting?.endDateTime,
-                        )
-                    }
-                    else -> {
-                        UpdatedScheduledMeetingFieldsAlert(
-                            id = megaUserAlert.id,
-                            seen = megaUserAlert.seen,
-                            createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                            isOwnChange = megaUserAlert.isOwnChange,
-                            chatId = megaUserAlert.nodeHandle,
-                            title = meeting?.title ?: megaUserAlert.title,
-                            email = megaUserAlert.email,
-                            startDate = meeting?.startDateTime,
-                            endDate = meeting?.endDateTime,
-                        )
-                    }
-                }
-            } else {
-                if (changes.size == 2 && changes.containsAll(listOf(
-                        ScheduledMeetingChangeType.StartDate, ScheduledMeetingChangeType.EndDate
-                    ))
-                ) {
-                    val dateTimeChanges = megaUserAlert.getDateTimeChanges()
-                    UpdatedScheduledMeetingDateTimeAlert(
-                        id = megaUserAlert.id,
-                        seen = megaUserAlert.seen,
-                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                        isOwnChange = megaUserAlert.isOwnChange,
-                        chatId = megaUserAlert.nodeHandle,
-                        title = meeting?.title ?: megaUserAlert.title,
-                        email = megaUserAlert.email,
-                        startDate = megaUserAlert.updatedStartDate?.get(1)
-                            ?: meeting?.startDateTime,
-                        endDate = megaUserAlert.updatedEndDate?.get(1)
-                            ?: meeting?.endDateTime,
-                        hasDateChanged = dateTimeChanges.first,
-                        hasTimeChanged = dateTimeChanges.second,
-                    )
-                } else {
-                    UpdatedScheduledMeetingFieldsAlert(
-                        id = megaUserAlert.id,
-                        seen = megaUserAlert.seen,
-                        createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
-                        isOwnChange = megaUserAlert.isOwnChange,
-                        chatId = megaUserAlert.nodeHandle,
-                        title = meeting?.title ?: megaUserAlert.title,
-                        email = megaUserAlert.email,
-                        startDate = meeting?.startDateTime,
-                        endDate = meeting?.endDateTime,
-                    )
-                }
-            }
+            megaUserAlert.getUpdatedMeetingAlert(
+                megaUserAlert.getTimestamp(createdTimeIndex),
+                scheduledMeetingProvider
+            )
         }
         else -> {
             UnknownAlert(
@@ -452,6 +357,154 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(createdTimeIndex),
                 isOwnChange = megaUserAlert.isOwnChange,
                 title = megaUserAlert.title
+            )
+        }
+    }
+}
+
+private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
+    createdTime: Long,
+    scheduledMeetingProvider: UserAlertScheduledMeetingProvider,
+): UserAlert {
+    val meeting = scheduledMeetingProvider(nodeHandle, schedId)
+    val changes = getScheduledMeetingChanges()
+    val isRecurring = meeting?.rules != null
+    val isOccurrence = meeting?.parentSchedId != null && meeting.parentSchedId != -1L
+    return if (changes.size == 1) {
+        when (changes.first()) {
+            ScheduledMeetingChangeType.Title -> {
+                UpdatedScheduledMeetingTitleAlert(
+                    id = id,
+                    seen = seen,
+                    createdTime = createdTime,
+                    isOwnChange = isOwnChange,
+                    chatId = nodeHandle,
+                    title = updatedTitle[1],
+                    email = email,
+                    startDate = meeting?.startDateTime,
+                    endDate = meeting?.endDateTime,
+                    oldTitle = updatedTitle[0],
+                    isRecurring = isRecurring,
+                    isOccurrence = isOccurrence,
+                )
+            }
+            ScheduledMeetingChangeType.Description -> {
+                UpdatedScheduledMeetingDescriptionAlert(
+                    id = id,
+                    seen = seen,
+                    createdTime = createdTime,
+                    isOwnChange = isOwnChange,
+                    chatId = nodeHandle,
+                    title = meeting?.title ?: title,
+                    email = email,
+                    startDate = meeting?.startDateTime,
+                    endDate = meeting?.endDateTime,
+                    isRecurring = isRecurring,
+                    isOccurrence = isOccurrence,
+                )
+            }
+            ScheduledMeetingChangeType.StartDate, ScheduledMeetingChangeType.EndDate -> {
+                val dateTimeChanges = getDateTimeChanges()
+                UpdatedScheduledMeetingDateTimeAlert(
+                    id = id,
+                    seen = seen,
+                    createdTime = createdTime,
+                    isOwnChange = isOwnChange,
+                    chatId = nodeHandle,
+                    title = meeting?.title ?: title,
+                    email = email,
+                    startDate = updatedStartDate?.get(1)
+                        ?: meeting?.startDateTime,
+                    endDate = updatedEndDate?.get(1)
+                        ?: meeting?.endDateTime,
+                    hasDateChanged = dateTimeChanges.first,
+                    hasTimeChanged = dateTimeChanges.second,
+                    isRecurring = isRecurring,
+                    isOccurrence = isOccurrence,
+                )
+            }
+            ScheduledMeetingChangeType.Canceled -> {
+                UpdatedScheduledMeetingCancelAlert(
+                    id = id,
+                    seen = seen,
+                    createdTime = createdTime,
+                    isOwnChange = isOwnChange,
+                    chatId = nodeHandle,
+                    title = meeting?.title ?: title,
+                    email = email,
+                    startDate = meeting?.startDateTime,
+                    endDate = meeting?.endDateTime,
+                    isRecurring = isRecurring,
+                    isOccurrence = isOccurrence,
+                )
+            }
+            ScheduledMeetingChangeType.Rules -> {
+                UpdatedScheduledMeetingRulesAlert(
+                    id = id,
+                    seen = seen,
+                    createdTime = createdTime,
+                    isOwnChange = isOwnChange,
+                    chatId = nodeHandle,
+                    title = meeting?.title ?: title,
+                    email = email,
+                    startDate = meeting?.startDateTime,
+                    endDate = meeting?.endDateTime,
+                    isRecurring = isRecurring,
+                    isOccurrence = isOccurrence,
+                )
+            }
+            else -> {
+                UpdatedScheduledMeetingFieldsAlert(
+                    id = id,
+                    seen = seen,
+                    createdTime = createdTime,
+                    isOwnChange = isOwnChange,
+                    chatId = nodeHandle,
+                    title = meeting?.title ?: title,
+                    email = email,
+                    startDate = meeting?.startDateTime,
+                    endDate = meeting?.endDateTime,
+                    isRecurring = isRecurring,
+                    isOccurrence = isOccurrence,
+                )
+            }
+        }
+    } else {
+        if (changes.size == 2 && changes.containsAll(listOf(
+                ScheduledMeetingChangeType.StartDate, ScheduledMeetingChangeType.EndDate
+            ))
+        ) {
+            val dateTimeChanges = getDateTimeChanges()
+            UpdatedScheduledMeetingDateTimeAlert(
+                id = id,
+                seen = seen,
+                createdTime = createdTime,
+                isOwnChange = isOwnChange,
+                chatId = nodeHandle,
+                title = meeting?.title ?: title,
+                email = email,
+                startDate = updatedStartDate?.get(1)
+                    ?: meeting?.startDateTime,
+                endDate = updatedEndDate?.get(1)
+                    ?: meeting?.endDateTime,
+                hasDateChanged = dateTimeChanges.first,
+                hasTimeChanged = dateTimeChanges.second,
+                isRecurring = isRecurring,
+                isOccurrence = isOccurrence,
+            )
+        } else {
+            UpdatedScheduledMeetingFieldsAlert(
+                id = id,
+                seen = seen,
+                createdTime = createdTime,
+                isOwnChange = isOwnChange,
+                chatId = nodeHandle,
+                title = meeting?.title ?: title,
+                email = email,
+                startDate = meeting?.startDateTime,
+                endDate = meeting?.endDateTime,
+                isRecurring = isRecurring,
+                isOccurrence = isOccurrence,
             )
         }
     }

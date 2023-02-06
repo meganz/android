@@ -11,8 +11,8 @@ package mega.privacy.android.domain.entity.chat
  */
 data class ChatScheduledMeetingOccurr(
     val schedId: Long,
-    val cancelled: Int,
-    val timezone: String,
-    val startDateTime: Long,
-    val endDateTime: Long,
+    val cancelled: Int?,
+    val timezone: String?,
+    val startDateTime: Long?,
+    val endDateTime: Long?,
 )

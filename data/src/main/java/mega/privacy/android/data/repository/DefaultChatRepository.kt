@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -236,16 +237,17 @@ internal class DefaultChatRepository @Inject constructor(
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
                             if (error.errorCode == MegaChatError.ERROR_OK) {
-                                request.megaChatScheduledMeetingOccurrList?.let { list ->
-                                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                    val size = list.size() - 1
-
-                                    for (i in 0..size) {
-                                        occurrences.add(chatScheduledMeetingOccurrMapper(list.at(i)))
+                                val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                                request.megaChatScheduledMeetingOccurrList.apply {
+                                    for (i in 0 until size()) {
+                                        occurrences.add(chatScheduledMeetingOccurrMapper(at(i)))
                                     }
-                                    continuation.resumeWith(Result.success(occurrences))
                                 }
-                                continuation.failWithError(error)
+                                if (occurrences.isNotEmpty()) {
+                                    continuation.resume(occurrences)
+                                } else {
+                                    continuation.failWithError(error)
+                                }
                             } else {
                                 continuation.failWithError(error)
                             }
