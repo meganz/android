@@ -23,4 +23,15 @@ internal interface AppEventGateway {
      * check whether SMS Verification Shown or not
      */
     suspend fun isSMSVerificationShown(): Boolean
+
+    /**
+     * Monitor transfer over quota
+     */
+    fun monitorTransferOverQuota(): Flow<Boolean>
+
+    /**
+     * Broadcast transfer over quota
+     *
+     */
+    suspend fun broadcastTransferOverQuota()
 }

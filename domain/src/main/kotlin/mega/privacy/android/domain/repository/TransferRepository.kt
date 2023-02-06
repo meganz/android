@@ -94,4 +94,15 @@ interface TransferRepository {
      * Reset Total Downloads
      */
     suspend fun resetTotalDownloads()
+
+    /**
+     * Monitor transfer over quota
+     */
+    fun monitorTransferOverQuota(): Flow<Boolean>
+
+    /**
+     * Broadcast transfer over quota
+     *
+     */
+    suspend fun broadcastTransferOverQuota()
 }

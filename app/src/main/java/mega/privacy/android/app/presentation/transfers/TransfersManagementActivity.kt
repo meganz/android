@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -86,6 +87,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
             } else {
                 transfersManagement.startNetworkTimer()
             }
+        }
+
+        collectFlow(monitorTransferOverQuota(), Lifecycle.State.CREATED) {
+            updateTransfersWidget(TransferType.NONE)
         }
 
         transfersViewModel.onTransfersInfoUpdate().observe(this) { transfersInfo ->
@@ -218,7 +223,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      *
      * @param transferType Type of the transfer.
      */
-    protected fun updateTransfersWidget(transferType: TransferType) {
+    private fun updateTransfersWidget(transferType: TransferType) {
         if (transfersManagement.isProcessingTransfers || transfersManagement.isProcessingFolders) {
             return
         }

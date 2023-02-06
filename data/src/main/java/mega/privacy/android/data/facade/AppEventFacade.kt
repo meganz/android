@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -18,6 +19,7 @@ internal class AppEventFacade @Inject constructor(
 ) : AppEventGateway {
 
     private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
+    private val _transferOverQuota = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
 
@@ -32,6 +34,12 @@ internal class AppEventFacade @Inject constructor(
     }
 
     override suspend fun isSMSVerificationShown(): Boolean = _isSMSVerificationShownState.value
+
+    override fun monitorTransferOverQuota(): Flow<Boolean> = _transferOverQuota.asSharedFlow()
+
+    override suspend fun broadcastTransferOverQuota() {
+        _transferOverQuota.emit(true)
+    }
 }
 
 private fun <T> Flow<T>.toSharedFlow(

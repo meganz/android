@@ -44,7 +44,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.BroadcastConstants.IS_OPEN_WITH
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
+import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -52,12 +52,12 @@ import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -118,7 +118,6 @@ import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
@@ -126,7 +125,9 @@ import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferOverQuota
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -154,6 +155,7 @@ import javax.inject.Inject
  * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
  * @property getAccountDetails
  * @property billingViewModel
+ * @property monitorTransferOverQuota
  */
 @AndroidEntryPoint
 open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -187,6 +189,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @Inject
     lateinit var getAccountDetails: GetAccountDetails
+
+    @Inject
+    lateinit var monitorTransferOverQuota: MonitorTransferOverQuota
 
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
@@ -502,8 +507,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         registerReceiver(cookieSettingsReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED))
 
-        LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean::class.java)
-            .observe(this) { showGeneralTransferOverQuotaWarning() }
+        collectFlow(monitorTransferOverQuota()) {
+            showGeneralTransferOverQuotaWarning()
+        }
 
         savedInstanceState?.apply {
             isExpiredBusinessAlertShown =
@@ -1090,8 +1096,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         if (isActivityInBackground || transfersManagement.isOnTransfersSection || transferGeneralOverQuotaWarning != null) return
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-        val dialogView = this.layoutInflater.inflate(R.layout.transfer_overquota_layout, null)
-        builder.setView(dialogView)
+        val binding = TransferOverquotaLayoutBinding.inflate(layoutInflater)
+        builder.setView(binding.root)
             .setOnDismissListener {
                 isGeneralTransferOverQuotaWarningShown = false
                 transferGeneralOverQuotaWarning = null
@@ -1100,29 +1106,37 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             .setCancelable(false)
         transferGeneralOverQuotaWarning = builder.create()
         transferGeneralOverQuotaWarning?.setCanceledOnTouchOutside(false)
-        val text = dialogView.findViewById<TextView>(R.id.text_transfer_overquota)
         val stringResource =
             if (transfersManagement.isCurrentTransferOverQuota) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
-        text.text = StringResourcesUtils.getString(stringResource, TimeUtils.getHumanizedTime(
-            megaApi.bandwidthOverquotaDelay))
-        val paymentButton = dialogView.findViewById<Button>(R.id.transfer_overquota_button_payment)
-        val isLoggedIn = megaApi.isLoggedIn != 0 && dbH.credentials != null
-        if (isLoggedIn) {
-            val isFreeAccount = myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
-            paymentButton.text =
+        binding.textTransferOverquota.text = StringResourcesUtils.getString(
+            stringResource, TimeUtils.getHumanizedTime(megaApi.bandwidthOverquotaDelay)
+        )
+        binding.transferOverquotaButtonPayment.apply {
+            val isLoggedIn = megaApi.isLoggedIn != 0 && dbH.credentials != null
+            text = if (isLoggedIn) {
+                val isFreeAccount =
+                    myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
                 StringResourcesUtils.getString(if (isFreeAccount) R.string.my_account_upgrade_pro else R.string.plans_depleted_transfer_overquota)
-        } else {
-            paymentButton.text = StringResourcesUtils.getString(R.string.login_text)
-        }
-        paymentButton.setOnClickListener {
-            transferGeneralOverQuotaWarning?.dismiss()
-            if (isLoggedIn) {
-                navigateToUpgradeAccount()
             } else {
-                navigateToLogin()
+                StringResourcesUtils.getString(R.string.login_text)
+            }
+            setOnClickListener {
+                transferGeneralOverQuotaWarning?.dismiss()
+                if (isLoggedIn) {
+                    navigateToUpgradeAccount()
+                } else {
+                    navigateToLogin()
+                }
             }
         }
-        TimeUtils.createAndShowCountDownTimer(stringResource, transferGeneralOverQuotaWarning, text)
+        binding.transferOverquotaButtonDissmiss.setOnClickListener {
+            transferGeneralOverQuotaWarning?.dismiss()
+        }
+        TimeUtils.createAndShowCountDownTimer(
+            stringResource,
+            transferGeneralOverQuotaWarning,
+            binding.textTransferOverquota
+        )
         transferGeneralOverQuotaWarning?.show()
         isGeneralTransferOverQuotaWarningShown = true
     }

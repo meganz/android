@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.isBackgroundTransfer
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -25,7 +26,6 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -40,6 +40,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val dbH: DatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
+    private val appEventGateway: AppEventGateway,
 ) : TransfersRepository, TransferRepository {
 
     override suspend fun cancelTransfer(transfer: MegaTransfer) = withContext(ioDispatcher) {
@@ -204,5 +205,12 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun resetTotalDownloads() = withContext(ioDispatcher) {
         megaApiGateway.resetTotalDownloads()
+    }
+
+    override fun monitorTransferOverQuota(): Flow<Boolean> =
+        appEventGateway.monitorTransferOverQuota()
+
+    override suspend fun broadcastTransferOverQuota() {
+        appEventGateway.broadcastTransferOverQuota()
     }
 }
