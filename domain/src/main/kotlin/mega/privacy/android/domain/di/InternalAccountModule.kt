@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -128,5 +129,9 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideConfirmAccount(accountRepository: AccountRepository): ConfirmAccount =
             ConfirmAccount(accountRepository::confirmAccount)
+
+        @Provides
+        fun provideQuerySignupLink(accountRepository: AccountRepository): QuerySignupLink =
+            QuerySignupLink(accountRepository::querySignupLink)
     }
 }

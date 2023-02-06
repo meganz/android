@@ -840,4 +840,7 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun resetTotalDownloads() {
         megaApi.resetTotalDownloads()
     }
+
+    override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
+        megaApi.querySignupLink(link, listener)
 }

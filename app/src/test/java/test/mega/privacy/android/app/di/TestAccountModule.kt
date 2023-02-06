@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -85,4 +86,7 @@ object TestAccountModule {
 
     @Provides
     fun provideConfirmAccount() = mock<ConfirmAccount>()
+
+    @Provides
+    fun provideQuerySignupLink() = mock<QuerySignupLink>()
 }

@@ -12,6 +12,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isType
+import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -42,12 +43,14 @@ import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NoLoggedInUserException
 import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
+import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
@@ -501,4 +504,37 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             }
         }
+
+    override suspend fun querySignupLink(signupLink: String): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK")
+                            continuation.resumeWith(Result.success(request.email))
+                        }
+                        MegaError.API_ENOENT -> {
+                            Timber.w("MegaRequest.TYPE_QUERY_SIGNUP_LINK link no longer available.")
+                            continuation.resumeWith(
+                                Result.failure(QuerySignupLinkException.LinkNoLongerAvailable)
+                            )
+                        }
+                        else -> {
+                            Timber.w("MegaRequest.TYPE_QUERY_SIGNUP_LINK error $error")
+                            continuation.resumeWith(
+                                Result.failure(QuerySignupLinkException.Unknown(error.toException()))
+                            )
+                        }
+                    }
+                }
+            )
+
+            megaApiGateway.querySignupLink(signupLink, listener)
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

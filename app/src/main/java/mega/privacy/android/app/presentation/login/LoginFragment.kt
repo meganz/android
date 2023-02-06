@@ -58,6 +58,7 @@ import mega.privacy.android.app.main.FolderLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.AccountController.Companion.localLogoutApp
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_OPEN_APP
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
@@ -84,6 +85,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -196,6 +198,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             showLoginScreen()
             showMessage(stringId)
         }
+
+        onQuerySignupLinkFinished().observe(viewLifecycleOwner, ::showQuerySignupLinkResult)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -445,22 +449,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     }
                     Constants.ACTION_PASS_CHANGED -> {
                         when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
-                            MegaError.API_OK -> (requireActivity() as LoginActivity).showSnackbar(
-                                requireContext().getFormattedStringOrDefault(
-                                    R.string.pass_changed_alert
-                                )
-                            )
+                            MegaError.API_OK -> showMessage(R.string.pass_changed_alert)
                             MegaError.API_EKEY -> showAlertIncorrectRK()
-                            MegaError.API_EBLOCKED -> (requireActivity() as LoginActivity).showSnackbar(
-                                requireContext().getFormattedStringOrDefault(
-                                    R.string.error_reset_account_blocked
-                                )
-                            )
-                            else -> (requireActivity() as LoginActivity).showSnackbar(
-                                requireContext().getFormattedStringOrDefault(
-                                    R.string.general_text_error
-                                )
-                            )
+                            MegaError.API_EBLOCKED -> showMessage(R.string.error_reset_account_blocked)
+                            else -> showMessage(R.string.general_text_error)
                         }
                         return
                     }
@@ -679,11 +671,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         newIntent.action = action
                     }
                     Constants.ACTION_FILE_EXPLORER_UPLOAD -> {
-                        (requireActivity() as LoginActivity).showSnackbar(
-                            requireContext().getFormattedStringOrDefault(
-                                R.string.login_before_share
-                            )
-                        )
+                        showMessage(R.string.login_before_share)
                     }
                     Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
                         intentDataString = intent.dataString
@@ -1011,11 +999,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             onKeysGeneratedLogin(email, password)
         } else {
             if (!viewModel.isConnected) {
-                (requireActivity() as LoginActivity).showSnackbar(
-                    requireContext().getFormattedStringOrDefault(
-                        R.string.error_server_connection_problem
-                    )
-                )
+                showMessage(R.string.error_server_connection_problem)
                 return
             }
 
@@ -1175,18 +1159,13 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun updateConfirmEmail(link: String?) {
         if (!viewModel.isConnected) {
-            (requireActivity() as LoginActivity).showSnackbar(
-                requireContext().getFormattedStringOrDefault(
-                    R.string.error_server_connection_problem
-                )
-            )
+            showMessage(R.string.error_server_connection_problem)
             return
         }
 
         showLoggingInScreen(fetchingNodes = false, queryingSignupLink = true)
-
         Timber.d("querySignupLink")
-        megaApi.querySignupLink(link, this)
+        link?.let { viewModel.checkSignupLink(it) }
     }
 
     /**
@@ -1626,53 +1605,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
                 viewModel.initChatSettings()
             }
-        } else if (request.type == MegaRequest.TYPE_QUERY_SIGNUP_LINK) {
-            Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
-
-            showLoginScreen()
-            binding.buttonForgotPass.isInvisible = true
-
-            if (error.errorCode == MegaError.API_OK) {
-                Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK")
-                if (request.flag) {
-                    with(binding) {
-                        buttonForgotPass.isInvisible = false
-                        loginProgressBar.isVisible = false
-                        loginTextView.text =
-                            requireContext().getFormattedStringOrDefault(R.string.login_to_mega)
-                        buttonLogin.text =
-                            requireContext().getFormattedStringOrDefault(R.string.login_text)
-                    }
-                    viewModel.updateAccountConfirmationLink(null)
-                    (requireActivity() as LoginActivity).showSnackbar(
-                        requireContext().getFormattedStringOrDefault(
-                            R.string.account_confirmed
-                        )
-                    )
-                    viewModel.updateIsAccountConfirmed(true)
-                } else {
-                    viewModel.updateIsAccountConfirmed(false)
-                    (requireActivity() as LoginActivity).showSnackbar(
-                        requireContext().getFormattedStringOrDefault(
-                            R.string.confirm_account
-                        )
-                    )
-                }
-                binding.loginEmailText.setText(request.email)
-                binding.loginPasswordText.requestFocus()
-            } else {
-                Timber.w(
-                    "MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK %s",
-                    error.errorCode
-                )
-                val loginActivity = requireActivity() as LoginActivity
-                if (error.errorCode == MegaError.API_ENOENT) {
-                    loginActivity.showSnackbar(requireContext().getFormattedStringOrDefault(R.string.reg_link_expired))
-                } else {
-                    loginActivity.showSnackbar(error.errorString)
-                }
-                viewModel.updateAccountConfirmationLink(null)
-            }
         }
     }
 
@@ -2080,15 +2012,34 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun isConnected(): Boolean =
         if (!viewModel.isConnected) {
             showLoginScreen()
-
-            (requireActivity() as LoginActivity).showSnackbar(
-                requireContext().getFormattedStringOrDefault(
-                    R.string.error_server_connection_problem
-                )
-            )
-
+            showMessage(R.string.error_server_connection_problem)
             false
         } else true
+
+    private fun showQuerySignupLinkResult(result: Result<String>) {
+        showLoginScreen()
+        binding.buttonForgotPass.isInvisible = true
+        viewModel.updateAccountConfirmationLink(null)
+
+        if (result.isSuccess) {
+            with(binding) {
+                buttonForgotPass.isInvisible = false
+                loginProgressBar.isVisible = false
+                loginTextView.text =
+                    requireContext().getFormattedStringOrDefault(R.string.login_to_mega)
+                buttonLogin.text =
+                    requireContext().getFormattedStringOrDefault(R.string.login_text)
+                loginEmailText.setText(result.getOrNull())
+                loginPasswordText.requestFocus()
+            }
+            showMessage(R.string.account_confirmed)
+            viewModel.updateIsAccountConfirmed(true)
+        } else {
+            (result.exceptionOrNull() as QuerySignupLinkException).messageId?.let {
+                showMessage(it)
+            }
+        }
+    }
 
     companion object {
         private const val LONG_CLICK_DELAY: Long = 5000

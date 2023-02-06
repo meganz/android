@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
@@ -58,6 +59,7 @@ class LoginViewModel @Inject constructor(
     private val hasCameraSyncEnabled: HasCameraSyncEnabled,
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
     private val confirmAccount: ConfirmAccount,
+    private val querySignupLink: QuerySignupLink,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -68,6 +70,8 @@ class LoginViewModel @Inject constructor(
     fun onConfirmAccountFinished(): LiveData<Unit> = confirmAccountFinished
     private val confirmAccountFailed = SingleLiveEvent<Int>()
     fun onConfirmAccountFailed(): LiveData<Int> = confirmAccountFailed
+    private val querySignupLinkFinished = SingleLiveEvent<Result<String>>()
+    fun onQuerySignupLinkFinished(): LiveData<Result<String>> = querySignupLinkFinished
 
     /**
      * Get latest value of StorageState.
@@ -334,7 +338,7 @@ class LoginViewModel @Inject constructor(
     fun confirmAccount(password: String) = viewModelScope.launch {
         state.value.accountConfirmationLink?.let {
             kotlin.runCatching { confirmAccount(it, password) }
-                .onSuccess { confirmAccountFinished.value = Unit }
+                .onSuccess { confirmAccountFinished.call() }
                 .onFailure {
                     if (it is MegaException) {
                         confirmAccountFailed.value =
@@ -346,5 +350,12 @@ class LoginViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    /**
+     * Checks a signup link.
+     */
+    fun checkSignupLink(link: String) = viewModelScope.launch {
+        querySignupLinkFinished.value = kotlin.runCatching { querySignupLink(link) }
     }
 }

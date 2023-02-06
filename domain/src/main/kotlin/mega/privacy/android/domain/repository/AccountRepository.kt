@@ -248,4 +248,12 @@ interface AccountRepository {
      * @param password         Password of the new account.
      */
     suspend fun confirmAccount(confirmationLink: String, password: String)
+
+    /**
+     * Queries a signup link.
+     *
+     * @param signupLink Signup link.
+     * @return The email related to the link.
+     */
+    suspend fun querySignupLink(signupLink: String): String
 }
