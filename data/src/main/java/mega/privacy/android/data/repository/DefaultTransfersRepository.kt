@@ -201,4 +201,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun resetTotalDownloads() = withContext(ioDispatcher) {
+        megaApiGateway.resetTotalDownloads()
+    }
 }

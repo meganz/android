@@ -1588,4 +1588,14 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setUserAttribute(type: Int, value: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reset the number of total downloads
+     * This function resets the number returned by MegaApi::getTotalDownloads
+     */
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                "provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    suspend fun resetTotalDownloads()
 }

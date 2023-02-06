@@ -89,4 +89,9 @@ interface TransferRepository {
      * @param transferTag   Tag that identifies the transfer
      */
     suspend fun cancelTransferByTag(transferTag: Int)
+
+    /**
+     * Reset Total Downloads
+     */
+    suspend fun resetTotalDownloads()
 }
