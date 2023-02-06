@@ -11,12 +11,17 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel
+import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.usecase.GetCurrentPayment
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
 import mega.privacy.android.domain.usecase.GetSubscriptions
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import org.junit.After
 
 import org.junit.Before
@@ -31,6 +36,8 @@ class UpgradeAccountViewModelTest {
 
     private val getSubscriptions = mock<GetSubscriptions>()
     private val getCurrentSubscriptionPlan = mock<GetCurrentSubscriptionPlan>()
+    private val getCurrentPayment = mock<GetCurrentPayment>()
+    private val isBillingAvailable = mock<IsBillingAvailable>()
 
 
     private val subscriptionProIMonthly = Subscription(
@@ -72,12 +79,23 @@ class UpgradeAccountViewModelTest {
         subscriptionProIIIMonthly
     )
 
+    private val expectedInitialCurrentPlan = AccountType.FREE
+    private val expectedCurrentPlan = AccountType.PRO_I
+    private val expectedShowBuyNewSubscriptionDialog = true
+    private val expectedInitialCurrentPayment = UpgradePayment()
+    private val expectedCurrentPayment =
+        UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.GOOGLE_WALLET)
+    private val expectedCurrentPaymentUpdated =
+        UpgradePayment(Constants.PRO_II, PaymentMethod.GOOGLE_WALLET)
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = UpgradeAccountViewModel(
             getSubscriptions = getSubscriptions,
-            getCurrentSubscriptionPlan = getCurrentSubscriptionPlan
+            getCurrentSubscriptionPlan = getCurrentSubscriptionPlan,
+            getCurrentPayment = getCurrentPayment,
+            isBillingAvailable = isBillingAvailable,
         )
     }
 
@@ -98,13 +116,86 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that current subscribed plan is listed`() =
         runTest {
-            val expectedInitialCurrentPlan = AccountType.FREE
-            val expectedCurrentPlan = AccountType.PRO_I
             whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
             underTest.state.map { it.currentSubscriptionPlan }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPlan)
                 assertThat(awaitItem()).isEqualTo(expectedCurrentPlan)
+            }
+        }
+
+    @Test
+    fun `test that initial state has current payment listed if current payment is available`() =
+        runTest {
+            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+            underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPayment)
+                assertThat(awaitItem()).isEqualTo(expectedCurrentPayment)
+            }
+        }
+
+    @Test
+    fun `test that state is updated when current payment is available and current payment check is called`() =
+        runTest {
+            whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
+            whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.currentPaymentCheck(Constants.PRO_II)
+
+            underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPayment)
+                assertThat(awaitItem()).isEqualTo(expectedCurrentPayment)
+                assertThat(awaitItem()).isEqualTo(expectedCurrentPaymentUpdated)
+            }
+            underTest.state.map { it.showBuyNewSubscriptionDialog }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(expectedShowBuyNewSubscriptionDialog)
+            }
+        }
+
+    @Test
+    fun `test that showBillingWarning state is set to True`() =
+        runTest {
+            whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
+            whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.setBillingWarningVisibility(true)
+
+            underTest.state.test {
+                val showBillingWarning = awaitItem().showBillingWarning
+                assertThat(showBillingWarning).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that showBillingWarning state is set to False`() =
+        runTest {
+            whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
+            whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.setBillingWarningVisibility(false)
+
+            underTest.state.test {
+                val showBillingWarning = awaitItem().showBillingWarning
+                assertThat(showBillingWarning).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that showBuyNewSubscriptionDialog state is updated if setShowBuyNewSubscriptionDialog is called`() =
+        runTest {
+            whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
+            whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.setShowBuyNewSubscriptionDialog(expectedShowBuyNewSubscriptionDialog)
+
+            underTest.state.test {
+                val showBuyNewSubscriptionDialog = awaitItem().showBuyNewSubscriptionDialog
+                assertThat(showBuyNewSubscriptionDialog).isEqualTo(
+                    expectedShowBuyNewSubscriptionDialog)
             }
         }
 }

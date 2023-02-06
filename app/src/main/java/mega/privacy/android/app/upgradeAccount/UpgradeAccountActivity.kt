@@ -2,9 +2,11 @@ package mega.privacy.android.app.upgradeAccount
 
 import android.os.Bundle
 import android.view.MenuItem
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 
+@AndroidEntryPoint
 class UpgradeAccountActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

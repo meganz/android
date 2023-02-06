@@ -1,7 +1,9 @@
 package mega.privacy.android.app.upgradeAccount.model
 
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.usecase.GetCurrentPayment
 
 /**
  * Upgrade Account state
@@ -13,4 +15,7 @@ import mega.privacy.android.domain.entity.Subscription
 data class UpgradeAccountState(
     val subscriptionsList: List<Subscription>,
     val currentSubscriptionPlan: AccountType?,
+    val showBillingWarning: Boolean,
+    val showBuyNewSubscriptionDialog: Boolean = false,
+    val currentPayment: UpgradePayment,
 )
