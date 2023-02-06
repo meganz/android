@@ -13,17 +13,13 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
-import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
-import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.ConfirmAccount
 import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetSession
@@ -36,7 +32,6 @@ import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
-import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
 /**
@@ -58,7 +53,6 @@ class LoginViewModel @Inject constructor(
     private val hasPreferences: HasPreferences,
     private val hasCameraSyncEnabled: HasCameraSyncEnabled,
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
-    private val confirmAccount: ConfirmAccount,
     private val querySignupLink: QuerySignupLink,
 ) : ViewModel() {
 
@@ -66,11 +60,11 @@ class LoginViewModel @Inject constructor(
     val state: StateFlow<LoginState> = _state
 
     // All these SingleLiveEvents will be contemplated in state and removed once migrated to Compose.
-    private val confirmAccountFinished = SingleLiveEvent<Unit>()
-    fun onConfirmAccountFinished(): LiveData<Unit> = confirmAccountFinished
-    private val confirmAccountFailed = SingleLiveEvent<Int>()
-    fun onConfirmAccountFailed(): LiveData<Int> = confirmAccountFailed
     private val querySignupLinkFinished = SingleLiveEvent<Result<String>>()
+
+    /**
+     * Notifies about querySignupLink request finish.
+     */
     fun onQuerySignupLinkFinished(): LiveData<Result<String>> = querySignupLinkFinished
 
     /**
@@ -327,28 +321,6 @@ class LoginViewModel @Inject constructor(
             _state.update { it.copy(pendingClicksSDK = CLICKS_TO_ENABLE_LOGS) }
         } else {
             _state.update { it.copy(pendingClicksSDK = pendingClicksSDK - 1) }
-        }
-    }
-
-    /**
-     * Confirms a new account.
-     *
-     * @param password Password of the new account.
-     */
-    fun confirmAccount(password: String) = viewModelScope.launch {
-        state.value.accountConfirmationLink?.let {
-            kotlin.runCatching { confirmAccount(it, password) }
-                .onSuccess { confirmAccountFinished.call() }
-                .onFailure {
-                    if (it is MegaException) {
-                        confirmAccountFailed.value =
-                            if (it.errorCode == MegaError.API_ENOENT || it.errorCode == MegaError.API_EKEY) {
-                                R.string.error_incorrect_email_or_password
-                            } else {
-                                it.getErrorStringId()
-                            }
-                    }
-                }
         }
     }
 

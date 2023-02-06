@@ -1534,42 +1534,6 @@ interface MegaApiGateway {
     fun resetTotalUploads()
 
     /**
-     * Confirms a MEGA account using a confirmation link and the user password
-     *
-     * The associated request type with this request is MegaRequest::TYPE_CONFIRM_ACCOUNT
-     * Valid data in the MegaRequest object received on callbacks:
-     * - MegaRequest::getLink - Returns the confirmation link
-     * - MegaRequest::getPassword - Returns the password
-     *
-     * Valid data in the MegaRequest object received in onRequestFinish when the error code
-     * is MegaError::API_OK:
-     * - MegaRequest::getEmail - Email of the account
-     * - MegaRequest::getName - Name of the user
-     *
-     * As a result of a successful confirmation, the app will receive the callback
-     * MegaListener::onEvent and MegaGlobalListener::onEvent with an event of type
-     * MegaEvent::EVENT_ACCOUNT_CONFIRMATION. You can check the email used to confirm
-     * the account by checking MegaEvent::getText. @see MegaListener::onEvent.
-     * <p>
-     * If already logged-in into a different account, you will get the error code MegaError::API_EACCESS
-     * in onRequestFinish.
-     * If logged-in into the account that is attempted to confirm and the account is already confirmed, you
-     * will get the error code MegaError::API_EEXPIRED in onRequestFinish.
-     * In both cases, the MegaRequest::getEmail will return the email of the account that was attempted
-     * to confirm, and the MegaRequest::getName will return the name.
-     *
-     * @param confirmationLink Confirmation link
-     * @param password         Password of the account
-     * @param listener         MegaRequestListener to track this request
-     */
-    fun confirmAccount(
-        confirmationLink: String,
-        password: String,
-        listener: MegaRequestListenerInterface,
-    )
-
-
-    /**
      * Get Export Master Key
      */
     suspend fun getExportMasterKey(): String?

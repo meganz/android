@@ -146,12 +146,17 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private var intentParentHandle: Long = -1
     private var intentShareInfo: ArrayList<ShareInfo>? = null
     private val sb by lazy { StringBuilder() }
-
     private val scaleW by lazy {
         Util.getScaleW(
             resources.displayMetrics,
             resources.displayMetrics.density
         )
+    }
+    private val pin2FAColor by lazy {
+        ContextCompat.getColor(requireContext(), R.color.grey_087_white_087)
+    }
+    private val pin2FAErrorColor by lazy {
+        ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
     }
 
     private val requestMediaPermission =
@@ -190,15 +195,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     }
 
     private fun setupObservers() = with(viewModel) {
-        onConfirmAccountFinished().observe(viewLifecycleOwner) {
-            with(uiState) { onKeysGeneratedLogin(accountSession?.email, password) }
-        }
-
-        onConfirmAccountFailed().observe(viewLifecycleOwner) { stringId ->
-            showLoginScreen()
-            showMessage(stringId)
-        }
-
         onQuerySignupLinkFinished().observe(viewLifecycleOwner, ::showQuerySignupLinkResult)
     }
 
@@ -418,268 +414,251 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      *
      * @param editTextPIN The field.
      */
-    private fun requestEditTextPinFocus(editTextPIN: EditTextPIN) {
-        editTextPIN.apply {
-            requestFocus()
-            isCursorVisible = true
-        }
+    private fun requestEditTextPinFocus(editTextPIN: EditTextPIN) = editTextPIN.apply {
+        requestFocus()
+        isCursorVisible = true
     }
 
     /**
      * Gets data from the intent and performs the corresponding action if necessary.
      */
-    private fun setupIntent() {
-        (requireActivity() as LoginActivity).intent?.let { intent ->
-            intentAction = intent.action
+    private fun setupIntent() = (requireActivity() as LoginActivity).intent?.let { intent ->
+        intentAction = intent.action
 
-            intentAction?.let { action ->
-                Timber.d("action is: %s", action)
-                when (action) {
-                    Constants.ACTION_CONFIRM -> {
-                        handleConfirmationIntent(intent)
-                        return
-                    }
-                    Constants.ACTION_RESET_PASS -> {
-                        val link = intent.dataString
-                        if (link != null) {
-                            Timber.d("Link to resetPass: %s", link)
-                            showDialogInsertMKToChangePass(link)
-                            return
-                        }
-                    }
-                    Constants.ACTION_PASS_CHANGED -> {
-                        when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
-                            MegaError.API_OK -> showMessage(R.string.pass_changed_alert)
-                            MegaError.API_EKEY -> showAlertIncorrectRK()
-                            MegaError.API_EBLOCKED -> showMessage(R.string.error_reset_account_blocked)
-                            else -> showMessage(R.string.general_text_error)
-                        }
-                        return
-                    }
-                    Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
-                        val accountBlockedString =
-                            intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
-                        if (!TextUtil.isTextEmpty(accountBlockedString)) {
-                            Util.showErrorAlertDialog(accountBlockedString, false, activity)
-                        }
-                    }
-                    ACTION_FORCE_RELOAD_ACCOUNT -> {
-                        viewModel.setIntentAction(ACTION_FORCE_RELOAD_ACCOUNT)
-                        isLoggingIn = true
-                        showLoggingInScreen()
+        intentAction?.let { action ->
+            Timber.d("action is: %s", action)
+            when (action) {
+                Constants.ACTION_CONFIRM -> {
+                    handleConfirmationIntent(intent)
+                    return
+                }
+                Constants.ACTION_RESET_PASS -> {
+                    val link = intent.dataString
+                    if (link != null) {
+                        Timber.d("Link to resetPass: %s", link)
+                        showDialogInsertMKToChangePass(link)
                         return
                     }
                 }
-            } ?: Timber.w("ACTION NULL")
+                Constants.ACTION_PASS_CHANGED -> {
+                    when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
+                        MegaError.API_OK -> showMessage(R.string.pass_changed_alert)
+                        MegaError.API_EKEY -> showAlertIncorrectRK()
+                        MegaError.API_EBLOCKED -> showMessage(R.string.error_reset_account_blocked)
+                        else -> showMessage(R.string.general_text_error)
+                    }
+                    return
+                }
+                Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
+                    val accountBlockedString =
+                        intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
+                    if (!TextUtil.isTextEmpty(accountBlockedString)) {
+                        Util.showErrorAlertDialog(accountBlockedString, false, activity)
+                    }
+                }
+                ACTION_FORCE_RELOAD_ACCOUNT -> {
+                    viewModel.setIntentAction(ACTION_FORCE_RELOAD_ACCOUNT)
+                    isLoggingIn = true
+                    showLoggingInScreen()
+                    return
+                }
+            }
+        } ?: Timber.w("ACTION NULL")
 
-            Timber.d("et_user.getText(): %s", binding.loginEmailText.text)
+        Timber.d("et_user.getText(): %s", binding.loginEmailText.text)
 
-            if (uiState.isAlreadyLoggedIn && !LoginActivity.isBackFromLoginPage) {
-                Timber.d("Credentials NOT null")
+        if (uiState.isAlreadyLoggedIn && !LoginActivity.isBackFromLoginPage) {
+            Timber.d("Credentials NOT null")
+
+            intentAction?.let { action ->
+                when (action) {
+                    Constants.ACTION_REFRESH -> {
+                        isLoggingIn = true
+                        startFetchNodes()
+                        return
+                    }
+                    Constants.ACTION_REFRESH_API_SERVER -> {
+                        viewModel.updateIsRefreshApiServer(true)
+                        intentParentHandle = intent.getLongExtra("PARENT_HANDLE", -1)
+                        startFastLogin()
+                        return
+                    }
+                    Constants.ACTION_REFRESH_AFTER_BLOCKED -> {
+                        startFastLogin()
+                        return
+                    }
+                    else -> {
+                        Timber.d("intent received $action")
+                        when (action) {
+                            Constants.ACTION_OPEN_MEGA_FOLDER_LINK,
+                            Constants.ACTION_IMPORT_LINK_FETCH_NODES,
+                            Constants.ACTION_CHANGE_MAIL,
+                            Constants.ACTION_CANCEL_ACCOUNT,
+                            Constants.ACTION_OPEN_HANDLE_NODE,
+                            Constants.ACTION_OPEN_CHAT_LINK,
+                            Constants.ACTION_JOIN_OPEN_CHAT_LINK,
+                            -> {
+                                intentDataString = intent.dataString
+                            }
+                            Constants.ACTION_FILE_PROVIDER -> {
+                                intentData = intent.data
+                                intentExtras = intent.extras
+                                intentDataString = null
+                            }
+                            Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL,
+                            Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL,
+                            -> {
+                                intentData = intent.data
+                            }
+                        }
+
+                        if (viewModel.rootNodeExists()) {
+                            var newIntent =
+                                Intent(requireContext(), ManagerActivity::class.java)
+
+                            when (action) {
+                                Constants.ACTION_FILE_PROVIDER -> {
+                                    newIntent =
+                                        Intent(
+                                            requireContext(),
+                                            FileProviderActivity::class.java
+                                        )
+                                    intentExtras?.let { newIntent.putExtras(it) }
+                                    newIntent.data = intentData
+                                }
+                                Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
+                                    newIntent =
+                                        Intent(requireContext(), FileLinkActivity::class.java)
+                                    newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    intentAction = Constants.ACTION_OPEN_MEGA_LINK
+                                    newIntent.data = intentData
+                                }
+                                Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
+                                    newIntent =
+                                        Intent(requireContext(), FolderLinkActivity::class.java)
+                                    newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
+                                    newIntent.data = intentData
+                                }
+                                Constants.ACTION_OPEN_CONTACTS_SECTION -> {
+                                    newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    intentAction = Constants.ACTION_OPEN_CONTACTS_SECTION
+                                    if (newIntent.getLongExtra(
+                                            Constants.CONTACT_HANDLE,
+                                            -1
+                                        ) != -1L
+                                    ) {
+                                        newIntent.putExtra(
+                                            Constants.CONTACT_HANDLE,
+                                            newIntent.getLongExtra(
+                                                Constants.CONTACT_HANDLE, -1
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+
+                            newIntent.action = intentAction
+
+                            intentDataString?.let { newIntent.data = Uri.parse(it) }
+                            newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+                            startCameraUploadService(false, 5 * 60 * 1000)
+                            startActivity(newIntent)
+                            requireActivity().finish()
+                        } else {
+                            startFastLogin()
+                        }
+
+                        return
+                    }
+                }
+            }
+
+            if (viewModel.rootNodeExists() && !uiState.isFetchingNodes && !isIsHeartBeatAlive) {
+                Timber.d("rootNode != null")
+
+                var newIntent = Intent(requireContext(), ManagerActivity::class.java)
 
                 intentAction?.let { action ->
                     when (action) {
-                        Constants.ACTION_REFRESH -> {
-                            isLoggingIn = true
-                            startFetchNodes()
-                            return
+                        Constants.ACTION_FILE_PROVIDER -> {
+                            newIntent =
+                                Intent(requireContext(), FileProviderActivity::class.java)
+                            intentExtras?.let { newIntent.putExtras(it) }
+                            newIntent.data = intentData
                         }
-                        Constants.ACTION_REFRESH_API_SERVER -> {
-                            viewModel.updateIsRefreshApiServer(true)
-                            intentParentHandle = intent.getLongExtra("PARENT_HANDLE", -1)
-                            startFastLogin()
-                            return
+                        Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
+                            newIntent = Intent(requireContext(), FileLinkActivity::class.java)
+                            newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            intentAction = Constants.ACTION_OPEN_MEGA_LINK
+                            newIntent.data = intentData
                         }
-                        Constants.ACTION_REFRESH_AFTER_BLOCKED -> {
-                            startFastLogin()
-                            return
+                        Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
+                            newIntent = Intent(requireContext(), FolderLinkActivity::class.java)
+                            newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
+                            newIntent.data = intentData
                         }
-                        else -> {
-                            when (action) {
-                                Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> {
-                                    intentDataString = intent.dataString
-                                }
-                                Constants.ACTION_IMPORT_LINK_FETCH_NODES -> {
-                                    intentDataString = intent.dataString
-                                }
-                                Constants.ACTION_CHANGE_MAIL -> {
-                                    Timber.d("intent received ACTION_CHANGE_MAIL")
-                                    intentDataString = intent.dataString
-                                }
-                                Constants.ACTION_CANCEL_ACCOUNT -> {
-                                    Timber.d("intent received ACTION_CANCEL_ACCOUNT")
-                                    intentDataString = intent.dataString
-                                }
-                                Constants.ACTION_FILE_PROVIDER -> {
-                                    intentData = intent.data
-                                    intentExtras = intent.extras
-                                    intentDataString = null
-                                }
-                                Constants.ACTION_OPEN_HANDLE_NODE -> {
-                                    intentDataString = intent.dataString
-                                }
-                                Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                                    intentData = intent.data
-                                }
-                                Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                                    intentData = intent.data
-                                }
-                                Constants.ACTION_OPEN_CHAT_LINK -> {
-                                    intentDataString = intent.dataString
-                                }
-                                Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
-                                    intentDataString = intent.dataString
-                                }
+                        Constants.ACTION_OPEN_CONTACTS_SECTION -> {
+                            newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+
+                            if (intent.getLongExtra(
+                                    Constants.CONTACT_HANDLE,
+                                    -1
+                                ) != -1L
+                            ) {
+                                newIntent.putExtra(
+                                    Constants.CONTACT_HANDLE,
+                                    intent.getLongExtra(Constants.CONTACT_HANDLE, -1)
+                                )
                             }
-
-                            if (viewModel.rootNodeExists()) {
-                                var newIntent =
-                                    Intent(requireContext(), ManagerActivity::class.java)
-
-                                when (action) {
-                                    Constants.ACTION_FILE_PROVIDER -> {
-                                        newIntent =
-                                            Intent(
-                                                requireContext(),
-                                                FileProviderActivity::class.java
-                                            )
-                                        intentExtras?.let { newIntent.putExtras(it) }
-                                        newIntent.data = intentData
-                                    }
-                                    Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                                        newIntent =
-                                            Intent(requireContext(), FileLinkActivity::class.java)
-                                        newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                        intentAction = Constants.ACTION_OPEN_MEGA_LINK
-                                        newIntent.data = intentData
-                                    }
-                                    Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                                        newIntent =
-                                            Intent(requireContext(), FolderLinkActivity::class.java)
-                                        newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                        intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-                                        newIntent.data = intentData
-                                    }
-                                    Constants.ACTION_OPEN_CONTACTS_SECTION -> {
-                                        newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                        intentAction = Constants.ACTION_OPEN_CONTACTS_SECTION
-                                        if (newIntent.getLongExtra(
-                                                Constants.CONTACT_HANDLE,
-                                                -1
-                                            ) != -1L
-                                        ) {
-                                            newIntent.putExtra(
-                                                Constants.CONTACT_HANDLE,
-                                                newIntent.getLongExtra(
-                                                    Constants.CONTACT_HANDLE, -1
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-
-                                newIntent.action = intentAction
-
-                                intentDataString?.let { newIntent.data = Uri.parse(it) }
-                                newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-                                startCameraUploadService(false, 5 * 60 * 1000)
-                                startActivity(newIntent)
-                                requireActivity().finish()
-                            } else {
-                                startFastLogin()
-                            }
-
-                            return
                         }
                     }
+
+                    newIntent.action = action
+                    intentDataString?.let { newIntent.data = Uri.parse(it) }
                 }
 
-                if (viewModel.rootNodeExists() && !uiState.isFetchingNodes && !isIsHeartBeatAlive) {
-                    Timber.d("rootNode != null")
+                newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
-                    var newIntent = Intent(requireContext(), ManagerActivity::class.java)
-
-                    intentAction?.let { action ->
-                        when (action) {
-                            Constants.ACTION_FILE_PROVIDER -> {
-                                newIntent =
-                                    Intent(requireContext(), FileProviderActivity::class.java)
-                                intentExtras?.let { newIntent.putExtras(it) }
-                                newIntent.data = intentData
-                            }
-                            Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                                newIntent = Intent(requireContext(), FileLinkActivity::class.java)
-                                newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                intentAction = Constants.ACTION_OPEN_MEGA_LINK
-                                newIntent.data = intentData
-                            }
-                            Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                                newIntent = Intent(requireContext(), FolderLinkActivity::class.java)
-                                newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-                                newIntent.data = intentData
-                            }
-                            Constants.ACTION_OPEN_CONTACTS_SECTION -> {
-                                newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-
-                                if (intent.getLongExtra(
-                                        Constants.CONTACT_HANDLE,
-                                        -1
-                                    ) != -1L
-                                ) {
-                                    newIntent.putExtra(
-                                        Constants.CONTACT_HANDLE,
-                                        intent.getLongExtra(Constants.CONTACT_HANDLE, -1)
-                                    )
-                                }
-                            }
-                        }
-
-                        newIntent.action = action
-                        intentDataString?.let { newIntent.data = Uri.parse(it) }
-                    }
-
-                    newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-                    if (uiState.isCUSettingEnabled) {
-                        startCameraUploadService(false, 30 * 1000)
-                    }
-
-                    this.startActivity(newIntent)
-                    (requireActivity() as LoginActivity).finish()
-                } else {
-                    Timber.d("rootNode is null or heart beat is alive -> do fast login")
-                    setHeartBeatAlive(false)
-                    startFastLogin()
+                if (uiState.isCUSettingEnabled) {
+                    startCameraUploadService(false, 30 * 1000)
                 }
 
-                return
+                this.startActivity(newIntent)
+                (requireActivity() as LoginActivity).finish()
+            } else {
+                Timber.d("rootNode is null or heart beat is alive -> do fast login")
+                setHeartBeatAlive(false)
+                startFastLogin()
             }
 
-            Timber.d("Credentials IS NULL")
-            Timber.d("INTENT NOT NULL")
+            return
+        }
 
-            intentAction?.let { action ->
-                Timber.d("ACTION NOT NULL")
-                val newIntent: Intent
-                when (action) {
-                    Constants.ACTION_FILE_PROVIDER -> {
-                        newIntent = Intent(requireContext(), FileProviderActivity::class.java)
-                        intentExtras?.let { newIntent.putExtras(it) }
-                        newIntent.data = intentData
-                        newIntent.action = action
-                    }
-                    Constants.ACTION_FILE_EXPLORER_UPLOAD -> {
-                        showMessage(R.string.login_before_share)
-                    }
-                    Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
-                        intentDataString = intent.dataString
-                    }
+        Timber.d("Credentials IS NULL")
+        Timber.d("INTENT NOT NULL")
+
+        intentAction?.let { action ->
+            Timber.d("ACTION NOT NULL")
+            val newIntent: Intent
+            when (action) {
+                Constants.ACTION_FILE_PROVIDER -> {
+                    newIntent = Intent(requireContext(), FileProviderActivity::class.java)
+                    intentExtras?.let { newIntent.putExtras(it) }
+                    newIntent.data = intentData
+                    newIntent.action = action
+                }
+                Constants.ACTION_FILE_EXPLORER_UPLOAD -> {
+                    showMessage(R.string.login_before_share)
+                }
+                Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
+                    intentDataString = intent.dataString
                 }
             }
-        } ?: Timber.w("No INTENT")
-    }
+        }
+    } ?: Timber.w("No INTENT")
 
     /**
      * Shows login in progress screen.
@@ -752,10 +731,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         loginServersBusyText.isVisible = false
         login2fa.isVisible = true
         confirmLogoutDialog?.dismiss()
-        pinFirstLogin.apply {
-            requestFocus()
-            isCursorVisible = true
-        }
+        requestEditTextPinFocus(pinFirstLogin)
     }
 
     /**
@@ -764,42 +740,14 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun hideError() = with(binding) {
         viewModel.setIs2FAErrorNotShown()
         pin2faErrorLogin.isVisible = false
-        pinFirstLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.grey_087_white_087
-            )
-        )
-        pinSecondLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.grey_087_white_087
-            )
-        )
-        pinThirdLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.grey_087_white_087
-            )
-        )
-        pinFourthLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.grey_087_white_087
-            )
-        )
-        pinFifthLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.grey_087_white_087
-            )
-        )
-        pinSixthLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.grey_087_white_087
-            )
-        )
+        listOf(
+            pinFirstLogin,
+            pinSecondLogin,
+            pinThirdLogin,
+            pinFourthLogin,
+            pinFifthLogin,
+            pinSixthLogin
+        ).forEach { it.setTextColor(pin2FAColor) }
     }
 
     /**
@@ -809,42 +757,14 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         viewModel.setWas2FAErrorShown()
         pin2faErrorLogin.isVisible = true
         confirmLogoutDialog?.dismiss()
-        pinFirstLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.red_600_red_300
-            )
-        )
-        pinSecondLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.red_600_red_300
-            )
-        )
-        pinThirdLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.red_600_red_300
-            )
-        )
-        pinFourthLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.red_600_red_300
-            )
-        )
-        pinFifthLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.red_600_red_300
-            )
-        )
-        pinSixthLogin.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.red_600_red_300
-            )
-        )
+        listOf(
+            pinFirstLogin,
+            pinSecondLogin,
+            pinThirdLogin,
+            pinFourthLogin,
+            pinFifthLogin,
+            pinSixthLogin
+        ).forEach { it.setTextColor(pin2FAErrorColor) }
     }
 
 
@@ -985,36 +905,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     }
 
     /**
-     * If login [onKeysGeneratedLogin].
-     * If confirm account updates the UI and launches the confirmAccount request if the is
-     * network connection.
-     *
-     * @param email    Typed email.
-     * @param password Typed password.
-     */
-    private fun onKeysGenerated(email: String?, password: String?) {
-        Timber.d("onKeysGenerated")
-
-        if (uiState.accountConfirmationLink == null) {
-            onKeysGeneratedLogin(email, password)
-        } else {
-            if (!viewModel.isConnected) {
-                showMessage(R.string.error_server_connection_problem)
-                return
-            }
-
-            showLoggingInScreen(
-                fetchingNodes = false,
-                generatingKeys = true,
-                activatingAccount = true
-            )
-
-            Timber.d("fastConfirm")
-            password?.let { viewModel.confirmAccount(it) }
-        }
-    }
-
-    /**
      * Returns to login form page.
      */
     private fun backToLoginForm() = with(binding) {
@@ -1038,8 +928,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * @param email    Typed email.
      * @param password Typed password.
      */
-    private fun onKeysGeneratedLogin(email: String?, password: String?) {
-        Timber.d("onKeysGeneratedLogin")
+    private fun onKeysGenerated(email: String?, password: String?) {
+        Timber.d("onKeysGenerated")
         if (!isConnected()) {
             return
         }
@@ -1151,23 +1041,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         textLoginTip.isVisible = false
     }
 
-
-    /**
-     * Gets email address from confirmation code and sets to emailView.
-     *
-     * @param link Link to check.
-     */
-    private fun updateConfirmEmail(link: String?) {
-        if (!viewModel.isConnected) {
-            showMessage(R.string.error_server_connection_problem)
-            return
-        }
-
-        showLoggingInScreen(fetchingNodes = false, queryingSignupLink = true)
-        Timber.d("querySignupLink")
-        link?.let { viewModel.checkSignupLink(it) }
-    }
-
     /**
      * Handles intent from confirmation email.
      *
@@ -1176,11 +1049,15 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun handleConfirmationIntent(intent: Intent) {
         val accountConfirmationLink = intent.getStringExtra(Constants.EXTRA_CONFIRMATION)
         viewModel.updateAccountConfirmationLink(accountConfirmationLink)
-        binding.loginTextView.text = requireContext()
-            .getFormattedStringOrDefault(R.string.login_confirm_account)
-        binding.buttonLogin.text =
-            requireContext().getFormattedStringOrDefault(R.string.login_confirm_account)
-        updateConfirmEmail(accountConfirmationLink)
+
+        if (!viewModel.isConnected) {
+            showMessage(R.string.error_server_connection_problem)
+            return
+        }
+
+        showLoggingInScreen(fetchingNodes = false, queryingSignupLink = true)
+        Timber.d("querySignupLink")
+        accountConfirmationLink?.let { viewModel.checkSignupLink(it) }
     }
 
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
