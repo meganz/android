@@ -1278,8 +1278,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             PurchaseType.DOWNGRADE
         }
         when {
-            this is PaymentActivity || this is UpgradeAccountActivity -> finish()
-            this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
+            this is PaymentActivity ||
+                    this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
                     || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
                     || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
                 purchaseType = type

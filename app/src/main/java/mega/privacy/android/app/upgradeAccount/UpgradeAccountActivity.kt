@@ -2,12 +2,21 @@ package mega.privacy.android.app.upgradeAccount
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleEventObserver
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.presentation.security.PasscodeCheck
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class UpgradeAccountActivity : PasscodeActivity() {
+class UpgradeAccountActivity : AppCompatActivity() {
+
+    /**
+     * A [LifecycleEventObserver] to display a passcode screen when the app is resumed
+     */
+    @Inject
+    lateinit var passcodeFacade: PasscodeCheck
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
