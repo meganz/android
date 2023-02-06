@@ -19,7 +19,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -53,7 +52,6 @@ import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
-import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
@@ -103,7 +101,6 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.HasPendingUploads
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
@@ -113,6 +110,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -467,12 +465,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var cancelAllUploadTransfers: CancelAllUploadTransfers
 
     /**
-     * Has Pending Uploads
-     */
-    @Inject
-    lateinit var hasPendingUploads: HasPendingUploads
-
-    /**
      * Copy Node
      */
     @Inject
@@ -509,12 +501,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var setupSecondaryFolder: SetupSecondaryFolder
 
     /**
+     * Reset Total Uploads
+     */
+    @Inject
+    lateinit var resetTotalUploads: ResetTotalUploads
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
-
-    private var primaryFolderCreationJob: Job? = null
-    private var secondaryFolderCreationJob: Job? = null
 
     private var receiver: NetworkTypeChangeReceiver? = null
     private var wifiLock: WifiLock? = null
@@ -535,7 +530,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var totalToUpload = 0
     private var lastUpdated: Long = 0
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
-    private var setAttrUserListener: SetAttrUserListener? = null
     private val cuTransfers: MutableList<MegaTransfer> = mutableListOf()
 
     private fun monitorUploadPauseStatus() {
@@ -582,7 +576,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
         getAttrUserListener = GetCameraUploadAttributeListener(this)
-        setAttrUserListener = SetAttrUserListener(this)
     }
 
     /**
@@ -594,7 +587,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         isServiceRunning = false
         receiver?.let { unregisterReceiver(it) }
         getAttrUserListener = null
-        setAttrUserListener = null
 
         stopActiveHeartbeat()
         coroutineScope?.cancel()
@@ -673,7 +665,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     /**
      * Cancels a pending [MegaTransfer] through [CancelTransfer],
-     * and call [resetTotalUploads] afterwards
+     * and call [ResetTotalUploads] after every cancellation to reset the total uploads if
+     * there are no more pending uploads
      *
      * @param transfer the [MegaTransfer] to be cancelled
      */
@@ -688,7 +681,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     /**
      * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfers],
-     * and call [resetTotalUploads] afterwards
+     * and call [ResetTotalUploads] afterwards
      */
     private suspend fun cancelAllPendingTransfers() {
         runCatching { cancelAllUploadTransfers() }
@@ -697,17 +690,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 resetTotalUploads()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
-    }
-
-    /**
-     * Checks [HasPendingUploads] and resets the overall upload count
-     * if there are no pending transfers
-     */
-    private suspend fun resetTotalUploads() {
-        if (!hasPendingUploads()) {
-            @Suppress("DEPRECATION")
-            megaApi.resetTotalUploads()
-        }
     }
 
     /**
@@ -875,7 +857,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
             StartCameraUploadsState.UNESTABLISHED_FOLDERS -> {
                 Timber.w("Primary and/or Secondary Folders do not exist. Establish the folders")
-                establishFolders()
+                runCatching { establishFolders() }
+                    .onSuccess { startWorker() }
+                    .onFailure { endService() }
             }
             else -> Unit
         }
@@ -1026,45 +1010,38 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     /**
      * When the Primary Folder and Secondary Folder (if enabled) does not exist, this function will establish
      * the folders
+     *
+     * @throws Exception if the creation of one of the upload folder failed
      */
     private suspend fun establishFolders() {
-        // Check if either Primary or Secondary Folder should be set up
-        val shouldSetupFolders =
-            !isPrimaryFolderEstablished() || (isSecondaryFolderEnabled() && !isSecondaryFolderEstablished())
-
         // Setup the Primary Folder if it is missing
         if (!isPrimaryFolderEstablished()) {
             Timber.w("The local primary folder is missing")
-            setupPrimaryFolder()
-            if (!isSecondaryFolderEnabled()) {
-                Timber.d("Waiting for user to login or to check the Camera Uploads attribute")
-                return
+
+            val primaryHandle = getPrimaryFolderHandle()
+
+            if (primaryHandle == MegaApiJava.INVALID_HANDLE) {
+                Timber.d("Proceed to create the Primary Folder")
+                createAndSetupPrimaryUploadFolder()
+            } else {
+                Timber.d("Primary Handle retrieved from getPrimaryFolderHandle(): $primaryHandle")
+                setPrimarySyncHandle(primaryHandle)
             }
         }
 
         // If Secondary Media Uploads is enabled, setup the Secondary Folder if it is missing
         if (isSecondaryFolderEnabled() && !isSecondaryFolderEstablished()) {
             Timber.w("The local secondary folder is missing")
-            setupSecondaryFolder()
-            Timber.d("Waiting for user to login or to check the Camera Uploads attribute")
-            return
-        }
 
-        // If either Primary or Secondary Folder needs to be set up, then call
-        // the API to setup both Folders for Camera Uploads
-        if (shouldSetupFolders) {
-            val primaryFolderHandle = getPrimaryFolderHandle()
-            val secondaryFolderHandle = getSecondaryFolderHandle()
+            val secondaryHandle = getSecondaryFolderHandle()
 
-            Timber.d("Setting Primary Folder handle: $primaryFolderHandle")
-            Timber.d("Setting Secondary Folder handle: $secondaryFolderHandle")
-
-            megaApi.setCameraUploadsFolders(
-                primaryFolderHandle,
-                secondaryFolderHandle,
-                setAttrUserListener,
-            )
-            Timber.d("Waiting to setup Camera Uploads folders")
+            if (secondaryHandle == MegaApiJava.INVALID_HANDLE) {
+                Timber.d("Proceed to create the Primary Folder")
+                createAndSetupSecondaryUploadFolder()
+            } else {
+                Timber.d("Secondary Handle retrieved from getSecondaryFolderHandle(): $secondaryHandle")
+                setSecondarySyncHandle(secondaryHandle)
+            }
         }
     }
 
@@ -1545,49 +1522,29 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Sets up the Primary Folder if it is missing
+     * Create the primary upload folder on the cloud drive
+     * If the creation succeed, set up the primary folder in local
+     *
+     * @throws Exception if the creation of the primary upload folder failed
      */
-    private suspend fun setupPrimaryFolder() {
-        val primaryHandle = getPrimaryFolderHandle().also {
-            Timber.d("Primary Handle retrieved from getPrimaryFolderHandle(): $it ")
-            setPrimarySyncHandle(it)
-        }
-        // isCreatingPrimary is a flag that prevents creating a duplicate Primary Folder
-        if (primaryHandle == MegaApiJava.INVALID_HANDLE && primaryFolderCreationJob?.isActive != true) {
-            Timber.d("Proceed to create the Primary Folder")
-            createAndSetupPrimaryUploadFolder()
-        }
+    private suspend fun createAndSetupPrimaryUploadFolder() {
+        createCameraUploadFolder(getString(R.string.section_photo_sync))?.let {
+            Timber.d("Primary Folder successfully created with handle $it. Setting up Primary Folder")
+            setupPrimaryFolder(it)
+        } ?: throw Exception("Failed to create primary upload folder")
     }
 
     /**
-     * Sets up the Secondary Folder if it is missing
+     * Create the secondary upload folder on the cloud drive
+     * If the creation succeed, set up the primary folder in local
+     *
+     * @throws Exception if the creation of the secondary upload folder failed
      */
-    private suspend fun setupSecondaryFolder() {
-        val secondaryHandle = getSecondaryFolderHandle().also {
-            setSecondarySyncHandle(it)
-        }
-        // isCreatingSecondary is a flag that prevents creating a duplicate Primary Folder
-        if (secondaryHandle == MegaApiJava.INVALID_HANDLE && secondaryFolderCreationJob?.isActive != true) {
-            Timber.d("Proceed to create the Secondary Folder")
-            createAndSetupSecondaryUploadFolder()
-        }
-    }
-
-    private fun createAndSetupPrimaryUploadFolder() {
-        primaryFolderCreationJob = coroutineScope?.launch {
-            createCameraUploadFolder(getString(R.string.section_photo_sync))?.let {
-                Timber.d("Primary Folder successfully created with handle $it. Setting up Primary Folder")
-                setupPrimaryFolder(it)
-            } ?: endService()
-        }
-    }
-
-    private fun createAndSetupSecondaryUploadFolder() {
-        secondaryFolderCreationJob = coroutineScope?.launch {
-            createCameraUploadFolder(getString(R.string.section_secondary_media_uploads))?.let {
-                setupSecondaryFolder(it)
-            } ?: endService()
-        }
+    private suspend fun createAndSetupSecondaryUploadFolder() {
+        createCameraUploadFolder(getString(R.string.section_secondary_media_uploads))?.let {
+            Timber.d("Secondary Folder successfully created with handle $it. Setting up Secondary Folder")
+            setupSecondaryFolder(it)
+        } ?: throw Exception("Failed to create secondary upload folder")
     }
 
     private fun initService() {
@@ -1694,23 +1651,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
             Timber.d("On Get Secondary - Start Coroutine")
             startWorker()
-        }
-    }
-
-    /**
-     * Set attributes for folder
-     */
-    fun onSetFolderAttribute() {
-        Timber.d("On Set Camera Upload Folder - Start Coroutine")
-        coroutineScope?.launch { startWorker() }
-    }
-
-    /**
-     * Create folder
-     */
-    fun onCreateFolder(isSuccessful: Boolean) {
-        if (!isSuccessful) {
-            endService()
         }
     }
 

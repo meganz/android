@@ -29,6 +29,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.LinkedList
 import kotlin.contracts.ExperimentalContracts
@@ -412,6 +413,12 @@ class DefaultCameraUploadRepositoryTest {
             val actual = underTest.getSecondarySyncHandle()
             assertThat(actual).isEqualTo(result)
         }
+    }
+
+    @Test
+    fun `test that reset total uploads is invoked`() = runTest {
+        underTest.resetTotalUploads()
+        verify(megaApiGateway).resetTotalUploads()
     }
 
     @Test

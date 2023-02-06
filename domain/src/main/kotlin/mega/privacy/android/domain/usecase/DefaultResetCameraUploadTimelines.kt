@@ -20,11 +20,9 @@ class DefaultResetCameraUploadTimelines @Inject constructor(
         }
 
         if (!isSecondary && handleInAttribute != getUploadFolderHandle(true)) {
-            cameraUploadRepository.setPrimaryFolderHandle(handleInAttribute)
             resetPrimaryTimeline()
             return true
         } else if (isSecondary && handleInAttribute != getUploadFolderHandle(false)) {
-            cameraUploadRepository.setSecondaryFolderHandle(handleInAttribute)
             resetSecondaryTimeline()
             return true
         }

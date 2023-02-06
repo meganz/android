@@ -65,7 +65,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 fun AlbumPhotosSelectionScreen(
     viewModel: AlbumPhotosSelectionViewModel = viewModel(),
     onBackClicked: () -> Unit,
-    onCompletion: (albumId: AlbumId, message: String) -> Unit,
+    onCompletion: (albumId: AlbumId, numCommittedPhotos: Int) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLight = MaterialTheme.colors.isLight
@@ -95,6 +95,7 @@ fun AlbumPhotosSelectionScreen(
     handleAddPhotosCompletion(
         album = state.album,
         isSelectionCompleted = state.isSelectionCompleted,
+        numCommittedPhotos = state.numCommittedPhotos,
         onCompletion = onCompletion,
     )
 
@@ -380,11 +381,12 @@ private fun SelectLocationDialog(
 private fun handleAddPhotosCompletion(
     album: Album.UserAlbum?,
     isSelectionCompleted: Boolean,
-    onCompletion: (albumId: AlbumId, message: String) -> Unit,
+    numCommittedPhotos: Int,
+    onCompletion: (albumId: AlbumId, numCommittedPhotos: Int) -> Unit,
 ) {
     val albumId = album?.id
     if (albumId != null && isSelectionCompleted) {
-        onCompletion(album.id, "")
+        onCompletion(album.id, numCommittedPhotos)
     }
 }
 

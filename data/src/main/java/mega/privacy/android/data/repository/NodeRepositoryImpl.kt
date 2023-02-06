@@ -89,6 +89,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) } ?: false
     }
 
+    override suspend fun isNodeInInbox(handle: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInInbox(it) } ?: false
+    }
 
     override suspend fun getBackupFolderId(): NodeId =
         withContext(ioDispatcher) {
@@ -144,6 +147,16 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getNodeHistoryNumVersions(handle: Long): Int = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let {
+            if (megaApiGateway.hasVersion(it)) {
+                megaApiGateway.getNumVersions(it)
+            } else {
+                0
+            }
+        } ?: 0
+    }
+
     override fun monitorNodeUpdates(): Flow<List<Node>> {
         return megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
@@ -175,4 +188,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
+
+    override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
+        megaApiGateway.base64ToHandle(base64)
+    }
 }

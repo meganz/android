@@ -159,8 +159,6 @@ interface SettingsRepository {
 
     /**
      * Set if we want to show copyright notice
-     *
-     * @param showCopyrights
      */
     suspend fun setShowCopyright()
 
@@ -420,4 +418,14 @@ interface SettingsRepository {
      * @return [Boolean]
      */
     suspend fun isMobileDataAllowed(): Boolean
+
+    /**
+     * Get Recovery Key
+     */
+    suspend fun getExportMasterKey(): String?
+
+    /**
+     * Set master key exported
+     */
+    suspend fun setMasterKeyExported()
 }

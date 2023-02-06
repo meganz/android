@@ -11,10 +11,7 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -33,9 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -44,10 +39,11 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
-import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -92,7 +88,6 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -117,7 +112,6 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
-import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -136,7 +130,6 @@ import timber.log.Timber
 import java.io.File
 import java.util.Locale
 import javax.inject.Inject
-import kotlin.math.abs
 
 /**
  * Activity for showing file and folder info.
@@ -254,33 +247,24 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
     private var nodeVersions: ArrayList<MegaNode>? = null
-    private var upArrow: Drawable? = null
-    private var drawableRemoveLink: Drawable? = null
-    private var drawableLink: Drawable? = null
-    private var drawableShare: Drawable? = null
-    private var drawableDots: Drawable? = null
-    private var drawableDownload: Drawable? = null
-    private var drawableLeave: Drawable? = null
-    private var drawableCopy: Drawable? = null
-    private var drawableChat: Drawable? = null
+    private val menuHelper by lazy {
+        FileInfoToolbarHelper(
+            context = this,
+            appBar = binding.appBar,
+            toolbar = binding.toolbar,
+            collapsingToolbarLayout = binding.fileInfoCollapseToolbar,
+            supportActionBar = supportActionBar,
+            fileInfoImageLayout = binding.fileInfoImageLayout,
+            fileInfoToolbarImage = binding.fileInfoToolbarImage,
+            fileInfoIconLayout = binding.fileInfoIconLayout,
+        )
+    }
+
     private var isShareContactExpanded = false
     private var owner = true
     private var typeExport = -1
     private var sl: ArrayList<MegaShare>? = null
     private var mOffDelete: MegaOffline? = null
-    private var downloadMenuItem: MenuItem? = null
-    private var shareMenuItem: MenuItem? = null
-    private var getLinkMenuItem: MenuItem? = null
-    private var editLinkMenuItem: MenuItem? = null
-    private var removeLinkMenuItem: MenuItem? = null
-    private var renameMenuItem: MenuItem? = null
-    private var moveMenuItem: MenuItem? = null
-    private var copyMenuItem: MenuItem? = null
-    private var rubbishMenuItem: MenuItem? = null
-    private var deleteMenuItem: MenuItem? = null
-    private var leaveMenuItem: MenuItem? = null
-    private var sendToChatMenuItem: MenuItem? = null
-    private lateinit var node: MegaNode
     private var availableOfflineBoolean = false
     private var cC: ContactController? = null
     private var statusDialog: AlertDialog? = null
@@ -300,7 +284,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private val adapter: MegaFileInfoSharedContactAdapter by lazy {
         MegaFileInfoSharedContactAdapter(
             this,
-            node,
+            viewModel.node,
             listContacts,
             bindingContent.fileInfoContactListView
         ).apply {
@@ -314,7 +298,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var versionsRemoved = 0
     private var errorVersionRemove = 0
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
-    private var currentColorFilter = 0
     private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             intent?.let {
@@ -359,8 +342,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     override fun finishRenameActionWithSuccess(newName: String) {
-        node = megaApi.getNodeByHandle((node).handle) ?: return
-        binding.fileInfoCollapseToolbar.title = node.name
+        viewModel.updateNode(megaApi.getNodeByHandle((viewModel.node).handle) ?: return)
+        menuHelper.setNodeName(viewModel.node.name)
     }
 
     override fun actionConfirmed() {
@@ -397,7 +380,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                                 this@FileInfoActivity,
                                 getFormattedStringOrDefault(R.string.context_permissions_changing_folder)
                             )
-                            cC?.changePermissions(cC?.getEmailShares(shares), it, node)
+                            cC?.changePermissions(cC?.getEmailShares(shares), it, viewModel.node)
                         }
                     }
 
@@ -455,7 +438,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 menu.findItem(R.id.cab_menu_unselect_all).isVisible = false
             }
             val changePermissionsMenuItem = menu.findItem(R.id.action_file_contact_list_permissions)
-            if (isNodeInInbox(node)) {
+            if (viewModel.isNodeInInbox()) {
                 // If the node came from Backups, hide the Change Permissions option from the Action Bar
                 changePermissionsMenuItem.isVisible = false
                 changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
@@ -493,11 +476,11 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             finish()
             return
         }
-        node = getNodeFromExtras() ?: run {
+        viewModel.updateNode(getNodeFromExtras() ?: run {
             finish()
             return
-        }
-        nodeVersions = megaApi.getVersions(node)
+        })
+        nodeVersions = megaApi.getVersions(viewModel.node)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         initFileBackupManager()
         cC = ContactController(this)
@@ -509,7 +492,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             if (handle == MegaApiJava.INVALID_HANDLE) {
                 return
             }
-            val list = megaApi.getOutShares(node)
+            val list = megaApi.getOutShares(viewModel.node)
             for (share in list) {
                 if (handle == share.nodeHandle) {
                     selectedShare = share
@@ -531,6 +514,29 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
         //view
         setupView()
+        collectUIState()
+    }
+
+    private fun collectUIState() {
+        this.collectFlow(viewModel.uiState) { viewState ->
+            with(bindingContent) {
+                // If the Node belongs to Backups or has no versions, then hide
+                // the Versions layout
+                if (viewState.showHistoryVersions) {
+                    filePropertiesVersionsLayout.isVisible = true
+                    val text = getQuantityStringOrDefault(
+                        R.plurals.number_of_versions,
+                        viewState.historyVersions,
+                        viewState.historyVersions
+                    )
+                    filePropertiesTextNumberVersions.text = text
+                    separatorVersions.isVisible = true
+                } else {
+                    filePropertiesVersionsLayout.isVisible = false
+                    separatorVersions.isVisible = false
+                }
+            }
+        }
     }
 
     private fun getNodeFromExtras(): MegaNode? {
@@ -556,61 +562,16 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun setupView() {
         binding = ActivityFileInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        getActionBarDrawables()
         with(binding) {
             setSupportActionBar(toolbar)
-            filePropertiesPermissionInfo.isVisible = false
-            val params = fileInfoIconLayout.layoutParams as CollapsingToolbarLayout.LayoutParams
             val rect = Rect()
             window.decorView.getWindowVisibleDisplayFrame(rect)
-            params.setMargins(Util.dp2px(16f), Util.dp2px(90f) + rect.top, 0, Util.dp2px(14f))
-            fileInfoIconLayout.layoutParams = params
-            fileInfoImageLayout.isVisible = false
-            val statusBarColor =
-                getColorForElevation(
-                    this@FileInfoActivity,
-                    resources.getDimension(R.dimen.toolbar_elevation)
-                )
-            fileInfoCollapseToolbar.setStatusBarScrimColor(statusBarColor)
-            if (Util.isDarkMode(this@FileInfoActivity)) {
-                fileInfoCollapseToolbar.setContentScrimColor(statusBarColor)
-            }
-            if (node.hasPreview() || node.hasThumbnail()) {
-                appBar.addOnOffsetChangedListener { appBar: AppBarLayout, offset: Int ->
-                    val collapsed = offset < 0 && abs(offset) >= appBar.totalScrollRange / 2
-                    setActionBarDrawablesColorFilter(
-                        resources.getColor(
-                            if (collapsed) R.color.grey_087_white_087 else R.color.white_alpha_087,
-                            null
-                        )
-                    )
-                }
-                fileInfoCollapseToolbar.setCollapsedTitleTextColor(
-                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
-                )
-                fileInfoCollapseToolbar.setExpandedTitleColor(
-                    resources.getColor(R.color.white_alpha_087, null)
-                )
-            } else {
-                setActionBarDrawablesColorFilter(
-                    resources.getColor(
-                        R.color.grey_087_white_087,
-                        null
-                    )
-                )
-            }
-            supportActionBar?.apply {
-                bindingContent.nestedLayout.setOnScrollChangeListener { v: NestedScrollView, _: Int, _: Int, _: Int, _: Int ->
-                    Util.changeViewElevation(
-                        this,
-                        v.canScrollVertically(-1) && v.visibility == View.VISIBLE,
-                        outMetrics
-                    )
-                }
-                setDisplayShowTitleEnabled(false)
-                setHomeButtonEnabled(true)
-                setDisplayHomeAsUpEnabled(true)
-            }
+            menuHelper.setupToolbar(
+                isCollapsable = viewModel.node.hasPreview() || viewModel.node.hasThumbnail(),
+                nestedView = bindingContent.nestedLayout,
+                visibleTop = rect.top
+            )
+            filePropertiesPermissionInfo.isVisible = false
         }
 
         with(bindingContent) {
@@ -646,7 +607,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             filePropertiesLinkButton.setOnClickListener {
                 Timber.d("Copy link button")
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Copied Text", node.publicLink)
+                val clip = ClipData.newPlainText("Copied Text", viewModel.node.publicLink)
                 clipboard.setPrimaryClip(clip)
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -665,7 +626,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             setContactList()
             moreButton.setOnClickListener {
                 val i = Intent(this@FileInfoActivity, FileContactListActivity::class.java)
-                i.putExtra(Constants.NAME, node.handle)
+                i.putExtra(Constants.NAME, viewModel.node.handle)
                 startActivity(i)
             }
             setMoreButtonText()
@@ -673,8 +634,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             //setup adapter
             listView.adapter = adapter
             refreshProperties()
-            val parent = nodeController.getParent(node)
-            if (!node.isTakenDown && parent.handle != megaApi.rubbishNode.handle) {
+            val parent = nodeController.getParent(viewModel.node)
+            if (!viewModel.node.isTakenDown && parent.handle != megaApi.rubbishNode.handle) {
                 filePropertiesSwitch.isEnabled = true
                 filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
                     filePropertiesSwitch()
@@ -691,7 +652,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             //Location Layout
             getNodeLocationInfo(
                 adapterType, from == Constants.FROM_INCOMING_SHARES,
-                node.handle
+                viewModel.node.handle
             )?.let { locationInfo ->
                 with(filePropertiesInfoDataLocation) {
                     text = locationInfo.location
@@ -703,34 +664,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 filePropertiesLocationLayout.isVisible = false
             }
 
-            if (node.isFolder) {
+            if (viewModel.node.isFolder) {
                 filePropertiesCreatedLayout.isVisible = false
-                if (isEmptyFolder(node)) {
+                if (isEmptyFolder(viewModel.node)) {
                     availableOfflineLayout.isVisible = false
                     availableOfflineSeparator.isVisible = false
                 }
             } else {
                 filePropertiesCreatedLayout.isVisible = true
             }
-            val name = node.name
-            binding.fileInfoCollapseToolbar.title = name
+            menuHelper.setNodeName(viewModel.node.name)
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
             filePropertiesTextNumberVersions.setOnClickListener {
-                versionHistoryLauncher.launch(node.handle)
-            }
-            if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
-                filePropertiesVersionsLayout.isVisible = false
-                separatorVersions.isVisible = false
-            } else {
-                filePropertiesVersionsLayout.isVisible = true
-                val text = getQuantityStringOrDefault(
-                    R.plurals.number_of_versions,
-                    megaApi.getNumVersions(node),
-                    megaApi.getNumVersions(node)
-                )
-                filePropertiesTextNumberVersions.text = text
-                separatorVersions.isVisible = true
+                versionHistoryLauncher.launch(viewModel.node.handle)
             }
         }
         setIconResource()
@@ -756,27 +703,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             })
     }
 
-    private fun getActionBarDrawables() {
-        drawableDots = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_dots_vertical_white)?.mutate()
-
-        upArrow = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_arrow_back_white)?.mutate()
-        drawableRemoveLink = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_remove_link)?.mutate()
-        drawableLink = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_link_white)?.mutate()
-        drawableShare = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_share)?.mutate()
-        drawableDownload = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_download_white)?.mutate()
-        drawableLeave = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_leave_share_w)?.mutate()
-        drawableCopy = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_copy_white)?.mutate()
-        drawableChat = ContextCompat
-            .getDrawable(applicationContext, R.drawable.ic_send_to_contact)?.mutate()
-    }
 
     private fun setOwnerState(userHandle: Long) =
         ChatUtil.setContactStatus(
@@ -790,154 +716,21 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.file_info_action, menu)
-        downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download)
-        shareMenuItem = menu.findItem(R.id.cab_menu_file_info_share_folder)
-        getLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_get_link)
-        getLinkMenuItem?.title = getQuantityStringOrDefault(R.plurals.get_links, 1)
-        editLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_edit_link)
-        removeLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_remove_link)
-        renameMenuItem = menu.findItem(R.id.cab_menu_file_info_rename)
-        moveMenuItem = menu.findItem(R.id.cab_menu_file_info_move)
-        copyMenuItem = menu.findItem(R.id.cab_menu_file_info_copy)
-        rubbishMenuItem = menu.findItem(R.id.cab_menu_file_info_rubbish)
-        deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete)
-        leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave)
-        sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat)
-        setIconsColorFilter()
-        megaApi.getNodeByHandle(node.handle)?.apply {
-            val parent = megaApi.getRootParentNode(this)
-
-            if (parent.handle == megaApi.rubbishNode.handle) {
-                deleteMenuItem?.isVisible = true
-            } else {
-                setDefaultOptionsToolbar()
-            }
-            // Check if read-only properties should be applied on MenuItems
-            shouldApplyMenuItemReadOnlyState(parent)
+        with(megaApi.getRootParentNode(megaApi.getNodeByHandle(viewModel.node.handle))) {
+            val isInRubbish = this == megaApi.rubbishNode
+            val isInInbox = viewModel.isNodeInInbox()
+            menuHelper.setupOptionsMenu(
+                menu = menu,
+                node = this,
+                isInInbox = isInInbox,
+                isInRubbish = isInRubbish,
+                fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
+                firstIncomingLevel = firstIncomingLevel,
+                nodeAccess = megaApi.getAccess(viewModel.node),
+            )
         }
         return super.onCreateOptionsMenu(menu)
     }
-
-    /**
-     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
-     * if the MegaNode is a Backup node.
-     *
-     * @param node The Mega Node
-     */
-    private fun shouldApplyMenuItemReadOnlyState(node: MegaNode) {
-        if (isNodeInInbox(node)) {
-            renameMenuItem?.isVisible = false
-            moveMenuItem?.isVisible = false
-            rubbishMenuItem?.isVisible = false
-        }
-    }
-
-    /**
-     * Sets up the default items to be displayed on the Toolbar Menu
-     */
-    private fun setDefaultOptionsToolbar() {
-        if (!node.isTakenDown && !node.isFolder) {
-            sendToChatMenuItem?.isVisible = true
-            sendToChatMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-        }
-        if (from == Constants.FROM_INCOMING_SHARES) {
-            if (!node.isTakenDown) {
-                downloadMenuItem?.isVisible = true
-                downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                leaveMenuItem?.isVisible = firstIncomingLevel
-                leaveMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                copyMenuItem?.isVisible = true
-            }
-            when (megaApi.getAccess(node)) {
-                MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
-                    rubbishMenuItem?.isVisible = !firstIncomingLevel
-                    renameMenuItem?.isVisible = true
-                }
-                MegaShare.ACCESS_READ -> copyMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-            }
-        } else {
-            if (!node.isTakenDown) {
-                downloadMenuItem?.isVisible = true
-                downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                if (node.isFolder) {
-                    shareMenuItem?.isVisible = true
-                    shareMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                }
-                if (node.isExported) {
-                    editLinkMenuItem?.isVisible = true
-                    removeLinkMenuItem?.isVisible = true
-                    removeLinkMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                } else {
-                    getLinkMenuItem?.isVisible = true
-                    getLinkMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                }
-                copyMenuItem?.isVisible = true
-            }
-            rubbishMenuItem?.isVisible = true
-            renameMenuItem?.isVisible = true
-            moveMenuItem?.isVisible = true
-        }
-    }
-
-    /**
-     * Changes the drawables color in ActionBar depending on the color received.
-     *
-     * @param color Can be Color.WHITE or Color.WHITE.
-     */
-    private fun setActionBarDrawablesColorFilter(color: Int) {
-        if (currentColorFilter == color || supportActionBar == null) {
-            return
-        }
-        currentColorFilter = color
-        upArrow?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-        supportActionBar?.setHomeAsUpIndicator(upArrow)
-        drawableDots?.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-        binding.toolbar.overflowIcon = drawableDots
-        setIconsColorFilter()
-    }
-
-    /**
-     * Sets the toolbar icons color.
-     */
-    private fun setIconsColorFilter() {
-        if (removeLinkMenuItem == null || getLinkMenuItem == null || downloadMenuItem == null
-            || shareMenuItem == null || leaveMenuItem == null || copyMenuItem == null
-            || sendToChatMenuItem == null
-        ) {
-            return
-        }
-        drawableRemoveLink?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        removeLinkMenuItem?.icon = drawableRemoveLink
-        drawableLink?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        getLinkMenuItem?.icon = drawableLink
-        drawableDownload?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        downloadMenuItem?.icon = drawableDownload
-        drawableShare?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        shareMenuItem?.icon = drawableShare
-        drawableLeave?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        leaveMenuItem?.icon = drawableLeave
-        drawableCopy?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        copyMenuItem?.icon = drawableCopy
-        drawableChat?.colorFilter =
-            PorterDuffColorFilter(currentColorFilter, PorterDuff.Mode.SRC_IN)
-        sendToChatMenuItem?.icon = drawableChat
-    }
-
-    /**
-     * Checks whether the provided Node exists in the Inbox or not
-     *
-     * @param node The Provided Node
-     *
-     * @return true if the provided Node exists in the Inbox, and false if otherwise
-     */
-    private fun isNodeInInbox(node: MegaNode?) = node != null && megaApi.isInInbox(node)
-
 
     /**
      * performs the action corresponding to the menu item selected
@@ -952,7 +745,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             R.id.cab_menu_file_info_download -> {
                 checkNotificationsPermission(this)
                 nodeSaver.saveNode(
-                    node,
+                    viewModel.node,
                     highPriority = false,
                     isFolderLink = false,
                     fromMediaViewer = false,
@@ -960,14 +753,14 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 )
             }
             R.id.cab_menu_file_info_share_folder -> {
-                val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
+                val nodeType = checkBackupNodeTypeByHandle(megaApi, viewModel.node)
                 if (nodeType != BACKUP_NONE) {
                     // Display a warning dialog when sharing a Backup folder and limit folder
                     // access to read-only
                     fileBackupManager?.defaultActionBackupNodeCallback?.let {
                         fileBackupManager?.shareBackupFolder(
                             nodeController,
-                            node,
+                            viewModel.node,
                             nodeType,
                             ACTION_BACKUP_SHARE_FOLDER,
                             it
@@ -978,13 +771,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 }
             }
             R.id.cab_menu_file_info_get_link, R.id.cab_menu_file_info_edit_link -> {
-                if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
                     return false
                 }
-                LinksUtil.showGetLinkActivity(this, node.handle)
+                LinksUtil.showGetLinkActivity(this, viewModel.node.handle)
             }
             R.id.cab_menu_file_info_remove_link -> {
-                if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
                     return false
                 }
                 shareIt = false
@@ -1013,22 +806,26 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     .setView(dialogLayout.root)
                     .setPositiveButton(getFormattedStringOrDefault(R.string.context_remove)) { _: DialogInterface?, _: Int ->
                         typeExport = TYPE_EXPORT_REMOVE
-                        megaApi.disableExport(node, megaRequestListener)
+                        megaApi.disableExport(viewModel.node, megaRequestListener)
                     }.setNegativeButton(getFormattedStringOrDefault(R.string.general_cancel), null)
                     .show()
             }
-            R.id.cab_menu_file_info_copy -> copyLauncher.launch(longArrayOf(node.handle))
-            R.id.cab_menu_file_info_move -> moveLauncher.launch(longArrayOf(node.handle))
+            R.id.cab_menu_file_info_copy -> copyLauncher.launch(longArrayOf(viewModel.node.handle))
+            R.id.cab_menu_file_info_move -> moveLauncher.launch(longArrayOf(viewModel.node.handle))
             R.id.cab_menu_file_info_rename -> {
-                showRenameNodeDialog(this, node, this, this)
+                showRenameNodeDialog(this, viewModel.node, this, this)
             }
-            R.id.cab_menu_file_info_leave -> showConfirmationLeaveIncomingShare(this, this, node)
+            R.id.cab_menu_file_info_leave -> showConfirmationLeaveIncomingShare(
+                this,
+                this,
+                viewModel.node
+            )
             R.id.cab_menu_file_info_rubbish, R.id.cab_menu_file_info_delete -> {
                 moveToTrash()
             }
             R.id.cab_menu_file_info_send_to_chat -> {
                 Timber.d("Send chat option")
-                nodeAttacher.attachNode(node)
+                nodeAttacher.attachNode(viewModel.node)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -1049,10 +846,10 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 }
                 result?.let {
                     val contactsData = ArrayList<String>().apply { addAll(result) }
-                    if (node.isFolder) {
+                    if (viewModel.node.isFolder) {
                         if (fileBackupManager?.shareFolder(
                                 nodeController,
-                                longArrayOf(node.handle),
+                                longArrayOf(viewModel.node.handle),
                                 contactsData,
                                 MegaShare.ACCESS_READ
                             ) != true
@@ -1074,7 +871,11 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                                             getFormattedStringOrDefault(R.string.context_sharing_folder)
                                         )
                                         permissionsDialog?.dismiss()
-                                        nodeController.shareFolder(node, contactsData, item)
+                                        nodeController.shareFolder(
+                                            viewModel.node,
+                                            contactsData,
+                                            item
+                                        )
                                     }.show()
                         }
                     } else {
@@ -1090,8 +891,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 if (!checkIsConnected()) {
                     return@registerForActivityResult
                 }
-                if (result == node.handle) {
-                    val versions = megaApi.getVersions(node)
+                if (result == viewModel.node.handle) {
+                    val versions = megaApi.getVersions(viewModel.node)
                     versionsToRemove = versions.size - 1
                     for (i in 1 until versions.size) {
                         megaApi.removeVersion(versions[i], megaRequestListener)
@@ -1162,20 +963,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      * Starts a new Intent to share the folder to different contacts
      */
     private fun shareFolder() {
-        selectContactForShareFolderLauncher.launch(node)
+        selectContactForShareFolderLauncher.launch(viewModel.node)
     }
 
     private fun refreshProperties() {
         Timber.d("refreshProperties")
-        if (!node.isTakenDown && node.isExported) {
+        if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
             publicLink = true
             bindingContent.dividerLinkLayout.isVisible = true
             bindingContent.filePropertiesLinkLayout.isVisible = true
             bindingContent.filePropertiesCopyLayout.isVisible = true
-            bindingContent.filePropertiesLinkText.text = node.publicLink
+            bindingContent.filePropertiesLinkText.text = viewModel.node.publicLink
             bindingContent.filePropertiesLinkDate.text = getFormattedStringOrDefault(
                 R.string.general_date_label, TimeUtils.formatLongDateTime(
-                    node.publicLinkCreationTime
+                    viewModel.node.publicLinkCreationTime
                 )
             )
         } else {
@@ -1185,28 +986,28 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesCopyLayout.isVisible = false
         }
 
-        if (node.isFile) {
+        if (viewModel.node.isFile) {
             Timber.d("Node is FILE")
             bindingContent.filePropertiesSharedLayout.isVisible = false
             bindingContent.dividerSharedLayout.isVisible = false
             bindingContent.filePropertiesInfoMenuSize.text =
                 getFormattedStringOrDefault(R.string.file_properties_info_size_file)
-            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(node.size)
+            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(viewModel.node.size)
             bindingContent.filePropertiesContentLayout.isVisible = false
-            if (node.creationTime != 0L) {
+            if (viewModel.node.creationTime != 0L) {
                 try {
                     bindingContent.filePropertiesInfoDataAdded.text =
                         TimeUtils.formatLongDateTime(
-                            node.creationTime
+                            viewModel.node.creationTime
                         )
                 } catch (ex: Exception) {
                     bindingContent.filePropertiesInfoDataAdded.text = ""
                 }
-                if (node.modificationTime != 0L) {
+                if (viewModel.node.modificationTime != 0L) {
                     try {
                         bindingContent.filePropertiesInfoDataCreated.text =
                             TimeUtils.formatLongDateTime(
-                                node.modificationTime
+                                viewModel.node.modificationTime
                             )
                     } catch (ex: Exception) {
                         bindingContent.filePropertiesInfoDataCreated.text = ""
@@ -1215,7 +1016,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     try {
                         bindingContent.filePropertiesInfoDataCreated.text =
                             TimeUtils.formatLongDateTime(
-                                node.creationTime
+                                viewModel.node.creationTime
                             )
                     } catch (ex: Exception) {
                         bindingContent.filePropertiesInfoDataCreated.text = ""
@@ -1225,66 +1026,41 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 bindingContent.filePropertiesInfoDataAdded.text = ""
                 bindingContent.filePropertiesInfoDataCreated.text = ""
             }
-            var thumb: Bitmap?
-            var preview: Bitmap?
-            thumb = ThumbnailUtils.getThumbnailFromCache(node)
-            if (thumb != null) {
-                binding.fileInfoToolbarImage.setImageBitmap(thumb)
-                binding.fileInfoImageLayout.isVisible = true
-                binding.fileInfoIconLayout.isVisible = false
-            } else {
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, this)
-                if (thumb != null) {
-                    binding.fileInfoToolbarImage.setImageBitmap(thumb)
-                    binding.fileInfoImageLayout.isVisible = true
-                    binding.fileInfoIconLayout.isVisible = false
+
+            val preview = PreviewUtils.getPreviewFromCache(viewModel.node)
+                ?: PreviewUtils.getPreviewFromFolder(viewModel.node, this)
+            if (preview == null) {
+                if (viewModel.node.hasPreview()) {
+                    val previewFile =
+                        File(
+                            PreviewUtils.getPreviewFolder(this),
+                            "${viewModel.node.base64Handle}.jpg"
+                        )
+                    megaApi.getPreview(
+                        viewModel.node,
+                        previewFile.absolutePath,
+                        megaRequestListener
+                    )
                 }
             }
-            preview = PreviewUtils.getPreviewFromCache(node)
-            if (preview != null) {
-                PreviewUtils.previewCache.put(node.handle, preview)
-                binding.fileInfoToolbarImage.setImageBitmap(preview)
-                binding.fileInfoImageLayout.isVisible = true
-                binding.fileInfoIconLayout.isVisible = false
-            } else {
-                preview = PreviewUtils.getPreviewFromFolder(node, this)
-                if (preview != null) {
-                    PreviewUtils.previewCache.put(node.handle, preview)
-                    binding.fileInfoToolbarImage.setImageBitmap(preview)
-                    binding.fileInfoImageLayout.isVisible = true
-                    binding.fileInfoIconLayout.isVisible = false
-                } else {
-                    if (node.hasPreview()) {
-                        val previewFile =
-                            File(PreviewUtils.getPreviewFolder(this), node.base64Handle + ".jpg")
-                        megaApi.getPreview(node, previewFile.absolutePath, megaRequestListener)
-                    }
-                }
+            (preview ?: ThumbnailUtils.getThumbnailFromCache(viewModel.node)
+            ?: ThumbnailUtils.getThumbnailFromFolder(viewModel.node, this))?.let {
+                menuHelper.setPreview(it)
             }
+
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
-            if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
-                bindingContent.filePropertiesVersionsLayout.isVisible = false
-                bindingContent.separatorVersions.isVisible = false
-            } else {
-                bindingContent.filePropertiesVersionsLayout.isVisible = true
-                val text = getQuantityStringOrDefault(
-                    R.plurals.number_of_versions,
-                    megaApi.getNumVersions(node),
-                    megaApi.getNumVersions(node)
-                )
-                bindingContent.filePropertiesTextNumberVersions.text = text
-                bindingContent.separatorVersions.isVisible = true
-                nodeVersions = megaApi.getVersions(node)
+            if (!viewModel.isNodeInInbox() && megaApi.hasVersions(viewModel.node)) {
+                nodeVersions = megaApi.getVersions(viewModel.node)
             }
-        } else if (node.isFolder) {
+        } else if (viewModel.node.isFolder) {
             Timber.d("Node is FOLDER")
-            megaApi.getFolderInfo(node, megaRequestListener)
+            megaApi.getFolderInfo(viewModel.node, megaRequestListener)
             bindingContent.filePropertiesInfoDataContent.isVisible = true
             bindingContent.filePropertiesInfoMenuContent.isVisible = true
             bindingContent.filePropertiesInfoDataContent.text =
-                MegaApiUtils.getMegaNodeFolderInfo(node)
-            val sizeFile = megaApi.getSize(node)
+                MegaApiUtils.getMegaNodeFolderInfo(viewModel.node)
+            val sizeFile = megaApi.getSize(viewModel.node)
             bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(sizeFile)
             setIconResource()
             if (from == Constants.FROM_INCOMING_SHARES) {
@@ -1293,7 +1069,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 val sharesIncoming = megaApi.inSharesList
                 for (j in sharesIncoming.indices) {
                     val mS = sharesIncoming[j]
-                    if (mS.nodeHandle == node.handle) {
+                    if (mS.nodeHandle == viewModel.node.handle) {
                         val user = megaApi.getContact(mS.user)
                         contactMail = user?.email
                         if (user != null) {
@@ -1343,14 +1119,14 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     }
                 }
             }
-            sl = megaApi.getOutShares(node)
+            sl = megaApi.getOutShares(viewModel.node)
             sl?.let { sl ->
                 if (sl.size == 0) {
                     bindingContent.filePropertiesSharedLayout.isVisible = false
                     bindingContent.dividerSharedLayout.isVisible = false
                     //If I am the owner
                     if (megaApi.checkAccessErrorExtended(
-                            node,
+                            viewModel.node,
                             MegaShare.ACCESS_OWNER
                         ).errorCode == MegaError.API_OK
                     ) {
@@ -1359,8 +1135,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                         owner = false
                         //If I am not the owner
                         binding.filePropertiesPermissionInfo.isVisible = true
-                        val accessLevel = megaApi.getAccess(node)
-                        Timber.d("Node: %s", node.handle)
+                        val accessLevel = megaApi.getAccess(viewModel.node)
+                        Timber.d("Node: %s", viewModel.node.handle)
                         when (accessLevel) {
                             MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
                                 binding.filePropertiesPermissionInfo.text =
@@ -1388,20 +1164,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                             sl.size, sl.size
                         )
                 }
-                if (node.creationTime != 0L) {
+                if (viewModel.node.creationTime != 0L) {
                     try {
                         bindingContent.filePropertiesInfoDataAdded.text =
                             DateUtils.getRelativeTimeSpanString(
-                                node.creationTime * 1000
+                                viewModel.node.creationTime * 1000
                             )
                     } catch (ex: Exception) {
                         bindingContent.filePropertiesInfoDataAdded.text = ""
                     }
-                    if (node.modificationTime != 0L) {
+                    if (viewModel.node.modificationTime != 0L) {
                         try {
                             bindingContent.filePropertiesInfoDataCreated.text =
                                 DateUtils.getRelativeTimeSpanString(
-                                    node.modificationTime * 1000
+                                    viewModel.node.modificationTime * 1000
                                 )
                         } catch (ex: Exception) {
                             bindingContent.filePropertiesInfoDataCreated.text = ""
@@ -1410,7 +1186,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                         try {
                             bindingContent.filePropertiesInfoDataCreated.text =
                                 DateUtils.getRelativeTimeSpanString(
-                                    node.creationTime * 1000
+                                    viewModel.node.creationTime * 1000
                                 )
                         } catch (ex: Exception) {
                             bindingContent.filePropertiesInfoDataCreated.text = ""
@@ -1427,7 +1203,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         }
 
         //Choose the button bindingContent.filePropertiesSwitch
-        if (OfflineUtils.availableOffline(this, node)) {
+        if (OfflineUtils.availableOffline(this, viewModel.node)) {
             availableOfflineBoolean = true
             bindingContent.filePropertiesSwitch.isChecked = true
             return
@@ -1479,7 +1255,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             if (!isChecked) {
                 Timber.d("isChecked")
                 isRemoveOffline = true
-                handle = node.handle
+                handle = viewModel.node.handle
                 availableOfflineBoolean = false
                 bindingContent.filePropertiesSwitch.isChecked = false
                 mOffDelete = dbH.findByHandle(handle)
@@ -1492,17 +1268,17 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 availableOfflineBoolean = true
                 bindingContent.filePropertiesSwitch.isChecked = true
                 val destination =
-                    OfflineUtils.getOfflineParentFile(this, from, node, megaApi)
+                    OfflineUtils.getOfflineParentFile(this, from, viewModel.node, megaApi)
                 Timber.d("Path destination: %s", destination)
                 if (FileUtil.isFileAvailable(destination) && destination.isDirectory) {
-                    val offlineFile = File(destination, node.name)
-                    if (FileUtil.isFileAvailable(offlineFile) && node.size == offlineFile.length() && offlineFile.name == node.name) {
+                    val offlineFile = File(destination, viewModel.node.name)
+                    if (FileUtil.isFileAvailable(offlineFile) && viewModel.node.size == offlineFile.length() && offlineFile.name == viewModel.node.name) {
                         //This means that is already available offline
                         return
                     }
                 }
-                Timber.d("Handle to save for offline : ${node.handle}")
-                OfflineUtils.saveOffline(destination, node, this)
+                Timber.d("Handle to save for offline : ${viewModel.node.handle}")
+                OfflineUtils.saveOffline(destination, viewModel.node, this)
             }
             invalidateOptionsMenu()
         } else {
@@ -1510,32 +1286,32 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             if (!isChecked) {
                 availableOfflineBoolean = false
                 bindingContent.filePropertiesSwitch.isChecked = false
-                mOffDelete = dbH.findByHandle(node.handle)
+                mOffDelete = dbH.findByHandle(viewModel.node.handle)
                 OfflineUtils.removeOffline(mOffDelete, dbH, this)
                 invalidateOptionsMenu()
             } else {
                 availableOfflineBoolean = true
                 bindingContent.filePropertiesSwitch.isChecked = true
                 invalidateOptionsMenu()
-                Timber.d("Checking the node%s", node.handle)
+                Timber.d("Checking the node%s", viewModel.node.handle)
 
                 //check the parent
-                val result = OfflineUtils.findIncomingParentHandle(node, megaApi)
+                val result = OfflineUtils.findIncomingParentHandle(viewModel.node, megaApi)
                 Timber.d("IncomingParentHandle: %s", result)
                 if (result != -1L) {
                     val destination = OfflineUtils.getOfflineParentFile(
                         this,
                         Constants.FROM_INCOMING_SHARES,
-                        node,
+                        viewModel.node,
                         megaApi
                     )
                     if (FileUtil.isFileAvailable(destination) && destination.isDirectory) {
-                        val offlineFile = File(destination, node.name)
-                        if (FileUtil.isFileAvailable(offlineFile) && node.size == offlineFile.length() && offlineFile.name == node.name) { //This means that is already available offline
+                        val offlineFile = File(destination, viewModel.node.name)
+                        if (FileUtil.isFileAvailable(offlineFile) && viewModel.node.size == offlineFile.length() && offlineFile.name == viewModel.node.name) { //This means that is already available offline
                             return
                         }
                     }
-                    OfflineUtils.saveOffline(destination, node, this)
+                    OfflineUtils.saveOffline(destination, viewModel.node, this)
                 } else {
                     Timber.w("result=findIncomingParentHandle NOT result!")
                 }
@@ -1553,7 +1329,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             return
         }
 
-        moveToRubbish = nodeController.getParent(node)?.handle != megaApi.rubbishNode.handle
+        moveToRubbish =
+            nodeController.getParent(viewModel.node)?.handle != megaApi.rubbishNode.handle
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog).apply {
             val messageId = if (moveToRubbish) {
@@ -1576,7 +1353,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
                 //Check if the node is not yet in the rubbish bin (if so, remove it)
                 if (moveToRubbish) {
-                    megaApi.moveNode(node, megaApi.rubbishNode, megaRequestListener)
+                    megaApi.moveNode(viewModel.node, megaApi.rubbishNode, megaRequestListener)
 
                     try {
                         statusDialog = createProgressDialog(
@@ -1587,7 +1364,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                         Timber.w("Exception showing move to trash confirmation")
                     }
                 } else {
-                    megaApi.remove(node, megaRequestListener)
+                    megaApi.remove(viewModel.node, megaRequestListener)
 
                     try {
                         statusDialog = createProgressDialog(
@@ -1614,21 +1391,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         if (request.type == MegaRequest.TYPE_GET_ATTR_FILE) {
             if (e?.errorCode == MegaError.API_OK) {
                 val previewDir = PreviewUtils.getPreviewFolder(this)
-                val preview = File(previewDir, node.base64Handle + ".jpg")
+                val preview = File(previewDir, viewModel.node.base64Handle + ".jpg")
                 if (preview.exists()) {
                     if (preview.length() > 0) {
-                        val bitmap = PreviewUtils.getBitmapForCache(preview, this)
-                        PreviewUtils.previewCache.put(node.handle, bitmap)
-                        binding.fileInfoToolbarImage.setImageBitmap(bitmap)
-                        binding.fileInfoImageLayout.isVisible = true
-                        binding.fileInfoIconLayout.isVisible = false
+                        PreviewUtils.getBitmapForCache(preview, this)?.also { bitmap ->
+                            PreviewUtils.previewCache.put(viewModel.node.handle, bitmap)
+                            menuHelper.setPreview(bitmap)
+                        }
                     }
                 }
             }
         } else if (request.type == MegaRequest.TYPE_FOLDER_INFO) {
 
             // If the Folder belongs to Backups, hide all Folder Version layouts
-            if (isNodeInInbox(node)) {
+            if (viewModel.isNodeInInbox()) {
                 bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = false
@@ -1807,7 +1583,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      * @param type         Type of name collision to check.
      */
     private fun checkCollision(parentHandle: Long, type: NameCollisionType) {
-        checkNameCollisionUseCase.check(node.handle, parentHandle, type)
+        checkNameCollisionUseCase.check(viewModel.node.handle, parentHandle, type)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -1841,7 +1617,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      * @param parentHandle Parent handle in which the node will be moved.
      */
     private fun move(parentHandle: Long) {
-        moveNodeUseCase.move(node.handle, parentHandle)
+        moveNodeUseCase.move(viewModel.node.handle, parentHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -1872,7 +1648,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      * @param parentHandle Parent handle in which the node will be copied.
      */
     private fun copy(parentHandle: Long) {
-        copyNodeUseCase.copy(node.handle, parentHandle)
+        copyNodeUseCase.copy(viewModel.node.handle, parentHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -1905,15 +1681,15 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         }
         var n: MegaNode? = null
         for (nodeToCheck in nodes) {
-            if (nodeToCheck.handle == node.handle) {
+            if (nodeToCheck.handle == viewModel.node.handle) {
                 thisNode = true
                 n = nodeToCheck
                 break
             } else {
-                if (node.isFolder) {
+                if (viewModel.node.isFolder) {
                     var parent = megaApi.getNodeByHandle(nodeToCheck.parentHandle)
                     while (parent != null) {
-                        if (parent.handle == node.handle) {
+                        if (parent.handle == viewModel.node.handle) {
                             updateContentFolder = true
                             break
                         }
@@ -1934,7 +1710,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
         }
         if (updateContentFolder) {
-            megaApi.getFolderInfo(node, megaRequestListener)
+            megaApi.getFolderInfo(viewModel.node, megaRequestListener)
         }
         if (!thisNode && !anyChild) {
             Timber.d("Not related to this node")
@@ -1944,21 +1720,23 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         //Check if the parent handle has changed
         if (n != null) {
             if (n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)) {
-                val oldParent = megaApi.getParentNode(node)
+                val oldParent = megaApi.getParentNode(viewModel.node)
                 val newParent = megaApi.getParentNode(n)
-                node = if (oldParent.handle == newParent.handle) {
-                    Timber.d("Parents match")
-                    if (newParent.isFile) {
-                        Timber.d("New version added")
-                        newParent
+                viewModel.updateNode(
+                    if (oldParent.handle == newParent.handle) {
+                        Timber.d("Parents match")
+                        if (newParent.isFile) {
+                            Timber.d("New version added")
+                            newParent
+                        } else {
+                            n
+                        }
                     } else {
                         n
                     }
-                } else {
-                    n
-                }
-                nodeVersions = if (megaApi.hasVersions(node)) {
-                    megaApi.getVersions(node)
+                )
+                nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
+                    megaApi.getVersions(viewModel.node)
                 } else {
                     null
                 }
@@ -1967,9 +1745,9 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     if (nodeVersions != null) {
                         val nodeHandle = nodeVersions?.get(1)?.handle ?: -1
                         if (megaApi.getNodeByHandle(nodeHandle) != null) {
-                            node = megaApi.getNodeByHandle(nodeHandle)
-                            nodeVersions = if (megaApi.hasVersions(node)) {
-                                megaApi.getVersions(node)
+                            viewModel.updateNode(megaApi.getNodeByHandle(nodeHandle))
+                            nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
+                                megaApi.getVersions(viewModel.node)
                             } else {
                                 null
                             }
@@ -1987,17 +1765,17 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     }
                 }
             } else {
-                node = n
-                nodeVersions = if (megaApi.hasVersions(node)) {
-                    megaApi.getVersions(node)
+                viewModel.updateNode(n)
+                nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
+                    megaApi.getVersions(viewModel.node)
                 } else {
                     null
                 }
             }
         } else {
             if (anyChild) {
-                nodeVersions = if (megaApi.hasVersions(node)) {
-                    megaApi.getVersions(node)
+                nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
+                    megaApi.getVersions(viewModel.node)
                 } else {
                     null
                 }
@@ -2006,13 +1784,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         if (moveToRubbish) {
             invalidateOptionsMenu()
         }
-        if (!node.isTakenDown && node.isExported) {
+        if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
             Timber.d("Node HAS public link")
             publicLink = true
             bindingContent.dividerLinkLayout.isVisible = true
             bindingContent.filePropertiesLinkLayout.isVisible = true
             bindingContent.filePropertiesCopyLayout.isVisible = true
-            bindingContent.filePropertiesLinkText.text = node.publicLink
+            bindingContent.filePropertiesLinkText.text = viewModel.node.publicLink
             invalidateOptionsMenu()
         } else {
             Timber.d("Node NOT public link")
@@ -2022,13 +1800,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesCopyLayout.isVisible = false
             invalidateOptionsMenu()
         }
-        if (node.isFolder) {
-            val sizeFile = megaApi.getSize(node)
+        if (viewModel.node.isFolder) {
+            val sizeFile = megaApi.getSize(viewModel.node)
             bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(sizeFile)
             bindingContent.filePropertiesInfoDataContent.text =
-                MegaApiUtils.getMegaNodeFolderInfo(node)
+                MegaApiUtils.getMegaNodeFolderInfo(viewModel.node)
             setIconResource()
-            sl = megaApi.getOutShares(node)
+            sl = megaApi.getOutShares(viewModel.node)
             sl?.let { sl ->
                 if (sl.size == 0) {
                     Timber.d("sl.size == 0")
@@ -2037,7 +1815,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
                     //If I am the owner
                     if (megaApi.checkAccessErrorExtended(
-                            node,
+                            viewModel.node,
                             MegaShare.ACCESS_OWNER
                         ).errorCode == MegaError.API_OK
                     ) {
@@ -2047,8 +1825,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                         //If I am not the owner
                         owner = false
                         binding.filePropertiesPermissionInfo.isVisible = true
-                        val accessLevel = megaApi.getAccess(node)
-                        Timber.d("Node: %s", node.handle)
+                        val accessLevel = megaApi.getAccess(viewModel.node)
+                        Timber.d("Node: %s", viewModel.node.handle)
                         when (accessLevel) {
                             MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
                                 binding.filePropertiesPermissionInfo.text =
@@ -2078,20 +1856,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 }
             }
         } else {
-            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(node.size)
+            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(viewModel.node.size)
         }
-        if (node.creationTime != 0L) {
+        if (viewModel.node.creationTime != 0L) {
             try {
                 bindingContent.filePropertiesInfoDataAdded.text =
-                    DateUtils.getRelativeTimeSpanString(node.creationTime * 1000)
+                    DateUtils.getRelativeTimeSpanString(viewModel.node.creationTime * 1000)
             } catch (ex: Exception) {
                 bindingContent.filePropertiesInfoDataAdded.text = ""
             }
-            if (node.modificationTime != 0L) {
+            if (viewModel.node.modificationTime != 0L) {
                 try {
                     bindingContent.filePropertiesInfoDataCreated.text =
                         DateUtils.getRelativeTimeSpanString(
-                            node.modificationTime * 1000
+                            viewModel.node.modificationTime * 1000
                         )
                 } catch (ex: Exception) {
                     bindingContent.filePropertiesInfoDataCreated.text = ""
@@ -2100,7 +1878,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 try {
                     bindingContent.filePropertiesInfoDataCreated.text =
                         DateUtils.getRelativeTimeSpanString(
-                            node.creationTime * 1000
+                            viewModel.node.creationTime * 1000
                         )
                 } catch (ex: Exception) {
                     bindingContent.filePropertiesInfoDataCreated.text = ""
@@ -2111,21 +1889,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesInfoDataCreated.text = ""
         }
 
-        // If the Node belongs to Backups or has no versions, then hide
-        // the Versions layout
-        if (isNodeInInbox(node) || !megaApi.hasVersions(node)) {
-            bindingContent.filePropertiesVersionsLayout.isVisible = false
-            bindingContent.separatorVersions.isVisible = false
-        } else {
-            bindingContent.filePropertiesVersionsLayout.isVisible = true
-            val text = getQuantityStringOrDefault(
-                R.plurals.number_of_versions,
-                megaApi.getNumVersions(node),
-                megaApi.getNumVersions(node)
-            )
-            bindingContent.filePropertiesTextNumberVersions.text = text
-            bindingContent.separatorVersions.isVisible = true
-        }
         refresh()
     }
 
@@ -2137,15 +1900,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         super.onDestroy()
         megaApi.removeGlobalListener(megaGlobalListener)
         megaApi.removeRequestListener(megaRequestListener)
-        if (upArrow != null) upArrow?.colorFilter = null
-        if (drawableRemoveLink != null) drawableRemoveLink?.colorFilter = null
-        if (drawableLink != null) drawableLink?.colorFilter = null
-        if (drawableShare != null) drawableShare?.colorFilter = null
-        if (drawableDots != null) drawableDots?.colorFilter = null
-        if (drawableDownload != null) drawableDownload?.colorFilter = null
-        if (drawableLeave != null) drawableLeave?.colorFilter = null
-        if (drawableCopy != null) drawableCopy?.colorFilter = null
-        if (drawableChat != null) drawableChat?.colorFilter = null
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(manageShareReceiver)
         nodeSaver.destroy()
@@ -2189,7 +1943,11 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         if (sShare == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
         selectedShare = sShare
         bottomSheetDialogFragment =
-            FileContactsListBottomSheetDialogFragment(selectedShare, selectedContact, node)
+            FileContactsListBottomSheetDialogFragment(
+                selectedShare,
+                selectedContact,
+                viewModel.node
+            )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
@@ -2230,7 +1988,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             cC?.changePermission(
                 selected.user,
                 item,
-                node,
+                viewModel.node,
                 ShareListener(this, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1)
             )
         }
@@ -2262,7 +2020,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 this,
                 ShareListener.REMOVE_SHARE_LISTENER,
                 1
-            ), node, email
+            ), viewModel.node, email
         )
     }
 
@@ -2273,7 +2031,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     private fun setContactList() {
-        fullListContacts = megaApi.getOutShares(node)
+        fullListContacts = megaApi.getOutShares(viewModel.node)
         listContacts = fullListContacts.take(MAX_NUMBER_OF_CONTACTS_IN_LIST)
     }
 
@@ -2313,7 +2071,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             this,
             getFormattedStringOrDefault(R.string.context_removing_contact_folder)
         )
-        nodeController.removeShares(shares, node)
+        nodeController.removeShares(shares, viewModel.node)
     }
 
     // Clear all selected items
@@ -2366,13 +2124,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     private fun setIconResource() {
-        val resource = if (node.isFolder) {
+        val resource = if (viewModel.node.isFolder) {
             getFolderIcon(
-                node,
+                viewModel.node,
                 if (adapterType == Constants.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
             )
         } else {
-            MimeTypeThumbnail.typeForName(node.name).iconResourceId
+            MimeTypeThumbnail.typeForName(viewModel.node.name).iconResourceId
         }
         binding.fileInfoToolbarIcon.setImageResource(resource)
     }

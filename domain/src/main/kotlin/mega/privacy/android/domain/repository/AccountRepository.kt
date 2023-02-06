@@ -232,4 +232,20 @@ interface AccountRepository {
      * @return [UserCredentials]
      */
     suspend fun getAccountCredentials(): UserCredentials?
+
+    /**
+     * Change email
+     *
+     * @param email the new user email
+     * @return new user email from sdk
+     */
+    suspend fun changeEmail(email: String): String
+
+    /**
+     * Confirms a new account.
+     *
+     * @param confirmationLink Confirmation link of the new account.
+     * @param password         Password of the new account.
+     */
+    suspend fun confirmAccount(confirmationLink: String, password: String)
 }

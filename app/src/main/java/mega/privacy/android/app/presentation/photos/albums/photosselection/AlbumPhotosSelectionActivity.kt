@@ -37,10 +37,10 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleCompletion(albumId: AlbumId, message: String) {
+    private fun handleCompletion(albumId: AlbumId, numCommittedPhotos: Int) {
         val data = Intent().apply {
             putExtra(ALBUM_ID, albumId.id)
-            putExtra(MESSAGE, message)
+            putExtra(NUM_PHOTOS, numCommittedPhotos)
         }
         setResult(RESULT_OK, data)
         finish()
@@ -51,7 +51,7 @@ class AlbumPhotosSelectionActivity : AppCompatActivity() {
 
         const val ALBUM_FLOW: String = "album_flow"
 
-        const val MESSAGE: String = "message"
+        const val NUM_PHOTOS: String = "num_photos"
 
         fun create(
             context: Context,

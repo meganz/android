@@ -33,7 +33,7 @@ interface MegaLocalStorageGateway {
     /**
      * Set Camera Uploads Secondary handle
      */
-    suspend fun setMegaHandleSecondaryFolder(secondaryHandle: Long)
+    suspend fun setCamSyncSecondaryHandle(secondaryHandle: Long)
 
     /**
      * Get cloud sort order
@@ -307,16 +307,6 @@ interface MegaLocalStorageGateway {
      * Get external SD card URI
      */
     suspend fun getUriExternalSd(): String?
-
-    /**
-     * Set primary folder handle
-     */
-    suspend fun setPrimaryFolderHandle(primaryHandle: Long)
-
-    /**
-     * Set secondary folder handle
-     */
-    suspend fun setSecondaryFolderHandle(secondaryHandle: Long)
 
     /**
      * Is secondary media folder enabled

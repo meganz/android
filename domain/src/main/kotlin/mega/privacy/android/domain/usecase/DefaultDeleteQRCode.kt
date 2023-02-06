@@ -4,6 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.repository.QRCodeRepository
 import javax.inject.Inject
 
 /**
@@ -11,14 +13,18 @@ import javax.inject.Inject
  */
 class DefaultDeleteQRCode @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val getQRFile: GetQRFile,
+    private val nodeRepository: NodeRepository,
+    private val qrCodeRepository: QRCodeRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : DeleteQRCode {
 
-    override suspend fun invoke(handle: Long, fileName: String) {
+    override suspend fun invoke(contactLink: String, fileName: String) {
         withContext(ioDispatcher) {
+            val contactLinkPrefix = "https://mega.nz/C!"
+            val base64Handle = contactLink.substring(contactLinkPrefix.length)
+            val handle = nodeRepository.convertBase64ToHandle(base64Handle)
             accountRepository.deleteContactLink(handle)
-            getQRFile(fileName)?.takeIf { it.exists() }?.delete()
+            qrCodeRepository.getQRFile(fileName)?.takeIf { it.exists() }?.delete()
         }
     }
 }

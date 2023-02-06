@@ -54,9 +54,6 @@ android {
         gms {
             dimension "service"
         }
-        hms {
-            dimension "service"
-        }
     }
 }
 

@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.account.AccountSession
  * @property accountSession          [AccountSession]
  * @property password                Typed password.
  * @property accountConfirmationLink Link for confirming a new account.
+ * @property isFirstTime             True if account credentials are null for the first time
  * @property isFetchingNodes         True if it is fetching nodes, false otherwise.
  * @property isAlreadyLoggedIn       True if account credentials are not null, false otherwise.
  * @property pressedBackWhileLogin   True if pressed back while a login was in progress, false otherwise.
@@ -30,6 +31,7 @@ data class LoginState(
     val password: String? = null,
     val accountConfirmationLink: String? = null,
     val isFetchingNodes: Boolean = false,
+    val isFirstTime: Boolean = false,
     val isAlreadyLoggedIn: Boolean = true,
     val pressedBackWhileLogin: Boolean = false,
     val is2FAEnabled: Boolean = false,

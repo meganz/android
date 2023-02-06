@@ -151,7 +151,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Observe changes in Chat notifications
      */
-    val chatNotificationsObserver = Observer<Any> {
+    private val chatNotificationsObserver = Observer<Any> {
         updateDndSeconds(state.value.chatId)
     }
 
@@ -244,7 +244,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     _state.update {
                         it.copy(participantItemList = list, numOfParticipants = list.size)
                     }
-                    updateFirstAndLastParticipants()
+                    updateFirstAndSecondParticipants()
                 }
         }.onFailure { exception ->
             Timber.e(exception)
@@ -254,23 +254,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     /**
      * Update first and last participants
      */
-    private fun updateFirstAndLastParticipants() {
+    private fun updateFirstAndSecondParticipants() {
         _state.value.participantItemList.let { list ->
-            if (list.isEmpty()) {
-                _state.update {
-                    it.copy(firstParticipant = null,
-                        lastParticipant = null)
-                }
-            } else if (list.size == 1) {
-                _state.update {
-                    it.copy(firstParticipant = list.first(),
-                        lastParticipant = null)
-                }
-            } else {
-                _state.update {
-                    it.copy(firstParticipant = list.first(),
-                        lastParticipant = list.last())
-                }
+            _state.update {
+                it.copy(
+                    firstParticipant = if (list.isNotEmpty()) list.first() else null,
+                    secondParticipant = if (list.size > 1) list[1] else null
+                )
             }
         }
     }
@@ -293,16 +283,18 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             Timber.d("Scheduled meeting exists")
                             _state.update {
-                                it.copy(scheduledMeeting = ScheduledMeetingItem(
-                                    chatId = scheduledMeetReceived.chatId,
-                                    scheduledMeetingId = scheduledMeetReceived.schedId,
-                                    title = scheduledMeetReceived.title,
-                                    description = scheduledMeetReceived.description,
-                                    startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                    endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                    isPast = ZonedDateTime.now()
-                                        .withZoneSameInstant(ZoneOffset.UTC)
-                                        .isAfter(scheduledMeetReceived.endDateTime?.parseDate()))
+                                it.copy(
+                                    scheduledMeeting = ScheduledMeetingItem(
+                                        chatId = scheduledMeetReceived.chatId,
+                                        scheduledMeetingId = scheduledMeetReceived.schedId,
+                                        title = scheduledMeetReceived.title,
+                                        description = scheduledMeetReceived.description,
+                                        startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                        endDate = scheduledMeetReceived.endDateTime?.parseDate(),
+                                        isPast = ZonedDateTime.now()
+                                            .withZoneSameInstant(ZoneOffset.UTC)
+                                            .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
+                                    )
                                 )
                             }
                             return@forEach
@@ -332,7 +324,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 isOpenInvite = chat.isOpenInvite || chat.ownPrivilege == ChatRoomPermission.Moderator,
-                                enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite)
+                                enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite
+                            )
                         }
                     }
                     ChatRoomChanges.Title -> {
@@ -353,8 +346,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
                         val intentRetentionTime =
                             Intent(ACTION_UPDATE_RETENTION_TIME)
-                        intentRetentionTime.putExtra(RETENTION_TIME,
-                            chat.retentionTime)
+                        intentRetentionTime.putExtra(
+                            RETENTION_TIME,
+                            chat.retentionTime
+                        )
                         getInstance().sendBroadcast(intentRetentionTime)
                     }
                     else -> {}
@@ -373,16 +368,18 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     ScheduledMeetingChanges.NewScheduledMeeting -> {
                         if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
                             _state.update {
-                                it.copy(scheduledMeeting = ScheduledMeetingItem(
-                                    chatId = scheduledMeetReceived.chatId,
-                                    scheduledMeetingId = scheduledMeetReceived.schedId,
-                                    title = scheduledMeetReceived.title,
-                                    description = scheduledMeetReceived.description,
-                                    startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                    endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                    isPast = ZonedDateTime.now()
-                                        .withZoneSameInstant(ZoneOffset.UTC)
-                                        .isAfter(scheduledMeetReceived.endDateTime?.parseDate()))
+                                it.copy(
+                                    scheduledMeeting = ScheduledMeetingItem(
+                                        chatId = scheduledMeetReceived.chatId,
+                                        scheduledMeetingId = scheduledMeetReceived.schedId,
+                                        title = scheduledMeetReceived.title,
+                                        description = scheduledMeetReceived.description,
+                                        startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                        endDate = scheduledMeetReceived.endDateTime?.parseDate(),
+                                        isPast = ZonedDateTime.now()
+                                            .withZoneSameInstant(ZoneOffset.UTC)
+                                            .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
+                                    )
                                 )
                             }
                         }
@@ -400,8 +397,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         _state.value.scheduledMeeting?.let {
                             if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
-                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                                        description = scheduledMeetReceived.description))
+                                    state.copy(
+                                        scheduledMeeting = state.scheduledMeeting?.copy(
+                                            description = scheduledMeetReceived.description
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -410,12 +410,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         _state.value.scheduledMeeting?.let {
                             if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
                                 _state.update { state ->
-                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                                        startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                        endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                        isPast = ZonedDateTime.now()
-                                            .withZoneSameInstant(ZoneOffset.UTC)
-                                            .isAfter(scheduledMeetReceived.endDateTime?.parseDate()))
+                                    state.copy(
+                                        scheduledMeeting = state.scheduledMeeting?.copy(
+                                            startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                            endDate = scheduledMeetReceived.endDateTime?.parseDate(),
+                                            isPast = ZonedDateTime.now()
+                                                .withZoneSameInstant(ZoneOffset.UTC)
+                                                .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
+                                        )
                                     )
                                 }
                             }
@@ -495,8 +497,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onSuccess { request ->
                 Timber.d("Query chat link successfully")
                 _state.update {
-                    it.copy(enabledMeetingLinkOption = request.text != null,
-                        meetingLink = request.text)
+                    it.copy(
+                        enabledMeetingLinkOption = request.text != null,
+                        meetingLink = request.text
+                    )
                 }
             }
         }
@@ -529,8 +533,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 showSnackBar(R.string.general_text_error)
             }.onSuccess { request ->
                 _state.update {
-                    it.copy(enabledMeetingLinkOption = true,
-                        meetingLink = request.text)
+                    it.copy(
+                        enabledMeetingLinkOption = true,
+                        meetingLink = request.text
+                    )
                 }
             }
         }
@@ -566,8 +572,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     }
                     ChatUtil.areAllMyContactsChatParticipants(state.value.chatId) -> {
                         _state.update {
-                            it.copy(addParticipantsNoContactsLeftToAddDialog = true,
-                                openAddContact = false)
+                            it.copy(
+                                addParticipantsNoContactsLeftToAddDialog = true,
+                                openAddContact = false
+                            )
                         }
                     }
                     else -> {
@@ -631,7 +639,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      *
      * @param chatCallId chat id
      */
-    fun openOrStartChatCall(chatCallId: Long) {
+    private fun openOrStartChatCall(chatCallId: Long) {
         cameraGateway.setFrontCamera()
         viewModelScope.launch {
             runCatching {
@@ -733,15 +741,17 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun dismissDialog() =
         _state.update { state ->
-            state.copy(leaveGroupDialog = false,
+            state.copy(
+                leaveGroupDialog = false,
                 addParticipantsNoContactsDialog = false,
-                addParticipantsNoContactsLeftToAddDialog = false)
+                addParticipantsNoContactsLeftToAddDialog = false
+            )
         }
 
     /**
      * Finish activity
      */
-    fun finishActivity() =
+    private fun finishActivity() =
         _state.update { state ->
             state.copy(finish = true)
         }
@@ -812,7 +822,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isOpenInvite = result || it.isHost,
-                            enabledAllowNonHostAddParticipantsOption = result)
+                            enabledAllowNonHostAddParticipantsOption = result
+                        )
                     }
                 }
             }
@@ -956,9 +967,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun setScheduledMeetingDate(date: String) {
         _state.update { state ->
-            state.copy(scheduledMeeting = state.scheduledMeeting?.copy(
-                date = date
-            ))
+            state.copy(
+                scheduledMeeting = state.scheduledMeeting?.copy(
+                    date = date
+                )
+            )
         }
     }
 

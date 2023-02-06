@@ -3,14 +3,11 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import java.io.File
 
 /**
  * Node repository
@@ -34,6 +31,13 @@ interface NodeRepository {
     suspend fun isNodeInRubbish(handle: Long): Boolean
 
     /**
+     * check whether the node is in inbox or not
+     *
+     * @return Boolean
+     */
+    suspend fun isNodeInInbox(handle: Long): Boolean
+
+    /**
      * Get the current backup folder node id
      */
     suspend fun getBackupFolderId(): NodeId
@@ -55,6 +59,13 @@ interface NodeRepository {
     suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode>
 
     /**
+     * Get the number of versions in node's history
+     * @param handle the handle of the node
+     * @return the number of history versions or 0 if the file is not found or has no versions
+     */
+    suspend fun getNodeHistoryNumVersions(handle: Long): Int
+
+    /**
      * Monitor node updates
      *
      * @return a flow of all global node updates
@@ -73,4 +84,9 @@ interface NodeRepository {
      * @return Offline node information if found
      */
     suspend fun getOfflineNodeInformation(nodeId: NodeId): OfflineNodeInformation?
+
+    /**
+     * Convert Base 64 string to handle
+     */
+    suspend fun convertBase64ToHandle(base64: String): Long
 }

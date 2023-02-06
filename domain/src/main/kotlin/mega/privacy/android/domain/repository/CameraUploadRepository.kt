@@ -258,16 +258,6 @@ interface CameraUploadRepository {
     suspend fun setSecondaryFolderPath(secondaryFolderPath: String)
 
     /**
-     * Set primary folder handle
-     */
-    suspend fun setPrimaryFolderHandle(primaryHandle: Long)
-
-    /**
-     * Set secondary folder handle
-     */
-    suspend fun setSecondaryFolderHandle(secondaryHandle: Long)
-
-    /**
      * Get remove GPS preference
      * if not set (null), then remove GPS
      *
@@ -344,6 +334,11 @@ interface CameraUploadRepository {
      * @return uploaded video quality
      */
     suspend fun getVideoQuality(): String
+
+    /**
+     * Reset total uploads
+     */
+    suspend fun resetTotalUploads()
 
     /**
      * Convert on charging
@@ -451,11 +446,6 @@ interface CameraUploadRepository {
     suspend fun deleteAllSecondarySyncRecords()
 
     /**
-     * Convert Base 64 string to handle
-     */
-    suspend fun convertBase64ToHandle(base64: String): Long
-
-    /**
      * monitor upload service pause State
      */
     fun monitorCameraUploadPauseState(): Flow<Boolean>
@@ -497,7 +487,9 @@ interface CameraUploadRepository {
     /**
      * number of pending uploads
      */
-    @Deprecated("Function related to statistics will be reviewed in future updates to\n" +
-            "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                " * provide more data and avoid race conditions. They could change or be removed in the current form.",
+    )
     fun getNumberOfPendingUploads(): Int
 }

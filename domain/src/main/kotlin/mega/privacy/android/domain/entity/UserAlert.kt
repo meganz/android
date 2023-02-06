@@ -60,6 +60,48 @@ sealed interface ScheduledMeetingAlert {
 }
 
 /**
+ * Scheduled meeting change type
+ *
+ * @property value
+ */
+enum class ScheduledMeetingChangeType(val value: Int) {
+    /**
+     * Title
+     */
+    Title(0),
+
+    /**
+     * Description
+     */
+    Description(1),
+
+    /**
+     * Canceled
+     */
+    Canceled(2),
+
+    /**
+     * Timezone
+     */
+    Timezone(3),
+
+    /**
+     * Start Date
+     */
+    StartDate(4),
+
+    /**
+     * End Date
+     */
+    EndDate(5),
+
+    /**
+     * Rules
+     */
+    Rules(6),
+}
+
+/**
  * Unknown alert
  *
  * @property id

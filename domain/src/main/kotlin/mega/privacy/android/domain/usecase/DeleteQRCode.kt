@@ -7,9 +7,8 @@ fun interface DeleteQRCode {
     /**
      * Invoke method
      *
-     * @param handle handle – Handle of the contact link to delete If the
-     *  parameter is INVALID_HANDLE, the active contact link is deleted
+     * @param contactLink handle – Contact link to be deleted. It is the URL starts with "https://"
      * @param fileName name of the QR code file in cache
      */
-    suspend operator fun invoke(handle: Long, fileName: String)
+    suspend operator fun invoke(contactLink: String, fileName: String)
 }

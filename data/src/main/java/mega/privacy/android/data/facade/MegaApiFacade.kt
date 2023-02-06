@@ -270,6 +270,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun hasVersion(node: MegaNode): Boolean = megaApi.hasVersions(node)
 
+    override suspend fun getNumVersions(node: MegaNode): Int = megaApi.getNumVersions(node)
+
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
     override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =
@@ -472,6 +474,8 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override suspend fun isInRubbish(node: MegaNode): Boolean = megaApi.isInRubbish(node)
+
+    override suspend fun isInInbox(node: MegaNode): Boolean = megaApi.isInInbox(node)
 
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
@@ -774,8 +778,10 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     @Suppress("DEPRECATION")
-    @Deprecated("Function related to statistics will be reviewed in future updates to\n" +
-            "     * provide more data and avoid race conditions. They could change or be removed in the current form.")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                "     * provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
     override val numberOfPendingUploads: Int
         get() = megaApi.numPendingUploads
 
@@ -795,6 +801,36 @@ internal class MegaApiFacade @Inject constructor(
     override fun checkValidNodeFile(node: MegaNode, nodeFile: File?) =
         nodeFile?.canRead() == true && nodeFile.length() == node.size
                 && node.fingerprint == megaApi.getFingerprint(nodeFile.absolutePath)
+
+    override fun changeEmail(email: String, listener: MegaRequestListenerInterface) =
+        megaApi.changeEmail(email, listener)
+
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                " * provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    override fun resetTotalUploads() {
+        megaApi.resetTotalUploads()
+    }
+
+    override fun confirmAccount(
+        confirmationLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.confirmAccount(confirmationLink, password, listener)
+
+    override suspend fun getExportMasterKey(): String? = megaApi.exportMasterKey()
+
+    override fun setMasterKeyExported(listener: MegaRequestListenerInterface?) {
+        megaApi.masterKeyExported(listener)
+    }
+
+    override fun setUserAttribute(
+        type: Int,
+        value: String,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.setUserAttribute(type, value, listener)
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)

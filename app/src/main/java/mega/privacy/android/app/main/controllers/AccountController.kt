@@ -22,6 +22,8 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,9 +80,12 @@ import nz.mega.sdk.MegaError
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
 
-class AccountController(private val context: Context) {
-
+@ActivityScoped
+class AccountController @Inject constructor(
+    @ActivityContext private val context: Context
+) {
     /**
      * Account controller entry point
      *
@@ -357,8 +362,8 @@ class AccountController(private val context: Context) {
             if (dbH.preferences != null) {
                 dbH.clearPreferences()
                 dbH.setFirstTime(false)
-                fireStopCameraUploadJob(context);
-                stopCameraUploadSyncHeartbeatWorkers(context);
+                fireStopCameraUploadJob(context)
+                stopCameraUploadSyncHeartbeatWorkers(context)
             }
 
             dbH.clearOffline()
@@ -392,8 +397,10 @@ class AccountController(private val context: Context) {
 
             //clear chat and calls preferences
             val entryPoint =
-                EntryPointAccessors.fromApplication(context,
-                    AccountControllerEntryPoint::class.java)
+                EntryPointAccessors.fromApplication(
+                    context,
+                    AccountControllerEntryPoint::class.java
+                )
             sharingScope.launch(Dispatchers.IO) {
                 entryPoint.callsPreferencesGateway().clearPreferences()
                 entryPoint.chatPreferencesGateway().clearPreferences()

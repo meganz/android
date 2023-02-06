@@ -309,6 +309,11 @@ interface MegaApiGateway {
     suspend fun hasVersion(node: MegaNode): Boolean
 
     /**
+     * Get node history num versions
+     */
+    suspend fun getNumVersions(node: MegaNode): Int
+
+    /**
      * Get children nodes by node
      * @param parentNode parent node
      * @param order order for the returned list, if null the default order is applied
@@ -726,6 +731,14 @@ interface MegaApiGateway {
      * @return True in, else not in
      */
     suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
+     * Check is megaNode in Inbox
+     *
+     * @param node MegaNode
+     * @return True in, else not in
+     */
+    suspend fun isInInbox(node: MegaNode): Boolean
 
     /**
      * Move a transfer to the top of the transfer queue
@@ -1479,7 +1492,102 @@ interface MegaApiGateway {
      */
     fun getContactLink(handle: Long, listener: MegaRequestListenerInterface)
 
+    /**
+     * Check valid node file
+     *
+     * @param node The [MegaNode] to check
+     * @param nodeFile The [File] to check
+     *
+     * @return True if the [MegaNode] File is valid
+     */
     fun checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean
+
+    /**
+     * Initialize the change of the email address associated to the account.
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_CHANGE_EMAIL_LINK.
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getEmail - Returns the email for the account
+     *
+     *
+     * If this request succeeds, a change-email link will be sent to the specified email address.
+     * If no user is logged in, you will get the error code MegaError::API_EACCESS in onRequestFinish().
+     *
+     *
+     * If the MEGA account is a sub-user business account, onRequestFinish will
+     * be called with the error code MegaError::API_EMASTERONLY.
+     *
+     * @param email    The new email to be associated to the account.
+     * @param listener MegaRequestListener to track this request
+     */
+    fun changeEmail(email: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reset the number of total uploads
+     * This function resets the number returned by MegaApi::getTotalUploads
+     */
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                "provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    fun resetTotalUploads()
+
+    /**
+     * Confirms a new account.
+     *
+     * @param confirmationLink Confirmation link
+     * @param password         Password of the account
+     * @param listener         MegaRequestListener to track this request
+     */
+    fun confirmAccount(
+        confirmationLink: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+
+    /**
+     * Get Export Master Key
+     */
+    suspend fun getExportMasterKey(): String?
+
+    /**
+     * Set master key exported
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun setMasterKeyExported(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Set a public attribute of the current user
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type
+     * - MegaRequest::getText - Returns the new value for the attribute
+     *
+     * @param type     Attribute type
+     * Valid values are:
+     * MegaApi::USER_ATTR_FIRSTNAME = 1
+     * Set the firstname of the user (public)
+     * MegaApi::USER_ATTR_LASTNAME = 2
+     * Set the lastname of the user (public)
+     * MegaApi::USER_ATTR_ED25519_PUBLIC_KEY = 5
+     * Set the public key Ed25519 of the user (public)
+     * MegaApi::USER_ATTR_CU25519_PUBLIC_KEY = 6
+     * Set the public key Cu25519 of the user (public)
+     * MegaApi::USER_ATTR_RUBBISH_TIME = 19
+     * Set number of days for rubbish-bin cleaning scheduler (private non-encrypted)
+     *
+     *
+     * If the MEGA account is a sub-user business account, and the value of the parameter
+     * type is equal to MegaApi::USER_ATTR_FIRSTNAME or MegaApi::USER_ATTR_LASTNAME
+     * onRequestFinish will be called with the error code MegaError::API_EMASTERONLY.
+     * @param value    New attribute value
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setUserAttribute(type: Int, value: String, listener: MegaRequestListenerInterface)
 
     /**
      * Function to get unverified incoming shares from [MegaApi]

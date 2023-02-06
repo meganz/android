@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -58,8 +57,6 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
     val state: StateFlow<AlbumPhotosSelectionState> = _state
-
-    private var addPhotosJob: Job? = null
 
     init {
         extractAlbumFlow()
@@ -240,14 +237,18 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     }
 
     fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) = viewModelScope.launch {
-        _state.update {
-            it.copy(isSelectionCompleted = true)
-        }
-
         val photoIds = withContext(defaultDispatcher) {
             val albumPhotoIds = _state.value.albumPhotoIds
             selectedPhotoIds - albumPhotoIds
         }
+
+        _state.update {
+            it.copy(
+                isSelectionCompleted = true,
+                numCommittedPhotos = photoIds.size,
+            )
+        }
+
         if (photoIds.isNotEmpty()) {
             addPhotosToAlbum(
                 albumId = album.id,

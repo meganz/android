@@ -139,7 +139,6 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     RecurringMeetingInfoActivity::class.java
                 ).apply {
                     putExtra(CHAT_ID, chatId)
-                    putExtra(SCHEDULED_MEETING_ID, MEGACHAT_INVALID_HANDLE)
                 })
             dismissAllowingStateLoss()
         }

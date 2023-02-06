@@ -620,6 +620,38 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
+    override suspend fun updateCurrentUserFirstName(value: String): String = executeNameUpdate(
+        MegaApiJava.USER_ATTR_FIRSTNAME,
+        "setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)",
+        value
+    ) { localStorageGateway.saveMyFirstName(it) }
+
+    override suspend fun updateCurrentUserLastName(value: String): String = executeNameUpdate(
+        MegaApiJava.USER_ATTR_LASTNAME,
+        "setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME)",
+        value
+    ) { localStorageGateway.saveMyLastName(it) }
+
+    private suspend inline fun executeNameUpdate(
+        type: Int,
+        methodName: String,
+        value: String,
+        crossinline block: suspend ((value: String) -> Unit),
+    ) = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine<String> { continuation ->
+            val listener =
+                continuation.getRequestListener(methodName = methodName) { it.text }
+            megaApiGateway.setUserAttribute(
+                type,
+                value,
+                listener,
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }.also {
+            block(it)
+        }
+    }
+
     private fun Long.toBase64Handle(): String =
         megaApiGateway.handleToBase64(this)
 }

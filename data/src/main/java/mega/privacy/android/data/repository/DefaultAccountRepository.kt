@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NoLoggedInUserException
@@ -461,4 +462,43 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun getAccountCredentials() = localStorageGateway.getUserCredentials()
+
+    override suspend fun changeEmail(email: String): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> continuation.resumeWith(Result.success(request.email))
+                        MegaError.API_EACCESS -> continuation.resumeWith(
+                            Result.failure(ChangeEmailException.EmailInUse)
+                        )
+                        MegaError.API_EEXIST -> continuation.resumeWith(
+                            Result.failure(ChangeEmailException.AlreadyRequested)
+                        )
+                        else -> continuation.resumeWith(
+                            Result.failure(ChangeEmailException.Unknown(error.errorCode))
+                        )
+                    }
+                }
+            )
+
+            megaApiGateway.changeEmail(email, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun confirmAccount(confirmationLink: String, password: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener { return@getRequestListener }
+
+                megaApiGateway.confirmAccount(confirmationLink, password, listener)
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

@@ -6,7 +6,6 @@ buildscript {
     ext.navigationVersion = '2.4.2'
     ext.googleServicesVersion = '4.3.10'
     ext.hiltVersion = "2.42"
-    ext.huaweiServicesVersion = "1.6.3.300"
     ext.firebaseCrashlyticsVersion = "2.8.1"
     ext.firebasePerformanceVersion = "1.4.2"
     ext.firebaseAppDistribution = "3.0.1"
@@ -16,7 +15,6 @@ buildscript {
     repositories {
         google()
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url 'https://developer.huawei.com/repo/' }
         jcenter()
     }
     dependencies {
@@ -25,7 +23,6 @@ buildscript {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.gms:google-services:$googleServicesVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
-        classpath "com.huawei.agconnect:agcp:$huaweiServicesVersion"
         classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsVersion"
         classpath "com.google.firebase:perf-plugin:$firebasePerformanceVersion"
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistribution"
@@ -46,9 +43,6 @@ allprojects {
         jcenter()
         maven {
             url "https://jitpack.io"
-        }
-        maven {
-            url 'https://developer.huawei.com/repo/'
         }
         maven {
             url "${System.env.ARTIFACTORY_BASE_URL}/artifactory/mega-gradle/mega-sdk-android"

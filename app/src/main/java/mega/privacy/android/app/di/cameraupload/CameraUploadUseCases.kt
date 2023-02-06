@@ -5,6 +5,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
@@ -82,6 +83,7 @@ import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.DefaultResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.DefaultResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.DefaultResetTotalUploads
 import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultRestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultSetupPrimaryFolder
@@ -126,6 +128,7 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
@@ -146,7 +149,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
  * Provides the use case implementation for camera upload
  */
 @Module(includes = [GetNodeModule::class])
-@InstallIn(SingletonComponent::class, ViewModelComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class, ServiceComponent::class)
 abstract class CameraUploadUseCases {
 
     companion object {
@@ -752,4 +755,14 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindCreateTempFileAndRemoveCoordinates(createTempFileAndRemoveCoordinates: DefaultCreateTempFileAndRemoveCoordinates): CreateTempFileAndRemoveCoordinates
+
+    /**
+     * Provide the [ResetTotalUploads] implementation
+     *
+     * @param resetTotalUploads [DefaultResetTotalUploads]
+     *
+     * @return [ResetTotalUploads]
+     */
+    @Binds
+    abstract fun bindResetTotalUploads(resetTotalUploads: DefaultResetTotalUploads): ResetTotalUploads
 }
