@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewM
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
@@ -385,7 +386,7 @@ class OutgoingSharesViewModelTest {
         val node = mock<Node> {
             on { this.id }.thenReturn(NodeId(987654321L))
         }
-        monitorNodeUpdates.emit(listOf(node))
+        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(
             getOutgoingSharesChildrenNode,

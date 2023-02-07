@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -23,6 +24,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -30,7 +32,9 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -76,6 +80,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
+    private val nodeUpdateMapper: NodeUpdateMapper
 ) : NodeRepository {
 
 
@@ -157,7 +162,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         } ?: 0
     }
 
-    override fun monitorNodeUpdates(): Flow<List<Node>> {
+    override fun monitorNodeUpdates(): Flow<NodeUpdate> {
         return megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
             .mapNotNull {
@@ -171,8 +176,11 @@ internal class NodeRepositoryImpl @Inject constructor(
                         fileTypeInfoMapper,
                         megaApiGateway::isPendingShare,
                         megaApiGateway::isInRubbish,
-                    )
+                    ) to nodeUpdateMapper(megaNode)
                 }
+            }
+            .map { nodes ->
+                NodeUpdate(nodes.toMap())
             }
             .flowOn(ioDispatcher)
     }

@@ -17,6 +17,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import org.junit.Before
@@ -43,7 +44,7 @@ class NodeRepositoryImplTest {
     private val fileGateway: FileGateway = mock()
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val streamingGateway: StreamingGateway = mock()
-
+    private val nodeUpdateMapper: NodeUpdateMapper = mock()
     @Before
     fun setup() {
         underTest = NodeRepositoryImpl(
@@ -63,6 +64,7 @@ class NodeRepositoryImplTest {
             fileGateway = fileGateway,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             streamingGateway = streamingGateway,
+            nodeUpdateMapper = nodeUpdateMapper
         )
     }
 

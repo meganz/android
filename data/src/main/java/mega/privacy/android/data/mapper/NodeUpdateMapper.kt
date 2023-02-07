@@ -1,27 +1,19 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.node.NodeChanges
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeUpdate
 import nz.mega.sdk.MegaNode
 
 /**
- * Mapper to convert list of updated nodes from sdk into a [NodeUpdate] entity
+ * Mapper to convert updated nodes from sdk into a List of [NodeChanges]
  */
-typealias NodeUpdateMapper = (@JvmSuppressWildcards List<@JvmSuppressWildcards MegaNode>) -> NodeUpdate
-
+typealias NodeUpdateMapper = (@JvmSuppressWildcards MegaNode) -> @JvmSuppressWildcards List<@JvmSuppressWildcards NodeChanges>
 
 /**
- * Maps from mega node list to NodeUpdate
+ * Maps from [MegaNode]  to list of [NodeChanges]
  *
  * @param nodeList
  */
-internal fun mapMegaNodeListToNodeUpdate(nodeList: List<MegaNode>) = NodeUpdate(
-    nodeList.groupBy { node -> NodeId(node.handle) }
-        .mapValues { (_, nodes) ->
-            nodes.map { i -> fromMegaNodeChangeFlags(i.changes) }.flatten()
-        }
-)
+internal fun mapMegaNodeListToNodeUpdate(node: MegaNode) = fromMegaNodeChangeFlags(node.changes)
 
 private fun fromMegaNodeChangeFlags(changeFlags: Int) = nodeChangesMap.filter {
     it.key and changeFlags != 0

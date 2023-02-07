@@ -27,6 +27,7 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
@@ -327,7 +328,7 @@ class ManagerViewModelTest {
 
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            monitorNodeUpdates.emit(listOf(mock()))
+            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
             assertThat(awaitItem()).isTrue()
         }
     }
@@ -338,7 +339,7 @@ class ManagerViewModelTest {
 
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            monitorNodeUpdates.emit(listOf(mock()))
+            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
             assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
             assertThat(awaitItem()).isFalse()

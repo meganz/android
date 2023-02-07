@@ -45,7 +45,7 @@ class DefaultGetTypedNodesFromFolder @Inject constructor(
     private fun getMonitoredList(folderId: NodeId, nodeIds: List<NodeId>) =
         nodeRepository.monitorNodeUpdates()
             .filter { changes ->
-                changes.map { it.id }
+                changes.changes.keys.map { it.id }
                     .intersect(
                         nodeIds.toSet()
                     ).isNotEmpty()

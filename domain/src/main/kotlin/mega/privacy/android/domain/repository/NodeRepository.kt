@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 
@@ -70,7 +71,7 @@ interface NodeRepository {
      *
      * @return a flow of all global node updates
      */
-    fun monitorNodeUpdates(): Flow<List<Node>>
+    fun monitorNodeUpdates(): Flow<NodeUpdate>
 
     /**
      * Check if node is in rubbish or deleted

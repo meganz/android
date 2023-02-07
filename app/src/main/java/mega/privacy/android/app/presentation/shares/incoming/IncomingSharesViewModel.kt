@@ -57,7 +57,7 @@ class IncomingSharesViewModel @Inject constructor(
                 // If the current incoming handle is the node that was updated,
                 // check if the current user still has access to it,
                 // if not redirect to root incoming shares
-                list
+                list.changes.keys
                     .filter { it.isIncomingShare }
                     .singleOrNull { it.id.longValue == _state.value.incomingHandle }
                     ?.let { node ->

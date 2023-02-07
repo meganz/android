@@ -9,7 +9,6 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
-import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.sortOrderToInt
@@ -43,7 +42,6 @@ class DefaultPhotosRepositoryTest {
     private val dateUtilWrapper = mock<DateUtilWrapper> {
         on { fromEpoch(any()) }.thenReturn(LocalDateTime.now())
     }
-    private val nodeUpdateMapper = mock<NodeUpdateMapper>()
     private val imageMapper: ImageMapper = ::createImage
     private val videoMapper: VideoMapper = ::createVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = ::mapFileTypeInfo
@@ -59,7 +57,6 @@ class DefaultPhotosRepositoryTest {
             dateUtilFacade = dateUtilWrapper,
             imageMapper = imageMapper,
             videoMapper = videoMapper,
-            nodeUpdateMapper = nodeUpdateMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             sortOrderIntMapper = sortOrderIntMapper,
         )

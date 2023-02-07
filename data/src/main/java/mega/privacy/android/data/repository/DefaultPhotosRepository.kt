@@ -2,10 +2,6 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
@@ -16,10 +12,8 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
-import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -28,7 +22,6 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -36,7 +29,6 @@ import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -49,7 +41,6 @@ import javax.inject.Inject
  * @property megaLocalStorageFacade MegaLocalStorageGateway
  * @property imageMapper ImageMapper
  * @property videoMapper VideoMapper
- * @property nodeUpdateMapper NodeUpdateMapper
  */
 internal class DefaultPhotosRepository @Inject constructor(
     private val megaApiFacade: MegaApiGateway,
@@ -59,7 +50,6 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val dateUtilFacade: DateUtilWrapper,
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
-    private val nodeUpdateMapper: NodeUpdateMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PhotosRepository {
@@ -85,16 +75,6 @@ internal class DefaultPhotosRepository @Inject constructor(
         val getMediaUploadFolderId = megaLocalStorageFacade.getMegaHandleSecondaryFolder()
         getMediaUploadFolderId
     }
-
-    override fun monitorNodeUpdates(): Flow<NodeUpdate> =
-        megaApiFacade.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull {
-                it.nodeList?.toList()
-            }.map { nodeList ->
-                nodeUpdateMapper(nodeList)
-            }
-
     override suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
         val images = async { mapPhotoNodesToImages(searchImages()) }
         val videos = async { mapPhotoNodesToVideos(searchVideos()) }

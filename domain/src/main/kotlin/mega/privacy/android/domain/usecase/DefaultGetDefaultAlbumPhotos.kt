@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ import javax.inject.Inject
  */
 class DefaultGetDefaultAlbumPhotos @Inject constructor(
     private val photosRepository: PhotosRepository,
+    private val nodeRepository: NodeRepository
 ) : GetDefaultAlbumPhotos {
 
     override fun invoke(list: List<suspend (Photo) -> Boolean>) = flow {
@@ -33,7 +35,7 @@ class DefaultGetDefaultAlbumPhotos @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getUpdatePhotos(list: List<suspend (Photo) -> Boolean>) =
-        photosRepository.monitorNodeUpdates()
+        nodeRepository.monitorNodeUpdates()
             .map { (changes) ->
                 changes
                     .filter { (_, value) ->

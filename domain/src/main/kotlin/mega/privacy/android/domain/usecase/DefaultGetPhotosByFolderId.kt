@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ import javax.inject.Inject
  */
 class DefaultGetPhotosByFolderId @Inject constructor(
     val photosRepository: PhotosRepository,
+    private val nodeRepository: NodeRepository
 ) : GetPhotosByFolderId {
 
     override fun invoke(folderId: Long, order: SortOrder): Flow<List<Photo>> {
@@ -32,6 +34,6 @@ class DefaultGetPhotosByFolderId @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getMonitoredList(folderId: Long, order: SortOrder) =
-        photosRepository.monitorNodeUpdates()
+        nodeRepository.monitorNodeUpdates()
             .mapLatest { getChildren(folderId, order) }
 }

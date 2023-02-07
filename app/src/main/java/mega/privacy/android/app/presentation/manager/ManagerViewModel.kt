@@ -141,9 +141,10 @@ class ManagerViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorNodeUpdates().collect {
-                checkItemForInbox(it)
+                val nodeList = it.changes.keys.toList()
+                checkItemForInbox(nodeList)
                 onReceiveNodeUpdate(true)
-                checkCameraUploadFolder(false, it)
+                checkCameraUploadFolder(false, nodeList)
             }
         }
         viewModelScope.launch(ioDispatcher) {

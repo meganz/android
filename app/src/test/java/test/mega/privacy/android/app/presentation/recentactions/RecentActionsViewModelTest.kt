@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetRecentActions
@@ -388,7 +389,7 @@ class RecentActionsViewModelTest {
                 .test {
                     assertThat(awaitItem().size).isEqualTo(0)
                     advanceUntilIdle()
-                    monitorNodeUpdates.emit(listOf(mock()))
+                    monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
                     whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
                     assertThat(awaitItem().size).isEqualTo(2)
                 }
