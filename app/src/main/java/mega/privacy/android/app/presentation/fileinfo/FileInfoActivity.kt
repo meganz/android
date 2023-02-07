@@ -538,7 +538,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     this
                 )
             }
-            FileInfoOneOffViewEvent.GeneralError -> showSnackbar(R.string.general_error)
+            is FileInfoOneOffViewEvent.GeneralError -> showSnackbar(R.string.general_error)
             is FileInfoOneOffViewEvent.CollisionDetected -> {
                 val list = ArrayList<NameCollision>()
                 list.add(event.collision)

@@ -6,6 +6,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.domain.di.ViewTypeModule
+import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import org.mockito.kotlin.mock
 
 @Module
@@ -16,4 +17,7 @@ import org.mockito.kotlin.mock
 object TestFileInfoModule {
     @Provides
     fun provideCheckNameCollision(): CheckNameCollision = mock()
+
+    @Provides
+    fun provideMoveNodeByHandle(): MoveNodeByHandle = mock()
 }

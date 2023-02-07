@@ -12,8 +12,10 @@ import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 
 /**
  * Get node module
@@ -89,6 +91,17 @@ abstract class GetNodeModule {
                     parentNodeHandle.longValue,
                     type
                 ).await()
+            }
+
+        /**
+         * Provides [MoveNodeByHandle] implementation
+         * @param moveNodeUseCase [MoveNodeUseCase]
+         * @return [MoveNodeByHandle]
+         */
+        @Provides
+        fun provideMoveNodeByHandle(moveNodeUseCase: MoveNodeUseCase): MoveNodeByHandle =
+            MoveNodeByHandle { nodeToCopy, newNodeParent ->
+                moveNodeUseCase.move(nodeToCopy.longValue, newNodeParent.longValue).await()
             }
     }
 }

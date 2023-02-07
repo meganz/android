@@ -6,21 +6,24 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -41,7 +44,7 @@ internal class FileInfoViewModelTest {
     private lateinit var getFileHistoryNumVersions: GetFileHistoryNumVersions
     private lateinit var isNodeInInbox: IsNodeInInbox
     private lateinit var checkNameCollision: CheckNameCollision
-    private lateinit var moveNodeUseCase: MoveNodeUseCase
+    private lateinit var moveNodeByHandle: MoveNodeByHandle
     private lateinit var copyNodeUseCase: CopyNodeUseCase
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
@@ -53,31 +56,43 @@ internal class FileInfoViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        initMocks()
+        runTest {
+            initDefaultMockBehaviour()
+        }
+        initUnderTestViewModel()
+    }
+
+    private fun initMocks() {
         monitorStorageStateEvent = mock()
         monitorConnectivity = mock()
         getFileHistoryNumVersions = mock()
         isNodeInInbox = mock()
         checkNameCollision = mock()
-        moveNodeUseCase = mock()
+        moveNodeByHandle = mock()
         copyNodeUseCase = mock()
         node = mock()
         nameCollision = mock()
+    }
+
+    private fun initUnderTestViewModel() {
         underTest = FileInfoViewModel(
             monitorStorageStateEvent,
             monitorConnectivity,
             getFileHistoryNumVersions,
             isNodeInInbox,
             checkNameCollision,
-            moveNodeUseCase,
+            moveNodeByHandle,
             copyNodeUseCase
         )
-        runBlocking {
-            whenever(node.handle).thenReturn(NODE_HANDLE)
-            whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
-            whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
-            whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
-            underTest.updateNode(node)
-        }
+        underTest.updateNode(node)
+    }
+
+    private suspend fun initDefaultMockBehaviour() {
+        whenever(node.handle).thenReturn(NODE_HANDLE)
+        whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
+        whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
+        whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
     }
 
     @After
@@ -91,10 +106,7 @@ internal class FileInfoViewModelTest {
             for (n in 0..5) {
                 whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(n)
                 underTest.updateNode(node)
-                underTest.uiState.test {
-                    val state = awaitItem()
-                    Truth.assertThat(state.historyVersions).isEqualTo(n)
-                }
+                Truth.assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
             }
         }
 
@@ -104,10 +116,7 @@ internal class FileInfoViewModelTest {
             suspend fun verify(isNodeInInbox: Boolean) {
                 whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(isNodeInInbox)
                 underTest.updateNode(node)
-                underTest.uiState.test {
-                    val state = awaitItem()
-                    Truth.assertThat(state.isNodeInInbox).isEqualTo(isNodeInInbox)
-                }
+                Truth.assertThat(underTest.uiState.value.isNodeInInbox).isEqualTo(isNodeInInbox)
                 Truth.assertThat(underTest.isNodeInInbox()).isEqualTo(isNodeInInbox)
             }
             verify(true)
@@ -120,10 +129,7 @@ internal class FileInfoViewModelTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.updateNode(node)
-            underTest.uiState.test {
-                val state = awaitItem()
-                Truth.assertThat(state.showHistoryVersions).isEqualTo(true)
-            }
+            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
     @Test
@@ -132,10 +138,7 @@ internal class FileInfoViewModelTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(2)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.updateNode(node)
-            underTest.uiState.test {
-                val state = awaitItem()
-                Truth.assertThat(state.showHistoryVersions).isEqualTo(true)
-            }
+            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
     @Test
@@ -144,10 +147,8 @@ internal class FileInfoViewModelTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(true)
             underTest.updateNode(node)
-            underTest.uiState.test {
-                val state = awaitItem()
-                Truth.assertThat(state.showHistoryVersions).isEqualTo(false)
-            }
+            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
+
         }
 
     @Test
@@ -156,23 +157,82 @@ internal class FileInfoViewModelTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.updateNode(node)
-            underTest.uiState.test {
-                val state = awaitItem()
-                Truth.assertThat(state.showHistoryVersions).isEqualTo(false)
-            }
+            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
+
         }
 
     @Test
     fun `test NotConnected event is launched if not connected while moving`() =
-        runBlocking {
+        runTest {
             whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(false))
             underTest.moveNodeCheckingCollisions(parentId)
-            underTest.uiState.test {
-                val state = awaitItem()
-                Truth.assertThat(state.oneOffViewEvent)
-                    .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
+            Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
+                .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
+
+        }
+
+    @Test
+    fun `test CollisionDetected event is launched when a collision is found while moving`() =
+        runTest {
+            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenReturn(
+                nameCollision
+            )
+            underTest.moveNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
+        }
+
+    @Test
+    fun `test CollisionDetected event is launched when a collision is found while copying`() =
+        runTest {
+            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY)).thenReturn(
+                nameCollision
+            )
+            underTest.copyNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
+        }
+
+    @Test
+    fun `test FinishedMoving event is launched without exceptions when the move finished OK`() =
+        runTest {
+            whenever(
+                moveNodeByHandle.invoke(nodeId, parentId)
+            ).thenReturn(Unit)
+            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenThrow(
+                MegaNodeException.ChildDoesNotExistsException::class.java
+            )
+            underTest.moveNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedMoving::class.java)?.also {
+                Truth.assertThat(it.exception).isNull()
             }
         }
+
+    @Test
+    fun `test FinishedMoving event is launched with the proper exceptions when the move finished KO`() =
+        runTest {
+            whenever(
+                moveNodeByHandle.invoke(nodeId, parentId)
+            ).thenThrow(RuntimeException("fake exception"))
+            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenThrow(
+                MegaNodeException.ChildDoesNotExistsException::class.java
+            )
+            underTest.moveNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedMoving::class.java)?.also {
+                Truth.assertThat(it.exception).isNotNull()
+            }
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    private suspend fun <T : FileInfoOneOffViewEvent> testNextEventIsOfType(
+        clazz: Class<T>,
+    ): T? {
+        return getNextEvent().also {
+            Truth.assertThat(it).isInstanceOf(clazz)
+        } as? T?
+    }
+
+    private suspend fun getNextEvent(): FileInfoOneOffViewEvent =
+        underTest.uiState.mapNotNull { it.oneOffViewEvent }.first()
+
 
     @Test
     fun `test NotConnected event is launched if not connected while copying`() =
@@ -186,39 +246,9 @@ internal class FileInfoViewModelTest {
             }
         }
 
-    @Test
-    fun `test CollisionDetected event is launched when a collision is found while moving`() =
-        runBlocking {
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenReturn(
-                nameCollision
-            )
-            underTest.moveNodeCheckingCollisions(parentId)
-            underTest.uiState.filterNot { it.oneOffViewEvent == null }.test {
-                val state = awaitItem()
-                Truth.assertThat(state.oneOffViewEvent)
-                    .isInstanceOf(FileInfoOneOffViewEvent.CollisionDetected::class.java)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `test CollisionDetected event is launched when a collision is found while copying`() =
-        runBlocking {
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY)).thenReturn(
-                nameCollision
-            )
-            underTest.copyNodeCheckingCollisions(parentId)
-            underTest.uiState.filterNot { it.oneOffViewEvent == null }.test {
-                val state = awaitItem()
-                Truth.assertThat(state.oneOffViewEvent)
-                    .isInstanceOf(FileInfoOneOffViewEvent.CollisionDetected::class.java)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
     companion object {
         private const val NODE_HANDLE = 10L
-        private const val PARENT_NODE_HANDLE = 10L
+        private const val PARENT_NODE_HANDLE = 12L
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
     }

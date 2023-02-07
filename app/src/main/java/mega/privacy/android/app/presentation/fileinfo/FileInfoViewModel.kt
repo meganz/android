@@ -9,18 +9,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.await
+import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
-import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class FileInfoViewModel @Inject constructor(
     private val getFileHistoryNumVersions: GetFileHistoryNumVersions,
     private val isNodeInInbox: IsNodeInInbox,
     private val checkNameCollision: CheckNameCollision,
-    private var moveNodeUseCase: MoveNodeUseCase,
+    private var moveNodeByHandle: MoveNodeByHandle,
     private var copyNodeUseCase: CopyNodeUseCase,
 ) : ViewModel() {
 
@@ -177,7 +177,7 @@ class FileInfoViewModel @Inject constructor(
      */
     private suspend fun move(parentHandle: NodeId) {
         val moved = runCatching {
-            moveNodeUseCase.move(node.handle, parentHandle.longValue).await()
+            moveNodeByHandle(NodeId(node.handle), parentHandle)
         }
         _uiState.updateEvent(FileInfoOneOffViewEvent.FinishedMoving(moved.exceptionOrNull()))
     }
