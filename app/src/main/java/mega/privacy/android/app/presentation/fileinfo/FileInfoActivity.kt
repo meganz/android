@@ -26,6 +26,7 @@ import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
@@ -33,8 +34,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
@@ -69,17 +68,12 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
-import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -112,6 +106,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -135,24 +130,12 @@ import javax.inject.Inject
  * Activity for showing file and folder info.
  *
  * @property passCodeFacade [PasscodeCheck] an injected component to enforce a Passcode security check
- * @property checkNameCollisionUseCase [CheckNameCollisionUseCase] injected use case
- * @property moveNodeUseCase [MoveNodeUseCase] injected use case
- * @property copyNodeUseCase [CopyNodeUseCase] injected use case
  */
 @AndroidEntryPoint
 class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
-
-    @Inject
-    lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
-
-    @Inject
-    lateinit var moveNodeUseCase: MoveNodeUseCase
-
-    @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
 
     private val viewModel: FileInfoViewModel by viewModels()
 
@@ -267,7 +250,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var mOffDelete: MegaOffline? = null
     private var availableOfflineBoolean = false
     private var cC: ContactController? = null
-    private var statusDialog: AlertDialog? = null
+    private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
     private var publicLink = false
     private var moveToRubbish = false
     private val density by lazy { outMetrics.density }
@@ -306,7 +289,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     hideMultipleSelect()
                 }
                 adapter.setShareList(listContacts)
-                statusDialog?.dismiss()
+                progressDialog?.first?.dismiss()
                 permissionsDialog?.dismiss()
             }
         }
@@ -376,8 +359,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                         setSingleChoiceItems(items, -1) { _, it ->
                             clearSelections()
                             permissionsDialog?.dismiss()
-                            statusDialog = createProgressDialog(
-                                this@FileInfoActivity,
+                            showProgressDialog(
                                 getFormattedStringOrDefault(R.string.context_permissions_changing_folder)
                             )
                             cC?.changePermissions(cC?.getEmailShares(shares), it, viewModel.node)
@@ -519,24 +501,104 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private fun collectUIState() {
         this.collectFlow(viewModel.uiState) { viewState ->
-            with(bindingContent) {
-                // If the Node belongs to Backups or has no versions, then hide
-                // the Versions layout
-                if (viewState.showHistoryVersions) {
-                    filePropertiesVersionsLayout.isVisible = true
-                    val text = getQuantityStringOrDefault(
-                        R.plurals.number_of_versions,
-                        viewState.historyVersions,
-                        viewState.historyVersions
-                    )
-                    filePropertiesTextNumberVersions.text = text
-                    separatorVersions.isVisible = true
+            updateView(viewState)
+            updateProgress(viewState.jobInProgressState)
+            viewState.oneOffViewEvent?.let {
+                consumeEvent(viewState.oneOffViewEvent)
+            }
+        }
+    }
+
+    private fun updateView(viewState: FileInfoViewState) {
+        with(bindingContent) {
+            // If the Node belongs to Backups or has no versions, then hide
+            // the Versions layout
+            if (viewState.showHistoryVersions) {
+                filePropertiesVersionsLayout.isVisible = true
+                val text = getQuantityStringOrDefault(
+                    R.plurals.number_of_versions,
+                    viewState.historyVersions,
+                    viewState.historyVersions
+                )
+                filePropertiesTextNumberVersions.text = text
+                separatorVersions.isVisible = true
+            } else {
+                filePropertiesVersionsLayout.isVisible = false
+                separatorVersions.isVisible = false
+            }
+        }
+    }
+
+    private fun consumeEvent(event: FileInfoOneOffViewEvent) {
+        when (event) {
+            FileInfoOneOffViewEvent.NotConnected -> {
+                Util.showErrorAlertDialog(
+                    getFormattedStringOrDefault(R.string.error_server_connection_problem),
+                    false,
+                    this
+                )
+            }
+            FileInfoOneOffViewEvent.GeneralError -> showSnackbar(R.string.general_error)
+            is FileInfoOneOffViewEvent.CollisionDetected -> {
+                val list = ArrayList<NameCollision>()
+                list.add(event.collision)
+                nameCollisionActivityContract?.launch(list)
+            }
+            is FileInfoOneOffViewEvent.FinishedMoving -> {
+                if (event.exception == null) {
+                    showSnackbar(R.string.context_correctly_moved)
+                    sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
+                    finish()
                 } else {
-                    filePropertiesVersionsLayout.isVisible = false
-                    separatorVersions.isVisible = false
+                    if (!manageCopyMoveException(event.exception)) {
+                        showSnackbar(R.string.context_no_moved)
+                    }
+                }
+            }
+            is FileInfoOneOffViewEvent.FinishedCopying -> {
+                if (event.exception == null) {
+                    showSnackbar(R.string.context_correctly_copied)
+                    sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
+                    finish()
+                } else {
+                    if (!manageCopyMoveException(event.exception)) {
+                        showSnackbar(R.string.context_no_copied)
+                    }
                 }
             }
         }
+        viewModel.consumeOneOffEvent(event)
+    }
+
+    private fun showSnackbar(@StringRes resString: Int) {
+        showSnackbar(
+            Constants.SNACKBAR_TYPE,
+            getFormattedStringOrDefault(resString),
+            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+        )
+    }
+
+    private fun updateProgress(progressState: FileInfoJobInProgressState?) {
+        if (progressState == null) {
+            progressDialog?.first?.dismiss()
+            progressDialog = null
+        } else if (progressDialog?.second != progressState) {
+            val string = when (progressState) {
+                FileInfoJobInProgressState.Moving -> R.string.context_moving
+                FileInfoJobInProgressState.Copying -> R.string.context_copying
+            }
+            showProgressDialog(getFormattedStringOrDefault(string), progressState)
+        }
+    }
+
+    private fun showProgressDialog(message: String, progress: FileInfoJobInProgressState? = null) {
+        progressDialog = Pair(
+            createProgressDialog(
+                this@FileInfoActivity,
+                message
+            ).also { it.show() },
+            progress
+        )
     }
 
     private fun getNodeFromExtras(): MegaNode? {
@@ -841,7 +903,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun configureSelectContactForShareFolderLauncher() {
         selectContactForShareFolderLauncher =
             registerForActivityResult(SelectUsersToShareActivityContract()) { result ->
-                if (!checkIsConnected()) {
+                if (!viewModel.checkAndHandleIsDeviceConnected()) {
                     return@registerForActivityResult
                 }
                 result?.let {
@@ -866,8 +928,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                                 )
                                     .setTitle(getFormattedStringOrDefault(R.string.file_properties_shared_folder_permissions))
                                     .setSingleChoiceItems(items, -1) { _, item ->
-                                        statusDialog = createProgressDialog(
-                                            this,
+                                        showProgressDialog(
                                             getFormattedStringOrDefault(R.string.context_sharing_folder)
                                         )
                                         permissionsDialog?.dismiss()
@@ -888,7 +949,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun configureVersionHistoryLauncher() {
         versionHistoryLauncher =
             registerForActivityResult(DeleteVersionsHistoryActivityContract()) { result ->
-                if (!checkIsConnected()) {
+                if (!viewModel.checkAndHandleIsDeviceConnected()) {
                     return@registerForActivityResult
                 }
                 if (result == viewModel.node.handle) {
@@ -904,60 +965,20 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun configureCopyLauncher() {
         copyLauncher =
             registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
-                manageMoveCopyResult(
-                    result?.second,
-                    R.string.context_copying,
-                    NameCollisionType.COPY
-                )
+                result?.second?.let { selectedFolderNode ->
+                    viewModel.copyNodeCheckingCollisions(parentHandle = NodeId(selectedFolderNode))
+                }
             }
     }
 
     private fun configureMoveLauncher() {
         moveLauncher =
             registerForActivityResult(SelectFolderToMoveActivityContract()) { result ->
-                manageMoveCopyResult(
-                    result?.second,
-                    R.string.context_moving,
-                    NameCollisionType.MOVE
-                )
+                result?.second?.let { selectedFolderNode ->
+                    viewModel.moveNodeCheckingCollisions(parentHandle = NodeId(selectedFolderNode))
+                }
             }
     }
-
-    private fun manageMoveCopyResult(
-        handle: Long?,
-        progressStringRes: Int,
-        collisionType: NameCollisionType,
-    ) {
-        if (!checkIsConnected()) {
-            return
-        }
-        handle?.let { toHandle ->
-            val temp: AlertDialog
-            try {
-                temp = createProgressDialog(
-                    this,
-                    getFormattedStringOrDefault(progressStringRes)
-                )
-                temp.show()
-            } catch (e: Exception) {
-                return
-            }
-            statusDialog = temp
-            checkCollision(toHandle, collisionType)
-        }
-    }
-
-    private fun checkIsConnected(): Boolean =
-        if (!viewModel.isConnected) {
-            Util.showErrorAlertDialog(
-                getFormattedStringOrDefault(R.string.error_server_connection_problem),
-                false,
-                this
-            )
-            false
-        } else {
-            true
-        }
 
     /**
      * Starts a new Intent to share the folder to different contacts
@@ -1322,7 +1343,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun moveToTrash() {
         Timber.d("moveToTrash")
         moveToRubbish = false
-        if (!checkIsConnected()) {
+        if (!viewModel.checkAndHandleIsDeviceConnected()) {
             return
         }
         if (isFinishing) {
@@ -1356,10 +1377,9 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     megaApi.moveNode(viewModel.node, megaApi.rubbishNode, megaRequestListener)
 
                     try {
-                        statusDialog = createProgressDialog(
-                            this@FileInfoActivity,
+                        showProgressDialog(
                             getFormattedStringOrDefault(R.string.context_move_to_trash)
-                        ).apply { show() }
+                        )
                     } catch (e: Exception) {
                         Timber.w("Exception showing move to trash confirmation")
                     }
@@ -1367,10 +1387,9 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     megaApi.remove(viewModel.node, megaRequestListener)
 
                     try {
-                        statusDialog = createProgressDialog(
-                            this@FileInfoActivity,
+                        showProgressDialog(
                             getFormattedStringOrDefault(R.string.context_delete_from_mega)
-                        ).apply { show() }
+                        )
                     } catch (e: Exception) {
                         Timber.w("Exception showing remove confirmation")
                     }
@@ -1453,7 +1472,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
         } else if (request.type == MegaRequest.TYPE_MOVE) {
             try {
-                statusDialog?.dismiss()
+                progressDialog?.first?.dismiss()
             } catch (ex: Exception) {
                 Timber.d(ex.message)
             }
@@ -1540,7 +1559,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
         } else if (request.type == MegaApiJava.USER_ATTR_AVATAR) {
             try {
-                statusDialog?.dismiss()
+                progressDialog?.first?.dismiss()
             } catch (ex: Exception) {
                 Timber.e(ex)
             }
@@ -1574,101 +1593,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         nodeSaver.handleRequestPermissionsResult(requestCode)
-    }
-
-    /**
-     * Checks if there is a name collision before moving or copying the node.
-     *
-     * @param parentHandle Parent handle of the node in which the node will be moved or copied.
-     * @param type         Type of name collision to check.
-     */
-    private fun checkCollision(parentHandle: Long, type: NameCollisionType) {
-        checkNameCollisionUseCase.check(viewModel.node.handle, parentHandle, type)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { collision: NameCollision ->
-                    statusDialog?.dismiss()
-                    val list = ArrayList<NameCollision>()
-                    list.add(collision)
-                    nameCollisionActivityContract?.launch(list)
-                }
-            ) { throwable: Throwable? ->
-                statusDialog?.dismiss()
-                if (throwable is ChildDoesNotExistsException) {
-                    if (type === NameCollisionType.MOVE) {
-                        move(parentHandle)
-                    } else {
-                        copy(parentHandle)
-                    }
-                } else {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.general_error),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }.also { composite.add(it) }
-    }
-
-    /**
-     * Moves the node.
-     *
-     * @param parentHandle Parent handle in which the node will be moved.
-     */
-    private fun move(parentHandle: Long) {
-        moveNodeUseCase.move(viewModel.node.handle, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                statusDialog?.dismiss()
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getFormattedStringOrDefault(R.string.context_correctly_moved),
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-                sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
-                finish()
-            }
-            ) { throwable: Throwable? ->
-                statusDialog?.dismiss()
-                if (!manageCopyMoveException(throwable)) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.context_no_moved),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }.also { composite.add(it) }
-    }
-
-    /**
-     * Copies the node.
-     *
-     * @param parentHandle Parent handle in which the node will be copied.
-     */
-    private fun copy(parentHandle: Long) {
-        copyNodeUseCase.copy(viewModel.node.handle, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                statusDialog?.dismiss()
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getFormattedStringOrDefault(R.string.context_correctly_copied),
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-            }
-            ) { throwable: Throwable? ->
-                statusDialog?.dismiss()
-                if (!manageCopyMoveException(throwable)) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.context_no_copied),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }.also { composite.add(it) }
     }
 
     private fun onNodesUpdate(nodes: ArrayList<MegaNode>?) {
@@ -1980,8 +1904,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         )
         val selected = selectedShare ?: return
         dialogBuilder.setSingleChoiceItems(items, selected.access) { _, item ->
-            statusDialog = createProgressDialog(
-                this,
+            showProgressDialog(
                 getFormattedStringOrDefault(R.string.context_permissions_changing_folder)
             )
             permissionsDialog?.dismiss()
@@ -2011,8 +1934,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             .show()
 
     private fun removeShare(email: String?) {
-        statusDialog = createProgressDialog(
-            this,
+        showProgressDialog(
             getFormattedStringOrDefault(R.string.context_removing_contact_folder)
         )
         nodeController.removeShare(
@@ -2067,8 +1989,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private fun removeMultipleShares(shares: ArrayList<MegaShare>?) {
         Timber.d("removeMultipleShares")
-        statusDialog = createProgressDialog(
-            this,
+        showProgressDialog(
             getFormattedStringOrDefault(R.string.context_removing_contact_folder)
         )
         nodeController.removeShares(shares, viewModel.node)

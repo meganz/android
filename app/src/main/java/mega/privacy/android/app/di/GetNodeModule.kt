@@ -5,10 +5,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.rx3.await
+import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 
@@ -72,5 +75,20 @@ abstract class GetNodeModule {
         @Provides
         fun provideGetUnverifiedOutGoingShares(megaNodeRepository: MegaNodeRepository): GetUnverifiedOutgoingShares =
             GetUnverifiedOutgoingShares(megaNodeRepository::getUnverifiedOutgoingShares)
+
+        /**
+         * Provides [CheckNameCollision] implementation
+         * @param checkNameCollisionUseCase [CheckNameCollisionUseCase] is the current implementation, not following the current architecture
+         * @return [CheckNameCollision]
+         */
+        @Provides
+        fun provideCheckNameCollision(checkNameCollisionUseCase: CheckNameCollisionUseCase): CheckNameCollision =
+            CheckNameCollision { nodeHandle, parentNodeHandle, type ->
+                checkNameCollisionUseCase.check(
+                    nodeHandle.longValue,
+                    parentNodeHandle.longValue,
+                    type
+                ).await()
+            }
     }
 }
