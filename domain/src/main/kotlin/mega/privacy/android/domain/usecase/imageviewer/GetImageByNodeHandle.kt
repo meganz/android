@@ -20,5 +20,5 @@ fun interface GetImageByNodeHandle {
         nodeHandle: Long,
         fullSize: Boolean,
         highPriority: Boolean
-    ): Flow<ImageResult>?
+    ): Flow<ImageResult>
 }

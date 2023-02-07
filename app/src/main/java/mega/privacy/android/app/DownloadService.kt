@@ -49,7 +49,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
 import mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAILABLE
 import mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA
 import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
@@ -58,7 +57,6 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.objects.SDTransfer
@@ -82,9 +80,11 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -106,7 +106,7 @@ import javax.inject.Inject
  * Background service to download files
  */
 @AndroidEntryPoint
-class DownloadService : Service(), MegaRequestListenerInterface {
+internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
@@ -140,6 +140,13 @@ class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var rootNodeExists: RootNodeExists
+
+    @Inject
+    lateinit var broadcastTransferOverQuota: BroadcastTransferOverQuota
+
+    @Inject
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -1425,7 +1432,9 @@ Error: ${e.errorCode} ${e.errorString}""")
             if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
                 transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
                 transfersManagement.setTransferOverQuotaTimestamp()
-                LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean::class.java).post(true)
+                applicationScope.launch {
+                    broadcastTransferOverQuota()
+                }
             }
         } else if (!transfersManagement.isTransferOverQuotaNotificationShown) {
             transfersManagement.isTransferOverQuotaNotificationShown = true

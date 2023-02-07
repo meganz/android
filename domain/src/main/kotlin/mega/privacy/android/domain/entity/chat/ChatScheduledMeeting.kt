@@ -42,6 +42,6 @@ data class ChatScheduledMeeting constructor(
      */
     fun isPending(): Boolean {
         val now = System.currentTimeMillis() / 1000
-        return (startDateTime ?: 0) > now || (endDateTime ?: 0) > now
+        return (startDateTime ?: 0) > now || (endDateTime ?: 0) > now || (rules?.until ?: 0) > now
     }
 }

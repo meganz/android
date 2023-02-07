@@ -6,13 +6,13 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.repository.QRCodeRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultDeleteQRCodeTest {
@@ -20,16 +20,17 @@ class DefaultDeleteQRCodeTest {
     private lateinit var underTest: DefaultDeleteQRCode
 
     private val accountRepository: AccountRepository = mock()
-    private val qrCodeRepository: QRCodeRepository = mock()
     private val nodeRepository: NodeRepository = mock()
+    private val getQRCodeFile: GetQRCodeFile = mock()
 
     @Before
     fun setup() {
         underTest = DefaultDeleteQRCode(
             accountRepository = accountRepository,
             nodeRepository = nodeRepository,
-            qrCodeRepository = qrCodeRepository,
             ioDispatcher = UnconfinedTestDispatcher(),
+            getQRCodeFile = getQRCodeFile
+
         )
     }
 
@@ -38,12 +39,13 @@ class DefaultDeleteQRCodeTest {
         val contactLink = "https://mega.nz/C!MTAwMDAwMA=="
         val handle = 1000000L
         val qrFileName = "tester@mega.co.nzQR_code_image.jpg"
+        val qrCodeFile: File = mock()
 
         whenever(nodeRepository.convertBase64ToHandle(any())).thenReturn(handle)
+        whenever(getQRCodeFile.invoke()).thenReturn(qrCodeFile)
 
-        underTest(contactLink, qrFileName)
+        underTest(contactLink)
         verify(accountRepository).deleteContactLink(handle)
-        verify(qrCodeRepository).getQRFile(fileName = qrFileName)
     }
 
     @Test(expected = MegaException::class)
@@ -60,7 +62,7 @@ class DefaultDeleteQRCodeTest {
             )
         }
 
-        underTest(contactLink, qrFileName)
+        underTest(contactLink)
     }
 
     @Test(expected = MegaException::class)
@@ -75,7 +77,7 @@ class DefaultDeleteQRCodeTest {
             )
         }
 
-        underTest(contactLink, qrFileName)
+        underTest(contactLink)
     }
 
 }

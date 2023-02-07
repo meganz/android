@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.repository.ChatRepository
@@ -159,18 +160,21 @@ class DefaultGetMeetings @Inject constructor(
             .map { scheduledMeeting ->
                 apply {
                     val currentItemIndex = indexOfFirst { it.chatId == scheduledMeeting.chatId }
-                    val currentItem = get(currentItemIndex)
-                    val isPending = currentItem.isActive && scheduledMeeting.isPending()
-                    val updatedItem = currentItem.copy(
-                        schedId = scheduledMeeting.schedId,
-                        scheduledStartTimestamp = scheduledMeeting.startDateTime,
-                        scheduledEndTimestamp = scheduledMeeting.endDateTime,
-                        isRecurring = currentItem.isRecurring,
-                        isPending = isPending,
-                    )
-                    if (currentItem != updatedItem) {
-                        mutex.withLock { set(currentItemIndex, updatedItem) }
-                        sortMeetings(mutex)
+                    getScheduledMeetingItem(get(currentItemIndex))?.let { updatedItem ->
+                        mutex.withLock {
+                            val newIndex = indexOfFirst { updatedItem.chatId == it.chatId }
+                            if (newIndex != -1) {
+                                val newUpdatedItem = get(newIndex).copy(
+                                    schedId = updatedItem.schedId,
+                                    scheduledStartTimestamp = updatedItem.scheduledStartTimestamp,
+                                    scheduledEndTimestamp = updatedItem.scheduledEndTimestamp,
+                                    isRecurring = updatedItem.isRecurring,
+                                    isPending = updatedItem.isPending,
+                                )
+                                set(newIndex, newUpdatedItem)
+                                sortMeetings(mutex)
+                            }
+                        }
                     }
                 }
             }
@@ -182,17 +186,24 @@ class DefaultGetMeetings @Inject constructor(
         )
 
     private suspend fun getScheduledMeetingItem(item: MeetingRoomItem): MeetingRoomItem? =
-        chatRepository.getScheduledMeetingsByChat(item.chatId)?.let { schedMeetings ->
-            if (schedMeetings.isEmpty()) return null
-            val parentSchedMeeting = schedMeetings.first()
-            val schedMeeting = schedMeetings.firstOrNull { it.isPending() } ?: parentSchedMeeting
+        chatRepository.getScheduledMeetingsByChat(item.chatId)?.firstOrNull()?.let { schedMeeting ->
+            val isPending = schedMeeting.isPending()
+            var startTimestamp = schedMeeting.startDateTime
+            var endTimestamp = schedMeeting.endDateTime
+
+            if (isPending && schedMeeting.rules?.until != null) {
+                getNextOccurrence(item.chatId)?.let { nextOccurrence ->
+                    startTimestamp = nextOccurrence.startDateTime
+                    endTimestamp = nextOccurrence.endDateTime
+                }
+            }
 
             item.copy(
-                schedId = parentSchedMeeting.schedId,
-                scheduledStartTimestamp = schedMeeting.startDateTime,
-                scheduledEndTimestamp = schedMeeting.endDateTime,
-                isRecurring = parentSchedMeeting.rules != null,
-                isPending = item.isActive && schedMeeting.isPending(),
+                schedId = schedMeeting.schedId,
+                scheduledStartTimestamp = startTimestamp,
+                scheduledEndTimestamp = endTimestamp,
+                isRecurring = schedMeeting.rules != null,
+                isPending = item.isActive && isPending,
             )
         }
 
@@ -222,4 +233,15 @@ class DefaultGetMeetings @Inject constructor(
             }
         }
     }
+
+    private suspend fun getNextOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
+        runCatching {
+            val now = System.currentTimeMillis() / 1000
+            chatRepository.fetchScheduledMeetingOccurrencesByChat(chatId)
+                ?.filter { (it.startDateTime ?: 0) > now }
+                ?.minByOrNull { it.startDateTime ?: 0 }
+        }.fold(
+            onSuccess = { result -> result },
+            onFailure = { null }
+        )
 }

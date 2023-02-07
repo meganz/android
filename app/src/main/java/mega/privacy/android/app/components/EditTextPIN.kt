@@ -38,9 +38,8 @@ class EditTextPIN @JvmOverloads constructor(
                         text.clear()
                     } else {
                         previousDigitEditText?.apply {
-                            requestFocus()
-                            isCursorVisible = true
                             this.text?.clear()
+                            requestFocus()
                         }
                     }
                 }

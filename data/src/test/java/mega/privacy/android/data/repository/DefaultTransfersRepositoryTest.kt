@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -34,6 +35,7 @@ class DefaultTransfersRepositoryTest {
     private val databaseHandler = mock<DatabaseHandler>()
     private val transferEventMapper = mock<TransferEventMapper>()
     private val cancelToken = mock<MegaCancelToken>()
+    private val appEventGateway: AppEventGateway = mock()
 
     @Before
     fun setUp() {
@@ -42,6 +44,7 @@ class DefaultTransfersRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             dbH = databaseHandler,
             transferEventMapper = transferEventMapper,
+            appEventGateway = appEventGateway,
         )
     }
 

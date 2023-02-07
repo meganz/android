@@ -50,6 +50,8 @@ sealed interface IncomingShareAlert {
  * @property email
  * @property startDate
  * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
  */
 sealed interface ScheduledMeetingAlert {
     val chatId: Long
@@ -57,6 +59,8 @@ sealed interface ScheduledMeetingAlert {
     val email: String
     val startDate: Long?
     val endDate: Long?
+    val isRecurring: Boolean
+    val isOccurrence: Boolean
 }
 
 /**
@@ -544,6 +548,8 @@ data class TakeDownReinstatedAlert(
  * @property email
  * @property startDate
  * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class NewScheduledMeetingAlert(
     override val id: Long,
@@ -555,7 +561,9 @@ data class NewScheduledMeetingAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
-) : UserAlert, ScheduledMeetingAlert {}
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+) : UserAlert, ScheduledMeetingAlert
 
 /**
  * Deleted scheduled meeting alert
@@ -569,6 +577,8 @@ data class NewScheduledMeetingAlert(
  * @property email
  * @property startDate
  * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class DeletedScheduledMeetingAlert(
     override val id: Long,
@@ -580,7 +590,9 @@ data class DeletedScheduledMeetingAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
-) : UserAlert, ScheduledMeetingAlert {}
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+) : UserAlert, ScheduledMeetingAlert
 
 /**
  * Updated scheduled meeting title alert
@@ -594,6 +606,8 @@ data class DeletedScheduledMeetingAlert(
  * @property email
  * @property startDate
  * @property oldTitle
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class UpdatedScheduledMeetingTitleAlert(
     override val id: Long,
@@ -605,8 +619,10 @@ data class UpdatedScheduledMeetingTitleAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
     val oldTitle: String,
-) : UserAlert, ScheduledMeetingAlert {}
+) : UserAlert, ScheduledMeetingAlert
 
 /**
  * Updated scheduled meeting description alert
@@ -620,6 +636,8 @@ data class UpdatedScheduledMeetingTitleAlert(
  * @property email
  * @property startDate
  * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class UpdatedScheduledMeetingDescriptionAlert(
     override val id: Long,
@@ -631,7 +649,9 @@ data class UpdatedScheduledMeetingDescriptionAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
-) : UserAlert, ScheduledMeetingAlert {}
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+) : UserAlert, ScheduledMeetingAlert
 
 /**
  * Updated scheduled meeting date time alert
@@ -647,6 +667,8 @@ data class UpdatedScheduledMeetingDescriptionAlert(
  * @property endDate
  * @property hasDateChanged
  * @property hasTimeChanged
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class UpdatedScheduledMeetingDateTimeAlert(
     override val id: Long,
@@ -658,9 +680,11 @@ data class UpdatedScheduledMeetingDateTimeAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
     val hasDateChanged: Boolean,
     val hasTimeChanged: Boolean,
-) : UserAlert, ScheduledMeetingAlert {}
+) : UserAlert, ScheduledMeetingAlert
 
 /**
  * Updated scheduled meeting cancel alert
@@ -674,6 +698,8 @@ data class UpdatedScheduledMeetingDateTimeAlert(
  * @property email
  * @property startDate
  * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class UpdatedScheduledMeetingCancelAlert(
     override val id: Long,
@@ -685,7 +711,38 @@ data class UpdatedScheduledMeetingCancelAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
-) : UserAlert, ScheduledMeetingAlert {}
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+) : UserAlert, ScheduledMeetingAlert
+
+/**
+ * Updated scheduled meeting rules alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property chatId
+ * @property title
+ * @property email
+ * @property startDate
+ * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
+ */
+data class UpdatedScheduledMeetingRulesAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val chatId: Long,
+    override val title: String,
+    override val email: String,
+    override val startDate: Long?,
+    override val endDate: Long?,
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+) : UserAlert, ScheduledMeetingAlert
 
 /**
  * Updated scheduled meeting fields alert
@@ -699,6 +756,8 @@ data class UpdatedScheduledMeetingCancelAlert(
  * @property email
  * @property startDate
  * @property endDate
+ * @property isRecurring
+ * @property isOccurrence
  */
 data class UpdatedScheduledMeetingFieldsAlert(
     override val id: Long,
@@ -710,4 +769,6 @@ data class UpdatedScheduledMeetingFieldsAlert(
     override val email: String,
     override val startDate: Long?,
     override val endDate: Long?,
-) : UserAlert, ScheduledMeetingAlert {}
+    override val isRecurring: Boolean,
+    override val isOccurrence: Boolean,
+) : UserAlert, ScheduledMeetingAlert

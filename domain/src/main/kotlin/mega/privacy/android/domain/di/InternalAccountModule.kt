@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.ConfirmAccount
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
@@ -21,6 +20,7 @@ import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -126,7 +126,7 @@ internal abstract class InternalAccountModule {
             ChangeEmail(accountRepository::changeEmail)
 
         @Provides
-        fun provideConfirmAccount(accountRepository: AccountRepository): ConfirmAccount =
-            ConfirmAccount(accountRepository::confirmAccount)
+        fun provideQuerySignupLink(accountRepository: AccountRepository): QuerySignupLink =
+            QuerySignupLink(accountRepository::querySignupLink)
     }
 }

@@ -242,10 +242,10 @@ interface AccountRepository {
     suspend fun changeEmail(email: String): String
 
     /**
-     * Confirms a new account.
+     * Queries a signup link.
      *
-     * @param confirmationLink Confirmation link of the new account.
-     * @param password         Password of the new account.
+     * @param signupLink Signup link.
+     * @return The email related to the link.
      */
-    suspend fun confirmAccount(confirmationLink: String, password: String)
+    suspend fun querySignupLink(signupLink: String): String
 }

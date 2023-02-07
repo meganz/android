@@ -24,6 +24,9 @@ import mega.privacy.android.domain.entity.account.AccountSession
  * @property isRefreshApiServer      True if it is refreshing API server, false otherwise.
  * @property temporalEmail           Temporal email used for account creation.
  * @property temporalPassword        Temporal password used for account creation.
+ * @property hasPreferences          True if has user preferences, false otherwise.
+ * @property hasCUSetting            True if has CU setting, false otherwise.
+ * @property isCUSettingEnabled      Ture if CU setting is enabled, false otherwise.
  */
 data class LoginState(
     val isFirstFetchNodesUpdate: Boolean = true,

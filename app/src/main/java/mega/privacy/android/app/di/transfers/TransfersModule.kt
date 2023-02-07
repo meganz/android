@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di.transfers
 
+import mega.privacy.android.domain.di.TransferModule as DomainTransferModule
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -24,11 +25,12 @@ import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.HasPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
+import mega.privacy.android.domain.usecase.ResetTotalDownloads
 
 /**
  * Use cases to check on transfer status
  */
-@Module
+@Module(includes = [DomainTransferModule::class])
 @InstallIn(SingletonComponent::class, ViewModelComponent::class, ServiceComponent::class)
 abstract class TransfersModule {
 
@@ -162,5 +164,15 @@ abstract class TransfersModule {
         @Provides
         fun provideCancelTransferByTag(transferRepository: TransferRepository): CancelTransferByTag =
             CancelTransferByTag(transferRepository::cancelTransferByTag)
+
+        /**
+         * Provides the [ResetTotalDownloads] implementation
+         *
+         * @param transferRepository [TransferRepository]
+         */
+        @Provides
+        fun provideResetTotalDownloads(transferRepository: TransferRepository):
+                ResetTotalDownloads =
+            ResetTotalDownloads(transferRepository::resetTotalDownloads)
     }
 }

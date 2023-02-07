@@ -7,7 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
-import mega.privacy.android.domain.usecase.ConfirmAccount
+import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -46,6 +47,9 @@ object TestAccountModule {
         on { runBlocking { invoke() } }.thenReturn(mock<AccountCredentials.MyAccountCredentials>())
     }
 
+
+    private val createContactLink = mock<CreateContactLink>()
+
     private val getAccountAchievementsOverview = mock<GetAccountAchievementsOverview>()
 
     private val isUserLoggedIn = mock<IsUserLoggedIn>()
@@ -69,6 +73,9 @@ object TestAccountModule {
     fun provideGetMyCredentials() = getMyCredentials
 
     @Provides
+    fun provideCreateContactLink() = createContactLink
+
+    @Provides
     fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()
 
     @Provides
@@ -84,5 +91,5 @@ object TestAccountModule {
     fun provideChangeEmail() = mock<ChangeEmail>()
 
     @Provides
-    fun provideConfirmAccount() = mock<ConfirmAccount>()
+    fun provideQuerySignupLink() = mock<QuerySignupLink>()
 }

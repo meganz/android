@@ -21,7 +21,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACT
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
 import static mega.privacy.android.app.constants.IntentConstants.ACTION_OPEN_ACHIEVEMENTS;
@@ -467,8 +466,6 @@ public class ManagerActivity extends TransfersManagementActivity
         ChatManagementCallback, ActionNodeCallback, SnackbarShower,
         MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, NotificationNavigationHandler {
 
-    private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
-
     public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
     private static final String BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
 
@@ -618,7 +615,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private boolean isStorageStatusDialogShown = false;
 
-    private boolean isTransferOverQuotaWarningShown;
     private AlertDialog confirmationTransfersDialog;
 
     private AlertDialog reconnectDialog;
@@ -1213,7 +1209,6 @@ public class ManagerActivity extends TransfersManagementActivity
             outState.putBoolean(BUSINESS_CU_ALERT_SHOWN, isBusinessCUAlertShown);
         }
 
-        outState.putBoolean(TRANSFER_OVER_QUOTA_SHOWN, isTransferOverQuotaWarningShown);
         outState.putInt(TYPE_CALL_PERMISSION, typesCameraPermission);
         outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
@@ -1387,7 +1382,6 @@ public class ManagerActivity extends TransfersManagementActivity
             openLinkDialogIsShown = savedInstanceState.getBoolean(OPEN_LINK_DIALOG_SHOWN, false);
             isBusinessGraceAlertShown = savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false);
             isBusinessCUAlertShown = savedInstanceState.getBoolean(BUSINESS_CU_ALERT_SHOWN, false);
-            isTransferOverQuotaWarningShown = savedInstanceState.getBoolean(TRANSFER_OVER_QUOTA_SHOWN, false);
             typesCameraPermission = savedInstanceState.getInt(TYPE_CALL_PERMISSION, INVALID_TYPE_PERMISSIONS);
             joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
             linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
@@ -1448,11 +1442,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .observeForever(refreshAddPhoneNumberButtonObserver);
-
-        LiveEventBus.get(EVENT_TRANSFER_OVER_QUOTA, Boolean.class).observe(this, update -> {
-            updateTransfersWidget(TransferType.NONE);
-            showTransfersTransferOverQuotaWarning();
-        });
 
         LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean.class).observe(this, failed -> {
             if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == TransfersTab.COMPLETED_TAB) {
@@ -2453,10 +2442,6 @@ public class ManagerActivity extends TransfersManagementActivity
             if (savedInstanceState.getBoolean(OPEN_LINK_ERROR, false)) {
                 openLink(text);
             }
-        }
-
-        if (drawerItem == DrawerItem.TRANSFERS && isTransferOverQuotaWarningShown) {
-            showTransfersTransferOverQuotaWarning();
         }
 
         PsaManager.INSTANCE.startChecking();
@@ -10679,29 +10664,6 @@ public class ManagerActivity extends TransfersManagementActivity
             refreshFragment(FragmentTag.INBOX.getTag());
             selectDrawerItem(DrawerItem.INBOX);
         }
-    }
-
-    /**
-     * Shows a "transfer over quota" warning.
-     */
-    public void showTransfersTransferOverQuotaWarning() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        int messageResource = R.string.warning_transfer_over_quota;
-
-        AlertDialog transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)
-                .setMessage(getString(messageResource, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())))
-                .setPositiveButton(R.string.my_account_upgrade_pro, (dialog, which) -> {
-                    navigateToUpgradeAccount();
-                })
-                .setNegativeButton(R.string.general_dismiss, null)
-                .setCancelable(false)
-                .setOnDismissListener(dialog -> isTransferOverQuotaWarningShown = false)
-                .create();
-
-        transferOverQuotaWarning.setCanceledOnTouchOutside(false);
-        TimeUtils.createAndShowCountDownTimer(messageResource, transferOverQuotaWarning);
-        transferOverQuotaWarning.show();
-        isTransferOverQuotaWarningShown = true;
     }
 
     /**

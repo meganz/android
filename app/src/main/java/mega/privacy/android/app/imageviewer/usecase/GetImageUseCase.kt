@@ -152,7 +152,7 @@ class GetImageUseCase @Inject constructor(
      * @param highPriority  Flag to request image with high priority.
      * @return              Flowable which emits Uri for every image, from low to high resolution.
      */
-    fun get(
+    private fun get(
         node: MegaNode?,
         fullSize: Boolean = false,
         highPriority: Boolean = false,
@@ -313,7 +313,7 @@ class GetImageUseCase @Inject constructor(
      * @param filePath  Destination path for the thumbnail
      * @return          Completable
      */
-    fun getThumbnailImage(node: MegaNode, filePath: String): Completable =
+    private fun getThumbnailImage(node: MegaNode, filePath: String): Completable =
         Completable.create { emitter ->
             if (!node.hasThumbnail()) {
                 emitter.tryOnError(ResourceDoesNotExistMegaException("Node has no thumbnail"))
@@ -342,7 +342,7 @@ class GetImageUseCase @Inject constructor(
      * @param filePath  Destination path for the preview
      * @return          Completable
      */
-    fun getPreviewImage(node: MegaNode, filePath: String): Completable =
+    private fun getPreviewImage(node: MegaNode, filePath: String): Completable =
         Completable.create { emitter ->
             if (!node.hasPreview()) {
                 emitter.tryOnError(ResourceDoesNotExistMegaException("Node has no preview"))
@@ -445,7 +445,7 @@ class GetImageUseCase @Inject constructor(
      * @return          Single with generated file uri
      */
     @Suppress("deprecation")
-    fun getVideoThumbnail(fileName: String, videoUri: Uri): Single<String> =
+    private fun getVideoThumbnail(fileName: String, videoUri: Uri): Single<String> =
         Single.fromCallable {
             val videoFile = videoUri.toFile()
             require(videoFile.exists())
@@ -480,7 +480,7 @@ class GetImageUseCase @Inject constructor(
      * @param highPriority  Flag to request image with high priority.
      * @return              Single with generated file uri
      */
-    fun getImageThumbnail(fileName: String, imageUri: Uri, highPriority: Boolean): Single<String> =
+    private fun getImageThumbnail(fileName: String, imageUri: Uri, highPriority: Boolean): Single<String> =
         Single.create { emitter ->
             val imageFile = imageUri.toFile()
             require(imageFile.exists())

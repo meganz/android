@@ -814,12 +814,6 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.resetTotalUploads()
     }
 
-    override fun confirmAccount(
-        confirmationLink: String,
-        password: String,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.confirmAccount(confirmationLink, password, listener)
-
     override suspend fun getExportMasterKey(): String? = megaApi.exportMasterKey()
 
     override fun setMasterKeyExported(listener: MegaRequestListenerInterface?) {
@@ -831,6 +825,18 @@ internal class MegaApiFacade @Inject constructor(
         value: String,
         listener: MegaRequestListenerInterface
     ) = megaApi.setUserAttribute(type, value, listener)
+
+    @Suppress("DEPRECATION")
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                " * provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    override suspend fun resetTotalDownloads() {
+        megaApi.resetTotalDownloads()
+    }
+
+    override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
+        megaApi.querySignupLink(link, listener)
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)

@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
+import mega.privacy.android.domain.entity.UpdatedScheduledMeetingRulesAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
 
@@ -80,16 +81,22 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
     { context ->
         when (this) {
             is NewScheduledMeetingAlert -> {
-                context.getFormattedStringOrDefault(
-                    R.string.notification_subtitle_scheduled_meeting_new,
-                    email
-                ).spanABTextFontColour(context)
+                val stringRes = if (isRecurring) {
+                    R.string.notification_subtitle_scheduled_recurring_meeting_new
+                } else {
+                    R.string.notification_subtitle_scheduled_meeting_new
+                }
+                context.getFormattedStringOrDefault(stringRes, email)
+                    .spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingCancelAlert, is DeletedScheduledMeetingAlert -> {
-                context.getFormattedStringOrDefault(
-                    R.string.notification_subtitle_scheduled_meeting_canceled,
-                    email
-                ).spanABTextFontColour(context)
+                val stringRes = when {
+                    isOccurrence -> R.string.notification_subtitle_scheduled_recurring_meeting_occurrence_canceled
+                    isRecurring -> R.string.notification_subtitle_scheduled_recurring_meeting_canceled
+                    else -> R.string.notification_subtitle_scheduled_meeting_canceled
+                }
+                context.getFormattedStringOrDefault(stringRes, email)
+                    .spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingTitleAlert -> {
                 context.getFormattedStringOrDefault(
@@ -100,29 +107,41 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                 ).spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingDescriptionAlert -> {
-                context.getFormattedStringOrDefault(
-                    R.string.notification_subtitle_scheduled_meeting_updated_description,
-                    email
-                ).spanABTextFontColour(context)
+                val stringRes = if (isRecurring) {
+                    R.string.notification_subtitle_scheduled_recurring_meeting_updated_description
+                } else {
+                    R.string.notification_subtitle_scheduled_meeting_updated_description
+                }
+                context.getFormattedStringOrDefault(stringRes, email)
+                    .spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingDateTimeAlert -> {
-                if (hasDateChanged) {
-                    context.getFormattedStringOrDefault(
-                        R.string.notification_subtitle_scheduled_meeting_updated_date,
-                        email
-                    ).spanABTextFontColour(context)
-                } else {
-                    context.getFormattedStringOrDefault(
-                        R.string.notification_subtitle_scheduled_meeting_updated_time,
-                        email
-                    ).spanABTextFontColour(context)
+                val stringRes = when {
+                    isOccurrence -> R.string.notification_subtitle_scheduled_recurring_meeting_updated_occurrence
+                    hasDateChanged -> R.string.notification_subtitle_scheduled_meeting_updated_date
+                    else -> if (isRecurring) {
+                        R.string.notification_subtitle_scheduled_recurring_meeting_updated_time
+                    } else {
+                        R.string.notification_subtitle_scheduled_meeting_updated_time
+                    }
                 }
+                context.getFormattedStringOrDefault(stringRes, email)
+                    .spanABTextFontColour(context)
             }
-            is UpdatedScheduledMeetingFieldsAlert -> {
+            is UpdatedScheduledMeetingRulesAlert -> {
                 context.getFormattedStringOrDefault(
-                    R.string.notification_subtitle_scheduled_meeting_updated_multiple,
+                    R.string.notification_subtitle_scheduled_recurring_meeting_updated_frequency,
                     email
                 ).spanABTextFontColour(context)
+            }
+            is UpdatedScheduledMeetingFieldsAlert -> {
+                val stringRes = if (isRecurring) {
+                    R.string.notification_subtitle_scheduled_recurring_meeting_updated_multiple
+                } else {
+                    R.string.notification_subtitle_scheduled_meeting_updated_multiple
+                }
+                context.getFormattedStringOrDefault(stringRes, email)
+                    .spanABTextFontColour(context)
             }
             else -> {
                 null

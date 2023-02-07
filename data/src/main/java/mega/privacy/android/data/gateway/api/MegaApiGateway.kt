@@ -1534,20 +1534,6 @@ interface MegaApiGateway {
     fun resetTotalUploads()
 
     /**
-     * Confirms a new account.
-     *
-     * @param confirmationLink Confirmation link
-     * @param password         Password of the account
-     * @param listener         MegaRequestListener to track this request
-     */
-    fun confirmAccount(
-        confirmationLink: String,
-        password: String,
-        listener: MegaRequestListenerInterface,
-    )
-
-
-    /**
      * Get Export Master Key
      */
     suspend fun getExportMasterKey(): String?
@@ -1588,6 +1574,47 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setUserAttribute(type: Int, value: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reset the number of total downloads
+     * This function resets the number returned by MegaApi::getTotalDownloads
+     */
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to\n" +
+                "provide more data and avoid race conditions. They could change or be removed in the current form."
+    )
+    suspend fun resetTotalDownloads()
+
+    /**
+     * Get information about a confirmation link or a new signup link
+     *
+     * The associated request type with this request is MegaRequest::TYPE_QUERY_SIGNUP_LINK.
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getLink - Returns the confirmation link
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getEmail - Return the email associated with the link
+     * - MegaRequest::getName - Returns the name associated with the link (available only for confirmation links)
+     * - MegaRequest::getFlag - Returns true if the account was automatically confirmed, otherwise false
+     *
+     * If MegaRequest::getFlag returns true, the account was automatically confirmed and it's not needed
+     * to call MegaApi::confirmAccount. If it returns false, it's needed to call MegaApi::confirmAccount
+     * as usual. New accounts (V2, starting from April 2018) do not require a confirmation with the password,
+     * but old confirmation links (V1) require it, so it's needed to check that parameter in onRequestFinish
+     * to know how to proceed.
+     *
+     * If already logged-in into a different account, you will get the error code MegaError::API_EACCESS
+     * in onRequestFinish.
+     * If logged-in into the account that is attempted to confirm and the account is already confirmed, you
+     * will get the error code MegaError::API_EEXPIRED in onRequestFinish.
+     * In both cases, the MegaRequest::getEmail will return the email of the account that was attempted
+     * to confirm, and the MegaRequest::getName will return the name.
+     *
+     * @param link     Confirmation link (confirm) or new signup link (newsignup)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun querySignupLink(link: String, listener: MegaRequestListenerInterface)
 
     /**
      * Function to get unverified incoming shares from [MegaApi]

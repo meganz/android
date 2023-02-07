@@ -51,8 +51,8 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.OccurrenceItem
-import mega.privacy.android.domain.entity.meeting.OccursType
 
 /**
  * Recurring meeting info View
@@ -138,17 +138,21 @@ private fun RecurringMeetingInfoAppBar(
                             overflow = TextOverflow.Ellipsis)
                     }
                 }
-                Text(text = when (state.typeOccurs) {
-                    OccursType.Daily -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_daily_subtitle)
-                    OccursType.Weekly -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_weekly_subtitle)
-                    OccursType.Monthly -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_monthly_subtitle)
-                },
-                    style = MaterialTheme.typography.subtitle2,
-                    color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                if (state.typeOccurs != OccurrenceFrequencyType.Invalid) {
+                    Text(text = when (state.typeOccurs) {
+                        OccurrenceFrequencyType.Daily -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_daily_subtitle)
+                        OccurrenceFrequencyType.Weekly -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_weekly_subtitle)
+                        OccurrenceFrequencyType.Monthly -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_monthly_subtitle)
+                        else -> ""
+                    },
+                        style = MaterialTheme.typography.subtitle2,
+                        color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis)
+                }
+
             }
         },
         navigationIcon = {
