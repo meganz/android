@@ -84,9 +84,7 @@ class IncomingSharesViewModel @Inject constructor(
                 }
             val handles = unverifiedIncomingShares
                 .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
-                .mapNotNull { shareData ->
-                    getNodeByHandle(shareData.nodeHandle)?.handle
-                }
+                .map { shareData -> shareData.nodeHandle }
             _state.update {
                 it.copy(nodes = unverifiedIncomingNodes,
                     unverifiedIncomingShares = unverifiedIncomingShares,

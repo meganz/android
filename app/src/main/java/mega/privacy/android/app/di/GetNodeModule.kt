@@ -8,11 +8,11 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.rx3.await
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.CopyNode
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.SetSecureFlag
@@ -92,7 +92,7 @@ abstract class GetNodeModule {
          */
         @Provides
         fun provideGetUnVerifiedInComingShares(megaNodeRepository: MegaNodeRepository): GetUnverifiedIncomingShares =
-            GetUnverifiedIncomingShares(megaNodeRepository::getUnVerifiedInComingShares)
+            GetUnverifiedIncomingShares(megaNodeRepository::getUnverifiedIncomingShares)
 
         /**
          * Provides [GetUnverifiedOutgoingShares] implementation

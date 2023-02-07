@@ -334,7 +334,7 @@ class SearchViewModel @Inject constructor(
     /**
      * Gets the feature flag value & updates state
      */
-    fun isMandatoryFingerprintRequired() {
+    private fun isMandatoryFingerprintRequired() {
         viewModelScope.launch {
             _state.update {
                 it.copy(isMandatoryFingerPrintVerificationRequired = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))

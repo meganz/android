@@ -528,7 +528,7 @@ class IncomingSharesViewModelTest {
     }
 
     @Test
-    fun `test that unverified outgoing shares are returned`() = runTest {
+    fun `test that unverified incoming shares are returned`() = runTest {
         val node1 = mock<MegaNode>()
         whenever(getNodeByHandle(any())).thenReturn(node1)
         assertThat(getNodeByHandle(any())).isNotNull()
