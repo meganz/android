@@ -39,12 +39,12 @@ object TestGetNodeModule {
     }
 
     @Provides
-    fun provideGetUnVerifiedInComingShares() = mock<GetUnverifiedIncomingShares>() {
+    fun provideGetUnverifiedIncomingShares() = mock<GetUnverifiedIncomingShares>() {
         onBlocking { invoke(any()) }.thenReturn(emptyList())
     }
 
     @Provides
-    fun provideGetUnverifiedOutGoingShares() = mock<GetUnverifiedOutgoingShares>() {
+    fun provideGetUnverifiedOutgoingShares() = mock<GetUnverifiedOutgoingShares>() {
         onBlocking { invoke(any()) }.thenReturn(emptyList())
     }
 }

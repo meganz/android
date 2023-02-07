@@ -31,12 +31,12 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOU
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
-import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.fileBrowserState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.inboxState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
@@ -117,7 +117,6 @@ import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getFolder;
@@ -325,9 +324,6 @@ import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
-import mega.privacy.android.app.presentation.login.LoginActivity;
-import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
@@ -349,9 +345,11 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel;
@@ -365,6 +363,7 @@ import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
+import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -422,12 +421,11 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
-import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
-import mega.privacy.android.domain.entity.transfer.TransferType;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
@@ -764,8 +762,7 @@ public class ManagerActivity extends TransfersManagementActivity
     int bottomNavigationCurrentItem = -1;
     View chatBadge;
     View callBadge;
-    View pendingActionsBadge;
-    BottomNavigationItemView sharedItemsView;
+    BottomNavigationMenuView menuView;
 
     private boolean joiningToChatLink;
     private String linkJoinToChatLink;
@@ -1683,7 +1680,7 @@ public class ManagerActivity extends TransfersManagementActivity
         badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.red_600_red_300,
                 R.color.white_dark_grey, R.color.white_dark_grey);
 
-        BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
+        menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
         // Navi button Chat
         BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(3);
         chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
@@ -2473,21 +2470,6 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
-        ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
-            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                addUnverifiedIncomingCountBadge(incomingSharesState.getUnverifiedIncomingShares().size());
-            }
-            return Unit.INSTANCE;
-        });
-
-        ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
-            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
-            }
-            return Unit.INSTANCE;
-        });
-
-        setPendingActionsBadge(menuView);
      }
 
     /**
@@ -2530,6 +2512,31 @@ public class ManagerActivity extends TransfersManagementActivity
             updateUserNameNavigationView(state.getFullName());
             nVEmail.setVisibility(View.VISIBLE);
             nVEmail.setText(state.getEmail());
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
+            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                addUnverifiedIncomingCountBadge(incomingSharesState.getUnverifiedIncomingShares().size());
+            }
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
+            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
+                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
+            }
+            return Unit.INSTANCE;
+        });
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
+            if (managerState.isMandatoryFingerprintVerificationNeeded() && managerState.getPendingActionsCount() > 0) {
+                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+                View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
+                sharedItemsView.addView(pendingActionsBadge);
+                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
+                tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
+            }
             return Unit.INSTANCE;
         });
     }
@@ -10044,7 +10051,6 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public MegaNode getSelectedNode() {
-        callOpenShareDialog();
         return selectedNode;
     }
 
@@ -10274,17 +10280,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
         } else {
             chatBadge.setVisibility(View.GONE);
-        }
-    }
-
-    private void callOpenShareDialog() {
-        if (searchViewModel.getState().getValue().isMandatoryFingerPrintVerificationRequired()) {
-            megaApi.openShareDialog(selectedNode, new OptionalMegaRequestListenerInterface() {
-                @Override
-                public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
-                    super.onRequestFinish(api, request, error);
-                }
-            });
         }
     }
 

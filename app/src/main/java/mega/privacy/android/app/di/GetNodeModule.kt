@@ -6,12 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.SetSecureFlag
 
 /**
  * Get node module
@@ -73,15 +72,5 @@ abstract class GetNodeModule {
         @Provides
         fun provideGetUnverifiedOutGoingShares(megaNodeRepository: MegaNodeRepository): GetUnverifiedOutgoingShares =
             GetUnverifiedOutgoingShares(megaNodeRepository::getUnverifiedOutgoingShares)
-
-        /**
-         * Provides [SetSecureFlag] implementation
-         *
-         * @param filesRepository [FilesRepository]
-         * @return [SetSecureFlag]
-         */
-        @Provides
-        fun provideSetSecureFlag(megaNodeRepository: MegaNodeRepository): SetSecureFlag =
-            SetSecureFlag(megaNodeRepository::setSecureFlag)
     }
 }
