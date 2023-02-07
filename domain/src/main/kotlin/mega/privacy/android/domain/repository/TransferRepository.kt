@@ -110,4 +110,16 @@ interface TransferRepository {
      * Cancels all transfers, uploads and downloads.
      */
     suspend fun cancelTransfers()
+
+    /**
+     * Monitor transfer failed
+     *
+     */
+    fun monitorFailedTransfer(): Flow<Boolean>
+
+    /**
+     * Broadcast transfer failed
+     *
+     */
+    suspend fun broadcastFailedTransfer(isFailed: Boolean)
 }

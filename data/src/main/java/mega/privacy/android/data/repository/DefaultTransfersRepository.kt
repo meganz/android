@@ -218,4 +218,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
         megaApiGateway.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
     }
+
+    override fun monitorFailedTransfer(): Flow<Boolean> = appEventGateway.monitorFailedTransfer()
+
+    override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
+        appEventGateway.broadcastFailedTransfer(isFailed)
+    }
 }

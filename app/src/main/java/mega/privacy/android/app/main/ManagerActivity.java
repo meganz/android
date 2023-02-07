@@ -16,7 +16,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_H
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
@@ -1433,12 +1432,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .observeForever(refreshAddPhoneNumberButtonObserver);
-
-        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean.class).observe(this, failed -> {
-            if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == TransfersTab.COMPLETED_TAB) {
-                retryTransfers.setVisible(failed);
-            }
-        });
 
         registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 

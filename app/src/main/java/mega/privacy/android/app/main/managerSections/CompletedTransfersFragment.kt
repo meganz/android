@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter
 import mega.privacy.android.app.utils.TextUtil
@@ -87,6 +88,12 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
                 else -> {}
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        collectFlow(viewModel.failedTransfer) { isFailed ->
+            if (isFailed) {
+                requireActivity().invalidateOptionsMenu()
+            }
+        }
     }
 
     /**
