@@ -26,7 +26,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingOut
 import mega.privacy.android.app.R
 import mega.privacy.android.app.TourImageAdapter
@@ -38,9 +37,8 @@ import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFra
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
-import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.domain.usecase.SetSecureFlag
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,11 +56,10 @@ class TourFragment : Fragment() {
     private lateinit var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>
 
     @Inject
-    @MegaApi
-    lateinit var megaApi: MegaApiAndroid
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
 
     @Inject
-    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    lateinit var setSecureFlag: SetSecureFlag
 
     private val selectedCircle by lazy {
         ContextCompat.getDrawable(requireContext(), R.drawable.selection_circle_page_adapter)
@@ -156,7 +153,7 @@ class TourFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            megaApi.setSecureFlag(getFeatureFlagValue(AppFeatures.SetSecureFlag))
+            setSecureFlag(getFeatureFlagValue(AppFeatures.SetSecureFlag))
         }
     }
 

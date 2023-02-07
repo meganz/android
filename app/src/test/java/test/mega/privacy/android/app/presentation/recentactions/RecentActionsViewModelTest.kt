@@ -24,7 +24,6 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
@@ -69,10 +68,6 @@ class RecentActionsViewModelTest {
         }
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
-
-    private val areCredentialsVerified = mock<AreCredentialsVerified> {
-        onBlocking { invoke(any()) }.thenReturn(false)
-    }
 
     private val node: TypedFileNode = mock {
         on { id }.thenReturn(NodeId(123))
@@ -120,7 +115,6 @@ class RecentActionsViewModelTest {
             getParentMegaNode,
             monitorHideRecentActivity,
             monitorNodeUpdates,
-            areCredentialsVerified,
         )
     }
 

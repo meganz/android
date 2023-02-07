@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.shares.outgoing.model
 
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import nz.mega.sdk.MegaNode
 
 /**
@@ -17,6 +18,7 @@ import nz.mega.sdk.MegaNode
  * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
  * @param unverifiedOutgoingShares List of unverified outgoing [ShareData]
  * @param unVerifiedOutgoingNodeHandles List of Unverified outgoing node handles
+ * @param areUserCredentialsVerified Boolean value to read if user credentials are verified
  */
 data class OutgoingSharesState(
     val outgoingHandle: Long = -1L,
@@ -29,6 +31,7 @@ data class OutgoingSharesState(
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val unverifiedOutgoingShares: List<ShareData> = emptyList(),
     val unVerifiedOutgoingNodeHandles: List<Long> = emptyList(),
+    val areUserCredentialsVerified: Boolean = false,
 ) {
 
     /**

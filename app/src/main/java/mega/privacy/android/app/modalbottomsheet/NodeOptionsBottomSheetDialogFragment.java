@@ -181,7 +181,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private IncomingSharesViewModel incomingSharesViewModel;
     private OutgoingSharesViewModel outgoingSharesViewModel;
-    private Set<Long> unverifiedHandles = new HashSet<>();
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
