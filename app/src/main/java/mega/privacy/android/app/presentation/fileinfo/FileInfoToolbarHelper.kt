@@ -111,15 +111,7 @@ internal class FileInfoToolbarHelper(
     /**
      * Setup of the options menu once is created in onCreateOptionsMenu
      */
-    fun setupOptionsMenu(
-        menu: Menu,
-        node: MegaNode,
-        isInRubbish: Boolean,
-        isInInbox: Boolean,
-        fromIncomingShares: Boolean,
-        firstIncomingLevel: Boolean,
-        nodeAccess: Int,
-    ) {
+    fun setupOptionsMenu(menu: Menu) {
         downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download)
         shareMenuItem = menu.findItem(R.id.cab_menu_file_info_share_folder)
         getLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_get_link)
@@ -133,6 +125,16 @@ internal class FileInfoToolbarHelper(
         deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete)
         leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave)
         sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat)
+    }
+
+    fun updateOptionsMenu(
+        node: MegaNode,
+        isInRubbish: Boolean,
+        isInInbox: Boolean,
+        fromIncomingShares: Boolean,
+        firstIncomingLevel: Boolean,
+        nodeAccess: Int,
+    ) {
         setIconsColorFilter()
         setupOptionsToolbar(
             node = node,

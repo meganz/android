@@ -15,6 +15,7 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsNodeInInbox
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
@@ -32,6 +33,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorConnectivity: MonitorConnectivity,
     private val getFileHistoryNumVersions: GetFileHistoryNumVersions,
     private val isNodeInInbox: IsNodeInInbox,
+    private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
     private var moveNodeByHandle: MoveNodeByHandle,
     private var copyNodeByHandle: CopyNodeByHandle,
@@ -60,6 +62,8 @@ class FileInfoViewModel @Inject constructor(
                 it.copy(
                     historyVersions = getFileHistoryNumVersions(node.handle),
                     isNodeInInbox = isNodeInInbox(node.handle),
+                    isNodeInRubbish = isNodeInRubbish(node.handle),
+                    jobInProgressState = null,
                 )
             }
         }
@@ -119,7 +123,7 @@ class FileInfoViewModel @Inject constructor(
     /**
      * Is connected
      */
-    val isConnected: Boolean
+    private val isConnected: Boolean
         get() = monitorConnectivity().value
 
     /**

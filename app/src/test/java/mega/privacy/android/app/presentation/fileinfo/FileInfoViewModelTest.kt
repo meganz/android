@@ -21,6 +21,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsNodeInInbox
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
@@ -45,6 +46,7 @@ internal class FileInfoViewModelTest {
     private lateinit var monitorConnectivity: MonitorConnectivity
     private lateinit var getFileHistoryNumVersions: GetFileHistoryNumVersions
     private lateinit var isNodeInInbox: IsNodeInInbox
+    private lateinit var isNodeInRubbish: IsNodeInRubbish
     private lateinit var checkNameCollision: CheckNameCollision
     private lateinit var moveNodeByHandle: MoveNodeByHandle
     private lateinit var copyNodeByHandle: CopyNodeByHandle
@@ -70,6 +72,7 @@ internal class FileInfoViewModelTest {
         monitorConnectivity = mock()
         getFileHistoryNumVersions = mock()
         isNodeInInbox = mock()
+        isNodeInRubbish = mock()
         checkNameCollision = mock()
         moveNodeByHandle = mock()
         copyNodeByHandle = mock()
@@ -83,6 +86,7 @@ internal class FileInfoViewModelTest {
             monitorConnectivity,
             getFileHistoryNumVersions,
             isNodeInInbox,
+            isNodeInRubbish,
             checkNameCollision,
             moveNodeByHandle,
             copyNodeByHandle
@@ -95,6 +99,7 @@ internal class FileInfoViewModelTest {
         whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
         whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
         whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
+        whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
     }
 
     @After
@@ -120,6 +125,21 @@ internal class FileInfoViewModelTest {
                 underTest.updateNode(node)
                 Truth.assertThat(underTest.uiState.value.isNodeInInbox).isEqualTo(isNodeInInbox)
                 Truth.assertThat(underTest.isNodeInInbox()).isEqualTo(isNodeInInbox)
+            }
+            verify(true)
+            verify(false)
+        }
+
+    @Test
+    fun `test that viewModel state's isNodeInRubbish property reflects the value of the isNodeInRubbish use case after updating the node`() =
+        runTest {
+            suspend fun verify(isNodeInRubbish: Boolean) {
+                whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(isNodeInRubbish)
+                underTest.updateNode(node)
+                underTest.uiState.test {
+                    val state = awaitItem()
+                    Truth.assertThat(state.isNodeInRubbish).isEqualTo(isNodeInRubbish)
+                }
             }
             verify(true)
             verify(false)

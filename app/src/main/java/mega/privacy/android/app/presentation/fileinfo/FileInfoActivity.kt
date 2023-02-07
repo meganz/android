@@ -93,7 +93,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLocationInfo
-import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
@@ -502,6 +501,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private fun collectUIState() {
         this.collectFlow(viewModel.uiState) { viewState ->
             updateView(viewState)
+            updateOptionsMenu(viewState)
             updateProgress(viewState.jobInProgressState)
             viewState.oneOffViewEvent?.let {
                 consumeEvent(viewState.oneOffViewEvent)
@@ -527,6 +527,34 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 separatorVersions.isVisible = false
             }
         }
+        with(bindingContent) {
+            if (!viewModel.node.isTakenDown && !viewState.isNodeInRubbish) {
+                filePropertiesSwitch.isEnabled = true
+                filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
+                    filePropertiesSwitch()
+                }
+                filePropertiesAvailableOfflineText.setTextColor(
+                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
+                )
+            } else {
+                filePropertiesSwitch.isEnabled = false
+                filePropertiesAvailableOfflineText.setTextColor(
+                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_700_026_grey_300_026)
+                )
+            }
+        }
+        refreshProperties(viewState)
+    }
+
+    private fun updateOptionsMenu(state: FileInfoViewState) {
+        menuHelper.updateOptionsMenu(
+            node = viewModel.node,
+            isInInbox = state.isNodeInInbox,
+            isInRubbish = state.isNodeInRubbish,
+            fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
+            firstIncomingLevel = firstIncomingLevel,
+            nodeAccess = megaApi.getAccess(viewModel.node),
+        )
     }
 
     private fun consumeEvent(event: FileInfoOneOffViewEvent) {
@@ -586,12 +614,14 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             val string = when (progressState) {
                 FileInfoJobInProgressState.Moving -> R.string.context_moving
                 FileInfoJobInProgressState.Copying -> R.string.context_copying
+                FileInfoJobInProgressState.InitialLoading -> return //no need to warn user here
             }
             showProgressDialog(getFormattedStringOrDefault(string), progressState)
         }
     }
 
     private fun showProgressDialog(message: String, progress: FileInfoJobInProgressState? = null) {
+        progressDialog?.first?.dismiss()
         progressDialog = Pair(
             createProgressDialog(
                 this@FileInfoActivity,
@@ -695,22 +725,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
             //setup adapter
             listView.adapter = adapter
-            refreshProperties()
-            val parent = nodeController.getParent(viewModel.node)
-            if (!viewModel.node.isTakenDown && parent.handle != megaApi.rubbishNode.handle) {
-                filePropertiesSwitch.isEnabled = true
-                filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
-                    filePropertiesSwitch()
-                }
-                filePropertiesAvailableOfflineText.setTextColor(
-                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
-                )
-            } else {
-                filePropertiesSwitch.isEnabled = false
-                filePropertiesAvailableOfflineText.setTextColor(
-                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_700_026_grey_300_026)
-                )
-            }
             //Location Layout
             getNodeLocationInfo(
                 adapterType, from == Constants.FROM_INCOMING_SHARES,
@@ -778,19 +792,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.file_info_action, menu)
-        with(megaApi.getRootParentNode(megaApi.getNodeByHandle(viewModel.node.handle))) {
-            val isInRubbish = this == megaApi.rubbishNode
-            val isInInbox = viewModel.isNodeInInbox()
-            menuHelper.setupOptionsMenu(
-                menu = menu,
-                node = this,
-                isInInbox = isInInbox,
-                isInRubbish = isInRubbish,
-                fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
-                firstIncomingLevel = firstIncomingLevel,
-                nodeAccess = megaApi.getAccess(viewModel.node),
-            )
-        }
+        menuHelper.setupOptionsMenu(menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -987,7 +989,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         selectContactForShareFolderLauncher.launch(viewModel.node)
     }
 
-    private fun refreshProperties() {
+    private fun refreshProperties(viewState: FileInfoViewState) {
         Timber.d("refreshProperties")
         if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
             publicLink = true
@@ -1071,7 +1073,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
-            if (!viewModel.isNodeInInbox() && megaApi.hasVersions(viewModel.node)) {
+            if (!viewState.isNodeInInbox && megaApi.hasVersions(viewModel.node)) {
                 nodeVersions = megaApi.getVersions(viewModel.node)
             }
         } else if (viewModel.node.isFolder) {
@@ -1350,8 +1352,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             return
         }
 
-        moveToRubbish =
-            nodeController.getParent(viewModel.node)?.handle != megaApi.rubbishNode.handle
+        moveToRubbish = !viewModel.uiState.value.isNodeInRubbish
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog).apply {
             val messageId = if (moveToRubbish) {
@@ -1667,7 +1668,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             } else if (n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)) {
                 if (thisNode) {
                     if (nodeVersions != null) {
-                        val nodeHandle = nodeVersions?.get(1)?.handle ?: -1
+                        val nodeHandle = nodeVersions?.getOrNull(1)?.handle ?: -1
                         if (megaApi.getNodeByHandle(nodeHandle) != null) {
                             viewModel.updateNode(megaApi.getNodeByHandle(nodeHandle))
                             nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
@@ -1827,6 +1828,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(manageShareReceiver)
         nodeSaver.destroy()
+        progressDialog?.first?.dismiss()
     }
 
 
