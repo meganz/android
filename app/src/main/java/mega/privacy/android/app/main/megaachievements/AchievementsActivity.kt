@@ -57,6 +57,7 @@ class AchievementsActivity : PasscodeActivity() {
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
         }
+        fetcher.fetch()
         setContentView(binding.root)
         binding.toolbarAchievements.isVisible = true
         setSupportActionBar(binding.toolbarAchievements)
