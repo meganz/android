@@ -6,7 +6,6 @@ import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
 import mega.privacy.android.domain.entity.SyncRecord
 import timber.log.Timber
 import java.io.File
-import kotlin.Exception
 
 /**
  * The class to compress videos

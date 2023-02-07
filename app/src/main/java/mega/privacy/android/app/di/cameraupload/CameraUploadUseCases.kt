@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinates
@@ -68,6 +69,7 @@ import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandl
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
+import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
@@ -765,4 +767,11 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindResetTotalUploads(resetTotalUploads: DefaultResetTotalUploads): ResetTotalUploads
+
+    /**
+     * Provide the [CompressVideos] implementation
+     */
+    @Binds
+    abstract fun bindCompressVideos(resetTotalUploads: DefaultCompressVideos): CompressVideos
+
 }
