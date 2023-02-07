@@ -73,6 +73,7 @@ import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
@@ -143,6 +144,7 @@ import mega.privacy.android.data.mapper.toUserCredentialsMapper
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
+import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
@@ -636,4 +638,10 @@ internal class MapperModule {
      */
     @Provides
     fun provideAccountSessionMapper(): AccountSessionMapper = ::toAccountSession
+
+    /**
+     * Provides VideoAttachment mapper
+     */
+    @Provides
+    fun provideVideoAttachmentMapper(): VideoAttachmentMapper = ::toVideoAttachment
 }

@@ -9,8 +9,10 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaMuxer
 import android.os.StatFs
 import android.view.Surface
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.cancellable
 import mega.privacy.android.data.compression.video.InputSurface
 import mega.privacy.android.data.compression.video.OutputSurface
 import mega.privacy.android.data.gateway.VideoCompressorGateway
@@ -22,18 +24,14 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicReference
+import javax.inject.Inject
 
 /**
  * Implementation of [VideoCompressorGateway]
  */
-internal class VideoCompressionFacade : VideoCompressorGateway {
+internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGateway {
 
     private val config = VideoCompressionConfig()
-
-    private val _state: MutableStateFlow<VideoCompressionState> =
-        MutableStateFlow(VideoCompressionState.Initial)
-
-    override val state = _state.asStateFlow()
 
     private companion object {
         const val TIMEOUT_USEC = 10000
@@ -58,37 +56,60 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
 
     override fun isRunning() = config.isRunning
 
-    override suspend fun stop() {
+    override fun stop() {
         config.isRunning = false
     }
 
-    override suspend fun start() {
+    override fun start() = callbackFlow {
         try {
             with(config) {
-                isRunning = true
                 while (queue.isNotEmpty() && isRunning()) {
+                    ensureActive()
                     val attachment = queue.poll()
+                    currentFileIndex += 1
+                    totalSizeProcessed += attachment?.originalPath.takeIf {
+                        it.isNullOrEmpty().not()
+                    }?.let {
+                        File(it).length()
+                    } ?: 0
                     runCatching {
                         attachment?.let {
                             if (hasEnoughStorage(it.originalPath)) {
-                                _state.emit(VideoCompressionState.InsufficientStorage)
+                                send(VideoCompressionState.InsufficientStorage)
                                 return@let
                             }
-                            prepareAndChangeResolution(attachment)
+                            prepareAndChangeResolution(attachment) { progress ->
+                                trySend(
+                                    VideoCompressionState.Progress(
+                                        progress,
+                                        currentFileIndex,
+                                        totalSizeProcessed,
+                                        attachment.newPath
+                                    )
+                                )
+                            }
+                            send(
+                                VideoCompressionState.FinishedCompression(
+                                    attachment.newPath,
+                                    true,
+                                    attachment.pendingMessageId,
+                                )
+                            )
                         }
                     }.onSuccess {
-                        _state.emit(VideoCompressionState.Successful(attachment?.id))
+                        send(VideoCompressionState.Successful(attachment?.id))
                     }.onFailure {
-                        _state.emit(VideoCompressionState.Failed(attachment?.id))
+                        send(VideoCompressionState.Failed(attachment?.id))
                     }
                 }
             }
         } catch (exception: Exception) {
-            _state.emit(VideoCompressionState.Failed())
+            send(VideoCompressionState.Failed())
         }
-        _state.emit(VideoCompressionState.Finished)
-        stop()
-    }
+        send(VideoCompressionState.Finished)
+        awaitClose { config.isRunning = false }
+    }.cancellable()
+
 
     private fun hasEnoughStorage(path: String): Boolean {
         val size = File(path).length()
@@ -101,15 +122,18 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
         return size > availableFreeSpace
     }
 
-    override suspend fun addItems(videoAttachments: List<VideoAttachment>) {
+    override fun addItems(videoAttachments: List<VideoAttachment>) {
         config.queue.addAll(videoAttachments)
     }
 
-    private suspend fun prepareAndChangeResolution(videoAttachment: VideoAttachment) {
+    private suspend fun prepareAndChangeResolution(
+        videoAttachment: VideoAttachment,
+        block: suspend (Int) -> Unit,
+    ) {
         Timber.d("prepareAndChangeResolution")
         var exception: Exception? = null
-        val mInputFile = videoAttachment.originalPath
-        val mOutputFile = videoAttachment.newPath
+        val inputFile = videoAttachment.originalPath
+        val outputFile = videoAttachment.newPath
         val videoCodecInfo = selectCodec(OUTPUT_VIDEO_MIME_TYPE)
             ?: return
         val audioCodecInfo = selectCodec(OUTPUT_AUDIO_MIME_TYPE)
@@ -124,11 +148,11 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
         var muxer: MediaMuxer? = null
         var inputSurface: InputSurface? = null
         try {
-            videoExtractor = createExtractor(mInputFile)
+            videoExtractor = createExtractor(outputFile)
             val videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor)
             val inputFormat = videoExtractor.getTrackFormat(videoInputTrack)
             val metadataRetriever = MediaMetadataRetriever()
-            metadataRetriever.setDataSource(mInputFile)
+            metadataRetriever.setDataSource(inputFile)
             getOriginalWidthAndHeight(metadataRetriever)
             config.resultWidth = config.width
             config.resultHeight = config.height
@@ -223,7 +247,7 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
             inputSurface.makeCurrent()
             outputSurface = OutputSurface()
             videoDecoder = createVideoDecoder(inputFormat, outputSurface.surface)
-            audioExtractor = createExtractor(mInputFile)
+            audioExtractor = createExtractor(inputFile)
             val audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor)
             if (audioInputTrack >= 0) {
                 val inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack)
@@ -237,7 +261,7 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
                 audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat)
                 audioDecoder = createAudioDecoder(inputAudioFormat)
             }
-            muxer = MediaMuxer(mOutputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            muxer = MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             changeResolution(
                 videoExtractor = videoExtractor,
                 audioExtractor = audioExtractor,
@@ -249,7 +273,9 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
                 inputSurface = inputSurface,
                 outputSurface = outputSurface,
                 video = videoAttachment,
-            )
+            ) {
+                block(it)
+            }
         } finally {
             try {
                 videoExtractor?.release()
@@ -273,14 +299,6 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
         if (exception != null) {
             Timber.e(exception, "Exception. Video not compressed, uploading original video.")
             throw exception as Exception
-        } else {
-            _state.emit(
-                VideoCompressionState.FinishedCompression(
-                    mOutputFile,
-                    true,
-                    videoAttachment.pendingMessageId,
-                )
-            )
         }
     }
 
@@ -306,9 +324,9 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
         inputSurface: InputSurface,
         outputSurface: OutputSurface,
         video: VideoAttachment,
+        block: suspend (Int) -> Unit,
     ) {
         Timber.d("changeResolution")
-        val mOutputFile = video.newPath
         val videoDecoderOutputBufferInfo: MediaCodec.BufferInfo?
         val videoEncoderOutputBufferInfo: MediaCodec.BufferInfo?
         videoDecoderOutputBufferInfo = MediaCodec.BufferInfo()
@@ -525,7 +543,7 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
                 muxing = true
             }
             video.compressionPercentage = (100 * video.readSize / video.size).toInt()
-            _state.emit(VideoCompressionState.Progress(video.compressionPercentage, mOutputFile))
+            block(video.compressionPercentage)
         }
         video.compressionPercentage = 100
     }
@@ -744,6 +762,8 @@ internal class VideoCompressionFacade : VideoCompressorGateway {
         var resultWidth: Int = 0,
         var resultHeight: Int = 0,
         var outputRoot: String? = null,
+        var currentFileIndex: Int = 0,
+        var totalSizeProcessed: Long = 0,
         val queue: ConcurrentLinkedQueue<VideoAttachment> = ConcurrentLinkedQueue(),
     )
 }

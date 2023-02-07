@@ -11,12 +11,6 @@ import mega.privacy.android.domain.entity.VideoQuality
  */
 internal interface VideoCompressorGateway {
 
-
-    /**
-     * flow to monitor states of video compression
-     */
-    val state: Flow<VideoCompressionState>
-
     /**
      * set video quality
      */
@@ -35,15 +29,15 @@ internal interface VideoCompressorGateway {
     /**
      * stop compression
      */
-    suspend fun stop()
+    fun stop()
 
     /**
      * start compression
      */
-    suspend fun start()
+    fun start(): Flow<VideoCompressionState>
 
     /**
      * add list to queue
      */
-    suspend fun addItems(videoAttachments: List<VideoAttachment>)
+    fun addItems(videoAttachments: List<VideoAttachment>)
 }

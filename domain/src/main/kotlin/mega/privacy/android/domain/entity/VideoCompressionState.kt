@@ -25,6 +25,14 @@ sealed interface VideoCompressionState {
          */
         val progress: Int,
         /**
+         * current Index
+         */
+        val currentIndex: Int,
+        /**
+         * total Video Size Processed
+         */
+        val totalSizeProcessed: Long,
+        /**
          * path of the output file
          */
         val path: String,
@@ -37,7 +45,7 @@ sealed interface VideoCompressionState {
         /**
          * record
          */
-        val id: Long?,
+        val id: Int?,
     ) : VideoCompressionState
 
     /**
@@ -47,7 +55,7 @@ sealed interface VideoCompressionState {
         /**
          * record
          */
-        val id: Long? = null,
+        val id: Int? = null,
     ) : VideoCompressionState
 
     /**
