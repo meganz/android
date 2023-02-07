@@ -39,6 +39,7 @@ import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBind
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -641,10 +642,20 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     private fun showConfirmChangeEmailQueryResult(result: String) {
-        if (matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
-            showConfirmChangeEmailDialog()
-        } else {
-            showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+        when {
+            matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS) -> {
+                showConfirmChangeEmailDialog()
+            }
+            result == getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_message) -> {
+                showAlert(
+                    this,
+                    result,
+                    getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_title)
+                )
+            }
+            else -> {
+                showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+            }
         }
     }
 

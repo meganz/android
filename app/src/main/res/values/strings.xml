@@ -4193,4 +4193,8 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email</string>
 </resources>

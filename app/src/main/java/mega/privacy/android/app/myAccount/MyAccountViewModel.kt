@@ -946,7 +946,7 @@ class MyAccountViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { result ->
-                confirmationLink = result
+                confirmationLink = link
                 action.invoke(result)
             }
             .addTo(composite)
