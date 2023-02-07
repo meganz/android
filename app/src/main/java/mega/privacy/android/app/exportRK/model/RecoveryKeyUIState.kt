@@ -1,23 +1,11 @@
 package mega.privacy.android.app.exportRK.model
 
 /**
- * UI State for ExportKeyRecoveryActivity.kt
+ * Recovery Key UI State
+ * @param isActionGroupVertical - The orientation for the Button group
+ * @param snackBarMessage - The SnackBar message, null will hide the SnackBar
  */
-sealed interface RecoveryKeyUIState {
-    /**
-     * UI State when user copies the recovery key
-     * @param key the recovery key
-     */
-    data class CopyRecoveryKey(val key: String?) : RecoveryKeyUIState
-
-    /**
-     * UI State when user exports the recovery key
-     * @param key the recovery key
-     */
-    data class ExportRecoveryKey(val key: String?) : RecoveryKeyUIState
-
-    /**
-     * UI State when user prints the recovery key
-     */
-    object PrintRecoveryKey : RecoveryKeyUIState
-}
+data class RecoveryKeyUIState(
+    val isActionGroupVertical: Boolean = false,
+    val snackBarMessage: String? = null
+)

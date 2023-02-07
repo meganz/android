@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel
-import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
 import mega.privacy.android.domain.usecase.GetExportMasterKey
 import mega.privacy.android.domain.usecase.SetMasterKeyExported
 import org.junit.After
@@ -51,58 +50,11 @@ class ExportRecoveryKeyViewModelTest {
     }
 
     @Test
-    fun `test that ui state is emitting the correct state and recovery key when copy`() = runTest {
-        whenever(getExportMasterKey()).thenReturn(fakeRecoveryKey)
-
-        underTest.onCopyRecoveryKey()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-
-            assertThat(state)
-                .isInstanceOf(RecoveryKeyUIState.CopyRecoveryKey::class.java)
-            assertThat((state as RecoveryKeyUIState.CopyRecoveryKey).key).isEqualTo(fakeRecoveryKey)
-        }
-    }
-
-    @Test
-    fun `test that ui state is emitting the correct state and recovery key when export`() =
-        runTest {
-            whenever(getExportMasterKey()).thenReturn(fakeRecoveryKey)
-
-            underTest.onExportRecoveryKey()
-
-            underTest.uiState.test {
-                val state = awaitItem()
-
-                assertThat(state)
-                    .isInstanceOf(RecoveryKeyUIState.ExportRecoveryKey::class.java)
-                assertThat((state as RecoveryKeyUIState.ExportRecoveryKey).key).isEqualTo(
-                    fakeRecoveryKey
-                )
-            }
-        }
-
-    @Test
-    fun `test that ui state is emitting the correct state when print`() = runTest {
-        whenever(getExportMasterKey()).thenReturn(fakeRecoveryKey)
-
-        underTest.onPrintRecoveryKey()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-
-            assertThat(state)
-                .isInstanceOf(RecoveryKeyUIState.PrintRecoveryKey::class.java)
-        }
-    }
-
-    @Test
-    fun `test that export master key should not trigger when recovery key is empty, and vice versa`() {
+    fun `test that setMasterKeyExported should NOT trigger when recovery key is empty, and vice versa`() {
         fun verify(key: String?, expectedInvocation: Int) = runTest {
             whenever(getExportMasterKey()).thenReturn(key)
 
-            underTest.onCopyRecoveryKey()
+            underTest.getRecoveryKey()
 
             advanceUntilIdle()
 
@@ -112,4 +64,42 @@ class ExportRecoveryKeyViewModelTest {
         verify(key = null, expectedInvocation = 0)
         verify(key = fakeRecoveryKey, expectedInvocation = 1)
     }
+
+    @Test
+    fun `test that action group should be vertical when setActionGroupVertical is triggered`() =
+        runTest {
+            underTest.setActionGroupVertical()
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isActionGroupVertical).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that message should be updated when showSnackBar`() =
+        runTest {
+            val fakeMessage = "asdjaskdjasalskdj"
+
+            underTest.showSnackBar(fakeMessage)
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().snackBarMessage).isEqualTo(fakeMessage)
+            }
+        }
+
+    @Test
+    fun `test that message should be resetted to null when snackbar is shown`() =
+        runTest {
+            underTest.setSnackBarShown()
+
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().snackBarMessage).isEqualTo(null)
+            }
+        }
 }

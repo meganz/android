@@ -2,8 +2,9 @@ package mega.privacy.android.app.exportRK
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
@@ -20,18 +21,19 @@ class ExportRecoveryKeyViewModel @Inject constructor(
     private val getExportMasterKey: GetExportMasterKey,
     private val setMasterKeyExported: SetMasterKeyExported,
 ) : BaseRxViewModel() {
-    private val _uiState = MutableSharedFlow<RecoveryKeyUIState>()
+    private val _uiState = MutableStateFlow(RecoveryKeyUIState())
 
     /**
      * Flow of [ExportRecoveryKeyActivity] UI State
-     * @see [ExportRecoveryKeyActivity]
+     * @see ExportRecoveryKeyActivity
+     * @see RecoveryKeyUIState
      */
-    val uiState = _uiState.asSharedFlow()
+    val uiState = _uiState.asStateFlow()
 
     /**
      * Exports the Recovery Key
      */
-    private suspend fun exportRecoveryKey(): String? {
+    suspend fun getRecoveryKey(): String? {
         return getExportMasterKey().also { key ->
             if (key.isNullOrBlank().not()) {
                 setMasterKeyExported()
@@ -40,23 +42,23 @@ class ExportRecoveryKeyViewModel @Inject constructor(
     }
 
     /**
-     * Triggers when user clicks the copy button to copy the recovery key
+     * Set Action Button Group to Vertical Orientation
      */
-    fun onCopyRecoveryKey() = viewModelScope.launch {
-        _uiState.emit(RecoveryKeyUIState.CopyRecoveryKey(exportRecoveryKey()))
+    fun setActionGroupVertical() = viewModelScope.launch {
+        _uiState.update { it.copy(isActionGroupVertical = true) }
     }
 
     /**
-     * Triggers when user finish choosing the location where to store the recovery key
+     * Action to trigger showing SnackBar in Compose View
      */
-    fun onExportRecoveryKey() = viewModelScope.launch {
-        _uiState.emit(RecoveryKeyUIState.ExportRecoveryKey(exportRecoveryKey()))
+    fun showSnackBar(message: String) = viewModelScope.launch {
+        _uiState.update { it.copy(snackBarMessage = message) }
     }
 
     /**
-     * Triggers when user prints the recovery key
+     * Action to mark that SnackBar has been shown
      */
-    fun onPrintRecoveryKey() = viewModelScope.launch {
-        _uiState.emit(RecoveryKeyUIState.PrintRecoveryKey)
+    fun setSnackBarShown() = viewModelScope.launch {
+        _uiState.update { it.copy(snackBarMessage = null) }
     }
 }

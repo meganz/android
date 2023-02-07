@@ -3,17 +3,19 @@ package mega.privacy.android.app.exportRK
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.view.Gravity
-import android.widget.LinearLayout
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
-import com.google.android.material.button.MaterialButton
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.lifecycleScope
+import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
-import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
+import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyScaffold
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.FileUtil
@@ -22,6 +24,8 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,18 +36,24 @@ import javax.inject.Inject
 class ExportRecoveryKeyActivity : PasscodeActivity() {
     private val viewModel by viewModels<ExportRecoveryKeyViewModel>()
 
-    private lateinit var binding: ActivityExportRecoveryKeyBinding
-
     /**
      * Account Controller class
      */
     @Inject
     lateinit var accountController: AccountController
 
+    /**
+     * Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
     private val downloadFolderActivityResult =
         registerForActivityResult(StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK || result.data != null) {
-                viewModel.onExportRecoveryKey()
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let {
+                    exportRecoveryKey(it)
+                }
             }
         }
 
@@ -52,62 +62,20 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityExportRecoveryKeyBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpView()
-        collectUIState()
-    }
+        setContent {
+            val themeMode by getThemeMode()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    /**
-     * Initial view setup, called on activity creation
-     */
-    private fun setUpView() {
-        with(binding) {
-            MKButtonsLayout.post {
-                if (isOverOneLine()) {
-                    setVerticalLayout()
-                }
-            }
-            printMKButton.setOnClickListener {
-                viewModel.onPrintRecoveryKey()
-            }
-            copyMKButton.setOnClickListener {
-                viewModel.onCopyRecoveryKey()
-            }
-            saveMKButton.setOnClickListener {
-                onSaveButtonClick()
-            }
-        }
-    }
-
-    /**
-     * Collect UI State from the View Model to update the view state
-     * @see [RecoveryKeyUIState.ExportRecoveryKey]
-     * @see [RecoveryKeyUIState.CopyRecoveryKey]
-     */
-    private fun collectUIState() {
-        this.collectFlow(viewModel.uiState) { uiState ->
-            when (uiState) {
-                is RecoveryKeyUIState.CopyRecoveryKey -> {
-                    copyRecoveryKey(uiState.key)
-                }
-                is RecoveryKeyUIState.ExportRecoveryKey -> {
-                    onRecoveryKeyExported(
-                        when {
-                            uiState.key.isNullOrEmpty() -> GENERAL_ERROR
-                            FileUtil.saveTextOnContentUri(
-                                this@ExportRecoveryKeyActivity.contentResolver,
-                                intent.data,
-                                uiState.key
-                            ) -> RK_EXPORTED
-                            else -> GENERAL_ERROR
-                        }
-                    )
-                }
-                RecoveryKeyUIState.PrintRecoveryKey -> {
-                    accountController.printRK()
-                }
-            }
+            ExportRecoveryKeyScaffold(
+                themeMode = themeMode,
+                uiState = uiState,
+                onSnackBarShown = { viewModel.setSnackBarShown() },
+                onButtonOverflow = { viewModel.setActionGroupVertical() },
+                onClickPrint = { printRecoveryKey() },
+                onClickCopy = { copyRecoveryKey() },
+                onClickSave = { chooseRecoverySaveLocation() }
+            )
         }
     }
 
@@ -133,10 +101,39 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
     }
 
     /**
+     * Action when permission has been asked to the user
+     * Will save to storage if permission granted
+     * else it will display a Snackbar telling that the user denied the request
+     */
+    private fun onPermissionAsked() {
+        if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            saveRecoveryKeyToStorage()
+        } else {
+            viewModel.showSnackBar(StringResourcesUtils.getString(R.string.denied_write_permissions))
+        }
+    }
+
+    /**
+     * Shows the result of a copy RK action.
+     *
+     * @param key Message to show as copy RK action result.
+     */
+    private fun onRecoveryKeyCopied(key: String?) {
+        showAlert(
+            this,
+            StringResourcesUtils.getString(
+                if (key.isNullOrBlank()) R.string.general_text_error
+                else R.string.copy_MK_confirmation
+            ),
+            null
+        )
+    }
+
+    /**
      * Action when save button is clicked. Will save to storage if permission granted
      * else will ask for permission to write external storage
      */
-    private fun onSaveButtonClick() {
+    private fun chooseRecoverySaveLocation() {
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             saveRecoveryKeyToStorage()
         } else {
@@ -149,100 +146,53 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
     }
 
     /**
-     * Action when permission has been asked to the user
-     * Will save to storage if permission granted
-     * else it will display a Snackbar telling that the user denied the request
+     * Action when User finished choosing folder to save recovery key
+     * Will show SnackBar message from Compose
      */
-    private fun onPermissionAsked() {
-        if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            saveRecoveryKeyToStorage()
-        } else {
-            showSnackbar(StringResourcesUtils.getString(R.string.denied_write_permissions))
+    private fun exportRecoveryKey(result: Intent) = lifecycleScope.launch {
+        val key = viewModel.getRecoveryKey()
+
+        val resId = when {
+            key.isNullOrBlank() -> R.string.general_text_error
+            isSaveToTextFileSuccessful(key, result) -> R.string.save_MK_confirmation
+            else -> R.string.general_text_error
         }
+
+        viewModel.showSnackBar(StringResourcesUtils.getString(resId))
     }
 
     /**
-     * Determines if one of those buttons show the content in more than one line.
-     * @return True if one of those buttons show the content in more than one line, false otherwise.
+     * Saving the recovery key to text file
+     * @return is save successful as [Boolean]
      */
-    private fun isOverOneLine(): Boolean {
-        return binding.printMKButton.lineCount > 1
-                || binding.copyMKButton.lineCount > 1
-                || binding.saveMKButton.lineCount > 1
-    }
-
-    /**
-     * Changes the buttons layout to vertical.
-     */
-    private fun setVerticalLayout() {
-        binding.MKButtonsLayout.orientation = LinearLayout.VERTICAL
-        updateViewParam(binding.copyMKButton)
-        updateViewParam(binding.saveMKButton)
-        updateViewParam(binding.printMKButton)
-    }
-
-    /**
-     * Updates the button params.
-     * @param view The target view which needs the update.
-     */
-    private fun updateViewParam(view: MaterialButton) {
-        val params = view.layoutParams as LinearLayout.LayoutParams
-        params.marginStart = 0
-
-        view.apply {
-            layoutParams = params
-            strokeWidth = 0
-            setPadding(0, 0, 0, 0)
-            gravity = Gravity.START
-        }
-    }
-
-    /**
-     * Shows the result of a copy RK action.
-     *
-     * @param copiedRK Message to show as copy RK action result.
-     */
-    private fun onRKCopied(copiedRK: String?) {
-        showAlert(
-            this,
-            StringResourcesUtils.getString(
-                if (copiedRK.isNullOrBlank()) R.string.general_text_error
-                else R.string.copy_MK_confirmation
-            ),
-            null
-        )
-    }
-
-    /**
-     * Shows the result of an export RK action.
-     *
-     * @param exportedRK Message to show as export RK action result.
-     */
-    private fun onRecoveryKeyExported(exportedRK: String) {
-        showSnackbar(
-            StringResourcesUtils.getString(
-                when (exportedRK) {
-                    ERROR_NO_SPACE -> R.string.error_not_enough_free_space
-                    GENERAL_ERROR -> R.string.general_text_error
-                    else -> R.string.save_MK_confirmation
-                }
+    private suspend fun isSaveToTextFileSuccessful(key: String, result: Intent): Boolean =
+        withContext(Dispatchers.IO) {
+            FileUtil.saveTextOnContentUri(
+                this@ExportRecoveryKeyActivity.contentResolver,
+                result.data,
+                key
             )
-        )
+        }
+
+    /**
+     * Prints the recovery key using Account Controller
+     * @see AccountController
+     */
+    private fun printRecoveryKey() {
+        accountController.printRK()
     }
 
     /**
      * Copy the recovery key to Clipboard.
      */
-    private fun copyRecoveryKey(key: String?) {
+    private fun copyRecoveryKey() = lifecycleScope.launch {
+        val key = viewModel.getRecoveryKey()
+
         if (key.isNullOrBlank().not()) {
-            TextUtil.copyToClipboard(this, key)
+            TextUtil.copyToClipboard(this@ExportRecoveryKeyActivity, key)
         }
 
-        onRKCopied(key)
-    }
-
-    private fun showSnackbar(text: String) {
-        showSnackbar(binding.exportMKFragmentContainer, text)
+        onRecoveryKeyCopied(key)
     }
 
     /**
@@ -263,20 +213,5 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
          * in order to save the Recovery Key
          */
         const val WRITE_STORAGE_TO_SAVE_RK = 1
-
-        /**
-         * Message code stating that device has no storage left
-         */
-        const val ERROR_NO_SPACE = "ERROR_NO_SPACE"
-
-        /**
-         * Message code stating general error, or when recovery key is null or empty
-         */
-        const val GENERAL_ERROR = "GENERAL_ERROR"
-
-        /**
-         * Message code stating that recovery key has been exported
-         */
-        const val RK_EXPORTED = "RK_EXPORTED"
     }
 }
