@@ -24,8 +24,8 @@ import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -35,6 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -110,6 +111,7 @@ class InboxFragment : RotatableFragment() {
     private var actionMode: ActionMode? = null
 
     private val viewModel by activityViewModels<InboxViewModel>()
+    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     companion object {
         /**
@@ -142,10 +144,16 @@ class InboxFragment : RotatableFragment() {
     ): View? {
         Timber.d("onCreateView()")
 
-        val sortByHeaderViewModel = ViewModelProvider(this)[SortByHeaderViewModel::class.java]
-
-        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
-            EventObserver { showSortByPanel() })
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
+                    EventObserver { showSortByPanel() }
+                )
+            }
+        }
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
+            refreshSortByHeader()
+        }
 
         val display = requireActivity().windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
@@ -166,8 +174,12 @@ class InboxFragment : RotatableFragment() {
                 it.clipToPadding = false
                 it.layoutManager = linearLayoutManager
                 it.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-                it.addItemDecoration(PositionDividerItemDecoration(requireContext(),
-                    resources.displayMetrics))
+                it.addItemDecoration(
+                    PositionDividerItemDecoration(
+                        requireContext(),
+                        resources.displayMetrics
+                    )
+                )
                 it.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
@@ -182,14 +194,16 @@ class InboxFragment : RotatableFragment() {
             emptyFolderDescriptionTextView =
                 v.findViewById(R.id.empty_list_folder_description_text_view)
             if (adapter == null) {
-                adapter = MegaNodeAdapter(requireActivity(),
+                adapter = MegaNodeAdapter(
+                    requireActivity(),
                     this,
                     emptyList(),
                     state().inboxHandle,
                     recyclerView,
                     Constants.INBOX_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                    sortByHeaderViewModel)
+                    sortByHeaderViewModel
+                )
             } else {
                 adapter?.parentHandle = state().inboxHandle
                 adapter?.setListFragment(recyclerView)
@@ -220,14 +234,16 @@ class InboxFragment : RotatableFragment() {
             emptyFolderContentGroup = v.findViewById(R.id.empty_grid_folder_content_group)
             emptyFolderTitleTextView = v.findViewById(R.id.empty_grid_folder_text_view)
             if (adapter == null) {
-                adapter = MegaNodeAdapter(requireActivity(),
+                adapter = MegaNodeAdapter(
+                    requireActivity(),
                     this,
                     emptyList(),
                     state().inboxHandle,
                     recyclerView,
                     Constants.INBOX_ADAPTER,
                     MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                    sortByHeaderViewModel)
+                    sortByHeaderViewModel
+                )
             } else {
                 adapter?.let {
                     it.parentHandle = state().inboxHandle
@@ -267,7 +283,8 @@ class InboxFragment : RotatableFragment() {
             if (!it.isMultipleSelect) {
                 it.isMultipleSelect = true
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                    ActionBarCallBack())
+                    ActionBarCallBack()
+                )
             }
         }
     }
@@ -323,7 +340,8 @@ class InboxFragment : RotatableFragment() {
             when (item.itemId) {
                 R.id.cab_menu_download -> {
                     (requireActivity() as ManagerActivity).saveNodesToDevice(
-                        selectedNodes, false, false, false, false)
+                        selectedNodes, false, false, false, false
+                    )
                     clearSelections()
                     hideMultipleSelect()
                 }
@@ -439,6 +457,15 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
+     * Refreshes the Sort By header in [MegaNodeAdapter]
+     */
+    private fun refreshSortByHeader() {
+        adapter?.let {
+            if (it.itemCount > 0) it.notifyItemChanged(0)
+        }
+    }
+
+    /**
      * Invalidates [recyclerView]
      *
      * This function is used by [ManagerActivity.refreshInboxList]
@@ -458,7 +485,8 @@ class InboxFragment : RotatableFragment() {
                 it.isMultipleSelect = true
                 it.selectAll()
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                    ActionBarCallBack())
+                    ActionBarCallBack()
+                )
             }
             updateActionModeTitle()
         }
@@ -520,7 +548,8 @@ class InboxFragment : RotatableFragment() {
             var opusFile = false
 
             if (MimeTypeList.typeForName(node.name).isVideoNotSupported || MimeTypeList.typeForName(
-                    node.name).isAudioNotSupported
+                    node.name
+                ).isAudioNotSupported
             ) {
                 mediaIntent = Intent(Intent.ACTION_VIEW)
                 internalIntent = false
@@ -537,11 +566,15 @@ class InboxFragment : RotatableFragment() {
             if (megaApi.getParentNode(node).type == MegaNode.TYPE_INCOMING) {
                 mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
             } else {
-                mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                    megaApi.getParentNode(node).handle)
+                mediaIntent.putExtra(
+                    Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                    megaApi.getParentNode(node).handle
+                )
             }
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                viewModel.getOrder())
+            mediaIntent.putExtra(
+                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                viewModel.getOrder()
+            )
             putThumbnailLocation(
                 launchIntent = mediaIntent,
                 rv = recyclerView,
@@ -559,14 +592,19 @@ class InboxFragment : RotatableFragment() {
             if (localPath != null) {
                 val mediaFile = File(localPath)
                 if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                    mediaIntent.setDataAndType(FileProvider.getUriForFile(
-                        requireActivity(),
-                        "mega.privacy.android.app.providers.fileprovider",
-                        mediaFile),
-                        MimeTypeList.typeForName(node.name).type)
+                    mediaIntent.setDataAndType(
+                        FileProvider.getUriForFile(
+                            requireActivity(),
+                            "mega.privacy.android.app.providers.fileprovider",
+                            mediaFile
+                        ),
+                        MimeTypeList.typeForName(node.name).type
+                    )
                 } else {
-                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile),
-                        MimeTypeList.typeForName(node.name).type)
+                    mediaIntent.setDataAndType(
+                        Uri.fromFile(mediaFile),
+                        MimeTypeList.typeForName(node.name).type
+                    )
                 }
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } else {
@@ -597,13 +635,16 @@ class InboxFragment : RotatableFragment() {
                 if (MegaApiUtils.isIntentAvailable(requireActivity(), mediaIntent)) {
                     startActivity(mediaIntent)
                 } else {
-                    (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+                    (requireActivity() as ManagerActivity).showSnackbar(
+                        Constants.SNACKBAR_TYPE,
                         getString(R.string.intent_not_available),
                         -1
                     )
                     adapter?.notifyDataSetChanged()
-                    (requireActivity() as ManagerActivity).saveNodesToDevice(listOf(node),
-                        true, false, false, false)
+                    (requireActivity() as ManagerActivity).saveNodesToDevice(
+                        listOf(node),
+                        true, false, false, false
+                    )
                 }
             }
             (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
@@ -616,15 +657,22 @@ class InboxFragment : RotatableFragment() {
             if (localPath != null) {
                 val mediaFile = File(localPath)
                 if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                    pdfIntent.setDataAndType(FileProvider.getUriForFile(
-                        requireActivity(),
-                        "mega.privacy.android.app.providers.fileprovider",
-                        mediaFile),
+                    pdfIntent.setDataAndType(
+                        FileProvider.getUriForFile(
+                            requireActivity(),
+                            "mega.privacy.android.app.providers.fileprovider",
+                            mediaFile
+                        ),
                         MimeTypeList.typeForName(
-                            node.name).type)
+                            node.name
+                        ).type
+                    )
                 } else {
-                    pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(
-                        node.name).type)
+                    pdfIntent.setDataAndType(
+                        Uri.fromFile(mediaFile), MimeTypeList.typeForName(
+                            node.name
+                        ).type
+                    )
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } else {
@@ -657,11 +705,15 @@ class InboxFragment : RotatableFragment() {
             if (MegaApiUtils.isIntentAvailable(requireActivity(), pdfIntent)) {
                 startActivity(pdfIntent)
             } else {
-                Toast.makeText(requireContext(),
+                Toast.makeText(
+                    requireContext(),
                     getString(R.string.intent_not_available),
-                    Toast.LENGTH_LONG).show()
-                (requireActivity() as ManagerActivity).saveNodesToDevice(listOf(node),
-                    true, false, false, false)
+                    Toast.LENGTH_LONG
+                ).show()
+                (requireActivity() as ManagerActivity).saveNodesToDevice(
+                    listOf(node),
+                    true, false, false, false
+                )
             }
             (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
         } else if (MimeTypeList.typeForName(node.name).isURL) {
@@ -864,8 +916,10 @@ class InboxFragment : RotatableFragment() {
             recyclerView?.visibility = View.GONE
             emptyFolderContentGroup?.visibility = View.VISIBLE
             if (viewModel.isCurrentlyOnBackupFolderLevel()) {
-                setEmptyFolderTextContent(getString(R.string.backups_empty_state_title),
-                    getString(R.string.backups_empty_state_body))
+                setEmptyFolderTextContent(
+                    getString(R.string.backups_empty_state_title),
+                    getString(R.string.backups_empty_state_body)
+                )
                 emptyFolderImageView?.setImageResource(
                     if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         R.drawable.ic_zero_landscape_empty_folder
@@ -874,8 +928,10 @@ class InboxFragment : RotatableFragment() {
                     }
                 )
             } else {
-                setEmptyFolderTextContent(getString(R.string.file_browser_empty_folder_new),
-                    "")
+                setEmptyFolderTextContent(
+                    getString(R.string.file_browser_empty_folder_new),
+                    ""
+                )
                 emptyFolderImageView?.setImageResource(
                     if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         R.drawable.empty_folder_landscape

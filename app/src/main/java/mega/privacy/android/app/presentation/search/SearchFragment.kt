@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -185,6 +186,9 @@ class SearchFragment : RotatableFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(
             viewLifecycleOwner,
             EventObserver { managerActivity.showNewSortByPanel(Constants.ORDER_CLOUD) })
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
+            refreshSortByHeader()
+        }
 
         searchViewModel.updateNodes.observe(
             viewLifecycleOwner,
@@ -279,6 +283,15 @@ class SearchFragment : RotatableFragment() {
                 newSearchNodesTask()
                 managerActivity.showFabButton()
             }
+        }
+    }
+
+    /**
+     * Refreshes the Sort By header in [MegaNodeAdapter]
+     */
+    private fun refreshSortByHeader() {
+        adapter?.let {
+            if (it.itemCount > 0) it.notifyItemChanged(0)
         }
     }
 

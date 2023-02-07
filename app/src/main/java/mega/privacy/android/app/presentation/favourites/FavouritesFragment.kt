@@ -14,7 +14,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -25,9 +24,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -60,10 +56,10 @@ import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
-
 
 /**
  * The Fragment for favourites
@@ -77,9 +73,15 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private lateinit var listAdapter: FavouritesAdapter
     private lateinit var gridAdapter: FavouritesGridAdapter
 
+    /**
+     * Used to access Mega Util functions
+     */
     @Inject
     lateinit var megaUtilWrapper: MegaUtilWrapper
 
+    /**
+     * Used to access Open File functions
+     */
     @Inject
     lateinit var openFileWrapper: OpenFileWrapper
 
@@ -88,8 +90,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private var isActionMode = false
     private lateinit var gridLayoutManager: RecyclerView.LayoutManager
     private lateinit var listLayoutManager: RecyclerView.LayoutManager
-
-    private var isList: Boolean = true
 
     /**
      * Is online - Temporary variable to hold state until view is migrated to compose
@@ -104,14 +104,19 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentFavouritesBinding.inflate(layoutInflater, container, false)
-        binding.emptyHintText.text = formatEmptyScreenText(requireContext(),
-            getString(R.string.homepage_empty_hint_favourites))
+        binding.emptyHintText.text = formatEmptyScreenText(
+            requireContext(),
+            getString(R.string.homepage_empty_hint_favourites)
+        )
         binding.fastscroll.setRecyclerView(binding.fileListViewBrowser)
         gridLayoutManager = GridLayoutManager(requireContext(), 2)
         listLayoutManager = LinearLayoutManager(requireContext())
@@ -122,6 +127,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         return binding.root
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupFlow()
@@ -129,11 +137,46 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         setupMiniAudioPlayer()
     }
 
+    /**
+     * onDestroy
+     */
     override fun onDestroy() {
         super.onDestroy()
         viewModel.exitSearch()
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
+    }
+
+    /**
+     * shouldShowSearchMenu
+     */
+    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
+
+    /**
+     * searchReady
+     */
+    override fun searchReady() {
+        // Rotate screen in action mode, the keyboard would pop up again, hide it
+        if (actionMode != null) {
+            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
+        }
+        viewModel.searchQuery("")
+        hideFabButton()
+    }
+
+    /**
+     * exitSearch
+     */
+    override fun exitSearch() {
+        viewModel.exitSearch()
+        showFabButton()
+    }
+
+    /**
+     * searchQuery
+     */
+    override fun searchQuery(query: String) {
+        viewModel.searchQuery(query)
     }
 
     /**
@@ -155,7 +198,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             onLongClicked = ::itemLongClicked,
             getThumbnail = thumbnailViewMode::getThumbnail
         )
-        switchListGridView(sortByHeaderViewModel.isList)
     }
 
     /**
@@ -178,14 +220,14 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.favouritesState
                     .combine(
-                        getListFlow()
-                    ) { state, isList ->
-                        Pair(state, isList)
-                    }.collect { (favouritesState, isList) ->
+                        sortByHeaderViewModel.state
+                    ) { favouritesState, sortByHeaderState ->
+                        Pair(favouritesState, sortByHeaderState)
+                    }.collect { (favouritesState, sortByHeaderState) ->
+                        val isList = sortByHeaderState.viewType == ViewType.LIST
+
                         handleConnectivityState(favouritesState.isConnected)
-                        if (isList != this@FavouritesFragment.isList) {
-                            switchListGridView(isList)
-                        }
+                        switchViewType(sortByHeaderState.viewType)
                         setViewVisible(favouritesState)
                         if (!favouritesState.showSearch) {
                             requireActivity().invalidateOptionsMenu()
@@ -214,11 +256,12 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
 
     }
 
-    private fun getListFlow() = flow {
-        emit(sortByHeaderViewModel.isList)
-        emitAll(sortByHeaderViewModel.listGridChangeEvent.asFlow().map { it.peekContent() })
-    }
-
+    /**
+     * Returns a list of Favourite Nodes
+     *
+     * @param favouritesState [FavouriteLoadState]
+     * @return a list of [FavouriteItem] objects
+     */
     private fun formatGridList(favouritesState: FavouriteLoadState.Success): List<FavouriteItem> {
         val list = favouritesState.favourites.toMutableList()
         if (list.any { it.favourite is FavouriteFolder }) {
@@ -230,6 +273,11 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         return list
     }
 
+    /**
+     * Handle the selected Favourite Nodes
+     *
+     * @param selectedItems A Set of Favourite [NodeId] objects
+     */
     private fun handleSelectedItems(selectedItems: Set<NodeId>) {
         val selectedCount = selectedItems.size
         if (selectedCount > 0) {
@@ -253,6 +301,11 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Opens the [NodeOptionsBottomSheetDialogFragment] to perform Favourites-related functions
+     *
+     * @param node The Favourite [MegaNode]
+     */
     private fun openBottomSheet(node: MegaNode) {
         (activity as ManagerActivity).showNodeOptionsPanel(
             node,
@@ -260,11 +313,19 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         )
     }
 
+    /**
+     * Handle the app connectivity state
+     *
+     * @param isConnected True if the user is connected to the Internet
+     */
     private fun handleConnectivityState(isConnected: Boolean) {
         isOnLine = isConnected
         if (!isConnected) showOfflineNotification()
     }
 
+    /**
+     * Displays a Snackbar to indicate that the user's device is offline
+     */
     private fun showOfflineNotification() {
         Snackbar.make(
             requireView(),
@@ -355,26 +416,6 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         actionModeCallback?.run {
             actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(this)
         }
-    }
-
-    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
-
-    override fun searchReady() {
-        // Rotate screen in action mode, the keyboard would pop up again, hide it
-        if (actionMode != null) {
-            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
-        }
-        viewModel.searchQuery("")
-        hideFabButton()
-    }
-
-    override fun exitSearch() {
-        viewModel.exitSearch()
-        showFabButton()
-    }
-
-    override fun searchQuery(query: String) {
-        viewModel.searchQuery(query)
     }
 
     /**
@@ -477,6 +518,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * @param item Favourite item
      * @return true to make the view long clickable, false otherwise
      */
+    @Suppress("DEPRECATION")
     private fun itemLongClicked(item: Favourite): Boolean {
         if (Util.isOnline(context)) {
             viewModel.itemSelected(item)
@@ -494,20 +536,23 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     }
 
     /**
-     * Switch the recycle view between list and grid
-     * @param isList true is list, otherwise is grid
+     * Switches how Favourite items are being displayed
+     *
+     * @param viewType The View Type
      */
-    private fun switchListGridView(isList: Boolean) {
-        this.isList = isList
+    private fun switchViewType(viewType: ViewType) {
         with(binding.fileListViewBrowser) {
-            if (isList) {
-                switchToLinear()
-                adapter = listAdapter
-            } else {
-                switchBackToGrid()
-                adapter = gridAdapter
-                (layoutManager as CustomizedGridLayoutManager).apply {
-                    spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+            when (viewType) {
+                ViewType.LIST -> {
+                    switchToLinear()
+                    adapter = listAdapter
+                }
+                ViewType.GRID -> {
+                    switchBackToGrid()
+                    adapter = gridAdapter
+                    (layoutManager as CustomizedGridLayoutManager).apply {
+                        spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                    }
                 }
             }
             itemAnimator = SelectAnimator()

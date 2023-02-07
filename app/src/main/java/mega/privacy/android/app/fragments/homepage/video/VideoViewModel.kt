@@ -44,7 +44,6 @@ class VideoViewModel @Inject constructor(
 
     private var _query = MutableLiveData<String>()
 
-    var isList = true
     var skipNextAutoScroll = false
 
     var searchMode = false
@@ -151,6 +150,28 @@ class VideoViewModel @Inject constructor(
             sortOrder = getCloudSortOrder()
             loadVideo(true)
         }
+    }
+
+    /**
+     * Readies the Search Functionality
+     */
+    fun readySearch() {
+        if (searchMode) return
+
+        searchMode = true
+        searchQuery = ""
+        refreshUi()
+    }
+
+    /**
+     * Exits the Search Functionality
+     */
+    fun exitSearch() {
+        if (!searchMode) return
+
+        searchMode = false
+        searchQuery = ""
+        refreshUi()
     }
 
     /**

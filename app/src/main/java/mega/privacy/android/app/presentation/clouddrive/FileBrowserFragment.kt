@@ -30,8 +30,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -123,6 +124,7 @@ class FileBrowserFragment : RotatableFragment() {
 
     private val managerViewModel by activityViewModels<ManagerViewModel>()
     private val fileBrowserViewModel by activityViewModels<FileBrowserViewModel>()
+    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     private var aB: ActionBar? = null
 
@@ -174,6 +176,15 @@ class FileBrowserFragment : RotatableFragment() {
      */
     private fun showSortByPanel() {
         (activity as? ManagerActivity)?.showNewSortByPanel(Constants.ORDER_CLOUD)
+    }
+
+    /**
+     * Refreshes the Sort By header in [MegaNodeAdapter]
+     */
+    private fun refreshSortByHeader() {
+        adapter?.let {
+            if (it.itemCount > 0) it.notifyItemChanged(0)
+        }
     }
 
     private inner class ActionBarCallBack : ActionMode.Callback {
@@ -442,10 +453,6 @@ class FileBrowserFragment : RotatableFragment() {
         if (!isAdded) {
             return null
         }
-        val sortByHeaderViewModel = ViewModelProvider(this)[SortByHeaderViewModel::class.java]
-        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
-            EventObserver { showSortByPanel() })
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 fileBrowserViewModel.state.collect {
@@ -454,6 +461,16 @@ class FileBrowserFragment : RotatableFragment() {
                     recyclerView?.invalidate()
                 }
             }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
+                    EventObserver { showSortByPanel() }
+                )
+            }
+        }
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
+            refreshSortByHeader()
         }
 
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
@@ -659,12 +676,6 @@ class FileBrowserFragment : RotatableFragment() {
     }
 
     override fun getAdapter(): RotatableAdapter? = adapter
-
-    /**
-     * Get current recyclerview
-     * @return RecyclerView
-     */
-    fun getRecyclerView() = recyclerView
 
     /**
      * Opens file

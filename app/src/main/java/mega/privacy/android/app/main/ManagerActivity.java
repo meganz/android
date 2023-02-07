@@ -426,6 +426,7 @@ import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
+import mega.privacy.android.domain.entity.preference.ViewType;
 import mega.privacy.android.domain.entity.transfer.TransferType;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -1428,7 +1429,7 @@ public class ManagerActivity extends TransfersManagementActivity
         registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
 
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
-                .observe(this, this::updateView);
+                .observe(this, this::updateViews);
 
         registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
@@ -1520,27 +1521,17 @@ public class ManagerActivity extends TransfersManagementActivity
         prefs = dbH.getPreferences();
         if (prefs == null) {
             firstTimeAfterInstallation = true;
-            isList = true;
         } else {
             if (prefs.getFirstTime() == null) {
                 firstTimeAfterInstallation = true;
             } else {
                 firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
             }
-            if (prefs.getPreferredViewList() == null) {
-                isList = true;
-            } else {
-                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-            }
         }
 
         if (firstTimeAfterInstallation) {
             setStartScreenTimeStamp(this);
         }
-
-        Timber.d("Preferred View List: %s", isList);
-
-        LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         handler = new Handler();
 
@@ -2497,6 +2488,10 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             return Unit.INSTANCE;
         });
+        ViewExtensionsKt.collectFlow(this, viewModel.getOnViewTypeChanged(), Lifecycle.State.STARTED, viewType -> {
+            updateViewType(viewType);
+            return Unit.INSTANCE;
+        });
 
         ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
             if (isConnected) {
@@ -2515,6 +2510,16 @@ public class ManagerActivity extends TransfersManagementActivity
             nVEmail.setText(state.getEmail());
             return Unit.INSTANCE;
         });
+    }
+
+    /**
+     * Updates the View Type
+     *
+     * @param viewType The new View Type
+     */
+    private void updateViewType(ViewType viewType) {
+        Timber.d("The updated View Type is %s", viewType.name());
+        isList = viewType == ViewType.LIST;
     }
 
     /**
@@ -5618,14 +5623,11 @@ public class ManagerActivity extends TransfersManagementActivity
         startActivity(intent);
     }
 
-    private void updateView(boolean isList) {
-        if (this.isList != isList) {
-            this.isList = isList;
-            dbH.setPreferredViewList(isList);
-        }
-
-        LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
-
+    /**
+     * Updates the views of different Fragments
+     */
+    private void updateViews(boolean isList) {
+        dbH.setPreferredViewList(isList);
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
 
@@ -9841,14 +9843,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean isList() {
         return isList;
-    }
-
-    public void setList(boolean isList) {
-        this.isList = isList;
-    }
-
-    public boolean isListCameraUploads() {
-        return false;
     }
 
     public boolean getFirstLogin() {
