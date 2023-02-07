@@ -543,12 +543,23 @@ internal class MegaApiFacade @Inject constructor(
     override fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
         listener: MegaRequestListenerInterface?,
     ) {
-        listener?.let {
-            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, it)
-        } ?: megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+        when {
+            newNodeName == null && listener == null -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent)
+            }
+            newNodeName != null && listener == null -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+            }
+            newNodeName == null && listener != null -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent, listener)
+            }
+            else /*newNodeName != null && listener != null*/ -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, listener)
+            }
+        }
     }
 
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =

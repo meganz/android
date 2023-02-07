@@ -6,7 +6,9 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,12 +18,12 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import nz.mega.sdk.MegaNode
@@ -45,7 +47,7 @@ internal class FileInfoViewModelTest {
     private lateinit var isNodeInInbox: IsNodeInInbox
     private lateinit var checkNameCollision: CheckNameCollision
     private lateinit var moveNodeByHandle: MoveNodeByHandle
-    private lateinit var copyNodeUseCase: CopyNodeUseCase
+    private lateinit var copyNodeByHandle: CopyNodeByHandle
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
 
@@ -70,7 +72,7 @@ internal class FileInfoViewModelTest {
         isNodeInInbox = mock()
         checkNameCollision = mock()
         moveNodeByHandle = mock()
-        copyNodeUseCase = mock()
+        copyNodeByHandle = mock()
         node = mock()
         nameCollision = mock()
     }
@@ -83,7 +85,7 @@ internal class FileInfoViewModelTest {
             isNodeInInbox,
             checkNameCollision,
             moveNodeByHandle,
-            copyNodeUseCase
+            copyNodeByHandle
         )
         underTest.updateNode(node)
     }
@@ -172,11 +174,18 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
+    fun `test NotConnected event is launched if not connected while copying`() =
+        runTest {
+            whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(false))
+            underTest.copyNodeCheckingCollisions(parentId)
+            Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
+                .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
+        }
+
+    @Test
     fun `test CollisionDetected event is launched when a collision is found while moving`() =
         runTest {
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenReturn(
-                nameCollision
-            )
+            mockCollisionMoving()
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
@@ -184,22 +193,24 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test CollisionDetected event is launched when a collision is found while copying`() =
         runTest {
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY)).thenReturn(
-                nameCollision
-            )
+            mockCollisionCopying()
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
 
     @Test
+    fun `test GeneralError event is launched when an unknown error is returned when check collision`() =
+        runTest {
+            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
+                .thenThrow(RuntimeException::class.java)
+            underTest.copyNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.GeneralError::class.java)
+        }
+
+    @Test
     fun `test FinishedMoving event is launched without exceptions when the move finished OK`() =
         runTest {
-            whenever(
-                moveNodeByHandle.invoke(nodeId, parentId)
-            ).thenReturn(Unit)
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenThrow(
-                MegaNodeException.ChildDoesNotExistsException::class.java
-            )
+            mockMoveOK()
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedMoving::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -209,17 +220,85 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test FinishedMoving event is launched with the proper exceptions when the move finished KO`() =
         runTest {
-            whenever(
-                moveNodeByHandle.invoke(nodeId, parentId)
-            ).thenThrow(RuntimeException("fake exception"))
-            whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE)).thenThrow(
-                MegaNodeException.ChildDoesNotExistsException::class.java
-            )
+            mockMoveKO()
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedMoving::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
+
+    @Test
+    fun `test FinishedCopying event is launched without exceptions when the move finished OK`() =
+        runTest {
+            mockCopyOK()
+            underTest.copyNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedCopying::class.java)?.also {
+                Truth.assertThat(it.exception).isNull()
+            }
+        }
+
+    @Test
+    fun `test FinishedCopying event is launched with the proper exceptions when the move finished KO`() =
+        runTest {
+            mockCopyKO()
+            underTest.copyNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedCopying::class.java)?.also {
+                Truth.assertThat(it.exception).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while copying OK, and unset at the end`() =
+        runTest {
+            mockCopyOK()
+            testProgressIsSetWhileCopyingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while copying KO, and unset at the end`() =
+        runTest {
+            mockCopyKO()
+            testProgressIsSetWhileCopyingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while copying and Name conflict found, and unset at the end`() =
+        runTest {
+            mockCollisionCopying()
+            testProgressIsSetWhileCopyingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while moving OK, and unset at the end`() =
+        runTest {
+            mockMoveOK()
+            testProgressIsSetWhileMovingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while moving KO, and unset at the end`() =
+        runTest {
+            mockMoveKO()
+            testProgressIsSetWhileMovingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while moving and Name conflict found, and unset at the end`() =
+        runTest {
+            mockCollisionMoving()
+            testProgressIsSetWhileMovingAndUnset()
+        }
+
+
+    @Test
+    fun `test on-off event is removed from state once is consumed`() {
+        `test CollisionDetected event is launched when a collision is found while copying`()
+        runTest {
+            Truth.assertThat(underTest.uiState.value.oneOffViewEvent).isNotNull()
+            underTest.consumeOneOffEvent(underTest.uiState.value.oneOffViewEvent ?: return@runTest)
+            Truth.assertThat(underTest.uiState.value.oneOffViewEvent).isNull()
+        }
+    }
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : FileInfoOneOffViewEvent> testNextEventIsOfType(
@@ -234,17 +313,64 @@ internal class FileInfoViewModelTest {
         underTest.uiState.mapNotNull { it.oneOffViewEvent }.first()
 
 
-    @Test
-    fun `test NotConnected event is launched if not connected while copying`() =
-        runBlocking {
-            whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(false))
+    private suspend fun mockCollisionCopying() {
+        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
+            .thenReturn(nameCollision)
+    }
+
+    private suspend fun mockCollisionMoving() {
+        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
+            .thenReturn(nameCollision)
+    }
+
+    private suspend fun mockCopyOK() {
+        whenever(copyNodeByHandle.invoke(nodeId, parentId)).thenReturn(nodeId)
+        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
+            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+    }
+
+    private suspend fun mockMoveOK() {
+        whenever(moveNodeByHandle.invoke(nodeId, parentId)).thenReturn(Unit)
+        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
+            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+    }
+
+    private suspend fun mockCopyKO() {
+        whenever(copyNodeByHandle.invoke(nodeId, parentId))
+            .thenThrow(RuntimeException("fake exception"))
+        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
+            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+    }
+
+    private suspend fun mockMoveKO() {
+        whenever(moveNodeByHandle.invoke(nodeId, parentId))
+            .thenThrow(RuntimeException("fake exception"))
+        whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
+            .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+    }
+
+    private suspend fun testProgressIsSetWhileCopyingAndUnset() =
+        testProgressSetAndUnset(FileInfoJobInProgressState.Copying) {
             underTest.copyNodeCheckingCollisions(parentId)
-            underTest.uiState.test {
-                val state = awaitItem()
-                Truth.assertThat(state.oneOffViewEvent)
-                    .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
-            }
         }
+
+    private suspend fun testProgressIsSetWhileMovingAndUnset() =
+        testProgressSetAndUnset(FileInfoJobInProgressState.Moving) {
+            underTest.moveNodeCheckingCollisions(parentId)
+        }
+
+    private suspend fun testProgressSetAndUnset(
+        progress: FileInfoJobInProgressState,
+        block: () -> Unit,
+    ) = runBlocking {
+        underTest.uiState.map { it.jobInProgressState }.distinctUntilChanged().test {
+            Truth.assertThat(awaitItem()).isNull()
+            block()
+            Truth.assertThat(awaitItem()).isEqualTo(progress)
+            Truth.assertThat(awaitItem()).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     companion object {
         private const val NODE_HANDLE = 10L

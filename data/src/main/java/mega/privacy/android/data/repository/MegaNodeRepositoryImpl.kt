@@ -75,7 +75,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     override suspend fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.copyNode(
@@ -93,6 +93,23 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                 )
             )
         }
+    }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun copyNodeByHandle(
+        nodeToCopy: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToCopy.longValue)
+        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        if (node == null) {
+            throw IllegalArgumentException("Node to copy with handle $nodeToCopy not found")
+        }
+        if (parent == null) {
+            throw IllegalArgumentException("Destination node with handle $newNodeParent not found")
+        }
+        copyNode(node, parent, newNodeName)
     }
 
     @Throws(MegaException::class)

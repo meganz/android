@@ -15,18 +15,33 @@ import nz.mega.sdk.MegaShare
 interface MegaNodeRepository {
 
     /**
-     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name
+     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name if set
      *
      * @param nodeToCopy the [MegaNode] to copy
      * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
-     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
      *
-     * @return the handle of the new [MegaNode] that was copied
+     * @return the [NodeId] handle of the new [MegaNode] that was copied
      */
     suspend fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
+     * Copy a [MegaNode] by its [NodeId] handle and move it to a new [MegaNode] by its [NodeId] handle while updating its name if set
+     *
+     * @param nodeToCopy the [NodeId] handle to copy
+     * @param newNodeParent the [NodeId] handle that [nodeToCopy] will be moved to
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [MegaNode] that was copied
+     */
+    suspend fun copyNodeByHandle(
+        nodeToCopy: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
     ): NodeId
 
     /**

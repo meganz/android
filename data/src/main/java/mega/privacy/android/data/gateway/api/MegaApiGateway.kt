@@ -844,17 +844,17 @@ interface MegaApiGateway {
     )
 
     /**
-     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name
+     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name if set
      *
      * @param nodeToCopy the [MegaNode] to copy
      * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
-     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if not null, if null the same name will be used
      * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
      */
     fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
         listener: MegaRequestListenerInterface?,
     )
 

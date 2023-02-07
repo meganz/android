@@ -8,13 +8,15 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.rx3.await
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 
 /**
@@ -37,6 +39,29 @@ abstract class GetNodeModule {
         @Provides
         fun provideCopyNode(megaNodeRepository: MegaNodeRepository): CopyNode =
             CopyNode(megaNodeRepository::copyNode)
+
+        /**
+         * Provides the [CopyNodeByHandle] implementation
+         *
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [CopyNodeByHandle]
+         */
+        @Provides
+        fun provideCopyNodeByHandle(megaNodeRepository: MegaNodeRepository): CopyNodeByHandle =
+            CopyNodeByHandle { node, parent ->
+                megaNodeRepository.copyNodeByHandle(node, parent, null)
+            }
+
+        /**
+         * Provides the [CopyNodeByHandleChangingName] implementation
+         *
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [CopyNodeByHandleChangingName]
+         */
+        @Provides
+        fun provideCopyNodeByHandleChangingName(megaNodeRepository: MegaNodeRepository): CopyNodeByHandleChangingName =
+            CopyNodeByHandleChangingName(megaNodeRepository::copyNodeByHandle)
+
 
         /**
          * Provides the [GetChildrenNode] implementation
