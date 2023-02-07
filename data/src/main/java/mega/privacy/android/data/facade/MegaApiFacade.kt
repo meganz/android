@@ -838,5 +838,10 @@ internal class MegaApiFacade @Inject constructor(
     override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
         megaApi.querySignupLink(link, listener)
 
+    override fun getPublicNode(
+        nodeFileLink: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getPublicNode(nodeFileLink, listener)
+
     override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
 }

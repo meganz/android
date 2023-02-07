@@ -20,10 +20,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getScreenSize
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.isVideo
+import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -46,6 +48,7 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
+import kotlin.coroutines.resumeWithException
 
 /**
  * The repository implementation class regarding thumbnail feature.
@@ -215,6 +218,42 @@ internal class DefaultImageRepository @Inject constructor(
             return@let getImageByNode(it, fullSize, highPriority, isMeteredConnection)
         } ?: throw IllegalArgumentException("Node is null")
     }
+
+    override suspend fun getImageByNodePublicLink(
+        nodeFileLink: String,
+        fullSize: Boolean,
+        highPriority: Boolean,
+        isMeteredConnection: Boolean,
+    ): Flow<ImageResult> = withContext(ioDispatcher) {
+        if (nodeFileLink.isBlank()) throw IllegalArgumentException("Invalid megaFileLink")
+        return@withContext getImageByNode(
+            getPublicNode(nodeFileLink),
+            fullSize,
+            highPriority,
+            isMeteredConnection
+        )
+    }
+
+    private suspend fun getPublicNode(nodeFileLink: String): MegaNode =
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        if (!request.flag) {
+                            continuation.resumeWith(Result.success(request.publicNode))
+                        } else {
+                            continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
+                        }
+                    } else {
+                        continuation.failWithException(error.toException())
+                    }
+                }
+            )
+            megaApiGateway.getPublicNode(nodeFileLink, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
 
     private suspend fun getFullImageFromServer(
         imageResult: ImageResult,

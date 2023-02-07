@@ -69,4 +69,19 @@ interface ImageRepository {
         highPriority: Boolean,
         isMeteredConnection: Boolean,
     ): Flow<ImageResult>
+
+    /**
+     * Get Image Result given Public Link
+     * @param nodeFileLink          Public link to a file in MEGA.
+     * @param fullSize              Flag to request full size image despite data/size requirements.
+     * @param highPriority          Flag to request image with high priority.
+     * @param isMeteredConnection   Boolean indicating if network connection is metered
+     * @return Flow<ImageResult>
+     */
+    suspend fun getImageByNodePublicLink(
+        nodeFileLink: String,
+        fullSize: Boolean,
+        highPriority: Boolean,
+        isMeteredConnection: Boolean,
+    ): Flow<ImageResult>
 }

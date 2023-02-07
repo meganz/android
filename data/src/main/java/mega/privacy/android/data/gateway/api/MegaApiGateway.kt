@@ -1617,6 +1617,17 @@ interface MegaApiGateway {
     fun querySignupLink(link: String, listener: MegaRequestListenerInterface)
 
     /**
+     * Get MegaNode given the Node File Link
+     *
+     * @param nodeFileLink  Public link to a file in MEGA
+     * @param listener      MegaRequestListener to track this request
+     */
+    fun getPublicNode(
+        nodeFileLink: String,
+        listener: MegaRequestListenerInterface
+    )
+
+    /**
      * Cancels all transfers of the same type.
      *
      * The associated request type with this request is MegaRequest::TYPE_CANCEL_TRANSFERS

@@ -155,4 +155,44 @@ class DefaultImageRepositoryTest {
             )
         }
     }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test that getImageByNodePublicLink throws exception if nodeFileLink is blank`() {
+        runTest {
+            underTest.getImageByNodePublicLink(
+                nodeFileLink = "",
+                fullSize = false,
+                highPriority = false,
+                isMeteredConnection = false
+            )
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `test that getImageByNodePublicLink throws exception if key for PublicNode is invalid`() {
+        runTest {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { flag }.thenReturn(true)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            whenever(megaApiGateway.getPublicNode(any(), any())).thenAnswer {
+                (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+
+            underTest.getImageByNodePublicLink(
+                nodeFileLink = "abc",
+                fullSize = false,
+                highPriority = false,
+                isMeteredConnection = false
+            )
+        }
+    }
 }
