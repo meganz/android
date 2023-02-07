@@ -268,18 +268,21 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         collectFlow(viewModel.state) { state ->
             binding.headerLayout.firstLineToolbar.text = state.name
+            binding.progressBar.isVisible = state.isLoading
+
             state.changeEmailResult?.let {
                 showChangeEmailResult(it)
                 viewModel.markHandleChangeEmailResult()
+            }
+
+            state.changeUserNameResult?.let {
+                updateName(it.isSuccess)
+                viewModel.markHandleChangeUserNameResult()
             }
         }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
             binding.headerLayout.secondLineToolbar.text = viewModel.getEmail()
-        }
-
-        viewModel.isProcessingFile().observe(this) { isProcessing ->
-            binding.progressBar.isVisible = isProcessing
         }
 
         lifecycleScope.launchWhenStarted {
@@ -296,8 +299,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
      * @param success True if the name was changed successfully, false otherwise.
      */
     private fun updateName(success: Boolean) {
-        binding.progressBar.isVisible = false
-
         showSnackbar(
             StringResourcesUtils.getString(
                 if (success) R.string.success_changing_user_attributes
@@ -587,13 +588,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                     }
 
                     if (!errorShown) {
-                        binding.progressBar.isVisible =
-                            viewModel.changeName(
-                                editProfileViewModel.getFirstName(),
-                                editProfileViewModel.getLastName(),
-                                dialogBinding.firstNameField.text.toString(),
-                                dialogBinding.lastNameField.text.toString()
-                            ) { success -> updateName(success) }
+                        viewModel.changeName(
+                            editProfileViewModel.getFirstName(),
+                            editProfileViewModel.getLastName(),
+                            dialogBinding.firstNameField.text.toString(),
+                            dialogBinding.lastNameField.text.toString()
+                        )
 
                         dismiss()
                     }
