@@ -1822,8 +1822,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun showCancelTransfersDialog() = AlertDialog.Builder(requireContext()).apply {
         setMessage(R.string.login_warning_abort_transfers)
         setPositiveButton(R.string.login_text) { _, _ ->
-            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
-            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+            viewModel.launchCancelTransfers()
             performLogin()
         }
         setNegativeButton(R.string.general_cancel, null)

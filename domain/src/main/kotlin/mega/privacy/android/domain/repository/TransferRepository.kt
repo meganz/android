@@ -105,4 +105,9 @@ interface TransferRepository {
      *
      */
     suspend fun broadcastTransferOverQuota()
+
+    /**
+     * Cancels all transfers, uploads and downloads.
+     */
+    suspend fun cancelTransfers()
 }

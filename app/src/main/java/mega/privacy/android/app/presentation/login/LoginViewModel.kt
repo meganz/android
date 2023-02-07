@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.usecase.CancelTransfers
 import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetSession
@@ -54,6 +55,7 @@ class LoginViewModel @Inject constructor(
     private val hasCameraSyncEnabled: HasCameraSyncEnabled,
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
     private val querySignupLink: QuerySignupLink,
+    private val cancelTransfers: CancelTransfers,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -330,4 +332,9 @@ class LoginViewModel @Inject constructor(
     fun checkSignupLink(link: String) = viewModelScope.launch {
         querySignupLinkFinished.value = kotlin.runCatching { querySignupLink(link) }
     }
+
+    /**
+     * Cancels all transfers, uploads and downloads.
+     */
+    fun launchCancelTransfers() = viewModelScope.launch { cancelTransfers() }
 }

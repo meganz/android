@@ -1615,4 +1615,18 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun querySignupLink(link: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Cancels all transfers of the same type.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CANCEL_TRANSFERS
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the first parameter
+     *
+     * @param direction Type of transfers to cancel.
+     *                  Valid values are:
+     *                  - MegaTransfer::TYPE_DOWNLOAD = 0
+     *                  - MegaTransfer::TYPE_UPLOAD = 1
+     */
+    suspend fun cancelTransfers(direction: Int)
 }

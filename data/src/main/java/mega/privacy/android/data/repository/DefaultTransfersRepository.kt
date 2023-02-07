@@ -213,4 +213,9 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun broadcastTransferOverQuota() {
         appEventGateway.broadcastTransferOverQuota()
     }
+
+    override suspend fun cancelTransfers() = withContext(ioDispatcher) {
+        megaApiGateway.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+        megaApiGateway.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
+    }
 }
