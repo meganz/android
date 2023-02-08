@@ -130,12 +130,11 @@
             style="@style/taken_down_icon"
             android:layout_marginStart="3dp"
             android:layout_marginEnd="6dp"
-            android:src="@drawable/ic_input_warning"
+            android:src="@drawable/ic_taken_down"
             app:layout_constraintStart_toEndOf="@id/public_link"
             app:layout_constraintTop_toTopOf="@id/public_link"
             app:layout_constraintBottom_toBottomOf="@id/public_link"
             app:visibleGone="@{item.node.takenDown}"
-            app:tint="?attr/colorError"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -49,7 +49,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="22dp"
                 android:layout_toStartOf="@+id/file_grid_three_dots"
-                android:src="@drawable/ic_input_warning"
+                android:src="@drawable/ic_taken_down"
                 tools:ignore="ContentDescription" />
 
             <ImageButton
@@ -164,8 +164,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="6dp"
-                android:src="@drawable/ic_input_warning"
-                app:tint="?attr/colorError"
+                android:src="@drawable/ic_taken_down"
                 tools:ignore="ContentDescription" />
 
             <ImageButton

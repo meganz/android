@@ -112,7 +112,7 @@
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:text="@{item.node.name}"
-                android:textColor="@{item.node.isTakenDown() ? @color/red_600_red_300 : @color/grey_087_white_087}"
+                android:textColor="@{item.node.isTakenDown() ? @color/red_800_red_400 : @color/grey_087_white_087}"
                 android:textSize="14sp"
                 tools:text="2048.jpg" />
 
@@ -122,9 +122,8 @@
                 android:layout_height="16dp"
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
-                android:src="@drawable/ic_input_warning"
-                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}"
-                app:tint="@color/red_600_red_300" />
+                android:src="@drawable/ic_taken_down"
+                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}" />
 
             <ImageView
                 android:layout_width="wrap_content"

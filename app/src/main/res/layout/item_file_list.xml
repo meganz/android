@@ -138,8 +138,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginEnd="6dp"
             android:layout_toEndOf="@+id/file_list_public_link"
-            android:src="@drawable/ic_input_warning"
-            app:tint="?attr/colorError"
+            android:src="@drawable/ic_taken_down"
             tools:ignore="ContentDescription"
             tools:visibility="visible"/>
 

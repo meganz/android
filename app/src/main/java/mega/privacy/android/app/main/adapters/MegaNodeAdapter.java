@@ -420,7 +420,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public void selectAll() {
-        for (int i = 0; i < nodes.size(); i ++) {
+        for (int i = 0; i < nodes.size(); i++) {
             selectedItems.put(i, true);
             notifyItemChanged(i);
         }
@@ -432,7 +432,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
 
-        for (int i = 0; i < nodes.size(); i ++) {
+        for (int i = 0; i < nodes.size(); i++) {
             selectedItems.delete(i);
             notifyItemChanged(i);
         }
@@ -825,8 +825,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.videoInfoLayout.setVisibility(View.GONE);
 
         if (node.isTakenDown()) {
-            holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
-            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.textViewFileNameForFile.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
+            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
@@ -995,7 +995,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
             holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
@@ -1048,7 +1048,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
                 if (node.isTakenDown()) {
-                    holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
                     holder.takenDownImage.setVisibility(View.VISIBLE);
                 } else {
                     holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
@@ -1080,7 +1080,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
 
-                    if(isMandatoryFingerprintVerificationNeeded) {
+                    if (isMandatoryFingerprintVerificationNeeded) {
                         //// TODO This if will also contain a check from SDK which shows whether user needs to be authorised
                         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                     }

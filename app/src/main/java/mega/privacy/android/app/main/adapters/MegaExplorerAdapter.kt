@@ -13,7 +13,9 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.util.forEach
 import androidx.core.view.isVisible
 import androidx.core.view.setMargins
@@ -35,6 +37,7 @@ import mega.privacy.android.app.main.IncomingSharesExplorerFragment
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
@@ -474,6 +477,24 @@ class MegaExplorerAdapter(
     }
 
     /**
+     * TextView set text and text color
+     * @param textView TextView
+     * @param info Favourite
+     */
+    private fun textViewSettings(textView: TextView, node: MegaNode) {
+        with(textView) {
+            text = node.name
+            setTextColor(
+                if (node.isTakenDown) {
+                    context.getColor(R.color.red_800_red_400)
+                } else {
+                    context.getColor(R.color.grey_087_white_087)
+                }
+            )
+        }
+    }
+
+    /**
      * The open class for explorer view holder
      */
     open class ViewHolderExplorer(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -512,15 +533,9 @@ class MegaExplorerAdapter(
 
                 currentPosition = position
                 document = node.handle
-                binding.fileExplorerFilename.text = node.name
+                textViewSettings(binding.fileExplorerFilename, node)
                 imageView.alpha = 1.0f
 
-                binding.fileExplorerFilename.setTextColor(
-                    getThemeColor(context,
-                        if (node.isTakenDown)
-                            R.attr.colorError
-                        else
-                            android.R.attr.textColorPrimary))
                 binding.fileListTakenDown.isVisible = node.isTakenDown
 
                 if (node.isFolder) {
@@ -589,8 +604,6 @@ class MegaExplorerAdapter(
                         }
                     } else {
                         imageView.alpha = 0.4f
-                        binding.fileExplorerFilename.setTextColor(getThemeColor(context,
-                            android.R.attr.textColorSecondary))
                     }
 
                     var thumbnail = ThumbnailUtils.getThumbnailFromCache(node)
@@ -673,33 +686,21 @@ class MegaExplorerAdapter(
             if (node.isFolder) {
                 binding.fileExplorerGridFolderLayout.isVisible = true
                 binding.fileExplorerGridFileLayout.isVisible = false
-                binding.fileExplorerGridFolderFilename.text = node.name
+                textViewSettings(binding.fileExplorerGridFolderFilename, node)
                 binding.fileExplorerGridFolderIcon.setImageResource(getFolderIcon(
                     node,
                     DrawerItem.CLOUD_DRIVE))
                 itemView.setOnClickListener(::clickItem)
 
-                binding.fileExplorerGridFolderFilename.setTextColor(
-                    getThemeColor(context,
-                        if (node.isTakenDown)
-                            R.attr.colorError
-                        else
-                            android.R.attr.textColorPrimary))
                 binding.fileGridTakenDown.isVisible = node.isTakenDown
             } else {
                 binding.fileExplorerGridFolderLayout.isVisible = false
                 binding.fileExplorerGridFileLayout.isVisible = true
-                binding.fileGridFilenameForFile.text = node.name
+                textViewSettings(binding.fileGridFilenameForFile, node)
                 fileThumbnail.isVisible = false
                 fileIcon.setImageResource(MimeTypeThumbnail.typeForName(
                     node.name).iconResourceId)
 
-                binding.fileGridFilenameForFile.setTextColor(
-                    getThemeColor(context,
-                        if (node.isTakenDown)
-                            R.attr.colorError
-                        else
-                            android.R.attr.textColorPrimary))
                 binding.fileGridTakenDownForFile.isVisible = node.isTakenDown
 
                 if (isVideoFile(node.name)) {
