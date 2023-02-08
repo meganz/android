@@ -236,17 +236,23 @@ internal class DefaultChatRepository @Inject constructor(
             megaChatApiGateway.getAllScheduledMeetings()?.map(chatScheduledMeetingMapper)
         }
 
-    override suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>? =
+    override suspend fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        since: Long,
+    ): List<ChatScheduledMeetingOccurr>? =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
                     chatId,
+                    since,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
                             val list = request.megaChatScheduledMeetingOccurrList
                             when {
                                 error.errorCode == MegaChatError.ERROR_OK && list != null -> {
-                                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                                    val occurrences =
+                                        mutableListOf<ChatScheduledMeetingOccurr>()
+
                                     for (i in 0 until list.size()) {
                                         occurrences.add(
                                             chatScheduledMeetingOccurrMapper(
@@ -266,6 +272,9 @@ internal class DefaultChatRepository @Inject constructor(
                     ))
             }
         }
+
+    override suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>? =
+        fetchScheduledMeetingOccurrencesByChat(chatId, 0)
 
     override suspend fun inviteToChat(chatId: Long, contactsData: List<String>) =
         withContext(ioDispatcher) {
