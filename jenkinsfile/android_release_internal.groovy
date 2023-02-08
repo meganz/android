@@ -34,6 +34,7 @@ def common
 
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
+    triggers { cron('0 7 * * 1-5') }   // every day at 7.00am NZ time, except Saturday and Sunday
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
@@ -58,6 +59,11 @@ pipeline {
 
         // Channel to add in the suffix of the version name
         APK_VERSION_NAME_CHANNEL_FOR_CD = "-internal"
+
+        // default gitlabUserName for this script
+        gitlabUserName = "Jenkins Pipeline"
+        // default gitlabSourceBranch for this script
+        gitlabSourceBranch = "develop"
 
         BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
@@ -365,7 +371,6 @@ private String releaseSuccessMessage(String lineBreak, Object common) {
     return ":rocket: Android Release uploaded to Google Play Internal channel successfully!" +
             "${lineBreak}Version:\t${common.readAppVersion1()}" +
             "${lineBreak}Last Commit Msg:\t${common.lastCommitMessage()}" +
-            "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}"
