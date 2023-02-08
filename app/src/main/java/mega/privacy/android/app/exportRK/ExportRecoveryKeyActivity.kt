@@ -15,15 +15,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyScaffold
+import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyView
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
@@ -67,15 +69,16 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            ExportRecoveryKeyScaffold(
-                themeMode = themeMode,
-                uiState = uiState,
-                onSnackBarShown = { viewModel.setSnackBarShown() },
-                onButtonOverflow = { viewModel.setActionGroupVertical() },
-                onClickPrint = { printRecoveryKey() },
-                onClickCopy = { copyRecoveryKey() },
-                onClickSave = { chooseRecoverySaveLocation() }
-            )
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                ExportRecoveryKeyView(
+                    uiState = uiState,
+                    onSnackBarShown = { viewModel.setSnackBarShown() },
+                    onButtonOverflow = { viewModel.setActionGroupVertical() },
+                    onClickPrint = { printRecoveryKey() },
+                    onClickCopy = { copyRecoveryKey() },
+                    onClickSave = { chooseRecoverySaveLocation() }
+                )
+            }
         }
     }
 

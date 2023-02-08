@@ -9,10 +9,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
 import mega.privacy.android.app.exportRK.view.COLUMN_TEST_TAG
-import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyScaffold
+import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyView
 import mega.privacy.android.app.exportRK.view.ROW_TEST_TAG
 import mega.privacy.android.app.exportRK.view.SNACKBAR_TEST_TAG
-import mega.privacy.android.domain.entity.ThemeMode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,8 +78,7 @@ class ExportRecoveryKeyComposeViewTest {
 
     private fun setComposeContent(uiState: RecoveryKeyUIState = RecoveryKeyUIState()) {
         composeTestRule.setContent {
-            ExportRecoveryKeyScaffold(
-                themeMode = ThemeMode.System,
+            ExportRecoveryKeyView(
                 uiState = uiState,
                 onSnackBarShown = {},
                 onButtonOverflow = {},

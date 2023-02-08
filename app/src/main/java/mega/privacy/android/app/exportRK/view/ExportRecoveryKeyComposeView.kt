@@ -1,9 +1,6 @@
 package mega.privacy.android.app.exportRK.view
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.util.TypedValue
-import androidx.annotation.AttrRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +12,6 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -27,20 +23,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
-import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.domain.entity.ThemeMode
 
 private typealias ExportRecoveryAction = () -> Unit
 
@@ -64,8 +56,7 @@ const val SNACKBAR_TEST_TAG = "snackbar_test_tag"
  */
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ExportRecoveryKeyScaffold(
-    themeMode: ThemeMode,
+fun ExportRecoveryKeyView(
     uiState: RecoveryKeyUIState,
     onSnackBarShown: ExportRecoveryAction,
     onButtonOverflow: ExportRecoveryAction,
@@ -73,37 +64,34 @@ fun ExportRecoveryKeyScaffold(
     onClickCopy: ExportRecoveryAction,
     onClickSave: ExportRecoveryAction,
 ) {
-    AndroidTheme(isDark = themeMode.isDarkMode()) {
-        val scaffoldState: ScaffoldState = rememberScaffoldState()
-        val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
-        Scaffold(
-            scaffoldState = scaffoldState,
-            snackbarHost = {
-                SnackbarHost(hostState = snackBarHostState) { data ->
-                    Snackbar(
-                        modifier = Modifier.testTag(SNACKBAR_TEST_TAG),
-                        snackbarData = data,
-                        backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
-                    )
-                }
-            },
-        ) {
-            uiState.snackBarMessage?.let {
-                LaunchedEffect(it) {
-                    snackBarHostState.showSnackbar(it)
-                    onSnackBarShown()
-                }
+    Scaffold(
+        scaffoldState = rememberScaffoldState(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState) { data ->
+                Snackbar(
+                    modifier = Modifier.testTag(SNACKBAR_TEST_TAG),
+                    snackbarData = data,
+                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
+                )
             }
-
-            ExportRecoveryKeyCompose(
-                isActionGroupVertical = uiState.isActionGroupVertical,
-                onButtonOverflow = onButtonOverflow,
-                onClickPrint = onClickPrint,
-                onClickCopy = onClickCopy,
-                onClickSave = onClickSave
-            )
+        },
+    ) {
+        uiState.snackBarMessage?.let {
+            LaunchedEffect(it) {
+                snackBarHostState.showSnackbar(it)
+                onSnackBarShown()
+            }
         }
+
+        ExportRecoveryKeyCompose(
+            isActionGroupVertical = uiState.isActionGroupVertical,
+            onButtonOverflow = onButtonOverflow,
+            onClickPrint = onClickPrint,
+            onClickCopy = onClickCopy,
+            onClickSave = onClickSave
+        )
     }
 }
 
@@ -143,7 +131,7 @@ fun ExportRecoveryKeyCompose(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.subtitle1.copy(
-                color = android.R.attr.textColorSecondary.asColor()
+                color = MaterialTheme.textColorSecondary()
             ),
             modifier = Modifier.padding(top = 20.dp)
         )
@@ -152,7 +140,7 @@ fun ExportRecoveryKeyCompose(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.subtitle1.copy(
-                color = android.R.attr.textColorSecondary.asColor()
+                color = MaterialTheme.textColorSecondary()
             ),
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -168,7 +156,7 @@ fun ExportRecoveryKeyCompose(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.body2.copy(
-                color = android.R.attr.textColorSecondary.asColor()
+                color = MaterialTheme.textColorSecondary()
             ),
             modifier = Modifier.padding(top = 20.dp)
         )
@@ -282,19 +270,4 @@ fun ActionButtonText(
             }
         }
     )
-}
-
-/**
- * Get color from Android Resource
- */
-@Composable
-@AttrRes
-private fun Int.asColor(): Color {
-    return colorResource(LocalContext.current.getColorFromAttrs(this).resourceId)
-}
-
-private fun Context.getColorFromAttrs(attr: Int): TypedValue {
-    return TypedValue().apply {
-        theme.resolveAttribute(attr, this, true)
-    }
 }
