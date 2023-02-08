@@ -57,7 +57,6 @@ import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -138,11 +137,13 @@ internal class DefaultChatRepository @Inject constructor(
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaChatApiGateway.getChatRoom(chatId)?.let { chat ->
-                    megaChatApiGateway.setOpenInvite(chatId,
+                    megaChatApiGateway.setOpenInvite(
+                        chatId,
                         !chat.isOpenInvite,
                         OptionalMegaChatRequestListenerInterface(
                             onRequestFinish = onRequestSetOpenInviteCompleted(continuation)
-                        ))
+                        )
+                    )
                 }
             }
         }
@@ -160,12 +161,14 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun startChatCall(chatId: Long, enabledVideo: Boolean, enabledAudio: Boolean) =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.startChatCall(chatId,
+                megaChatApiGateway.startChatCall(
+                    chatId,
                     enabledVideo,
                     enabledAudio,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -177,22 +180,26 @@ internal class DefaultChatRepository @Inject constructor(
     ): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.answerChatCall(chatId,
+                megaChatApiGateway.answerChatCall(
+                    chatId,
                     enabledVideo,
                     enabledAudio,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
     override suspend fun leaveChat(chatId: Long): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.leaveChat(chatId,
+                megaChatApiGateway.leaveChat(
+                    chatId,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -236,20 +243,24 @@ internal class DefaultChatRepository @Inject constructor(
                     chatId,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                            if (error.errorCode == MegaChatError.ERROR_OK) {
-                                val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                request.megaChatScheduledMeetingOccurrList.apply {
-                                    for (i in 0 until size()) {
-                                        occurrences.add(chatScheduledMeetingOccurrMapper(at(i)))
+                            val list = request.megaChatScheduledMeetingOccurrList
+                            when {
+                                error.errorCode == MegaChatError.ERROR_OK && list != null -> {
+                                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                                    for (i in 0 until list.size()) {
+                                        occurrences.add(
+                                            chatScheduledMeetingOccurrMapper(
+                                                list.at(
+                                                    i
+                                                )
+                                            )
+                                        )
                                     }
+                                    continuation.resumeWith(Result.success(occurrences))
                                 }
-                                if (occurrences.isNotEmpty()) {
-                                    continuation.resume(occurrences)
-                                } else {
+                                else -> {
                                     continuation.failWithError(error)
                                 }
-                            } else {
-                                continuation.failWithError(error)
                             }
                         }
                     ))
@@ -267,49 +278,59 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun setPublicChatToPrivate(chatId: Long): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.setPublicChatToPrivate(chatId,
+                megaChatApiGateway.setPublicChatToPrivate(
+                    chatId,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
     override suspend fun createChatLink(chatId: Long): ChatRequest = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
-            megaChatApiGateway.createChatLink(chatId,
+            megaChatApiGateway.createChatLink(
+                chatId,
                 OptionalMegaChatRequestListenerInterface(
                     onRequestFinish = onRequestCompleted(continuation)
-                ))
+                )
+            )
         }
     }
 
     override suspend fun removeChatLink(chatId: Long): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.removeChatLink(chatId,
+                megaChatApiGateway.removeChatLink(
+                    chatId,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
     override suspend fun checkChatLink(link: String): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.checkChatLink(link,
+                megaChatApiGateway.checkChatLink(
+                    link,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
     override suspend fun queryChatLink(chatId: Long): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.queryChatLink(chatId,
+                megaChatApiGateway.queryChatLink(
+                    chatId,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestQueryChatLinkCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -325,10 +346,12 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun inviteContact(email: String): InviteContactRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaApiGateway.inviteContact(email,
+                megaApiGateway.inviteContact(
+                    email,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = onRequestInviteContactCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -363,20 +386,24 @@ internal class DefaultChatRepository @Inject constructor(
                     ChatRoomPermission.ReadOnly -> MegaChatRoom.PRIV_RO
                     else -> MegaChatRoom.PRIV_UNKNOWN
                 }
-                megaChatApiGateway.updateChatPermissions(chatId, handle, privilege,
+                megaChatApiGateway.updateChatPermissions(
+                    chatId, handle, privilege,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
     override suspend fun removeFromChat(chatId: Long, handle: Long): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApiGateway.removeFromChat(chatId, handle,
+                megaChatApiGateway.removeFromChat(
+                    chatId, handle,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestCompleted(continuation)
-                    ))
+                    )
+                )
             }
         }
 
@@ -452,7 +479,8 @@ internal class DefaultChatRepository @Inject constructor(
         .mapNotNull {
             it.users?.find { user ->
                 user.isOwnChange <= 0 && (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) || user.hasChanged(
-                    MegaUser.CHANGE_TYPE_LASTNAME)) && user.email == megaApiGateway.accountEmail
+                    MegaUser.CHANGE_TYPE_LASTNAME
+                )) && user.email == megaApiGateway.accountEmail
             }
         }
         .map {

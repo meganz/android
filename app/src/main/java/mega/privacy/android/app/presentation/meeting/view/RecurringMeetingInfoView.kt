@@ -42,6 +42,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getDateFormatted
+import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -51,8 +53,8 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.domain.entity.meeting.OccurrenceItem
 
 /**
  * Recurring meeting info View
@@ -62,7 +64,7 @@ fun RecurringMeetingInfoView(
     state: RecurringMeetingInfoState,
     onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
-    onOccurrenceClicked: (OccurrenceItem) -> Unit = {},
+    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit = {},
     onSeeMoreClicked: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -98,7 +100,7 @@ fun RecurringMeetingInfoView(
                         onOccurrenceClicked = onOccurrenceClicked
                     )
                 }
-                if (state.occurrencesList.size > 10) {
+                if (state.showSeeMoreButton) {
                     SeeMoreOccurrencesButton(
                         onSeeMoreClicked = onSeeMoreClicked
                     )
@@ -173,19 +175,20 @@ private fun RecurringMeetingInfoAppBar(
  * View of a occurrence in the list
  *
  * @param state                    [RecurringMeetingInfoState]
- * @param occurrence               [OccurrenceItem]
+ * @param occurrence               [ChatScheduledMeetingOccurr]
  * @param onOccurrenceClicked      Detect when a occurrence is clicked
  */
 @Composable
 private fun OccurrenceItemView(
     modifier: Modifier = Modifier,
     state: RecurringMeetingInfoState,
-    occurrence: OccurrenceItem,
-    onOccurrenceClicked: (OccurrenceItem) -> Unit = {},
+    occurrence: ChatScheduledMeetingOccurr,
+    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit = {},
 ) {
     val isLight = MaterialTheme.colors.isLight
     Column {
-        occurrence.dateFormatted?.let { date ->
+
+        occurrence.getDateFormatted()?.let { date ->
             Row(
                 modifier = modifier
                     .fillMaxWidth()
@@ -240,7 +243,7 @@ private fun OccurrenceItemView(
                             )
                         }
                     }
-                    occurrence.timeFormatted?.let { time ->
+                    occurrence.getTimeFormatted(state.is24HourFormat)?.let { time ->
                         Text(text = time,
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             style = MaterialTheme.typography.subtitle2)

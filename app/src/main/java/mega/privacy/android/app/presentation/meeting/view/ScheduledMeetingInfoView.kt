@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.ContactStatus
@@ -405,9 +406,9 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                             state.numOfParticipants,
                             state.numOfParticipants
                         ),
-                            style = MaterialTheme.typography.subtitle2,
+                            style = MaterialTheme.typography.body1,
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                            fontWeight = FontWeight.Normal,
+                            fontSize = 12.sp,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis)
                     } else {
