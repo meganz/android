@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.theme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
@@ -23,12 +24,15 @@ fun AndroidTheme(
         LightColorPalette
     }
 
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = colors.primary,
-            darkIcons = !isDark
-        )
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        val systemUiController = rememberSystemUiController()
+        SideEffect {
+            systemUiController.setSystemBarsColor(
+                color = colors.primary,
+                darkIcons = !isDark
+            )
+        }
     }
 
     MaterialTheme(
