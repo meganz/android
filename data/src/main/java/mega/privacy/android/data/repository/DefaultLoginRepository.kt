@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -26,12 +27,14 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiFolderGateway
  * @property megaChatApiGateway
  * @property ioDispatcher
+ * @property appEventGateway
  */
 internal class DefaultLoginRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val appEventGateway: AppEventGateway,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -114,4 +117,8 @@ internal class DefaultLoginRepository @Inject constructor(
                 continuation.failWithError(error)
             }
         }
+
+    override fun monitorLogout() = appEventGateway.monitorLogout()
+
+    override suspend fun broadcastLogout() = appEventGateway.broadcastLogout()
 }

@@ -19,6 +19,7 @@ import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorLogout
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
@@ -33,6 +34,7 @@ class HomePageViewModel @Inject constructor(
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     getCallUseCase: GetCallUseCase,
     private val monitorConnectivity: MonitorConnectivity,
+    private val monitorLogout: MonitorLogout,
 ) : BaseRxViewModel() {
 
     private val _notificationCount = MutableLiveData<Int>()
@@ -88,6 +90,8 @@ class HomePageViewModel @Inject constructor(
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
         }
+
+        viewModelScope.launch { monitorLogout().collect { repository.logout() } }
     }
 
     override fun onCleared() {

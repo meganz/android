@@ -6,9 +6,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.BroadcastLogout
 import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.DefaultCompleteFastLogin
 import mega.privacy.android.domain.usecase.InitialiseMegaChat
+import mega.privacy.android.domain.usecase.MonitorLogout
 
 /**
  * Login module.
@@ -31,6 +33,20 @@ abstract class LoginModule {
         @Provides
         fun bindInitialiseMegaChat(loginRepository: LoginRepository): InitialiseMegaChat =
             InitialiseMegaChat(loginRepository::initMegaChat)
+
+        /**
+         * Provides [MonitorLogout]
+         */
+        @Provides
+        fun provideMonitorLogout(loginRepository: LoginRepository): MonitorLogout =
+            MonitorLogout(loginRepository::monitorLogout)
+
+        /**
+         * Provides [BroadcastLogout]
+         */
+        @Provides
+        fun provideBroadcastLogout(loginRepository: LoginRepository): BroadcastLogout =
+            BroadcastLogout(loginRepository::broadcastLogout)
     }
 
 

@@ -74,6 +74,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PushesRepository
+import mega.privacy.android.domain.usecase.BroadcastLogout
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -112,6 +113,8 @@ class AccountController @Inject constructor(
         fun pushRepository(): PushesRepository
 
         fun billingRepository(): BillingRepository
+
+        fun broadcastLogout(): BroadcastLogout
     }
 
     fun existsAvatar(): Boolean {
@@ -402,11 +405,13 @@ class AccountController @Inject constructor(
                     AccountControllerEntryPoint::class.java
                 )
             sharingScope.launch(Dispatchers.IO) {
-                entryPoint.callsPreferencesGateway().clearPreferences()
-                entryPoint.chatPreferencesGateway().clearPreferences()
-                //clear push token
-                entryPoint.pushRepository().clearPushToken()
-                entryPoint.billingRepository().clearCache()
+                with(entryPoint) {
+                    callsPreferencesGateway().clearPreferences()
+                    chatPreferencesGateway().clearPreferences()
+                    pushRepository().clearPushToken()
+                    billingRepository().clearCache()
+                    broadcastLogout()
+                }
             }
 
             // Clear text editor preference
@@ -429,9 +434,6 @@ class AccountController @Inject constructor(
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()
-
-            // Clear get banner success flag
-            LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED).post(null)
         }
 
         fun removeFolder(context: Context?, folder: File?) {
