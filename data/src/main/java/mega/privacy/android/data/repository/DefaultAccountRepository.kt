@@ -1,5 +1,9 @@
 package mega.privacy.android.data.repository
 
+import android.app.NotificationManager
+import android.content.Context
+import androidx.preference.PreferenceManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -14,9 +18,13 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
@@ -59,9 +67,11 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [AccountRepository]
  *
+ * @property context                      [Context]
  * @property myAccountInfoFacade          [AccountInfoWrapper]
  * @property megaApiGateway               [MegaApiGateway]
  * @property megaChatApiGateway           [MegaChatApiGateway]
+ * @property megaApiFolderGateway         [MegaApiFolderGateway]
  * @property dbHandler                    [DatabaseHandler]
  * @property ioDispatcher                 [CoroutineDispatcher]
  * @property userUpdateMapper             [UserUpdateMapper]
@@ -75,12 +85,17 @@ import kotlin.coroutines.suspendCoroutine
  * @property accountDetailMapper          [AccountDetailMapper]
  * @property userCredentialsMapper        [UserCredentialsMapper]
  * @property accountSessionMapper         [AccountSessionMapper]
+ * @property chatPreferencesGateway       [chatPreferencesGateway]
+ * @property callsPreferencesGateway      [CallsPreferencesGateway]
+ * @property cacheFolderGateway           [CacheFolderGateway]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val myAccountInfoFacade: AccountInfoWrapper,
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val dbHandler: DatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
@@ -95,6 +110,9 @@ internal class DefaultAccountRepository @Inject constructor(
     private val accountDetailMapper: AccountDetailMapper,
     private val userCredentialsMapper: UserCredentialsMapper,
     private val accountSessionMapper: AccountSessionMapper,
+    private val chatPreferencesGateway: ChatPreferencesGateway,
+    private val callsPreferencesGateway: CallsPreferencesGateway,
+    private val cacheFolderGateway: CacheFolderGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -523,5 +541,96 @@ internal class DefaultAccountRepository @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
+    }
+
+    override suspend fun resetAccountAuth() = withContext(ioDispatcher) {
+        megaApiFolderGateway.accountAuth = null
+    }
+
+    override suspend fun clearAccountPreferences() = withContext(ioDispatcher) {
+        with(localStorageGateway) {
+            clearCredentials()
+            clearPreferences()
+            setFirstTime(false)
+            clearOffline()
+            clearContacts()
+            clearNonContacts()
+            clearChatItems()
+            clearCompletedTransfers()
+            clearPendingMessages()
+            clearAttributes()
+            deleteAllSyncRecordsTypeAny()
+            clearChatSettings()
+            clearBackups()
+            clearMegaContacts()
+        }
+
+        callsPreferencesGateway.clearPreferences()
+        chatPreferencesGateway.clearPreferences()
+    }
+
+    override suspend fun clearSharedPreferences() = withContext(ioDispatcher) {
+        with(context) {
+            getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+
+            getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+
+
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .edit()
+                .putBoolean(SHOW_LINE_NUMBERS, false)
+                .putBoolean(SHOW_OFFLINE_WARNING, true)
+                .remove(KEY_MOBILE_DATA_HIGH_RESOLUTION)
+                .apply()
+
+            //Remove emoji preferences
+            getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+
+            getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+
+            getSharedPreferences(PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+
+            getSharedPreferences(PREFERENCE_VARIANT_REACTION, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+
+            //Remove sms dialog time checker preference
+            getSharedPreferences(LAST_SHOW_SMS_FILE, Context.MODE_PRIVATE)
+                .edit().clear().apply()
+        }
+    }
+
+    override suspend fun clearAppDataAndCache() = withContext(ioDispatcher) {
+        with(cacheFolderGateway) {
+            clearCache()
+            clearAppData()
+            removeOldTempFolders()
+        }
+    }
+
+    override suspend fun cancelAllNotifications() = withContext(ioDispatcher) {
+        try {
+            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .cancelAll()
+        } catch (e: Exception) {
+            Timber.e("EXCEPTION removing all the notifications", e)
+        }
+    }
+
+    companion object {
+        private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
+        private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
+        private const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
+        private const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
+        private const val KEY_MOBILE_DATA_HIGH_RESOLUTION = "setting_mobile_data_high_resolution"
+        private const val PREFERENCE_EMOJI = "emoji-recent-manager"
+        private const val PREFERENCE_REACTION = "reaction-recent-manager"
+        private const val PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager"
+        private const val PREFERENCE_VARIANT_REACTION = "variant-reaction-manager"
+        private const val LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp"
     }
 }

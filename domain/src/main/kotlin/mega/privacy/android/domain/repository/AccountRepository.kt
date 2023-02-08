@@ -248,4 +248,31 @@ interface AccountRepository {
      * @return The email related to the link.
      */
     suspend fun querySignupLink(signupLink: String): String
+
+    /**
+     * Stops using the current authentication token, it's needed to explicitly call
+     * set accountAuth as NULL as parameter. Otherwise, the value set would continue
+     * being used despite this MegaApi object is logged in or logged out.s account
+     */
+    suspend fun resetAccountAuth()
+
+    /**
+     * Clears the account data and preferences.
+     */
+    suspend fun clearAccountPreferences()
+
+    /**
+     * Clears shared preferences.
+     */
+    suspend fun clearSharedPreferences()
+
+    /**
+     * Clears app data and cache.
+     */
+    suspend fun clearAppDataAndCache()
+
+    /**
+     * Cancels all notifications.
+     */
+    suspend fun cancelAllNotifications()
 }
