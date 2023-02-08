@@ -1175,6 +1175,41 @@ interface MegaApiGateway {
     fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
 
     /**
+     * Check the current password availability
+     * @param password as password to check
+     * @return true if password is the same as current password, else false
+     */
+    suspend fun isCurrentPassword(password: String): Boolean
+
+    /**
+     * Change the given user's password
+     * @param newPassword as user's chosen new password
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun changePassword(newPassword: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reset the user's password from a link
+     * @param link as reset link
+     * @param newPassword as user's chosen new password
+     * @param masterKey as user's account master key
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Check the given password's strength
+     * @param password as password to test
+     * @return password strength level from 0 - 4
+     */
+    suspend fun getPasswordStrength(password: String): Int
+
+    /**
      * Requests the currently available country calling codes
      *
      * @param listener [MegaRequestListenerInterface] to track this request
@@ -1624,7 +1659,7 @@ interface MegaApiGateway {
      */
     fun getPublicNode(
         nodeFileLink: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     )
 
     /**

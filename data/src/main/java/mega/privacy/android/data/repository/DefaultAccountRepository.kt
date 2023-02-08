@@ -621,6 +621,36 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
+    override suspend fun isCurrentPassword(password: String) = withContext(ioDispatcher) {
+        megaApiGateway.isCurrentPassword(password)
+    }
+
+    override suspend fun changePassword(newPassword: String) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { it.flag }
+            megaApiGateway.changePassword(newPassword, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String,
+    ) = suspendCancellableCoroutine { continuation ->
+        val listener = continuation.getRequestListener { it.flag }
+        megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)
+        continuation.invokeOnCancellation {
+            megaApiGateway.removeRequestListener(listener)
+        }
+    }
+
+    override suspend fun getPasswordStrength(password: String) = withContext(ioDispatcher) {
+        megaApiGateway.getPasswordStrength(password)
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

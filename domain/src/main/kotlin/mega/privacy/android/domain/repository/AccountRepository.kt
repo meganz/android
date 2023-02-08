@@ -275,4 +275,38 @@ interface AccountRepository {
      * Cancels all notifications.
      */
     suspend fun cancelAllNotifications()
+
+    /**
+     * Check whether password is user's current password
+     * @param password as password to check
+     * @return true if password is the same as current password
+     */
+    suspend fun isCurrentPassword(password: String): Boolean
+
+    /**
+     * Change the given user's password
+     * @param newPassword as user's chosen new password
+     * @return true if successful
+     */
+    suspend fun changePassword(newPassword: String): Boolean
+
+    /**
+     * Reset the user's password from a link
+     * @param link as reset link
+     * @param newPassword as user's chosen new password
+     * @param masterKey as user's account master key
+     * @return true if successful, else false
+     */
+    suspend fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String
+    ): Boolean
+
+    /**
+     * Check the given password's strength
+     * @param password as password to test
+     * @return password strength level from 0 - 4
+     */
+    suspend fun getPasswordStrength(password: String): Int
 }

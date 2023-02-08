@@ -665,6 +665,22 @@ internal class MegaApiFacade @Inject constructor(
     override fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
         megaApi.verifyCredentials(user, listener)
 
+    override suspend fun isCurrentPassword(password: String) =
+        megaApi.checkPassword(password)
+
+    override fun changePassword(newPassword: String, listener: MegaRequestListenerInterface) =
+        megaApi.changePassword(null, newPassword, listener)
+
+    override fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.confirmResetPassword(link, newPassword, masterKey, listener)
+
+    override suspend fun getPasswordStrength(password: String) =
+        megaApi.getPasswordStrength(password)
+
     override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
         megaApi.getCountryCallingCodes(listener)
 
@@ -834,7 +850,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun setUserAttribute(
         type: Int,
         value: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAttribute(type, value, listener)
 
     @Suppress("DEPRECATION")
