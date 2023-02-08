@@ -162,8 +162,13 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
-            switchViewType(state.viewType)
-            viewModel.refreshUi()
+            if ((state.viewType == ViewType.LIST) != viewModel.isList) {
+                // Changing the adapter will cause the scroll position to be lost
+                // To avoid that, the adapter will only change when the list/grid view
+                // really changes
+                switchViewType(state.viewType)
+                viewModel.refreshUi()
+            }
         }
     }
 
@@ -288,6 +293,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
      * @param viewType The View Type
      */
     private fun switchViewType(viewType: ViewType) {
+        viewModel.isList = viewType == ViewType.LIST
         listView.apply {
             when (viewType) {
                 ViewType.LIST -> {
@@ -497,7 +503,16 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 autoScrollToTop()
             }
         })
+
+        switchViewType(sortByHeaderState().viewType)
     }
+
+    /**
+     * The UI State from [SortByHeaderViewModel]
+     *
+     * @return The UI State
+     */
+    private fun sortByHeaderState() = sortByHeaderViewModel.state.value
 
     /**
      * Immediately scroll to the top of the list

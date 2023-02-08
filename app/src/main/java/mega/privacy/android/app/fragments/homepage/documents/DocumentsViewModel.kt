@@ -43,6 +43,11 @@ class DocumentsViewModel @Inject constructor(
 
     private var _query = MutableLiveData<String>()
 
+    /**
+     * Serves as the original View Type.
+     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed
+     */
+    var isList = true
     var skipNextAutoScroll = false
     var searchMode = false
     var searchQuery = ""
