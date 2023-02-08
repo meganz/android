@@ -29,6 +29,7 @@ import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -63,6 +64,7 @@ import kotlin.coroutines.resumeWithException
 internal class DefaultImageRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
@@ -234,6 +236,18 @@ internal class DefaultImageRepository @Inject constructor(
         )
     }
 
+    override suspend fun getImageForChatMessage(
+        chatRoomId: Long,
+        chatMessageId: Long,
+        fullSize: Boolean,
+        highPriority: Boolean,
+        isMeteredConnection: Boolean,
+    ): Flow<ImageResult> = withContext(ioDispatcher) {
+        getChatNode(chatRoomId, chatMessageId)?.let {
+            return@let getImageByNode(it, fullSize, highPriority, isMeteredConnection)
+        } ?: throw IllegalArgumentException("Node is null")
+    }
+
     private suspend fun getPublicNode(nodeFileLink: String): MegaNode =
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
@@ -252,6 +266,23 @@ internal class DefaultImageRepository @Inject constructor(
             megaApiGateway.getPublicNode(nodeFileLink, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
+            }
+        }
+
+    private suspend fun getChatNode(chatId: Long, chatMessageId: Long) =
+        withContext(ioDispatcher) {
+            val chatMessage = megaChatApiGateway.getMessage(chatId, chatMessageId)
+                ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, chatMessageId)
+
+            chatMessage?.let {
+                val node = chatMessage.megaNodeList.get(0)
+                val chatRoom = megaChatApiGateway.getChatRoom(chatId)
+
+                if (chatRoom?.isPreview == true) {
+                    megaApiGateway.authorizeChatNode(node, chatRoom.authorizationToken)
+                } else {
+                    node
+                }
             }
         }
 
