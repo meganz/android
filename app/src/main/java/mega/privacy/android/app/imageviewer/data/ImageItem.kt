@@ -30,7 +30,7 @@ sealed class ImageItem {
         val handle: Long,
         override val id: Long,
         override val name: String,
-        override val infoText: String,
+        override val infoText: String = "",
         override val nodeItem: MegaNodeItem? = null,
         override val imageResult: ImageResult? = null
     ) : ImageItem()

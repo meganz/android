@@ -129,7 +129,6 @@ class GetImageHandlesUseCase @Inject constructor(
                         id = node.handle,
                         handle = node.handle,
                         name = node.name,
-                        infoText = node.getInfoText()
                     )
                 )
             }
@@ -309,7 +308,6 @@ class GetImageHandlesUseCase @Inject constructor(
                         id = node.handle,
                         handle = node.handle,
                         name = node.name,
-                        infoText = node.getInfoText()
                     )
                 )
             }
