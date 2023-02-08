@@ -359,7 +359,6 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
                     recyclerView, selectFile, sortByHeaderViewModel, megaApi);
         } else {
             adapter.setParentHandle(parentHandle);
-            adapter.setSelectFile(selectFile);
         }
 
         if (gridLayoutManager != null) {

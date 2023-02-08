@@ -31,7 +31,6 @@ import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.CloudDriveExplorerFragment
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.IncomingSharesExplorerFragment
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER
@@ -68,7 +67,7 @@ class MegaExplorerAdapter(
     nodes: List<MegaNode?>,
     parentHandle: Long,
     private val recyclerView: RecyclerView,
-    selectFile: Boolean,
+    private val selectFile: Boolean,
     private val sortByViewModel: SortByHeaderViewModel,
     private val megaApi: MegaApiAndroid,
 ) : RecyclerView.Adapter<MegaExplorerAdapter.ViewHolderExplorer>(), SectionTitleProvider,
@@ -80,11 +79,6 @@ class MegaExplorerAdapter(
      * Parent handle
      */
     var parentHandle: Long = INVALID_HANDLE
-
-    /**
-     * Whether select file
-     */
-    var selectFile: Boolean = false
 
     private val selectedItems: SparseBooleanArray = SparseBooleanArray()
 
@@ -105,7 +99,6 @@ class MegaExplorerAdapter(
 
     init {
         this.parentHandle = parentHandle
-        this.selectFile = selectFile
         data.addAll(nodes)
         outMetrics = context.resources.displayMetrics
     }
@@ -116,7 +109,7 @@ class MegaExplorerAdapter(
         if (data.isNotEmpty() && position == 0) {
             ITEM_VIEW_TYPE_HEADER
         } else {
-            if ((context as FileExplorerActivity).isList) {
+            if (sortByViewModel.isListView()) {
                 ITEM_VIEW_TYPE_LIST
             } else {
                 ITEM_VIEW_TYPE_GRID
@@ -218,7 +211,7 @@ class MegaExplorerAdapter(
     }
 
     private fun startAnimation(position: Int, delete: Boolean) {
-        if ((context as FileExplorerActivity).isList) {
+        if (sortByViewModel.isListView()) {
             Timber.d("adapter type is LIST")
             recyclerView.findViewHolderForAdapterPosition(position)?.let { view ->
                 Timber.d("Start animation: $position")
@@ -343,8 +336,7 @@ class MegaExplorerAdapter(
     private fun clickItem(view: View) {
         (view.tag as ViewHolderExplorer).let { holder ->
             when (fragment) {
-                is CloudDriveExplorerFragment -> fragment.itemClick(view,
-                    holder.absoluteAdapterPosition)
+                is CloudDriveExplorerFragment -> fragment.itemClick(holder.absoluteAdapterPosition)
                 is IncomingSharesExplorerFragment -> fragment.itemClick(view,
                     holder.absoluteAdapterPosition)
             }
@@ -397,7 +389,7 @@ class MegaExplorerAdapter(
      *
      * @param nodes MegaNode items
      */
-    fun setNodes(nodes: List<MegaNode>) {
+    fun setNodes(nodes: List<MegaNode?>) {
         data.clear()
         data.addAll(insertPlaceHolderNode(nodes))
         notifyDataSetChanged()
@@ -433,7 +425,7 @@ class MegaExplorerAdapter(
      */
     private fun insertPlaceHolderNode(nodes: List<MegaNode?>): List<MegaNode?> {
         val result = nodes.toMutableList()
-        if ((context as FileExplorerActivity).isList) {
+        if (sortByViewModel.isListView()) {
             if (result.isNotEmpty()) {
                 placeholderCount = 1
                 result.add(0, null)
@@ -454,7 +446,7 @@ class MegaExplorerAdapter(
                 spanCount - (folderCount % spanCount)
             }
 
-            if (folderCount > 0 && placeholderCount != 0 && !context.isList) {
+            if (folderCount > 0 && placeholderCount != 0 && !sortByViewModel.isListView()) {
                 //Add placeholder at folders' end.
                 for (i in 0 until placeholderCount) {
                     result.add(folderCount + i, null)
@@ -477,7 +469,7 @@ class MegaExplorerAdapter(
 
         when (fragment) {
             is IncomingSharesExplorerFragment -> fragment.fastScroller.isVisible = visible
-            is CloudDriveExplorerFragment -> fragment.fastScroller.isVisible = visible
+            is CloudDriveExplorerFragment -> fragment.getFastScroller().isVisible = visible
         }
     }
 

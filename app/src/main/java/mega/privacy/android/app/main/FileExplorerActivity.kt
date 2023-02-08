@@ -1060,7 +1060,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     if (isMultiselect) {
                         cDriveExplorer = cloudExplorerFragment
                         searchMenuItem?.isVisible =
-                            cDriveExplorer != null && cDriveExplorer?.isFolderEmpty == false
+                            cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
                     }
                 }
                 INCOMING_TAB -> {
@@ -2020,15 +2020,19 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 if (megaApi.getNodeByHandle(cDriveExplorer.parentHandle) != null) {
                     nodes =
                         megaApi.getChildren(megaApi.getNodeByHandle(parentHandle))
-                    cDriveExplorer.setNodes(nodes)
-                    cDriveExplorer.recyclerView?.invalidate()
+                    nodes?.let {
+                        cDriveExplorer.updateNodesByAdapter(it)
+                    }
+                    cDriveExplorer.recyclerView.invalidate()
                 } else {
                     if (megaApi.rootNode != null) {
                         parentHandle = megaApi.rootNode.handle
                         nodes =
                             megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
-                        cDriveExplorer.setNodes(nodes)
-                        cDriveExplorer.recyclerView?.invalidate()
+                        nodes?.let {
+                            cDriveExplorer.updateNodesByAdapter(it)
+                        }
+                        cDriveExplorer.recyclerView.invalidate()
                     }
                 }
             }
@@ -2332,13 +2336,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     private fun refreshViewNodes(isList: Boolean) {
         this.isList = isList
-        cDriveExplorer = cloudExplorerFragment
         iSharesExplorer = incomingExplorerFragment
-
-        cDriveExplorer?.let {
-            supportFragmentManager.beginTransaction().detach(it).commitNowAllowingStateLoss()
-            supportFragmentManager.beginTransaction().attach(it).commitNowAllowingStateLoss()
-        }
 
         iSharesExplorer?.let {
             supportFragmentManager.beginTransaction().detach(it).commitNowAllowingStateLoss()

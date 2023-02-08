@@ -113,6 +113,8 @@
 
 	</RelativeLayout>
 
-	<include layout="@layout/general_progress_bar"/>
+	<include
+		android:id="@+id/progressbar_layout"
+		layout="@layout/general_progress_bar"/>
 
 </RelativeLayout>
