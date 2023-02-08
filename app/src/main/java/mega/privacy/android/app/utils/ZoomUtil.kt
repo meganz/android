@@ -125,11 +125,4 @@ object ZoomUtil {
                 zoom
             ) * spanCount * 2) - getMargin(context, zoom) * 2) / spanCount
         }
-
-    fun resetZoomLevel() {
-        PHOTO_ZOOM_LEVEL = ZOOM_DEFAULT
-        IMAGES_ZOOM_LEVEL = ZOOM_DEFAULT
-        MEDIA_ZOOM_LEVEL = ZOOM_DEFAULT
-        ALBUM_ZOOM_LEVEL = ZOOM_DEFAULT
-    }
 }
