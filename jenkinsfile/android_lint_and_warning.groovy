@@ -7,6 +7,8 @@ import groovy.json.JsonSlurperClassic
 BUILD_STEP = ""
 
 GMS_APK_BUILD_LOG = "gms_build.log"
+BUILD_WARNING_FILE = "buildWarnings.json"
+WARNING_SOURCE_FILE = "warningResultLog.txt"
 
 MODULE_LIST = ['app', 'domain', 'data', 'core-ui']
 
@@ -50,12 +52,11 @@ pipeline {
         GOOGLE_MAP_API_UNZIPPED = 'default_google_map_api_unzipped'
 
         COMBINE_LINT_REPORTS = "true"
+        DO_NOT_SUPPRESS_WARNINGS = "true"
     }
     post {
         failure {
             script {
-                common = load('jenkinsfile/common.groovy')
-
                 withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
                     def comment = ":x: Android Lint Build failed"
                     slackSend color: "danger", message: comment
@@ -66,16 +67,18 @@ pipeline {
         }
         success {
             script {
-                common = load('jenkinsfile/common.groovy')
-
                 def successSlackMessage = "Android Lint report: \n" +
                         buildLintSummaryTable()
                 slackSend channel: "#android_lint_and_build_warnings", color: "good", message: successSlackMessage
+                slackSend channel: "#mobile-dev-team", color: "good", message: successSlackMessage
 
                 def lintReportFile = "app/build/reports/combined.html"
 
-                slackUploadFile channel: "#android_lint_and_build_warnings", filePath: lintReportFile, initialComment: "Lint report"
-
+                withCredentials([string(credentialsId: 'Slack-integration-login', variable: 'CREDENTIALS')]) {
+                    sh "curl -F file=@${lintReportFile} -F \"initial_comment=Lint report\" -F channels=android_lint_and_build_warnings -H \"Authorization: Bearer ${CREDENTIALS}\" https://slack.com/api/files.upload"
+                    sh "curl -F file=@${BUILD_WARNING_FILE} -F \"initial_comment=Build warnings\" -F channels=android_lint_and_build_warnings -H \"Authorization: Bearer ${CREDENTIALS}\" https://slack.com/api/files.upload"
+                    sh "curl -F file=@${WARNING_SOURCE_FILE} -F \"initial_comment=Source file\" -F channels=android_lint_and_build_warnings -H \"Authorization: Bearer ${CREDENTIALS}\" https://slack.com/api/files.upload"
+                }
             }
         }
         cleanup {
@@ -157,6 +160,16 @@ pipeline {
                             exit 1
                         fi
                     """
+                }
+            }
+        }
+        stage('Generate warning report') {
+            steps {
+                script {
+                    BUILD_STEP = "Generate warning report"
+
+                    generateWarningReport(BUILD_WARNING_FILE)
+
                 }
             }
         }
@@ -261,4 +274,14 @@ String lintSummary(String module) {
  */
 static boolean isDefined(String value) {
     return value != null && !value.isEmpty()
+}
+
+/**
+ * Generate a build warning json file at the target location
+ * @param targetFileLocation
+ * @return
+ */
+String generateWarningReport(String targetFileLocation) {
+    sh "./gradlew -w clean compileGmsReleaseUnitTestSources > ${WARNING_SOURCE_FILE} 2>&1"
+    sh "python3 ${WORKSPACE}/jenkinsfile/warning_report.py ${WARNING_SOURCE_FILE} ${targetFileLocation}"
 }

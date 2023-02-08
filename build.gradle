@@ -132,6 +132,10 @@ ext {
     billingVersion = '5.1.0'
 }
 
+ext.shouldSuppressWarnings = { ->
+    return isCiBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != 'true'
+}
+
 ext.isCiBuild = { ->
     return System.getenv("BUILD_NUMBER") != null
 }

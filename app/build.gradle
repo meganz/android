@@ -130,7 +130,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
-        suppressWarnings = isCiBuild()
+        suppressWarnings = shouldSuppressWarnings()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 

@@ -15,7 +15,7 @@ apply from: "$project.rootDir/tools/jacoco.gradle"
 compileKotlin {
     kotlinOptions {
         jvmTarget = "11"
-        suppressWarnings = isCiBuild()
+        suppressWarnings = shouldSuppressWarnings()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
