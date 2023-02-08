@@ -52,8 +52,7 @@
 
     <activity
         android:id="@+id/export_recovery_key"
-        android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity"
-        tools:layout="@layout/activity_export_recovery_key"/>
+        android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity" />
 
     <activity
         android:id="@+id/add_phone_number"
