@@ -312,7 +312,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                         R.string.context_copy
                 )
                 (requireActivity() as FileExplorerActivity).parentMoveCopy().let { parentNode ->
-                    activateButton(parentNode == null || parentNode.handle != parentHandle)
+                    activateButton(modeCloud == FileExplorerActivity.COPY || parentNode == null || parentNode.handle != parentHandle)
                 }
             }
             FileExplorerActivity.UPLOAD -> binding.actionText.text =
@@ -563,8 +563,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                             activateButton(true)
                         } else {
                             activity.parentMoveCopy().let { parentNode ->
-                                activateButton(
-                                    parentNode == null || parentNode.handle != parentHandle)
+                                activateButton(modeCloud == FileExplorerActivity.COPY || parentNode == null || parentNode.handle != parentHandle)
                             }
                         }
                     }

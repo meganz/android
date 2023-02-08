@@ -677,6 +677,7 @@
 
         <activity
             android:name="mega.privacy.android.app.namecollision.NameCollisionActivity"
+            android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:label="@string/title_duplicated_items"
             android:launchMode="singleTop"/>
 

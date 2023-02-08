@@ -92,9 +92,6 @@ class NameCollisionActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityNameCollisionBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         if (savedInstanceState == null) {
             @Suppress("UNCHECKED_CAST")
             val collisionsList = with(intent) {
@@ -108,8 +105,10 @@ class NameCollisionActivity : PasscodeActivity() {
 
             val singleCollision = with(intent) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT,
-                        NameCollision::class.java)
+                    getSerializableExtra(
+                        INTENT_EXTRA_SINGLE_COLLISION_RESULT,
+                        NameCollision::class.java
+                    )
                 } else {
                     @Suppress("DEPRECATION")
                     getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
@@ -117,8 +116,8 @@ class NameCollisionActivity : PasscodeActivity() {
             }
 
             when {
-                collisionsList != null -> viewModel.setData(collisionsList)
-                singleCollision != null -> viewModel.setSingleData(singleCollision)
+                collisionsList != null -> viewModel.setData(collisionsList, this)
+                singleCollision != null -> viewModel.setSingleData(singleCollision, this)
                 else -> {
                     Timber.e("No collisions received")
                     finish()
@@ -128,7 +127,12 @@ class NameCollisionActivity : PasscodeActivity() {
             viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
         }
 
-        setupView()
+        if (!viewModel.isCopyToOrigin) {
+            setTheme(R.style.Theme_Mega)
+            binding = ActivityNameCollisionBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+            setupView()
+        }
         setupObservers()
     }
 
@@ -211,6 +215,8 @@ class NameCollisionActivity : PasscodeActivity() {
             finish()
             return
         }
+        if (viewModel.isCopyToOrigin)
+            return
 
         val collision = collisionResult.nameCollision
         val isFile = collision.isFile
@@ -452,6 +458,9 @@ class NameCollisionActivity : PasscodeActivity() {
      *                              - Third:    True if the collision is related to a file, false if is to a folder.
      */
     private fun updateFileVersioningData(fileVersioningInfo: Triple<Boolean, NameCollisionType, Boolean>) {
+        if (viewModel.isCopyToOrigin)
+            return
+
         val isFileVersioningEnabled = fileVersioningInfo.first
         val nameCollisionType = fileVersioningInfo.second
         val isFile = fileVersioningInfo.third
@@ -502,7 +511,10 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResult>) {
         setResult(
             Activity.RESULT_OK,
-            Intent().putParcelableArrayListExtra(INTENT_EXTRA_COLLISION_RESULTS, collisionsResolution)
+            Intent().putParcelableArrayListExtra(
+                INTENT_EXTRA_COLLISION_RESULTS,
+                collisionsResolution
+            )
         )
         finish()
     }

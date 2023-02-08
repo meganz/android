@@ -20,10 +20,12 @@ import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.usecase.data.MoveRequestResult
+import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -35,11 +37,11 @@ import javax.inject.Inject
 /**
  * ViewModel which manages data of [NameCollisionActivity]
  *
- * @property getFileVersionsOptionUseCase   Required for checking file versioning.
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
  * @property uploadUseCase                  Required for uploading files.
  * @property moveNodeUseCase                Required for moving nodes.
  * @property copyNodeUseCase                Required for copying nodes.
+ * @property getNodeUseCase                 Required for getting node from handle
  */
 @HiltViewModel
 class NameCollisionViewModel @Inject constructor(
@@ -49,6 +51,7 @@ class NameCollisionViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
+    private val getNodeUseCase: GetNodeUseCase
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -74,6 +77,7 @@ class NameCollisionViewModel @Inject constructor(
     var pendingFileCollisions = 0
     var pendingFolderCollisions = 0
     private var allCollisionsProcessed = false
+    var isCopyToOrigin = false
 
     init {
         viewModelScope.launch {
@@ -89,21 +93,32 @@ class NameCollisionViewModel @Inject constructor(
         }
     }
 
+    private fun setCopyToOrigin(collision: NameCollision.Copy) {
+        val node = getNodeUseCase.get(collision.nodeHandle).blockingGetOrNull()
+        if (node?.parentHandle == collision.parentHandle) {
+            isCopyToOrigin = true
+        }
+    }
+
     /**
      * Sets the initial data for resolving a single name collision.
      *
      * @param collision [NameCollision] to resolve.
      */
-    fun setSingleData(collision: NameCollision) {
-        getCurrentCollision(collision)
+    fun setSingleData(collision: NameCollision, context: Context) {
+        if (collision is NameCollision.Copy)
+            setCopyToOrigin(collision)
+        getCurrentCollision(collision, context, true)
     }
 
     /**
      * Gets the complete collision data.
      *
      * @param collision [NameCollision] to resolve.
+     * @param context   Required Context for uploads.
+     * @param rename    Whether to call rename() or not
      */
-    private fun getCurrentCollision(collision: NameCollision) {
+    private fun getCurrentCollision(collision: NameCollision, context: Context, rename: Boolean) {
         var firstUpdate = true
 
         getNameCollisionResultUseCase.get(collision)
@@ -122,7 +137,13 @@ class NameCollisionViewModel @Inject constructor(
                     Timber.e(error, "Error getting collisionResult")
                     currentCollision.value = null
                 },
-                onComplete = { Timber.d("Get current name collision finished") }
+                onComplete = {
+                    Timber.d("Get current name collision finished")
+                    currentCollision.value?.let {
+                        if (isCopyToOrigin && rename)
+                            rename(context, true)
+                    }
+                }
             )
             .addTo(composite)
     }
@@ -132,8 +153,12 @@ class NameCollisionViewModel @Inject constructor(
      * Reorders the list to show files first, then folders. Then gets the current collision.
      *
      * @param collisions    ArrayList of [NameCollision] to resolve.
+     * @param context       Required Context for uploads.
      */
-    fun setData(collisions: ArrayList<NameCollision>) {
+    fun setData(collisions: ArrayList<NameCollision>, context: Context) {
+        val firstCollision = collisions[0]
+        if (firstCollision is NameCollision.Copy)
+            setCopyToOrigin(firstCollision)
         getNameCollisionResultUseCase.reorder(collisions)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -142,11 +167,11 @@ class NameCollisionViewModel @Inject constructor(
                     val reorderedCollisions = result.first
                     pendingFileCollisions = result.second
                     pendingFolderCollisions = result.third
-                    getCurrentCollision(reorderedCollisions[0])
+                    getCurrentCollision(reorderedCollisions[0], context, false)
                     reorderedCollisions.removeAt(0)
 
                     if (reorderedCollisions.isNotEmpty()) {
-                        getPendingCollisions(reorderedCollisions)
+                        getPendingCollisions(reorderedCollisions, context)
                     }
                 },
                 onError = { error ->
@@ -161,8 +186,9 @@ class NameCollisionViewModel @Inject constructor(
      * Gets the list with complete data of pending collisions.
      *
      * @param collisions    MutableList of [NameCollision] to resolve.
+     * @param context       Required Context for uploads.
      */
-    private fun getPendingCollisions(collisions: MutableList<NameCollision>) {
+    private fun getPendingCollisions(collisions: MutableList<NameCollision>, context: Context) {
         getNameCollisionResultUseCase.get(collisions)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -172,7 +198,11 @@ class NameCollisionViewModel @Inject constructor(
                     pendingCollisions.clear()
                     pendingCollisions.addAll(collisionsResult)
                 },
-                onComplete = { Timber.d("Get complete name collisions finished") }
+                onComplete = {
+                    Timber.d("Get complete name collisions finished")
+                    if (isCopyToOrigin)
+                        rename(context, true)
+                }
             )
             .addTo(composite)
     }

@@ -384,11 +384,7 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
             optionButton.setText(getString(R.string.add_to_cloud));
         } else if (isMultiselect()) {
             optionButton.setText(getString(R.string.context_send));
-            if (adapter != null && adapter.getSelectedItemCount() > 0) {
-                activateButton(true);
-            } else {
-                activateButton(false);
-            }
+            activateButton(adapter != null && adapter.getSelectedItemCount() > 0);
         } else if (modeCloud == FileExplorerActivity.SELECT) {
             optionsBar.setVisibility(View.GONE);
         } else if (modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER) {
@@ -945,6 +941,6 @@ public class IncomingSharesExplorerFragment extends RotatableFragment
      */
     private void checkCopyMoveButton() {
         MegaNode parentMove = ((FileExplorerActivity) context).parentMoveCopy();
-        activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
+        activateButton(modeCloud == COPY || parentMove == null || parentMove.getHandle() != parentHandle);
     }
 }
