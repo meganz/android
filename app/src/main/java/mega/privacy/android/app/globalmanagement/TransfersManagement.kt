@@ -26,13 +26,11 @@ import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.Constants
@@ -363,7 +361,6 @@ class TransfersManagement @Inject constructor(
                 }
 
                 shouldShowNetworkWarning = true
-                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
             }
         }.start()
     }
@@ -375,7 +372,6 @@ class TransfersManagement @Inject constructor(
         networkTimer?.let { timer ->
             timer.cancel()
             shouldShowNetworkWarning = false
-            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
         }
     }
 
