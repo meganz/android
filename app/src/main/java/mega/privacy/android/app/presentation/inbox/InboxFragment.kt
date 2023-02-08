@@ -24,7 +24,6 @@ import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,7 +34,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -111,7 +109,7 @@ class InboxFragment : RotatableFragment() {
     private var actionMode: ActionMode? = null
 
     private val viewModel by activityViewModels<InboxViewModel>()
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     companion object {
         /**
@@ -150,9 +148,6 @@ class InboxFragment : RotatableFragment() {
                     EventObserver { showSortByPanel() }
                 )
             }
-        }
-        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
-            refreshSortByHeader()
         }
 
         val display = requireActivity().windowManager.defaultDisplay
@@ -453,15 +448,6 @@ class InboxFragment : RotatableFragment() {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Refreshes the Sort By header in [MegaNodeAdapter]
-     */
-    private fun refreshSortByHeader() {
-        adapter?.let {
-            if (it.itemCount > 0) it.notifyItemChanged(0)
         }
     }
 

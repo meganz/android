@@ -45,7 +45,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -124,7 +123,7 @@ class FileBrowserFragment : RotatableFragment() {
 
     private val managerViewModel by activityViewModels<ManagerViewModel>()
     private val fileBrowserViewModel by activityViewModels<FileBrowserViewModel>()
-    private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     private var aB: ActionBar? = null
 
@@ -176,15 +175,6 @@ class FileBrowserFragment : RotatableFragment() {
      */
     private fun showSortByPanel() {
         (activity as? ManagerActivity)?.showNewSortByPanel(Constants.ORDER_CLOUD)
-    }
-
-    /**
-     * Refreshes the Sort By header in [MegaNodeAdapter]
-     */
-    private fun refreshSortByHeader() {
-        adapter?.let {
-            if (it.itemCount > 0) it.notifyItemChanged(0)
-        }
     }
 
     private inner class ActionBarCallBack : ActionMode.Callback {
@@ -468,9 +458,6 @@ class FileBrowserFragment : RotatableFragment() {
                     EventObserver { showSortByPanel() }
                 )
             }
-        }
-        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
-            refreshSortByHeader()
         }
 
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)

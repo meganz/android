@@ -25,7 +25,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -36,7 +35,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -87,7 +85,7 @@ class RubbishBinFragment : Fragment() {
     lateinit var megaApi: MegaApiAndroid
 
     private val managerViewModel: ManagerViewModel by activityViewModels()
-    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
 
     private var recyclerView: RecyclerView? = null
@@ -144,9 +142,6 @@ class RubbishBinFragment : Fragment() {
                     recyclerView?.invalidate()
                 }
             }
-        }
-        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
-            refreshSortByHeader()
         }
 
         requireActivity().display?.getMetrics(outMetrics)
@@ -247,15 +242,6 @@ class RubbishBinFragment : Fragment() {
         DragToExitSupport.observeDragSupportEvents(viewLifecycleOwner,
             recyclerView,
             Constants.VIEWER_FROM_RUBBISH_BIN)
-    }
-
-    /**
-     * Refreshes the Sort By header in [MegaNodeAdapter]
-     */
-    private fun refreshSortByHeader() {
-        adapter?.let {
-            if (it.itemCount > 0) it.notifyItemChanged(0)
-        }
     }
 
     /**
