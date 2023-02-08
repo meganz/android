@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -144,7 +145,12 @@ class RubbishBinFragment : Fragment() {
             }
         }
 
-        requireActivity().display?.getMetrics(outMetrics)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().display?.getMetrics(outMetrics)
+        } else {
+            @Suppress("DEPRECATION")
+            activity?.windowManager?.defaultDisplay?.getMetrics(outMetrics)
+        }
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()
