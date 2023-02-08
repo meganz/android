@@ -6,11 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.wifi.WifiManager
-import android.net.wifi.WifiManager.WifiLock
 import android.os.Build
 import android.os.IBinder
-import android.os.PowerManager
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
 import androidx.exifinterface.media.ExifInterface
@@ -55,6 +52,8 @@ import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
+import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
+import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.BackupState
@@ -507,13 +506,23 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var resetTotalUploads: ResetTotalUploads
 
     /**
+     * Camera Service Wake Lock Handler
+     */
+    @Inject
+    lateinit var cameraServiceWakeLockHandler: CameraServiceWakeLockHandler
+
+    /**
+     * Camera Service Wifi Lock Handler
+     */
+    @Inject
+    lateinit var cameraServiceWifiLockHandler: CameraServiceWifiLockHandler
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
 
     private var receiver: NetworkTypeChangeReceiver? = null
-    private var wifiLock: WifiLock? = null
-    private var wakeLock: PowerManager.WakeLock? = null
     private var videoCompressor: VideoCompressor? = null
     private var notification: Notification? = null
     private var notificationManager: NotificationManager? = null
@@ -1549,19 +1558,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private fun initService() {
         registerNetworkTypeChangeReceiver()
-
-        val wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF
-        val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
-        wifiLock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock")
-        val pm = getSystemService(POWER_SERVICE) as PowerManager
-        wakeLock =
-            pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock:")
-        if (wakeLock?.isHeld == false) {
-            wakeLock?.acquire()
-        }
-        if (wifiLock?.isHeld == false) {
-            wifiLock?.acquire()
-        }
+        startWakeAndWifiLocks()
 
         stopByNetworkStateChange = false
         lastUpdated = 0
@@ -1589,9 +1586,25 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
+    /**
+     * When [CameraUploadsService] is initialized, start the Wake and Wifi Locks
+     */
+    private fun startWakeAndWifiLocks() {
+        cameraServiceWakeLockHandler.startWakeLock()
+        cameraServiceWifiLockHandler.startWifiLock()
+    }
+
+    /**
+     * When [CameraUploadsService] ends, Stop both Wake and Wifi Locks
+     */
+    private fun stopWakeAndWifiLocks() {
+        cameraServiceWakeLockHandler.stopWakeLock()
+        cameraServiceWifiLockHandler.stopWifiLock()
+    }
+
     private fun endService() {
         Timber.d("Finish Camera upload process.")
-        releaseLocks()
+        stopWakeAndWifiLocks()
         if (isOverQuota) {
             showStorageOverQuotaNotification()
             JobUtil.fireStopCameraUploadJob(this)
@@ -2181,22 +2194,5 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             return ERROR_CREATE_FILE_IO_ERROR
         }
         return destPath
-    }
-
-    private fun releaseLocks() {
-        if (wifiLock?.isHeld == true) {
-            try {
-                wifiLock?.release()
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-        if (wakeLock?.isHeld == true) {
-            try {
-                wakeLock?.release()
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
     }
 }
