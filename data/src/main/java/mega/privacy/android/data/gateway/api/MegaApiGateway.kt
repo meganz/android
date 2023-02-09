@@ -1710,4 +1710,19 @@ interface MegaApiGateway {
      *                  - MegaTransfer::TYPE_UPLOAD = 1
      */
     suspend fun cancelTransfers(direction: Int)
+
+    /**
+     * Get verified phone number
+     *
+     * @return verified phone number if present else null
+     */
+    suspend fun getVerifiedPhoneNumber(): String?
+
+    /**
+     * Verify phone number
+     *
+     * @param pin verification pin
+     * @param listener MegaRequestListener to track this request
+     */
+    fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface)
 }

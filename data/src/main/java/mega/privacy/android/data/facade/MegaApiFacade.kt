@@ -896,4 +896,9 @@ internal class MegaApiFacade @Inject constructor(
     ) = megaApi.getPublicNode(nodeFileLink, listener)
 
     override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
+
+    override suspend fun getVerifiedPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
+
+    override fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface) =
+        megaApi.checkSMSVerificationCode(pin, listener)
 }

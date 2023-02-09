@@ -31,6 +31,12 @@ sealed class SMSVerificationException(errorCode: Int, errorString: String?) :
         SMSVerificationException(errorCode, errorString)
 
     /**
+     * Verification code does not match
+     */
+    class VerificationCodeDoesNotMatch(errorCode: Int, errorString: String? = null) :
+        SMSVerificationException(errorCode, errorString)
+
+    /**
      * Calling Code Loading Failed
      */
     object CallingCodesLoadingFailed :
