@@ -221,7 +221,6 @@ class DefaultAlbumRepositoryTest {
         underTest.monitorUserSetsUpdate().test {
             val actualUserSets = awaitItem()
             assertThat(expectedUserSets).isEqualTo(actualUserSets)
-            awaitComplete()
         }
     }
 
@@ -339,6 +338,18 @@ class DefaultAlbumRepositoryTest {
         verify(albumStringResourceGateway).getSystemAlbumNames()
         verify(albumStringResourceGateway).getProscribedStrings()
         assertEquals(listOf("abc", "123"), actualStringsList)
+    }
+
+    @Test
+    fun `test that update album cover executes properly`() = runTest {
+        val albumId = AlbumId(1L)
+        val elementId = NodeId(2L)
+
+        try {
+            underTest.updateAlbumCover(albumId, elementId)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
+        }
     }
 
     private fun createUserSet(

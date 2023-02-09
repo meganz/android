@@ -110,4 +110,12 @@ interface AlbumRepository {
      * Get all the names that User Albums are not allowed to have
      */
     suspend fun getProscribedAlbumTitles(): List<String>
+
+    /**
+     * Update album cover
+     *
+     * @param albumId the album id
+     * @param elementId the element id to be set as cover
+     */
+    suspend fun updateAlbumCover(albumId: AlbumId, elementId: NodeId)
 }

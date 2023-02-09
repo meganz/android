@@ -664,7 +664,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getSet(sid: Long): MegaSet? = megaApi.getSet(sid)
 
-    override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
+    override suspend fun getSetElements(sid: Long): MegaSetElementList =
+        megaApi.getSetElements(sid, false)
 
     override fun removeSet(sid: Long, listener: MegaRequestListenerInterface) =
         megaApi.removeSet(sid, listener)
@@ -674,6 +675,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun updateSetName(sid: Long, name: String?) =
         megaApi.updateSetName(sid, name)
+
+    override suspend fun putSetCover(sid: Long, eid: Long) = megaApi.putSetCover(sid, eid)
 
     override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApi.removeRequestListener(listener)

@@ -1161,6 +1161,26 @@ interface MegaApiGateway {
     fun updateSetName(sid: Long, name: String?)
 
     /**
+     * Request to update the cover of a Set
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be updated
+     * - MegaRequest::getNodeHandle - Returns Element id to be set as the new cover
+     * - MegaRequest::getParamType - Returns OPTION_SET_COVER
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_EARGS - Given Element id was not part of the current Set; Malformed (from API).
+     * - MegaError::API_ENOENT - Set with the given id could not be found (before or after the request).
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid the id of the Set to be updated
+     * @param eid the id of the Element to be set as cover
+     */
+    suspend fun putSetCover(sid: Long, eid: Long)
+
+    /**
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)

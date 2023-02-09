@@ -1,7 +1,9 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -21,6 +23,7 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -34,6 +37,7 @@ import java.time.LocalDateTime
 class DefaultPhotosRepositoryTest {
     private lateinit var underTest: PhotosRepository
 
+    private val nodeRepository = mock<NodeRepository>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val cacheFolderFacade = mock<CacheFolderGateway> {
         on { getCacheFolder(any()) }.thenReturn(null)
@@ -49,17 +53,8 @@ class DefaultPhotosRepositoryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultPhotosRepository(
-            megaApiFacade = megaApiGateway,
-            ioDispatcher = UnconfinedTestDispatcher(),
-            cacheFolderFacade = cacheFolderFacade,
-            megaLocalStorageFacade = megaLocalStorageGateway,
-            dateUtilFacade = dateUtilWrapper,
-            imageMapper = imageMapper,
-            videoMapper = videoMapper,
-            fileTypeInfoMapper = fileTypeInfoMapper,
-            sortOrderIntMapper = sortOrderIntMapper,
-        )
+        whenever(nodeRepository.monitorNodeUpdates())
+            .thenReturn(flowOf())
     }
 
     @Test
@@ -70,6 +65,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo)
             .isInstanceOf(StaticImageFileTypeInfo::class.java)
@@ -83,6 +79,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(GifFileTypeInfo::class.java)
     }
@@ -95,6 +92,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(RawFileTypeInfo::class.java)
     }
@@ -107,6 +105,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(VideoFileTypeInfo::class.java)
     }
@@ -119,9 +118,24 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
+        underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo == null)
     }
+
+    private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultPhotosRepository(
+        nodeRepository = nodeRepository,
+        megaApiFacade = megaApiGateway,
+        appScope = coroutineScope,
+        ioDispatcher = UnconfinedTestDispatcher(),
+        cacheFolderFacade = cacheFolderFacade,
+        megaLocalStorageFacade = megaLocalStorageGateway,
+        dateUtilFacade = dateUtilWrapper,
+        imageMapper = imageMapper,
+        videoMapper = videoMapper,
+        fileTypeInfoMapper = fileTypeInfoMapper,
+        sortOrderIntMapper = sortOrderIntMapper,
+    )
 
     private fun createMegaNode(
         handle: Long = 0L,
