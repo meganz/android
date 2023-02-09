@@ -103,7 +103,6 @@ class ManagerViewModelTest {
             getPricing = mock(),
             getFullAccountInfo = mock(),
             getActiveSubscription = mock(),
-            setSyncLocalPath = mock(),
             getFeatureFlagValue = mock()
         )
     }
