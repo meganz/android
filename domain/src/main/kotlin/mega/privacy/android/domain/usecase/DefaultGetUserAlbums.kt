@@ -22,6 +22,7 @@ import javax.inject.Inject
 class DefaultGetUserAlbums @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val photosRepository: PhotosRepository,
+    private val isNodeInRubbish: IsNodeInRubbish,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetUserAlbums {
     override fun invoke(): Flow<List<Album.UserAlbum>> = flow {
@@ -32,7 +33,12 @@ class DefaultGetUserAlbums @Inject constructor(
     private suspend fun getUserAlbums(): List<Album.UserAlbum> =
         albumRepository.getAllUserSets()
             .map { set ->
-                val photo = set.cover?.let { photosRepository.getPhotoFromNodeID(NodeId(it)) }
+                val photo = set.cover?.let { eid ->
+                    if (eid == -1L) null
+                    else albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
+                        .find { it.id == eid && !isNodeInRubbish(handle = it.nodeId.longValue) }
+                        ?.let { photosRepository.getPhotoFromNodeID(it.nodeId, it) }
+                }
                 Album.UserAlbum(
                     id = AlbumId(set.id),
                     title = set.name,
