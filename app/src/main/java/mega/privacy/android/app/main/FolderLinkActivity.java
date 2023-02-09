@@ -3,6 +3,7 @@ package mega.privacy.android.app.main;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
@@ -77,11 +78,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -97,11 +101,15 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -124,6 +132,7 @@ import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
 import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.domain.entity.SortOrder;
+import mega.privacy.android.domain.entity.preference.ViewType;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -156,7 +165,9 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     String folderKey;
     String folderSubHandle;
     RecyclerView listView;
+    RecyclerView gridView;
     LinearLayoutManager mLayoutManager;
+    CustomizedGridLayoutManager gridLayoutManager;
     MegaNode selectedNode;
     ImageView emptyImageView;
     TextView emptyTextView;
@@ -209,6 +220,14 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     @Inject
     CookieDialogHandler cookieDialogHandler;
     private FolderLinkViewModel viewModel;
+    private SortByHeaderViewModel sortByHeaderViewModel;
+
+    private RecyclerView getRecyclerView() {
+        if (viewModel.isList())
+            return listView;
+        else
+            return gridView;
+    }
 
     public void activateActionMode() {
         Timber.d("activateActionMode");
@@ -305,7 +324,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
             separator.setVisibility(View.VISIBLE);
 
             // No App bar in this activity, control tool bar instead.
-            boolean withElevation = listView.canScrollVertically(-1);
+            boolean withElevation = getRecyclerView().canScrollVertically(-1);
             ColorUtils.changeStatusBarColorForElevation(FolderLinkActivity.this, withElevation);
             if (!withElevation) {
                 tB.setElevation(0);
@@ -368,6 +387,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(FolderLinkViewModel.class);
+        sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -410,6 +430,13 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         folderLinkActivity = this;
 
         prefs = dbH.getPreferences();
+        if (prefs != null) {
+            if (prefs.getPreferredViewList() == null) {
+                viewModel.setList(true);
+            } else {
+                viewModel.setList(Boolean.parseBoolean(prefs.getPreferredViewList()));
+            }
+        }
 
         lastPositionStack = new Stack<>();
 
@@ -454,8 +481,8 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         emptyImageView.setVisibility(View.GONE);
         emptyTextView.setVisibility(View.GONE);
 
-        listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
-        listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        listView = findViewById(R.id.folder_link_list_view_browser);
+        listView.addItemDecoration(new PositionDividerItemDecoration(this, getResources().getDisplayMetrics()));
         mLayoutManager = new LinearLayoutManager(this);
         listView.setLayoutManager(mLayoutManager);
         listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
@@ -468,6 +495,27 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                 checkScroll();
             }
         });
+
+        gridView = findViewById(R.id.folder_link_grid_view_browser);
+        gridLayoutManager = (CustomizedGridLayoutManager) gridView.getLayoutManager();
+        gridView.setLayoutManager(gridLayoutManager);
+        gridView.setItemAnimator(new DefaultItemAnimator());
+        gridView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
+
+        if (viewModel.isList()) {
+            gridView.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+        } else {
+            gridView.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        }
 
         optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
         separator = (View) findViewById(R.id.separator_3);
@@ -581,9 +629,36 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
         setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
 
-        observeDragSupportEvents(this, listView, VIEWER_FROM_FOLDER_LINK);
+        observeDragSupportEvents(this, getRecyclerView(), VIEWER_FROM_FOLDER_LINK);
 
         fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
+
+        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
+                .observe(this, this::updateView);
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getOnViewTypeChanged(), Lifecycle.State.STARTED, viewType -> {
+            updateViewType(viewType);
+            return Unit.INSTANCE;
+        });
+    }
+
+    /**
+     * Updates the View Type
+     *
+     * @param viewType The new View Type
+     */
+    private void updateViewType(ViewType viewType) {
+        Timber.d("The updated View Type is %s", viewType.name());
+        viewModel.setList(viewType == ViewType.LIST);
+    }
+
+    private void updateView(boolean isList) {
+        if (viewModel.isList() != isList) {
+            viewModel.setList(isList);
+            dbH.setPreferredViewList(isList);
+        }
+
+        setupRecyclerViewAdapter();
     }
 
     @Override
@@ -594,9 +669,9 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
     }
 
     public void checkScroll() {
-        if (listView == null) return;
+        if (getRecyclerView() == null) return;
 
-        boolean canScroll = listView.canScrollVertically(-1);
+        boolean canScroll = getRecyclerView().canScrollVertically(-1);
         Util.changeToolBarElevation(this, tB, canScroll || adapterList.isMultipleSelect());
     }
 
@@ -639,6 +714,12 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
             emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
         } else {
             emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
+        }
+
+        if (!viewModel.isList()) {
+            gridView.measure(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.MATCH_PARENT);
+            adapterList.setNodes(new ArrayList<>(nodes));
+            gridLayoutManager.setSpanSizeLookup(adapterList.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
         }
 
         cookieDialogHandler.showDialogIfNeeded(this, true);
@@ -991,32 +1072,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                             aB.setTitle(megaApiFolder.getRootNode().getName());
                             supportInvalidateOptionsMenu();
                         }
-
-                        if (adapterList == null) {
-                            adapterList = new MegaNodeAdapter(this, null, nodes,
-                                    parentHandle, listView, FOLDER_LINK_ADAPTER,
-                                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-                        } else {
-                            adapterList.setParentHandle(parentHandle);
-                            adapterList.setNodes(nodes);
-                        }
-
-                        adapterList.setMultipleSelect(false);
-
-                        listView.setAdapter(adapterList);
-
-                        //If folder has not files
-                        if (adapterList.getItemCount() == 0) {
-                            listView.setVisibility(View.GONE);
-                            emptyImageView.setVisibility(View.VISIBLE);
-                            emptyTextView.setVisibility(View.VISIBLE);
-                        } else {
-                            listView.setVisibility(View.VISIBLE);
-                            emptyImageView.setVisibility(View.GONE);
-                            emptyTextView.setVisibility(View.GONE);
-                        }
-
-
+                        setupRecyclerViewAdapter();
                     }
                 } else {
                     try {
@@ -1125,6 +1181,40 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
         Timber.w("onRequestTemporaryError: %s", request.getRequestString());
     }
 
+    private void setupRecyclerViewAdapter() {
+        int adapterType = viewModel.isList() ? MegaNodeAdapter.ITEM_VIEW_TYPE_LIST : MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
+
+        adapterList = new MegaNodeAdapter(this, null, new ArrayList<>(),
+                    parentHandle, getRecyclerView(), FOLDER_LINK_ADAPTER,
+                    adapterType, sortByHeaderViewModel);
+
+        adapterList.setMultipleSelect(false);
+        adapterList.setNodes(new ArrayList<>(nodes));
+
+        getRecyclerView().setAdapter(adapterList);
+
+        if (viewModel.isList()) {
+            gridView.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+        } else {
+            gridView.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+            gridLayoutManager.setSpanSizeLookup(adapterList.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
+        }
+
+        //If folder has not files
+        if (adapterList.getItemCount() == 0) {
+            listView.setVisibility(View.GONE);
+            gridView.setVisibility(View.GONE);
+            emptyImageView.setVisibility(View.VISIBLE);
+            emptyTextView.setVisibility(View.VISIBLE);
+        } else {
+            getRecyclerView().setVisibility(View.VISIBLE);
+            emptyImageView.setVisibility(View.GONE);
+            emptyTextView.setVisibility(View.GONE);
+        }
+    }
+
     /*
      * Disable selection
      */
@@ -1219,47 +1309,49 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                 updateActionModeTitle();
             }
         } else {
-            if (nodes.get(position).isFolder()) {
-                MegaNode n = nodes.get(position);
-
+            MegaNode node = adapterList.getItem(position);
+            if (node.isFolder()) {
                 int lastFirstVisiblePosition = 0;
 
-                lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+                if (viewModel.isList())
+                    lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+                else
+                    lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
 
                 Timber.d("Push to stack %d position", lastFirstVisiblePosition);
                 lastPositionStack.push(lastFirstVisiblePosition);
 
-                aB.setTitle(n.getName());
+                aB.setTitle(node.getName());
                 supportInvalidateOptionsMenu();
 
-                parentHandle = nodes.get(position).getHandle();
+                parentHandle = node.getHandle();
                 adapterList.setParentHandle(parentHandle);
-                nodes = megaApiFolder.getChildren(nodes.get(position), SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
-                adapterList.setNodes(nodes);
-                listView.scrollToPosition(0);
+                nodes = megaApiFolder.getChildren(node, SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
+                adapterList.setNodes(new ArrayList<>(nodes));
+                getRecyclerView().scrollToPosition(0);
 
                 //If folder has no files
                 if (adapterList.getItemCount() == 0) {
-                    listView.setVisibility(View.GONE);
+                    getRecyclerView().setVisibility(View.GONE);
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.VISIBLE);
                 } else {
-                    listView.setVisibility(View.VISIBLE);
+                    getRecyclerView().setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
                     emptyTextView.setVisibility(View.GONE);
                 }
             } else {
-                if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
+                if (MimeTypeList.typeForName(node.getName()).isImage()) {
                     long[] children = nodes.stream().mapToLong(MegaNode::getHandle).toArray();
                     Intent intent = ImageViewerActivity.getIntentForChildren(
                             this,
                             children,
-                            nodes.get(position).getHandle()
+                            node.getHandle()
                     );
-                    putThumbnailLocation(intent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
+                    putThumbnailLocation(intent, getRecyclerView(), position, VIEWER_FROM_FOLDER_LINK, adapterList);
                     startActivity(intent);
                     overridePendingTransition(0, 0);
-                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
+                } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
                     MegaNode file = nodes.get(position);
 
                     String mimeType = MimeTypeList.typeForName(file.getName()).getType();
@@ -1277,27 +1369,27 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                         }
                     } else {
                         internalIntent = true;
-                        mediaIntent = getMediaIntent(this, nodes.get(position).getName());
+                        mediaIntent = getMediaIntent(this, node.getName());
                     }
                     mediaIntent.putExtra("orderGetChildren", orderGetChildren);
                     mediaIntent.putExtra("isFolderLink", true);
                     mediaIntent.putExtra("HANDLE", file.getHandle());
                     mediaIntent.putExtra("FILENAME", file.getName());
-                    putThumbnailLocation(mediaIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
+                    putThumbnailLocation(mediaIntent, getRecyclerView(), position, VIEWER_FROM_FOLDER_LINK, adapterList);
                     mediaIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
 
-                    MegaNode parentNode = megaApiFolder.getParentNode(nodes.get(position));
+                    MegaNode parentNode = megaApiFolder.getParentNode(node);
 
                     //Null check validation.
                     if (parentNode == null) {
-                        Timber.e("%s's parent node is null", nodes.get(position).getName());
+                        Timber.e("%s's parent node is null", node.getName());
                         return;
                     }
 
                     if (parentNode.getType() == MegaNode.TYPE_ROOT) {
                         mediaIntent.putExtra("parentNodeHandle", -1L);
                     } else {
-                        mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
+                        mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(node).getHandle());
                     }
 
                     String localPath = getLocalFile(file);
@@ -1327,12 +1419,12 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                         } else {
                             showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available));
                             adapterList.notifyDataSetChanged();
-                            downloadNodes(Collections.singletonList(nodes.get(position)));
+                            downloadNodes(Collections.singletonList(node));
                         }
                     }
                     overridePendingTransition(0, 0);
-                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()) {
-                    MegaNode file = nodes.get(position);
+                } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
+                    MegaNode file = node;
 
                     String mimeType = MimeTypeList.typeForName(file.getName()).getType();
                     Timber.d("FILE HANDLE: %d, TYPE: %s", file.getHandle(), mimeType);
@@ -1360,17 +1452,17 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                     pdfIntent.putExtra("HANDLE", file.getHandle());
                     pdfIntent.putExtra("isFolderLink", true);
                     pdfIntent.putExtra("inside", true);
-                    putThumbnailLocation(pdfIntent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
+                    putThumbnailLocation(pdfIntent, getRecyclerView(), position, VIEWER_FROM_FOLDER_LINK, adapterList);
                     if (isIntentAvailable(FolderLinkActivity.this, pdfIntent)) {
                         startActivity(pdfIntent);
                     } else {
                         Toast.makeText(FolderLinkActivity.this, FolderLinkActivity.this.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-                        downloadNodes(Collections.singletonList(nodes.get(position)));
+                        downloadNodes(Collections.singletonList(node));
                     }
                     overridePendingTransition(0, 0);
-                } else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
-                    manageTextFileIntent(this, nodes.get(position), FOLDER_LINK_ADAPTER);
+                } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+                    manageTextFileIntent(this, node, FOLDER_LINK_ADAPTER);
                 } else {
                     boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                     if (!hasStoragePermission) {
@@ -1379,13 +1471,13 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
                         handleListM.clear();
-                        handleListM.add(nodes.get(position).getHandle());
+                        handleListM.add(node.getHandle());
 
                         return;
                     }
 
                     adapterList.notifyDataSetChanged();
-                    downloadNodes(Collections.singletonList(nodes.get(position)));
+                    downloadNodes(Collections.singletonList(node));
                 }
             }
         }
@@ -1416,7 +1508,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
             MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
             if (parentNode != null) {
                 Timber.d("parentNode != NULL");
-                listView.setVisibility(View.VISIBLE);
+                getRecyclerView().setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
                 aB.setTitle(parentNode.getName());
@@ -1425,7 +1517,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
                 parentHandle = parentNode.getHandle();
                 nodes = megaApiFolder.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
-                adapterList.setNodes(nodes);
+                adapterList.setNodes(new ArrayList<>(nodes));
                 int lastVisiblePosition = 0;
                 if (!lastPositionStack.empty()) {
                     lastVisiblePosition = lastPositionStack.pop();
@@ -1434,9 +1526,10 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                 Timber.d("Scroll to %d position", lastVisiblePosition);
 
                 if (lastVisiblePosition >= 0) {
-
-                    mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-
+                    if (viewModel.isList())
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                    else
+                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
                 }
                 adapterList.setParentHandle(parentHandle);
                 return;
@@ -1453,7 +1546,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
             MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
             if (parentNode != null) {
                 Timber.d("parentNode != NULL");
-                listView.setVisibility(View.VISIBLE);
+                getRecyclerView().setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
                 aB.setTitle(parentNode.getName());
@@ -1462,7 +1555,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
 
                 parentHandle = parentNode.getHandle();
                 nodes = megaApiFolder.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
-                adapterList.setNodes(nodes);
+                adapterList.setNodes(new ArrayList<>(nodes));
                 int lastVisiblePosition = 0;
                 if (!lastPositionStack.empty()) {
                     lastVisiblePosition = lastPositionStack.pop();
@@ -1471,9 +1564,10 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                 Timber.d("Scroll to %d position", lastVisiblePosition);
 
                 if (lastVisiblePosition >= 0) {
-
-                    mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-
+                    if (viewModel.isList())
+                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+                    else
+                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
                 }
                 adapterList.setParentHandle(parentHandle);
                 return;

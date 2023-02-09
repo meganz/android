@@ -225,11 +225,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap().get(orderType));
 
+            if (type == FOLDER_LINK_ADAPTER) {
+                binding.sortByLayout.setVisibility(View.GONE);
+                binding.enterMediaDiscovery.setVisibility(View.GONE);
+            } else {
+                binding.sortByLayout.setVisibility(View.VISIBLE);
+                setMediaDiscoveryVisibility(binding);
+            }
+
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE
                     : View.VISIBLE);
-
-            setMediaDiscoveryVisibility(binding);
         }
     }
 
@@ -548,14 +554,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /**
      * Checks if should show sort by header.
      * It should show the header if the list of nodes is not empty and if the adapter is not:
-     * FOLDER_LINK_ADAPTER, CONTACT_SHARED_FOLDER_ADAPTER or CONTACT_FILE_ADAPTER.
+     * CONTACT_SHARED_FOLDER_ADAPTER or CONTACT_FILE_ADAPTER.
      *
      * @param nodes List of nodes to check if is empty or not.
      * @return True if should show the sort by header, false otherwise.
      */
     private boolean shouldShowSortByHeader(List<MegaNode> nodes) {
-        return !nodes.isEmpty() && type != FOLDER_LINK_ADAPTER
-                && type != CONTACT_SHARED_FOLDER_ADAPTER && type != CONTACT_FILE_ADAPTER;
+        return !nodes.isEmpty() && type != CONTACT_SHARED_FOLDER_ADAPTER && type != CONTACT_FILE_ADAPTER;
     }
 
     @NotNull
@@ -1188,7 +1193,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getItemViewType(int position) {
         return !nodes.isEmpty() && position == 0
-                && type != FOLDER_LINK_ADAPTER
                 && type != CONTACT_SHARED_FOLDER_ADAPTER
                 && type != CONTACT_FILE_ADAPTER
                 ? ITEM_VIEW_TYPE_HEADER
