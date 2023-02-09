@@ -1951,6 +1951,15 @@ object MegaNodeUtil {
         isFile && (isImage() || isGif() || isVideo())
 
     /**
+     * Check if a specific MegaNode is valid for Slideshow
+     *
+     * @return  True if it's valid, false otherwise
+     */
+    @JvmStatic
+    fun MegaNode.isValidForSlideShow(): Boolean =
+        isFile && (isImage() || isGif())
+
+    /**
      * Check if a specific MegaOffline is valid for Image Viewer
      *
      * @return  True if it's valid, false otherwise

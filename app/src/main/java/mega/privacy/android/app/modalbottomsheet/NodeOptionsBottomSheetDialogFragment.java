@@ -326,7 +326,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionOpenWith.setVisibility(View.GONE);
         }
 
-        if (MegaNodeUtil.isValidForImageViewer(node)) {
+        if (MegaNodeUtil.isValidForSlideShow(node)) {
             optionSlideshow.setVisibility(View.VISIBLE);
         } else {
             optionSlideshow.setVisibility(View.GONE);
