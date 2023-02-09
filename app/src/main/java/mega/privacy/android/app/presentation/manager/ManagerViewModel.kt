@@ -23,6 +23,7 @@ import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.getStateFlow
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetPricing
@@ -101,6 +103,7 @@ class ManagerViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
     private val getActiveSubscription: GetActiveSubscription,
+    getFeatureFlagValue: GetFeatureFlagValue,
 ) : ViewModel() {
 
     /**
@@ -153,6 +156,11 @@ class ManagerViewModel @Inject constructor(
             }.collect {
                 _state.update(it)
             }
+        }
+
+        viewModelScope.launch {
+            val showSyncSection = getFeatureFlagValue(AppFeatures.AndroidSync)
+            _state.value = _state.value.copy(showSyncSection = showSyncSection)
         }
     }
 

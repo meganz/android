@@ -13,6 +13,7 @@ internal enum class FragmentTag {
     TRANSFERS,
     COMPLETED_TRANSFERS,
     RECENT_CHAT,
+    SYNC,
     RUBBISH_BIN,
     NOTIFICATIONS,
     TURN_ON_NOTIFICATIONS,
@@ -27,6 +28,7 @@ internal enum class FragmentTag {
         get() = when (this) {
             CLOUD_DRIVE -> "fileBrowserFragment"
             HOMEPAGE -> "homepageFragment"
+            SYNC -> "syncFragment"
             RUBBISH_BIN -> "rubbishBinFragment"
             PHOTOS -> "photosFragment"
             INBOX -> "inboxFragment"

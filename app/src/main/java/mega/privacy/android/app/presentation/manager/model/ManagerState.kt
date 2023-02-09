@@ -21,4 +21,5 @@ data class ManagerState(
     val shouldStopCameraUpload: Boolean = false,
     val shouldSendCameraBroadcastEvent: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
+    val showSyncSection: Boolean = false
 )

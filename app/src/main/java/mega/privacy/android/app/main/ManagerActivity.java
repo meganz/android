@@ -30,12 +30,12 @@ import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOU
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_UPGRADE_ACCOUNT;
 import static mega.privacy.android.app.data.extensions.MegaTransferKt.isBackgroundTransfer;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
-import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_CREATE;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_JOIN;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.fileBrowserState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.inboxState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.incomingSharesState;
@@ -286,7 +286,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
-import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -323,9 +322,6 @@ import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
-import mega.privacy.android.app.presentation.login.LoginActivity;
-import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
@@ -347,8 +343,10 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel;
@@ -362,10 +360,12 @@ import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
+import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
@@ -373,6 +373,7 @@ import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewM
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity;
+import mega.privacy.android.app.presentation.sync.SyncFragment;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -419,12 +420,12 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
-import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.preference.ViewType;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
@@ -689,6 +690,7 @@ public class ManagerActivity extends TransfersManagementActivity
     // Fragments
     private FileBrowserFragment fileBrowserFragment;
     private RubbishBinFragment rubbishBinFragment;
+    private SyncFragment syncFragment;
     private InboxFragment inboxFragment;
     private MegaNodeBaseFragment incomingSharesFragment;
     private MegaNodeBaseFragment outgoingSharesFragment;
@@ -753,6 +755,7 @@ public class ManagerActivity extends TransfersManagementActivity
     RelativeLayout inboxSection;
     RelativeLayout contactsSection;
     RelativeLayout notificationsSection;
+    private RelativeLayout syncSection;
     private RelativeLayout rubbishBinSection;
     RelativeLayout settingsSection;
     Button upgradeAccount;
@@ -1623,6 +1626,8 @@ public class ManagerActivity extends TransfersManagementActivity
         findViewById(R.id.offline_section).setOnClickListener(this);
         RelativeLayout transfersSection = findViewById(R.id.transfers_section);
         transfersSection.setOnClickListener(this);
+        syncSection = findViewById(R.id.sync_section);
+        syncSection.setOnClickListener(this);
         rubbishBinSection = findViewById(R.id.rubbish_bin_section);
         rubbishBinSection.setOnClickListener(this);
         settingsSection = findViewById(R.id.settings_section);
@@ -2467,6 +2472,9 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
+            if (managerState.getShowSyncSection()) {
+                syncSection.setVisibility(View.VISIBLE);
+            }
             if (managerState.getNodeUpdateReceived()) {
                 // Invalidate the menu will collapse/expand the search view and set the query text to ""
                 // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -4486,6 +4494,16 @@ public class ManagerActivity extends TransfersManagementActivity
                 showFabButton();
                 break;
             }
+            case SYNC: {
+                syncFragment = (SyncFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.SYNC.getTag());
+                if (syncFragment == null) {
+                    syncFragment = SyncFragment.newInstance();
+                }
+                setBottomNavigationMenuItemChecked(NO_BNV);
+                supportInvalidateOptionsMenu();
+                replaceFragment(syncFragment, FragmentTag.SYNC.getTag());
+                break;
+            }
             case HOMEPAGE: {
                 // Don't use fabButton.hide() here.
                 fabButton.setVisibility(View.GONE);
@@ -5354,8 +5372,9 @@ public class ManagerActivity extends TransfersManagementActivity
         switch (id) {
             case android.R.id.home: {
                 if (isFirstNavigationLevel() && drawerItem != DrawerItem.SEARCH) {
-                    if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX
-                            || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
+                    if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.RUBBISH_BIN
+                            || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
+                            || drawerItem == DrawerItem.TRANSFERS) {
 
                         backToDrawerItem(bottomNavigationCurrentItem);
                         if (transfersToImageViewer) {
@@ -5726,6 +5745,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     performOnBack();
                 }
             }
+        } else if (drawerItem == DrawerItem.SYNC) {
+            backToDrawerItem(bottomNavigationCurrentItem);
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             rubbishBinFragment = (RubbishBinFragment) getSupportFragmentManager()
                     .findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
@@ -7624,6 +7645,12 @@ public class ManagerActivity extends TransfersManagementActivity
                 sectionClicked = true;
                 drawerItem = DrawerItem.TRANSFERS;
                 break;
+
+            case R.id.sync_section: {
+                sectionClicked = true;
+                drawerItem = DrawerItem.SYNC;
+                break;
+            }
 
             case R.id.rubbish_bin_section:
                 sectionClicked = true;
@@ -11048,6 +11075,7 @@ public class ManagerActivity extends TransfersManagementActivity
         comesFromNotificationHandleSaved = -1;
         refreshCloudDrive();
     }
+
     /**
      * Updates Inbox section visibility depending on if it has children.
      *
