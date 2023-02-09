@@ -105,4 +105,9 @@ interface AlbumRepository {
         albumId: AlbumId,
         newName: String,
     ): String
+
+    /**
+     * Get all the names that User Albums are not allowed to have
+     */
+    suspend fun getProscribedAlbumTitles(): List<String>
 }

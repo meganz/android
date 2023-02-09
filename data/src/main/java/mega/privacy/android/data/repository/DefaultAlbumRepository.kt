@@ -13,6 +13,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -42,6 +43,7 @@ typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<
 internal class DefaultAlbumRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val userSetMapper: UserSetMapper,
+    private val albumStringResourceGateway: AlbumStringResourceGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
     private val albumPhotosAddingProgressPool: AlbumPhotosAddingProgressPool = mutableMapOf()
@@ -184,6 +186,9 @@ internal class DefaultAlbumRepository @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun getProscribedAlbumTitles(): List<String> =
+        albumStringResourceGateway.getSystemAlbumNames() + albumStringResourceGateway.getProscribedStrings()
 
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
         albumPhotosAddingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }
