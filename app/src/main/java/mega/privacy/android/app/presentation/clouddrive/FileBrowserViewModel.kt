@@ -17,7 +17,6 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaNode
 import java.util.Stack
 import javax.inject.Inject
 
@@ -36,7 +35,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getBrowserChildrenNode: GetBrowserChildrenNode,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdates: MonitorNodeUpdates,
-    private val getFileBrowserParentNodeHandle: GetParentNodeHandle
+    private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -116,29 +115,30 @@ class FileBrowserViewModel @Inject constructor(
 
     /**
      * If a folder only contains images or videos, then go to MD mode directly
+     *
+     * @param parentHandle the folder handle
+     * @param mediaDiscoveryViewSettings [mediaDiscoveryViewSettings]
+     * @return true is should enter MD mode, otherwise is false
      */
-    fun shouldEnterMDMode(mediaDiscoveryViewSettings: Int): Boolean {
-        if (_state.value.nodes.isEmpty())
-            return false
-        val isMediaDiscoveryEnable =
-            mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.ENABLED.ordinal ||
-                    mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
-        if (!isMediaDiscoveryEnable)
-            return false
-
-        for (node: MegaNode in _state.value.nodes) {
-            if (node.isFolder ||
-                !MimeTypeList.typeForName(node.name).isImage &&
-                !MimeTypeList.typeForName(node.name).isVideoReproducible
-            ) {
-                return false
+    suspend fun shouldEnterMediaDiscoveryMode(
+        parentHandle: Long,
+        mediaDiscoveryViewSettings: Int,
+    ): Boolean =
+        getBrowserChildrenNode(parentHandle)?.let { nodes ->
+            if (nodes.isEmpty() || mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.DISABLED.ordinal) {
+                false
+            } else {
+                nodes.firstOrNull { node ->
+                    node.isFolder || !MimeTypeList.typeForName(node.name).isImage
+                            && !MimeTypeList.typeForName(node.name).isVideoReproducible
+                }?.let {
+                    false
+                } ?: true
             }
-        }
-        return true
-    }
+        } ?: false
 
     /**
-     * This will refresh filebrowser nodes and update [FileBrowserState.nodes]
+     * This will refresh file browser nodes and update [FileBrowserState.nodes]
      */
     fun refreshNodes() {
         viewModelScope.launch {

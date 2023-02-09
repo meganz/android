@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -133,7 +134,8 @@ class FileBrowserViewModelTest {
         underTest.setBrowserParentHandle(newValue)
 
         val shouldEnter =
-            underTest.shouldEnterMDMode(MediaDiscoveryViewSettings.INITIAL.ordinal)
+            underTest.shouldEnterMediaDiscoveryMode(newValue,
+                MediaDiscoveryViewSettings.INITIAL.ordinal)
         assertFalse(shouldEnter)
     }
 
@@ -152,8 +154,28 @@ class FileBrowserViewModelTest {
             underTest.setBrowserParentHandle(newValue)
 
             val shouldEnter =
-                underTest.shouldEnterMDMode(
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
                     MediaDiscoveryViewSettings.DISABLED.ordinal
+                )
+            assertFalse(shouldEnter)
+        }
+
+    @Test
+    fun `test that when MediaDiscoveryViewSettings is Enabled and nodes contains not folder then Enter in MD mode will return false`() =
+        runTest {
+            val newValue = 123456789L
+            val folderNode = mock<MegaNode> {
+                on { isFolder }.thenReturn(true)
+            }
+            whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(listOf(folderNode))
+
+            underTest.setBrowserParentHandle(newValue)
+
+            val shouldEnter =
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
+                    MediaDiscoveryViewSettings.ENABLED.ordinal
                 )
             assertFalse(shouldEnter)
         }

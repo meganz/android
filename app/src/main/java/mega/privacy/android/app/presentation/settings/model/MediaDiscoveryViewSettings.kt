@@ -16,7 +16,7 @@ enum class MediaDiscoveryViewSettings {
     ENABLED,
 
     /**
-     * Media discovery view is enabled
+     * Media discovery view is disabled
      */
     DISABLED
 }

@@ -30,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -970,30 +969,33 @@ class FileBrowserFragment : RotatableFragment() {
             adapter?.getItem(position)?.let { node ->
                 if (node.isFolder) {
                     fileBrowserViewModel.setBrowserParentHandle(node.handle)
-                    if (fileBrowserViewModel.shouldEnterMDMode(
-                            mediaDiscoveryViewSettings
-                        )
-                    ) {
-                        showMediaDiscovery()
-                    } else {
-                        val lastFirstVisiblePosition =
-                            if (isList) {
-                                mLayoutManager.findFirstCompletelyVisibleItemPosition()
-                            } else {
-                                val pos =
-                                    (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
-                                if (pos == -1) {
-                                    Timber.w("Completely -1 then find just visible position")
-                                    (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        if (fileBrowserViewModel.shouldEnterMediaDiscoveryMode(
+                                parentHandle = node.handle,
+                                mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
+                            )
+                        ) {
+                            showMediaDiscovery()
+                        } else {
+                            val lastFirstVisiblePosition =
+                                if (isList) {
+                                    mLayoutManager.findFirstCompletelyVisibleItemPosition()
+                                } else {
+                                    val pos =
+                                        (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
+                                    if (pos == -1) {
+                                        Timber.w("Completely -1 then find just visible position")
+                                        (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
+                                    }
+                                    pos
                                 }
-                                pos
-                            }
-                        Timber.d("Push to stack $lastFirstVisiblePosition position")
-                        fileBrowserViewModel.onFolderItemClicked(
-                            lastFirstVisiblePosition,
-                            node.handle
-                        )
-                        setFolderInfoNavigation(node)
+                            Timber.d("Push to stack $lastFirstVisiblePosition position")
+                            fileBrowserViewModel.onFolderItemClicked(
+                                lastFirstVisiblePosition,
+                                node.handle
+                            )
+                            setFolderInfoNavigation(node)
+                        }
                     }
                 } else {
                     openFile(node = node, position = position)
