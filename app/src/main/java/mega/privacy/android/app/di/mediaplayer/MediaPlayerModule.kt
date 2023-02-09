@@ -7,8 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
+import mega.privacy.android.app.mediaplayer.facade.StopAudioServiceFacade
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
+import mega.privacy.android.domain.usecase.StopAudioServiceGateway
 import javax.inject.Singleton
 
 /**
@@ -43,4 +45,11 @@ class MediaPlayerModule {
         repeatToggleModeMapper: RepeatToggleModeMapper,
     ): MediaPlayerFacade =
         MediaPlayerFacade(context, repeatModeMapper, repeatToggleModeMapper)
+
+    /**
+     * Provide the implementation for [StopAudioServiceGateway]
+     */
+    @Provides
+    fun provideStopAudioPlayerService(@ApplicationContext context: Context): StopAudioServiceGateway =
+        StopAudioServiceFacade(context)
 }
