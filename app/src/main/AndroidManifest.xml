@@ -643,7 +643,7 @@
             android:name=".myAccount.MyAccountActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".exportRK.ExportRecoveryKeyActivity"
+            android:name=".presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".upgradeAccount.UpgradeAccountActivity"

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.exportRK
+package test.mega.privacy.android.app.presentation.settings.exportrecoverykey
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyViewModel
 import mega.privacy.android.domain.usecase.GetExportMasterKey
 import mega.privacy.android.domain.usecase.SetMasterKeyExported
 import org.junit.After

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.exportRK
+package test.mega.privacy.android.app.presentation.settings.exportrecoverykey.view
 
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -7,11 +7,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
-import mega.privacy.android.app.exportRK.view.COLUMN_TEST_TAG
-import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyView
-import mega.privacy.android.app.exportRK.view.ROW_TEST_TAG
-import mega.privacy.android.app.exportRK.view.SNACKBAR_TEST_TAG
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.COLUMN_TEST_TAG
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ROW_TEST_TAG
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.SNACKBAR_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.exportRK
+package mega.privacy.android.app.presentation.settings.exportrecoverykey
 
 import android.Manifest
 import android.content.Intent
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.exportRK.view.ExportRecoveryKeyView
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.extensions.isDarkMode

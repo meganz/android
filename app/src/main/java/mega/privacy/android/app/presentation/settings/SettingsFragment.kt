@@ -65,7 +65,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.exportRK
+package mega.privacy.android.app.presentation.settings.exportrecoverykey
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
 import mega.privacy.android.domain.usecase.GetExportMasterKey
 import mega.privacy.android.domain.usecase.SetMasterKeyExported
 import javax.inject.Inject

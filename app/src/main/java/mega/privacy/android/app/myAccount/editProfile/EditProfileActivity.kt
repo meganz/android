@@ -32,7 +32,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATE
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown

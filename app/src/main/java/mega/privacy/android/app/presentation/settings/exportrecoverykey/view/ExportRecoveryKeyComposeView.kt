@@ -1,4 +1,4 @@
-package mega.privacy.android.app.exportRK.view
+package mega.privacy.android.app.presentation.settings.exportrecoverykey.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.exportRK.model.RecoveryKeyUIState
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.white

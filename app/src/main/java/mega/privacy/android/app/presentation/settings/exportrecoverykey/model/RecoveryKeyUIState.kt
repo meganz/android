@@ -1,4 +1,4 @@
-package mega.privacy.android.app.exportRK.model
+package mega.privacy.android.app.presentation.settings.exportrecoverykey.model
 
 /**
  * Recovery Key UI State
