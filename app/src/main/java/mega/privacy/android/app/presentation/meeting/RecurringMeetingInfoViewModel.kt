@@ -143,12 +143,22 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private fun getOccurrences() =
         viewModelScope.launch {
             runCatching {
-                fetchScheduledMeetingOccurrencesByChat(state.value.chatId)
+                when {
+                    state.value.isEmptyOccurrencesList() -> {
+                        fetchScheduledMeetingOccurrencesByChat(
+                            state.value.chatId,
+                            0
+                        )
+                    }
+                    else -> state.value.occurrencesList.last().startDateTime?.let {
+                        fetchScheduledMeetingOccurrencesByChat(state.value.chatId, it)
+                    }
+                }
             }.onFailure { exception ->
                 Timber.e("Error retrieving list of occurrences: $exception")
             }.onSuccess { list ->
                 list?.let { listOccurrences ->
-                    Timber.d("List of occurrences successfully retrieved")
+                    Timber.d("List of occurrences successfully retrieved. Number new occurrences: ${listOccurrences.size - 1}")
                     val newList = state.value.occurrencesList.toMutableList()
                     for (occurrence in listOccurrences) {
                         if (!newList.contains(occurrence)) {

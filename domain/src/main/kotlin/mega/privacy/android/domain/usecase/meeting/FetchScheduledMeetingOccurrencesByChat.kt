@@ -11,7 +11,8 @@ fun interface FetchScheduledMeetingOccurrencesByChat {
      * Invoke.
      *
      * @param chatId                            Chat id.
+     * @param since                             Timestamp from which API will generate more occurrences
      * @return [ChatScheduledMeetingOccurr]     List of occurrences.
      */
-    suspend operator fun invoke(chatId: Long): List<ChatScheduledMeetingOccurr>?
+    suspend operator fun invoke(chatId: Long, since: Long): List<ChatScheduledMeetingOccurr>?
 }
