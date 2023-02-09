@@ -539,7 +539,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var totalToUpload = 0
     private var lastUpdated: Long = 0
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
-    private val cuTransfers: MutableList<MegaTransfer> = mutableListOf()
 
     private fun monitorUploadPauseStatus() {
         coroutineScope?.launch {
@@ -1268,22 +1267,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private fun onGlobalTransferUpdated(globalTransfer: GlobalTransfer) {
         when (globalTransfer) {
-            is GlobalTransfer.OnTransferStart -> onTransferStarted(globalTransfer)
             is GlobalTransfer.OnTransferFinish -> onTransferFinished(globalTransfer)
             is GlobalTransfer.OnTransferUpdate -> onTransferUpdated(globalTransfer)
             is GlobalTransfer.OnTransferTemporaryError -> onTransferTemporaryError(globalTransfer)
-            // No further action necessary for this scenario
-            is GlobalTransfer.OnTransferData -> Unit
+            // No further action necessary for these Scenarios
+            is GlobalTransfer.OnTransferStart,
+            is GlobalTransfer.OnTransferData
+            -> Unit
         }
-    }
-
-    /**
-     * Handle logic for when an upload begins
-     *
-     * @param globalTransfer [GlobalTransfer.OnTransferStart]
-     */
-    private fun onTransferStarted(globalTransfer: GlobalTransfer.OnTransferStart) {
-        cuTransfers.add(globalTransfer.transfer)
     }
 
     /**
@@ -1611,7 +1602,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
 
         videoCompressor?.stop()
-        cuTransfers.clear()
         canceled = true
         running = false
         stopForeground(STOP_FOREGROUND_REMOVE)
