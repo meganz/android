@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.fragments.managerFragments.cu.album.AlbumContentFragment
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
@@ -230,15 +229,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 ORDER_CAMERA -> {
                     sortByHeaderViewModel.setOrderCamera(order).join()
-
-                    callManager { manager ->
-                        if (manager.isInAlbumContentPage) {
-                            val f = manager.albumContentFragment
-                            if (f is AlbumContentFragment) {
-                                f.loadPhotos()
-                            }
-                        }
-                    }
                 }
                 ORDER_OTHERS -> {
                     sortByHeaderViewModel.setOrderOthers(order).join()
