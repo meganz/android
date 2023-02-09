@@ -5,8 +5,12 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <include layout="@layout/collapsing_app_bar_contact" />
+    <include
+        android:id="@+id/collapsing_app_bar"
+        layout="@layout/collapsing_app_bar_contact" />
 
-    <include layout="@layout/content_chat_contact_properties_activity" />
+    <include
+        android:id="@+id/content_contact_properties"
+        layout="@layout/content_chat_contact_properties_activity" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
