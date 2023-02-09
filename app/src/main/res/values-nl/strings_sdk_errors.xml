@@ -75,5 +75,5 @@
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">HTTP fout</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
-    <string name="api_ecircular_ec_upload">Overdracht mislukt door een recursieve directorystructuur</string>
+    <string name="api_ecircular_ec_upload">Overdracht mislukt door een recursieve mapstructuur</string>
 </resources>

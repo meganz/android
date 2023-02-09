@@ -334,20 +334,6 @@ interface MegaChatApiGateway {
     )
 
     /**
-     * Get a list of all scheduled meeting occurrences for a chatroom
-     *
-     * @param chatId  MegaChatHandle that identifies a chat room
-     * @param since     Timestamp from which API will generate more occurrences
-     * @param listener MegaChatRequestListener to track this request
-     * @return The list of scheduled meetings occurrences.
-     */
-    fun fetchScheduledMeetingOccurrencesByChat(
-        chatId: Long,
-        since: Long,
-        listener: MegaChatRequestListenerInterface,
-    )
-
-    /**
      * Invite contact to a chat
      *
      * @param chatId        Chat id.

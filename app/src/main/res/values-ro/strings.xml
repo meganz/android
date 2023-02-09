@@ -497,7 +497,7 @@
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">Te rugăm să introduci cheia de decriptare pentru link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
-    <string name="invalid_decryption_key">Cheie de decriptate nevalidă</string>
+    <string name="invalid_decryption_key">Cheie de decriptare nevalidă</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
@@ -802,7 +802,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Salvează</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Cheia de recuperare a fost copiată cu succes</string>
+    <string name="copy_MK_confirmation">Cheie de recuperare copiată în clipboard. Salveaz-o într-un loc sigur unde o poți accesa cu ușurință mai târziu.</string>
     <!-- Button to change the password -->
     <string name="change_pass">Schimbă</string>
     <!-- Positive button to perform a general action -->
@@ -928,7 +928,7 @@
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Linkul fișierului indisponibil</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
+    <string name="file_link_unavaible_ToS_violation">Linkul fișierului a fost eliminat deoarece a încălcat Termenii de utilizare a serviciului.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
@@ -1519,7 +1519,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cum funcționează</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invită-ți prietenii să-și creeze un cont gratuit MEGA și să-și instaleze aplicația mobilă MEGA. Vei primi spațiu de stocare gratuit drept bonus pentru fiecare înscriere cu succes și instalare a aplicației.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonusul pentru spațiul de stocare gratuit se aplică numai la noile invitații și în cazul în care este instalată aplicația mobilă MEGA sau aplicația desktop MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1805,13 +1805,13 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calitate video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Încărcări cameră are nevoie să îți acceseze fotografiile și alt conținut media de pe dispozitiv. Te rugăm să mergi la pagina de setări și să acorzi permisiunea.</string>
+    <string name="on_refuse_storage_permission">Încărcări cameră are nevoie să îți acceseze fotografiile și alte tipuri media de pe dispozitiv. Te rugăm să mergi la pagina de setări și să acorzi permisiunea.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Scăzut(ă)</item>
+        <item>Scăzută</item>
         <item>Medie</item>
-        <item>Ridicat(ă)</item>
-        <item>Original</item>
+        <item>Ridicată</item>
+        <item>Originală</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Apel ratat</string>
@@ -2050,7 +2050,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Previzualizări îmbogățite ale URL-urilor</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable them in Settings. Do you want to continue?</string>
+    <string name="text_confirmation_disable_rich_links">Dezactivezi previzualizările îmbogățite ale URL-urilor. Poți reactiva previzualizările îmbogățite ale URL-urilor din Setări. Vrei să continui?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Apel ratat[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2076,7 +2076,7 @@
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">A apărut o eroare. Element nerestaurat.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Trimite mesaj</string>
+    <string name="context_send_message">Trimite un mesaj</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Această acțiune nu poate fi finalizată, deoarece îți va depăși limita de stocare actuală. Dorești să îți upgradezi contul?</string>
     <!-- Title of the section Archived chats -->
@@ -2228,9 +2228,9 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">S-ar putea să ai mesaje noi</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Rubbish bin emptying scheduler</string>
+    <string name="settings_rb_scheduler_enable_title">Planificator de golire a Coșului de gunoi</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">The Rubbish bin is emptied for you automatically.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">Coșul de gunoi este golit automat pentru tine.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">Perioada minimă este de 7 zile.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2246,7 +2246,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Dacă videoclipurile spre comprimare sunt mai mari de</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish bin emptying scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva planificatorul de golire a Coșului de gunoi sau pentru a seta o perioadă de păstrare mai lungă, te rugăm să te abonezi la un plan Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">zile</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2492,7 +2492,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurare MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
+    <string name="setup_mega_explanation">MEGA are nevoie de permisiunea ta ca să îți acceseze conținutul media și fișiere pentru partajare. Alte permisiuni de acces pot fi necesare pentru schimbul de mesaje criptate și pentru a efectua apeluri securizate.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permite accesul la fotografii, conținut media și fișiere.</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2566,7 +2566,7 @@
     <!-- Title of the activity that sends a location -->
     <string name="title_activity_maps">Trimite locația</string>
     <!-- Label layout on maps activity that permits send current location -->
-    <string name="current_location_label">Trimite locația ta actuala</string>
+    <string name="current_location_label">Trimite locația ta actuală</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Trimite locația ta actuală: [A]%1$s[/A]</string>
     <!-- Label layout on maps activity indicating nearby places -->
@@ -2844,7 +2844,7 @@
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Cont dezactivat</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Your Business account has been deactivated due to payment failure. You won’t be able to access the data stored in your account. To make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="expired_admin_business_text">Contul tău Business a fost dezactivat din cauza unei plăți nereușite. Nu vei putea accesa datele stocate în contul tău. Pentru a efectua o plată și a-ți reactiva abonamentul, autentifică-te în MEGA printr-un browser.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
@@ -3420,7 +3420,7 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Grupuri</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <string name="warning_get_links">Opțiuni precum „Trimite separat cheia de decriptare”, „Setează dată de expirare” sau „Setează protecție prin parolă” sunt disponibile numai pentru elemente individuale.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Copiază toate</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
@@ -3496,7 +3496,7 @@
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Desemnează ca gazdă</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please assign one or more new hosts.</string>
+    <string name="pick_new_moderator_message">Te rugăm să desemnezi una sau mai multe gazde noi.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Modifică numele întâlnirii</string>
     <!-- The literal meeting link text-->
@@ -3586,7 +3586,7 @@
     <!-- Label indicating video original quality -->
     <string name="original_quality">Calitate originală</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
-    <string name="setting_fingerprint">Fingerprint ID</string>
+    <string name="setting_fingerprint">Identificare prin amprentă</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
     <string name="title_enable_fingerprint">Confirmă amprenta pentru a debloca</string>
     <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
@@ -3640,7 +3640,7 @@
     <!-- summary for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_summary">Permite folosirea datelor mobile pentru a încărca imagini de înaltă rezoluție la previzualizare. Dacă opțiunea este dezactivată, imaginea originală va fi încărcată numai când faci zoom in.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
-    <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
+    <string name="backup_remove_root_folder">Ștergi folderul de backupuri. Acest lucru va elimina toate backupurile pe care le-ai setat. Sigur vrei să faci acest lucru?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Mută „%1s” în Coșul de gunoi</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -3654,7 +3654,7 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Configurează backupul</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">To ensure these items added to your backup folder are automatically synchronised to the MEGA Cloud, please set them up in the MEGA Desktop App.</string>
+    <string name="backup_add_item_to_root_text">Pentru a te asigura că aceste elemente adăugate în folderul de backup sunt sincronizate automat în unitatea cloud MEGA, te rugăm să le configurezi în aplicația desktop MEGA.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Numai citire</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3706,7 +3706,7 @@
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Vizitează %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
-    <string name="delete_account_text_other_platform_last_step">This is the last step to delete your account. Both your account and subscription will be deleted and you will permanently lose all the data stored in the cloud. Please enter your password below.</string>
+    <string name="delete_account_text_other_platform_last_step">Acesta este ultimul pas pentru a-ți șterge contul. Atât contul, cât și abonamentul vor fi șterse și vei pierde definitiv toate datele stocate în unitatea cloud. Te rugăm să introduci parola mai jos.</string>
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Cronologie</string>
     <!-- Title of album tab in photos section. -->
@@ -3718,11 +3718,11 @@
     <!-- Action button which will remove favourites in selection mode -->
     <string name="action_remove_favourites">Elimină favoritele</string>
     <!-- Message of notice that the zip file format is error -->
-    <string name="message_zip_format_error">File format is not supported. Cannot open the file.</string>
+    <string name="message_zip_format_error">Formatul fișierului nu este suportat. Nu se poate deschide fișierul.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
-    <string name="no_uploads_empty_folder">The selected folder is empty. No files to upload.</string>
+    <string name="no_uploads_empty_folder">Folderul selectat este gol. Niciun fișier spre încărcare.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
-    <string name="error_same_password">You have entered your current password</string>
+    <string name="error_same_password">Ai introdus parola actuală</string>
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">Fișiererul nu mai este disponibil</string>
     <!-- Body of pop-up error message for taken down file. -->
@@ -3742,9 +3742,9 @@
     <!-- Setting option available to choose for the preferred start screen. -->
     <string name="settings_start_screen_photos_option">Fotografii</string>
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file">Open unsupported file types in third-party apps</string>
+    <string name="settings_file_management_auto_open_downloaded_file">Deschide tipuri de fișiere nesuportate în aplicații terțe</string>
     <!-- Clarification of the setting which allows to open unsupported file types in third-party apps if enabled -->
-    <string name="settings_file_management_auto_open_downloaded_file_description">Unsupported files types will be opened in third-party apps instead of the MEGA app.</string>
+    <string name="settings_file_management_auto_open_downloaded_file_description">Tipurile de fișiere nesuportate vor fi deschise în aplicații terțe în loc de aplicația MEGA.</string>
     <!-- Label for the option on setting to set up the quality of image files uploaded to the chat -->
     <string name="settings_chat_image_quality">Calitatea imaginilor</string>
     <!-- Label for the automatic option on setting to set up the quality of image files uploaded to the chat -->
@@ -3794,7 +3794,7 @@
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Introdu parola</string>
     <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Transfers have been paused. Resume them to proceed with the download.</string>
+    <string name="resume_paused_transfers_text">Transferurile au fost puse pe pauză. Reia-le pentru a continua descărcarea.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">Te rugăm să nu închizi aplicația.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
@@ -3806,11 +3806,11 @@
     <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
     <string name="button_proceed">Continuă</string>
     <!-- Warning informing transfers were cancelled. -->
-    <string name="transfers_cancelled">Transfers have been cancelled.</string>
+    <string name="transfers_cancelled">Transferurile au fost anulate.</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
     <string name="title_duplicated_items">Elemente duplicate</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
-    <string name="file_already_exists_in_location">A file named [B]%1$s[/B] already exists at this destination.</string>
+    <string name="file_already_exists_in_location">Un fișier numit [B]%1$s[/B] există deja la această destinație.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
     <string name="choose_file">Selectează fișierul pe care vrei să-l păstrezi</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose. -->
@@ -3860,7 +3860,7 @@
     <!-- Move and merge action button for a name collision. -->
     <string name="move_and_merge">Mută și îmbină</string>
     <!-- Informs about what is expected after choose the option upload and merge for a name collision. -->
-    <string name="warning_upload_and_merge">Merge the folder at the destination with the folder you are uploading.</string>
+    <string name="warning_upload_and_merge">Îmbină folderul la destinație cu folderul pe care îl încarci.</string>
     <!-- Upload and merge action button for a name collision. -->
     <string name="upload_and_merge">Încarcă și îmbină</string>
     <!-- Informs about what is expected after choose the option "Don’t copy/move/upload" for file name collisions. -->
@@ -3902,13 +3902,13 @@
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Raportează o problemă</string>
     <!-- Report issue fragment instructions-->
-    <string name="settings_help_report_issue_instructions">Your feedback helps us improve MEGA. Please clearly describe the issue you’ve experienced. The more details you provide, the easier it will be for us to resolve it.</string>
+    <string name="settings_help_report_issue_instructions">Feedbackul tău ne ajută să îmbunătățim MEGA. Te rugăm să descrii clar problema pe care ai întâmpinat-o. Cu cât furnizezi mai multe detalii, cu atât mai ușor ne va fi să o rezolvăm.</string>
     <!-- Hint text for the description field on the report issue screen-->
     <string name="settings_help_report_issue_description_label">Descrie problema</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
-    <string name="settings_help_report_issue_attach_logs_label">Send log file</string>
+    <string name="settings_help_report_issue_attach_logs_label">Trimite fișierul log</string>
     <!-- Error message when there is no connectivity when reporting an issue-->
-    <string name="check_internet_connection_error">No internet connection. Check your connection and try again.</string>
+    <string name="check_internet_connection_error">Fără conexiune la internet. Verifică conexiunea și încearcă din nou.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Trimite</string>
     <!-- Error message when submit issue failed-->
@@ -4019,8 +4019,6 @@
     <string name="chat_recent_list_empty_action">Începe să chatuiești acum</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chatuiește securizat și privat, cu oricine și de pe orice dispozitiv, știind că nimeni nu îți poate citi chaturile, nici măcar MEGA.</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Arhivează întâlnirea</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Începe întâlnirea acum</string>
     <!-- Label for call option on settings -->
@@ -4082,23 +4080,23 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Planifică o întâlnire</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Thank you for your Pro&#160;Lite monthly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Îți mulțumim pentru abonamentul lunar Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Thank you for your Pro&#160;Lite yearly subscription</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Îți mulțumim pentru abonamentul anual Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Thank you for your Pro&#160;I monthly subscription</string>
+    <string name="upgrade_account_successful_pro_1_monthly">Îți mulțumim pentru abonamentul lunar Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Thank you for your Pro&#160;I yearly subscription</string>
+    <string name="upgrade_account_successful_pro_1_yearly">Îți mulțumim pentru abonamentul anual Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Thank you for your Pro&#160;II monthly subscription</string>
+    <string name="upgrade_account_successful_pro_2_monthly">Îți mulțumim pentru abonamentul lunar Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Thank you for your Pro&#160;II yearly subscription</string>
+    <string name="upgrade_account_successful_pro_2_yearly">Îți mulțumim pentru abonamentul anual Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Thank you for your Pro&#160;III monthly subscription</string>
+    <string name="upgrade_account_successful_pro_3_monthly">Îți mulțumim pentru abonamentul lunar Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
-    <string name="upgrade_account_successful_pro_3_yearly">Thank you for your Pro&#160;III yearly subscription</string>
+    <string name="upgrade_account_successful_pro_3_yearly">Îți mulțumim pentru abonamentul anual Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
-    <string name="chat_group_chat_info_allow_non_host_participants_option">Allow non-hosts to add participants</string>
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Permite non-gazdelor să adauge participanți</string>
     <!-- Title of gif album. -->
     <string name="photos_album_title_gif">GIF-uri</string>
     <!-- Title of raw album. -->
@@ -4113,16 +4111,14 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">You’ve already added all your contacts to this chat. If you want to add more participants, first invite them to your contact list.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Imagine salvată în galeria dispozitivului</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]Data reînnoirii:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
-    <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <string name="photos_album_creation_dialog_title">Introdu numele albumului</string>
     <!-- Album creation input name placeholder -->
-    <string name="photos_album_creation_dialog_input_placeholder">New album</string>
+    <string name="photos_album_creation_dialog_input_placeholder">Album nou</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_share_meeting_link_label">Partajează linkul întâlnirii</string>
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
+    <string name="meetings_scheduled_meeting_info_see_more_participants_label">Vezi mai mulți</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
     <string name="meetings_scheduled_meeting_info_leave_group_label">Părăsește grupul</string>
     <!-- Error message for creating an album with a system albums name -->
@@ -4130,9 +4126,9 @@
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
+    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Album nou (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">Add items to “%s”</string>
+    <string name="photos_album_selection_title">Adaugă elemente în „%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="one">%d element a fost adăugat în „%s”</item>
@@ -4146,7 +4142,7 @@
     <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
     <string name="notifications_pro_payment_received">Plata pentru planul %1$s a fost primită.</string>
     <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Your payment for the %1$s plan was unsuccessful.</string>
+    <string name="notifications_pro_payment_failed">Plata pentru planul %1$s nu a avut succes.</string>
     <!-- Text of a notification about an expiring pro plan -->
     <plurals name="notifications_expiring_pro_plan_text">
         <item quantity="one">Planul tău pentru calitatea de membru Pro va expira în 1 zi.</item>
@@ -4172,7 +4168,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Întâlnire periodică</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s săptămânal</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Media discovery view</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4206,9 +4202,9 @@
         <item quantity="other">Albumele vor fi șterse, însă conținutul lor va rămâne în Cronologie.</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
+    <string name="meetings_scheduled_meeting_info_see_less_participants_label">Vezi mai puțini</string>
     <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
+    <string name="shared_items_verify_credentials_contact_verification_title">Verificarea contactului</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
@@ -4216,42 +4212,101 @@
     <!--Header message located at the top of "My credentials" section-->
     <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
     <!--Undecrypted folder label-->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[folder nedecriptat]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
-    <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
+    <string name="shared_items_bottom_sheet_menu_verify_user">Verifică pe %s</string>
     <!--My credentials header on contact verification screen-->
     <string name="shared_items_verify_credentials_my_credentials">Acreditările tale</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
-    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
+    <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Se pregătește fișierul pentru previzualizare</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
     <plurals name="account_achievements_bonus_expiration_date">
-        <item quantity="one">Bonus expires in %1$d day</item>
-        <item quantity="other">Bonus expires in %1$d days</item>
+        <item quantity="one">Bonusul expiră în %1$d zi</item>
+        <item quantity="few">Bonusul expiră în %1$d zile</item>
+        <item quantity="other">Bonusul expiră în %1$d de zile</item>
     </plurals>
     <!-- Title of section to show scheduled meeting description in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_scheduled_meeting_description_label">Descriere</string>
     <!-- Dialog confirmation text for removing photos in an album -->
-    <string name="photos_album_remove_from_album_confirmation_text">Remove from album?</string>
+    <string name="photos_album_remove_from_album_confirmation_text">Elimini din album?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, grant MEGA access to your photos and other media on your device.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Pentru a activa Încărcări cameră, acordă-i lui MEGA acces la fotografiile și alte tipuri media de pe dispozitivul tău.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Acordă acces</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
-    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don’t grant</string>
+    <string name="settings_camera_uploads_grant_media_permissions_negative_button">Nu acorda</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %d item from “%s”</item>
-        <item quantity="other">Removed %d items from “%s”</item>
+        <item quantity="one">%d element a fost eliminat din „%s”</item>
+        <item quantity="few">%d elemente au fost eliminate din „%s”</item>
+        <item quantity="other">%d de elemente au fost eliminate din „%s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <string name="meetings_list_one_off_meeting_label">Întâlnire unică</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
-    <string name="video_playback_position_dialog_title">Resume video?</string>
+    <string name="video_playback_position_dialog_title">Reiei videoclipul?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
+    <string name="video_playback_position_dialog_message">%1$s va fi reluat de la %2$s</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Reia</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Repornește</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">Acces refuzat</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">Acordă permisiunea</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">Nu acorda</string>
+    <!-- Option of a recurring meeting in meeting list to view occurrences -->
+    <string name="meetings_list_recurring_meeting_occurrences_option"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
 </resources>

@@ -778,7 +778,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">保存</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">已成功复制恢复密钥</string>
+    <string name="copy_MK_confirmation">恢复密钥已付知道剪贴板。请把它保存到一个您之后可以轻松访问的安全地方。</string>
     <!-- Button to change the password -->
     <string name="change_pass">更改</string>
     <!-- Positive button to perform a general action -->
@@ -1972,7 +1972,7 @@
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_signature">消息签名无效</string>
     <!-- When the user tries to reproduce a file through streaming and ocurred an error creating it -->
-    <string name="error_streaming">尝试创建流时发生错误</string>
+    <string name="error_streaming">尝试创建串流时发生错误</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">恢复</string>
     <!-- success message when a node was restore from Rubbish bin -->
@@ -3811,8 +3811,6 @@
     <string name="chat_recent_list_empty_action">立即开始聊天</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">与他人跨设备进行安全私密交谈，即使是MEGA也无法读取您的聊天记录。</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">归档会议</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">立即发起会议</string>
     <!-- Label for call option on settings -->
@@ -3905,8 +3903,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">您已将所有联系人添加到此聊天中。如果您想添加更多参与者，请先邀请他们成为您的联系人。</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">截屏已保存到您设备的图片库</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]续订日期：[/A][B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">输入相册名称</string>
     <!-- Album creation input name placeholder -->
@@ -3958,7 +3954,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">定期会议</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">每周%s</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">媒体发现视图</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4019,17 +4015,74 @@
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">授予权限</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">不授予</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="other">已从“%s”中移除了%d个项目</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <string name="meetings_list_one_off_meeting_label">单次会议</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
-    <string name="video_playback_position_dialog_title">Resume video?</string>
+    <string name="video_playback_position_dialog_title">继续播放？</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
+    <string name="video_playback_position_dialog_message">%1$s将从%2$s开始继续播放</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">恢复</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">重启</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">访问被拒绝</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">您拒绝了MEGA对您设备的存储和媒体文件的访问。如果您想继续分享，请给予MEGA权限。</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">允许权限</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">不允许</string>
+    <!-- Option of a recurring meeting in meeting list to view occurrences -->
+    <string name="meetings_list_recurring_meeting_occurrences_option"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
 </resources>
