@@ -18,4 +18,9 @@ sealed interface FileInfoJobInProgressState {
      * the node is being moved to another folder
      */
     object Moving : FileInfoJobInProgressState
+
+    /**
+     * the node is being moved to the rubbish bin
+     */
+    object MovingToRubbishBin : FileInfoJobInProgressState
 }

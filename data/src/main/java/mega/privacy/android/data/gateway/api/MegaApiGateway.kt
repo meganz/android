@@ -848,11 +848,26 @@ interface MegaApiGateway {
      *
      * @param nodeToCopy the [MegaNode] to copy
      * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
-     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if not null, if null the same name will be used
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
      * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
      */
     fun copyNode(
         nodeToCopy: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
+     * Moves a [MegaNode] to a new [MegaNode] while updating its name if set
+     *
+     * @param nodeToMove the [MegaNode] to move
+     * @param newNodeParent the [MegaNode] that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun moveNode(
+        nodeToMove: MegaNode,
         newNodeParent: MegaNode,
         newNodeName: String?,
         listener: MegaRequestListenerInterface?,

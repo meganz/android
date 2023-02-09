@@ -8,6 +8,7 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.domain.di.ViewTypeModule
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import org.mockito.kotlin.mock
 
 @Module
@@ -24,4 +25,7 @@ object TestFileInfoModule {
 
     @Provides
     fun provideCopyNodeByHandle(): CopyNodeByHandle = mock()
+
+    @Provides
+    fun provideMoveNodeToRubbishByHandle(): MoveNodeToRubbishByHandle = mock()
 }

@@ -11,18 +11,18 @@ import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 
 /**
  * Get node module
  *
- * Provides use cases for manager activity and camera upload service
+ * Provides use cases for managing nodes
  */
 @Module
 @InstallIn(ViewModelComponent::class, SingletonComponent::class)
@@ -120,13 +120,24 @@ abstract class GetNodeModule {
 
         /**
          * Provides [MoveNodeByHandle] implementation
-         * @param moveNodeUseCase [MoveNodeUseCase]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [MoveNodeByHandle]
          */
         @Provides
-        fun provideMoveNodeByHandle(moveNodeUseCase: MoveNodeUseCase): MoveNodeByHandle =
-            MoveNodeByHandle { nodeToCopy, newNodeParent ->
-                moveNodeUseCase.move(nodeToCopy.longValue, newNodeParent.longValue).await()
+        fun provideMoveNodeByHandle(megaNodeRepository: MegaNodeRepository): MoveNodeByHandle =
+            MoveNodeByHandle { node, parent ->
+                megaNodeRepository.moveNodeByHandle(node, parent, null)
             }
+
+        /**
+         * Provides [MoveNodeToRubbishByHandle] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [MoveNodeToRubbishByHandle]
+         */
+        @Provides
+        fun provideMoveNodeToRubbishByHandle(
+            megaNodeRepository: MegaNodeRepository,
+        ): MoveNodeToRubbishByHandle =
+            MoveNodeToRubbishByHandle(megaNodeRepository::moveNodeToRubbishBinByHandle)
     }
 }

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo
 
+import androidx.annotation.StringRes
+import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.data.NameCollision
 
 /**
@@ -18,16 +20,48 @@ sealed interface FileInfoOneOffViewEvent {
     object GeneralError : FileInfoOneOffViewEvent
 
     /**
-     * to notify move has finished, either OK or KO
-     * @param exception not null if something went wrong
+     * Sealed class to join all events related to finish moving or copying the node
+     * to notify move or copy has finished, either OK or KO
+     * @param successMessage the String resource representing the message to show in case of success
+     * @param failMessage the String resource representing the message to show in case of failure
      */
-    data class FinishedMoving(val exception: Throwable?) : FileInfoOneOffViewEvent
+    sealed class Finished(
+        @StringRes val successMessage: Int,
+        @StringRes val failMessage: Int,
+    ) : FileInfoOneOffViewEvent {
+        /**
+         * [Throwable] not null if something went wrong
+         */
+        abstract val exception: Throwable?
 
-    /**
-     * to notify copy has finished, either OK or KO
-     * @param exception not null if something went wrong
-     */
-    data class FinishedCopying(val exception: Throwable?) : FileInfoOneOffViewEvent
+        /**
+         * to notify copy has finished, either OK or KO
+         * @param exception not null if something went wrong
+         */
+        data class Copying(override val exception: Throwable?) : Finished(
+            successMessage = R.string.context_correctly_copied,
+            failMessage = R.string.context_no_copied,
+        )
+
+        /**
+         * to notify move has finished, either OK or KO
+         * @param exception not null if something went wrong
+         */
+        data class Moving(override val exception: Throwable?) : Finished(
+            successMessage = R.string.context_correctly_moved,
+            failMessage = R.string.context_no_moved,
+        )
+
+        /**
+         * to notify move to rubbish bin has finished, either OK or KO
+         * @param exception not null if something went wrong
+         */
+        data class MovingToRubbish(override val exception: Throwable?) : Finished(
+            successMessage = R.string.context_correctly_moved,
+            failMessage = R.string.context_no_moved,
+        )
+
+    }
 
     /**
      * A collision is detected while moving or copying

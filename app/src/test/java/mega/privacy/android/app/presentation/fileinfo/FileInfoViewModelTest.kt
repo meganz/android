@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -49,6 +50,7 @@ internal class FileInfoViewModelTest {
     private lateinit var isNodeInRubbish: IsNodeInRubbish
     private lateinit var checkNameCollision: CheckNameCollision
     private lateinit var moveNodeByHandle: MoveNodeByHandle
+    private lateinit var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle
     private lateinit var copyNodeByHandle: CopyNodeByHandle
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
@@ -76,6 +78,7 @@ internal class FileInfoViewModelTest {
         checkNameCollision = mock()
         moveNodeByHandle = mock()
         copyNodeByHandle = mock()
+        moveNodeToRubbishByHandle = mock()
         node = mock()
         nameCollision = mock()
     }
@@ -89,7 +92,8 @@ internal class FileInfoViewModelTest {
             isNodeInRubbish,
             checkNameCollision,
             moveNodeByHandle,
-            copyNodeByHandle
+            copyNodeByHandle,
+            moveNodeToRubbishByHandle,
         )
         underTest.updateNode(node)
     }
@@ -228,56 +232,76 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
-    fun `test FinishedMoving event is launched without exceptions when the move finished OK`() =
+    fun `test FinishedMoving event is launched without exceptions when the move finished successfully`() =
         runTest {
-            mockMoveOK()
+            mockMoveSuccess()
             underTest.moveNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedMoving::class.java)?.also {
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
         }
 
     @Test
-    fun `test FinishedMoving event is launched with the proper exceptions when the move finished KO`() =
+    fun `test FinishedMoving event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
-            mockMoveKO()
+            mockMoveFailure()
             underTest.moveNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedMoving::class.java)?.also {
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
 
     @Test
-    fun `test FinishedCopying event is launched without exceptions when the move finished OK`() =
+    fun `test FinishedMovingToRubbish event is launched without exceptions when the move finished successfully`() =
         runTest {
-            mockCopyOK()
-            underTest.copyNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedCopying::class.java)?.also {
+            mockMoveToRubbishSuccess()
+            underTest.moveNodeToRubbishBin()
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
         }
 
     @Test
-    fun `test FinishedCopying event is launched with the proper exceptions when the move finished KO`() =
+    fun `test FinishedMovingToRubbish event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
-            mockCopyKO()
-            underTest.copyNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.FinishedCopying::class.java)?.also {
+            mockMoveToRubbishFailure()
+            underTest.moveNodeToRubbishBin()
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
 
     @Test
-    fun `test FileInfoJobInProgressState is set while copying OK, and unset at the end`() =
+    fun `test FinishedCopying event is launched without exceptions when the move finished successfully`() =
         runTest {
-            mockCopyOK()
+            mockCopySuccess()
+            underTest.copyNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Copying::class.java)?.also {
+                Truth.assertThat(it.exception).isNull()
+            }
+        }
+
+    @Test
+    fun `test FinishedCopying event is launched with the proper exceptions when the move finished with an error`() =
+        runTest {
+            mockCopyFailure()
+            underTest.copyNodeCheckingCollisions(parentId)
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Copying::class.java)?.also {
+                Truth.assertThat(it.exception).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while copying successfully, and unset at the end`() =
+        runTest {
+            mockCopySuccess()
             testProgressIsSetWhileCopyingAndUnset()
         }
 
     @Test
-    fun `test FileInfoJobInProgressState is set while copying KO, and unset at the end`() =
+    fun `test FileInfoJobInProgressState is set while copying with an error, and unset at the end`() =
         runTest {
-            mockCopyKO()
+            mockCopyFailure()
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -289,16 +313,16 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
-    fun `test FileInfoJobInProgressState is set while moving OK, and unset at the end`() =
+    fun `test FileInfoJobInProgressState is set while moving successfully, and unset at the end`() =
         runTest {
-            mockMoveOK()
+            mockMoveSuccess()
             testProgressIsSetWhileMovingAndUnset()
         }
 
     @Test
-    fun `test FileInfoJobInProgressState is set while moving KO, and unset at the end`() =
+    fun `test FileInfoJobInProgressState is set while moving with an error, and unset at the end`() =
         runTest {
-            mockMoveKO()
+            mockMoveFailure()
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -307,6 +331,20 @@ internal class FileInfoViewModelTest {
         runTest {
             mockCollisionMoving()
             testProgressIsSetWhileMovingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while moving to rubbish successfully, and unset at the end`() =
+        runTest {
+            mockMoveToRubbishSuccess()
+            testProgressIsSetWhileMovingToRubbishBinAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while moving to rubbish with an error, and unset at the end`() =
+        runTest {
+            mockMoveToRubbishFailure()
+            testProgressIsSetWhileMovingToRubbishBinAndUnset()
         }
 
 
@@ -343,30 +381,38 @@ internal class FileInfoViewModelTest {
             .thenReturn(nameCollision)
     }
 
-    private suspend fun mockCopyOK() {
+    private suspend fun mockCopySuccess() {
         whenever(copyNodeByHandle.invoke(nodeId, parentId)).thenReturn(nodeId)
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
     }
 
-    private suspend fun mockMoveOK() {
-        whenever(moveNodeByHandle.invoke(nodeId, parentId)).thenReturn(Unit)
+    private suspend fun mockMoveSuccess() {
+        whenever(moveNodeByHandle.invoke(nodeId, parentId)).thenReturn(nodeId)
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
     }
 
-    private suspend fun mockCopyKO() {
+    private suspend fun mockCopyFailure() {
         whenever(copyNodeByHandle.invoke(nodeId, parentId))
             .thenThrow(RuntimeException("fake exception"))
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
     }
 
-    private suspend fun mockMoveKO() {
+    private suspend fun mockMoveFailure() {
         whenever(moveNodeByHandle.invoke(nodeId, parentId))
             .thenThrow(RuntimeException("fake exception"))
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
+    }
+
+    private suspend fun mockMoveToRubbishSuccess() {
+        whenever(moveNodeToRubbishByHandle.invoke(nodeId)).thenReturn(Unit)
+    }
+
+    private suspend fun mockMoveToRubbishFailure() {
+        whenever(moveNodeToRubbishByHandle.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 
     private suspend fun testProgressIsSetWhileCopyingAndUnset() =
@@ -377,6 +423,11 @@ internal class FileInfoViewModelTest {
     private suspend fun testProgressIsSetWhileMovingAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.Moving) {
             underTest.moveNodeCheckingCollisions(parentId)
+        }
+
+    private suspend fun testProgressIsSetWhileMovingToRubbishBinAndUnset() =
+        testProgressSetAndUnset(FileInfoJobInProgressState.MovingToRubbishBin) {
+            underTest.moveNodeToRubbishBin()
         }
 
     private suspend fun testProgressSetAndUnset(

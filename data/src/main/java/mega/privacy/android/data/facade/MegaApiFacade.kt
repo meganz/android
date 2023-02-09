@@ -562,6 +562,28 @@ internal class MegaApiFacade @Inject constructor(
         }
     }
 
+    override fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        when {
+            newNodeName == null && listener == null -> {
+                megaApi.moveNode(nodeToMove, newNodeParent)
+            }
+            newNodeName != null && listener == null -> {
+                megaApi.moveNode(nodeToMove, newNodeParent, newNodeName)
+            }
+            newNodeName == null && listener != null -> {
+                megaApi.moveNode(nodeToMove, newNodeParent, listener)
+            }
+            else /*newNodeName != null && listener != null*/ -> {
+                megaApi.moveNode(nodeToMove, newNodeParent, newNodeName, listener)
+            }
+        }
+    }
+
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
         megaApi.copyBucket(bucket)
 

@@ -45,6 +45,36 @@ interface MegaNodeRepository {
     ): NodeId
 
     /**
+     * Moves a [MegaNode] to a new [MegaNode] while updating its name if set
+     *
+     * @param nodeToMove the [MegaNode] to move
+     * @param newNodeParent the [MegaNode] that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [MegaNode] that was moved
+     */
+    suspend fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
+     * Moves a [MegaNode] referenced by it handle [NodeId] to a new [MegaNode] referenced by its handle [NodeId] while updating its name if set
+     *
+     * @param nodeToMove the [NodeId] handle to move
+     * @param newNodeParent the [NodeId] handle that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [MegaNode] that was moved
+     */
+    suspend fun moveNodeByHandle(
+        nodeToMove: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
      * Get folder version info
      *
      * @return info
@@ -72,6 +102,12 @@ interface MegaNodeRepository {
      * @return A node corresponding to the rubbish bin node, null if cannot be retrieved
      */
     suspend fun getRubbishBinNode(): MegaNode?
+
+    /**
+     * Moves a MegaNode referenced by its handle [NodeId] to a the rubbish bin
+     * @param nodeToMove the node's handle [NodeId] that we want to move to the rubbish bin
+     */
+    suspend fun moveNodeToRubbishBinByHandle(nodeToMove: NodeId)
 
     /**
      * Check is megaNode in rubbish bin

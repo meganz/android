@@ -3,8 +3,10 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -112,6 +114,43 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         copyNode(node, parent, newNodeName)
     }
 
+    override suspend fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                NodeId(it.nodeHandle)
+            }
+            megaApiGateway.moveNode(
+                nodeToMove = nodeToMove,
+                newNodeParent = newNodeParent,
+                newNodeName = newNodeName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun moveNodeByHandle(
+        nodeToMove: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
+        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        if (node == null) {
+            throw IllegalArgumentException("Node to copy with handle $nodeToMove not found")
+        }
+        if (parent == null) {
+            throw IllegalArgumentException("Destination node with handle $newNodeParent not found")
+        }
+        moveNode(node, parent, newNodeName)
+    }
+
+
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
         withContext(ioDispatcher) {
@@ -154,6 +193,18 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRubbishBinNode()
+    }
+
+    override suspend fun moveNodeToRubbishBinByHandle(nodeToMove: NodeId) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
+        val rubbish = megaApiGateway.getRubbishBinNode()
+        if (node == null) {
+            throw IllegalArgumentException("Node to copy with handle $nodeToMove not found")
+        }
+        if (rubbish == null) {
+            throw IllegalArgumentException("Rubbish bin node not found")
+        }
+        moveNode(node, rubbish, null)
     }
 
     override suspend fun isInRubbish(node: MegaNode): Boolean = withContext(ioDispatcher) {

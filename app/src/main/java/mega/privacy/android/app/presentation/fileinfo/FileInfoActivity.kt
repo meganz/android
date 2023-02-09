@@ -74,7 +74,6 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil
@@ -148,7 +147,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         }
 
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, error: MegaError?) {
-            this@FileInfoActivity.onRequestFinish(api, request, error)
+            this@FileInfoActivity.onRequestFinish(request, error)
         }
 
         override fun onRequestTemporaryError(
@@ -566,31 +565,26 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     this
                 )
             }
-            is FileInfoOneOffViewEvent.GeneralError -> showSnackbar(R.string.general_error)
+            is FileInfoOneOffViewEvent.GeneralError -> showSnackBar(R.string.general_error)
             is FileInfoOneOffViewEvent.CollisionDetected -> {
                 val list = ArrayList<NameCollision>()
                 list.add(event.collision)
                 nameCollisionActivityContract?.launch(list)
             }
-            is FileInfoOneOffViewEvent.FinishedMoving -> {
+            is FileInfoOneOffViewEvent.Finished -> {
+                moveToRubbish = false
                 if (event.exception == null) {
-                    showSnackbar(R.string.context_correctly_moved)
+                    showSnackBar(event.successMessage)
                     sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
-                    finish()
-                } else {
-                    if (!manageCopyMoveException(event.exception)) {
-                        showSnackbar(R.string.context_no_moved)
+                    if (event !is FileInfoOneOffViewEvent.Finished.Copying) {
+                        //TODO once everything is represented in view state, maybe we don't need to
+                        // finish after moving the file because the view will be fully updated automatically
+                        finish()
                     }
-                }
-            }
-            is FileInfoOneOffViewEvent.FinishedCopying -> {
-                if (event.exception == null) {
-                    showSnackbar(R.string.context_correctly_copied)
-                    sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
-                    finish()
                 } else {
+                    Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {
-                        showSnackbar(R.string.context_no_copied)
+                        showSnackBar(event.failMessage)
                     }
                 }
             }
@@ -598,7 +592,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         viewModel.consumeOneOffEvent(event)
     }
 
-    private fun showSnackbar(@StringRes resString: Int) {
+    private fun showSnackBar(@StringRes resString: Int) {
         showSnackbar(
             Constants.SNACKBAR_TYPE,
             getFormattedStringOrDefault(resString),
@@ -612,9 +606,10 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             progressDialog = null
         } else if (progressDialog?.second != progressState) {
             val string = when (progressState) {
+                FileInfoJobInProgressState.InitialLoading -> return //no need to warn user here
                 FileInfoJobInProgressState.Moving -> R.string.context_moving
                 FileInfoJobInProgressState.Copying -> R.string.context_copying
-                FileInfoJobInProgressState.InitialLoading -> return //no need to warn user here
+                FileInfoJobInProgressState.MovingToRubbishBin -> R.string.context_move_to_trash
             }
             showProgressDialog(getFormattedStringOrDefault(string), progressState)
         }
@@ -1375,15 +1370,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
                 //Check if the node is not yet in the rubbish bin (if so, remove it)
                 if (moveToRubbish) {
-                    megaApi.moveNode(viewModel.node, megaApi.rubbishNode, megaRequestListener)
-
-                    try {
-                        showProgressDialog(
-                            getFormattedStringOrDefault(R.string.context_move_to_trash)
-                        )
-                    } catch (e: Exception) {
-                        Timber.w("Exception showing move to trash confirmation")
-                    }
+                    viewModel.moveNodeToRubbishBin()
                 } else {
                     megaApi.remove(viewModel.node, megaRequestListener)
 
@@ -1402,7 +1389,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     @SuppressLint("NewApi")
-    private fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError?) {
+    private fun onRequestFinish(request: MegaRequest, e: MegaError?) {
         if (adapter.isMultipleSelect) {
             adapter.clearSelections()
             hideMultipleSelect()
@@ -1470,36 +1457,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = false
-            }
-        } else if (request.type == MegaRequest.TYPE_MOVE) {
-            try {
-                progressDialog?.first?.dismiss()
-            } catch (ex: Exception) {
-                Timber.d(ex.message)
-            }
-            if (moveToRubbish) {
-                moveToRubbish = false
-                Timber.d("Move to rubbish request finished")
-            } else {
-                Timber.d("Move nodes request finished")
-            }
-            if (e?.errorCode == MegaError.API_OK) {
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getFormattedStringOrDefault(R.string.context_correctly_moved),
-                    -1
-                )
-                val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN)
-                sendBroadcast(intent)
-                finish()
-            } else if (e?.errorCode == MegaError.API_EOVERQUOTA && api.isForeignNode(request.parentHandle)) {
-                showForeignStorageOverQuotaWarningDialog(this)
-            } else {
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getFormattedStringOrDefault(R.string.context_no_moved),
-                    -1
-                )
             }
         } else if (request.type == MegaRequest.TYPE_REMOVE) {
             if (versionsToRemove > 0) {

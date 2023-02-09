@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -37,6 +38,7 @@ class FileInfoViewModel @Inject constructor(
     private val checkNameCollision: CheckNameCollision,
     private var moveNodeByHandle: MoveNodeByHandle,
     private var copyNodeByHandle: CopyNodeByHandle,
+    private var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -84,7 +86,7 @@ class FileInfoViewModel @Inject constructor(
      * Tries to move the node to the destination parentHandle node
      * First it checks for collisions, firing the [FileInfoOneOffViewEvent.CollisionDetected] event if corresponds
      * It sets [FileInfoJobInProgressState.Moving] while moving.
-     * It will launch [FileInfoOneOffViewEvent.FinishedMoving] at the end with an exception if something went wrong
+     * It will launch [FileInfoOneOffViewEvent.Finished.Moving] at the end, with an exception if something went wrong
      */
     fun moveNodeCheckingCollisions(parentHandle: NodeId) =
         performBlockSettingProgress(FileInfoJobInProgressState.Moving) {
@@ -97,7 +99,7 @@ class FileInfoViewModel @Inject constructor(
      * Tries to copy the node to the destination parentHandle node
      * First it checks for collisions, firing the [FileInfoOneOffViewEvent.CollisionDetected] event if corresponds
      * It sets [FileInfoJobInProgressState.Copying] while copying.
-     * It will launch [FileInfoOneOffViewEvent.FinishedCopying] at the end with an exception if something went wrong
+     * It will launch [FileInfoOneOffViewEvent.Finished.Copying] at the end, with an exception if something went wrong
      */
     fun copyNodeCheckingCollisions(parentHandle: NodeId) =
         performBlockSettingProgress(FileInfoJobInProgressState.Copying) {
@@ -105,6 +107,20 @@ class FileInfoViewModel @Inject constructor(
                 copy(parentHandle)
             }
         }
+
+    /**
+     * Tries to move the node to the rubbish bin
+     * It sets [FileInfoJobInProgressState.MovingToRubbishBin] while moving.
+     * It will launch [FileInfoOneOffViewEvent.Finished.MovingToRubbish] at the end, with an exception if something went wrong
+     */
+    fun moveNodeToRubbishBin() {
+        performBlockSettingProgress(FileInfoJobInProgressState.MovingToRubbishBin) {
+            val movedToRubbish = runCatching {
+                moveNodeToRubbishByHandle(NodeId(node.handle))
+            }
+            _uiState.updateEvent(FileInfoOneOffViewEvent.Finished.MovingToRubbish(movedToRubbish.exceptionOrNull()))
+        }
+    }
 
     /**
      * Some events need to be consumed to don't be missed or fired more than once
@@ -182,7 +198,7 @@ class FileInfoViewModel @Inject constructor(
         val moved = runCatching {
             moveNodeByHandle(NodeId(node.handle), parentHandle)
         }
-        _uiState.updateEvent(FileInfoOneOffViewEvent.FinishedMoving(moved.exceptionOrNull()))
+        _uiState.updateEvent(FileInfoOneOffViewEvent.Finished.Moving(moved.exceptionOrNull()))
     }
 
 
@@ -195,7 +211,7 @@ class FileInfoViewModel @Inject constructor(
         val copied = runCatching {
             copyNodeByHandle(NodeId(node.handle), parentHandle)
         }
-        _uiState.updateEvent(FileInfoOneOffViewEvent.FinishedCopying(copied.exceptionOrNull()))
+        _uiState.updateEvent(FileInfoOneOffViewEvent.Finished.Copying(copied.exceptionOrNull()))
     }
 
     private fun MutableStateFlow<FileInfoViewState>.updateEvent(event: FileInfoOneOffViewEvent?) =
