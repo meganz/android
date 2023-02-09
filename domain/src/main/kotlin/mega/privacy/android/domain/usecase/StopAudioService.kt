@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase
 /**
  * The interface for stop audio player service
  */
-interface StopAudioServiceGateway {
+interface StopAudioService {
     /**
      * stop audio player service
      */

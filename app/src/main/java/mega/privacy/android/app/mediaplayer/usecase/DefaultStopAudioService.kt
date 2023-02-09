@@ -1,16 +1,16 @@
-package mega.privacy.android.app.mediaplayer.facade
+package mega.privacy.android.app.mediaplayer.usecase
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
-import mega.privacy.android.domain.usecase.StopAudioServiceGateway
+import mega.privacy.android.domain.usecase.StopAudioService
 import javax.inject.Inject
 
 /**
  * The implementation for stop audio service
  */
-class StopAudioServiceFacade @Inject constructor(@ApplicationContext private val context: Context) :
-    StopAudioServiceGateway {
+class DefaultStopAudioService @Inject constructor(@ApplicationContext private val context: Context) :
+    StopAudioService {
 
     override suspend fun invoke() {
         MediaPlayerService.stopAudioPlayer(context)
