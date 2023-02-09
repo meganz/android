@@ -15,6 +15,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * To switch into new photos modularization architecture or not toggle
+     */
+    PhotosCompose("Enable compose-world photos feature (modularization)",
+        false),
+
+    /**
      * Android Sync toggle
      */
     AndroidSync("Enable a synchronization between folders on local storage and folders on MEGA cloud",

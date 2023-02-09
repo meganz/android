@@ -102,6 +102,7 @@ ext {
     gsonVersion = '2.8.5'
     hiltAndroidXCompilerVersion = '1.0.0'
     hiltAndroidXVersion = '1.0.0-alpha03'
+    hiltNavigationComposeVersion = '1.0.0'
     junitVersion = '4.13.2'
     ktxVersion = '1.7.0'
     legacySupportVersion = 'v4:1.0.0'

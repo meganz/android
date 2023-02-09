@@ -263,6 +263,7 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
+    implementation "androidx.hilt:hilt-navigation-compose:$hiltNavigationComposeVersion"
 
     // Other libs
     implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
@@ -370,6 +371,7 @@ dependencies {
     // pager
     implementation "com.google.accompanist:accompanist-pager:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistLayoutVersion"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanistVersion"
 
     // Coil Compose
     implementation "io.coil-kt:coil-compose:$coilVersion"

@@ -23,11 +23,15 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
@@ -38,6 +42,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import collectAsStateWithLifecycle
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
@@ -61,6 +67,8 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
+import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavGraph
+import mega.privacy.android.app.presentation.photos.compose.navigation.photosRoute
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -107,7 +115,7 @@ import javax.inject.Inject
 /**
  * PhotosFragment
  */
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @AndroidEntryPoint
 class PhotosFragment : Fragment() {
 
@@ -161,7 +169,24 @@ class PhotosFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    PhotosBody()
+                    val usePhotosCompose by produceState(initialValue = false) {
+                        value = getFeatureFlag(AppFeatures.PhotosCompose)
+                    }
+                    if (usePhotosCompose) {
+                        val animatedNavController = rememberAnimatedNavController()
+                        AnimatedNavHost(
+                            animatedNavController,
+                            startDestination = photosRoute,
+                            enterTransition = { EnterTransition.None },
+                            exitTransition = { ExitTransition.None },
+                            popEnterTransition = { EnterTransition.None },
+                            popExitTransition = { ExitTransition.None },
+                        ) {
+                            photosNavGraph(animatedNavController)
+                        }
+                    } else {
+                        PhotosBody()
+                    }
                 }
             }
         }
