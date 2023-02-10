@@ -1092,10 +1092,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     } else {
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
-
-                    if (isMandatoryFingerprintVerificationNeeded
+                    boolean hasUnverifiedNodes = isMandatoryFingerprintVerificationNeeded
                             && !unverifiedIncomingNodeHandles.isEmpty()
-                            && unverifiedIncomingNodeHandles.contains(node.getHandle())) {
+                            && unverifiedIncomingNodeHandles.contains(node.getHandle());
+                    if (hasUnverifiedNodes) {
                         showUnverifiedNodeUi(holder, true);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
@@ -1106,9 +1106,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-                if (isMandatoryFingerprintVerificationNeeded
+                boolean hasUnverifiedNodes = isMandatoryFingerprintVerificationNeeded
                         && !unverifiedOutgoingNodeHandles.isEmpty()
-                        && unverifiedOutgoingNodeHandles.contains(node.getHandle())) {
+                        && unverifiedOutgoingNodeHandles.contains(node.getHandle());
+                if (hasUnverifiedNodes) {
                     showUnverifiedNodeUi(holder, false);
                 }
             }
