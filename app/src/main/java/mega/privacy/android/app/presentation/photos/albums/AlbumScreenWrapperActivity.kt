@@ -10,13 +10,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
+import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionViewModel
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -29,26 +31,52 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    private val viewModel: AlbumPhotosSelectionViewModel by viewModels()
+    private val albumScreen: AlbumScreen? by lazy(LazyThreadSafetyMode.NONE) {
+        AlbumScreen.valueOf(intent.getStringExtra(ALBUM_SCREEN) ?: "")
+    }
+
+    private val albumPhotosSelectionViewModel: AlbumPhotosSelectionViewModel by viewModels()
+
+    private val albumCoverSelectionViewModel: AlbumCoverSelectionViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                AlbumPhotosSelectionScreen(
-                    viewModel,
-                    onBackClicked = ::finish,
-                    onCompletion = ::handleCompletion,
-                )
+                when (albumScreen) {
+                    AlbumScreen.AlbumPhotosSelectionScreen -> {
+                        AlbumPhotosSelectionScreen(
+                            albumPhotosSelectionViewModel,
+                            onBackClicked = ::finish,
+                            onCompletion = ::handleAlbumPhotosSelectionCompletion,
+                        )
+                    }
+                    AlbumScreen.AlbumCoverSelectionScreen -> {
+                        AlbumCoverSelectionScreen(
+                            albumCoverSelectionViewModel,
+                            onBackClicked = ::finish,
+                            onCompletion = ::handleAlbumCoverSelectionCompletion,
+                        )
+                    }
+                    else -> finish()
+                }
             }
         }
     }
 
-    private fun handleCompletion(albumId: AlbumId, numCommittedPhotos: Int) {
+    private fun handleAlbumPhotosSelectionCompletion(albumId: AlbumId, numCommittedPhotos: Int) {
         val data = Intent().apply {
             putExtra(ALBUM_ID, albumId.id)
             putExtra(NUM_PHOTOS, numCommittedPhotos)
+        }
+        setResult(RESULT_OK, data)
+        finish()
+    }
+
+    private fun handleAlbumCoverSelectionCompletion(message: String) {
+        val data = Intent().apply {
+            putExtra(MESSAGE, message)
         }
         setResult(RESULT_OK, data)
         finish()
