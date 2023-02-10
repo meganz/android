@@ -36,7 +36,20 @@
                     android:id="@+id/sliding_tabs_shares"
                     style="@style/Widget.Mega.TabLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_incoming_shares"/>
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_outgoing_shares"/>
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tab_links_shares"/>
+                </com.google.android.material.tabs.TabLayout>
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_transfers"
@@ -57,7 +70,8 @@
                 android:id="@+id/shares_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1" >
+            </androidx.viewpager2.widget.ViewPager2>
 
             <mega.privacy.android.app.components.CustomViewPager
                 android:id="@+id/transfers_tabs_pager"
