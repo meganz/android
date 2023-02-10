@@ -699,7 +699,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun resetPasswordFromLink(
         link: String,
         newPassword: String,
-        masterKey: String,
+        masterKey: String?,
         listener: MegaRequestListenerInterface,
     ) = megaApi.confirmResetPassword(link, newPassword, masterKey, listener)
 

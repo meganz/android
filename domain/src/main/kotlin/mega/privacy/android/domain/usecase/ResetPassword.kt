@@ -14,6 +14,6 @@ fun interface ResetPassword {
     suspend operator fun invoke(
         link: String,
         newPassword: String,
-        masterKey: String?
+        masterKey: String
     ): Boolean
 }

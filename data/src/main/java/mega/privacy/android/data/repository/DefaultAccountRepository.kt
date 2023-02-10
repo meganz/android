@@ -638,7 +638,7 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun resetPasswordFromLink(
         link: String,
         newPassword: String,
-        masterKey: String,
+        masterKey: String?,
     ) = suspendCancellableCoroutine { continuation ->
         val listener = continuation.getRequestListener { it.flag }
         megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)

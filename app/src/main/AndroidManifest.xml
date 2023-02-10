@@ -325,7 +325,7 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.MaterialComponents.DayNight.Dialog" />
         <activity
-            android:name=".main.ChangePasswordActivity"
+            android:name=".presentation.changepassword.ChangePasswordActivity"
             android:label="@string/my_account_change_password" />
         <activity
             android:name=".getLink.GetLinkActivity"

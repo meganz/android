@@ -300,7 +300,7 @@ interface AccountRepository {
     suspend fun resetPasswordFromLink(
         link: String,
         newPassword: String,
-        masterKey: String
+        masterKey: String?
     ): Boolean
 
     /**

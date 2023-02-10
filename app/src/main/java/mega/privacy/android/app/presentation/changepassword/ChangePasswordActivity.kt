@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.changepassword
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -23,8 +23,10 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChangePasswordBinding
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.TestPasswordActivity
+import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
-import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.ColorUtils.getThemeColorHexString
 import mega.privacy.android.app.utils.Constants
@@ -575,11 +577,14 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 if (e.errorCode == MegaError.API_OK) {
                     if (request.flag) {
                         val intent = Intent(this, VerifyTwoFactorActivity::class.java)
-                        intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE,
+                        intent.putExtra(
+                            VerifyTwoFactorActivity.KEY_VERIFY_TYPE,
                             Constants.CHANGE_PASSWORD_2FA)
-                        intent.putExtra(VerifyTwoFactorActivity.KEY_NEW_PASSWORD,
+                        intent.putExtra(
+                            VerifyTwoFactorActivity.KEY_NEW_PASSWORD,
                             binding.changePasswordNewPassword1.text.toString())
-                        intent.putExtra(KEY_IS_LOGOUT,
+                        intent.putExtra(
+                            KEY_IS_LOGOUT,
                             getIntent() != null && getIntent().getBooleanExtra(
                                 KEY_IS_LOGOUT, false))
                         startActivity(intent)

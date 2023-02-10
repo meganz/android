@@ -40,6 +40,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.app.main.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
