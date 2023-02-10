@@ -85,10 +85,10 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileContactListActivity;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -326,11 +326,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionOpenWith.setVisibility(View.GONE);
         }
 
-        if (MegaNodeUtil.isValidForSlideShow(node)) {
-            optionSlideshow.setVisibility(View.VISIBLE);
-        } else {
-            optionSlideshow.setVisibility(View.GONE);
-        }
+        //Due to requirement change, not just hide slideshow entry in node context menu
+        optionSlideshow.setVisibility(View.GONE);
 
         if (isOnline(requireContext())) {
             nodeName.setText(node.getName());
