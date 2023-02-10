@@ -6,6 +6,6 @@ include ':core-ui'
 include ':screenshot'
 include ':data'
 include ':lint'
-if (!shouldUsePrebuiltSdk()) {
+if (!shouldUsePrebuiltSdk() || isCiBuild()) {
     include ':sdk'
 }

@@ -106,6 +106,10 @@ boolean shouldUsePrebuiltSdk() {
     return usePrebuiltSdk == null || usePrebuiltSdk != "false"
 }
 
+boolean isCiBuild() {
+    return System.getenv("BUILD_NUMBER") != null
+}
+
 /**
  * Check whether we should use combine lint reports into a single file
  *
@@ -235,6 +239,7 @@ ext {
     readTesters = this.&readTesters
     readTesterGroupList = this.&readTesterGroupList
     shouldUsePrebuiltSdk = this.&shouldUsePrebuiltSdk
+    isCiBuild = this.&isCiBuild
     shouldCombineLintReports = this.&shouldCombineLintReports
     getAppGitHash = this.&getAppGitHash
     getSdkGitHash = this.&getSdkGitHash
