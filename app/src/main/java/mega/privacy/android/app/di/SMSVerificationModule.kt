@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,9 +12,12 @@ import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.Logout
-import mega.privacy.android.domain.usecase.ResetSMSVerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
+import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
+import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 
 /**
  * SMS verification Module
@@ -21,6 +25,9 @@ import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SMSVerificationModule {
+
+    @Binds
+    abstract fun bindMonitorVerifiedPhoneNumber(implementation: DefaultMonitorVerifiedPhoneNumber): MonitorVerifiedPhoneNumber
 
     companion object {
         /**
@@ -77,5 +84,9 @@ abstract class SMSVerificationModule {
          */
         @Provides
         fun provideLogout(repository: AccountRepository): Logout = Logout(repository::logout)
+
+        @Provides
+        fun provideVerifyPhoneNumber(repository: VerificationRepository): VerifyPhoneNumber =
+            VerifyPhoneNumber(repository::verifyPhoneNumber)
     }
 }
