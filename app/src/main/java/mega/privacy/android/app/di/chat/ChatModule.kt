@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 
 /**
@@ -172,11 +173,19 @@ abstract class ChatModule {
             CheckChatLink(chatRepository::checkChatLink)
 
         /**
+         * Provides the Use Case [MonitorScheduledMeetingOccurrencesUpdates]
+         */
+        @Provides
+        fun provideMonitorScheduledMeetingOccurrencesUpdates(chatRepository: ChatRepository): MonitorScheduledMeetingOccurrencesUpdates =
+            MonitorScheduledMeetingOccurrencesUpdates(chatRepository::monitorScheduledMeetingOccurrencesUpdates)
+
+        /**
          * Provides the Use Case [MonitorScheduledMeetingUpdates]
          */
         @Provides
         fun provideMonitorScheduledMeetingUpdates(chatRepository: ChatRepository): MonitorScheduledMeetingUpdates =
-            MonitorScheduledMeetingUpdates(chatRepository::monitorScheduledMeetingsUpdates)
+            MonitorScheduledMeetingUpdates(chatRepository::monitorScheduledMeetingUpdates)
+
 
         /**
          * Provides the Use Case [MonitorChatRoomUpdates]

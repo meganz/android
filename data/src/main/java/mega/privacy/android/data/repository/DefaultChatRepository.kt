@@ -424,7 +424,7 @@ internal class DefaultChatRepository @Inject constructor(
             .flowOn(ioDispatcher)
 
 
-    override suspend fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting> =
+    override suspend fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting> =
         megaChatApiGateway.scheduledMeetingUpdates
             .filterIsInstance<ScheduledMeetingUpdate.OnChatSchedMeetingUpdate>()
             .mapNotNull { it.item }

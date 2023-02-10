@@ -252,7 +252,7 @@ interface ChatRepository {
      *
      * @return          A flow of [ChatScheduledMeeting]
      */
-    suspend fun monitorScheduledMeetingsUpdates(): Flow<ChatScheduledMeeting>
+    suspend fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting>
 
     /**
      * Monitor updates on scheduled meeting occurrences

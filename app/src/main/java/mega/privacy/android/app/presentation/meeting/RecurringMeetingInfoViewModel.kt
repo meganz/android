@@ -14,11 +14,14 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,6 +33,8 @@ import javax.inject.Inject
  * @property fetchScheduledMeetingOccurrencesByChat         [FetchScheduledMeetingOccurrencesByChat]
  * @property getChatParticipants                            [GetChatParticipants]
  * @property megaChatApiGateway                             [MegaChatApiGateway]
+ * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
+ * @property monitorScheduledMeetingOccurrencesUpdates      [MonitorScheduledMeetingOccurrencesUpdates]
  * @property state                                          Current view state as [RecurringMeetingInfoState]
  */
 @HiltViewModel
@@ -40,6 +45,8 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private val getChatParticipants: GetChatParticipants,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val deviceGateway: DeviceGateway,
+    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
 ) : ViewModel() {
     private val _state = MutableStateFlow(RecurringMeetingInfoState())
     val state: StateFlow<RecurringMeetingInfoState> = _state
@@ -106,6 +113,8 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
+                            getOccurrencesUpdates()
+                            getScheduledMeetingUpdates()
                             getOccurrences()
                             return@forEach
                         }
@@ -172,6 +181,75 @@ class RecurringMeetingInfoViewModel @Inject constructor(
 
                     checkSeeMoreVisibility(listOccurrences.size)
                 }
+            }
+        }
+
+    /**
+     * Get scheduled meeting updates
+     */
+    private fun getScheduledMeetingUpdates() =
+        viewModelScope.launch {
+            monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
+                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
+                when (scheduledMeetReceived.changes) {
+                    ScheduledMeetingChanges.NewScheduledMeeting -> {
+                        if (scheduledMeetReceived.parentSchedId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                            Timber.d("Scheduled meeting exists")
+                            var freq = OccurrenceFrequencyType.Invalid
+                            var until: Long = -1
+                            scheduledMeetReceived.rules?.let { rules ->
+                                freq = rules.freq
+                                until = rules.until ?: -1
+                            }
+
+                            _state.update {
+                                it.copy(
+                                    schedTitle = scheduledMeetReceived.title,
+                                    schedId = scheduledMeetReceived.schedId,
+                                    schedUntil = until,
+                                    typeOccurs = freq
+                                )
+                            }
+                        }
+                    }
+                    ScheduledMeetingChanges.Title -> {
+                        if (scheduledMeetReceived.schedId == state.value.schedId) {
+                            _state.update {
+                                it.copy(
+                                    schedTitle = scheduledMeetReceived.title,
+                                )
+                            }
+                        }
+                    }
+                    ScheduledMeetingChanges.RepetitionRules -> {
+                        if (scheduledMeetReceived.schedId == state.value.schedId) {
+                            var freq = OccurrenceFrequencyType.Invalid
+                            var until: Long = -1
+                            scheduledMeetReceived.rules?.let { rules ->
+                                freq = rules.freq
+                                until = rules.until ?: -1
+                            }
+
+                            _state.update {
+                                it.copy(
+                                    schedUntil = until,
+                                    typeOccurs = freq,
+                                )
+                            }
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+    /**
+     * Get occurrences updates
+     */
+    private fun getOccurrencesUpdates() =
+        viewModelScope.launch {
+            monitorScheduledMeetingOccurrencesUpdates().collectLatest {
+                Timber.d("Monitor occurrences updated")
             }
         }
 

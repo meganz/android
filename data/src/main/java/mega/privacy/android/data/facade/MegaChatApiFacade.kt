@@ -286,7 +286,9 @@ internal class MegaChatApiFacade @Inject constructor(
             }
 
             chatApi.addSchedMeetingListener(listener)
-            awaitClose { chatApi.removeSchedMeetingListener(listener) }
+            awaitClose {
+                chatApi.removeSchedMeetingListener(listener)
+            }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>? =

@@ -85,7 +85,8 @@ class DefaultGetMeetings @Inject constructor(
         chatRepository.monitorMutedChats()
             .map {
                 apply {
-                    val existingIndex = indexOfFirst { it.isMuted != !chatRepository.isChatNotifiable(it.chatId) }
+                    val existingIndex =
+                        indexOfFirst { it.isMuted != !chatRepository.isChatNotifiable(it.chatId) }
                     if (existingIndex != -1) {
                         val existingItem = get(existingIndex)
                         val updatedItem = existingItem.copy(
@@ -101,7 +102,8 @@ class DefaultGetMeetings @Inject constructor(
             .filter { any { meeting -> meeting.chatId == it.chatId } }
             .map { chatCall ->
                 apply {
-                    val chatRoom = chatRepository.getCombinedChatRoom(chatCall.chatId) ?: return@apply
+                    val chatRoom =
+                        chatRepository.getCombinedChatRoom(chatCall.chatId) ?: return@apply
                     val currentItemIndex = indexOfFirst { it.chatId == chatCall.chatId }
                     val currentItem = get(currentItemIndex)
                     val updatedItem = currentItem.copy(
@@ -155,7 +157,7 @@ class DefaultGetMeetings @Inject constructor(
             }
 
     private suspend fun MutableList<MeetingRoomItem>.monitorScheduledMeetings(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
-        chatRepository.monitorScheduledMeetingsUpdates()
+        chatRepository.monitorScheduledMeetingUpdates()
             .filter { any { meeting -> meeting.chatId == it.chatId } }
             .map { scheduledMeeting ->
                 apply {
@@ -180,7 +182,8 @@ class DefaultGetMeetings @Inject constructor(
             }
 
     private suspend fun CombinedChatRoom.toMeetingRoomItem(): MeetingRoomItem =
-        meetingRoomMapper.invoke(this,
+        meetingRoomMapper.invoke(
+            this,
             chatRepository::isChatNotifiable,
             chatRepository::isChatLastMessageGeolocation
         )
