@@ -8,9 +8,10 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.rx3.await
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.OpenShareDialog
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
@@ -139,5 +140,15 @@ abstract class GetNodeModule {
         @Provides
         fun provideSetSecureFlag(megaNodeRepository: MegaNodeRepository): SetSecureFlag =
             SetSecureFlag(megaNodeRepository::setSecureFlag)
+
+        /**
+         * Provides [OpenShareDialog] implementation
+         *
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [OpenShareDialog]
+         */
+        @Provides
+        fun provideOpenShareDialog(megaNodeRepository: MegaNodeRepository): OpenShareDialog =
+            OpenShareDialog(megaNodeRepository::openShareDialog)
     }
 }
