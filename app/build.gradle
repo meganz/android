@@ -561,6 +561,16 @@ task printAppVersionName {
 }
 
 /**
+ * Gradle task for getting the pre-build SDK version
+ * Run ./gradlew -q printPrebuildSdkVersion
+ */
+task printPrebuildSdkVersion {
+    doLast {
+        println megaSdkVersion
+    }
+}
+
+/**
  * Gradle task for getting the app version name channel
  * Run ./gradlew -q printAppVersionNameChannel
  */
