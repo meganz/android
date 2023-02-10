@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSh
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
@@ -35,6 +36,7 @@ import javax.inject.Inject
  * @param getVisibleContacts
  * @param setHideRecentActivity
  * @param monitorNodeUpdates
+ * @param areCredentialsVerified
  */
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
@@ -47,6 +49,7 @@ class RecentActionsViewModel @Inject constructor(
     private val getParentMegaNode: GetParentMegaNode,
     monitorHideRecentActivity: MonitorHideRecentActivity,
     monitorNodeUpdates: MonitorNodeUpdates,
+    private val areCredentialsVerified: AreCredentialsVerified,
 ) : ViewModel() {
 
     private var _buckets = listOf<RecentActionBucket>()
@@ -161,18 +164,17 @@ class RecentActionsViewModel @Inject constructor(
                 visibleContacts.find { bucket.userEmail == it.email }?.contactData?.fullName.orEmpty()
 
             val currentUserIsOwner = getAccountDetails(false).email == bucket.userEmail
-
+            val isNodeKeyVerified =
+                bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified(bucket.userEmail)
             val parentNode = getNodeByHandle(bucket.parentHandle)
             val sharesType = getParentSharesType(parentNode)
-            val isNodeKeyDecrypted =
-                !bucket.nodes[0].isNodeKeyDecrypted && !areCredentialsVerified(bucket.userEmail)
             recentItemList.add(RecentActionItemType.Item(
                 bucket,
                 userName,
                 parentNode?.name ?: "",
                 sharesType,
                 currentUserIsOwner,
-                isNodeKeyDecrypted,
+                isNodeKeyVerified,
             ))
         }
 

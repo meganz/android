@@ -9,6 +9,7 @@ import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
@@ -47,4 +48,7 @@ object TestGetNodeModule {
     fun provideGetUnverifiedOutgoingShares() = mock<GetUnverifiedOutgoingShares>() {
         onBlocking { invoke(any()) }.thenReturn(emptyList())
     }
+
+    @Provides
+    fun provideOpenShareDialog() = mock<OpenShareDialog>()
 }
