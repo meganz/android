@@ -10,6 +10,7 @@ import mega.privacy.android.domain.usecase.BroadcastLogout
 import mega.privacy.android.domain.usecase.CompleteFastLogin
 import mega.privacy.android.domain.usecase.DefaultCompleteFastLogin
 import mega.privacy.android.domain.usecase.InitialiseMegaChat
+import mega.privacy.android.domain.usecase.LocalLogout
 import mega.privacy.android.domain.usecase.MonitorLogout
 
 /**
@@ -47,7 +48,12 @@ abstract class LoginModule {
         @Provides
         fun provideBroadcastLogout(loginRepository: LoginRepository): BroadcastLogout =
             BroadcastLogout(loginRepository::broadcastLogout)
+
+        /**
+         * Provides [LocalLogout]
+         */
+        @Provides
+        fun provideLocalLogout(loginRepository: LoginRepository): LocalLogout =
+            LocalLogout(loginRepository::localLogout)
     }
-
-
 }

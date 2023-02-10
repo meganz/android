@@ -1725,4 +1725,15 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Logouts of the MEGA account without invalidating the session.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_LOGOUT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getFlag - Returns false
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun localLogout(listener: MegaRequestListenerInterface)
 }

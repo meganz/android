@@ -901,4 +901,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface) =
         megaApi.checkSMSVerificationCode(pin, listener)
+
+    override fun localLogout(listener: MegaRequestListenerInterface) = megaApi.localLogout(listener)
 }

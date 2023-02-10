@@ -38,4 +38,9 @@ interface LoginRepository {
      *
      */
     suspend fun broadcastLogout()
+
+    /**
+     * Logouts of the MEGA account without invalidating the session.
+     */
+    suspend fun localLogout()
 }
