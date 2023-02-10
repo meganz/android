@@ -706,7 +706,7 @@
             android:windowSoftInputMode="adjustNothing"/>
 
         <activity
-            android:name="mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity"
+            android:name="mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"/>
 

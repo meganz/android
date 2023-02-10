@@ -65,7 +65,7 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActi
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
+import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosRoute
@@ -617,18 +617,20 @@ class PhotosFragment : Fragment() {
         )
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent =
-            AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Creation)
+        val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
+            context = requireContext(),
+            albumId = albumId,
+            albumFlow = AlbumFlow.Creation,
+        )
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
-
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
-        val numPhotos = result.data?.getIntExtra(AlbumPhotosSelectionActivity.NUM_PHOTOS, 0)
+        val numPhotos = result.data?.getIntExtra(AlbumScreenWrapperActivity.NUM_PHOTOS, 0)
         if (numPhotos == 0) return
 
-        val albumId = result.data?.getLongExtra(AlbumPhotosSelectionActivity.ALBUM_ID, -1) ?: -1
+        val albumId = result.data?.getLongExtra(AlbumScreenWrapperActivity.ALBUM_ID, -1) ?: -1
         val uiAlbum = albumsViewModel.state.value.let { state ->
             state.currentUIAlbum ?: state.findUIAlbum(AlbumId(albumId))
         } ?: return
