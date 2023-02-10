@@ -52,8 +52,10 @@ import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
+import mega.privacy.android.domain.usecase.impl.DefaultGetProscribedAlbumNames
 import mega.privacy.android.domain.usecase.impl.DefaultRemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.impl.DefaultUpdateAlbumNameUseCase
+import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -124,6 +126,9 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindUpdateAlbumCover(useCase: DefaultUpdateAlbumCover): UpdateAlbumCover
+
+    @Binds
+    abstract fun bindGetProscribedAlbumNames(useCase: DefaultGetProscribedAlbumNames): GetProscribedAlbumNames
 
     companion object {
         @Provides

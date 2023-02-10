@@ -91,7 +91,7 @@ fun AlbumsView(
     albumsViewState: AlbumsViewState,
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
-    onDialogPositiveButtonClicked: (name: String, proscribedStrings: List<String>) -> Unit,
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit = {},
     setInputValidity: (Boolean) -> Unit = {},
     openPhotosSelectionActivity: (AlbumId) -> Unit = {},
