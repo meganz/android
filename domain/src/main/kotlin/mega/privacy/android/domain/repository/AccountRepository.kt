@@ -298,7 +298,7 @@ interface AccountRepository {
      * @return true if successful, else false
      */
     suspend fun resetPasswordFromLink(
-        link: String,
+        link: String?,
         newPassword: String,
         masterKey: String?
     ): Boolean

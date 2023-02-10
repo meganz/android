@@ -1241,7 +1241,7 @@ interface MegaApiGateway {
      * @param listener as [MegaRequestListenerInterface]
      */
     fun resetPasswordFromLink(
-        link: String,
+        link: String?,
         newPassword: String,
         masterKey: String?,
         listener: MegaRequestListenerInterface,

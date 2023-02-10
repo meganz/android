@@ -12,8 +12,8 @@ fun interface ResetPassword {
      * @return true if reset password is successful, else false
      */
     suspend operator fun invoke(
-        link: String,
+        link: String?,
         newPassword: String,
-        masterKey: String
+        masterKey: String?
     ): Boolean
 }

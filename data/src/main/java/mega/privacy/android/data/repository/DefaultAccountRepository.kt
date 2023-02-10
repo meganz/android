@@ -636,7 +636,7 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun resetPasswordFromLink(
-        link: String,
+        link: String?,
         newPassword: String,
         masterKey: String?,
     ) = suspendCancellableCoroutine { continuation ->
