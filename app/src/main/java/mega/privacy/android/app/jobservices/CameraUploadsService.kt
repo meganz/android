@@ -174,7 +174,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         const val CU_CACHE_FOLDER = "cu"
 
         private var ignoreAttr = false
-        private var running = false
 
         /**
          * Is Camera Upload running now
@@ -1121,7 +1120,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         startActiveHeartbeat(finalList)
         for (file in finalList) {
-            if (!running) break
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
 
@@ -1133,7 +1131,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
                     // Only retry for 60 seconds
                     var counter = 60
-                    while (ERROR_NOT_ENOUGH_SPACE == newPath && running && counter != 0) {
+                    while (ERROR_NOT_ENOUGH_SPACE == newPath && counter != 0) {
                         counter--
                         try {
                             Timber.d("Waiting for disk space to process")
@@ -1439,8 +1437,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * When the user is not logged in, perform a Complete Fast Login procedure
      */
     private suspend fun performCompleteFastLogin() {
-        running = true
-
         Timber.d("Waiting for the user to complete the Fast Login procedure")
 
         // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
@@ -1557,7 +1553,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         totalToUpload = 0
         canceled = false
         isOverQuota = false
-        running = true
 
         cameraServiceIpChangeHandler.start()
         // end new logic
@@ -1603,7 +1598,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         videoCompressor?.stop()
         canceled = true
-        running = false
         stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
