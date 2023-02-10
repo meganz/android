@@ -10,6 +10,14 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_menu_select_album_cover"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="102"
+        android:title="@string/photos_album_select_cover"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_menu_sort_by"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="105"

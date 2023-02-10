@@ -21,11 +21,16 @@ class DefaultUIAlbumMapper @Inject constructor(@ApplicationContext private val c
             Album.RawAlbum -> context.getString(R.string.photos_album_title_raw)
             is Album.UserAlbum -> album.title
         }
+        val defaultCover = { photos.maxByOrNull { it.modificationTime } }
 
         return UIAlbum(
             title = title,
             count = photos.size,
-            coverPhoto = photos.maxByOrNull { it.modificationTime },
+            coverPhoto = if (album is Album.UserAlbum) {
+                album.cover ?: defaultCover()
+            } else {
+                defaultCover()
+            },
             photos = photos,
             id = album,
         )

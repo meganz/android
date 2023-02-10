@@ -36,6 +36,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -62,6 +63,7 @@ import java.util.Locale
 @Composable
 internal fun PhotosGridView(
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
+    endSpacing: Dp = 56.dp,
     photoDownland: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
@@ -129,7 +131,7 @@ internal fun PhotosGridView(
 
         item(span = { GridItemSpan(currentLineSpan = maxLineSpan) }) {
             Spacer(
-                modifier = Modifier.height(50.dp)
+                modifier = Modifier.height(endSpacing)
             )
         }
     }
