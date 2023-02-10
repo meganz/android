@@ -1,10 +1,9 @@
-package mega.privacy.android.app.di.login
+package mega.privacy.android.domain.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.usecase.BroadcastLogout
 import mega.privacy.android.domain.usecase.CompleteFastLogin
@@ -13,12 +12,9 @@ import mega.privacy.android.domain.usecase.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.LocalLogout
 import mega.privacy.android.domain.usecase.MonitorLogout
 
-/**
- * Login module.
- */
 @Module
-@InstallIn(SingletonComponent::class)
-abstract class LoginModule {
+@DisableInstallInCheck
+internal abstract class InternalLoginModule {
 
     /**
      * Provides [CompleteFastLogin] implementation.
