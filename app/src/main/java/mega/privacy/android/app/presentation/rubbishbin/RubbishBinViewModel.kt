@@ -132,7 +132,7 @@ class RubbishBinViewModel @Inject constructor(
             if (value.contains(NodeChanges.Remove) && _state.value.rubbishBinHandle == key.id.longValue) {
                 setRubbishBinHandle(key.parentId.longValue)
                 return@forEach
-            } else if (value.contains(NodeChanges.Parent)) {
+            } else if (value.contains(NodeChanges.Parent) && _state.value.rubbishBinHandle == key.id.longValue) {
                 setRubbishBinHandle(-1)
                 return@forEach
             }

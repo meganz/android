@@ -14,6 +14,9 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
@@ -80,9 +83,27 @@ class FileBrowserViewModel @Inject constructor(
         viewModelScope.launch {
             refreshNodes()
             monitorNodeUpdates().collect {
-                refreshNodes()
+                checkForDeletedNode(it.changes)
             }
         }
+    }
+
+    /**
+     * This will update handle for fileBrowser if any node is deleted from browser and
+     * moved to rubbish bin
+     * we are in same screen else will simply refresh nodes with parentID
+     * @param changes [Map] of [Node], list of [NodeChanges]
+     */
+    private fun checkForDeletedNode(changes: Map<Node, List<NodeChanges>>) {
+        changes.forEach { (node, _) ->
+            if (node is FolderNode) {
+                if (node.isInRubbishBin && _state.value.fileBrowserHandle == node.id.longValue) {
+                    setBrowserParentHandle(node.parentId.longValue)
+                    return@forEach
+                }
+            }
+        }
+        refreshNodes()
     }
 
     /**
