@@ -2494,6 +2494,15 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 viewModel.nodeUpdateHandled();
             }
+
+            // Update pending actions badge on bottom navigation menu
+            if (managerState.isMandatoryFingerprintVerificationNeeded() && managerState.getPendingActionsCount() > 0) {
+                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+                View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
+                sharedItemsView.addView(pendingActionsBadge);
+                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
+                tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
+            }
             return Unit.INSTANCE;
         });
 
@@ -2525,17 +2534,6 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
             if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
                 addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
-            }
-            return Unit.INSTANCE;
-        });
-
-        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
-            if (managerState.isMandatoryFingerprintVerificationNeeded() && managerState.getPendingActionsCount() > 0) {
-                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
-                View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
-                sharedItemsView.addView(pendingActionsBadge);
-                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
-                tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
             }
             return Unit.INSTANCE;
         });
