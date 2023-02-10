@@ -35,8 +35,6 @@ import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -79,8 +77,6 @@ class RecentActionsFragment : Fragment() {
     private lateinit var fastScroller: FastScroller
 
     private val viewModel: RecentActionsViewModel by activityViewModels()
-    private val incomingSharesViewModel: IncomingSharesViewModel by activityViewModels()
-    private val outGoingSharesViewModel: OutgoingSharesViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -126,22 +122,6 @@ class RecentActionsFragment : Fragment() {
         fastScroller = binding.fastscroll
 
         initAdapter()
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                incomingSharesViewModel.state.collect {
-                    adapter.setUnverifiedIncomingNodeHandles(it.unVerifiedIncomingNodeHandles)
-                }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                outGoingSharesViewModel.state.collect {
-                    adapter.setUnverifiedOutgoingNodeHandles(it.unVerifiedOutgoingNodeHandles)
-                }
-            }
-        }
-
     }
 
     /**
@@ -150,9 +130,7 @@ class RecentActionsFragment : Fragment() {
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
 
-            if (incomingSharesViewModel.state.value.unVerifiedIncomingNodeHandles.contains(item.bucket.nodes[0].id.longValue)
-                || outGoingSharesViewModel.state.value.unVerifiedOutgoingNodeHandles.contains(item.bucket.nodes[0].id.longValue)
-            ) {
+            if (!item.isKeyVerified) {
                 Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
                     putExtra(Constants.EMAIL, item.bucket.userEmail)
                     requireActivity().startActivity(this)

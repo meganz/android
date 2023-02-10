@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
+import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.domain.entity.ShareData
@@ -64,6 +65,8 @@ class OutgoingSharesViewModelTest {
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
 
+    private val openShareDialog = mock<OpenShareDialog>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -80,6 +83,7 @@ class OutgoingSharesViewModelTest {
             monitorNodeUpdates,
             getFeatureFlagValue,
             getUnverifiedOutgoingShares,
+            openShareDialog,
         )
     }
 

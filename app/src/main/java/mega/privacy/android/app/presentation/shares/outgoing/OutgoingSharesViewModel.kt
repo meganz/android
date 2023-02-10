@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -36,6 +37,7 @@ class OutgoingSharesViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
+    private val openShareDialog: OpenShareDialog,
 ) : ViewModel() {
 
     /** private UI state */
@@ -199,6 +201,19 @@ class OutgoingSharesViewModel @Inject constructor(
     private suspend fun isMandatoryFingerprintRequired() {
         _state.update {
             it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
+        }
+    }
+
+    /**
+     * Calls OpenShareDialog use case to create crypto key for sharing
+     *
+     * @param nodeHandle: [MegaNode] handle
+     */
+    fun callOpenShareDialog(nodeHandle: Long) {
+        viewModelScope.launch {
+            getNodeByHandle(nodeHandle)?.let { megaNode ->
+                openShareDialog(megaNode)
+            }
         }
     }
 }

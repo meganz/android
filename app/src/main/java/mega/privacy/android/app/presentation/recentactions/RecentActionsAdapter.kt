@@ -72,9 +72,6 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      */
     private var headerColor: Int = 0
 
-    private lateinit var unverifiedIncomingNodeHandles: HashSet<Long>
-    private lateinit var unverifiedOutgoingNodeHandles: HashSet<Long>
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentActionViewHolder {
         val binding = ItemBucketBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
@@ -194,7 +191,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
                         binding.thumbnailView.setImageResource(R.drawable.media)
                     } else {
-                        if (unverifiedIncomingNodeHandles.contains(item.bucket.nodes[0].id.longValue)) {
+                        if (!item.isKeyVerified) {
                             binding.firstLineText.text =
                                 context.getQuantityStringOrDefault(R.plurals.cloud_drive_undecrypted_file,
                                     nodeList.size)
@@ -349,14 +346,4 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
      */
     inner class RecentActionViewHolder(val binding: ItemBucketBinding) :
         RecyclerView.ViewHolder(binding.root)
-
-    fun setUnverifiedIncomingNodeHandles(handles: List<Long>) {
-        unverifiedIncomingNodeHandles = HashSet()
-        unverifiedIncomingNodeHandles.addAll(handles)
-    }
-
-    fun setUnverifiedOutgoingNodeHandles(handles: List<Long>) {
-        unverifiedOutgoingNodeHandles = HashSet()
-        unverifiedOutgoingNodeHandles.addAll(handles)
-    }
 }

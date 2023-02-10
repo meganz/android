@@ -10283,19 +10283,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     }
 
-    public void setPendingActionsBadge(BottomNavigationMenuView menuView) {
-        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
-            if (managerState.isMandatoryFingerprintVerificationNeeded() && managerState.getPendingActionsCount() > 0) {
-                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
-                View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
-                sharedItemsView.addView(pendingActionsBadge);
-                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
-                tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
-            }
-            return Unit.INSTANCE;
-        });
-    }
-
     private void setCallBadge() {
         if (!viewModel.isConnected() || megaChatApi.getNumCalls() <= 0 || (megaChatApi.getNumCalls() == 1 && participatingInACall())) {
             callBadge.setVisibility(View.GONE);

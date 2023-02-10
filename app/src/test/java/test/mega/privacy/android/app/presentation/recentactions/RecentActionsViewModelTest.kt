@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
@@ -100,6 +101,9 @@ class RecentActionsViewModelTest {
         on { this.isUpdate }.thenReturn(false)
     }
 
+    private val areCredentialsVerified = mock<AreCredentialsVerified> {
+        onBlocking { invoke(any()) }.thenReturn(true)
+    }
 
     @Before
     fun setUp() {
@@ -114,6 +118,7 @@ class RecentActionsViewModelTest {
             getParentMegaNode,
             monitorHideRecentActivity,
             monitorNodeUpdates,
+            areCredentialsVerified,
         )
     }
 
@@ -438,5 +443,13 @@ class RecentActionsViewModelTest {
             assertThat(underTest.snapshotActionList).isEqualTo(expectedSnapshotActionList)
         }
 
-
+    @Test
+    fun `test that isKeyVerified gets updated in recent action items`() = runTest {
+        whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+        underTest.state.map { it.recentActionItems }.distinctUntilChanged().test {
+            awaitItem()
+            assertThat((awaitItem().filterIsInstance<RecentActionItemType.Item>()[0]).isKeyVerified)
+                .isEqualTo(true)
+        }
+    }
 }

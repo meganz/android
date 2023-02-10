@@ -76,9 +76,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import kotlin.Unit;
 import mega.privacy.android.app.MegaOffline;
@@ -88,14 +86,13 @@ import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileContactListActivity;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.VersionsFileActivity;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity;
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
@@ -107,10 +104,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ViewUtils;
 import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
@@ -884,6 +878,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
     }
+
     private void setUnverifiedNodeUserName(List<ShareData> shareDataList) {
         for (int j = 0; j < shareDataList.size(); j++) {
             ShareData mS = shareDataList.get(j);
@@ -894,6 +889,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 } else {
                     nodeInfo.setText(mS.getUser());
                 }
+                break;
             }
         }
     }
@@ -1002,23 +998,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                if(incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
-                        &&
-                (!node.isNodeKeyDecrypted() ||
-                        !megaApi.areCredentialsVerified(
-                                megaApi.getContact(String.valueOf(node.getOwner())))
-                        )
-                ) {
-                    megaApi.openShareDialog(node, new OptionalMegaRequestListenerInterface() {
-                        @Override
-                        public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError error) {
-                            super.onRequestFinish(api, request, error);
-                            showShareFolderOptions();
-                        }
-                    });
-                } else {
-                    showShareFolderOptions();
-                }
+                outgoingSharesViewModel.callOpenShareDialog(node.getHandle());
+                showShareFolderOptions();
                 break;
 
             case R.id.clear_share_option:
