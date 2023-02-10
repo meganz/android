@@ -861,4 +861,11 @@ class DefaultAccountRepositoryTest {
             verify(cacheFolderGateway).clearAppData()
             verify(cacheFolderGateway).removeOldTempFolders()
         }
+
+    @Test
+    fun `test that AccountInfoWrapper is invoked when resetting account info`() =
+        runTest {
+            underTest.resetAccountInfo()
+            verify(accountInfoWrapper).resetAccountInfo()
+        }
 }

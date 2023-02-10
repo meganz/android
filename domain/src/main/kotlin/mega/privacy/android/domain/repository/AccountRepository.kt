@@ -309,4 +309,9 @@ interface AccountRepository {
      * @return password strength level from 0 - 4
      */
     suspend fun getPasswordStrength(password: String): Int
+
+    /**
+     * Resets account info.
+     */
+    suspend fun resetAccountInfo()
 }

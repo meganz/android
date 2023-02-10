@@ -68,4 +68,9 @@ interface AccountInfoWrapper {
      *
      */
     fun monitorAccountDetail(): Flow<AccountDetail>
+
+    /**
+     * Resets account info.
+     */
+    suspend fun resetAccountInfo()
 }

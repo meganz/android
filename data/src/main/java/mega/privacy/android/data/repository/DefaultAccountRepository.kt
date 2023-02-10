@@ -651,6 +651,8 @@ internal class DefaultAccountRepository @Inject constructor(
         megaApiGateway.getPasswordStrength(password)
     }
 
+    override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
