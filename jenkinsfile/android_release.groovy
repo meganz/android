@@ -478,16 +478,17 @@ private String releaseSuccessMessage(String lineBreak, Object common) {
  * @return the composed message
  */
 private String getBuildVersionInfo(Object common) {
-
+    println("entering getBuildVersionInfo")
     String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${common.artifactoryUploadPath()}"
     String artifactVersion = common.readAppVersion2()
 
     String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
     String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
 
+    String sdkVersion = common.readPrebuiltSdkVersion()
     String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + common.appCommitId()
-    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.sdkCommitId()
-    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.megaChatSdkCommitId()
+    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.queryPrebuiltSdkProperty("sdk-commit", sdkVersion)
+    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.queryPrebuiltSdkProperty("chat-commit", sdkVersion)
 
     String appBranch = env.gitlabSourceBranch
 
