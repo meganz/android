@@ -584,6 +584,17 @@ internal class MegaApiFacade @Inject constructor(
         }
     }
 
+    override fun deleteNode(
+        node: MegaNode,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        listener?.let {
+            megaApi.remove(node, it)
+        } ?: run {
+            megaApi.remove(node)
+        }
+    }
+
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
         megaApi.copyBucket(bucket)
 

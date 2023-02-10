@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -19,9 +20,11 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -39,6 +42,7 @@ class FileInfoViewModel @Inject constructor(
     private var moveNodeByHandle: MoveNodeByHandle,
     private var copyNodeByHandle: CopyNodeByHandle,
     private var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private var deleteNodeByHandle: DeleteNodeByHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -55,17 +59,19 @@ class FileInfoViewModel @Inject constructor(
         private set
 
     /**
-     * sets the node and updates its state
+     * Sets the node and updates its state
      */
     fun updateNode(node: MegaNode) {
         this.node = node
         viewModelScope.launch {
             _uiState.update {
+                val clearProgressState =
+                    it.jobInProgressState == FileInfoJobInProgressState.InitialLoading
                 it.copy(
                     historyVersions = getFileHistoryNumVersions(node.handle),
                     isNodeInInbox = isNodeInInbox(node.handle),
                     isNodeInRubbish = isNodeInRubbish(node.handle),
-                    jobInProgressState = null,
+                    jobInProgressState = if (clearProgressState) null else it.jobInProgressState,
                 )
             }
         }
@@ -109,16 +115,49 @@ class FileInfoViewModel @Inject constructor(
         }
 
     /**
+     * It checks if the node is in the rubbish bin,
+     * if it's not in the rubbish bin, moves the node to the rubbish bin
+     * if it's already in the rubbish bin, deletes the node.
+     * I will sets the proper [FileInfoJobInProgressState] and launch the proper [FileInfoOneOffViewEvent.Finished]
+     */
+    fun removeNode() {
+        if (_uiState.value.isNodeInRubbish) {
+            deleteNode()
+        } else {
+            moveNodeToRubbishBin()
+        }
+    }
+
+    /**
      * Tries to move the node to the rubbish bin
      * It sets [FileInfoJobInProgressState.MovingToRubbishBin] while moving.
      * It will launch [FileInfoOneOffViewEvent.Finished.MovingToRubbish] at the end, with an exception if something went wrong
      */
-    fun moveNodeToRubbishBin() {
+    private fun moveNodeToRubbishBin() {
         performBlockSettingProgress(FileInfoJobInProgressState.MovingToRubbishBin) {
             val movedToRubbish = runCatching {
                 moveNodeToRubbishByHandle(NodeId(node.handle))
             }
             _uiState.updateEvent(FileInfoOneOffViewEvent.Finished.MovingToRubbish(movedToRubbish.exceptionOrNull()))
+        }
+    }
+
+    /**
+     * Tries to delete the node
+     * It sets [FileInfoJobInProgressState.Deleting] while moving.
+     * It will launch [FileInfoOneOffViewEvent.Finished.Deleting] at the end, with an exception if something went wrong
+     */
+    private fun deleteNode() {
+        performBlockSettingProgress(FileInfoJobInProgressState.Deleting) {
+            val deleted = runCatching {
+                deleteNodeByHandle(NodeId(node.handle))
+            }
+            val customMessage =
+                (deleted.exceptionOrNull() as? MegaException)
+                    ?.takeIf { it.errorCode == MegaError.API_EMASTERONLY }?.errorMessage
+            _uiState.updateEvent(
+                FileInfoOneOffViewEvent.Finished.Deleting(deleted.exceptionOrNull(), customMessage)
+            )
         }
     }
 

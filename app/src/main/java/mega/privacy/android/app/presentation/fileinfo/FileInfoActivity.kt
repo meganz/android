@@ -250,7 +250,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var cC: ContactController? = null
     private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
     private var publicLink = false
-    private var moveToRubbish = false
     private val density by lazy { outMetrics.density }
     private var shareIt = true
     private var from = 0
@@ -546,6 +545,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     private fun updateOptionsMenu(state: FileInfoViewState) {
+        if (state.jobInProgressState == FileInfoJobInProgressState.InitialLoading) return
         menuHelper.updateOptionsMenu(
             node = viewModel.node,
             isInInbox = state.isNodeInInbox,
@@ -572,7 +572,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 nameCollisionActivityContract?.launch(list)
             }
             is FileInfoOneOffViewEvent.Finished -> {
-                moveToRubbish = false
                 if (event.exception == null) {
                     showSnackBar(event.successMessage)
                     sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
@@ -584,7 +583,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 } else {
                     Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {
-                        showSnackBar(event.failMessage)
+                        showSnackBar(event.failMessage(this))
                     }
                 }
             }
@@ -592,10 +591,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         viewModel.consumeOneOffEvent(event)
     }
 
-    private fun showSnackBar(@StringRes resString: Int) {
+    private fun showSnackBar(@StringRes resString: Int) =
+        showSnackBar(getFormattedStringOrDefault(resString))
+
+    private fun showSnackBar(message: String) {
         showSnackbar(
             Constants.SNACKBAR_TYPE,
-            getFormattedStringOrDefault(resString),
+            message,
             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         )
     }
@@ -605,13 +607,9 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             progressDialog?.first?.dismiss()
             progressDialog = null
         } else if (progressDialog?.second != progressState) {
-            val string = when (progressState) {
-                FileInfoJobInProgressState.InitialLoading -> return //no need to warn user here
-                FileInfoJobInProgressState.Moving -> R.string.context_moving
-                FileInfoJobInProgressState.Copying -> R.string.context_copying
-                FileInfoJobInProgressState.MovingToRubbishBin -> R.string.context_move_to_trash
+            progressState.progressMessage?.let {
+                showProgressDialog(getFormattedStringOrDefault(it), progressState)
             }
-            showProgressDialog(getFormattedStringOrDefault(string), progressState)
         }
     }
 
@@ -1339,7 +1337,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private fun moveToTrash() {
         Timber.d("moveToTrash")
-        moveToRubbish = false
         if (!viewModel.checkAndHandleIsDeviceConnected()) {
             return
         }
@@ -1347,10 +1344,8 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             return
         }
 
-        moveToRubbish = !viewModel.uiState.value.isNodeInRubbish
-
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog).apply {
-            val messageId = if (moveToRubbish) {
+            val messageId = if (!viewModel.uiState.value.isNodeInRubbish) {
                 when {
                     CameraUploadUtil.getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled() -> {
                         R.string.confirmation_move_cu_folder_to_rubbish
@@ -1368,20 +1363,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
             setMessage(messageId)
             setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
-                //Check if the node is not yet in the rubbish bin (if so, remove it)
-                if (moveToRubbish) {
-                    viewModel.moveNodeToRubbishBin()
-                } else {
-                    megaApi.remove(viewModel.node, megaRequestListener)
-
-                    try {
-                        showProgressDialog(
-                            getFormattedStringOrDefault(R.string.context_delete_from_mega)
-                        )
-                    } catch (e: Exception) {
-                        Timber.w("Exception showing remove confirmation")
-                    }
-                }
+                viewModel.removeNode()
             }
             setNegativeButton(R.string.general_cancel, null)
             show()
@@ -1496,23 +1478,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     versionsToRemove = 0
                     versionsRemoved = 0
                     errorVersionRemove = 0
-                }
-            } else {
-                Timber.d("Remove request finished")
-                when (e?.errorCode) {
-                    MegaError.API_OK -> {
-                        finish()
-                    }
-                    MegaError.API_EMASTERONLY -> {
-                        showSnackbar(Constants.SNACKBAR_TYPE, e.errorString, -1)
-                    }
-                    else -> {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getFormattedStringOrDefault(R.string.context_no_removed),
-                            -1
-                        )
-                    }
                 }
             }
         } else if (request.type == MegaApiJava.USER_ATTR_AVATAR) {
@@ -1663,9 +1628,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 }
             }
         }
-        if (moveToRubbish) {
-            invalidateOptionsMenu()
-        }
+        invalidateOptionsMenu()
         if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
             Timber.d("Node HAS public link")
             publicLink = true
@@ -1673,14 +1636,12 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesLinkLayout.isVisible = true
             bindingContent.filePropertiesCopyLayout.isVisible = true
             bindingContent.filePropertiesLinkText.text = viewModel.node.publicLink
-            invalidateOptionsMenu()
         } else {
             Timber.d("Node NOT public link")
             publicLink = false
             bindingContent.dividerLinkLayout.isVisible = false
             bindingContent.filePropertiesLinkLayout.isVisible = false
             bindingContent.filePropertiesCopyLayout.isVisible = false
-            invalidateOptionsMenu()
         }
         if (viewModel.node.isFolder) {
             val sizeFile = megaApi.getSize(viewModel.node)

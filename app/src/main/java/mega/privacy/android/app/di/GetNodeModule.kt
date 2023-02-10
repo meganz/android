@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 
@@ -139,5 +140,16 @@ abstract class GetNodeModule {
             megaNodeRepository: MegaNodeRepository,
         ): MoveNodeToRubbishByHandle =
             MoveNodeToRubbishByHandle(megaNodeRepository::moveNodeToRubbishBinByHandle)
+
+        /**
+         * Provides [DeleteNodeByHandle] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [DeleteNodeByHandle]
+         */
+        @Provides
+        fun provideDeleteNodeByHandle(
+            megaNodeRepository: MegaNodeRepository,
+        ): DeleteNodeByHandle =
+            DeleteNodeByHandle(megaNodeRepository::deleteNodeByHandle)
     }
 }

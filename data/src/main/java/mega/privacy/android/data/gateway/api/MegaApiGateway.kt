@@ -874,6 +874,16 @@ interface MegaApiGateway {
     )
 
     /**
+     * Deletes the node if it's already in the rubbish bin
+     * @param node MegaNode
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun deleteNode(
+        node: MegaNode,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
      * Creates a copy of MegaRecentActionBucket required for its usage in the app.
      *
      * @param bucket The MegaRecentActionBucket received.

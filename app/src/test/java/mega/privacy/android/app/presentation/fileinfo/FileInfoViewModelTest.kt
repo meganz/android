@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
@@ -52,6 +53,7 @@ internal class FileInfoViewModelTest {
     private lateinit var moveNodeByHandle: MoveNodeByHandle
     private lateinit var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle
     private lateinit var copyNodeByHandle: CopyNodeByHandle
+    private lateinit var deleteNodeByHandle: DeleteNodeByHandle
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
 
@@ -79,6 +81,7 @@ internal class FileInfoViewModelTest {
         moveNodeByHandle = mock()
         copyNodeByHandle = mock()
         moveNodeToRubbishByHandle = mock()
+        deleteNodeByHandle = mock()
         node = mock()
         nameCollision = mock()
     }
@@ -94,6 +97,7 @@ internal class FileInfoViewModelTest {
             moveNodeByHandle,
             copyNodeByHandle,
             moveNodeToRubbishByHandle,
+            deleteNodeByHandle,
         )
         underTest.updateNode(node)
     }
@@ -255,7 +259,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMovingToRubbish event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockMoveToRubbishSuccess()
-            underTest.moveNodeToRubbishBin()
+            underTest.removeNode()
             testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
@@ -265,8 +269,28 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMovingToRubbish event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockMoveToRubbishFailure()
-            underTest.moveNodeToRubbishBin()
+            underTest.removeNode()
             testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.MovingToRubbish::class.java)?.also {
+                Truth.assertThat(it.exception).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test FinishedDeleting event is launched without exceptions when the delete finished successfully`() =
+        runTest {
+            mockDeleteSuccess()
+            underTest.removeNode()
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Deleting::class.java)?.also {
+                Truth.assertThat(it.exception).isNull()
+            }
+        }
+
+    @Test
+    fun `test FinishedDeleting event is launched with the proper exceptions when the delete finished with an error`() =
+        runTest {
+            mockDeleteFailure()
+            underTest.removeNode()
+            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
@@ -347,6 +371,20 @@ internal class FileInfoViewModelTest {
             testProgressIsSetWhileMovingToRubbishBinAndUnset()
         }
 
+    @Test
+    fun `test FileInfoJobInProgressState is set while deleting successfully, and unset at the end`() =
+        runTest {
+            mockDeleteSuccess()
+            testProgressIsSetWhileDeletingAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while deleting with an error, and unset at the end`() =
+        runTest {
+            mockDeleteSuccess()
+            testProgressIsSetWhileDeletingAndUnset()
+        }
+
 
     @Test
     fun `test on-off event is removed from state once is consumed`() {
@@ -415,6 +453,18 @@ internal class FileInfoViewModelTest {
         whenever(moveNodeToRubbishByHandle.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 
+    private suspend fun mockDeleteSuccess() {
+        whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
+        underTest.updateNode(node)
+        whenever(deleteNodeByHandle.invoke(nodeId)).thenReturn(Unit)
+    }
+
+    private suspend fun mockDeleteFailure() {
+        whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
+        underTest.updateNode(node)
+        whenever(deleteNodeByHandle.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
+    }
+
     private suspend fun testProgressIsSetWhileCopyingAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.Copying) {
             underTest.copyNodeCheckingCollisions(parentId)
@@ -427,7 +477,12 @@ internal class FileInfoViewModelTest {
 
     private suspend fun testProgressIsSetWhileMovingToRubbishBinAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.MovingToRubbishBin) {
-            underTest.moveNodeToRubbishBin()
+            underTest.removeNode()
+        }
+
+    private suspend fun testProgressIsSetWhileDeletingAndUnset() =
+        testProgressSetAndUnset(FileInfoJobInProgressState.Deleting) {
+            underTest.removeNode()
         }
 
     private suspend fun testProgressSetAndUnset(
