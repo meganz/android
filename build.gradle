@@ -1,3 +1,4 @@
+apply from: "tools/util.gradle"
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.gradleVersion = '7.2.2'
@@ -141,4 +142,6 @@ ext.isCiBuild = { ->
     return System.getenv("BUILD_NUMBER") != null
 }
 
-apply from: "$project.rootDir/tools/prebuilt-sdk.gradle"
+if (!shouldUsePrebuiltSdk()) {
+    apply from: "$project.rootDir/tools/prebuilt-sdk.gradle"
+}
