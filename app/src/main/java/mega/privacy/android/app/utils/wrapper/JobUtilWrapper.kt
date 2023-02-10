@@ -43,4 +43,11 @@ interface JobUtilWrapper {
     fun fireRestartCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean) =
         JobUtil.fireRestartCameraUploadJob(context, shouldIgnoreAttributes)
 
+    /**
+     * Wrapper method that calls [JobUtil.stopCameraUploadSyncHeartbeatWorkers]
+     *
+     * @param context [Context]
+     */
+    fun stopCameraUploadSyncHeartbeatWorkers(context: Context) =
+        JobUtil.stopCameraUploadSyncHeartbeatWorkers(context)
 }

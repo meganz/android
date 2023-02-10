@@ -143,6 +143,7 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.StartCameraUpload
 import mega.privacy.android.domain.usecase.StopCameraUpload
+import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
@@ -228,6 +229,17 @@ abstract class CameraUploadUseCases {
             @ApplicationContext context: Context,
         ): StopCameraUpload = StopCameraUpload {
             jobUtilWrapper.fireStopCameraUploadJob(context)
+        }
+
+        /**
+         * Provide the [StopCameraUploadSyncHeartbeat] implementation
+         */
+        @Provides
+        fun provideStopCameraUploadSyncHeartbeat(
+            jobUtilWrapper: JobUtilWrapper,
+            @ApplicationContext context: Context,
+        ): StopCameraUploadSyncHeartbeat = StopCameraUploadSyncHeartbeat {
+            jobUtilWrapper.stopCameraUploadSyncHeartbeatWorkers(context)
         }
 
         // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
