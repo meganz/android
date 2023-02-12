@@ -423,7 +423,7 @@
         <activity
             android:name=".BusinessExpiredAlertActivity" />
         <activity android:name=".smsVerification.SMSVerificationActivity" />
-        <activity android:name=".smsVerification.SMSVerificationReceiveTxtActivity" />
+        <activity android:name=".smsVerification.SMSVerificationTextActivity" />
         <activity
             android:name=".activities.settingsActivities.CameraUploadsPreferencesActivity"
             android:label="@string/section_photo_sync"
