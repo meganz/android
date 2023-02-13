@@ -684,7 +684,7 @@ public class CreateAccountFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        // TODO Auto-generated method stub
+
 
     }
 

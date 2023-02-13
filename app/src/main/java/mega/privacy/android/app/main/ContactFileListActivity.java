@@ -467,7 +467,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
     public void showUploadPanel() {
         Timber.d("showUploadPanel");
-        String[] PERMISSIONS = new String[] {
+        String[] PERMISSIONS = new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 PermissionUtils.getImagePermissionByVersion(),
                 PermissionUtils.getAudioPermissionByVersion(),
@@ -925,7 +925,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-        // TODO Auto-generated method stub
+
 
     }
 
@@ -965,7 +965,7 @@ public class ContactFileListActivity extends PasscodeActivity
 
     @Override
     public void onReloadNeeded(MegaApiJava api) {
-        // TODO Auto-generated method stub
+
 
     }
 
@@ -1061,14 +1061,14 @@ public class ContactFileListActivity extends PasscodeActivity
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-        // TODO Auto-generated method stub
+
 
     }
 
     @Override
     public void onContactRequestsUpdate(MegaApiJava api,
                                         ArrayList<MegaContactRequest> requests) {
-        // TODO Auto-generated method stub
+
 
     }
 

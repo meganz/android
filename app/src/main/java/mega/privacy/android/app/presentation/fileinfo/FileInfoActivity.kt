@@ -576,7 +576,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     showSnackBar(event.successMessage)
                     sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
                     if (event !is FileInfoOneOffViewEvent.Finished.Copying) {
-                        //TODO once everything is represented in view state, maybe we don't need to
+
                         // finish after moving the file because the view will be fully updated automatically
                         finish()
                     }

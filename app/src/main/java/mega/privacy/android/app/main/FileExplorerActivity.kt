@@ -28,12 +28,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -97,7 +95,9 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -227,8 +227,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private var parentHandle: Long = 0
 
     private val transparentColor by lazy {
-        ContextCompat.getColor(this,
-            android.R.color.transparent)
+        ContextCompat.getColor(
+            this,
+            android.R.color.transparent
+        )
     }
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
@@ -415,35 +417,43 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                     intent.getBooleanExtra(ALLOW_ADD_PARTICIPANTS, false)
 
                                 if (isEKR) {
-                                    megaChatApi.createGroupChat(peers,
+                                    megaChatApi.createGroupChat(
+                                        peers,
                                         chatTitle,
                                         false,
                                         false,
                                         allowAddParticipants,
-                                        this)
+                                        this
+                                    )
                                 } else {
                                     val chatLink = intent.getBooleanExtra(EXTRA_CHAT_LINK, false)
 
                                     if (chatLink) {
                                         if (chatTitle != null && chatTitle.isNotEmpty()) {
-                                            megaChatApi.createPublicChat(peers,
+                                            megaChatApi.createPublicChat(
+                                                peers,
                                                 chatTitle,
                                                 false,
                                                 false,
                                                 allowAddParticipants,
-                                                CreateGroupChatWithPublicLink(this, chatTitle))
+                                                CreateGroupChatWithPublicLink(this, chatTitle)
+                                            )
                                         } else {
-                                            Util.showAlert(this,
+                                            Util.showAlert(
+                                                this,
                                                 getString(R.string.message_error_set_title_get_link),
-                                                null)
+                                                null
+                                            )
                                         }
                                     } else {
-                                        megaChatApi.createPublicChat(peers,
+                                        megaChatApi.createPublicChat(
+                                            peers,
                                             chatTitle,
                                             false,
                                             false,
                                             allowAddParticipants,
-                                            this)
+                                            this
+                                        )
                                     }
                                 }
                             }
@@ -466,8 +476,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 importFragmentSelected = getInt("importFragmentSelected", -1)
                 action = getString("action", null)
                 chatExplorer =
-                    this@FileExplorerActivity.supportFragmentManager.getFragment(savedInstanceState,
-                        "chatExplorerFragment") as ChatExplorerFragment?
+                    this@FileExplorerActivity.supportFragmentManager.getFragment(
+                        savedInstanceState,
+                        "chatExplorerFragment"
+                    ) as ChatExplorerFragment?
                 querySearch = getString("querySearch", "")
                 isSearchExpanded = getBoolean("isSearchExpanded", isSearchExpanded)
                 pendingToAttach = getInt("pendingToAttach", 0)
@@ -482,8 +494,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 }
                 if (getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
                     newFolderDialog =
-                        showNewFolderDialog(this@FileExplorerActivity, this@FileExplorerActivity,
-                            currentParentNode, savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT))
+                        showNewFolderDialog(
+                            this@FileExplorerActivity, this@FileExplorerActivity,
+                            currentParentNode, savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT)
+                        )
                 }
             }
         } else {
@@ -512,21 +526,25 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         if (credentials == null) {
             Timber.w("User credentials NULL")
             if (viewModel.isImportingText(intent)) {
-                startActivity(Intent(this, LoginActivity::class.java)
-                    .putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(Intent.EXTRA_TEXT))
-                    .putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(Intent.EXTRA_SUBJECT))
-                    .putExtra(Intent.EXTRA_EMAIL, intent.getStringExtra(Intent.EXTRA_EMAIL))
-                    .setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD)
-                    .setType(Constants.TYPE_TEXT_PLAIN)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+                startActivity(
+                    Intent(this, LoginActivity::class.java)
+                        .putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                        .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(Intent.EXTRA_TEXT))
+                        .putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(Intent.EXTRA_SUBJECT))
+                        .putExtra(Intent.EXTRA_EMAIL, intent.getStringExtra(Intent.EXTRA_EMAIL))
+                        .setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD)
+                        .setType(Constants.TYPE_TEXT_PLAIN)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                )
 
                 finish()
             } else {
                 needLogin = true
                 viewModel.ownFilePrepareTask(this, intent)
-                createAndShowProgressDialog(false,
-                    StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1))
+                createAndShowProgressDialog(
+                    false,
+                    StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                )
             }
             return
         } else {
@@ -576,10 +594,14 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             afterLoginAndFetch()
         }
 
-        window.setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH)
-        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+        )
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+        )
 
         checkNotificationsPermission(this)
     }
@@ -587,9 +609,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private fun setupObservers() {
         nameCollisionActivityContract =
             registerForActivityResult(NameCollisionActivityContract()) { result: String? ->
-                backToCloud(if (result != null) parentHandle else INVALID_HANDLE,
+                backToCloud(
+                    if (result != null) parentHandle else INVALID_HANDLE,
                     0,
-                    result)
+                    result
+                )
             }
 
         viewModel.filesInfo.observe(this) { info: List<ShareInfo>? ->
@@ -608,8 +632,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         supportActionBar?.apply {
             show()
             Timber.d("supportActionBar.setHomeAsUpIndicator")
-            setHomeAsUpIndicator(tintIcon(this@FileExplorerActivity,
-                R.drawable.ic_arrow_back_white))
+            setHomeAsUpIndicator(
+                tintIcon(
+                    this@FileExplorerActivity,
+                    R.drawable.ic_arrow_back_white
+                )
+            )
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
@@ -698,8 +726,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     action = intent.action
                     viewModel.ownFilePrepareTask(this, intent)
                     chooseFragment(IMPORT_FRAGMENT)
-                    createAndShowProgressDialog(false,
-                        StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1))
+                    createAndShowProgressDialog(
+                        false,
+                        StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                    )
 
                     with(binding) {
                         cloudDriveFrameLayout.isVisible = true
@@ -730,13 +760,17 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             val position =
                 if (mTabsAdapterExplorer != null) explorerTabsPager.currentItem else 0
 
-            mTabsAdapterExplorer = FileExplorerPagerAdapter(supportFragmentManager,
-                this@FileExplorerActivity.lifecycle)
+            mTabsAdapterExplorer = FileExplorerPagerAdapter(
+                supportFragmentManager,
+                this@FileExplorerActivity.lifecycle
+            )
             explorerTabsPager.adapter = mTabsAdapterExplorer
             explorerTabsPager.currentItem = position
 
-            TabLayoutMediator(slidingTabsFileExplorer,
-                explorerTabsPager) { tab: TabLayout.Tab, tabPosition: Int ->
+            TabLayoutMediator(
+                slidingTabsFileExplorer,
+                explorerTabsPager
+            ) { tab: TabLayout.Tab, tabPosition: Int ->
                 tab.text = when (tabPosition) {
                     1 -> StringResourcesUtils.getString(R.string.tab_incoming_shares)
                     2 -> StringResourcesUtils.getString(R.string.section_chat)
@@ -849,9 +883,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     importFileFragment = ImportFilesFragment()
                 }
 
-                ft.replace(R.id.cloudDriveFrameLayout,
+                ft.replace(
+                    R.id.cloudDriveFrameLayout,
                     importFileFragment ?: return,
-                    "importFileFragment")
+                    "importFileFragment"
+                )
             }
         }
 
@@ -1195,8 +1231,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                     setRootTitle()
                                     supportActionBar?.setSubtitle(R.string.general_select_to_download)
                                 } else {
-                                    supportActionBar?.setTitle(megaApi.getNodeByHandle(
-                                        cDriveExplorer?.parentHandle ?: return).name)
+                                    supportActionBar?.setTitle(
+                                        megaApi.getNodeByHandle(
+                                            cDriveExplorer?.parentHandle ?: return
+                                        ).name
+                                    )
                                 }
                             }
                         }
@@ -1208,8 +1247,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     if (cDriveExplorer?.parentHandle == -1L || cDriveExplorer?.parentHandle == megaApi.rootNode.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(cDriveExplorer?.parentHandle
-                            ?: return).name)
+                        supportActionBar?.setTitle(
+                            megaApi.getNodeByHandle(
+                                cDriveExplorer?.parentHandle
+                                    ?: return
+                            ).name
+                        )
                     }
                 }
 
@@ -1422,8 +1465,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             filesToUploadFingerPrint[fingerprint] = info.fileAbsolutePath
 
             for (item in chatListItems) {
-                val pendingMsg = ChatUtil.createAttachmentPendingMessage(item.chatId,
-                    info.fileAbsolutePath, info.getTitle(), true)
+                val pendingMsg = ChatUtil.createAttachmentPendingMessage(
+                    item.chatId,
+                    info.fileAbsolutePath, info.getTitle(), true
+                )
 
                 idPendMsgs[pos] = pendingMsg.id
                 pos++
@@ -1576,14 +1621,18 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                             checkNotificationsPermission(this)
 
                             val text =
-                                StringResourcesUtils.getQuantityString(R.plurals.upload_began,
+                                StringResourcesUtils.getQuantityString(
+                                    R.plurals.upload_began,
                                     withoutCollisions.size,
-                                    withoutCollisions.size)
+                                    withoutCollisions.size
+                                )
 
-                            uploadUseCase.uploadInfos(this,
+                            uploadUseCase.uploadInfos(
+                                this,
                                 infos,
                                 viewModel.fileNames.value,
-                                (parentNode ?: return@subscribe).handle)
+                                (parentNode ?: return@subscribe).handle
+                            )
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({
@@ -1689,8 +1738,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
                 if (filePreparedInfos == null) {
                     viewModel.ownFilePrepareTask(this, intent)
-                    createAndShowProgressDialog(false,
-                        StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1))
+                    createAndShowProgressDialog(
+                        false,
+                        StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                    )
                 } else {
                     onIntentProcessed()
                 }
@@ -1824,9 +1875,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            showSnackbar(Constants.SNACKBAR_TYPE,
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
                                 text,
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            )
                             Timber.d("After UPLOAD click - back to Cloud")
                             backToCloud(parentHandle, 1, null)
                             finishAndRemoveTask()
@@ -1987,15 +2040,15 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         api: MegaApiJava, request: MegaRequest,
         e: MegaError,
     ) {
-        // TODO Auto-generated method stub
+
     }
 
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        // TODO Auto-generated method stub
+
     }
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
-        // TODO Auto-generated method stub
+
     }
 
     override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
@@ -2009,7 +2062,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     override fun onSetElementsUpdate(
         api: MegaApiJava?,
-        elements: java.util.ArrayList<MegaSetElement>?
+        elements: java.util.ArrayList<MegaSetElement>?,
     ) {
     }
 
@@ -2040,7 +2093,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     override fun onReloadNeeded(api: MegaApiJava) {
-        // TODO Auto-generated method stub
+
     }
 
     public override fun onDestroy() {
@@ -2083,14 +2136,14 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     override fun onAccountUpdate(api: MegaApiJava) {
-        // TODO Auto-generated method stub
+
     }
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
         requests: ArrayList<MegaContactRequest>,
     ) {
-        // TODO Auto-generated method stub
+
     }
 
     /**
@@ -2109,8 +2162,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 onBackPressedDispatcher.onBackPressed()
             }
             R.id.cab_menu_create_folder -> {
-                newFolderDialog = showNewFolderDialog(this, this,
-                    currentParentNode, null)
+                newFolderDialog = showNewFolderDialog(
+                    this, this,
+                    currentParentNode, null
+                )
             }
             R.id.cab_menu_new_chat -> {
                 if (megaApi.rootNode != null) {
@@ -2123,14 +2178,17 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         } else {
                             createChatLauncher.launch(
                                 Intent(this, AddContactActivity::class.java)
-                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA))
+                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                            )
                         }
                     }
                 } else {
                     Timber.w("Online but not megaApi")
-                    Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),
+                    Util.showErrorAlertDialog(
+                        getString(R.string.error_server_connection_problem),
                         false,
-                        this)
+                        this
+                    )
                 }
             }
         }
@@ -2192,7 +2250,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 chats,
                 users,
                 this,
-                this) { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) }
+                this
+            ) { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) }
 
             for (user in users) {
                 val peers = MegaChatPeerList.createInstance()
@@ -2222,16 +2281,20 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            createChatLauncher.launch(Intent(this, AddContactActivity::class.java)
-                                .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                                .putExtra(EXTRA_ONLY_CREATE_GROUP, true))
+                            createChatLauncher.launch(
+                                Intent(this, AddContactActivity::class.java)
+                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                                    .putExtra(EXTRA_ONLY_CREATE_GROUP, true)
+                            )
                         }
                     }
                 } else {
                     Timber.w("Online but not megaApi")
-                    Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),
+                    Util.showErrorAlertDialog(
+                        getString(R.string.error_server_connection_problem),
                         false,
-                        this)
+                        this
+                    )
                 }
             }
         }
@@ -2267,8 +2330,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             return
         }
         if (filePreparedInfos == null) {
-            createAndShowProgressDialog(false,
-                StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1))
+            createAndShowProgressDialog(
+                false,
+                StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+            )
 
             filePrepareUseCase.prepareFiles(intent)
                 .subscribeOn(Schedulers.io())

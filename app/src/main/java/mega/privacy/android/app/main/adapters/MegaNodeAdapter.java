@@ -83,10 +83,10 @@ import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactFileListFragment;
-import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
@@ -1086,7 +1086,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
 
                     if (isMandatoryFingerprintVerificationNeeded) {
-                        //// TODO This if will also contain a check from SDK which shows whether user needs to be authorised
+                        //
                         holder.permissionsIcon.setImageResource(R.drawable.serious_warning);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
@@ -1095,7 +1095,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                if(isMandatoryFingerprintVerificationNeeded) {
+                if (isMandatoryFingerprintVerificationNeeded) {
                     holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                 }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case

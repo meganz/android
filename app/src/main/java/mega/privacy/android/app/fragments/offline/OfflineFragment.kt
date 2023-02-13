@@ -179,7 +179,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun onStart() {
         super.onStart()
 
-        // TODO: workaround for navigation with ManagerActivity
+
         callManager {
             if (args.rootFolderOnly) {
                 it.pagerOfflineFragmentOpened(this)
@@ -216,7 +216,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun onStop() {
         super.onStop()
 
-        // TODO: workaround for navigation with ManagerActivity
+
         callManager {
             if (args.rootFolderOnly) {
                 it.pagerOfflineFragmentClosed(this)

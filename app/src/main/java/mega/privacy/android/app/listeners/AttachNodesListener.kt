@@ -22,7 +22,7 @@ class AttachNodesListener(
     private val snackbarShower: SnackbarShower,
     private val forceNonChatSnackbar: Boolean,
     private val attachNodeToChatListener: AttachNodeToChatListener?,
-    private val onFinish: () -> Unit
+    private val onFinish: () -> Unit,
 ) : ChatBaseListener(MegaApplication.getInstance()) {
 
     private var successCount = 0
@@ -39,7 +39,7 @@ class AttachNodesListener(
             }
 
             if (successCount + failureCount == totalCount) {
-                // TODO: what if both successCount and failureCount > 0?
+
                 if (successCount > 0) {
                     if (forceNonChatSnackbar) {
                         snackbarShower.showSnackbar(

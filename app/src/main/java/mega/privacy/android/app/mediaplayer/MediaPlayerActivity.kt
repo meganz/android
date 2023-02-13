@@ -61,7 +61,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
@@ -72,6 +71,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -211,9 +211,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 service.serviceGateway.videoSizeUpdate()
                     .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                     .onEach { (width, height) ->
-                        val rotationMode = Settings.System.getInt(contentResolver,
+                        val rotationMode = Settings.System.getInt(
+                            contentResolver,
                             ACCELEROMETER_ROTATION,
-                            SCREEN_BRIGHTNESS_MODE_MANUAL)
+                            SCREEN_BRIGHTNESS_MODE_MANUAL
+                        )
                         currentOrientation = if (width > height) {
                             SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                         } else {
@@ -287,8 +289,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             setContentView(dragToExit.wrapContentView(binding.root))
             dragToExit.observeThumbnailLocation(this, intent)
             binding.toolbar.run {
-                collapseIcon = AppCompatResources.getDrawable(this@MediaPlayerActivity,
-                    androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+                collapseIcon = AppCompatResources.getDrawable(
+                    this@MediaPlayerActivity,
+                    androidx.appcompat.R.drawable.abc_ic_ab_back_material
+                )
                 collapseIcon?.setTint(Color.WHITE)
             }
             binding.toolbar.post {
@@ -385,9 +389,11 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             true,
             object : ContentObserver(Handler(mainLooper)) {
                 override fun onChange(selfChange: Boolean) {
-                    val rotationMode = Settings.System.getInt(contentResolver,
+                    val rotationMode = Settings.System.getInt(
+                        contentResolver,
                         ACCELEROMETER_ROTATION,
-                        SCREEN_BRIGHTNESS_MODE_MANUAL)
+                        SCREEN_BRIGHTNESS_MODE_MANUAL
+                    )
                     requestedOrientation =
                         if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
                             SCREEN_ORIENTATION_SENSOR
@@ -503,7 +509,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 R.menu.media_player
             } else {
                 R.menu.menu_video_player
-            }, menu)
+            }, menu
+        )
 
         menu.findItem(R.id.get_link).title =
             StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
@@ -602,7 +609,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                             menu.findItem(R.id.chat_import).isVisible = true
                             menu.findItem(R.id.chat_save_for_offline).isVisible = true
 
-                            // TODO: share option will be added in AND-12831
+
                             menu.findItem(R.id.share).isVisible = false
 
                             val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
@@ -745,7 +752,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val launchIntent = playerServiceViewModelGateway?.getCurrentIntent() ?: return false
         val playingHandle = playerServiceViewModelGateway?.getCurrentPlayingHandle() ?: return false
@@ -876,8 +883,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                     }
                     else -> {
                         playerServiceViewModelGateway?.run {
-                            shareNode(this@MediaPlayerActivity,
-                                megaApi.getNodeByHandle(getCurrentPlayingHandle()))
+                            shareNode(
+                                this@MediaPlayerActivity,
+                                megaApi.getNodeByHandle(getCurrentPlayingHandle())
+                            )
                         }
                     }
                 }
@@ -913,7 +922,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                                     refreshMenuOptionsVisibility()
                                 }
                             }
-                        }))
+                        })
+                    )
                 }
                 return true
             }
@@ -1021,7 +1031,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
 
@@ -1127,8 +1137,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      * Show system UI
      */
     fun showSystemUI() {
-        WindowInsetsControllerCompat(window,
-            binding.root).show(WindowInsetsCompat.Type.systemBars())
+        WindowInsetsControllerCompat(
+            window,
+            binding.root
+        ).show(WindowInsetsCompat.Type.systemBars())
     }
 
     /**
@@ -1160,18 +1172,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         val isVideoPlayerMainView = !isAudioPlayer() && isMainPlayer
         val isVideoPlaylist = !isAudioPlayer() && isPlaylist
 
-        WindowCompat.setDecorFitsSystemWindows(window,
-            !isVideoPlayerMainView || !isVideoPlaylist)
+        WindowCompat.setDecorFitsSystemWindows(
+            window,
+            !isVideoPlayerMainView || !isVideoPlaylist
+        )
 
         updatePaddingForSystemUI(isVideoPlayerMainView, isVideoPlaylist)
 
-        binding.rootLayout.setBackgroundColor(getColor(
-            if (isAudioPlayer()) {
-                R.color.white_dark_grey
-            } else {
-                R.color.dark_grey
-            }
-        ))
+        binding.rootLayout.setBackgroundColor(
+            getColor(
+                if (isAudioPlayer()) {
+                    R.color.white_dark_grey
+                } else {
+                    R.color.dark_grey
+                }
+            )
+        )
 
         when {
             isAudioPlayer() && isMainPlayer -> {
@@ -1313,7 +1329,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         stopPlayer()
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }

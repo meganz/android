@@ -32,15 +32,15 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATE
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
-import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -189,7 +189,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         return super.onOptionsItemSelected(item)
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)

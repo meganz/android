@@ -3888,7 +3888,7 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * When the user is in Photos, this sets the correct Toolbar Icon depending on
      * certain conditions.
-     *
+     * <p>
      * This is only called when there are no unread notifications
      */
     private void setPhotosNavigationToolbarIcon() {
@@ -4081,7 +4081,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }).attach();
 
             if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()) {
-                //// TODO hardcoded number for now. This will get changed after SDK changes are available
+                //
                 TabLayout.Tab incomingSharesTab = tabLayoutShares.getTabAt(0);
                 if (incomingSharesTab != null) {
                     incomingSharesTab.getOrCreateBadge().setNumber(2);
@@ -8476,7 +8476,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
 
-                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+
                 try {
                     ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
@@ -8499,7 +8499,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
 
-                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+
                 try {
                     ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {

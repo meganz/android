@@ -131,9 +131,11 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         binding.actionCancel.setOnClickListener { finish() }
         var textToShowTOP = getString(R.string.top)
         try {
-            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'"
-                    + getThemeColorHexString(this, R.attr.colorSecondary)
-                    + "\'>")
+            textToShowTOP = textToShowTOP.replace(
+                "[B]", "<font color=\'"
+                        + getThemeColorHexString(this, R.attr.colorSecondary)
+                        + "\'>"
+            )
                 .replace("[/B]", "</font>")
                 .replace("[A]", "<u>")
                 .replace("[/A]", "</u>")
@@ -169,9 +171,11 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 mk = intent.getStringExtra(IntentConstants.EXTRA_MASTER_KEY)
                 if (mk == null) {
                     Timber.w("MK is NULL - close activity")
-                    Util.showAlert(this,
+                    Util.showAlert(
+                        this,
                         getString(R.string.general_text_error),
-                        getString(R.string.general_error_word))
+                        getString(R.string.general_error_word)
+                    )
                 }
                 supportActionBar?.title = getString(R.string.title_enter_new_password)
             }
@@ -181,9 +185,11 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 linkToReset = intent.dataString
                 if (linkToReset == null) {
                     Timber.w("link is NULL - close activity")
-                    Util.showAlert(this,
+                    Util.showAlert(
+                        this,
                         getString(R.string.general_text_error),
-                        getString(R.string.general_error_word))
+                        getString(R.string.general_error_word)
+                    )
                 }
                 mk = null
                 supportActionBar?.title = getString(R.string.title_enter_new_password)
@@ -222,9 +228,11 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                     Timber.d("Reset pass on click")
                     if (linkToReset == null) {
                         Timber.w("link is NULL")
-                        Util.showAlert(this,
+                        Util.showAlert(
+                            this,
                             getString(R.string.general_text_error),
-                            getString(R.string.general_error_word))
+                            getString(R.string.general_error_word)
+                        )
                     } else {
                         if (mk == null) {
                             Timber.d("Proceed to park account")
@@ -271,23 +279,37 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             when {
                 isSamePassword || passWordStrength == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length < 4 -> {
                     shapePasswdFirst.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_very_weak)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_very_weak
+                        )
                     shapePasswdSecond.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     shapePasswdThird.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     shapePasswdFourth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     shapePasswdFifth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     passwordType.text = getString(R.string.pass_very_weak)
-                    passwordType.setTextColor(ContextCompat.getColor(this@ChangePasswordActivity,
-                        R.color.red_600_red_300))
+                    passwordType.setTextColor(
+                        ContextCompat.getColor(
+                            this@ChangePasswordActivity,
+                            R.color.red_600_red_300
+                        )
+                    )
                     passwordAdviceText.text = getString(R.string.passwd_weak)
                     passwdValid = false
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
@@ -295,23 +317,37 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 }
                 passWordStrength == MegaApiJava.PASSWORD_STRENGTH_WEAK -> {
                     shapePasswdFirst.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_weak)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_weak
+                        )
                     shapePasswdSecond.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_weak)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_weak
+                        )
                     shapePasswdThird.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     shapePasswdFourth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     shapePasswdFifth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     passwordType.text = getString(R.string.pass_weak)
-                    passwordType.setTextColor(ContextCompat.getColor(this@ChangePasswordActivity,
-                        R.color.yellow_600_yellow_300))
+                    passwordType.setTextColor(
+                        ContextCompat.getColor(
+                            this@ChangePasswordActivity,
+                            R.color.yellow_600_yellow_300
+                        )
+                    )
                     passwordAdviceText.text = getString(R.string.passwd_weak)
                     passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
@@ -319,23 +355,37 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 }
                 passWordStrength == MegaApiJava.PASSWORD_STRENGTH_MEDIUM -> {
                     shapePasswdFirst.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_medium)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_medium
+                        )
                     shapePasswdSecond.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_medium)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_medium
+                        )
                     shapePasswdThird.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_medium)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_medium
+                        )
                     shapePasswdFourth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     shapePasswdFifth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     passwordType.text = getString(R.string.pass_medium)
-                    passwordType.setTextColor(ContextCompat.getColor(this@ChangePasswordActivity,
-                        R.color.green_500_green_400))
+                    passwordType.setTextColor(
+                        ContextCompat.getColor(
+                            this@ChangePasswordActivity,
+                            R.color.green_500_green_400
+                        )
+                    )
                     passwordAdviceText.text = getString(R.string.passwd_medium)
                     passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
@@ -343,23 +393,37 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 }
                 passWordStrength == MegaApiJava.PASSWORD_STRENGTH_GOOD -> {
                     shapePasswdFirst.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_good)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_good
+                        )
                     shapePasswdSecond.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_good)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_good
+                        )
                     shapePasswdThird.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_good)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_good
+                        )
                     shapePasswdFourth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_good)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_good
+                        )
                     shapePasswdFifth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.shape_password)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.shape_password
+                        )
                     passwordType.text = getString(R.string.pass_good)
-                    passwordType.setTextColor(ContextCompat.getColor(this@ChangePasswordActivity,
-                        R.color.lime_green_500_200))
+                    passwordType.setTextColor(
+                        ContextCompat.getColor(
+                            this@ChangePasswordActivity,
+                            R.color.lime_green_500_200
+                        )
+                    )
                     passwordAdviceText.text = getString(R.string.passwd_good)
                     passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
@@ -367,23 +431,37 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 }
                 else -> {
                     shapePasswdFirst.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_strong)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_strong
+                        )
                     shapePasswdSecond.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_strong)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_strong
+                        )
                     shapePasswdThird.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_strong)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_strong
+                        )
                     shapePasswdFourth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_strong)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_strong
+                        )
                     shapePasswdFifth.background =
-                        ContextCompat.getDrawable(this@ChangePasswordActivity,
-                            R.drawable.passwd_strong)
+                        ContextCompat.getDrawable(
+                            this@ChangePasswordActivity,
+                            R.drawable.passwd_strong
+                        )
                     passwordType.text = getString(R.string.pass_strong)
-                    passwordType.setTextColor(ContextCompat.getColor(this@ChangePasswordActivity,
-                        R.color.dark_blue_500_200))
+                    passwordType.setTextColor(
+                        ContextCompat.getColor(
+                            this@ChangePasswordActivity,
+                            R.color.dark_blue_500_200
+                        )
+                    )
                     passwordAdviceText.text = getString(R.string.passwd_strong)
                     passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong)
@@ -514,9 +592,11 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             MegaRequest.TYPE_CHANGE_PW -> {
                 Timber.d("TYPE_CHANGE_PW")
                 if (e.errorCode != MegaError.API_OK) {
-                    Timber.w("e.getErrorCode = %d__ e.getErrorString = %s",
+                    Timber.w(
+                        "e.getErrorCode = %d__ e.getErrorString = %s",
                         e.errorCode,
-                        e.errorString)
+                        e.errorString
+                    )
                     try {
                         progress.dismiss()
                     } catch (ex: Exception) {
@@ -551,9 +631,11 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                     Timber.w(ex, "Exception dismissing progress dialog")
                 }
                 if (e.errorCode != MegaError.API_OK) {
-                    Timber.w("e.getErrorCode = %d__ e.getErrorString = %s",
+                    Timber.w(
+                        "e.getErrorCode = %d__ e.getErrorString = %s",
                         e.errorCode,
-                        e.errorString)
+                        e.errorString
+                    )
                 } else {
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                 }
@@ -579,14 +661,18 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                         val intent = Intent(this, VerifyTwoFactorActivity::class.java)
                         intent.putExtra(
                             VerifyTwoFactorActivity.KEY_VERIFY_TYPE,
-                            Constants.CHANGE_PASSWORD_2FA)
+                            Constants.CHANGE_PASSWORD_2FA
+                        )
                         intent.putExtra(
                             VerifyTwoFactorActivity.KEY_NEW_PASSWORD,
-                            binding.changePasswordNewPassword1.text.toString())
+                            binding.changePasswordNewPassword1.text.toString()
+                        )
                         intent.putExtra(
                             KEY_IS_LOGOUT,
                             getIntent() != null && getIntent().getBooleanExtra(
-                                KEY_IS_LOGOUT, false))
+                                KEY_IS_LOGOUT, false
+                            )
+                        )
                         startActivity(intent)
                     } else {
                         changePassword(binding.changePasswordNewPassword1.text.toString())
@@ -649,7 +735,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     }
 
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        // TODO Auto-generated method stub
+
     }
 
     public override fun onDestroy() {

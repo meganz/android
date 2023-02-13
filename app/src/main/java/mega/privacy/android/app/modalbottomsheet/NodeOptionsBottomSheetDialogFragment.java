@@ -144,7 +144,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private static final String SAVED_STATE_KEY_MODE = "MODE";
 
-    /** Values used to control the display of option separators*/
+    /**
+     * Values used to control the display of option separators
+     */
     private int counterOpen = 2;
     private int counterSave = 2;
     private int counterShares = 6;
@@ -254,8 +256,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionRubbishBin = contentView.findViewById(R.id.rubbish_bin_option);
         TextView optionRemove = contentView.findViewById(R.id.remove_option);
 
-        if(searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
-            ////TODO This flag for false for now. This will get manipulated after SDK changes
+        if (searchViewModel.getMandatoryFingerPrintVerificationState().getValue()) {
+            //
             TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
             nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
             optionVerifyUser.setVisibility(View.VISIBLE);
@@ -728,14 +730,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     /**
      * Apply read-only Restrictions for Backup Nodes by hiding the following options:
-     *
+     * <p>
      * 1.) Rename
      * 2.) Move to
      * 3.) Move to Rubbish Bin
      * 4.) Favourite
      * 5.) Label
      * 6.) Versions
-     *
+     * <p>
      * Hiding the aforementioned options will reduce the counter values for the Modify and Open
      * group options
      */
@@ -1000,8 +1002,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         requireActivity(),
                         node,
                         ((ManagerActivity) requireActivity())::saveNodeByOpenWith,
-                        (ManagerActivity)requireActivity(),
-                        (ManagerActivity)requireActivity(),
+                        (ManagerActivity) requireActivity(),
+                        (ManagerActivity) requireActivity(),
                         true);
                 dismissAllowingStateLoss();
                 return;

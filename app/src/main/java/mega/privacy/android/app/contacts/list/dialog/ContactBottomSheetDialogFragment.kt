@@ -40,7 +40,6 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.setImageRequestFromUri
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
@@ -76,7 +75,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     lateinit var passcodeManagement: PasscodeManagement
 
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
-    private val userHandle by lazy { arguments?.getLong(USER_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE }
+    private val userHandle by lazy {
+        arguments?.getLong(USER_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE
+    }
 
     private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
     private var removeContactDialog: AlertDialog? = null
@@ -92,35 +93,47 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        selectFileLauncher = registerForActivityResult(SelectFileToShareActivityContract()) { result ->
-            if (result != null) {
-                viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { user ->
-                    nodeAttacher.handleSelectFileResult(result, user, activity as ContactsActivity)
+        selectFileLauncher =
+            registerForActivityResult(SelectFileToShareActivityContract()) { result ->
+                if (result != null) {
+                    viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { user ->
+                        nodeAttacher.handleSelectFileResult(
+                            result,
+                            user,
+                            activity as ContactsActivity
+                        )
+                        dismiss()
+                    }
+                }
+            }
+
+        selectFolderLauncher =
+            registerForActivityResult(SelectFolderToShareActivityContract()) { result ->
+                if (result != null) {
+                    selectedContacts = result.getStringArrayListExtra(SELECTED_CONTACTS)
+                    folderHandle = result.getLongExtra(EXTRA_SELECTED_FOLDER, 0)
+                    showNodePermissionsDialog()
+                }
+            }
+
+        selectChatLauncher =
+            registerForActivityResult(SelectChatsToAttachActivityContract()) { result ->
+                if (result != null) {
+                    nodeAttacher.handleActivityResult(
+                        REQUEST_CODE_SELECT_CHAT,
+                        RESULT_OK,
+                        result,
+                        activity as ContactsActivity
+                    )
                     dismiss()
                 }
             }
-        }
-
-        selectFolderLauncher = registerForActivityResult(SelectFolderToShareActivityContract()) { result ->
-            if (result != null) {
-                selectedContacts = result.getStringArrayListExtra(SELECTED_CONTACTS)
-                folderHandle = result.getLongExtra(EXTRA_SELECTED_FOLDER, 0)
-                showNodePermissionsDialog()
-            }
-        }
-
-        selectChatLauncher = registerForActivityResult(SelectChatsToAttachActivityContract()) { result ->
-            if (result != null) {
-                nodeAttacher.handleActivityResult(REQUEST_CODE_SELECT_CHAT, RESULT_OK, result, activity as ContactsActivity)
-                dismiss()
-            }
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = BottomSheetContactDetailBinding.inflate(inflater, container, false)
         contentView = binding.root
@@ -199,7 +212,10 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.optionCall.setOnClickListener {
             MegaApplication.userWaitingForCall = megaUser.handle
             if (CallUtil.canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                val audio = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
+                val audio = PermissionUtils.hasPermissions(
+                    requireContext(),
+                    Manifest.permission.RECORD_AUDIO
+                )
                 viewModel.onCallTap(video = false, audio = audio)
             }
             dismiss()
@@ -256,7 +272,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showNodePermissionsDialog() {
         if (nodePermissionsDialog?.isShowing == true) nodePermissionsDialog?.dismiss()
 
-        val node = megaApi.getNodeByHandle(folderHandle!!) // TODO Remove `MegaApi` calls in UI
+        val node = megaApi.getNodeByHandle(folderHandle!!)
         if (node?.isFolder == true) {
             val permissions = arrayOf(
                 getString(R.string.file_properties_shared_folder_read_only),
@@ -266,7 +282,10 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             nodePermissionsDialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.file_properties_shared_folder_permissions))
-                .setSingleChoiceItems(permissions, INVALID_ITEM) { dialog: DialogInterface, item: Int ->
+                .setSingleChoiceItems(
+                    permissions,
+                    INVALID_ITEM
+                ) { dialog: DialogInterface, item: Int ->
                     NodeController(requireContext()).shareFolder(node, selectedContacts, item)
                     folderHandle = null
                     selectedContacts = null

@@ -37,8 +37,8 @@ import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -233,7 +233,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         super.onSaveInstanceState(outState)
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
@@ -786,12 +786,16 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private fun isAppStoreAvailable(): Boolean {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getPackageInfo(BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
-                    PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong()))
+                packageManager.getPackageInfo(
+                    BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong())
+                )
             } else {
                 @Suppress("DEPRECATION")
-                packageManager.getPackageInfo(BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
-                    PackageManager.GET_ACTIVITIES)
+                packageManager.getPackageInfo(
+                    BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                    PackageManager.GET_ACTIVITIES
+                )
             }
             true
         } catch (exception: PackageManager.NameNotFoundException) {

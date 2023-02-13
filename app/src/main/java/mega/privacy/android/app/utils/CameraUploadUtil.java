@@ -40,8 +40,6 @@ public class CameraUploadUtil {
     private static final DatabaseHandler dbH = app.getDbH();
 
     /**
-     * TODO replace with use case
-     *
      * @see ResetPrimaryTimeline
      */
     public static void resetPrimaryTimeline() {
@@ -52,8 +50,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case
-     *
      * @see ResetSecondaryTimeline
      */
     public static void resetSecondaryTimeline() {
@@ -64,8 +60,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case
-     *
      * @see GetUploadFolderHandle
      */
     public static long getPrimaryFolderHandle() {
@@ -73,8 +67,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case
-     *
      * @see GetUploadFolderHandle
      */
     public static long getSecondaryFolderHandle() {
@@ -82,8 +74,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case
-     *
      * @see GetUploadFolderHandle
      */
     private static long getUploadFolderHandle(boolean isPrimary) {
@@ -98,8 +88,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case
-     *
      * @see ResetCameraUploadTimelines
      */
     public static boolean compareAndUpdateLocalFolderAttribute(long handleInUserAttr, boolean isSecondary) {
@@ -189,8 +177,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case after settings are refactored in CU-3
-     *
      * @see GetDefaultNodeHandle
      */
     public static long findDefaultFolder(String folderName) {
@@ -200,8 +186,6 @@ public class CameraUploadUtil {
     }
 
     /**
-     * TODO replace with use case after attributes are refactored in CU-123
-     *
      * @see UpdateFolderIconBroadcast
      */
     public static void forceUpdateCameraUploadFolderIcon(boolean isSecondary, long handle) {

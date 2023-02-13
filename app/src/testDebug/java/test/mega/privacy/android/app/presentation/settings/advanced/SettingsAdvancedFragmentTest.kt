@@ -96,7 +96,7 @@ class SettingsAdvancedFragmentTest {
 
         isOnline.tryEmit(false)
 
-        Thread.sleep(200) //TODO: Find an alternative. This is a hack to get around Robolectric not respecting idling resources.
+        Thread.sleep(200)
 
         verifyPreference(ViewMatchers.isNotEnabled())
     }
@@ -112,7 +112,7 @@ class SettingsAdvancedFragmentTest {
 
         isOnline.tryEmit(true)
 
-        Thread.sleep(200) //TODO: Find an alternative. This is a hack to get around Robolectric not respecting idling resources.
+        Thread.sleep(200)
 
         verifyPreference(ViewMatchers.isEnabled())
     }
@@ -124,8 +124,10 @@ class SettingsAdvancedFragmentTest {
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
         onPreferences().perform(
-            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0,
-                ViewActions.click())
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                ViewActions.click()
+            )
         )
 
         verifyPreference(ViewMatchers.isChecked())
@@ -141,8 +143,10 @@ class SettingsAdvancedFragmentTest {
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
         onPreferences().perform(
-            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0,
-                ViewActions.click())
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0,
+                ViewActions.click()
+            )
         )
 
         verifyPreference(ViewMatchers.isNotChecked())
@@ -152,7 +156,7 @@ class SettingsAdvancedFragmentTest {
 
     private fun setInitialState(
         isOnline: StateFlow<Boolean> = MutableStateFlow(true),
-        rootNodeExists: Boolean = true
+        rootNodeExists: Boolean = true,
     ) {
         whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(isOnline)
         runBlocking { whenever(TestInitialiseUseCases.rootNodeExists()).thenReturn(rootNodeExists) }

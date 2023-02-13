@@ -219,7 +219,7 @@ abstract class CameraUploadUseCases {
         fun provideUpdateFolderDestinationBroadcast(cameraUploadRepository: CameraUploadRepository): UpdateFolderDestinationBroadcast =
             UpdateFolderDestinationBroadcast(cameraUploadRepository::sendUpdateFolderDestinationBroadcast)
 
-        // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
+
         /**
          * Provide the [StopCameraUpload] implementation
          */
@@ -242,7 +242,7 @@ abstract class CameraUploadUseCases {
             jobUtilWrapper.stopCameraUploadSyncHeartbeatWorkers(context)
         }
 
-        // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
+
         /**
          * Provide the [StartCameraUpload] implementation
          */

@@ -680,7 +680,6 @@ public class AppRTCAudioManager {
 
     /**
      * Changes default audio device.
-     * TODO(henrika): add usage of this method in the AppRTCMobile client.
      */
     private void setDefaultAudioDevice(AudioDevice defaultDevice) {
         ThreadUtils.checkIsOnMainThread();
@@ -853,7 +852,6 @@ public class AppRTCAudioManager {
 
     /**
      * Updates list of possible audio devices and make new device selection.
-     * TODO(henrika): add unit test to verify all state transitions.
      */
     public void updateAudioDeviceState() {
         startBluetooth();

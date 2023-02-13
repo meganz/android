@@ -200,7 +200,6 @@ internal class CameraUploadMediaFacade @Inject constructor(
                 && media.filePath!!.startsWith(parentPath)
 
 
-    // TODO Refactor SD Card Util Class
     private fun getSDCardRoot(path: String): String {
         var i = 0
         var x = 0

@@ -182,13 +182,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -206,7 +206,7 @@ public class ThumbnailUtils {
         @Override
         public void onRequestTemporaryError(MegaApiJava api,
                                             MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -225,7 +225,7 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -292,13 +292,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
     }
@@ -316,7 +316,7 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -371,13 +371,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
     }
@@ -395,7 +395,7 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -445,13 +445,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
     }
@@ -469,7 +469,7 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -509,13 +509,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
     }
@@ -533,7 +533,7 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -574,13 +574,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
     }
@@ -1140,13 +1140,13 @@ public class ThumbnailUtils {
             }
             pdfiumCore.closeDocument(pdfDocument);
         } catch (Exception e) {
-            //todo with exception
+
         } finally {
             try {
                 if (out != null)
                     out.close();
             } catch (Exception e) {
-                //todo with exception
+
             }
         }
     }
@@ -1271,7 +1271,7 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestStart(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
 
@@ -1317,13 +1317,13 @@ public class ThumbnailUtils {
 
         @Override
         public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-            // TODO Auto-generated method stub
+
 
         }
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
 
         }
     }

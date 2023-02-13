@@ -99,7 +99,6 @@ public class RoundedDrawable extends Drawable {
                 // just return if it's already a RoundedDrawable
                 return drawable;
             } else if (drawable instanceof ColorDrawable) {
-                // FIXME we don't support ColorDrawables yet
                 return drawable;
             } else if (drawable instanceof LayerDrawable) {
                 LayerDrawable ld = (LayerDrawable) drawable;
