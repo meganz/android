@@ -13,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.UpgradeSecurity
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -51,4 +52,7 @@ object TestGetNodeModule {
 
     @Provides
     fun provideOpenShareDialog() = mock<OpenShareDialog>()
+
+    @Provides
+    fun provideUpgradeSecurity() = mock<UpgradeSecurity>()
 }
