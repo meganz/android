@@ -300,7 +300,7 @@ class AlbumsViewModel @Inject constructor(
                 val finalTitle = title.ifEmpty {
                     _state.value.createAlbumPlaceholderTitle
                 }.trim()
-                if (checkTitleValidity(finalTitle)) {
+                if (checkTitleValidity(finalTitle, true)) {
                     val album = createAlbum(finalTitle)
                     _state.update {
                         it.copy(
