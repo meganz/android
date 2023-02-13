@@ -21,12 +21,14 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChangePasswordBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
+import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.ColorUtils.getThemeColorHexString
 import mega.privacy.android.app.utils.Constants
@@ -76,6 +78,9 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        collectUIState()
+
         passwdValid = false
         binding.containerPasswdElements.visibility = View.GONE
         binding.changePasswordNewPassword1Layout.isEndIconVisible = false
@@ -197,6 +202,20 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
     }
 
+    private fun collectUIState() {
+        this.collectFlow(viewModel.uiState) { state ->
+            handleNetworkConnectionState(state)
+        }
+    }
+
+    private fun handleNetworkConnectionState(uiState: ChangePasswordUIState) {
+        if (uiState.isShowNoNetworkSnackBar) {
+            showSnackbar(getString(R.string.error_server_connection_problem))
+            viewModel.onNoNetworkSnackBarShown()
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         Timber.d("onBackPressed")
         if (intent?.getBooleanExtra(KEY_IS_LOGOUT, false) == true) {
@@ -476,8 +495,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
 
     private fun onResetPasswordClick(hasMk: Boolean) {
         Timber.d("hasMk: %s", hasMk)
-        if (!viewModel.isConnected) {
-            showSnackbar(getString(R.string.error_server_connection_problem))
+        if (viewModel.isConnectedToNetwork().not()) {
             return
         }
         if (!validateForm(false)) {
@@ -498,8 +516,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
 
     private fun onChangePasswordClick() {
         Timber.d("onChangePasswordClick")
-        if (!viewModel.isConnected) {
-            showSnackbar(getString(R.string.error_server_connection_problem))
+        if (viewModel.isConnectedToNetwork().not()) {
             return
         }
         if (!validateForm(true)) {

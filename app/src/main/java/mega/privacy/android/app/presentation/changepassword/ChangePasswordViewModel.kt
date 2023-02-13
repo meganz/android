@@ -36,10 +36,23 @@ internal class ChangePasswordViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     /**
-     * Is network connected
+     * Check device network connection status
+     * Updates the UI State with network connection status to show SnackBar
+     * @return true when device has network connection, else false
      */
-    val isConnected: Boolean
-        get() = monitorConnectivity().value
+    fun isConnectedToNetwork(): Boolean {
+        val isConnected = monitorConnectivity().value
+        _uiState.update { it.copy(isShowNoNetworkSnackBar = isConnected.not()) }
+
+        return isConnected
+    }
+
+    /**
+     * Reset the UI State when no network SnackBar has been shown.
+     */
+    fun onNoNetworkSnackBarShown() {
+        _uiState.update { it.copy(isShowNoNetworkSnackBar = false) }
+    }
 
     fun onConfirmResetPassword(
         link: String?,

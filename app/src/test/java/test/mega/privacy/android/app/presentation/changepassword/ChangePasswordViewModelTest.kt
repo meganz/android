@@ -23,8 +23,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ChangePasswordViewModelTest {
@@ -55,18 +54,6 @@ internal class ChangePasswordViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-    }
-
-    @Test
-    fun `test that isConnected true when MonitorConnectivity emit true`() = runTest {
-        testFlow.emit(true)
-        assertTrue(underTest.isConnected)
-    }
-
-    @Test
-    fun `test that isConnected false when MonitorConnectivity emit false`() = runTest {
-        testFlow.emit(false)
-        assertFalse(underTest.isConnected)
     }
 
     @Test
@@ -102,6 +89,31 @@ internal class ChangePasswordViewModelTest {
     fun `test that when multi factor auth disabled and change password fails isChangePassword should be FAILED`() {
         verifyChangePasswordUiState(false, ActionResult.FAILED)
     }
+
+    @Test
+    fun `test that no network SnackBar status should update when isConnectedToNetwork called`() =
+        runTest {
+            val isConnected = Random.nextBoolean()
+            testFlow.emit(isConnected)
+
+            val expectedValue = underTest.isConnectedToNetwork()
+
+            assertThat(expectedValue).isEqualTo(isConnected)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isShowNoNetworkSnackBar).isEqualTo(isConnected.not())
+            }
+        }
+
+    @Test
+    fun `test that when onNoNetworkSnackBarShown called should reset isShowNoNetworkSnackBar to false`() =
+        runTest {
+            underTest.onNoNetworkSnackBarShown()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isShowNoNetworkSnackBar).isEqualTo(false)
+            }
+        }
 
     private fun verifyChangePasswordUiState(
         isSuccessChangePassword: Boolean,
