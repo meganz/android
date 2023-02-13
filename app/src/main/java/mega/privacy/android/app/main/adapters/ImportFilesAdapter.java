@@ -284,7 +284,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 if (typeForName(file.getTitle()).isImage()
                         || typeForName(file.getTitle()).isVideo()
-                        || typeForName(file.getTitle()).isVideoReproducible()) {
+                        || typeForName(file.getTitle()).isVideoMimeType()) {
                     File thumb = getThumbnail(file);
 
                     if (thumb.exists()) {

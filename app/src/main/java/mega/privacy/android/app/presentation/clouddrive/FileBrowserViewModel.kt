@@ -151,7 +151,7 @@ class FileBrowserViewModel @Inject constructor(
             } else {
                 nodes.firstOrNull { node ->
                     node.isFolder || !MimeTypeList.typeForName(node.name).isImage
-                            && !MimeTypeList.typeForName(node.name).isVideoReproducible
+                            && !MimeTypeList.typeForName(node.name).isVideoMimeType
                 }?.let {
                     false
                 } ?: true

@@ -33,7 +33,7 @@ class OpenFileHelper @Inject constructor(
                 isImage -> {
                     intent = getIntentForOpenImage(context, node)
                 }
-                isVideoReproducible || isAudio -> {
+                isVideoMimeType || isAudio -> {
                     intent = getIntentForOpenMedia(
                         context = context,
                         node = node,

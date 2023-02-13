@@ -1351,7 +1351,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                     putThumbnailLocation(intent, getRecyclerView(), position, VIEWER_FROM_FOLDER_LINK, adapterList);
                     startActivity(intent);
                     overridePendingTransition(0, 0);
-                } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
+                } else if (MimeTypeList.typeForName(node.getName()).isVideoMimeType() || MimeTypeList.typeForName(node.getName()).isAudio()) {
                     MegaNode file = nodes.get(position);
 
                     String mimeType = MimeTypeList.typeForName(file.getName()).getType();

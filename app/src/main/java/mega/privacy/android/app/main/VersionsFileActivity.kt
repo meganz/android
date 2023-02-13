@@ -519,7 +519,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                 }
-                mimetype.isVideoReproducible || mimetype.isAudio -> {
+                mimetype.isVideoMimeType || mimetype.isAudio -> {
                     val mediaIntent: Intent
                     val internalIntent: Boolean
                     var opusFile = false

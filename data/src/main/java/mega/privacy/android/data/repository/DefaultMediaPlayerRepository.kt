@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -468,8 +467,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             if (isAudio) {
                 isAudio(type, extension) && !isAudioNotSupported(extension)
             } else {
-                isVideo(type, extension) &&
-                        isVideoReproducible(type, extension) &&
+                isVideo(type) &&
+                        isVideoMimeType(type, extension) &&
                         !isVideoNotSupported(extension)
             }
         }
@@ -494,18 +493,12 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     /*
      * Check is MimeType of video type
      */
-    private fun isVideo(type: String, extension: String): Boolean =
-        type.startsWith("video/") || extension == "mkv"
+    private fun isVideo(type: String): Boolean =
+        type.startsWith("video/")
 
-    private fun isVideoReproducible(type: String, extension: String): Boolean =
+    private fun isVideoMimeType(type: String, extension: String): Boolean =
         type.startsWith("video/") ||
-                extension == "mkv" ||
-                extension == "flv" ||
-                extension == "vob" ||
-                extension == "avi" ||
-                extension == "wmv" ||
-                extension == "mpg" ||
-                extension == "mts"
+                extension == "vob"
 
     private fun isVideoNotSupported(extension: String): Boolean =
         extension == "mpg" || extension == "avi" || extension == "wmv"

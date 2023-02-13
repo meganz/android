@@ -777,7 +777,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             }
-            mime.isVideoReproducible || mime.isAudio -> {
+            mime.isVideoMimeType || mime.isAudio -> {
                 Timber.d("Video/Audio file")
 
                 val mediaIntent: Intent

@@ -26,5 +26,5 @@ fun MegaNode.getFileName(): String =
  * Check if Node is a Video
  */
 fun MegaNode.isVideo() =
-    this.isFile && (MimeTypeList.typeForName(name).isVideoReproducible() ||
+    this.isFile && (MimeTypeList.typeForName(name).isVideoMimeType() ||
             MimeTypeList.typeForName(name).isMp4Video())

@@ -340,16 +340,14 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
      * Return if type is video
      */
     val isVideo
-        get() = type.startsWith("video/") || extension == "mkv"
+        get() = type.startsWith("video/")
 
     /**
-     * Return if type is VideoReproducible
+     * Check if MimeType is Video
      */
-    val isVideoReproducible
+    val isVideoMimeType
         get() =
-            type.startsWith("video/") || extension == "mkv" || extension == "flv"
-                    || extension == "vob" || extension == "avi" || extension == "wmv"
-                    || extension == "mpg" || extension == "mts"
+            type.startsWith("video/") || extension == "vob"
 
     /**
      * Returns if type is non supported video

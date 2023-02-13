@@ -639,7 +639,7 @@ class RubbishBinFragment : Fragment() {
                 adapter)
             startActivity(intent)
             ((requireActivity()) as ManagerActivity).overridePendingTransition(0, 0)
-        } else if (MimeTypeList.typeForName(node.name).isVideoReproducible ||
+        } else if (MimeTypeList.typeForName(node.name).isVideoMimeType ||
             MimeTypeList.typeForName(node.name).isAudio
         ) {
             val mimeType = MimeTypeList.typeForName(node.name).type

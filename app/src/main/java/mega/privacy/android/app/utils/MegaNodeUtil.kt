@@ -1378,7 +1378,7 @@ object MegaNodeUtil {
 
                 activityLauncher.launchActivity(pdfIntent)
             }
-            mime.isVideoReproducible || mime.isAudio -> {
+            mime.isVideoMimeType || mime.isAudio -> {
                 val mediaIntent: Intent
                 val internalIntent: Boolean
                 var opusFile = false
@@ -1908,7 +1908,7 @@ object MegaNodeUtil {
 
         children?.forEach {
             val mime = MimeTypeList.typeForName(it?.name)
-            if (mime.isImage || mime.isVideoReproducible) return true
+            if (mime.isImage || mime.isVideoMimeType) return true
         }
 
         return false
@@ -1930,7 +1930,7 @@ object MegaNodeUtil {
         this.isFile && MimeTypeList.typeForName(name).isGIF
 
     fun MegaNode.isVideo(): Boolean =
-        this.isFile && (MimeTypeList.typeForName(name).isVideoReproducible ||
+        this.isFile && (MimeTypeList.typeForName(name).isVideoMimeType ||
                 MimeTypeList.typeForName(name).isMp4Video)
 
     fun MegaNode.getLastAvailableTime(): Long =
@@ -1959,7 +1959,7 @@ object MegaNodeUtil {
     fun MegaOffline.isValidForImageViewer(): Boolean =
         !isFolder && (MimeTypeList.typeForName(name).isImage
                 || MimeTypeList.typeForName(name).isGIF
-                || (MimeTypeList.typeForName(name).isVideoReproducible || MimeTypeList.typeForName(
+                || (MimeTypeList.typeForName(name).isVideoMimeType || MimeTypeList.typeForName(
             name
         ).isMp4Video))
 

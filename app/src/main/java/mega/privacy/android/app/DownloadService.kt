@@ -828,7 +828,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                     builder.build())
                             }
                         }
-                    } else if (MimeTypeList.typeForName(currentFile?.name).isVideoReproducible || MimeTypeList.typeForName(
+                    } else if (MimeTypeList.typeForName(currentFile?.name).isVideoMimeType || MimeTypeList.typeForName(
                             currentFile?.name).isAudio
                     ) {
                         Timber.d("Video/Audio file")

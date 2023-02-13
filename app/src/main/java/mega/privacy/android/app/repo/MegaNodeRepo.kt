@@ -15,12 +15,6 @@ import mega.privacy.android.app.utils.SortUtil.sortOfflineBySizeDescending
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
@@ -100,7 +94,7 @@ class MegaNodeRepo @Inject constructor(
             }
 
             val mime = MimeTypeList.typeForName(node.name)
-            if (mime.isImage || mime.isVideoReproducible) {
+            if (mime.isImage || mime.isVideoMimeType) {
                 nodes.add(node)
             }
         }

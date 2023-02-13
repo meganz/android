@@ -5605,7 +5605,7 @@ public class ChatActivity extends PasscodeActivity
                 Timber.d("Image without preview - open with");
                 openWith(this, node);
             }
-        } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
+        } else if (MimeTypeList.typeForName(node.getName()).isVideoMimeType() || MimeTypeList.typeForName(node.getName()).isAudio()) {
             String mimeType = MimeTypeList.typeForName(node.getName()).getType();
             Intent mediaIntent;
             boolean internalIntent;

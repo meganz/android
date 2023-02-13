@@ -508,7 +508,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 Timber.d("Image without preview - show node attachment panel for one node");
                                 showNodeAttachmentBottomSheet(m, position);
                             }
-                        } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
+                        } else if (MimeTypeList.typeForName(node.getName()).isVideoMimeType() || MimeTypeList.typeForName(node.getName()).isAudio()) {
                             Timber.d("isFile:isVideoReproducibleOrIsAudio");
                             String mimeType = MimeTypeList.typeForName(node.getName()).getType();
                             Timber.d("FILE HANDLE: %d, TYPE: %s", node.getHandle(), mimeType);
