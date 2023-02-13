@@ -83,7 +83,7 @@ class FileBrowserViewModel @Inject constructor(
         viewModelScope.launch {
             refreshNodes()
             monitorNodeUpdates().collect {
-                checkForDeletedNode(it.changes)
+                checkForNodeIsInRubbish(it.changes)
             }
         }
     }
@@ -93,8 +93,8 @@ class FileBrowserViewModel @Inject constructor(
      * moved to rubbish bin
      * we are in same screen else will simply refresh nodes with parentID
      * @param changes [Map] of [Node], list of [NodeChanges]
-     */
-    private fun checkForDeletedNode(changes: Map<Node, List<NodeChanges>>) {
+     `*/
+    private fun checkForNodeIsInRubbish(changes: Map<Node, List<NodeChanges>>) {
         changes.forEach { (node, _) ->
             if (node is FolderNode) {
                 if (node.isInRubbishBin && _state.value.fileBrowserHandle == node.id.longValue) {
