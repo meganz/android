@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -22,7 +21,6 @@ import javax.inject.Inject
 class DefaultGetUserAlbums @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val photosRepository: PhotosRepository,
-    private val isNodeInRubbish: IsNodeInRubbish,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetUserAlbums {
     override fun invoke(): Flow<List<Album.UserAlbum>> = flow {
@@ -36,7 +34,7 @@ class DefaultGetUserAlbums @Inject constructor(
                 val photo = set.cover?.let { eid ->
                     if (eid == -1L) null
                     else albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
-                        .find { it.id == eid && !isNodeInRubbish(handle = it.nodeId.longValue) }
+                        .find { it.id == eid }
                         ?.let { photosRepository.getPhotoFromNodeID(it.nodeId, it) }
                 }
                 Album.UserAlbum(

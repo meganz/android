@@ -27,7 +27,6 @@ class DefaultGetUserAlbumsTest {
         underTest = DefaultGetUserAlbums(
             albumRepository = albumRepository,
             photosRepository = photosRepository,
-            isNodeInRubbish = { false },
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }

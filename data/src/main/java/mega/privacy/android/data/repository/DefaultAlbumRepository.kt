@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
@@ -45,12 +46,15 @@ typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<
 internal class DefaultAlbumRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val userSetMapper: UserSetMapper,
+    private val isNodeInRubbish: IsNodeInRubbish,
     private val albumStringResourceGateway: AlbumStringResourceGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
     private val userSets: MutableMap<Long, UserSet> = mutableMapOf()
 
     private val userSetsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
+
+    private val albumElements: MutableMap<AlbumId, List<AlbumPhotoId>> = mutableMapOf()
 
     private val albumPhotosAddingProgressPool: AlbumPhotosAddingProgressPool = mutableMapOf()
 
@@ -87,16 +91,18 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSets.clear()
 
         (0 until setList.size()).map { index ->
-            setList.get(index).toUserSet()
             val userSet = setList.get(index).toUserSet()
             userSets[userSet.id] = userSet
             userSet
         }
     }
 
-    override suspend fun getUserSet(albumId: AlbumId): UserSet? = withContext(ioDispatcher) {
-        megaApiGateway.getSet(sid = albumId.id)?.toUserSet()
-    }
+    override suspend fun getUserSet(albumId: AlbumId): UserSet? =
+        userSets[albumId.id] ?: withContext(ioDispatcher) {
+            megaApiGateway.getSet(sid = albumId.id)?.toUserSet()?.also {
+                userSets[it.id] = it
+            }
+        }
 
     override fun monitorUserSetsUpdate(): Flow<List<UserSet>> = merge(
         megaApiGateway.globalUpdates
@@ -107,11 +113,11 @@ internal class DefaultAlbumRepository @Inject constructor(
     )
 
     override suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId> =
-        withContext(ioDispatcher) {
+        albumElements[albumId] ?: withContext(ioDispatcher) {
             val elementList = megaApiGateway.getSetElements(sid = albumId.id)
             (0 until elementList.size()).map { index ->
                 elementList[index].toAlbumPhotoId()
-            }
+            }.also { albumElements[albumId] = it }
         }
 
     override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<AlbumPhotoId>> =
@@ -121,6 +127,7 @@ internal class DefaultAlbumRepository @Inject constructor(
             .map { elements -> elements.filter { it.setId() == albumId.id } }
             .onEach(::checkSetsCoverRemoved)
             .map { elements -> elements.map { it.toAlbumPhotoId() } }
+            .onEach { albumElements.remove(albumId) }
 
     private fun checkSetsCoverRemoved(elements: List<MegaSetElement>) {
         val userSets = elements.mapNotNull { element ->
@@ -226,7 +233,15 @@ internal class DefaultAlbumRepository @Inject constructor(
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
         albumPhotosAddingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }
 
-    private fun MegaSet.toUserSet(): UserSet = userSetMapper(id(), name(), cover(), ts())
+    private suspend fun MegaSet.toUserSet(): UserSet {
+        var cover = cover()
+        if (cover != -1L) {
+            getAlbumElementIDs(AlbumId(id()))
+                .find { it.id == cover && !isNodeInRubbish(handle = it.nodeId.longValue) }
+                .let { cover = it?.id ?: -1L }
+        }
+        return userSetMapper(id(), name(), cover, ts())
+    }
 
     private fun MegaSetElement.toAlbumPhotoId(): AlbumPhotoId = AlbumPhotoId(
         id = id(),

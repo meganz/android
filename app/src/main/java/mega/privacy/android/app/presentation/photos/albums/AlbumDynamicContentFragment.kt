@@ -616,10 +616,11 @@ class AlbumDynamicContentFragment : Fragment() {
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
             photos.setFilterMenuItemVisibility()
-            photos.setSelectAlbumCoverMenuItemVisibility()
             if (album is Album.UserAlbum) {
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
                 menu.findItem(R.id.action_menu_delete)?.isVisible = true
+
+                photos.setSelectAlbumCoverMenuItemVisibility()
             }
         }
     }
