@@ -39,6 +39,12 @@ data class MimeTypeList(
     }
 
     /**
+     * Return if type is video
+     */
+    val isVideo
+        get() = type.startsWith("video/") || extension == "mkv"
+
+    /**
      * Check if MimeType is Video Reproducible
      */
     fun isVideoReproducible() =

@@ -13,6 +13,11 @@ sealed interface OfflineNodeInformation {
      * Name
      */
     val name: String
+
+    /**
+     * Handle
+     */
+    val handle: String
 }
 
 /**
@@ -24,6 +29,7 @@ sealed interface OfflineNodeInformation {
 data class OtherOfflineNodeInformation(
     override val path: String,
     override val name: String,
+    override val handle: String,
 ) : OfflineNodeInformation
 
 /**
@@ -35,6 +41,7 @@ data class OtherOfflineNodeInformation(
 data class InboxOfflineNodeInformation(
     override val path: String,
     override val name: String,
+    override val handle: String,
 ) : OfflineNodeInformation
 
 /**
@@ -47,5 +54,6 @@ data class InboxOfflineNodeInformation(
 data class IncomingShareOfflineNodeInformation(
     override val path: String,
     override val name: String,
+    override val handle: String,
     val incomingHandle: String,
 ) : OfflineNodeInformation

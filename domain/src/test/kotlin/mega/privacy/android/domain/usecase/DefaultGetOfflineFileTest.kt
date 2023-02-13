@@ -19,6 +19,7 @@ class DefaultGetOfflineFileTest {
     private val fileName = "fileName"
     private val offlinePath = "Offline path"
     private val offlineInboxPath = "Offline inbox path"
+    private val handle = "handle"
 
     private val fileSystemRepository = mock<FileSystemRepository> {
         onBlocking { getOfflinePath() }.thenReturn(offlinePath)
@@ -37,7 +38,8 @@ class DefaultGetOfflineFileTest {
         runTest {
             val input = OtherOfflineNodeInformation(
                 path = File.separator,
-                name = fileName
+                name = fileName,
+                handle = handle,
             )
             val expected = offlinePath + File.separator + fileName
 
@@ -51,7 +53,8 @@ class DefaultGetOfflineFileTest {
         runTest {
             val input = OtherOfflineNodeInformation(
                 path = "",
-                name = fileName
+                name = fileName,
+                handle = handle,
             )
             val expected = offlinePath + File.separator + fileName
 
@@ -66,7 +69,8 @@ class DefaultGetOfflineFileTest {
             val path = "path/to/file"
             val input = OtherOfflineNodeInformation(
                 path = path,
-                name = fileName
+                name = fileName,
+                handle = handle,
             )
             val expected = offlinePath + File.separator + path + File.separator + fileName
 
@@ -80,7 +84,8 @@ class DefaultGetOfflineFileTest {
         runTest {
             val input = InboxOfflineNodeInformation(
                 path = File.separator,
-                name = fileName
+                name = fileName,
+                handle = handle,
             )
             val expected = offlineInboxPath + File.separator + fileName
 
@@ -94,7 +99,8 @@ class DefaultGetOfflineFileTest {
         runTest {
             val input = InboxOfflineNodeInformation(
                 path = "",
-                name = fileName
+                name = fileName,
+                handle = handle,
             )
             val expected = offlineInboxPath + File.separator + fileName
 
@@ -109,7 +115,8 @@ class DefaultGetOfflineFileTest {
             val path = "path/to/file"
             val input = InboxOfflineNodeInformation(
                 path = path,
-                name = fileName
+                name = fileName,
+                handle = handle,
             )
             val expected = offlineInboxPath + File.separator + path + File.separator + fileName
 
@@ -125,6 +132,7 @@ class DefaultGetOfflineFileTest {
             val input = IncomingShareOfflineNodeInformation(
                 path = File.separator,
                 name = fileName,
+                handle = handle,
                 incomingHandle = incomingHandle
             )
             val expected = offlinePath + File.separator + incomingHandle + File.separator + fileName
@@ -141,6 +149,7 @@ class DefaultGetOfflineFileTest {
             val input = IncomingShareOfflineNodeInformation(
                 path = "",
                 name = fileName,
+                handle = handle,
                 incomingHandle = incomingHandle
             )
             val expected = offlinePath + File.separator + incomingHandle + File.separator + fileName
@@ -158,6 +167,7 @@ class DefaultGetOfflineFileTest {
             val input = IncomingShareOfflineNodeInformation(
                 path = path,
                 name = fileName,
+                handle = handle,
                 incomingHandle = incomingHandle
             )
             val expected = offlinePath + File.separator + incomingHandle + File.separator + path + File.separator + fileName
