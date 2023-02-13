@@ -14,6 +14,7 @@ data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
     val versionsInfo: String? = null,
     val name: String = "",
+    val email: String = "",
     val changeEmailResult: Result<String>? = null,
     val isLoading: Boolean = false,
     val changeUserNameResult: Result<Unit>? = null,

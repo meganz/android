@@ -31,9 +31,15 @@ internal class UserInfoViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorUserUpdates()
-                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname }
+                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
                 .collect {
-                    getUserFullName()
+                    when (it) {
+                        UserChanges.Email -> getMyEmail()
+                        UserChanges.Firstname,
+                        UserChanges.Lastname,
+                        -> getUserFullName()
+                        else -> Unit
+                    }
                 }
         }
     }

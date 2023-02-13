@@ -24,7 +24,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
@@ -130,8 +129,6 @@ class MyAccountFragment : Fragment(), Scrollable {
             findNavController().navigate(R.id.action_my_account_to_edit_profile)
         }
 
-        binding.emailText.text = viewModel.getEmail()
-
         setupPhoneNumber()
         setupAccountDetails()
 
@@ -162,10 +159,8 @@ class MyAccountFragment : Fragment(), Scrollable {
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
             binding.nameText.text = state.name
+            binding.emailText.text = state.email
         }
-
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .observe(viewLifecycleOwner) { binding.emailText.text = viewModel.getEmail() }
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
             .observe(viewLifecycleOwner) { setupPhoneNumber() }

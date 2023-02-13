@@ -21,7 +21,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
 import static mega.privacy.android.app.constants.IntentConstants.ACTION_OPEN_ACHIEVEMENTS;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ACCOUNT_TYPE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ASK_PERMISSIONS;
@@ -9402,20 +9401,14 @@ public class ManagerActivity extends TransfersManagementActivity
                         Timber.d("Changes: %s", user.getChanges());
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)) {
-                            if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("I change my first name");
-                                megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
-                            } else {
+                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 Timber.d("The user: %dchanged his first name", user.getHandle());
                                 megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new GetAttrUserListener(this));
                             }
                         }
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)) {
-                            if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("I change my last name");
-                                megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
-                            } else {
+                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 Timber.d("The user: %dchanged his last name", user.getHandle());
                                 megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new GetAttrUserListener(this));
                             }
@@ -9515,10 +9508,7 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void updateMyEmail(String email) {
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean.class).post(true);
-
         Timber.d("New email: %s", email);
-        nVEmail.setText(email);
         String oldEmail = dbH.getMyEmail();
         if (oldEmail != null) {
             Timber.d("Old email: %s", oldEmail);

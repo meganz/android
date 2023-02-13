@@ -28,7 +28,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
@@ -268,6 +267,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         collectFlow(viewModel.state) { state ->
             binding.headerLayout.firstLineToolbar.text = state.name
+            binding.headerLayout.secondLineToolbar.text = state.email
             binding.progressBar.isVisible = state.isLoading
 
             state.changeEmailResult?.let {
@@ -279,10 +279,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 updateName(it.isSuccess)
                 viewModel.markHandleChangeUserNameResult()
             }
-        }
-
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
-            binding.headerLayout.secondLineToolbar.text = viewModel.getEmail()
         }
 
         lifecycleScope.launchWhenStarted {
@@ -451,7 +447,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         binding.headerLayout.secondLineToolbar.apply {
             maxWidth = maxWidth
-            text = viewModel.getEmail()
             textSize = EMAIL_SIZE
         }
     }
