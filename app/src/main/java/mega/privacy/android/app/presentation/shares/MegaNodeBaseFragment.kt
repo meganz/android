@@ -17,7 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -84,7 +84,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     /**
      * viewModel responsible for sorting the list
      */
-    protected val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    protected val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
 
     /**
      * Adapter holding the list of nodes
@@ -152,21 +152,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      */
     protected abstract fun showSortByPanel()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            showSortByPanel()
-        })
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView?.let { observeDragSupportEvents(viewLifecycleOwner, it, viewerFrom) }
         checkScroll()
+        setupObservers()
     }
 
     override fun onAttach(context: Context) {
@@ -283,6 +273,15 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     }
 
     /**
+     * Setup ViewModel observers
+     */
+    private fun setupObservers() {
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            showSortByPanel()
+        })
+    }
+
+    /**
      * Display the elevation of the app bar or not
      */
     fun checkScroll() {
@@ -357,9 +356,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
 
                         val mediaFile = File(localPath)
                         setDataAndType(
-                            FileProvider.getUriForFile(requireContext(),
+                            FileProvider.getUriForFile(
+                                requireContext(),
                                 Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                mediaFile),
+                                mediaFile
+                            ),
                             MimeTypeList.typeForName(node.name).type
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -392,9 +393,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                             setDataAndType(it, mimeTypeType)
                         } ?: run {
                             Timber.e("ERROR:httpServerGetLocalLink")
-                            managerActivity?.showSnackbar(Constants.SNACKBAR_TYPE,
+                            managerActivity?.showSnackbar(
+                                Constants.SNACKBAR_TYPE,
                                 getString(R.string.general_text_error),
-                                MegaApiJava.INVALID_HANDLE)
+                                MegaApiJava.INVALID_HANDLE
+                            )
                             return
                         }
                     }
@@ -423,9 +426,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     if (localPath != null) {
                         val mediaFile = File(localPath)
                         setDataAndType(
-                            FileProvider.getUriForFile(requireContext(),
+                            FileProvider.getUriForFile(
+                                requireContext(),
                                 Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                mediaFile),
+                                mediaFile
+                            ),
                             mimeTypeType
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -451,9 +456,11 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                             setDataAndType(it, mimeTypeType)
                         } ?: run {
                             Timber.e("ERROR:httpServerGetLocalLink")
-                            managerActivity?.showSnackbar(Constants.SNACKBAR_TYPE,
+                            managerActivity?.showSnackbar(
+                                Constants.SNACKBAR_TYPE,
                                 getString(R.string.general_text_error),
-                                MegaApiJava.INVALID_HANDLE)
+                                MegaApiJava.INVALID_HANDLE
+                            )
                             return
                         }
                     }
@@ -469,7 +476,8 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
             else -> {
                 Timber.d("itemClick:isFile:otherOption")
                 managerActivity?.let {
-                    onNodeTapped(requireActivity(),
+                    onNodeTapped(
+                        requireActivity(),
                         node,
                         { node: MegaNode? -> it.saveNodeByTap(node) },
                         it,
@@ -490,17 +498,21 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     private fun launchIntent(intent: Intent?, internalIntent: Boolean, position: Int) {
         if (intent != null) {
             if (internalIntent || MegaApiUtils.isIntentAvailable(requireContext(), intent)) {
-                putThumbnailLocation(intent,
+                putThumbnailLocation(
+                    intent,
                     recyclerView ?: return,
                     position,
                     viewerFrom,
-                    adapter ?: return)
+                    adapter ?: return
+                )
                 startActivity(intent)
                 managerActivity?.overridePendingTransition(0, 0)
             } else {
-                Toast.makeText(requireContext(),
+                Toast.makeText(
+                    requireContext(),
                     StringResourcesUtils.getString(R.string.intent_not_available),
-                    Toast.LENGTH_LONG).show()
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -513,8 +525,12 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
         recyclerView = v.findViewById(R.id.file_list_view_browser)
         mLayoutManager = LinearLayoutManager(requireContext())
         recyclerView?.layoutManager = mLayoutManager
-        recyclerView?.addItemDecoration(PositionDividerItemDecoration(requireContext(),
-            resources.displayMetrics))
+        recyclerView?.addItemDecoration(
+            PositionDividerItemDecoration(
+                requireContext(),
+                resources.displayMetrics
+            )
+        )
         fastScroller = v.findViewById(R.id.fastscroll)
         setRecyclerView()
         recyclerView?.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
@@ -548,10 +564,12 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      * Setup the recyclerview
      */
     private fun setRecyclerView() {
-        recyclerView?.setPadding(0,
+        recyclerView?.setPadding(
             0,
             0,
-            Util.dp2px(85.toFloat(), resources.displayMetrics))
+            0,
+            Util.dp2px(85.toFloat(), resources.displayMetrics)
+        )
         recyclerView?.setHasFixedSize(true)
         recyclerView?.clipToPadding = false
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -581,13 +599,17 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
             }
 
         try {
-            text = text.replace("[A]", "<font color=\'"
-                    + getColorHexString(requireContext(), R.color.grey_900_grey_100)
-                    + "\'>")
+            text = text.replace(
+                "[A]", "<font color=\'"
+                        + getColorHexString(requireContext(), R.color.grey_900_grey_100)
+                        + "\'>"
+            )
             text = text.replace("[/A]", "</font>")
-            text = text.replace("[B]", "<font color=\'"
-                    + getColorHexString(requireContext(), R.color.grey_300_grey_600)
-                    + "\'>")
+            text = text.replace(
+                "[B]", "<font color=\'"
+                        + getColorHexString(requireContext(), R.color.grey_300_grey_600)
+                        + "\'>"
+            )
             text = text.replace("[/B]", "</font>")
         } catch (e: Exception) {
             Timber.w(e, "Exception formatting text")
@@ -665,8 +687,10 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     managerActivity?.showConfirmationRemoveSeveralPublicLinks(nodes)
                     hideActionMode()
                 }
-                R.id.cab_menu_leave_share -> showConfirmationLeaveIncomingShares(requireActivity(),
-                    (requireActivity() as SnackbarShower), handleList)
+                R.id.cab_menu_leave_share -> showConfirmationLeaveIncomingShares(
+                    requireActivity(),
+                    (requireActivity() as SnackbarShower), handleList
+                )
                 R.id.cab_menu_send_to_chat -> {
                     adapter?.arrayListSelectedNodes?.let {
                         managerActivity?.attachNodesToChats(it)
@@ -677,7 +701,8 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                 R.id.cab_menu_select_all -> selectAll()
                 R.id.cab_menu_clear_selection -> hideActionMode()
                 R.id.cab_menu_remove_share -> managerActivity?.showConfirmationRemoveAllSharingContacts(
-                    selected)
+                    selected
+                )
             }
             return true
         }

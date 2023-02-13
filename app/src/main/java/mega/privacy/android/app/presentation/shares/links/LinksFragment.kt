@@ -39,10 +39,13 @@ import timber.log.Timber
 @AndroidEntryPoint
 class LinksFragment : MegaNodeBaseFragment() {
 
-    private val viewModel: LinksViewModel by activityViewModels()
+    private val viewModel by activityViewModels<LinksViewModel>()
 
     private fun state() = viewModel.state.value
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,11 +60,22 @@ class LinksFragment : MegaNodeBaseFragment() {
         val view = getListView(inflater, container)
 
         initAdapter()
-        observe()
 
         return view
     }
 
+    /**
+     * onViewCreated
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupObservers()
+    }
+
+    /**
+     * activateActionMode
+     */
     override fun activateActionMode() {
         if (adapter?.isMultipleSelect == true) return
 
@@ -151,7 +165,7 @@ class LinksFragment : MegaNodeBaseFragment() {
                 viewModel.resetLinksTreeDepth()
                 0
             }
-            
+
         }
 
     }
@@ -168,9 +182,9 @@ class LinksFragment : MegaNodeBaseFragment() {
         get() = state().linksHandle
 
     /**
-     * Observe viewModel
+     * Setup ViewModel observers
      */
-    private fun observe() {
+    private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
@@ -193,7 +207,6 @@ class LinksFragment : MegaNodeBaseFragment() {
                     visibilityFastScroller()
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
-
                 }
             }
         }
@@ -204,14 +217,16 @@ class LinksFragment : MegaNodeBaseFragment() {
      */
     private fun initAdapter() {
         if (adapter == null) {
-            adapter = MegaNodeAdapter(requireActivity(),
+            adapter = MegaNodeAdapter(
+                requireActivity(),
                 this,
                 state().nodes,
                 state().linksHandle,
                 recyclerView,
                 Constants.LINKS_ADAPTER,
                 MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                sortByHeaderViewModel)
+                sortByHeaderViewModel
+            )
         } else {
             adapter?.parentHandle = state().linksHandle
             adapter?.setListFragment(recyclerView)
@@ -250,8 +265,10 @@ class LinksFragment : MegaNodeBaseFragment() {
         var textToShow: String? = null
         if (isInvalidHandle) {
             emptyImageView?.let {
-                setImageViewAlphaIfDark(requireContext(),
-                    it, ColorUtils.DARK_IMAGE_ALPHA)
+                setImageViewAlphaIfDark(
+                    requireContext(),
+                    it, ColorUtils.DARK_IMAGE_ALPHA
+                )
             }
             emptyImageView?.setImageResource(R.drawable.ic_zero_data_public_links)
             textToShow = requireContext().getString(R.string.context_empty_links)
@@ -288,8 +305,10 @@ class LinksFragment : MegaNodeBaseFragment() {
                 control.saveToDevice().isVisible = false
             }
             if (selected.size == 1
-                && megaApi.checkAccessErrorExtended(selected[0],
-                    MegaShare.ACCESS_FULL).errorCode == MegaError.API_OK
+                && megaApi.checkAccessErrorExtended(
+                    selected[0],
+                    MegaShare.ACCESS_FULL
+                ).errorCode == MegaError.API_OK
             ) {
                 control.rename().isVisible = true
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {

@@ -41,10 +41,13 @@ import timber.log.Timber
 @AndroidEntryPoint
 class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
-    private val viewModel: OutgoingSharesViewModel by activityViewModels()
+    private val viewModel by activityViewModels<OutgoingSharesViewModel>()
 
     private fun state() = viewModel.state.value
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,11 +63,22 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             else getGridView(inflater, container)
 
         initAdapter()
-        observe()
 
         return view
     }
 
+    /**
+     * onViewCreated
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupObservers()
+    }
+
+    /**
+     * activateActionMode
+     */
     override fun activateActionMode() {
         if (adapter?.isMultipleSelect == true) return
 
@@ -93,9 +107,11 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
             // click on a file
             else ->
-                openFile(state().nodes[actualPosition],
+                openFile(
+                    state().nodes[actualPosition],
                     Constants.OUTGOING_SHARES_ADAPTER,
-                    actualPosition)
+                    actualPosition
+                )
         }
     }
 
@@ -193,9 +209,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         get() = state().outgoingHandle
 
     /**
-     * Observe viewModel
+     * Setup ViewModel observers
      */
-    private fun observe() {
+    private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
@@ -218,7 +234,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     visibilityFastScroller()
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
-
                 }
             }
         }
@@ -339,8 +354,10 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 control.saveToDevice().isVisible = false
             }
             if (selected.size == 1
-                && megaApi.checkAccessErrorExtended(selected[0],
-                    MegaShare.ACCESS_FULL).errorCode == MegaError.API_OK
+                && megaApi.checkAccessErrorExtended(
+                    selected[0],
+                    MegaShare.ACCESS_FULL
+                ).errorCode == MegaError.API_OK
             ) {
                 control.rename().isVisible = true
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
