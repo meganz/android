@@ -12,6 +12,7 @@ import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.UpgradeSecurity
 
 /**
  * Get node module
@@ -83,5 +84,14 @@ abstract class GetNodeModule {
         @Provides
         fun provideOpenShareDialog(megaNodeRepository: MegaNodeRepository): OpenShareDialog =
             OpenShareDialog(megaNodeRepository::openShareDialog)
+
+        /**
+         * Provides [UpgradeSecurity] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [UpgradeSecurity]
+         */
+        @Provides
+        fun provideUpgradeSecurity(megaNodeRepository: MegaNodeRepository): UpgradeSecurity =
+            UpgradeSecurity(megaNodeRepository::upgradeSecurity)
     }
 }
