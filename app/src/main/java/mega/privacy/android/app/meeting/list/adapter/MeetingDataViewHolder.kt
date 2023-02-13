@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ScalingUtils
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingDataBinding
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.setImageRequestFromFilePath
 import mega.privacy.android.app.utils.view.TextDrawable
@@ -45,19 +46,35 @@ class MeetingDataViewHolder(
 
         binding.txtTitle.text = room.title
         if (room.isPending) {
-            val scheduledTimeFormatted = room.scheduledTimestampFormatted
+            val scheduledTimeFormatted = when {
+                room.isRecurringDaily -> itemView.context.getFormattedStringOrDefault(
+                    R.string.meetings_list_scheduled_meeting_daily_label,
+                    room.scheduledTimestampFormatted
+                )
+                room.isRecurringWeekly -> itemView.context.getFormattedStringOrDefault(
+                    R.string.meetings_list_scheduled_meeting_weekly_label,
+                    room.scheduledTimestampFormatted
+                )
+                room.isRecurringMonthly -> itemView.context.getFormattedStringOrDefault(
+                    R.string.meetings_list_scheduled_meeting_monthly_label,
+                    room.scheduledTimestampFormatted
+                )
+                else -> room.scheduledTimestampFormatted
+            }
             binding.txtLastMessage.text = scheduledTimeFormatted
             binding.txtLastMessage.isVisible = !scheduledTimeFormatted.isNullOrBlank()
-            binding.imgRecurring.isVisible = room.isRecurring
+            binding.imgRecurring.isVisible = room.isRecurring()
             if (room.highlight) {
                 binding.txtTimestamp.text = room.lastMessage
                 binding.txtTimestamp.setTextColor(highLightColor)
             } else {
-                binding.txtTimestamp.setText(if (room.isRecurring) {
-                    R.string.meetings_list_recurring_meeting_label
-                } else {
-                    R.string.meetings_list_upcoming_meeting_label
-                })
+                binding.txtTimestamp.setText(
+                    if (room.isRecurring()) {
+                        R.string.meetings_list_recurring_meeting_label
+                    } else {
+                        R.string.meetings_list_upcoming_meeting_label
+                    }
+                )
                 binding.txtTimestamp.setTextColor(secondaryColor)
             }
         } else {
