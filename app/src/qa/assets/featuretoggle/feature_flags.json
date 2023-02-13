@@ -9,6 +9,6 @@
   },
   {
     "name": "SetSecureFlag",
-    "value": true
+    "value": false
   }
 ]
