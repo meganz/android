@@ -9,6 +9,7 @@ apply plugin: 'jacoco'
 apply plugin: 'com.google.gms.google-services'
 
 apply from: "$project.rootDir/tools/util.gradle"
+apply from: "$project.rootDir/tools/sdk.gradle"
 
 configurations {
     jacocoAnt
@@ -207,15 +208,6 @@ dependencies {
     implementation project(':domain')
     implementation project(':core-ui')
     implementation project(':data')
-
-    // decide SDK dependency
-    if (shouldUsePrebuiltSdk()) {
-        println("[app] use remote pre-built SDK")
-        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
-    } else {
-        println("[app] use local SDK")
-        implementation project(':sdk')
-    }
 
     qaImplementation project(':screenshot')
 
@@ -438,6 +430,7 @@ dependencies {
     kapt "com.google.auto.value:auto-value:$autovalueVersion"
     lintChecks project(':lint')
 
+    implementation(project(":feature:sync"))
 }
 
 

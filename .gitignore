@@ -1,7 +1,7 @@
 /local.properties
 
 /build/
-/app/build/
+**/build
 
 ### Android Studio files ###
 *.iml

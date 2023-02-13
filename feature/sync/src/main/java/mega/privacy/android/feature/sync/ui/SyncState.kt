@@ -1,6 +1,6 @@
-package mega.privacy.android.app.presentation.sync
+package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.domain.entity.sync.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * @param selectedLocalFolder selected local folder

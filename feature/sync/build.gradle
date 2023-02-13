@@ -2,7 +2,11 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
+
+apply from: "$project.rootDir/tools/util.gradle"
+apply from: "$project.rootDir/tools/sdk.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -21,13 +25,9 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
     }
 
     compileOptions {
-        // Flag to enable support for the new language APIs
-//        coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 11
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
@@ -44,28 +44,26 @@ android {
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":core-ui"))
 
     implementation platform("androidx.compose:compose-bom:$composeBomVersion")
+    implementation "androidx.activity:activity-compose:$activityComposeVersion"
     implementation "androidx.core:core-ktx:$ktxVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.material:material'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
     implementation 'androidx.compose.ui:ui-tooling'
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
 
-    //Showkase
-    implementation "com.airbnb.android:showkase:$showkaseVersion"
-    kapt "com.airbnb.android:showkase-processor:$showkaseVersion"
     lintChecks project(':lint')
 
-    testImplementation 'junit:junit:4.13.2'
-
-    testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
-    testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
 }

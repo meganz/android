@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity.sync
+package mega.privacy.android.feature.sync.domain.entity
 
 /**
  * Represents a folder on Remote Storage.

@@ -1,8 +1,8 @@
-package mega.privacy.android.app.domain.usecase.sync
+package mega.privacy.android.feature.sync.domain.usecase
 
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.sync.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * Returns the list of MEGA folders from users root folder.

@@ -1,0 +1,10 @@
+dependencies {
+    // decide SDK dependency
+    if (shouldUsePrebuiltSdk()) {
+        println("[app] use remote pre-built SDK")
+        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
+    } else {
+        println("[app] use local SDK")
+        implementation project(':sdk')
+    }
+}

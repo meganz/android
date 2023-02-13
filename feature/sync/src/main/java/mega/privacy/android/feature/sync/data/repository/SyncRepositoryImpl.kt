@@ -1,12 +1,12 @@
-package mega.privacy.android.data.repository
+package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import mega.privacy.android.domain.entity.sync.RemoteFolder
-import mega.privacy.android.domain.repository.SyncRepository
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Inject
 
-class SyncRepositoryImpl @Inject constructor() : SyncRepository {
+internal class SyncRepositoryImpl @Inject constructor() : SyncRepository {
 
     private val localPath = MutableSharedFlow<String>(1)
     private val remotePath = MutableSharedFlow<RemoteFolder>(1)

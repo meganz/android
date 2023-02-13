@@ -43,7 +43,6 @@ import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
-import mega.privacy.android.data.repository.SyncRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
@@ -77,7 +76,6 @@ import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.StreamingServerRepository
 import mega.privacy.android.domain.repository.SupportRepository
-import mega.privacy.android.domain.repository.SyncRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
@@ -118,10 +116,6 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindSupportRepository(implementation: DefaultSupportRepository): SupportRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindSyncRepository(implementation: SyncRepositoryImpl): SyncRepository
 
     @Binds
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository

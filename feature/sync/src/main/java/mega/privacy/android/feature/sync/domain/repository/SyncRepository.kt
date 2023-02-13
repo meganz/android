@@ -1,12 +1,12 @@
-package mega.privacy.android.domain.repository
+package mega.privacy.android.feature.sync.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.sync.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * repository for sync feature
  */
-interface SyncRepository {
+internal interface SyncRepository {
 
     /**
      * saves the the path to local folder that will be synced

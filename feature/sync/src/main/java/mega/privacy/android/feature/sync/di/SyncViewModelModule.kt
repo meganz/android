@@ -1,24 +1,24 @@
-package mega.privacy.android.app.di.sync
+package mega.privacy.android.feature.sync.di
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.sync.GetRemoteFolders
-import mega.privacy.android.app.domain.usecase.sync.GetRemoteFoldersImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.repository.SyncRepository
-import mega.privacy.android.domain.usecase.sync.GetSyncLocalPath
-import mega.privacy.android.domain.usecase.sync.GetSyncRemotePath
-import mega.privacy.android.domain.usecase.sync.SetSyncLocalPath
-import mega.privacy.android.domain.usecase.sync.SetSyncRemotePath
+import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFolders
+import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFoldersImpl
+import mega.privacy.android.feature.sync.domain.usecase.GetSyncLocalPath
+import mega.privacy.android.feature.sync.domain.usecase.GetSyncRemotePath
+import mega.privacy.android.feature.sync.domain.usecase.SetSyncLocalPath
+import mega.privacy.android.feature.sync.domain.usecase.SetSyncRemotePath
 
 /**
  * Dagger module for Sync feature
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-class SyncModule {
+internal class SyncViewModelModule {
 
     /**
      * provides SetSyncLocalPath use case

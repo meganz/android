@@ -373,7 +373,6 @@ import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewM
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity;
-import mega.privacy.android.app.presentation.sync.SyncFragment;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -427,6 +426,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.preference.ViewType;
 import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
+import mega.privacy.android.feature.sync.ui.SyncFragment;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;

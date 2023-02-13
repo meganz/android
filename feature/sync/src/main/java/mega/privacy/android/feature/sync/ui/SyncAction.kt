@@ -1,7 +1,7 @@
-package mega.privacy.android.app.presentation.sync
+package mega.privacy.android.feature.sync.ui
 
 import android.net.Uri
-import mega.privacy.android.domain.entity.sync.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * Action from UI

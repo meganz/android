@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.sync
+package mega.privacy.android.feature.sync.ui
 
 import android.net.Uri
 import android.os.Environment
@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.sync.GetRemoteFolders
-import mega.privacy.android.domain.usecase.sync.GetSyncLocalPath
-import mega.privacy.android.domain.usecase.sync.SetSyncLocalPath
+import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFolders
+import mega.privacy.android.feature.sync.domain.usecase.GetSyncLocalPath
+import mega.privacy.android.feature.sync.domain.usecase.SetSyncLocalPath
 import javax.inject.Inject
 
 /**

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.sync
+package mega.privacy.android.feature.sync.ui
 
 import android.content.res.Configuration
 import android.net.Uri
@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.entity.sync.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * Composable Sync screen

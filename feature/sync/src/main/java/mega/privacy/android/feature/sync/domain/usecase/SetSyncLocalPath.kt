@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.sync
+package mega.privacy.android.feature.sync.domain.usecase
 
 /**
  * Sets the path to local folder that the user has selected

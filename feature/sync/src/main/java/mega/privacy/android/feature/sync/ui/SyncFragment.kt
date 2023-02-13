@@ -1,17 +1,18 @@
-package mega.privacy.android.app.presentation.sync
+package mega.privacy.android.feature.sync.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
@@ -53,5 +54,15 @@ class SyncFragment : Fragment() {
                 )
             }
         }
+    }
+
+    /**
+     * Is current theme mode a dark theme
+     */
+    @Composable
+    fun ThemeMode.isDarkMode() = when (this) {
+        ThemeMode.Light -> false
+        ThemeMode.Dark -> true
+        ThemeMode.System -> isSystemInDarkTheme()
     }
 }
