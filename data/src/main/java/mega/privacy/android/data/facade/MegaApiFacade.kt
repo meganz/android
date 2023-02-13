@@ -272,6 +272,13 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getNumVersions(node: MegaNode): Int = megaApi.getNumVersions(node)
 
+    override suspend fun getVersions(node: MegaNode): List<MegaNode> = megaApi.getVersions(node)
+
+    override fun deleteVersion(
+        nodeVersion: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.removeVersion(nodeVersion, listener)
+
     override suspend fun getParentNode(node: MegaNode): MegaNode? = megaApi.getParentNode(node)
 
     override suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode? =

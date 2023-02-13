@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -31,8 +32,6 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -80,7 +79,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
-    private val nodeUpdateMapper: NodeUpdateMapper
+    private val nodeUpdateMapper: NodeUpdateMapper,
 ) : NodeRepository {
 
 
@@ -161,6 +160,32 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         } ?: 0
     }
+
+    override suspend fun getNodeHistoryVersions(handle: NodeId) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle.longValue)?.let { megaNode ->
+            megaApiGateway.getVersions(megaNode).map { version ->
+                nodeMapper(
+                    version,
+                    cacheFolderGateway::getThumbnailCacheFilePath,
+                    megaApiGateway::hasVersion,
+                    megaApiGateway::getNumChildFolders,
+                    megaApiGateway::getNumChildFiles,
+                    fileTypeInfoMapper,
+                    megaApiGateway::isPendingShare,
+                    megaApiGateway::isInRubbish,
+                )
+            }
+        } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+    }
+
+    override suspend fun deleteNodeVersionByHandle(nodeVersionToDelete: NodeId): Unit =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeVersionToDelete.longValue)?.let { version ->
+                suspendCancellableCoroutine { continuation ->
+                    megaApiGateway.deleteVersion(version, continuation.getRequestListener {})
+                }
+            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+        }
 
     override fun monitorNodeUpdates(): Flow<NodeUpdate> {
         return megaApiGateway.globalUpdates

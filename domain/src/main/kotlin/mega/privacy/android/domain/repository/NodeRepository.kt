@@ -67,6 +67,19 @@ interface NodeRepository {
     suspend fun getNodeHistoryNumVersions(handle: Long): Int
 
     /**
+     * Get the history versions of the node
+     * @param handle [NodeId] the handle of the node
+     * @return the history versions of the node, including current one
+     */
+    suspend fun getNodeHistoryVersions(handle: NodeId): List<UnTypedNode>
+
+    /**
+     * Deletes a MegaNode's history version referenced by its handle [NodeId]
+     * @param nodeVersionToDelete [NodeId] handle of the node version we want to delete
+     */
+    suspend fun deleteNodeVersionByHandle(nodeVersionToDelete: NodeId)
+
+    /**
      * Monitor node updates
      *
      * @return a flow of all global node updates

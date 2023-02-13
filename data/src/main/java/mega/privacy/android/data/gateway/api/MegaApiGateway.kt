@@ -314,6 +314,21 @@ interface MegaApiGateway {
     suspend fun getNumVersions(node: MegaNode): Int
 
     /**
+     * Returns the list of versions of [node]
+     */
+    suspend fun getVersions(node: MegaNode): List<MegaNode>
+
+    /**
+     * Deletes [nodeVersion]
+     * @param nodeVersion MegaNode
+     * @param listener a [MegaRequestListenerInterface] for callback purposes
+     */
+    fun deleteVersion(
+        nodeVersion: MegaNode,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
      * Get children nodes by node
      * @param parentNode parent node
      * @param order order for the returned list, if null the default order is applied
