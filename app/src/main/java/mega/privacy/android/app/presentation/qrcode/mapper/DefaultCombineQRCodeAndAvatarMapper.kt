@@ -23,6 +23,7 @@ class DefaultCombineQRCodeAndAvatarMapper @Inject constructor(
         avatarBitmap: Bitmap,
         avatarWidth: Int,
         avatarBorderWidth: Int,
+        @ColorInt avatarBorderColor: Int,
     ): Bitmap = withContext(iODispatcher) {
         val qrCode = Bitmap.createBitmap(qrCodeWidth, qrCodeWidth, Bitmap.Config.ARGB_8888)
         val offset = (avatarWidth / 2).toFloat()
@@ -30,7 +31,7 @@ class DefaultCombineQRCodeAndAvatarMapper @Inject constructor(
         val c = Canvas(qrCode)
         val paint = Paint()
         paint.isAntiAlias = true
-        paint.color = qrCodeBgColor
+        paint.color = avatarBorderColor
         val scaledAvatar =
             Bitmap.createScaledBitmap(avatarBitmap, avatarWidth, avatarWidth, false)
         c.drawBitmap(qrCodeBitmap, 0f, 0f, null)

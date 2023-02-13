@@ -19,6 +19,7 @@ fun interface CombineQRCodeAndAvatarMapper {
      * @param avatarBitmap  bitmap of avatar
      * @param avatarWidth expected width of the avatar.
      * @param avatarBorderWidth border width of the circle around the avatar
+     * @param avatarBorderColor border color of avatar
      */
     suspend operator fun invoke(
         qrCodeBitmap: Bitmap,
@@ -27,5 +28,6 @@ fun interface CombineQRCodeAndAvatarMapper {
         avatarBitmap: Bitmap,
         avatarWidth: Int,
         avatarBorderWidth: Int,
+        @ColorInt avatarBorderColor: Int
     ): Bitmap
 }

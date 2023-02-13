@@ -23,5 +23,5 @@ fun interface QRCodeMapper {
         height: Int,
         penColor: Int,
         bgColor: Int,
-    ): Bitmap?
+    ): Bitmap
 }

@@ -11,7 +11,6 @@ import javax.inject.Inject
  */
 class DefaultResetContactLink @Inject constructor(
     private val accountRepository: AccountRepository,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ResetContactLink {
     override suspend fun invoke(): String =
         accountRepository.createContactLink(renew = true)

@@ -11,7 +11,6 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import timber.log.Timber
 import java.util.EnumMap
 import javax.inject.Inject
 
@@ -27,19 +26,15 @@ class DefaultQRCodeMapper @Inject constructor(
         height: Int,
         penColor: Int,
         bgColor: Int,
-    ): Bitmap? = withContext(defaultDispatcher) {
+    ): Bitmap = withContext(defaultDispatcher) {
 
         // use zxing library to generate QR code
         val hints: MutableMap<EncodeHintType, ErrorCorrectionLevel?> =
             EnumMap<EncodeHintType, ErrorCorrectionLevel>(EncodeHintType::class.java).apply {
                 set(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H)
             }
-        val bitMatrix: BitMatrix = try {
+        val bitMatrix: BitMatrix =
             MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints)
-        } catch (e: Exception) {
-            Timber.e(e)
-            return@withContext null
-        }
 
         val w = bitMatrix.width
         val h = bitMatrix.height
@@ -51,11 +46,13 @@ class DefaultQRCodeMapper @Inject constructor(
             color = bgColor
         }
 
-        canvas.drawRect(0f,
+        canvas.drawRect(
+            0f,
             0f,
             width.toFloat(),
             height.toFloat(),
-            paint)
+            paint
+        )
         paint.color = penColor
         for (y in 0 until h) {
             val offset = y * w

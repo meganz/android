@@ -10,15 +10,19 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.ViewPager
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityQrCodeBinding
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
 import mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
@@ -27,10 +31,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -41,9 +41,10 @@ import java.io.IOException
  * Activity for user's QR code
  */
 @AndroidEntryPoint
-class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
+class QRCodeActivity : PasscodeActivity() {
 
     private val scanCodeViewModel: ScanCodeViewModel by viewModels()
+    private val qrCodeViewModel: MyCodeViewModel by viewModels()
 
     private lateinit var binding: ActivityQrCodeBinding
 
@@ -102,6 +103,27 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
         } else {
             initActivity()
         }
+        setupFlow()
+    }
+
+    private fun setupFlow() {
+        collectFlow(qrCodeViewModel.uiState, Lifecycle.State.RESUMED) { uiState ->
+            if (qrCodeFragmentPos != QR_CODE_PAGE_INDEX) return@collectFlow
+
+            with(uiState) {
+                val hasContactLink = contactLink != null
+                shareMenuItem?.isVisible = hasContactLink
+                saveMenuItem?.isVisible = hasContactLink
+                deleteQRMenuItem?.isVisible = hasContactLink
+                resetQRMenuItem?.isVisible = true
+                settingsMenuItem?.isVisible = true
+
+                localQRCodeFile?.let {
+                    shareQR()
+                    qrCodeViewModel.finishSharing()
+                }
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -131,9 +153,8 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 }
 
                 override fun onPageSelected(position: Int) {
+                    qrCodeFragmentPos = position
                     invalidateOptionsMenu()
-                    qrCodeFragmentPos =
-                        if (position == 0) QR_CODE_PAGE_INDEX else SCAN_CODE_PAGE_INDEX
                 }
 
                 override fun onPageScrollStateChanged(state: Int) {}
@@ -162,12 +183,25 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
         resetQRMenuItem = menu.findItem(R.id.qr_code_reset)
         deleteQRMenuItem = menu.findItem(R.id.qr_code_delete)
 
-        val isVisible = qrCodeFragmentPos == QR_CODE_PAGE_INDEX
-        shareMenuItem?.isVisible = isVisible
-        saveMenuItem?.isVisible = isVisible
-        settingsMenuItem?.isVisible = isVisible
-        resetQRMenuItem?.isVisible = isVisible
-        deleteQRMenuItem?.isVisible = isVisible
+
+
+        when (qrCodeFragmentPos) {
+            QR_CODE_PAGE_INDEX -> {
+                val hasContactLink = qrCodeViewModel.uiState.value.contactLink != null
+                shareMenuItem?.isVisible = hasContactLink
+                saveMenuItem?.isVisible = hasContactLink
+                settingsMenuItem?.isVisible = true
+                resetQRMenuItem?.isVisible = true
+                deleteQRMenuItem?.isVisible = hasContactLink
+            }
+            SCAN_CODE_PAGE_INDEX -> {
+                shareMenuItem?.isVisible = false
+                saveMenuItem?.isVisible = false
+                settingsMenuItem?.isVisible = false
+                resetQRMenuItem?.isVisible = false
+                deleteQRMenuItem?.isVisible = false
+            }
+        }
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -179,7 +213,7 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 onBackPressedDispatcher.onBackPressed()
             }
             R.id.qr_code_share -> {
-                shareQR()
+                qrCodeViewModel.startSharing()
             }
             R.id.qr_code_save -> {
                 if (!qrCodeSaveBottomSheetDialogFragment.isBottomSheetDialogShown()) {
@@ -285,7 +319,7 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
         Timber.d("shareQR")
         ensureMyCodeFragment()
         myCodeFragment?.takeIf { it.isAdded }?.run {
-            queryIfQRExists()?.takeIf { it.exists() }?.let { qrCodeFile ->
+            qrCodeViewModel.uiState.value.localQRCodeFile?.let { qrCodeFile ->
                 Timber.d("Use provider to share")
 
                 val uri = FileProvider.getUriForFile(
@@ -307,32 +341,29 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
     }
 
     private fun resetQR() {
-        Timber.d("resetQR")
-        ensureMyCodeFragment()
-        myCodeFragment?.takeIf { it.isAdded }?.resetQRCode()
+        Timber.d("resetQRCode")
+        val penColor = ContextCompat.getColor(this, R.color.dark_grey)
+        val bgColor = ContextCompat.getColor(this, R.color.white_grey_700)
+        val avatarBorderColor = ContextCompat.getColor(this, R.color.white_dark_grey)
+        qrCodeViewModel.resetQRCode(
+            width = MyCodeFragment.QRCODE_WIDTH,
+            height = MyCodeFragment.QRCODE_WIDTH,
+            penColor = penColor,
+            bgColor = bgColor,
+            avatarWidth = MyCodeFragment.AVATAR_WIDTH,
+            avatarBorderWidth = MyCodeFragment.AVATAR_BORDER_WIDTH,
+            avatarBorderColor = avatarBorderColor,
+        )
     }
 
     private fun deleteQR() {
         Timber.d("deleteQR")
         ensureMyCodeFragment()
-        myCodeFragment?.takeIf { it.isAdded }?.deleteQRCode()
+        myCodeFragment?.takeIf { it.isAdded }?.run { qrCodeViewModel.deleteQR() }
     }
 
     override fun showSnackbar(view: View, s: String) =
         showSnackbar(Constants.SNACKBAR_TYPE, view, s)
-
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish ")
-        if (request.type == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
-            ensureMyCodeFragment()
-            myCodeFragment?.takeIf { it.isAdded }?.initCreateQR(request, e)
-        } else if (request.type == MegaRequest.TYPE_CONTACT_LINK_DELETE) {
-            ensureMyCodeFragment()
-            myCodeFragment?.takeIf { it.isAdded }?.initDeleteQR(request, e)
-        }
-    }
 
     private fun ensureMyCodeFragment() {
         if (myCodeFragment == null) {
@@ -343,44 +374,6 @@ class QRCodeActivity : PasscodeActivity(), MegaRequestListenerInterface {
                     QR_CODE_PAGE_INDEX
                 ) as? MyCodeFragment
         }
-    }
-
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
-
-    /**
-     * Handle when QR code reset is successful.
-     */
-    fun resetSuccessfully(success: Boolean) {
-        Timber.d("resetSuccessfully")
-        if (success) {
-            showSnackbar(binding.rootLevelLayout, getString(R.string.qrcode_reset_successfully))
-        } else {
-            showSnackbar(binding.rootLevelLayout, getString(R.string.qrcode_reset_not_successfully))
-        }
-    }
-
-    /**
-     * Handle when contact link is deleted successfully.
-     */
-    fun deleteSuccessfully() {
-        Timber.d("delete Successfully")
-        shareMenuItem?.isVisible = false
-        saveMenuItem?.isVisible = false
-        settingsMenuItem?.isVisible = true
-        resetQRMenuItem?.isVisible = true
-        deleteQRMenuItem?.isVisible = false
-    }
-
-    /**
-     * Handle when contact link is created successfully.
-     */
-    fun createSuccessfully() {
-        Timber.d("create Successfully")
-        shareMenuItem?.isVisible = true
-        saveMenuItem?.isVisible = true
-        settingsMenuItem?.isVisible = true
-        resetQRMenuItem?.isVisible = true
-        deleteQRMenuItem?.isVisible = true
     }
 
     companion object {
