@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -11,11 +13,13 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
+import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
@@ -23,6 +27,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
@@ -46,7 +51,7 @@ import kotlin.coroutines.Continuation
  * @property cacheGateway [CacheGateway]
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
- * @property ioDispatcher CoroutineDispatcher
+ * @property ioDispatcher [CoroutineDispatcher]
  */
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -61,6 +66,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
+    private val videoCompressorGateway: VideoCompressorGateway,
+    private val videoAttachmentMapper: VideoAttachmentMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -449,7 +456,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override fun monitorChargingStoppedInfo() = broadcastReceiverGateway.monitorChargingStoppedState
 
-    override suspend fun setCameraUploadsFolders(primaryFolder: Long, secondaryFolder: Long) =
+    override suspend fun setCameraUploadsFolders(primaryFolder: Long, secondaryFolder: Long): Unit =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener { return@getRequestListener }
@@ -479,4 +486,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 " * provide more data and avoid race conditions. They could change or be removed in the current form."
     )
     override fun getNumberOfPendingUploads() = megaApiGateway.numberOfPendingUploads
+
+    override fun compressVideos(
+        root: String,
+        quality: VideoQuality,
+        records: List<SyncRecord>,
+    ): Flow<VideoCompressionState> {
+        videoCompressorGateway.run {
+            setOutputRoot(root)
+            setVideoQuality(quality)
+            addItems(videoAttachmentMapper(records))
+        }
+        return videoCompressorGateway.start().flowOn(ioDispatcher)
+    }
 }

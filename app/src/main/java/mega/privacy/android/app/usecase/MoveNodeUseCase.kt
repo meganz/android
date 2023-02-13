@@ -24,7 +24,7 @@ import javax.inject.Inject
  */
 class MoveNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
 ) {
 
     /**
@@ -34,6 +34,11 @@ class MoveNodeUseCase @Inject constructor(
      * @param parentHandle  The parent MegaNode where the node has to be moved.
      * @return Completable.
      */
+    @Deprecated(
+        message = "This RXJava version has been deprecated in favour of MoveNodeByHandle use case",
+        replaceWith = ReplaceWith("MoveNodeByHandle"),
+        level = DeprecationLevel.WARNING
+    )
     fun move(handle: Long, parentHandle: Long): Completable =
         Completable.fromCallable {
             move(
@@ -60,6 +65,11 @@ class MoveNodeUseCase @Inject constructor(
      * @param handle        The identifier of the MegaNode to move.
      * @return Completable.
      */
+    @Deprecated(
+        message = "This RXJava version has been deprecated in favour of MoveNodeToRubbishByHandle use case",
+        replaceWith = ReplaceWith("MoveNodeToRubbishByHandle"),
+        level = DeprecationLevel.WARNING
+    )
     fun moveToRubbishBin(handle: Long): Completable =
         Completable.fromCallable {
             move(getNodeUseCase.get(handle).blockingGetOrNull(), megaApi.rubbishNode)
@@ -113,7 +123,7 @@ class MoveNodeUseCase @Inject constructor(
      */
     fun move(
         collisionResult: NameCollisionResult,
-        rename: Boolean
+        rename: Boolean,
     ): Single<MoveRequestResult.GeneralMovement> =
         Single.create { emitter ->
             val node = getNodeUseCase
@@ -177,7 +187,7 @@ class MoveNodeUseCase @Inject constructor(
      */
     fun move(
         collisions: List<NameCollisionResult>,
-        rename: Boolean
+        rename: Boolean,
     ): Single<MoveRequestResult.GeneralMovement> =
         Single.create { emitter ->
             var errorCount = 0

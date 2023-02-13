@@ -15,7 +15,9 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaNode
@@ -53,9 +55,6 @@ class InboxViewModelTest {
     }
     private val retrievedNode = mock<MegaNode> {
         on { this.handle }.thenReturn(RETRIEVED_NODE_HANDLE)
-    }
-    private val emittedNode = mock<Node> {
-        on { this.id }.thenReturn(NodeId(EMITTED_NODE_HANDLE))
     }
 
     @get:Rule
@@ -105,7 +104,7 @@ class InboxViewModelTest {
         setUnderTest()
 
         underTest.updateInboxHandle(INBOX_NODE_HANDLE)
-        monitorNodeUpdates.emit(listOf(emittedNode))
+        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
 
         underTest.state.test {
             val state = awaitItem()
@@ -119,8 +118,8 @@ class InboxViewModelTest {
         runTest {
             setupData()
             setUnderTest()
-
-            monitorNodeUpdates.emit(listOf(emittedNode))
+            val update = mapOf(mock<Node>() to emptyList<NodeChanges>())
+            monitorNodeUpdates.emit(NodeUpdate(update))
 
             underTest.state.test {
                 val state = awaitItem()

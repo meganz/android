@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -24,6 +25,7 @@ class DefaultLoginRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
+    private val appEventGateway = mock<AppEventGateway>()
 
     @Before
     fun setUp() {
@@ -31,7 +33,8 @@ class DefaultLoginRepositoryTest {
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = megaChatApiGateway,
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            appEventGateway = appEventGateway
         )
     }
 
@@ -70,4 +73,15 @@ class DefaultLoginRepositoryTest {
             verify(megaChatApiGateway).init(sessionId)
         }
 
+    @Test
+    fun `test that AppEventGateway is invoked when broadcastLogout is launched`() = runTest {
+        underTest.broadcastLogout()
+        verify(appEventGateway).broadcastLogout()
+    }
+
+    @Test
+    fun `test that AppEventGateway is invoked when monitorLogout is received`() = runTest {
+        underTest.monitorLogout()
+        verify(appEventGateway).monitorLogout()
+    }
 }

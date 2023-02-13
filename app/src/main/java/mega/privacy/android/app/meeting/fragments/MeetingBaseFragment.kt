@@ -264,7 +264,7 @@ open class MeetingBaseFragment : Fragment() {
         }
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

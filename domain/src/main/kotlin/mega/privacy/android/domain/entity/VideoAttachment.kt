@@ -15,7 +15,7 @@ data class VideoAttachment(
     val newPath: String,
     val size: Long,
     val pendingMessageId: Long?,
-    val id: Long?,
+    val id: Int?,
 ) {
     var compressionPercentage: Int = 0
     var readSize: Long = 0

@@ -248,4 +248,70 @@ interface AccountRepository {
      * @return The email related to the link.
      */
     suspend fun querySignupLink(signupLink: String): String
+
+    /**
+     * Stops using the current authentication token, it's needed to explicitly call
+     * set accountAuth as NULL as parameter. Otherwise, the value set would continue
+     * being used despite this MegaApi object is logged in or logged out.s account
+     */
+    suspend fun resetAccountAuth()
+
+    /**
+     * Clears the account data and preferences.
+     */
+    suspend fun clearAccountPreferences()
+
+    /**
+     * Clears shared preferences.
+     */
+    suspend fun clearSharedPreferences()
+
+    /**
+     * Clears app data and cache.
+     */
+    suspend fun clearAppDataAndCache()
+
+    /**
+     * Cancels all notifications.
+     */
+    suspend fun cancelAllNotifications()
+
+    /**
+     * Check whether password is user's current password
+     * @param password as password to check
+     * @return true if password is the same as current password
+     */
+    suspend fun isCurrentPassword(password: String): Boolean
+
+    /**
+     * Change the given user's password
+     * @param newPassword as user's chosen new password
+     * @return true if successful
+     */
+    suspend fun changePassword(newPassword: String): Boolean
+
+    /**
+     * Reset the user's password from a link
+     * @param link as reset link
+     * @param newPassword as user's chosen new password
+     * @param masterKey as user's account master key
+     * @return true if successful, else false
+     */
+    suspend fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String?
+    ): Boolean
+
+    /**
+     * Check the given password's strength
+     * @param password as password to test
+     * @return password strength level from 0 - 4
+     */
+    suspend fun getPasswordStrength(password: String): Int
+
+    /**
+     * Resets account info.
+     */
+    suspend fun resetAccountInfo()
 }

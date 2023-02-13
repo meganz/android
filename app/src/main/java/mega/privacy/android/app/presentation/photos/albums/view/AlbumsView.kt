@@ -2,6 +2,10 @@ package mega.privacy.android.app.presentation.photos.albums.view
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.graphics.Typeface
+import android.os.Build
+import android.text.TextUtils
+import android.widget.TextView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
@@ -54,9 +58,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
@@ -64,6 +69,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -73,7 +79,6 @@ import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.subtitle1
-import mega.privacy.android.core.ui.theme.subtitle2
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
@@ -86,7 +91,7 @@ fun AlbumsView(
     albumsViewState: AlbumsViewState,
     openAlbum: (album: UIAlbum) -> Unit,
     downloadPhoto: PhotoDownload,
-    onDialogPositiveButtonClicked: (name: String, proscribedStrings: List<String>) -> Unit,
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit = {},
     setInputValidity: (Boolean) -> Unit = {},
     openPhotosSelectionActivity: (AlbumId) -> Unit = {},
@@ -258,12 +263,27 @@ fun AlbumsView(
                                         else Modifier
                                     ),
                             )
-                            MiddleEllipsisText(
-                                modifier = Modifier.padding(top = 10.dp, bottom = 3.dp),
-                                text = album.title,
-                                style = subtitle2,
-                                color = if (MaterialTheme.colors.isLight) black else white,
-                                fontWeight = FontWeight.Medium
+
+                            AndroidView(
+                                factory = {
+                                    TextView(it).apply {
+                                        maxLines = 1
+                                        ellipsize = TextUtils.TruncateAt.MIDDLE
+                                        textSize = 14f
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                            typeface = Typeface.create(null, 500, false)
+                                        }
+
+                                        setTextColor(
+                                            ContextCompat.getColor(
+                                                it,
+                                                R.color.white.takeIf { !isLight } ?: R.color.black,
+                                            )
+                                        )
+                                        setPadding(0, dp2px(10f), 0, dp2px(3f))
+                                    }
+                                },
+                                update = { it.text = album.title },
                             )
 
                             Text(

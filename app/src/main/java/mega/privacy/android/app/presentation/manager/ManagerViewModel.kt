@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
@@ -56,6 +57,7 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import nz.mega.sdk.MegaEvent
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -77,7 +79,11 @@ import javax.inject.Inject
  * @param ioDispatcher
  * @param monitorMyAvatarFile
  * @param monitorStorageStateEvent monitor global storage state changes
+ * @param monitorViewType
  * @param getCloudSortOrder
+ * @param getFeatureFlagValue
+ * @param getUnverifiedIncomingShares
+ * @param getUnverifiedOutgoingShares
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -92,6 +98,7 @@ class ManagerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorViewType: MonitorViewType,
     private val getPrimarySyncHandle: GetPrimarySyncHandle,
     private val getSecondarySyncHandle: GetSecondarySyncHandle,
     private val checkCameraUpload: CheckCameraUpload,
@@ -145,9 +152,10 @@ class ManagerViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorNodeUpdates().collect {
-                checkItemForInbox(it)
+                val nodeList = it.changes.keys.toList()
+                checkItemForInbox(nodeList)
                 onReceiveNodeUpdate(true)
-                checkCameraUploadFolder(false, it)
+                checkCameraUploadFolder(false, nodeList)
             }
         }
         viewModelScope.launch(ioDispatcher) {
@@ -156,6 +164,11 @@ class ManagerViewModel @Inject constructor(
             }.collect {
                 _state.update(it)
             }
+        }
+
+        viewModelScope.launch {
+            val showSyncSection = getFeatureFlagValue(AppFeatures.AndroidSync)
+            _state.value = _state.value.copy(showSyncSection = showSyncSection)
         }
 
         viewModelScope.launch {
@@ -253,6 +266,12 @@ class ManagerViewModel @Inject constructor(
      */
     val onMyAvatarFileChanged: Flow<File?>
         get() = monitorMyAvatarFile()
+
+    /**
+     * Flow that monitors the View Type
+     */
+    val onViewTypeChanged: Flow<ViewType>
+        get() = monitorViewType()
 
     /**
      * Set a flag to know if the current navigation level is the first one

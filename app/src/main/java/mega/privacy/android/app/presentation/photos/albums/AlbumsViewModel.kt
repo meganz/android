@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
+import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -52,6 +53,7 @@ class AlbumsViewModel @Inject constructor(
     private val getDefaultAlbumsMap: GetDefaultAlbumsMap,
     private val getUserAlbums: GetUserAlbums,
     private val getAlbumPhotos: GetAlbumPhotos,
+    private val getProscribedAlbumNames: GetProscribedAlbumNames,
     private val uiAlbumMapper: UIAlbumMapper,
     private var getFeatureFlag: GetFeatureFlagValue,
     private val removeFavourites: RemoveFavourites,
@@ -291,14 +293,14 @@ class AlbumsViewModel @Inject constructor(
      *
      * @param title the name of the album
      */
-    fun createNewAlbum(title: String, proscribedStrings: List<String>) {
+    fun createNewAlbum(title: String) {
         if (createAlbumJob?.isActive == true) return
         createAlbumJob = viewModelScope.launch {
             try {
                 val finalTitle = title.ifEmpty {
                     _state.value.createAlbumPlaceholderTitle
                 }.trim()
-                if (checkTitleValidity(finalTitle, proscribedStrings)) {
+                if (checkTitleValidity(finalTitle)) {
                     val album = createAlbum(finalTitle)
                     _state.update {
                         it.copy(
@@ -317,11 +319,11 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    fun updateAlbumName(title: String, proscribedStrings: List<String>) {
+    fun updateAlbumName(title: String) {
         viewModelScope.launch {
             try {
                 val finalTitle = title.trim()
-                if (checkTitleValidity(finalTitle, proscribedStrings, showEmptyError = true)) {
+                if (checkTitleValidity(finalTitle, showEmptyError = true)) {
                     val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
                     updateAlbumNameUseCase(currentAlbumId, finalTitle)
                     _state.update {
@@ -371,11 +373,12 @@ class AlbumsViewModel @Inject constructor(
         it.id is Album.UserAlbum
     }.map { it.title }
 
-    private fun checkTitleValidity(
+    private suspend fun checkTitleValidity(
         title: String,
-        proscribedStrings: List<String>,
         showEmptyError: Boolean = false,
     ): Boolean {
+        val proscribedStrings = getProscribedAlbumNames()
+
         var errorMessage: Int? = null
         var isTitleValid = true
 
@@ -401,6 +404,7 @@ class AlbumsViewModel @Inject constructor(
         }
 
         return isTitleValid
+
     }
 
     fun setNewAlbumNameValidity(valid: Boolean) = _state.update {

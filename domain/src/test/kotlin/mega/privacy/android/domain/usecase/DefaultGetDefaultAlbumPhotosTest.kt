@@ -5,10 +5,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import org.junit.Before
 import org.junit.Test
@@ -21,10 +22,11 @@ class DefaultGetDefaultAlbumPhotosTest {
 
     lateinit var underTest: GetDefaultAlbumPhotos
     private val photosRepository = mock<PhotosRepository>()
+    private val nodeRepository = mock<NodeRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetDefaultAlbumPhotos(photosRepository)
+        underTest = DefaultGetDefaultAlbumPhotos(photosRepository, nodeRepository)
     }
 
     @Test
@@ -33,11 +35,12 @@ class DefaultGetDefaultAlbumPhotosTest {
             whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
                 createVideo(id = 1L)
             ))
-            whenever(photosRepository.monitorNodeUpdates()).thenReturn(
+            val node = mock<Node>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
                 flowOf(
                     NodeUpdate(
                         mapOf(
-                            NodeId(1L) to NodeChanges.values().filter {
+                            node to NodeChanges.values().filter {
                                 it !in listOf(
                                     NodeChanges.New,
                                     NodeChanges.Favourite,
@@ -63,8 +66,9 @@ class DefaultGetDefaultAlbumPhotosTest {
             whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
                 createVideo(id = 1L)
             ))
-            whenever(photosRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                NodeId(1L) to listOf(NodeChanges.New)))))
+            val node = mock<Node>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
+                node to listOf(NodeChanges.New)))))
 
             underTest(listOf())
                 .test {
@@ -80,8 +84,9 @@ class DefaultGetDefaultAlbumPhotosTest {
             whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
                 createVideo(id = 1L)
             ))
-            whenever(photosRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                NodeId(1L) to listOf(NodeChanges.Favourite)))))
+            val node = mock<Node>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
+                node to listOf(NodeChanges.Favourite)))))
 
             underTest(listOf())
                 .test {
@@ -97,8 +102,9 @@ class DefaultGetDefaultAlbumPhotosTest {
             whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
                 createVideo(id = 1L)
             ))
-            whenever(photosRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                NodeId(1L) to listOf(NodeChanges.Attributes)))))
+            val node = mock<Node>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
+                node to listOf(NodeChanges.Attributes)))))
 
             underTest(listOf())
                 .test {
@@ -114,8 +120,9 @@ class DefaultGetDefaultAlbumPhotosTest {
             whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
                 createVideo(id = 1L)
             ))
-            whenever(photosRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                NodeId(1L) to listOf(NodeChanges.Parent)))))
+            val node = mock<Node>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
+                node to listOf(NodeChanges.Parent)))))
 
             underTest(listOf())
                 .test {

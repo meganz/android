@@ -14,10 +14,10 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -61,12 +61,16 @@ import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * [Fragment] that handles Video-related operations
+ */
 @AndroidEntryPoint
 class VideoFragment : Fragment(), HomepageSearchable {
 
@@ -84,10 +88,25 @@ class VideoFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
+    /**
+     * Used to access SDK-related functions
+     */
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    /**
+     * onSaveInstanceState
+     */
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
+    }
+
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -101,6 +120,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
         return binding.root
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
@@ -124,29 +146,81 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_VIDEOS)
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            if ((state.viewType == ViewType.LIST) != viewModel.isList) {
+                // Changing the adapter will cause the scroll position to be lost
+                // To avoid that, the adapter will only change when the list/grid view
+                // really changes
+                switchViewType(state.viewType)
+                viewModel.refreshUi()
+            }
+        }
     }
 
+    /**
+     * onDestroyView
+     */
     override fun onDestroyView() {
         viewModel.cancelSearch()
         super.onDestroyView()
     }
 
+    /**
+     * shouldShowSearchMenu
+     */
+    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
+
+    /**
+     * searchReady
+     */
+    override fun searchReady() {
+        // Rotate screen in action mode, the keyboard would pop up again, hide it
+        if (actionMode != null) {
+            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
+        }
+
+        itemDecoration.setDrawAllDividers(true)
+        disableRecyclerViewAnimator(listView)
+        viewModel.readySearch()
+    }
+
+    /**
+     * exitSearch
+     */
+    override fun exitSearch() {
+        itemDecoration.setDrawAllDividers(false)
+        disableRecyclerViewAnimator(listView)
+        viewModel.exitSearch()
+    }
+
+    /**
+     * searchQuery
+     */
+    override fun searchQuery(query: String) {
+        if (viewModel.searchQuery == query) return
+        viewModel.searchQuery = query
+        viewModel.loadVideo()
+    }
+
+    /**
+     * Setup empty hint behavior
+     */
     private fun setupEmptyHint() {
         with(binding.emptyHint) {
             emptyHintImage.isVisible = false
             emptyHintImage.setImageResource(R.drawable.ic_homepage_empty_video)
             emptyHintText.isVisible = false
-            emptyHintText.text = formatEmptyScreenText(requireContext(),
-                getString(R.string.homepage_empty_hint_video))
+            emptyHintText.text = formatEmptyScreenText(
+                requireContext(),
+                getString(R.string.homepage_empty_hint_video)
+            )
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        viewModel.skipNextAutoScroll = true
-    }
-
+    /**
+     * Establishes the List View
+     */
     private fun setupListView() {
         listView = binding.videoList
         with(listView) {
@@ -166,6 +240,11 @@ class VideoFragment : Fragment(), HomepageSearchable {
         itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
     }
 
+    /**
+     * Perform a specific operation when online
+     *
+     * @param operation lambda that specifies the operation to be executed
+     */
     private fun doIfOnline(operation: () -> Unit) {
         if (viewModel.isConnected) {
             operation()
@@ -181,6 +260,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Setup the List Adapter
+     */
     private fun setupListAdapter() {
         listAdapter =
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
@@ -196,10 +278,19 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 autoScrollToTop()
             }
         })
-
-        switchListGridView(sortByHeaderViewModel.isList)
+        switchViewType(sortByHeaderState().viewType)
     }
 
+    /**
+     * The UI State from [SortByHeaderViewModel]
+     *
+     * @return The UI State
+     */
+    private fun sortByHeaderState() = sortByHeaderViewModel.state.value
+
+    /**
+     * Immediately scroll to the top of the list
+     */
     private fun autoScrollToTop() {
         if (!viewModel.skipNextAutoScroll) {
             listView.layoutManager?.scrollToPosition(0)
@@ -207,27 +298,41 @@ class VideoFragment : Fragment(), HomepageSearchable {
         viewModel.skipNextAutoScroll = false
     }
 
-    private fun switchListGridView(isList: Boolean) {
-        viewModel.isList = isList
-        if (isList) {
-            listView.switchToLinear()
-            listView.adapter = listAdapter
-            if (listView.itemDecorationCount == 0) {
-                listView.addItemDecoration(itemDecoration)
-            }
-        } else {
-            listView.switchBackToGrid()
-            listView.adapter = gridAdapter
-            listView.removeItemDecoration(itemDecoration)
+    /**
+     * Switches how Audio items are being displayed
+     *
+     * @param viewType The View Type
+     */
+    private fun switchViewType(viewType: ViewType) {
+        viewModel.isList = viewType == ViewType.LIST
+        listView.apply {
+            when (viewType) {
+                ViewType.LIST -> {
+                    switchToLinear()
+                    adapter = listAdapter
+                    if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
+                }
+                ViewType.GRID -> {
+                    switchBackToGrid()
+                    adapter = gridAdapter
+                    removeItemDecoration(itemDecoration)
 
-            (listView.layoutManager as CustomizedGridLayoutManager).apply {
-                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                    (layoutManager as CustomizedGridLayoutManager).apply {
+                        spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                    }
+                }
             }
         }
     }
 
+    /**
+     * Setup fast scroller for the [RecyclerView]
+     */
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
+    /**
+     * Establishes the Action Mode
+     */
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
             requireActivity() as ManagerActivity, actionModeViewModel, megaApi
@@ -239,13 +344,19 @@ class VideoFragment : Fragment(), HomepageSearchable {
         observeActionModeDestroy()
     }
 
+    /**
+     * Performs certain behavior when a long press is observed
+     */
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { actionModeViewModel.enterActionMode(it) }
         })
 
+    /**
+     * Observe selected Nodes from [ActionModeViewModel]
+     */
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
@@ -266,12 +377,15 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
                 actionMode?.title = it.size.toString()
             }
-        })
+        }
 
+    /**
+     * Observes item animation
+     */
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner) {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time
@@ -305,7 +419,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
 
-                    val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
+                    val imageView: ImageView? = if (sortByHeaderViewModel.isListView()) {
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         itemView.findViewById(R.id.ic_selected)
@@ -325,25 +439,34 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
             animatorSet?.playTogether(animatorList)
             animatorSet?.start()
-        })
+        }
     }
 
+    /**
+     * Performs certain behavior when the Action Mode is destroyed
+     */
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
             callManager { it.showKeyboardForSearch() }
         })
 
+    /**
+     * Updates the UI by refreshing the list content
+     */
     private fun updateUi() = viewModel.items.value?.let {
         // Must create a new list, otherwise, onBindViewHolder in adapter cannot trigger.
         val newList = ArrayList<NodeItem>(it)
-        if (sortByHeaderViewModel.isList) {
+        if (sortByHeaderViewModel.isListView()) {
             listAdapter.submitList(newList)
         } else {
             gridAdapter.submitList(newList)
         }
     }
 
+    /**
+     * Setup the navigation of this feature
+     */
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
             val node = it.node
@@ -370,20 +493,11 @@ class VideoFragment : Fragment(), HomepageSearchable {
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.onOrderChange()
         })
-
-        sortByHeaderViewModel.listGridChangeEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { isList ->
-                if (isList != viewModel.isList) {
-                    // change adapter will cause lose scroll position,
-                    // to avoid that, we only change adapter when the list/grid view
-                    // really change.
-                    switchListGridView(isList)
-                }
-                viewModel.refreshUi()
-            })
     }
 
+    /**
+     * Establish the mini audio player
+     */
     private fun setupMiniAudioPlayer() {
         val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
             shouldVisible = true
@@ -391,6 +505,12 @@ class VideoFragment : Fragment(), HomepageSearchable {
         lifecycle.addObserver(audioPlayerController)
     }
 
+    /**
+     * Opens a Node
+     *
+     * @param node The [MegaNode] to be opened
+     * @param index The [MegaNode] index
+     */
     private fun openNode(node: MegaNode, index: Int) {
         val file: MegaNode = node
 
@@ -402,8 +522,10 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-            sortByHeaderViewModel.cloudSortOrder.value)
+        intent.putExtra(
+            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+            sortByHeaderViewModel.cloudSortOrder.value
+        )
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
 
@@ -420,11 +542,13 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
         val localPath = FileUtil.getLocalFile(file)
         var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-            FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
+            FileUtil.setLocalIntentParams(
+                context, node, intent, localPath, false,
                 requireActivity() as ManagerActivity
             )
         } else {
-            FileUtil.setStreamingIntentParams(context, node, megaApi, intent,
+            FileUtil.setStreamingIntentParams(
+                context, node, megaApi, intent,
                 requireActivity() as ManagerActivity
             )
         }
@@ -458,41 +582,5 @@ class VideoFragment : Fragment(), HomepageSearchable {
             )
             callManager { it.saveNodesToDevice(listOf(node), true, false, false, false) }
         }
-    }
-
-    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
-
-    override fun searchReady() {
-        // Rotate screen in action mode, the keyboard would pop up again, hide it
-        if (actionMode != null) {
-            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
-        }
-
-        itemDecoration.setDrawAllDividers(true)
-        disableRecyclerViewAnimator(listView)
-
-
-        if (viewModel.searchMode) return
-
-        viewModel.searchMode = true
-        viewModel.searchQuery = ""
-        viewModel.refreshUi()
-    }
-
-    override fun exitSearch() {
-        itemDecoration.setDrawAllDividers(false)
-        disableRecyclerViewAnimator(listView)
-
-        if (!viewModel.searchMode) return
-
-        viewModel.searchMode = false
-        viewModel.searchQuery = ""
-        viewModel.refreshUi()
-    }
-
-    override fun searchQuery(query: String) {
-        if (viewModel.searchQuery == query) return
-        viewModel.searchQuery = query
-        viewModel.loadVideo()
     }
 }

@@ -436,7 +436,7 @@ class SMSVerificationActivity : PasscodeActivity(), View.OnClickListener,
                 MegaError.API_OK -> {
                     Timber.d("The SMS verification request has been sent successfully.")
                     val enteredPhoneNumber = phoneNumberInput.text.toString()
-                    val intent = Intent(this, SMSVerificationReceiveTxtActivity::class.java)
+                    val intent = Intent(this, SMSVerificationTextActivity::class.java)
                     intent.putExtra(SELECTED_COUNTRY_CODE, selectedDialCode)
                     intent.putExtra(ENTERED_PHONE_NUMBER, enteredPhoneNumber)
                     intent.putExtra(NAME_USER_LOCKED, isUserLocked)

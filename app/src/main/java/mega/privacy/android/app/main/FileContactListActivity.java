@@ -558,10 +558,10 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     /**
      * Handle the process of sharing the Folder to contacts
-     *
+     * <p>
      * If the Folder is a Backup folder, a warning dialog is displayed and the shared folder can only be
      * configured in read-only mode.
-     *
+     * <p>
      * Otherwise, no warning dialog is displayed and the shared folder can be configured in different
      * access modes (read-only, read and write, full access)
      */
@@ -970,7 +970,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         String message = getResources().getQuantityString(R.plurals.remove_multiple_contacts_shared_folder, contacts.size(), contacts.size());
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
+    }
 
     public void removeMultipleShares(ArrayList<MegaShare> shares) {
         Timber.d("Number of shared to remove: %s", shares.size());
@@ -981,20 +981,20 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     @Override
     public void onReloadNeeded(MegaApiJava api) {
-        // TODO Auto-generated method stub
+
 
     }
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-        // TODO Auto-generated method stub
+
 
     }
 
     @Override
     public void onContactRequestsUpdate(MegaApiJava api,
                                         ArrayList<MegaContactRequest> requests) {
-        // TODO Auto-generated method stub
+
 
     }
 

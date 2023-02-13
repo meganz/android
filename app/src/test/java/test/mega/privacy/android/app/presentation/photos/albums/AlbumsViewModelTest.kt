@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
+import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -56,6 +57,7 @@ class AlbumsViewModelTest {
     private val getFeatureFlag =
         mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
+    private val getProscribedAlbumNames = mock<GetProscribedAlbumNames>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
@@ -74,6 +76,7 @@ class AlbumsViewModelTest {
             getDefaultAlbumsMap = getDefaultAlbumsMap,
             getUserAlbums = getUserAlbums,
             getAlbumPhotos = getAlbumPhotos,
+            getProscribedAlbumNames = getProscribedAlbumNames,
             uiAlbumMapper = uiAlbumMapper,
             getFeatureFlag = getFeatureFlag,
             removeFavourites = removeFavourites,
@@ -339,9 +342,13 @@ class AlbumsViewModelTest {
             )
         )
 
-        whenever(getUserAlbums()).thenReturn(flowOf(listOf(
-            newAlbum1, newAlbum2, newAlbum3
-        )))
+        whenever(getUserAlbums()).thenReturn(
+            flowOf(
+                listOf(
+                    newAlbum1, newAlbum2, newAlbum3
+                )
+            )
+        )
         whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
         val expectedUserAlbums = listOf(
@@ -363,8 +370,9 @@ class AlbumsViewModelTest {
         whenever(createAlbum(expectedAlbumName)).thenReturn(
             createUserAlbum(title = expectedAlbumName)
         )
+        whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
 
-        underTest.createNewAlbum(expectedAlbumName, proscribedStrings)
+        underTest.createNewAlbum(expectedAlbumName)
 
         underTest.state.drop(1).test {
             val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
@@ -376,7 +384,7 @@ class AlbumsViewModelTest {
     fun `test that an error in creating an album would keep current album as null`() = runTest {
         whenever(createAlbum(any())).thenAnswer { throw Exception() }
 
-        underTest.createNewAlbum("ABD", proscribedStrings)
+        underTest.createNewAlbum("ABD")
 
         underTest.state.test {
             assertNull(awaitItem().currentAlbum)
@@ -411,9 +419,13 @@ class AlbumsViewModelTest {
                     id = newUserAlbum,
                 )
             )
-            whenever(getUserAlbums()).thenReturn(flowOf(listOf(
-                newUserAlbum
-            )))
+            whenever(getUserAlbums()).thenReturn(
+                flowOf(
+                    listOf(
+                        newUserAlbum
+                    )
+                )
+            )
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
 
@@ -454,10 +466,14 @@ class AlbumsViewModelTest {
                 )
             )
 
-            whenever(getUserAlbums()).thenReturn(flowOf(listOf(
-                newAlbum1,
-                newAlbum2
-            )))
+            whenever(getUserAlbums()).thenReturn(
+                flowOf(
+                    listOf(
+                        newAlbum1,
+                        newAlbum2
+                    )
+                )
+            )
             whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
 
@@ -478,6 +494,7 @@ class AlbumsViewModelTest {
                 Album.RawAlbum to { false },
             )
 
+            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
             whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
                 UIAlbum(
                     title = "Favourites",
@@ -493,7 +510,7 @@ class AlbumsViewModelTest {
 
             underTest.state.drop(1).test {
                 awaitItem()
-                underTest.createNewAlbum("favourites", proscribedStrings)
+                underTest.createNewAlbum("favourites")
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -523,13 +540,13 @@ class AlbumsViewModelTest {
                     id = Album.FavouriteAlbum
                 )
             )
-
+            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
             whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
             underTest.state.drop(1).test {
                 awaitItem()
-                underTest.createNewAlbum("raw", proscribedStrings)
+                underTest.createNewAlbum("raw")
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -544,9 +561,11 @@ class AlbumsViewModelTest {
     @Test
     fun `test that creating an album with all spaces will not create the album`() =
         runTest {
+            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+
             underTest.state.test {
                 awaitItem()
-                underTest.createNewAlbum("      ", proscribedStrings)
+                underTest.createNewAlbum("      ")
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -563,6 +582,7 @@ class AlbumsViewModelTest {
             val testAlbumName = "Album 1"
             val newAlbum1 = createUserAlbum(title = testAlbumName)
 
+            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
             whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
                 UIAlbum(
                     title = newAlbum1.title,
@@ -578,7 +598,7 @@ class AlbumsViewModelTest {
 
             underTest.state.drop(1).test {
                 awaitItem()
-                underTest.createNewAlbum(testAlbumName, proscribedStrings)
+                underTest.createNewAlbum(testAlbumName)
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
@@ -594,9 +614,11 @@ class AlbumsViewModelTest {
         runTest {
             val testAlbumName = "*"
 
+            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+
             underTest.state.test {
                 awaitItem()
-                underTest.createNewAlbum(testAlbumName, proscribedStrings)
+                underTest.createNewAlbum(testAlbumName)
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(

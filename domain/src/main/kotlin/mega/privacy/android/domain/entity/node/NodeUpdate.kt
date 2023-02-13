@@ -6,4 +6,4 @@ package mega.privacy.android.domain.entity.node
  *
  * @property changes
  */
-data class NodeUpdate(val changes: Map<NodeId, List<NodeChanges>>)
+data class NodeUpdate(val changes: Map<Node, List<NodeChanges>>)

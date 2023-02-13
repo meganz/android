@@ -86,8 +86,10 @@ internal class DefaultAvatarRepository @Inject constructor(
         val user = megaApiGateway.getLoggedInUser() ?: return getColor(null)
         val avatarFile = getMyAvatarFile()
         if (avatarFile != null) {
-            val avatarBitmap = bitmapFactoryWrapper.decodeFile(avatarFile.absolutePath,
-                BitmapFactory.Options())
+            val avatarBitmap = bitmapFactoryWrapper.decodeFile(
+                avatarFile.absolutePath,
+                BitmapFactory.Options()
+            )
             if (avatarBitmap != null) {
                 return avatarWrapper.getDominantColor(avatarBitmap)
             }
@@ -142,6 +144,22 @@ internal class DefaultAvatarRepository @Inject constructor(
 
     private fun getColor(color: String?): Int =
         color?.toColorInt() ?: avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)
+
+    override suspend fun updateMyAvatarWithNewEmail(oldEmail: String, newEmail: String): Boolean =
+        withContext(ioDispatcher) {
+            if (oldEmail.isBlank() || oldEmail == newEmail) return@withContext false
+            val oldFile =
+                cacheFolderGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION)
+                    ?: return@withContext false
+            if (oldFile.exists()) {
+                val newFile =
+                    cacheFolderGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION)
+                        ?: return@withContext false
+                return@withContext oldFile.renameTo(newFile)
+
+            }
+            return@withContext false
+        }
 
     companion object {
         /**

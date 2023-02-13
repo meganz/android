@@ -4,13 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Pair
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.facebook.common.executors.UiThreadImmediateExecutorService
 import com.facebook.datasource.BaseDataSubscriber
 import com.facebook.datasource.DataSource
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.request.ImageRequest
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,16 +48,6 @@ class HomepageRepository @Inject constructor(
 
     /** Whether the previous getting banners was successful or not */
     private var getBannerSuccess = false
-
-    private val logoutObserver = Observer<Unit> {
-        getBannerSuccess = false
-        bannerList.value = null
-    }
-
-    init {
-        LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED, Unit::class.java)
-            .observeForever(logoutObserver)
-    }
 
     fun getBannerListLiveData(): MutableLiveData<MutableList<MegaBanner>?> {
         return bannerList
@@ -167,5 +155,13 @@ class HomepageRepository @Inject constructor(
 
     fun dismissBanner(id: Int) {
         megaApi.dismissBanner(id)
+    }
+
+    /**
+     * Resets values after logout.
+     */
+    fun logout() {
+        getBannerSuccess = false
+        bannerList.value = null
     }
 }

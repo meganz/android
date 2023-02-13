@@ -15,9 +15,13 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -104,7 +108,11 @@ class FileBrowserViewModelTest {
             whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
                 listOf(mock(), mock())
             )
-            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            val update = mapOf<Node, List<NodeChanges>>(
+                mock<Node>() to emptyList(),
+                mock<Node>() to emptyList()
+            )
+            monitorNodeUpdates.emit(NodeUpdate(update))
             underTest.setBrowserParentHandle(newValue)
             assertThat(underTest.state.value.nodes.size).isEqualTo(2)
         }
@@ -126,7 +134,8 @@ class FileBrowserViewModelTest {
         underTest.setBrowserParentHandle(newValue)
 
         val shouldEnter =
-            underTest.shouldEnterMDMode(MediaDiscoveryViewSettings.INITIAL.ordinal)
+            underTest.shouldEnterMediaDiscoveryMode(newValue,
+                MediaDiscoveryViewSettings.INITIAL.ordinal)
         assertFalse(shouldEnter)
     }
 
@@ -137,12 +146,36 @@ class FileBrowserViewModelTest {
             whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
                 listOf(mock(), mock())
             )
-            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            val update = mapOf<Node, List<NodeChanges>>(
+                mock<Node>() to emptyList(),
+                mock<Node>() to emptyList()
+            )
+            monitorNodeUpdates.emit(NodeUpdate(update))
             underTest.setBrowserParentHandle(newValue)
 
             val shouldEnter =
-                underTest.shouldEnterMDMode(
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
                     MediaDiscoveryViewSettings.DISABLED.ordinal
+                )
+            assertFalse(shouldEnter)
+        }
+
+    @Test
+    fun `test that when MediaDiscoveryViewSettings is Enabled and nodes contains not folder then Enter in MD mode will return false`() =
+        runTest {
+            val newValue = 123456789L
+            val folderNode = mock<MegaNode> {
+                on { isFolder }.thenReturn(true)
+            }
+            whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(listOf(folderNode))
+
+            underTest.setBrowserParentHandle(newValue)
+
+            val shouldEnter =
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
+                    MediaDiscoveryViewSettings.ENABLED.ordinal
                 )
             assertFalse(shouldEnter)
         }
@@ -153,10 +186,11 @@ class FileBrowserViewModelTest {
             val lastFirstVisiblePosition = 123456
             val newValue = 12345L
 
-            val thenReturn = whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
-                listOf(mock(), mock())
+            val update = mapOf<Node, List<NodeChanges>>(
+                mock<Node>() to emptyList(),
+                mock<Node>() to emptyList()
             )
-            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            monitorNodeUpdates.emit(NodeUpdate(update))
             underTest.setBrowserParentHandle(newValue)
 
             underTest.onFolderItemClicked(lastFirstVisiblePosition, newValue)

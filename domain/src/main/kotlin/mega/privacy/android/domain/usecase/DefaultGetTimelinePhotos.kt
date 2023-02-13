@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ import javax.inject.Inject
  */
 class DefaultGetTimelinePhotos @Inject constructor(
     private val photosRepository: PhotosRepository,
+    private val nodeRepository: NodeRepository
 ) : GetTimelinePhotos {
 
     override fun invoke(): Flow<List<Photo>> = flow {
@@ -25,7 +27,7 @@ class DefaultGetTimelinePhotos @Inject constructor(
         emitAll(getUpdatePhotos())
     }
 
-    private fun getUpdatePhotos(): Flow<List<Photo>> = photosRepository.monitorNodeUpdates()
+    private fun getUpdatePhotos(): Flow<List<Photo>> = nodeRepository.monitorNodeUpdates()
         .filter(predicate)
         .map { photosRepository.searchMegaPhotos() }
 

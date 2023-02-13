@@ -48,7 +48,6 @@ import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
-import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -85,6 +84,7 @@ import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -106,7 +106,6 @@ class MyAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
-    private val updateMyUserAttributesUseCase: UpdateMyUserAttributesUseCase,
     private val check2FAUseCase: Check2FAUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killSessionUseCase: KillSessionUseCase,
@@ -128,18 +127,17 @@ class MyAccountViewModel @Inject constructor(
     private val getCurrentUserFullName: GetCurrentUserFullName,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val changeEmail: ChangeEmail,
+    private val updateCurrentUserName: UpdateCurrentUserName,
 ) : BaseRxViewModel() {
 
     companion object {
         private const val CLICKS_TO_CHANGE_API_SERVER = 5
         private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
-        const val PROCESSING_FILE = "PROCESSING_FILE"
         const val CHECKING_2FA = "CHECKING_2FA"
     }
 
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAccountDetails: MutableLiveData<Boolean> = MutableLiveData()
-    private val processingFile: MutableLiveData<Boolean> = MutableLiveData()
 
     private val defaultSubscriptionDialogState = SubscriptionDialogState.Invisible
     private val defaultCancelAccountDialogState = CancelAccountDialogState.Invisible
@@ -286,7 +284,6 @@ class MyAccountViewModel @Inject constructor(
 
     fun checkElevation(): LiveData<Boolean> = withElevation
     fun onUpdateAccountDetails(): LiveData<Boolean> = updateAccountDetails
-    fun isProcessingFile(): LiveData<Boolean> = processingFile
 
     fun setElevation(withElevation: Boolean) {
         this.withElevation.value = withElevation
@@ -507,7 +504,7 @@ class MyAccountViewModel @Inject constructor(
                 }
 
                 data.action = Intent.ACTION_GET_CONTENT
-                processingFile.value = true
+                _state.update { it.copy(isLoading = true) }
                 prepareAvatarFile(data)
             }
         }
@@ -723,7 +720,7 @@ class MyAccountViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onComplete = {
-                        processingFile.value = false
+                        _state.update { it.copy(isLoading = false) }
                         showResult(getString(R.string.success_changing_user_avatar))
                     },
                     onError = { showResult(getString(R.string.error_changing_user_avatar)) }
@@ -765,7 +762,6 @@ class MyAccountViewModel @Inject constructor(
      * @param oldLastName
      * @param newFirstName New first name if changed, same as current one if not.
      * @param newLastName  New last name if changed, same as current one if not.
-     * @param action       Action to perform after change name.
      * @return True if something changed, false otherwise.
      */
     fun changeName(
@@ -773,31 +769,19 @@ class MyAccountViewModel @Inject constructor(
         oldLastName: String,
         newFirstName: String,
         newLastName: String,
-        action: (Boolean) -> Unit,
-    ): Boolean {
-        val shouldUpdateFirstName = newFirstName != oldFirstName
-        val shouldUpdateLastName = newLastName != oldLastName
-
-        when {
-            shouldUpdateFirstName && shouldUpdateLastName -> updateMyUserAttributesUseCase.updateFirstAndLastName(
-                newFirstName,
-                newLastName
-            ).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result -> action.invoke(result) }
-                .addTo(composite)
-            shouldUpdateFirstName -> updateMyUserAttributesUseCase.updateFirstName(newFirstName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result -> action.invoke(result) }
-                .addTo(composite)
-            shouldUpdateLastName -> updateMyUserAttributesUseCase.updateLastName(newLastName)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result -> action.invoke(result) }
-                .addTo(composite)
+    ) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val result = runCatching {
+                updateCurrentUserName(
+                    oldFirstName = oldFirstName,
+                    oldLastName = oldLastName,
+                    newFirstName = newFirstName,
+                    newLastName = newLastName,
+                )
+            }
+            _state.update { it.copy(changeUserNameResult = result, isLoading = false) }
         }
-        return shouldUpdateFirstName || shouldUpdateLastName
     }
 
     /**
@@ -816,7 +800,6 @@ class MyAccountViewModel @Inject constructor(
      *
      * @param context  Current context.
      * @param newEmail New email if changed, same as the current one if not.
-     * @param action   Action to perform after change the email.
      * @return An error string if something wrong happened, CHECKING_2FA if checking 2FA or null otherwise
      */
     fun changeEmail(context: Context, newEmail: String): String? {
@@ -946,7 +929,7 @@ class MyAccountViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { result ->
-                confirmationLink = result
+                confirmationLink = link
                 action.invoke(result)
             }
             .addTo(composite)
@@ -1038,5 +1021,13 @@ class MyAccountViewModel @Inject constructor(
      */
     fun markHandleChangeEmailResult() {
         _state.update { it.copy(changeEmailResult = null) }
+    }
+
+    /**
+     * Mark handle change user name result
+     *
+     */
+    fun markHandleChangeUserNameResult() {
+        _state.update { it.copy(changeUserNameResult = null) }
     }
 }

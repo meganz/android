@@ -25,7 +25,7 @@
     <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
     <string name="api_ecircular">Legătură circulară detectată</string>
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-    <string name="api_eaccess">Acces interzis</string>
+    <string name="api_eaccess">Acces refuzat</string>
     <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
     <string name="api_eexist">Există deja</string>
     <!-- Label to show that an error related with an Incomplete SDK operation. -->

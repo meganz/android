@@ -9,9 +9,13 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountSessionMapper
@@ -68,6 +72,7 @@ class DefaultAccountRepositoryTest {
         mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val userAccountMapper = ::UserAccount
     private val accountTypeMapper = mock<AccountTypeMapper>()
@@ -79,6 +84,9 @@ class DefaultAccountRepositoryTest {
     private val isUserLoggedIn = mock<IsUserLoggedIn>()
     private val userCredentialsMapper = mock<UserCredentialsMapper>()
     private val accountSessionMapper = mock<AccountSessionMapper>()
+    private val chatPreferencesGateway = mock<ChatPreferencesGateway>()
+    private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
+    private val cacheFolderGateway = mock<CacheFolderGateway>()
 
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
         { credentials: String? ->
@@ -112,9 +120,11 @@ class DefaultAccountRepositoryTest {
     @Before
     fun setUp() {
         underTest = DefaultAccountRepository(
+            context = mock(),
             myAccountInfoFacade = accountInfoWrapper,
             megaApiGateway = megaApiGateway,
             megaChatApiGateway = megaChatApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             userUpdateMapper = { UserUpdate(emptyMap()) },
             localStorageGateway = localStorageGateway,
@@ -129,6 +139,9 @@ class DefaultAccountRepositoryTest {
             accountDetailMapper = mock(),
             userCredentialsMapper = userCredentialsMapper,
             accountSessionMapper = accountSessionMapper,
+            chatPreferencesGateway = chatPreferencesGateway,
+            callsPreferencesGateway = callsPreferencesGateway,
+            cacheFolderGateway = cacheFolderGateway,
         )
 
         whenever(megaChatApiGateway.getMyEmail()).thenReturn("my@email.com")
@@ -798,5 +811,61 @@ class DefaultAccountRepositoryTest {
                 ))
             }
             underTest.changeEmail(expectedEmail)
+        }
+
+    @Test
+    fun `test that MegaApiFolderGateway is invoked when resetting accountAuth`() = runTest {
+        underTest.resetAccountAuth()
+        verify(megaApiFolderGateway).accountAuth = null
+    }
+
+    @Test
+    fun `test that MegaLocalStorageGateway is invoked for clearing account preferences`() =
+        runTest {
+            underTest.clearAccountPreferences()
+            verify(localStorageGateway).clearCredentials()
+            verify(localStorageGateway).clearPreferences()
+            verify(localStorageGateway).setFirstTime(false)
+            verify(localStorageGateway).clearOffline()
+            verify(localStorageGateway).clearContacts()
+            verify(localStorageGateway).clearNonContacts()
+            verify(localStorageGateway).clearChatItems()
+            verify(localStorageGateway).clearCompletedTransfers()
+            verify(localStorageGateway).clearPendingMessages()
+            verify(localStorageGateway).clearAttributes()
+            verify(localStorageGateway).deleteAllSyncRecordsTypeAny()
+            verify(localStorageGateway).clearChatSettings()
+            verify(localStorageGateway).clearBackups()
+            verify(localStorageGateway).clearMegaContacts()
+        }
+
+    @Test
+    fun `test that CallsPreferencesGateway is invoked for clearing account preferences`() =
+        runTest {
+            underTest.clearAccountPreferences()
+            verify(callsPreferencesGateway).clearPreferences()
+        }
+
+    @Test
+    fun `test that ChatPreferencesGateway is invoked for clearing account preferences`() =
+        runTest {
+            underTest.clearAccountPreferences()
+            verify(chatPreferencesGateway).clearPreferences()
+        }
+
+    @Test
+    fun `test that CacheFolderGateway is invoked when clearing app data and cache`() =
+        runTest {
+            underTest.clearAppDataAndCache()
+            verify(cacheFolderGateway).clearCache()
+            verify(cacheFolderGateway).clearAppData()
+            verify(cacheFolderGateway).removeOldTempFolders()
+        }
+
+    @Test
+    fun `test that AccountInfoWrapper is invoked when resetting account info`() =
+        runTest {
+            underTest.resetAccountInfo()
+            verify(accountInfoWrapper).resetAccountInfo()
         }
 }

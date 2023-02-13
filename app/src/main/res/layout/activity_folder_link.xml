@@ -91,6 +91,18 @@
             android:choiceMode="multipleChoice"
             android:clipToPadding="false"/>
 
+        <mega.privacy.android.app.components.NewGridRecyclerView
+            android:id="@+id/folder_link_grid_view_browser"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/separator_3"
+            android:layout_below="@id/toolbar_folder_link"
+            android:choiceMode="multipleChoice"
+            android:clipToPadding="false"
+            android:columnWidth="172dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="65dp" />
+
         <include
             layout="@layout/transfers_widget"
             android:layout_width="wrap_content"

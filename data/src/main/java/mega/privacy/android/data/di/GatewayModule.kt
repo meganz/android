@@ -196,6 +196,5 @@ internal abstract class GatewayModule {
     abstract fun bindFileManagementPreferencesGateway(implementation: FileManagementPreferencesFacade): FileManagementPreferencesGateway
 
     @Binds
-    @Singleton
     abstract fun bindVideoCompressorGateway(implementation: VideoCompressionFacade): VideoCompressorGateway
 }

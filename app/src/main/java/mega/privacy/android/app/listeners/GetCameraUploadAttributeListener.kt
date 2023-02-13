@@ -75,7 +75,7 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
                     // Happens when both Primary and Secondary folders are not set
                     Timber.w("First time setting Camera Upload Attributes")
                     CameraUploadUtil.initCUFolderFromScratch(context, false)
-                    // TODO Move call here after this class is use case
+
                     (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(
                         MegaApiJava.INVALID_HANDLE,
                         true
@@ -139,13 +139,13 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
             Timber.d("Camera Uploads should not be stopped")
             if (!isSecondary) {
                 // Primary is set first, camera upload will not get started, do not call a start service worker
-                // TODO Move call here after this class is use case
+
                 Timber.d("Call onGetPrimaryFolderAttribute with handle: $handle")
                 (context as? CameraUploadsService)?.onGetPrimaryFolderAttribute(handle, false)
             } else {
                 // Secondary is set after primary, camera upload will get started
-                // TODO pass isPrimaryHandleSynced = true as intent extra and call start service worker
-                // TODO Move call here after this class is use case
+
+
                 Timber.d("Call onGetSecondaryFolderAttribute with handle $handle")
                 (context as? CameraUploadsService)?.onGetSecondaryFolderAttribute(handle)
             }

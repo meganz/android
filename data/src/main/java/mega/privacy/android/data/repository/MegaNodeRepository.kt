@@ -16,18 +16,63 @@ import nz.mega.sdk.MegaShare
 interface MegaNodeRepository {
 
     /**
-     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name
+     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name if set
      *
      * @param nodeToCopy the [MegaNode] to copy
      * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
-     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
      *
-     * @return the handle of the new [MegaNode] that was copied
+     * @return the [NodeId] handle of the new [MegaNode] that was copied
      */
     suspend fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
+     * Copy a [MegaNode] by its [NodeId] handle and move it to a new [MegaNode] by its [NodeId] handle while updating its name if set
+     *
+     * @param nodeToCopy the [NodeId] handle to copy
+     * @param newNodeParent the [NodeId] handle that [nodeToCopy] will be moved to
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [MegaNode] that was copied
+     */
+    suspend fun copyNodeByHandle(
+        nodeToCopy: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
+     * Moves a [MegaNode] to a new [MegaNode] while updating its name if set
+     *
+     * @param nodeToMove the [MegaNode] to move
+     * @param newNodeParent the [MegaNode] that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [MegaNode] that was moved
+     */
+    suspend fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
+     * Moves a [MegaNode] referenced by it handle [NodeId] to a new [MegaNode] referenced by its handle [NodeId] while updating its name if set
+     *
+     * @param nodeToMove the [NodeId] handle to move
+     * @param newNodeParent the [NodeId] handle that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the new [MegaNode] that was moved
+     */
+    suspend fun moveNodeByHandle(
+        nodeToMove: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
     ): NodeId
 
     /**
@@ -60,12 +105,25 @@ interface MegaNodeRepository {
     suspend fun getRubbishBinNode(): MegaNode?
 
     /**
+     * Moves a MegaNode referenced by its handle [NodeId] to a the rubbish bin
+     * @param nodeToMove the node's handle [NodeId] that we want to move to the rubbish bin
+     */
+    suspend fun moveNodeToRubbishBinByHandle(nodeToMove: NodeId)
+
+    /**
      * Check is megaNode in rubbish bin
      *
      * @param node MegaNode
      * @return if node is in rubbish bin
      */
     suspend fun isInRubbish(node: MegaNode): Boolean
+
+    /**
+     * Deletes a MegaNode referenced by its handle [NodeId] ONLY if it's already in the rubbish bin
+     * @param nodeToDelete the node's handle [NodeId] that we want to delete
+     * @throws IllegalArgumentException if the node does not exist or is not in the rubbish bin
+     */
+    suspend fun deleteNodeByHandle(nodeToDelete: NodeId)
 
     /**
      * Get the parent node of a MegaNode

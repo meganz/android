@@ -383,20 +383,20 @@ pipeline {
                     BUILD_STEP = 'Sign APK(GMS)'
                 }
                 withCredentials([
-                        string(credentialsId: 'ANDROID_QA_SIGN_PASSWORD', variable: 'ANDROID_QA_SIGN_PASSWORD'),
-                        file(credentialsId: 'ANDROID_QA_KEYSTORE', variable: 'ANDROID_QA_KEYSTORE')
+                        file(credentialsId: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE', variable: 'ANDROID_PRD_GMS_APK_PASSWORD_FILE'),
+                        file(credentialsId: 'ANDROID_PRD_GMS_APK_KEYSTORE', variable: 'ANDROID_PRD_GMS_APK_KEYSTORE')
                 ]) {
                     script {
-                        sh '''
+                        sh """
                                 cd app/build/outputs/apk/gms/release
                                 zipalign -v -p 4 app-*-unsigned.apk app-gms-release-unsigned-aligned.apk
-                                apksigner sign --ks "$ANDROID_QA_KEYSTORE" --ks-pass "pass:$ANDROID_QA_SIGN_PASSWORD" --out app-gms-release-signed.apk app-gms-release-unsigned-aligned.apk
+                                apksigner sign --ks "${ANDROID_PRD_GMS_APK_KEYSTORE}" --ks-pass file:"${ANDROID_PRD_GMS_APK_PASSWORD_FILE}" --out app-gms-release-signed.apk app-gms-release-unsigned-aligned.apk
                                 ls -lh
                                 rm -fv *unsigned*.apk
                                 pwd
                                 ls -lh
                                 cd -
-                            '''
+                            """
                     }
                 }
 

@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinates
@@ -68,6 +69,7 @@ import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandl
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
+import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
@@ -141,6 +143,7 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.StartCameraUpload
 import mega.privacy.android.domain.usecase.StopCameraUpload
+import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
@@ -216,7 +219,7 @@ abstract class CameraUploadUseCases {
         fun provideUpdateFolderDestinationBroadcast(cameraUploadRepository: CameraUploadRepository): UpdateFolderDestinationBroadcast =
             UpdateFolderDestinationBroadcast(cameraUploadRepository::sendUpdateFolderDestinationBroadcast)
 
-        // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
+
         /**
          * Provide the [StopCameraUpload] implementation
          */
@@ -228,7 +231,18 @@ abstract class CameraUploadUseCases {
             jobUtilWrapper.fireStopCameraUploadJob(context)
         }
 
-        // TODO CU-180 use refactored JobUtil gateway in camera upload repository and remove JobUtilWrapper/Context
+        /**
+         * Provide the [StopCameraUploadSyncHeartbeat] implementation
+         */
+        @Provides
+        fun provideStopCameraUploadSyncHeartbeat(
+            jobUtilWrapper: JobUtilWrapper,
+            @ApplicationContext context: Context,
+        ): StopCameraUploadSyncHeartbeat = StopCameraUploadSyncHeartbeat {
+            jobUtilWrapper.stopCameraUploadSyncHeartbeatWorkers(context)
+        }
+
+
         /**
          * Provide the [StartCameraUpload] implementation
          */
@@ -765,4 +779,11 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindResetTotalUploads(resetTotalUploads: DefaultResetTotalUploads): ResetTotalUploads
+
+    /**
+     * Provide the [CompressVideos] implementation
+     */
+    @Binds
+    abstract fun bindCompressVideos(resetTotalUploads: DefaultCompressVideos): CompressVideos
+
 }

@@ -1,7 +1,11 @@
+apply from: "tools/util.gradle"
+
 include ':app'
 include ':domain'
-include ':sdk'
 include ':core-ui'
 include ':screenshot'
 include ':data'
 include ':lint'
+if (!shouldUsePrebuiltSdk() || isCiBuild()) {
+    include ':sdk'
+}

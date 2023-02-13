@@ -34,4 +34,26 @@ internal interface AppEventGateway {
      *
      */
     suspend fun broadcastTransferOverQuota()
+
+    /**
+     * Monitors logout.
+     */
+    fun monitorLogout(): Flow<Boolean>
+
+    /**
+     * Broadcast logout.
+     */
+    suspend fun broadcastLogout()
+
+    /**
+     * Monitor transfer failed
+     *
+     */
+    fun monitorFailedTransfer(): Flow<Boolean>
+
+    /**
+     * Broadcast transfer failed
+     *
+     */
+    suspend fun broadcastFailedTransfer(isFailed: Boolean)
 }

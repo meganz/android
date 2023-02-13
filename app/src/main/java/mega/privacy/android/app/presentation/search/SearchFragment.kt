@@ -27,7 +27,6 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -103,7 +102,7 @@ class SearchFragment : RotatableFragment() {
 
     private val lastPositionStack: Stack<Int> = Stack()
 
-    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val incomingSharesViewModel: IncomingSharesViewModel by activityViewModels()

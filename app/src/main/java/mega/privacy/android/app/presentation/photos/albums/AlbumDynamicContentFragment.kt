@@ -8,7 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -68,7 +67,6 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumConte
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionActivity
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
@@ -129,6 +127,12 @@ class AlbumDynamicContentFragment : Fragment() {
         arguments?.getBoolean(INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS,
             false) ?: false
     }
+
+    private val albumCoverSelectionLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAlbumCoverSelectionResult,
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -555,11 +559,13 @@ class AlbumDynamicContentFragment : Fragment() {
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
 
     private fun openAlbumPhotosSelection(albumId: AlbumId) {
-        val intent =
-            AlbumPhotosSelectionActivity.create(requireContext(), albumId, AlbumFlow.Addition)
+        val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
+            context = requireContext(),
+            albumId = albumId,
+            albumFlow = AlbumFlow.Addition,
+        )
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
-
     }
 
     fun onClick(photo: Photo) {
@@ -610,6 +616,7 @@ class AlbumDynamicContentFragment : Fragment() {
             val photos = albumsViewModel.state.value.albums.getAlbumPhotos(album)
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
             photos.setFilterMenuItemVisibility()
+            photos.setSelectAlbumCoverMenuItemVisibility()
             if (album is Album.UserAlbum) {
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
                 menu.findItem(R.id.action_menu_delete)?.isVisible = true
@@ -628,6 +635,10 @@ class AlbumDynamicContentFragment : Fragment() {
         return showFilterMenuItem
     }
 
+    private fun List<Photo>.setSelectAlbumCoverMenuItemVisibility() {
+        menu?.findItem(R.id.action_menu_select_album_cover)?.isVisible = this.isNotEmpty()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_menu_sort_by -> {
@@ -641,6 +652,9 @@ class AlbumDynamicContentFragment : Fragment() {
             }
             R.id.action_menu_rename -> {
                 albumsViewModel.showRenameDialog(showRenameDialog = true)
+            }
+            R.id.action_menu_select_album_cover -> {
+                openAlbumCoverSelectionScreen()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -667,6 +681,23 @@ class AlbumDynamicContentFragment : Fragment() {
         )
 
         closeScreen = true
+    }
+
+    private fun openAlbumCoverSelectionScreen() {
+        val album = albumsViewModel.state.value.currentAlbum
+        if (album !is Album.UserAlbum) return
+
+        val intent = AlbumScreenWrapperActivity.createAlbumCoverSelectionScreen(
+            context = requireContext(),
+            albumId = album.id,
+        )
+        albumCoverSelectionLauncher.launch(intent)
+        managerActivity.overridePendingTransition(0, 0)
+    }
+
+    private fun handleAlbumCoverSelectionResult(result: ActivityResult) {
+        val message = result.data?.getStringExtra(AlbumScreenWrapperActivity.MESSAGE)
+        albumsViewModel.setSnackBarMessage(message.orEmpty())
     }
 
     /**

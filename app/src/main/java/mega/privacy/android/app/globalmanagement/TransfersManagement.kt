@@ -20,19 +20,18 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.components.transferWidget.TransfersWidget.Companion.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
-import mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.Constants
@@ -43,7 +42,9 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -68,6 +69,8 @@ class TransfersManagement @Inject constructor(
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val dbH: DatabaseHandler,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val broadcastFailedTransfer: BroadcastFailedTransfer,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
 
     companion object {
@@ -363,7 +366,6 @@ class TransfersManagement @Inject constructor(
                 }
 
                 shouldShowNetworkWarning = true
-                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
             }
         }.start()
     }
@@ -375,7 +377,6 @@ class TransfersManagement @Inject constructor(
         networkTimer?.let { timer ->
             timer.cancel()
             shouldShowNetworkWarning = false
-            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(NO_TYPE)
         }
     }
 
@@ -650,7 +651,9 @@ class TransfersManagement @Inject constructor(
 
     fun setAreFailedTransfers(failed: Boolean) {
         areFailedTransfers = failed
-        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean::class.java).post(false)
+        applicationScope.launch {
+            broadcastFailedTransfer(failed)
+        }
     }
 
     fun getAreFailedTransfers(): Boolean = areFailedTransfers

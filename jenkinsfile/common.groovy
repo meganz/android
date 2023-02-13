@@ -166,7 +166,9 @@ void checkoutMegaChatSdkByTag(String megaChatTag) {
  * @return version of prebuilt SDK
  */
 String readPrebuiltSdkVersion() {
-    return sh(script: "grep megaSdkVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
+    String version = sh(script: "./gradlew -q printPrebuildSdkVersion  | tail -n 1", returnStdout: true).trim()
+    println("readPrebuiltSdkVersion version = $version")
+    return version
 }
 
 /**
@@ -590,6 +592,7 @@ void downloadAndExtractNativeSymbols() {
         unzip ${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE} -d ${targetObjLocalLocation}
     """
 }
+
 
 
 return this

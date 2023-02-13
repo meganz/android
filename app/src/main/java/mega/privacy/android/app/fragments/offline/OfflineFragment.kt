@@ -35,6 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -85,11 +86,21 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
 
+/**
+ * [Fragment] to display Offline Nodes
+ */
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
     companion object {
+        /**
+         * Refresh Offline File List
+         */
         const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
+
+        /**
+         * Display the Offline warning message
+         */
         const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
     }
 
@@ -109,6 +120,18 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
+    /**
+     * onSaveInstanceState
+     */
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
+    }
+
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -117,47 +140,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        // TODO: workaround for navigation with ManagerActivity
-        callManager {
-            if (args.rootFolderOnly) {
-                it.pagerOfflineFragmentOpened(this)
-            } else {
-                it.fullscreenOfflineFragmentOpened(this)
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        requireContext()
-            .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
-
-        viewModel.loadOfflineNodes()
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        requireContext().unregisterReceiver(receiverRefreshOffline)
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        // TODO: workaround for navigation with ManagerActivity
-        callManager {
-            if (args.rootFolderOnly) {
-                it.pagerOfflineFragmentClosed(this)
-            } else {
-                it.fullscreenOfflineFragmentClosed(this)
-            }
-        }
-    }
-
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -167,6 +152,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         return binding.root
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -182,53 +170,206 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             setViewModelDisplayParam(viewModel.path)
         }
 
-        observeDragSupportEvents(viewLifecycleOwner, recyclerView!!, VIEWER_FROM_OFFLINE)
+        observeDragSupportEvents(viewLifecycleOwner, recyclerView ?: return, VIEWER_FROM_OFFLINE)
     }
 
-    private fun setViewModelDisplayParam(path: String) {
-        viewModel.setDisplayParam(
-            args.rootFolderOnly, isList(),
-            if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
-            sortByHeaderViewModel.cloudSortOrder.value
-        )
+    /**
+     * onStart
+     */
+    override fun onStart() {
+        super.onStart()
+
+
+        callManager {
+            if (args.rootFolderOnly) {
+                it.pagerOfflineFragmentOpened(this)
+            } else {
+                it.fullscreenOfflineFragmentOpened(this)
+            }
+        }
     }
 
+    /**
+     * onResume
+     */
+    override fun onResume() {
+        super.onResume()
+
+        requireContext()
+            .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
+
+        viewModel.loadOfflineNodes()
+    }
+
+    /**
+     * onPause
+     */
+    override fun onPause() {
+        super.onPause()
+
+        requireContext().unregisterReceiver(receiverRefreshOffline)
+    }
+
+    /**
+     * onStop
+     */
+    override fun onStop() {
+        super.onStop()
+
+
+        callManager {
+            if (args.rootFolderOnly) {
+                it.pagerOfflineFragmentClosed(this)
+            } else {
+                it.fullscreenOfflineFragmentClosed(this)
+            }
+        }
+    }
+
+    /**
+     * onDestroyView
+     */
     override fun onDestroyView() {
         super.onDestroyView()
 
         viewModel.clearEmptySearchQuery()
     }
 
+    /**
+     * onActionItemClicked
+     */
+    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+        Timber.d("ActionBarCallBack::onActionItemClicked")
+
+        when (item!!.itemId) {
+            R.id.cab_menu_download -> {
+                callManager { it.saveOfflineNodesToDevice(viewModel.getSelectedNodes()) }
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_share_out -> {
+                OfflineUtils.shareOfflineNodes(requireContext(), viewModel.getSelectedNodes())
+                viewModel.clearSelection()
+            }
+            R.id.cab_menu_delete -> {
+                callManager {
+                    it.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes()) {
+                        viewModel.clearSelection()
+                    }
+                }
+            }
+            R.id.cab_menu_select_all -> {
+                viewModel.selectAll()
+            }
+            R.id.cab_menu_clear_selection -> {
+                viewModel.clearSelection()
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * onPrepareActionMode
+     */
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        Timber.d("ActionBarCallBack::onPrepareActionMode")
+
+        menu!!.findItem(R.id.cab_menu_select_all).isVisible =
+            (viewModel.getSelectedNodesCount()
+                    < getItemCount() - viewModel.placeholderCount)
+
+        return true
+    }
+
+    /**
+     * onCreateActionMode
+     */
+    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        Timber.d("ActionBarCallBack::onCreateActionMode")
+        val inflater = mode!!.menuInflater
+
+        inflater.inflate(R.menu.offline_browser_action, menu)
+        checkScroll()
+
+        return true
+    }
+
+    /**
+     * onDestroyActionMode
+     */
+    override fun onDestroyActionMode(mode: ActionMode?) {
+        Timber.d("ActionBarCallBack::onDestroyActionMode")
+
+        viewModel.clearSelection()
+        checkScroll()
+    }
+
+    /**
+     * checkScroll
+     */
+    override fun checkScroll() {
+        val rv = recyclerView ?: return
+
+        callManager { manager ->
+            manager.changeAppBarElevation(
+                !args.rootFolderOnly
+                        && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarningLayout.isVisible)
+            )
+        }
+    }
+
+    /**
+     * Sets display parameters for [OfflineViewModel]
+     *
+     * @param path the Display path
+     */
+    private fun setViewModelDisplayParam(path: String) {
+        viewModel.setDisplayParam(
+            rootFolderOnly = args.rootFolderOnly,
+            isList = isListViewOrRootFolder(),
+            spanCount = if (isListViewOrRootFolder()) 0 else binding.offlineBrowserGrid.spanCount,
+            path = path,
+            order = sortByHeaderViewModel.cloudSortOrder.value,
+        )
+    }
+
+    /**
+     * Establishes the Fragment
+     */
     private fun setupView() {
         setupOfflineWarning()
 
         adapter =
-            OfflineAdapter(isList(), sortByHeaderViewModel, object : OfflineAdapterListener {
-                override fun onNodeClicked(position: Int, node: OfflineNode) {
-                    var firstVisiblePosition: Int
-                    if (isList()) {
-                        firstVisiblePosition =
-                            (binding.offlineBrowserList.layoutManager as LinearLayoutManager)
-                                .findFirstCompletelyVisibleItemPosition()
-                    } else {
-                        firstVisiblePosition =
-                            binding.offlineBrowserGrid.findFirstCompletelyVisibleItemPosition()
-                        if (firstVisiblePosition == INVALID_POSITION) {
+            OfflineAdapter(
+                isList = isListViewOrRootFolder(),
+                sortByHeaderViewModel = sortByHeaderViewModel,
+                listener = object : OfflineAdapterListener {
+                    override fun onNodeClicked(position: Int, node: OfflineNode) {
+                        var firstVisiblePosition: Int
+                        if (isListViewOrRootFolder()) {
                             firstVisiblePosition =
-                                binding.offlineBrowserGrid.findFirstVisibleItemPosition()
+                                (binding.offlineBrowserList.layoutManager as LinearLayoutManager)
+                                    .findFirstCompletelyVisibleItemPosition()
+                        } else {
+                            firstVisiblePosition =
+                                binding.offlineBrowserGrid.findFirstCompletelyVisibleItemPosition()
+                            if (firstVisiblePosition == INVALID_POSITION) {
+                                firstVisiblePosition =
+                                    binding.offlineBrowserGrid.findFirstVisibleItemPosition()
+                            }
                         }
+                        viewModel.onNodeClicked(position, node, firstVisiblePosition)
                     }
-                    viewModel.onNodeClicked(position, node, firstVisiblePosition)
-                }
 
-                override fun onNodeLongClicked(position: Int, node: OfflineNode) {
-                    viewModel.onNodeLongClicked(position, node)
-                }
+                    override fun onNodeLongClicked(position: Int, node: OfflineNode) {
+                        viewModel.onNodeLongClicked(position, node)
+                    }
 
-                override fun onOptionsClicked(position: Int, node: OfflineNode) {
-                    viewModel.onNodeOptionsClicked(position, node)
-                }
-            })
+                    override fun onOptionsClicked(position: Int, node: OfflineNode) {
+                        viewModel.onNodeOptionsClicked(position, node)
+                    }
+                },
+            )
 
         adapter?.setHasStableIds(true)
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -255,7 +396,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         setupRecyclerView(binding.offlineBrowserList)
         setupRecyclerView(binding.offlineBrowserGrid)
 
-        recyclerView = if (isList()) {
+        recyclerView = if (isListViewOrRootFolder()) {
             binding.offlineBrowserList.isVisible = true
             binding.offlineBrowserList
         } else {
@@ -270,7 +411,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             )
         } else {
             listDivider = PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
-            binding.offlineBrowserList.addItemDecoration(listDivider!!)
+            binding.offlineBrowserList.addItemDecoration(listDivider ?: return)
         }
 
         var textToShow = StringResourcesUtils.getString(R.string.context_empty_offline)
@@ -295,6 +436,16 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         checkScroll()
     }
 
+    /**
+     * Checks whether the Offline page is using a List View or under a Root Folder
+     *
+     * @return True if Offline page is set to a List View, or if the page is viewing a Root Folder
+     */
+    private fun isListViewOrRootFolder() = sortByHeaderViewModel.isListView() || args.rootFolderOnly
+
+    /**
+     * Sets up the Offline warning message
+     */
     private fun setupOfflineWarning() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
@@ -308,6 +459,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
+    /**
+     * Sets up the Recycler View
+     *
+     * @param rv The [RecyclerView] to be set up
+     */
     private fun setupRecyclerView(rv: RecyclerView) {
         rv.apply {
             setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
@@ -326,6 +482,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
+    /**
+     * Observes the changes in several ViewModels
+     */
     private fun observeLiveData() {
         viewModel.nodes.observe(viewLifecycleOwner) {
             val nodes = it.first
@@ -449,10 +608,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             adapter?.notifyItemChanged(0)
         })
 
-        sortByHeaderViewModel.listGridChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            switchListGridView()
-        })
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.updateNodes.collect {
@@ -460,8 +615,35 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 }
             }
         }
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) {
+            switchViewType()
+        }
     }
 
+    /**
+     * Switches how Offline items are being displayed
+     */
+    private fun switchViewType() {
+        with(isListViewOrRootFolder()) {
+            binding.offlineBrowserList.isVisible = this
+            binding.offlineBrowserList.adapter = adapter.takeIf { this }
+            binding.offlineBrowserGrid.isVisible = this.not()
+            binding.offlineBrowserGrid.adapter = adapter.takeUnless { this }
+
+            adapter?.isList = this
+            recyclerView =
+                if (this) binding.offlineBrowserList else binding.offlineBrowserGrid
+        }
+
+        setViewModelDisplayParam(viewModel.path)
+    }
+
+    /**
+     * Scroll to a given Offline Node position
+     *
+     * @param position The Offline Node position to navigate to
+     */
     private fun scrollToPosition(position: Int) {
         val layoutManager = recyclerView?.layoutManager
 
@@ -470,6 +652,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
+    /**
+     * Observes item animation
+     */
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
@@ -559,6 +744,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
+    /**
+     * Opens an Offline Node
+     *
+     * @param position The Offline Node position
+     * @param node The Offline Node to open
+     */
     private fun openNode(position: Int, node: OfflineNode) {
         val file = getOfflineFile(context, node.node)
         val mime = MimeTypeList.typeForName(file.name)
@@ -569,17 +760,20 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 ZipBrowserActivity.start(requireActivity(), file.path)
             }
             mime.isImage -> {
-                val handles = adapter!!.getOfflineNodes().map { it.handle.toLong() }.toLongArray()
+                val handles =
+                    (adapter ?: return).getOfflineNodes().map { it.handle.toLong() }.toLongArray()
                 val intent = ImageViewerActivity.getIntentForOfflineChildren(
                     requireContext(),
                     handles,
                     node.node.handle.toLongOrNull()
                 )
-                putThumbnailLocation(intent,
-                    recyclerView!!,
-                    position,
-                    VIEWER_FROM_OFFLINE,
-                    adapter!!)
+                putThumbnailLocation(
+                    launchIntent = intent,
+                    rv = recyclerView ?: return,
+                    position = position,
+                    viewerFrom = VIEWER_FROM_OFFLINE,
+                    thumbnailGetter = adapter ?: return,
+                )
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             }
@@ -609,14 +803,16 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
-                putThumbnailLocation(mediaIntent,
-                    recyclerView!!,
-                    position,
-                    VIEWER_FROM_OFFLINE,
-                    adapter!!)
+                putThumbnailLocation(
+                    launchIntent = mediaIntent,
+                    rv = recyclerView ?: return,
+                    position = position,
+                    viewerFrom = VIEWER_FROM_OFFLINE,
+                    thumbnailGetter = adapter ?: return,
+                )
 
                 mediaIntent.putExtra(
-                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
+                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList((adapter ?: return).getOfflineNodes())
                 )
                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
@@ -671,11 +867,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
 
-                putThumbnailLocation(pdfIntent,
-                    recyclerView!!,
-                    position,
-                    VIEWER_FROM_OFFLINE,
-                    adapter!!)
+                putThumbnailLocation(
+                    launchIntent = pdfIntent,
+                    rv = recyclerView ?: return,
+                    position = position,
+                    viewerFrom = VIEWER_FROM_OFFLINE,
+                    thumbnailGetter = adapter ?: return,
+                )
 
                 if (setLocalIntentParams(
                         context, node.node, pdfIntent, file.absolutePath, false,
@@ -705,6 +903,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
+    /**
+     * Opens the file
+     *
+     * @param file [File]
+     */
     private fun openFile(file: File) {
         Timber.d("openFile")
         val viewIntent = Intent(Intent.ACTION_VIEW)
@@ -740,132 +943,67 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
     }
 
-    private fun isList(): Boolean {
-        return callManager { it.isList } ?: true || args.rootFolderOnly
-    }
-
-    override fun checkScroll() {
-        val rv = recyclerView ?: return
-
-        callManager { manager ->
-            manager.changeAppBarElevation(!args.rootFolderOnly
-                    && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarningLayout.isVisible))
-        }
-    }
-
+    /**
+     * Sets the Search Query. This function is only being used by [ManagerActivity]
+     *
+     * @param query The text to find items. It may be nullable
+     */
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
         recyclerView?.let { disableRecyclerViewAnimator(it) }
     }
 
+    /**
+     * Signals that a Search Query has been submitted. This function is only being used by [ManagerActivity]
+     */
     fun onSearchQuerySubmitted() {
         viewModel.onSearchQuerySubmitted()
     }
 
+    /**
+     * Selects all Offline Nodes. This function is only being used by [ManagerActivity]
+     */
     fun selectAll() {
         viewModel.selectAll()
     }
 
+    /**
+     * Handle Back Press behavior. This function is only being used by [ManagerActivity]
+     *
+     * @return Back Press Indication
+     */
     fun onBackPressed(): Int {
         return viewModel.navigateOut(args.path)
     }
 
+    /**
+     * Retrieves the overall count of displayed Offline Nodes. This function is also used by [ManagerActivity]
+     *
+     * @return Total count of Offline Nodes
+     */
     fun getItemCount(): Int {
         return viewModel.getDisplayedNodesCount()
     }
 
+    /**
+     * Checks whether the Offline section is currently under Search Mode or not. This function
+     * is only being used by [ManagerActivity]
+     *
+     * @return Boolean value
+     */
     fun searchMode() = viewModel.searchMode()
 
+    /**
+     * Refreshes the list of Offline Nodes. This function is also used by [ManagerActivity]
+     */
     fun refreshNodes() {
         viewModel.loadOfflineNodes()
     }
 
+    /**
+     * Refreshes the Action Bar title. This function is only being used by [ManagerActivity]
+     */
     fun refreshActionBarTitle() {
         viewModel.refreshActionBarTitle()
-    }
-
-    private fun switchListGridView() {
-        recyclerView = if (isList()) {
-            binding.offlineBrowserList.isVisible = true
-            binding.offlineBrowserList.adapter = adapter
-            binding.offlineBrowserGrid.isVisible = false
-            binding.offlineBrowserGrid.adapter = null
-            adapter?.isList = true
-
-            binding.offlineBrowserList
-        } else {
-            binding.offlineBrowserGrid.isVisible = true
-            binding.offlineBrowserGrid.adapter = adapter
-            binding.offlineBrowserList.isVisible = false
-            binding.offlineBrowserList.adapter = null
-            adapter?.isList = false
-
-            binding.offlineBrowserGrid
-        }
-
-        setViewModelDisplayParam(viewModel.path)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        viewModel.skipNextAutoScroll = true
-    }
-
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        Timber.d("ActionBarCallBack::onActionItemClicked")
-
-        when (item!!.itemId) {
-            R.id.cab_menu_download -> {
-                callManager { it.saveOfflineNodesToDevice(viewModel.getSelectedNodes()) }
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_share_out -> {
-                OfflineUtils.shareOfflineNodes(requireContext(), viewModel.getSelectedNodes())
-                viewModel.clearSelection()
-            }
-            R.id.cab_menu_delete -> {
-                callManager {
-                    it.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes()) {
-                        viewModel.clearSelection()
-                    }
-                }
-            }
-            R.id.cab_menu_select_all -> {
-                viewModel.selectAll()
-            }
-            R.id.cab_menu_clear_selection -> {
-                viewModel.clearSelection()
-            }
-        }
-
-        return false
-    }
-
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        Timber.d("ActionBarCallBack::onCreateActionMode")
-        val inflater = mode!!.menuInflater
-
-        inflater.inflate(R.menu.offline_browser_action, menu)
-        checkScroll()
-
-        return true
-    }
-
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        Timber.d("ActionBarCallBack::onPrepareActionMode")
-
-        menu!!.findItem(R.id.cab_menu_select_all).isVisible =
-            (viewModel.getSelectedNodesCount()
-                    < getItemCount() - viewModel.placeholderCount)
-
-        return true
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {
-        Timber.d("ActionBarCallBack::onDestroyActionMode")
-
-        viewModel.clearSelection()
-        checkScroll()
     }
 }

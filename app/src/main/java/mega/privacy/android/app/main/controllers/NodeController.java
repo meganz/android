@@ -290,7 +290,7 @@ public class NodeController {
 
     public void selectContactToShareFolders(ArrayList<Long> handleList) {
         Timber.d("shareFolders ArrayListLong");
-        //TODO shareMultipleFolders
+
 
         if (!isOnline(context)) {
             ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);

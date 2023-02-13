@@ -130,7 +130,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
-        suppressWarnings = isCiBuild()
+        suppressWarnings = shouldSuppressWarnings()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 
@@ -263,6 +263,7 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
     implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
+    implementation "androidx.hilt:hilt-navigation-compose:$hiltNavigationComposeVersion"
 
     // Other libs
     implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
@@ -289,6 +290,7 @@ dependencies {
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
     implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.6.4"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
@@ -369,6 +371,7 @@ dependencies {
     // pager
     implementation "com.google.accompanist:accompanist-pager:$accompanistVersion"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanistLayoutVersion"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanistVersion"
 
     // Coil Compose
     implementation "io.coil-kt:coil-compose:$coilVersion"
@@ -556,6 +559,16 @@ task printAppGitHash {
 task printAppVersionName {
     doLast {
         println android.defaultConfig.versionName
+    }
+}
+
+/**
+ * Gradle task for getting the pre-build SDK version
+ * Run ./gradlew -q printPrebuildSdkVersion
+ */
+task printPrebuildSdkVersion {
+    doLast {
+        println megaSdkVersion
     }
 }
 

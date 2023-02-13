@@ -149,7 +149,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Không có kết nối mạng</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Bạn bị đẩy đăng xuất ra ngoài vì đã đăng nhập ở một thiết bị khác</string>
+    <string name="error_server_expired_session">Bạn bị đăng&#160;xuất ra&#160;khỏi thiết&#160;bị vì đăng&#160;nhập ở một thiết&#160;bị khác</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Đang tạo ra các chìa khóa mã</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -611,7 +611,7 @@
     <!-- error message that will show to user when user reached the sms verification daily limit -->
     <string name="verify_account_error_reach_limit">Đã đạt mức giới hạn hằng ngày</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
-    <string name="verify_account_error_wrong_code">Mã xác thực không trùng khớp.</string>
+    <string name="verify_account_error_wrong_code">Mã xác&#160;thực không trùng&#160;khớp.</string>
     <!-- error message that will show to user when code has been verified -->
     <string name="verify_account_error_code_verified">Mã đã được xác thực</string>
     <!-- error message that will show to user when user entered invalid verification code -->
@@ -702,7 +702,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Thông Tin</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">Chính Sách Quyền Riêng Tư</string>
+    <string name="settings_about_privacy_policy">Chính&#160;Sách Riêng&#160;Tư</string>
     <!--  -->
     <string name="settings_about_terms_of_service">Điều Khoản Dịch Vụ</string>
     <!-- App means “Application” -->
@@ -750,7 +750,7 @@
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Bản ghi chép đã được tắt</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
-    <string name="search_open_location">Đi đến vị trí chứa tệp tin</string>
+    <string name="search_open_location">Đến vị&#160;trí chứa tệp&#160;tin</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
     <!-- Label in My Account section to show user account type -->
@@ -778,7 +778,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Lưu</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Chìa&#160;Khóa Phục&#160;Hồi đã được lưu&#160;lại vào bảng&#160;nhớ</string>
+    <string name="copy_MK_confirmation">Chìa&#160;khóa phục&#160;hồi đã được sao&#160;chép vào bộ&#160;nhớ&#160;tạm. Lưu chìa&#160;khóa lại vào nơi bạn có&#160;thể dễ&#160;dàng truy&#160;cập khi cần dùng sau&#160;này.</string>
     <!-- Button to change the password -->
     <string name="change_pass">Thay đổi</string>
     <!-- Positive button to perform a general action -->
@@ -828,7 +828,7 @@
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Nhập mật khẩu mới</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
-    <string name="recovery_link_expired">Liên kết phục hồi này đã bị hết hạn, xin thử lại.</string>
+    <string name="recovery_link_expired">Đường liên&#160;kết phục&#160;hồi này đã hết&#160;hạn, xin thử lại.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">Chìa&#160;Khóa Phục&#160;Hồi của bạn là cách duy&#160;nhất để đặt&#160;lại mật&#160;khẩu. Xin nhập mật&#160;khẩu ở dưới đây.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -1004,7 +1004,7 @@
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Thêm thành viên</string>
     <!-- Menu item to remove a participants from a chat -->
-    <string name="remove_participant_menu_item">Mời ra khỏi cuộc chát</string>
+    <string name="remove_participant_menu_item">Loại&#160;khỏi cuộc chát</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_info_empty_screen">Bảo vệ các cuộc trò chuyện nghiêm ngặt với công nghệ bảo mật đầu-cuối (người dùng kiểm soát) cung cấp sự đảm bảo an toàn cần thiết:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1104,7 +1104,7 @@
     <!-- chat message when a participant was added to a group chat -->
     <string name="non_format_message_add_participant">%2$s đã thêm %1$s vào nhóm chát</string>
     <!-- chat message when a participant was removed from a group chat -->
-    <string name="non_format_message_remove_participant">%2$s đã loại bỏ %1$s khỏi nhóm chát</string>
+    <string name="non_format_message_remove_participant">%2$s đã loại&#160;bỏ %1$s khỏi nhóm chát</string>
     <!-- Message shown when a participant change the title of a group chat. -->
     <string name="non_format_change_title_messages">%1$s đã đổi tên nhóm chát thành ”%2$s”</string>
     <!-- chat message when a participant left a group chat -->
@@ -1191,13 +1191,13 @@
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">Tin nhắn này không chỉnh sửa được</string>
     <!-- Label of the modal bottom sheet to clear completed transfers -->
-    <string name="option_to_clear_transfers">Dọn danh sách truyền tải</string>
+    <string name="option_to_clear_transfers">Dọn danh&#160;sách các truyền&#160;tải</string>
     <!-- Label indicating action to retry failed or cancelled transfers -->
     <string name="option_to_retry_transfers">Thử lại tất cả các truyền tải</string>
     <!-- Button to confirm the action of restarting one transfer -->
     <string name="button_resume_individual_transfer">Tiếp tục truyền</string>
     <!-- Dialog to confirm before removing completed transfers -->
-    <string name="confirmation_to_clear_completed_transfers">Dọn các mục đã hoàn tất?</string>
+    <string name="confirmation_to_clear_completed_transfers">Dọn các truyền&#160;tải đã hoàn&#160;tất?</string>
     <!-- Title of the tab section for transfers in progress -->
     <string name="title_tab_in_progress_transfers">Đang truyền</string>
     <!-- Title of the tab section for completed transfers -->
@@ -1317,7 +1317,7 @@
     <!--  -->
     <string name="camera_uploads_cellular_connection">Dùng mạng viễn thông để tải lên</string>
     <!--  -->
-    <string name="camera_uploads_upload_videos">Cho phép video được tải lên</string>
+    <string name="camera_uploads_upload_videos">Cho&#160;phép video được tải&#160;lên</string>
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Đã cập nhật ảnh đại diện</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1517,7 +1517,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ký tự không hợp lệ</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Các ký tự này không được phép sử dụng: %1$s</string>
+    <string name="invalid_characters_defined">Các ký&#160;tự này không&#160;được phép sử&#160;dụng: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">Tên tệp tin không được để trống.</item>
@@ -1613,7 +1613,7 @@
     <!-- Item menu option to reproduce audio or video in external reproductors -->
     <string name="external_play">Mở với</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
-    <string name="context_share">Chia sẻ thông qua</string>
+    <string name="context_share">Chia&#160;sẻ bằng</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Thùng Rác[/A] [B]trống[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
@@ -1956,7 +1956,7 @@
     <!-- Text of the dialog to disable the rich links previews on chat -->
     <string name="text_confirmation_disable_rich_links">Tính năng xem trước nội dụng URL sẽ bị tắt. Bạn có thể bật lại trong phần Thiết Đặt. Bạn có muốn tiếp tục không?</string>
     <!-- Message shown when a call ends. -->
-    <string name="call_missed_messages">[A]Cuộc gọi bị lỡ[/A]</string>
+    <string name="call_missed_messages">[A]Cuộc&#160;gọi nhỡ[/A]</string>
     <!-- Message shown when a call ends. -->
     <string name="call_rejected_messages">[A]Cuộc gọi bị từ chối[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2232,7 +2232,7 @@
     <!-- Subtitle of the historic notification when an user blocks you as contact -->
     <string name="subtitle_contact_notification_blocked">[A]%s [/A][B]đã chặn tên bạn khỏi sổ liên lạc.[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
-    <string name="section_notification_with_unread">Thông báo [A](%1$d)[/A]</string>
+    <string name="section_notification_with_unread">Thông&#160;báo [A](%1$d)[/A]</string>
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
     <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
@@ -2304,7 +2304,7 @@
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Để nâng cấp gói đăng ký dịch vụ hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói theo nhu cầu[/A].</string>
     <!-- Input field description in the create file dialog. -->
-    <string name="context_new_file_name_hint">tên tệp tin</string>
+    <string name="context_new_file_name_hint">tên tệp&#160;tin</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
     <string name="option_enable_last_green_chat">Hiện Lần thấy cuối&#8230;</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
@@ -2418,7 +2418,7 @@
     <!-- Message to indicate a group call has ended without indicate the call duration. -->
     <string name="group_call_ended_no_duration_message">[A]Cuộc gọi nhóm kết thúc[/A]</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
-    <string name="last_seen_today">[A]Lần thấy cuối [/A]hôm nay lúc %1$s</string>
+    <string name="last_seen_today">[A]Lần thấy cuối [/A]hôm&#160;nay lúc %1$s</string>
     <!-- String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user -->
     <string name="last_seen_long_time_ago">[A]Lần thấy cuối [/A]đã một thời gian rất lâu</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. -->
@@ -2708,7 +2708,7 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">Liên hệ với ban tổng quản lý tài khoản doanh nghiệp để giải quyết và khôi phục tài khoản của bạn.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">Khi đăng xuất, các tệp tin trong phần Ngoại Tuyến sẽ bị xóa khỏi thiết bị.</string>
+    <string name="logout_warning_offline">Khi đăng&#160;xuất, các tệp&#160;tin trong phần Ngoại&#160;Tuyến sẽ bị xóa khỏi thiết&#160;bị.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">Khi đăng xuất, tất cả các phiên truyền tải chưa xong sẽ bị hủy.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
@@ -2836,7 +2836,7 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Đây là cách tốt nhất để tạo các buổi meeting người thật với nhau. Nếu bạn đã có phương thức xác minh khác như OTR hay PGP, bạn cũng có thể dùng được.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Chứng thực của bạn</string>
+    <string name="label_your_credentials">Chứng&#160;thực của bạn</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">Đặt lại</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3811,8 +3811,6 @@
     <string name="chat_recent_list_empty_action">Bắt đầu trò chuyện ngay</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chát an toàn và riêng tư, với bất kỳ ai và bất kỳ thiết bị, và an tâm sẽ không có ai có thể đọc tin nhắn của bạn, ngay cả MEGA.</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Bảo lưu cuộc họp</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Bắt đầu cuộc họp ngay</string>
     <!-- Label for call option on settings -->
@@ -3905,8 +3903,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">Bạn đã thêm tất cả các tên liên lạc đã có vào trong cuộc chát này rồi. Nếu bạn muốn thêm thành viên nữa, trước hết hãy mời thêm người vào sổ liên lạc của bạn.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Đã lưu lại ảnh vào thư viện của thiết bị</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]Ngày gia hạn chu kỳ:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Điền tên album</string>
     <!-- Album creation input name placeholder -->
@@ -3958,7 +3954,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Cuộc họp định kỳ</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s mỗi tuần</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Kiểu xem kho phương&#160;tiện số</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4019,11 +4015,12 @@
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cấp quyền</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Không cấp quyền</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="other">Đã loại&#160;bỏ %d mục khỏi “%s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <string name="meetings_list_one_off_meeting_label">Cuộc&#160;họp một lần</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Tiếp&#160;tục phát video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -4032,4 +4029,60 @@
     <string name="video_playback_position_dialog_resume_button">Tiếp tục truyền</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Khởi động lại</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">Truy cập bị từ chối</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">Bạn đã từ&#160;chối cho MEGA truy&#160;cập vào không&#160;gian lưu&#160;trữ và tệp&#160;tin phương&#160;tiện&#160;số của thiết&#160;bị. Nếu bạn muốn tiếp&#160;tục chia&#160;sẻ, cho phép MEGA quyền&#160;hạn.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">Cho phép quyền&#160;hạn</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">Không&#160;cho phép</string>
+    <!-- Option of a recurring meeting in meeting list to view occurrences -->
+    <string name="meetings_list_recurring_meeting_occurrences_option">Thời&#160;điểm tái&#160;diễn</string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
 </resources>

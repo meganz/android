@@ -138,8 +138,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 showDiscardChangesConfirmationDialog()
             } else {
                 if (viewModel.isCreateMode()) {
-                    viewModel.saveFile(this@TextEditorActivity,
-                        intent.getBooleanExtra(FROM_HOME_PAGE, false))
+                    viewModel.saveFile(
+                        this@TextEditorActivity,
+                        intent.getBooleanExtra(FROM_HOME_PAGE, false)
+                    )
                 } else if (viewModel.isReadingContent()) {
                     viewModel.finishBeforeClosing()
                 }
@@ -303,7 +305,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         return super.onOptionsItemSelected(item)
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
 
@@ -738,7 +740,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     /**
      * Manages the import node action.
      */
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     private fun importNode() {
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER

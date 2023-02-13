@@ -19,7 +19,9 @@ import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewM
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
@@ -478,6 +480,7 @@ class IncomingSharesViewModelTest {
                 on { this.id }.thenReturn(NodeId(handle))
                 on { this.isIncomingShare }.thenReturn(true)
             }
+            val map = mapOf(node to emptyList<NodeChanges>())
             whenever(getNodeByHandle(any())).thenReturn(null)
             whenever(authorizeNode(any())).thenReturn(null)
             whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
@@ -487,7 +490,7 @@ class IncomingSharesViewModelTest {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.setIncomingTreeDepth(any(), handle)
                     assertThat(awaitItem()).isEqualTo(handle)
-                    monitorNodeUpdates.emit(listOf(node))
+                    monitorNodeUpdates.emit(NodeUpdate(map))
                     assertThat(awaitItem()).isEqualTo(-1L)
                 }
         }
@@ -507,7 +510,7 @@ class IncomingSharesViewModelTest {
                     assertThat(awaitItem()).isEqualTo(-1L)
                     underTest.setIncomingTreeDepth(any(), handle)
                     assertThat(awaitItem()).isEqualTo(handle)
-                    monitorNodeUpdates.emit(listOf(node))
+                    monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
                 }
         }
 
@@ -516,7 +519,7 @@ class IncomingSharesViewModelTest {
         val node = mock<Node> {
             on { this.id }.thenReturn(NodeId(987654321L))
         }
-        monitorNodeUpdates.emit(listOf(node))
+        monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(
             getIncomingSharesChildrenNode,

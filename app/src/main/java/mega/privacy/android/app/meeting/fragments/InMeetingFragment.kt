@@ -840,8 +840,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         toolbar.apply {
-            setBackgroundColor(ContextCompat.getColor(requireContext(),
-                R.color.dark_grey_alpha_070))
+            setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.dark_grey_alpha_070
+                )
+            )
         }
 
         meetingActivity.window.statusBarColor =
@@ -1226,10 +1230,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     alpha = 1f
                     isVisible = shouldBeShown
                     if (shouldBeShown) {
-                        setBackgroundColor(ContextCompat.getColor(
-                            MegaApplication.getInstance().applicationContext,
-                            R.color.dark_grey_alpha_070
-                        ))
+                        setBackgroundColor(
+                            ContextCompat.getColor(
+                                MegaApplication.getInstance().applicationContext,
+                                R.color.dark_grey_alpha_070
+                            )
+                        )
                         text =
                             StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
                     }
@@ -1249,9 +1255,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     alpha = 1f
                     isVisible = shouldBeShown
                     if (shouldBeShown) {
-                        setBackgroundColor(ContextCompat.getColor(
-                            MegaApplication.getInstance().applicationContext,
-                            android.R.color.transparent))
+                        setBackgroundColor(
+                            ContextCompat.getColor(
+                                MegaApplication.getInstance().applicationContext,
+                                android.R.color.transparent
+                            )
+                        )
                         text =
                             StringResourcesUtils.getString(R.string.reconnecting_message)
                         startAnimation(blink)
@@ -2117,8 +2126,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
 
             if (bannerShouldBeShown) {
-                it.setBackgroundColor(ContextCompat.getColor(requireContext(),
-                    R.color.dark_grey_alpha_070))
+                it.setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.dark_grey_alpha_070
+                    )
+                )
                 Timber.d("Show banner info")
                 it.isVisible = true
             } else {
@@ -2567,7 +2580,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Open invite participant page
      */
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onInviteParticipants() {
         Timber.d("chooseAddContactDialog")
         val contacts = megaApi.contacts
@@ -2883,7 +2896,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             text = StringResourcesUtils.getString(
-                R.string.calls_call_screen_waiting_for_participants)
+                R.string.calls_call_screen_waiting_for_participants
+            )
         }
     }
 
@@ -2894,8 +2908,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.startCounterTimerAfterBanner()
         val currentTime =
             MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog
-        showCallWillEndInBanner(if (currentTime > 0) currentTime else TimeUnit.SECONDS.toMillis(
-            SECONDS_TO_WAIT_ALONE_ON_THE_CALL))
+        showCallWillEndInBanner(
+            if (currentTime > 0) currentTime else TimeUnit.SECONDS.toMillis(
+                SECONDS_TO_WAIT_ALONE_ON_THE_CALL
+            )
+        )
         showOnlyMeInTheCallDialog()
     }
 

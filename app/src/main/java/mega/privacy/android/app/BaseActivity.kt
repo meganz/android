@@ -64,7 +64,6 @@ import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.upgradeAccount.PaymentActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
@@ -285,7 +284,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
             checkWhyAmIBlocked(
                 intent.getLongExtra(BroadcastConstants.EVENT_NUMBER, INVALID_VALUE.toLong()),
-                intent.getStringExtra(BroadcastConstants.EVENT_TEXT))
+                intent.getStringExtra(BroadcastConstants.EVENT_TEXT)
+            )
         }
     }
 
@@ -331,10 +331,14 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             if (intent == null) return
             Timber.d("BROADCAST INFORM THERE ARE TAKEN DOWN FILES IMPLIED IN ACTION")
             val numberFiles = intent.getIntExtra(BroadcastConstants.NUMBER_FILES, 1)
-            Util.showSnackbar(this@BaseActivity,
-                resources.getQuantityString(R.plurals.alert_taken_down_files,
+            Util.showSnackbar(
+                this@BaseActivity,
+                resources.getQuantityString(
+                    R.plurals.alert_taken_down_files,
                     numberFiles,
-                    numberFiles))
+                    numberFiles
+                )
+            )
         }
     }
 
@@ -361,15 +365,20 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 StringResourcesUtils.getString(R.string.file_available_offline)
             } else {
                 resources.getQuantityString(
-                    R.plurals.download_finish, numTransfers, numTransfers)
+                    R.plurals.download_finish, numTransfers, numTransfers
+                )
             }
             when (intent.getStringExtra(BroadcastConstants.TRANSFER_TYPE)) {
-                BroadcastConstants.DOWNLOAD_TRANSFER -> Util.showSnackbar(this@BaseActivity,
-                    message)
+                BroadcastConstants.DOWNLOAD_TRANSFER -> Util.showSnackbar(
+                    this@BaseActivity,
+                    message
+                )
                 BroadcastConstants.UPLOAD_TRANSFER -> {
-                    message = resources.getQuantityString(R.plurals.upload_finish,
+                    message = resources.getQuantityString(
+                        R.plurals.upload_finish,
                         numTransfers,
-                        numTransfers)
+                        numTransfers
+                    )
                     Util.showSnackbar(this@BaseActivity, message)
                 }
                 BroadcastConstants.DOWNLOAD_TRANSFER_OPEN -> {
@@ -385,8 +394,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 BroadcastConstants.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW -> {
                     autoPlayInfo = AutoPlayInfo(
                         intent.getStringExtra(BroadcastConstants.NODE_NAME) ?: return,
-                        intent.getLongExtra(BroadcastConstants.NODE_HANDLE,
-                            INVALID_VALUE.toLong()),
+                        intent.getLongExtra(
+                            BroadcastConstants.NODE_HANDLE,
+                            INVALID_VALUE.toLong()
+                        ),
                         intent.getStringExtra(BroadcastConstants.NODE_LOCAL_PATH) ?: return,
                         true
                     )
@@ -448,8 +459,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             }
             val view = window.decorView.findViewById<View>(android.R.id.content)
             if (view != null) {
-                showSnackbar(view,
-                    StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved))
+                showSnackbar(
+                    view,
+                    StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved)
+                )
             }
         }
     }
@@ -479,32 +492,50 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             }
         }
 
-        registerReceiver(sslErrorReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED))
+        registerReceiver(
+            sslErrorReceiver,
+            IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED)
+        )
 
-        registerReceiver(signalPresenceReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE))
+        registerReceiver(
+            signalPresenceReceiver,
+            IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
+        )
 
-        registerReceiver(accountBlockedReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED))
+        registerReceiver(
+            accountBlockedReceiver,
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
+        )
 
-        registerReceiver(businessExpiredReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+        registerReceiver(
+            businessExpiredReceiver,
+            IntentFilter(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED)
+        )
 
-        registerReceiver(takenDownFilesReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES))
+        registerReceiver(
+            takenDownFilesReceiver,
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES)
+        )
 
-        registerReceiver(transferFinishedReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED))
+        registerReceiver(
+            transferFinishedReceiver,
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+        )
 
-        registerReceiver(showSnackbarReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR))
+        registerReceiver(
+            showSnackbarReceiver,
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR)
+        )
 
-        registerReceiver(resumeTransfersReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS))
+        registerReceiver(
+            resumeTransfersReceiver,
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS)
+        )
 
-        registerReceiver(cookieSettingsReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED))
+        registerReceiver(
+            cookieSettingsReceiver,
+            IntentFilter(BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
+        )
 
         collectFlow(monitorTransferOverQuota()) {
             showGeneralTransferOverQuotaWarning()
@@ -519,14 +550,16 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             }
 
             isGeneralTransferOverQuotaWarningShown = getBoolean(
-                TRANSFER_OVER_QUOTA_WARNING_SHOWN, false)
+                TRANSFER_OVER_QUOTA_WARNING_SHOWN, false
+            )
 
             if (isGeneralTransferOverQuotaWarningShown) {
                 showGeneralTransferOverQuotaWarning()
             }
 
             isResumeTransfersWarningShown = getBoolean(
-                RESUME_TRANSFERS_WARNING_SHOWN, false)
+                RESUME_TRANSFERS_WARNING_SHOWN, false
+            )
 
             if (isResumeTransfersWarningShown) {
                 showResumeTransfersWarning(this@BaseActivity)
@@ -577,9 +610,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             (psaWebBrowserContainer ?: return@post).id = R.id.psa_web_browser_container
 
             findViewById<ViewGroup>(android.R.id.content)
-                .addView(psaWebBrowserContainer,
-                    ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT))
+                .addView(
+                    psaWebBrowserContainer,
+                    ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                )
 
             psaWebBrowser = PsaWebBrowser()
 
@@ -679,7 +716,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         val dismissButton = v.findViewById<Button>(R.id.dialog_third_button)
         val params = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT)
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
         params.gravity = Gravity.RIGHT
         title.setText(R.string.ssl_error_dialog_title)
         text.setText(R.string.ssl_error_dialog_text)
@@ -839,19 +877,27 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         Timber.d("Show snackbar: %s", s)
         snackbar = try {
             when (type) {
-                MESSAGE_SNACKBAR_TYPE -> Snackbar.make(view,
+                MESSAGE_SNACKBAR_TYPE -> Snackbar.make(
+                    view,
                     (if (s?.isNotEmpty() == true) s else StringResourcesUtils.getString(R.string.sent_as_message))
                         ?: return,
-                    Snackbar.LENGTH_LONG)
-                NOT_SPACE_SNACKBAR_TYPE -> Snackbar.make(view,
+                    Snackbar.LENGTH_LONG
+                )
+                NOT_SPACE_SNACKBAR_TYPE -> Snackbar.make(
+                    view,
                     R.string.error_not_enough_free_space,
-                    Snackbar.LENGTH_LONG)
-                MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> Snackbar.make(view,
+                    Snackbar.LENGTH_LONG
+                )
+                MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> Snackbar.make(
+                    view,
                     R.string.notifications_are_already_muted,
-                    Snackbar.LENGTH_LONG)
-                DISMISS_ACTION_SNACKBAR -> Snackbar.make(view,
+                    Snackbar.LENGTH_LONG
+                )
+                DISMISS_ACTION_SNACKBAR -> Snackbar.make(
+                    view,
                     s ?: return,
-                    Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.LENGTH_INDEFINITE
+                )
                 else -> Snackbar.make(view, s ?: return, Snackbar.LENGTH_LONG)
             }
         } catch (e: Exception) {
@@ -894,8 +940,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     show()
                 }
                 INVITE_CONTACT_TYPE -> {
-                    setAction(R.string.contact_invite,
-                        SnackbarNavigateOption(view.context, type, userEmail))
+                    setAction(
+                        R.string.contact_invite,
+                        SnackbarNavigateOption(view.context, type, userEmail)
+                    )
                     show()
                 }
                 DISMISS_ACTION_SNACKBAR -> {
@@ -910,13 +958,17 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     show()
                 }
                 SENT_REQUESTS_TYPE -> {
-                    setAction(R.string.tab_sent_requests,
-                        SnackbarNavigateOption(view.context, type, userEmail))
+                    setAction(
+                        R.string.tab_sent_requests,
+                        SnackbarNavigateOption(view.context, type, userEmail)
+                    )
                     show()
                 }
                 RESUME_TRANSFERS_TYPE -> {
-                    setAction(R.string.button_resume_individual_transfer,
-                        SnackbarNavigateOption(view.context, type))
+                    setAction(
+                        R.string.button_resume_individual_transfer,
+                        SnackbarNavigateOption(view.context, type)
+                    )
                     show()
                 }
             }
@@ -957,16 +1009,24 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         var expiredString =
                             StringResourcesUtils.getString(R.string.expired_user_business_text)
                         try {
-                            expiredString = expiredString.replace("[B]", "<b><font color=\'"
-                                    + getColorHexString(this@BaseActivity, R.color.black_white)
-                                    + "\'>")
+                            expiredString = expiredString.replace(
+                                "[B]", "<b><font color=\'"
+                                        + getColorHexString(this@BaseActivity, R.color.black_white)
+                                        + "\'>"
+                            )
                             expiredString = expiredString.replace("[/B]", "</font></b>")
                         } catch (e: Exception) {
                             Timber.w(e, "Exception formatting string")
                         }
-                        setMessage(TextUtils.concat(HtmlCompat.fromHtml(expiredString,
-                            HtmlCompat.FROM_HTML_MODE_LEGACY),
-                            "\n\n${StringResourcesUtils.getString(R.string.expired_user_business_text_2)}"))
+                        setMessage(
+                            TextUtils.concat(
+                                HtmlCompat.fromHtml(
+                                    expiredString,
+                                    HtmlCompat.FROM_HTML_MODE_LEGACY
+                                ),
+                                "\n\n${StringResourcesUtils.getString(R.string.expired_user_business_text_2)}"
+                            )
+                        )
                     }
 
                     setNegativeButton(R.string.general_dismiss) { dialog, _ ->
@@ -1000,20 +1060,34 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         val intent: Intent
         when (eventNumber.toString()) {
             ACCOUNT_NOT_BLOCKED -> {}
-            TOS_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(this,
-                StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_copyright_message),
-                loggingSettings))
-            TOS_NON_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(
-                this,
-                StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
-                loggingSettings))
-            DISABLED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(
-                this,
-                StringResourcesUtils.getString(R.string.error_business_disabled),
-                loggingSettings))
-            REMOVED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(ChatLogoutListener(this,
-                StringResourcesUtils.getString(R.string.error_business_removed),
-                loggingSettings))
+            TOS_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(
+                ChatLogoutListener(
+                    this,
+                    StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_copyright_message),
+                    loggingSettings
+                )
+            )
+            TOS_NON_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(
+                ChatLogoutListener(
+                    this,
+                    StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
+                    loggingSettings
+                )
+            )
+            DISABLED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(
+                ChatLogoutListener(
+                    this,
+                    StringResourcesUtils.getString(R.string.error_business_disabled),
+                    loggingSettings
+                )
+            )
+            REMOVED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(
+                ChatLogoutListener(
+                    this,
+                    StringResourcesUtils.getString(R.string.error_business_removed),
+                    loggingSettings
+                )
+            )
             SMS_VERIFICATION_ACCOUNT_BLOCK -> {
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed) return
                 MegaApplication.smsVerifyShowed(true)
@@ -1233,7 +1307,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         startActivity(intent)
     }
 
-    // TODO Migrate to registerForActivityResult()
+
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         @Suppress("DEPRECATION")
         startActivityForResult(intent, requestCode)
@@ -1261,9 +1335,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             val sku = purchase.sku
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
-                Timber.d("Purchase " + sku + " successfully, subscription type is: "
-                        + getSubscriptionType(sku) + ", subscription renewal type is: "
-                        + getSubscriptionRenewalType(sku))
+                Timber.d(
+                    "Purchase " + sku + " successfully, subscription type is: "
+                            + getSubscriptionType(sku) + ", subscription renewal type is: "
+                            + getSubscriptionRenewalType(sku)
+                )
                 RatingHandlerImpl(this).updateTransactionFlag(true)
                 PurchaseType.SUCCESS
             } else {
@@ -1371,21 +1447,24 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                 image = R.drawable.ic_pro_i_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
                                     if (Skus.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_1_yearly
-                                    else R.string.upgrade_account_successful_pro_1_monthly)
+                                    else R.string.upgrade_account_successful_pro_1_monthly
+                                )
                             }
                             PRO_II -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
                                     if (Skus.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_2_yearly
-                                    else R.string.upgrade_account_successful_pro_2_monthly)
+                                    else R.string.upgrade_account_successful_pro_2_monthly
+                                )
                             }
                             PRO_III -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
                                     if (Skus.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_3_yearly
-                                    else R.string.upgrade_account_successful_pro_3_monthly)
+                                    else R.string.upgrade_account_successful_pro_3_monthly
+                                )
                             }
                             PRO_LITE -> {
                                 account = R.string.prolite_account
@@ -1393,7 +1472,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                 image = R.drawable.ic_lite_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
                                     if (Skus.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_lite_yearly
-                                    else R.string.upgrade_account_successful_pro_lite_monthly)
+                                    else R.string.upgrade_account_successful_pro_lite_monthly
+                                )
                             }
                             else -> {
                                 Timber.w("Unexpected account subscription level")
@@ -1442,9 +1522,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * Launches ManagerActivity intent to show over quota warning.
      */
     protected fun launchOverQuota() {
-        startActivity(Intent(this, ManagerActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setAction(ACTION_OVERQUOTA_STORAGE))
+        startActivity(
+            Intent(this, ManagerActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_OVERQUOTA_STORAGE)
+        )
         finish()
     }
 
@@ -1452,9 +1534,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * Launches ManagerActivity intent to show pre over quota warning.
      */
     protected fun launchPreOverQuota() {
-        startActivity(Intent(this, ManagerActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .setAction(ACTION_PRE_OVERQUOTA_STORAGE))
+        startActivity(
+            Intent(this, ManagerActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_PRE_OVERQUOTA_STORAGE)
+        )
         finish()
     }
 
@@ -1494,10 +1578,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             val snackLayout = snackbar.view as SnackbarLayout
             snackLayout.setBackgroundResource(R.drawable.background_snackbar)
             val params = snackLayout.layoutParams as FrameLayout.LayoutParams
-            params.setMargins(Util.dp2px(8f, outMetrics),
+            params.setMargins(
+                Util.dp2px(8f, outMetrics),
                 0,
                 Util.dp2px(8f, outMetrics),
-                Util.dp2px(8f, outMetrics))
+                Util.dp2px(8f, outMetrics)
+            )
             snackLayout.layoutParams = params
             val snackTextView =
                 snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)

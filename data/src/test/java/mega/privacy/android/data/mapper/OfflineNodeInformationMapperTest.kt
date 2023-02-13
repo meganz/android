@@ -14,6 +14,7 @@ class OfflineNodeInformationMapperTest {
 
     private val expectedPath = "path"
     private val expectedName = "name"
+    private val expectedHandle = "handle"
     private val expectedIncomingHandle = "incomingHandle"
 
     @Test
@@ -25,6 +26,7 @@ class OfflineNodeInformationMapperTest {
             IncomingShareOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,
+                handle = expectedHandle,
                 incomingHandle = expectedIncomingHandle,
             )
         )
@@ -38,7 +40,8 @@ class OfflineNodeInformationMapperTest {
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
             InboxOfflineNodeInformation(
                 path = expectedPath,
-                name = expectedName
+                name = expectedName,
+                handle = expectedHandle,
             )
         )
     }
@@ -52,7 +55,8 @@ class OfflineNodeInformationMapperTest {
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
             OtherOfflineNodeInformation(
                 path = expectedPath,
-                name = expectedName
+                name = expectedName,
+                handle = expectedHandle,
             )
         )
     }

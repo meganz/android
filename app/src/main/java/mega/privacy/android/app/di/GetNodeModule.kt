@@ -5,19 +5,27 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.rx3.await
+import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.OpenShareDialog
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.UpgradeSecurity
 
 /**
  * Get node module
  *
- * Provides use cases for manager activity and camera upload service
+ * Provides use cases for managing nodes
  */
 @Module
 @InstallIn(ViewModelComponent::class, SingletonComponent::class)
@@ -34,6 +42,29 @@ abstract class GetNodeModule {
         @Provides
         fun provideCopyNode(megaNodeRepository: MegaNodeRepository): CopyNode =
             CopyNode(megaNodeRepository::copyNode)
+
+        /**
+         * Provides the [CopyNodeByHandle] implementation
+         *
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [CopyNodeByHandle]
+         */
+        @Provides
+        fun provideCopyNodeByHandle(megaNodeRepository: MegaNodeRepository): CopyNodeByHandle =
+            CopyNodeByHandle { node, parent ->
+                megaNodeRepository.copyNodeByHandle(node, parent, null)
+            }
+
+        /**
+         * Provides the [CopyNodeByHandleChangingName] implementation
+         *
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [CopyNodeByHandleChangingName]
+         */
+        @Provides
+        fun provideCopyNodeByHandleChangingName(megaNodeRepository: MegaNodeRepository): CopyNodeByHandleChangingName =
+            CopyNodeByHandleChangingName(megaNodeRepository::copyNodeByHandle)
+
 
         /**
          * Provides the [GetChildrenNode] implementation
@@ -74,6 +105,54 @@ abstract class GetNodeModule {
         @Provides
         fun provideGetUnverifiedOutGoingShares(megaNodeRepository: MegaNodeRepository): GetUnverifiedOutgoingShares =
             GetUnverifiedOutgoingShares(megaNodeRepository::getUnverifiedOutgoingShares)
+
+        /**
+         * Provides [CheckNameCollision] implementation
+         * @param checkNameCollisionUseCase [CheckNameCollisionUseCase] is the current implementation, not following the current architecture
+         * @return [CheckNameCollision]
+         */
+        @Provides
+        fun provideCheckNameCollision(checkNameCollisionUseCase: CheckNameCollisionUseCase): CheckNameCollision =
+            CheckNameCollision { nodeHandle, parentNodeHandle, type ->
+                checkNameCollisionUseCase.check(
+                    nodeHandle.longValue,
+                    parentNodeHandle.longValue,
+                    type
+                ).await()
+            }
+
+        /**
+         * Provides [MoveNodeByHandle] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [MoveNodeByHandle]
+         */
+        @Provides
+        fun provideMoveNodeByHandle(megaNodeRepository: MegaNodeRepository): MoveNodeByHandle =
+            MoveNodeByHandle { node, parent ->
+                megaNodeRepository.moveNodeByHandle(node, parent, null)
+            }
+
+        /**
+         * Provides [MoveNodeToRubbishByHandle] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [MoveNodeToRubbishByHandle]
+         */
+        @Provides
+        fun provideMoveNodeToRubbishByHandle(
+            megaNodeRepository: MegaNodeRepository,
+        ): MoveNodeToRubbishByHandle =
+            MoveNodeToRubbishByHandle(megaNodeRepository::moveNodeToRubbishBinByHandle)
+
+        /**
+         * Provides [DeleteNodeByHandle] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [DeleteNodeByHandle]
+         */
+        @Provides
+        fun provideDeleteNodeByHandle(
+            megaNodeRepository: MegaNodeRepository,
+        ): DeleteNodeByHandle =
+            DeleteNodeByHandle(megaNodeRepository::deleteNodeByHandle)
 
         /**
          * Provides [OpenShareDialog] implementation

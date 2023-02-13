@@ -16,7 +16,6 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -44,6 +43,10 @@ class AudioViewModel @Inject constructor(
 
     private var _query = MutableLiveData<String>()
 
+    /**
+     * Serves as the original View Type.
+     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed
+     */
     var isList = true
     var skipNextAutoScroll = false
     var searchMode = false
@@ -157,6 +160,28 @@ class AudioViewModel @Inject constructor(
     }
 
     /**
+     * Readies the Search Functionality
+     */
+    fun readySearch() {
+        if (searchMode) return
+
+        searchMode = true
+        searchQuery = ""
+        refreshUi()
+    }
+
+    /**
+     * Exits the Search Functionality
+     */
+    fun exitSearch() {
+        if (!searchMode) return
+
+        searchMode = false
+        searchQuery = ""
+        refreshUi()
+    }
+
+    /**
      * Load audio by calling Mega Api or just filter loaded nodes
      * @param forceUpdate True if retrieve all nodes by calling API
      * , false if filter current nodes by searchQuery
@@ -185,9 +210,6 @@ class AudioViewModel @Inject constructor(
     }
 
     fun shouldShowSearchMenu() = items.value?.isNotEmpty() ?: false
-
-    fun getNodePositionByHandle(handle: Long) =
-        items.value?.find { it.node?.handle == handle }?.index ?: INVALID_POSITION
 
     fun getHandlesOfAudio() =
         items.value?.map { node -> node.node?.handle ?: INVALID_HANDLE }?.toLongArray()

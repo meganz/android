@@ -14,7 +14,7 @@ import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 
 /**
- * TODO Has been migrated to MeetingActivityViewModel, can be deleted.
+
  */
 @HiltViewModel
 class AbstractMeetingOnBoardingViewModel @Inject constructor(
@@ -59,7 +59,8 @@ class AbstractMeetingOnBoardingViewModel @Inject constructor(
                             } else {
                                 showDefaultAvatar()
                             }
-                        }))
+                        })
+                    )
                     else -> {
                         showDefaultAvatar()
                     }

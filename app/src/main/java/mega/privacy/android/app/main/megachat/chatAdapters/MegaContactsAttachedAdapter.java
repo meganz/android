@@ -38,12 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
+import mega.privacy.android.data.model.MegaContactDB;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -120,7 +120,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
         @Override
         public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-            // TODO Auto-generated method stub
+
         }
 
     }

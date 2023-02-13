@@ -153,7 +153,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">U bent afgemeld op dit apparaat vanaf een andere locatie</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Encryptiesleutels genereren</string>
+    <string name="login_generating_key">Coderingssleutels genereren</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Verbinding maken met de server</string>
     <!-- Status text when updating the file manager -->
@@ -790,7 +790,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Opslaan</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">De Herstelsleutel was succesvol gekopieerd</string>
+    <string name="copy_MK_confirmation">Herstelsleutel gekopieerd naar klembord. Bewaar het op een veilige plaats waar u later gemakkelijk toegang toe heeft.</string>
     <!-- Button to change the password -->
     <string name="change_pass">Wijzigen</string>
     <!-- Positive button to perform a general action -->
@@ -1083,7 +1083,7 @@
     <!-- Option in menu to change title of a chat group. -->
     <string name="change_title_option">Titel wijzigen</string>
     <!-- confirmation message before leaving a group chat -->
-    <string name="confirmation_leave_group_chat">Als u weggaat, heeft u niet langer toegang om berichten te lezen of te verzenden.</string>
+    <string name="confirmation_leave_group_chat">Als u weggaat, heeft u niet langer toegang om berichten te lezen of te versturen.</string>
     <!-- title confirmation message before leaving a group chat -->
     <string name="title_confirmation_leave_group_chat">Groepsgesprek verlaten?</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1429,7 +1429,7 @@
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_contact_request_notification">Nieuw contact verzoek</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
-    <string name="title_properties_chat_clear">Chatgeschiedenis wissen</string>
+    <string name="title_properties_chat_clear">Gespreksgeschiedenis wissen</string>
     <!-- Title of the section to remove contact in the Contact Properties screen -->
     <string name="title_properties_remove_contact">Contact verwijderen</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1508,8 +1508,8 @@
     <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslag ruimte ontvangen als uw gratis registratie bonus.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
-        <item quantity="one">Gedeelde map</item>
-        <item quantity="other">Gedeelde mappen</item>
+        <item quantity="one">Map delen</item>
+        <item quantity="other">Mappen delen</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
@@ -2149,7 +2149,7 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">Video</string>
     <!-- Title of file explorer to send a link -->
-    <string name="title_file_explorer_send_link">Link verzenden naar &#8230;</string>
+    <string name="title_file_explorer_send_link">Link versturen naar &#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Versturen naar&#8230;</string>
     <!-- More button in contact info page -->
@@ -2795,7 +2795,7 @@
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
     <string name="contacts_sent">%s Contacten verstuurd.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
-    <string name="my_chat_files_folder">Mijn gesprek bestanden</string>
+    <string name="my_chat_files_folder">Mijn gespreksbestanden</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">Fout. De map %1$s is niet gemaakt</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
@@ -2990,7 +2990,7 @@
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] heeft de tijd voor het wissen van berichten gewijzigd in [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
-    <string name="title_properties_clear_chat_history">Chatgeschiedenis wissen</string>
+    <string name="title_properties_clear_chat_history">Gespreksgeschiedenis wissen</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
     <string name="retention_history_disabled">[A]%1$s [/A][B] heeft het wissen van berichten uitgeschakeld. [/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
@@ -3059,7 +3059,7 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">Kan de prioriteit van de overdracht niet wijzigen “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">Verzend de decoderingssleutel afzonderlijk</string>
+    <string name="option_send_decryption_key_separately">Verstuur de decoderingssleutel afzonderlijk</string>
     <!-- Explanation option to send separated the link and decryption key -->
     <string name="explanation_send_decryption_key_separately">Exporteer link en decoderingssleutel afzonderlijk.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
@@ -3325,7 +3325,7 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Groepen</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Opties zoals “Decoderingssleutel afzonderlijk verzenden”, “Vervaldatum instellen” of “Wachtwoordbeveiliging instellen” zijn alleen beschikbaar voor afzonderlijke items.</string>
+    <string name="warning_get_links">Opties zoals “Decoderingssleutel afzonderlijk versturen”, “Vervaldatum instellen” of “Wachtwoordbeveiliging instellen” zijn alleen beschikbaar voor afzonderlijke items.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Alles kopiëren</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
@@ -3915,8 +3915,6 @@
     <string name="chat_recent_list_empty_action">Begin nu met chatten</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">Chat veilig en privé, met iedereen en op elk apparaat, wetende dat niemand uw chats kan lezen, zelfs MEGA niet.</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">Vergadering archiveren</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Vergadering nu beginnen</string>
     <!-- Label for call option on settings -->
@@ -4009,8 +4007,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">U heeft al uw contacten aan dit gesprek toegevoegd. Als u meer deelnemers wilt toevoegen, nodig ze dan eerst uit voor uw contactenlijst.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Afbeelding opslaan naar uw apparaat gallerij</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]Verlengingsdatum:[/A] [B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Voer album naam in</string>
     <!-- Album creation input name placeholder -->
@@ -4065,7 +4061,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">Terugkerende vergadering</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s wekelijks</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">Media discovery weergave</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4130,6 +4126,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Toegang verlenen</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Niet toestaan</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="one">%d item verwijderd van “%s”</item>
         <item quantity="other">%d items verwijderd van “%s”</item>
@@ -4144,4 +4141,60 @@
     <string name="video_playback_position_dialog_resume_button">Hervatten</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Herstarten</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">Toegang geweigerd</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">U heeft MEGA toegang geweigerd tot de opslag- en mediabestanden van uw apparaat. Als u wilt blijven delen, sta MEGA toestemming toe.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">Toestemming toestaan</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">Niet toestaan</string>
+    <!-- Option of a recurring meeting in meeting list to view occurrences -->
+    <string name="meetings_list_recurring_meeting_occurrences_option"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
 </resources>

@@ -18,8 +18,8 @@ import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.Logout
-import mega.privacy.android.domain.usecase.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
+import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

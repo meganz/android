@@ -543,12 +543,56 @@ internal class MegaApiFacade @Inject constructor(
     override fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        when {
+            newNodeName == null && listener == null -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent)
+            }
+            newNodeName != null && listener == null -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+            }
+            newNodeName == null && listener != null -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent, listener)
+            }
+            else /*newNodeName != null && listener != null*/ -> {
+                megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, listener)
+            }
+        }
+    }
+
+    override fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        when {
+            newNodeName == null && listener == null -> {
+                megaApi.moveNode(nodeToMove, newNodeParent)
+            }
+            newNodeName != null && listener == null -> {
+                megaApi.moveNode(nodeToMove, newNodeParent, newNodeName)
+            }
+            newNodeName == null && listener != null -> {
+                megaApi.moveNode(nodeToMove, newNodeParent, listener)
+            }
+            else /*newNodeName != null && listener != null*/ -> {
+                megaApi.moveNode(nodeToMove, newNodeParent, newNodeName, listener)
+            }
+        }
+    }
+
+    override fun deleteNode(
+        node: MegaNode,
         listener: MegaRequestListenerInterface?,
     ) {
         listener?.let {
-            megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, it)
-        } ?: megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
+            megaApi.remove(node, it)
+        } ?: run {
+            megaApi.remove(node)
+        }
     }
 
     override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
@@ -631,7 +675,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getSet(sid: Long): MegaSet? = megaApi.getSet(sid)
 
-    override suspend fun getSetElements(sid: Long): MegaSetElementList = megaApi.getSetElements(sid)
+    override suspend fun getSetElements(sid: Long): MegaSetElementList =
+        megaApi.getSetElements(sid, false)
 
     override fun removeSet(sid: Long, listener: MegaRequestListenerInterface) =
         megaApi.removeSet(sid, listener)
@@ -641,6 +686,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun updateSetName(sid: Long, name: String?) =
         megaApi.updateSetName(sid, name)
+
+    override suspend fun putSetCover(sid: Long, eid: Long) = megaApi.putSetCover(sid, eid)
 
     override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApi.removeRequestListener(listener)
@@ -653,6 +700,22 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface) =
         megaApi.verifyCredentials(user, listener)
+
+    override suspend fun isCurrentPassword(password: String) =
+        megaApi.checkPassword(password)
+
+    override fun changePassword(newPassword: String, listener: MegaRequestListenerInterface) =
+        megaApi.changePassword(null, newPassword, listener)
+
+    override fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String?,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.confirmResetPassword(link, newPassword, masterKey, listener)
+
+    override suspend fun getPasswordStrength(password: String) =
+        megaApi.getPasswordStrength(password)
 
     override fun getCountryCallingCodes(listener: MegaRequestListenerInterface) =
         megaApi.getCountryCallingCodes(listener)
@@ -823,7 +886,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun setUserAttribute(
         type: Int,
         value: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAttribute(type, value, listener)
 
     @Suppress("DEPRECATION")
@@ -837,6 +900,20 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
         megaApi.querySignupLink(link, listener)
+
+    override fun getPublicNode(
+        nodeFileLink: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getPublicNode(nodeFileLink, listener)
+
+    override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
+
+    override suspend fun getVerifiedPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
+
+    override fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface) =
+        megaApi.checkSMSVerificationCode(pin, listener)
+
+    override fun localLogout(listener: MegaRequestListenerInterface) = megaApi.localLogout(listener)
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)

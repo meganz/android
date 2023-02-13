@@ -89,6 +89,8 @@ class AccountInfoFacade @Inject constructor(
 
     override fun monitorAccountDetail(): Flow<AccountDetail> = accountDetail.asStateFlow()
 
+    override suspend fun resetAccountInfo() = myAccountInfo.resetDefaults()
+
     override val subscriptionMethodId: Int
         get() = myAccountInfo.subscriptionMethodId
 

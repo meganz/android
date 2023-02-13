@@ -1,11 +1,11 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
@@ -16,10 +16,8 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
-import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -27,18 +25,20 @@ import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default implementation of [PhotosRepository]
@@ -49,24 +49,39 @@ import javax.inject.Inject
  * @property megaLocalStorageFacade MegaLocalStorageGateway
  * @property imageMapper ImageMapper
  * @property videoMapper VideoMapper
- * @property nodeUpdateMapper NodeUpdateMapper
  */
+@Singleton
 internal class DefaultPhotosRepository @Inject constructor(
+    private val nodeRepository: NodeRepository,
     private val megaApiFacade: MegaApiGateway,
+    @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheFolderFacade: CacheFolderGateway,
     private val megaLocalStorageFacade: MegaLocalStorageGateway,
     private val dateUtilFacade: DateUtilWrapper,
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
-    private val nodeUpdateMapper: NodeUpdateMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PhotosRepository {
+    private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
     private var thumbnailFolderPath: String? = null
 
     private var previewFolderPath: String? = null
+
+    init {
+        nodeRepository.monitorNodeUpdates()
+            .map { it.changes.keys.toList() }
+            .onEach(::invalidatePhotosCache)
+            .launchIn(appScope)
+    }
+
+    private fun invalidatePhotosCache(nodes: List<Node>) {
+        for (node in nodes) {
+            photosCache.remove(node.id)
+        }
+    }
 
     override suspend fun getPublicLinksCount(): Int = withContext(ioDispatcher) {
         megaApiFacade.getPublicLinks().size
@@ -86,40 +101,36 @@ internal class DefaultPhotosRepository @Inject constructor(
         getMediaUploadFolderId
     }
 
-    override fun monitorNodeUpdates(): Flow<NodeUpdate> =
-        megaApiFacade.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull {
-                it.nodeList?.toList()
-            }.map { nodeList ->
-                nodeUpdateMapper(nodeList)
-            }
-
     override suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
         val images = async { mapPhotoNodesToImages(searchImages()) }
         val videos = async { mapPhotoNodesToVideos(searchVideos()) }
         images.await() + videos.await()
     }
 
-    override suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId?): Photo? =
-        withContext(ioDispatcher) {
-            megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
-                ?.let { megaNode ->
-                    megaNode to fileTypeInfoMapper(megaNode)
-                }?.let { (megaNode, fileType) ->
-                    when (fileType) {
-                        is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
-                            mapMegaNodeToImage(megaNode, albumPhotoId?.id)
-                        }
-                        is VideoFileTypeInfo -> {
-                            mapMegaNodeToVideo(megaNode, albumPhotoId?.id)
-                        }
-                        else -> {
-                            null
+    override suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId?): Photo? {
+        return when (val photo = photosCache[nodeId]) {
+            is Photo.Image -> photo.copy(albumPhotoId = albumPhotoId?.id)
+            is Photo.Video -> photo.copy(albumPhotoId = albumPhotoId?.id)
+            else -> withContext(ioDispatcher) {
+                megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
+                    ?.let { megaNode ->
+                        megaNode to fileTypeInfoMapper(megaNode)
+                    }?.let { (megaNode, fileType) ->
+                        when (fileType) {
+                            is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
+                                mapMegaNodeToImage(megaNode, albumPhotoId?.id)
+                            }
+                            is VideoFileTypeInfo -> {
+                                mapMegaNodeToVideo(megaNode, albumPhotoId?.id)
+                            }
+                            else -> {
+                                null
+                            }
                         }
                     }
-                }
-        }
+            }
+        }?.also { photosCache[nodeId] = it }
+    }
 
     override suspend fun getPhotosByFolderId(id: Long, order: SortOrder): List<Photo> =
         withContext(ioDispatcher) {

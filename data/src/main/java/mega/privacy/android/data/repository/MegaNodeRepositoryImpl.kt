@@ -78,7 +78,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     override suspend fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.copyNode(
@@ -95,6 +95,76 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                     }
                 )
             )
+        }
+    }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun copyNodeByHandle(
+        nodeToCopy: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToCopy.longValue)
+        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        if (node == null) {
+            throw IllegalArgumentException("Node to copy with handle $nodeToCopy not found")
+        }
+        if (parent == null) {
+            throw IllegalArgumentException("Destination node with handle $newNodeParent not found")
+        }
+        copyNode(node, parent, newNodeName)
+    }
+
+    override suspend fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                NodeId(it.nodeHandle)
+            }
+            megaApiGateway.moveNode(
+                nodeToMove = nodeToMove,
+                newNodeParent = newNodeParent,
+                newNodeName = newNodeName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun moveNodeByHandle(
+        nodeToMove: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
+        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        if (node == null) {
+            throw IllegalArgumentException("Node to copy with handle $nodeToMove not found")
+        }
+        if (parent == null) {
+            throw IllegalArgumentException("Destination node with handle $newNodeParent not found")
+        }
+        moveNode(node, parent, newNodeName)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun deleteNodeByHandle(nodeToDelete: NodeId) = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToDelete.longValue)
+            ?: throw IllegalArgumentException("Node to delete with handle $nodeToDelete not found")
+        if (!megaApiGateway.isInRubbish(node)) {
+            throw IllegalArgumentException("Node needs to be in the rubbish bin before deleting it")
+        }
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {}
+            megaApiGateway.deleteNode(
+                node = node,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -140,6 +210,18 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRubbishBinNode()
+    }
+
+    override suspend fun moveNodeToRubbishBinByHandle(nodeToMove: NodeId) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
+        val rubbish = megaApiGateway.getRubbishBinNode()
+        if (node == null) {
+            throw IllegalArgumentException("Node to copy with handle $nodeToMove not found")
+        }
+        if (rubbish == null) {
+            throw IllegalArgumentException("Rubbish bin node not found")
+        }
+        moveNode(node, rubbish, null)
     }
 
     override suspend fun isInRubbish(node: MegaNode): Boolean = withContext(ioDispatcher) {

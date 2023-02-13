@@ -120,7 +120,7 @@ class FolderContentAdapter(
         when (getItem(position)) {
             is FolderContent.Header -> VIEW_TYPE_HEADER
             is FolderContent.Data ->
-                if (sortByViewModel.isList) VIEW_TYPE_DATA_LIST else VIEW_TYPE_DATA_GRID
+                if (sortByViewModel.isListView()) VIEW_TYPE_DATA_LIST else VIEW_TYPE_DATA_GRID
             is FolderContent.Separator -> VIEW_TYPE_GRID_SEPARATOR
         }
 

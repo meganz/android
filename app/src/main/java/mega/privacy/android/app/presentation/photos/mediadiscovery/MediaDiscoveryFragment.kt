@@ -62,10 +62,10 @@ import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -237,7 +237,7 @@ class MediaDiscoveryFragment : Fragment() {
             lazyGridState = lazyGridState,
             onClick = this::onClick,
             onLongPress = this::onLongPress,
-            selectedPhotoIds = mediaDiscoveryViewModel.state.value.selectedPhotoIds,
+            selectedPhotoIds = uiState.selectedPhotoIds,
             uiPhotoList = uiState.uiPhotoList,
         )
 
@@ -252,28 +252,38 @@ class MediaDiscoveryFragment : Fragment() {
      */
     @Composable
     fun MediaDiscoveryDialog() {
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 3.dp)
-            .shadow(elevation = 10.dp,
-                ambientColor = colorResource(id = R.color.black),
-                spotColor = colorResource(id = R.color.black))
-            .zIndex(2f),
-            color = Color.Transparent)
-        Text(modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 30.dp, end = 20.dp),
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 3.dp)
+                .shadow(
+                    elevation = 10.dp,
+                    ambientColor = colorResource(id = R.color.black),
+                    spotColor = colorResource(id = R.color.black)
+                )
+                .zIndex(2f),
+            color = Color.Transparent
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 30.dp, end = 20.dp),
             text = getString(R.string.cloud_drive_media_discovery_banner_context),
-            color = colorResource(id = R.color.grey_alpha_087_white))
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End) {
+            color = colorResource(id = R.color.grey_alpha_087_white)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
             SettingsButton()
             OKButton()
         }
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
-            color = colorResource(id = R.color.grey_012_white_015))
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            color = colorResource(id = R.color.grey_012_white_015)
+        )
     }
 
     /**
@@ -288,11 +298,19 @@ class MediaDiscoveryFragment : Fragment() {
             ),
             onClick = {
                 mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
-                    MediaDiscoveryViewSettings.ENABLED.ordinal)
-                requireContext().startActivity(Intent(requireActivity(),
-                    SettingsActivity::class.java))
+                    MediaDiscoveryViewSettings.ENABLED.ordinal
+                )
+                requireContext().startActivity(
+                    Intent(
+                        requireActivity(),
+                        SettingsActivity::class.java
+                    )
+                )
             }) {
-            Text(text = getString(R.string.cloud_drive_media_discovery_banner_settings), fontSize = 16.sp)
+            Text(
+                text = getString(R.string.cloud_drive_media_discovery_banner_settings),
+                fontSize = 16.sp
+            )
         }
     }
 
@@ -308,7 +326,8 @@ class MediaDiscoveryFragment : Fragment() {
             ),
             onClick = {
                 mediaDiscoveryViewModel.setMediaDiscoveryViewSettings(
-                    MediaDiscoveryViewSettings.ENABLED.ordinal)
+                    MediaDiscoveryViewSettings.ENABLED.ordinal
+                )
             }) {
             Text(text = getString(R.string.cloud_drive_media_discovery_banner_ok), fontSize = 16.sp)
         }

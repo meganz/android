@@ -6,7 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
@@ -19,6 +21,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -35,6 +38,7 @@ class TransfersViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val dbH: LegacyDatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    monitorFailedTransfer: MonitorFailedTransfer,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -45,6 +49,12 @@ class TransfersViewModel @Inject constructor(
 
     private val _completedState =
         MutableStateFlow<CompletedTransfersState>(CompletedTransfersState.Default)
+
+    /**
+     * Failed transfer
+     */
+    val failedTransfer = monitorFailedTransfer()
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * The state regarding completed transfers UI

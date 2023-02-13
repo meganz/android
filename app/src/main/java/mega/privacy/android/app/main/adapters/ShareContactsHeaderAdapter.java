@@ -1,10 +1,21 @@
 package mega.privacy.android.app.main.adapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarShareContact;
+import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
+import static mega.privacy.android.app.utils.Constants.HEADER_VIEW_TYPE;
+import static mega.privacy.android.app.utils.Constants.ITEM_PROGRESS;
+import static mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_LAND;
+import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_PORT;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -14,6 +25,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +43,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContacts> implements View.OnClickListener, SectionTitleProvider {
 
@@ -60,15 +66,14 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         this.shareContacts = shareContacts;
     }
 
-    public void setContacts(List<ShareContactInfo> shareContacts){
+    public void setContacts(List<ShareContactInfo> shareContacts) {
         this.shareContacts = shareContacts;
         notifyDataSetChanged();
 
     }
 
-    public ShareContactInfo getItem(int position)
-    {
-        if(position < shareContacts.size() && position >= 0){
+    public ShareContactInfo getItem(int position) {
+        if (position < shareContacts.size() && position >= 0) {
             return shareContacts.get(position);
         }
 
@@ -84,11 +89,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     public String getSectionTitle(int position) {
         ShareContactInfo contact = shareContacts.get(position);
 
-        if (contact.isMegaContact() && !contact.isHeader()){
+        if (contact.isMegaContact() && !contact.isHeader()) {
             return contact.getMegaContactAdapter().getFullName().substring(0, 1).toUpperCase();
-        }
-        else if (!contact.isHeader()) {
-            return contact.getPhoneContactInfo().getName().substring(0,1).toUpperCase();
+        } else if (!contact.isHeader()) {
+            return contact.getPhoneContactInfo().getName().substring(0, 1).toUpperCase();
         }
         return null;
     }
@@ -108,7 +112,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         return ITEM_VIEW_TYPE;
     }
 
-    public class ViewHolderShareContacts extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolderShareContacts extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         RelativeLayout itemProgress;
         RelativeLayout itemHeader;
@@ -129,8 +133,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
         @Override
         public void onClick(View v) {
-            // TODO Auto-generated method stub
-            if(mItemClickListener != null){
+
+            if (mItemClickListener != null) {
                 mItemClickListener.onItemClick(v, getPosition());
             }
         }
@@ -139,8 +143,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     @Override
     public ViewHolderShareContacts onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
+        Display display = ((Activity) mContext).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
 
@@ -155,11 +159,10 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.itemLayout = rowView.findViewById(R.id.item_content);
         holder.contactNameTextView = rowView.findViewById(R.id.contact_name);
 
-        if(!isScreenInPortrait(mContext)){
+        if (!isScreenInPortrait(mContext)) {
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics());
             holder.contactNameTextView.setMaxWidthEmojis((int) width);
-        }
-        else{
+        } else {
             float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics());
             holder.contactNameTextView.setMaxWidthEmojis((int) width);
         }
@@ -182,13 +185,12 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.itemProgress.setVisibility(View.GONE);
         holder.verifiedIcon.setVisibility(View.GONE);
 
-        if (contact.isMegaContact()){
-            if (contact.isHeader()){
+        if (contact.isMegaContact()) {
+            if (contact.isHeader()) {
                 holder.itemLayout.setVisibility(View.GONE);
                 holder.itemHeader.setVisibility(View.VISIBLE);
                 holder.textHeader.setText(mContext.getString(R.string.section_contacts));
-            }
-            else {
+            } else {
                 holder.itemLayout.setVisibility(View.VISIBLE);
                 holder.itemHeader.setVisibility(View.GONE);
                 holder.contactStateIcon.setVisibility(View.VISIBLE);
@@ -202,8 +204,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 if (contact.getMegaContactAdapter().getFullName() != null) {
                     name = contact.getMegaContactAdapter().getFullName();
-                }
-                else {
+                } else {
                     name = mail;
                 }
                 holder.contactNameTextView.setText(name);
@@ -226,14 +227,12 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     }
                 }
             }
-        }
-        else if (contact.isPhoneContact()){
-            if (contact.isHeader()){
+        } else if (contact.isPhoneContact()) {
+            if (contact.isHeader()) {
                 holder.itemLayout.setVisibility(View.GONE);
                 holder.itemHeader.setVisibility(View.VISIBLE);
                 holder.textHeader.setText(mContext.getString(R.string.contacts_phone));
-            }
-            else {
+            } else {
                 holder.itemLayout.setVisibility(View.VISIBLE);
                 holder.itemHeader.setVisibility(View.GONE);
                 holder.contactStateIcon.setVisibility(View.GONE);
@@ -248,6 +247,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
             holder.itemProgress.setVisibility(View.VISIBLE);
         }
     }
+
     @Override
     public int getItemCount() {
         if (shareContacts == null) {
@@ -265,7 +265,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         public void onItemClick(View view, int position);
     }
 
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
+    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 }

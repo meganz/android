@@ -57,14 +57,52 @@ interface ImageRepository {
 
     /**
      * Get Image Result given Node Handle
+     *
      * @param nodeHandle    Image Node handle to request.
      * @param fullSize      Flag to request full size image despite data/size requirements.
      * @param highPriority  Flag to request image with high priority.
      * @param isMeteredConnection   Boolean indicating if network connection is metered
+     *
      * @return Flow<ImageResult>
      */
     suspend fun getImageByNodeHandle(
         nodeHandle: Long,
+        fullSize: Boolean,
+        highPriority: Boolean,
+        isMeteredConnection: Boolean,
+    ): Flow<ImageResult>
+
+    /**
+     * Get Image Result given Public Link
+     *
+     * @param nodeFileLink          Public link to a file in MEGA.
+     * @param fullSize              Flag to request full size image despite data/size requirements.
+     * @param highPriority          Flag to request image with high priority.
+     * @param isMeteredConnection   Boolean indicating if network connection is metered
+     *
+     * @return Flow<ImageResult>
+     */
+    suspend fun getImageByNodePublicLink(
+        nodeFileLink: String,
+        fullSize: Boolean,
+        highPriority: Boolean,
+        isMeteredConnection: Boolean,
+    ): Flow<ImageResult>
+
+    /**
+     * Get an ImageResult given a Node Chat Room Id and Chat Message Id.
+     *
+     * @param chatRoomId            Chat Message Room Id
+     * @param chatMessageId         Chat Message Id
+     * @param fullSize              Flag to request full size image despite data/size requirements.
+     * @param highPriority          Flag to request image with high priority.
+     * @param isMeteredConnection   Boolean indicating if network connection is metered
+     *
+     * @return Flow<ImageResult>
+     */
+    suspend fun getImageForChatMessage(
+        chatRoomId: Long,
+        chatMessageId: Long,
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,

@@ -184,7 +184,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     private fun setNodes(nodes: ArrayList<MegaNode>) {
         this.contactNodes = nodes
         adapter?.setNodes(contactNodes)
-        //todo handle when no node available - collapse section and update button?
+
     }
 
     /**

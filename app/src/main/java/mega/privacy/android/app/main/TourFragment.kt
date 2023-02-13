@@ -33,6 +33,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.DialogRecoveryKeyBinding
 import mega.privacy.android.app.databinding.FragmentTourBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants

@@ -8,11 +8,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -42,8 +45,13 @@ typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<
 internal class DefaultAlbumRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val userSetMapper: UserSetMapper,
+    private val albumStringResourceGateway: AlbumStringResourceGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
+    private val userSets: MutableMap<Long, UserSet> = mutableMapOf()
+
+    private val userSetsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
+
     private val albumPhotosAddingProgressPool: AlbumPhotosAddingProgressPool = mutableMapOf()
 
     override suspend fun createAlbum(name: String): UserSet = withContext(ioDispatcher) {
@@ -76,8 +84,13 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     override suspend fun getAllUserSets(): List<UserSet> = withContext(ioDispatcher) {
         val setList = megaApiGateway.getSets()
+        userSets.clear()
+
         (0 until setList.size()).map { index ->
             setList.get(index).toUserSet()
+            val userSet = setList.get(index).toUserSet()
+            userSets[userSet.id] = userSet
+            userSet
         }
     }
 
@@ -85,10 +98,13 @@ internal class DefaultAlbumRepository @Inject constructor(
         megaApiGateway.getSet(sid = albumId.id)?.toUserSet()
     }
 
-    override fun monitorUserSetsUpdate(): Flow<List<UserSet>> = megaApiGateway.globalUpdates
-        .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
-        .mapNotNull { it.sets }
-        .map { sets -> sets.map { it.toUserSet() } }
+    override fun monitorUserSetsUpdate(): Flow<List<UserSet>> = merge(
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
+            .mapNotNull { it.sets }
+            .map { sets -> sets.map { it.toUserSet() } },
+        userSetsFlow,
+    )
 
     override suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId> =
         withContext(ioDispatcher) {
@@ -103,7 +119,18 @@ internal class DefaultAlbumRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
             .mapNotNull { it.elements }
             .map { elements -> elements.filter { it.setId() == albumId.id } }
+            .onEach(::checkSetsCoverRemoved)
             .map { elements -> elements.map { it.toAlbumPhotoId() } }
+
+    private fun checkSetsCoverRemoved(elements: List<MegaSetElement>) {
+        val userSets = elements.mapNotNull { element ->
+            val userSet = userSets[element.setId()]
+            userSet.takeIf { element.id() == userSet?.cover }
+        }
+
+        if (userSets.isEmpty()) return
+        userSetsFlow.tryEmit(userSets)
+    }
 
     override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
@@ -184,6 +211,17 @@ internal class DefaultAlbumRepository @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun getProscribedAlbumTitles(): List<String> =
+        albumStringResourceGateway.getSystemAlbumNames() + albumStringResourceGateway.getProscribedStrings()
+
+    override suspend fun updateAlbumCover(albumId: AlbumId, elementId: NodeId) =
+        withContext(ioDispatcher) {
+            megaApiGateway.putSetCover(
+                sid = albumId.id,
+                eid = elementId.longValue,
+            )
+        }
 
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
         albumPhotosAddingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }

@@ -514,6 +514,7 @@ public class Util {
 
     /**
      * Check if device connect to network
+     *
      * @deprecated use MonitorConnectivity instead
      */
     @Deprecated
@@ -1332,7 +1333,7 @@ public class Util {
         return String.format("#%06X", 0xFFFFFF & color);
     }
 
-    //TODO Use ViewUtils.showSoftKeyboardDelayed(View) instead
+
     public static void showKeyboardDelayed(final View view) {
         if (view == null) return;
 

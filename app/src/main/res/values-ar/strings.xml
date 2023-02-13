@@ -838,7 +838,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">حفظ</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">تم نسخ مفتاح الاستعادة بنجاح</string>
+    <string name="copy_MK_confirmation">تم نسخ مفتاح الاستعادة إلى الحافظة. احفظه في مكان آمن حيث يمكنك الوصول إليه بسهولة لاحقًا.</string>
     <!-- Button to change the password -->
     <string name="change_pass">تغيير</string>
     <!-- Positive button to perform a general action -->
@@ -3268,9 +3268,9 @@
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">بحث GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
-    <string name="empty_search_giphy">لم يتم العثور على [A]صور GIFs[/A]</string>
+    <string name="empty_search_giphy">لم يتم العثور على [A]صور GIF[/A]</string>
     <!-- Label indicating there is not available GIFs due to down server -->
-    <string name="server_down_giphy">لا توجد ملفات GIF متاحة. الرجاء معاودة المحاولة في وقت لاحق</string>
+    <string name="server_down_giphy">لا يوجد صور GIF متاحة. الرجاء معاودة المحاولة في وقت لاحق</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]نهاية[/A] النتائج</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
@@ -4331,8 +4331,6 @@
     <string name="chat_recent_list_empty_action">ابدأ المحادثة الآن</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">تقوم بالمحادثة مع أي شخص وعلى أي جهاز بأمان وخصوصية مع معرفة أنه لا يمكن لأحد قراءة محادثاتك ولا حتى ميغا MEGA.</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">قم بأرشفة الاجتماع</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">ابدأ الاجتماع الآن</string>
     <!-- Label for call option on settings -->
@@ -4412,7 +4410,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">السماح لغير المضيفين بإضافة مشاركين</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIFs</string>
+    <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
@@ -4425,8 +4423,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">لقد أضفت بالفعل جميع جهات اتصالك إلى هذه المحادثة. إذا كنت ترغب في إضافة المزيد من المشاركين، قم أولاً بدعوتهم إلى قائمة جهات الاتصال الخاصة بك.</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">تم حفظ الصورة في معرض جهازك</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]تاريخ التجديد:[/A][B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">أدخل اسم الألبوم</string>
     <!-- Album creation input name placeholder -->
@@ -4493,7 +4489,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">اجتماع متكرر</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">%s أسبوعياً</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">عرض اكتشاف الوسائط</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4574,6 +4570,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">منح اذن الوصول</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">لا تمنح</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="zero">تم إزالة %d عنصر من ”%s“</item>
         <item quantity="one">تم إزالة %d عنصر من ”%s“</item>
@@ -4592,4 +4589,60 @@
     <string name="video_playback_position_dialog_resume_button">استئناف</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">إعادة تشغيل</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">تم رفض إمكانية الوصول</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">لقد قمت برفض وصول ميغا MEGA إلى جهازك وملفات الوسائط. إذا كنت ترغب في متابعة المشاركة  فامنح ميغا MEGA إذن الوصول.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">منح إذن الوصول</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">لا تسمح</string>
+    <!-- Option of a recurring meeting in meeting list to view occurrences -->
+    <string name="meetings_list_recurring_meeting_occurrences_option"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
 </resources>

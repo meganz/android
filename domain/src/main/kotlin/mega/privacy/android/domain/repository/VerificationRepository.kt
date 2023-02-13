@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.VerifiedPhoneNumber
+
 /**
  * Verification repository
  */
@@ -46,4 +49,18 @@ interface VerificationRepository {
      * @param countryCode
      */
     suspend fun formatPhoneNumber(number: String, countryCode: String): String?
+
+    /**
+     * Monitor verified phone number
+     *
+     * @return flow of the verified phone number response
+     */
+    fun monitorVerifiedPhoneNumber(): Flow<VerifiedPhoneNumber>
+
+    /**
+     * Verify phone number
+     *
+     * @param pin
+     */
+    suspend fun verifyPhoneNumber(pin: String)
 }

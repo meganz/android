@@ -15,7 +15,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -142,13 +141,6 @@ class ScanCodeFragment : Fragment() {
     }
 
     private fun setupView() {
-        val aB = (activity as AppCompatActivity).supportActionBar
-        aB?.apply {
-            title = requireContext().getFormattedStringOrDefault(R.string.section_qr_code)
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-        }
-
         codeScanner = CodeScanner(requireContext(), binding.scannerView)
         codeScanner?.apply {
             setDecodeCallback { result ->

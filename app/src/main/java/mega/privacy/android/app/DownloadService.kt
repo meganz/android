@@ -49,7 +49,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
 import mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAILABLE
 import mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
-import mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.fragments.offline.OfflineFragment
@@ -384,8 +383,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             } else {
                 stopForeground()
             }
-            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-                .post(MegaTransfer.TYPE_DOWNLOAD)
             return
         }
 
@@ -623,7 +620,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 }
                 sendBroadcast(intent)
             }
-            LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java).post(Constants.INVALID_VALUE)
             megaApi.resetTotalDownloads()
             backgroundTransfers.clear()
             errorEBlocked = 0
@@ -1177,8 +1173,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         appData))
                 }
                 transfersManagement.checkScanningTransferOnStart(transfer)
-                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-                    .post(MegaTransfer.TYPE_DOWNLOAD)
                 transfersCount++
                 updateProgressNotification()
             }
@@ -1213,8 +1207,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     if (transfer.state == MegaTransfer.STATE_FAILED) {
                         transfersManagement.setAreFailedTransfers(true)
                     }
-                    LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-                        .post(MegaTransfer.TYPE_DOWNLOAD)
                     if (!isVoiceClip && !isBackgroundTransfer) {
                         updateProgressNotification()
                     }
@@ -1386,8 +1378,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     backgroundTransfers.add(transfer.tag)
                     return@fromCallable null
                 }
-                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Int::class.java)
-                    .post(MegaTransfer.TYPE_DOWNLOAD)
                 transfersManagement.checkScanningTransferOnUpdate(transfer)
                 if (!transfer.isFolderTransfer) {
                     updateProgressNotification()

@@ -8,7 +8,7 @@ BUILD_STEP = ""
 GMS_APK_BUILD_LOG = "gms_build.log"
 QA_APK_BUILD_LOG = "qa_build.log"
 
-MODULE_LIST = ['app', 'domain', 'sdk', 'data']
+MODULE_LIST = ['app', 'domain', 'core-ui', 'data']
 
 LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"

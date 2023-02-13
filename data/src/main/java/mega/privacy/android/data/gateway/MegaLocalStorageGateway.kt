@@ -590,4 +590,75 @@ interface MegaLocalStorageGateway {
      * Clears ephemeral.
      */
     suspend fun clearEphemeral()
+
+
+    /**
+     * Clear account credentials.
+     */
+    suspend fun clearCredentials()
+
+    /**
+     * Clear preferences
+     */
+    suspend fun clearPreferences()
+
+    /**
+     * Sets first time.
+     */
+    suspend fun setFirstTime(firstTime: Boolean)
+
+    /**
+     * Clears offline files.
+     */
+    suspend fun clearOffline()
+
+    /**
+     * Clears contacts.
+     */
+    suspend fun clearContacts()
+
+    /**
+     * Clears non contacts.
+     */
+    suspend fun clearNonContacts()
+
+    /**
+     * Clears chat items.
+     */
+    suspend fun clearChatItems()
+
+    /**
+     * Clears completed transfers.
+     */
+    suspend fun clearCompletedTransfers()
+
+    /**
+     * Clears pending messages.
+     */
+    suspend fun clearPendingMessages()
+
+    /**
+     * clears attributes.
+     */
+    suspend fun clearAttributes()
+
+    /**
+     * Deletes sync records.
+     */
+    suspend fun deleteAllSyncRecordsTypeAny()
+
+    /**
+     * Clears chat settings.
+     */
+    suspend fun clearChatSettings()
+
+    /**
+     * Clears backups.
+     */
+    suspend fun clearBackups()
+
+    /**
+     * Clear MegaContacts.
+     */
+    suspend fun clearMegaContacts()
 }

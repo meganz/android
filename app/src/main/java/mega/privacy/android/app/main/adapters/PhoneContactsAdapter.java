@@ -187,7 +187,7 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
 
         @Override
         public void onClick(View v) {
-            // TODO Auto-generated method stub
+
             if (mItemClickListener != null) {
                 mItemClickListener.onItemClick(v, getPosition());
             }

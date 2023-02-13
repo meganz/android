@@ -57,7 +57,7 @@ fun CreateNewAlbumDialog(
     titleResID: Int,
     positiveButtonTextResID: Int,
     onDismissRequest: () -> Unit = {},
-    onDialogPositiveButtonClicked: (name: String, proscribedString: List<String>) -> Unit,
+    onDialogPositiveButtonClicked: (name: String) -> Unit,
     onDialogInputChange: (Boolean) -> Unit = {},
     initialInputText: () -> String = { "" },
     inputPlaceHolderText: () -> String = { "" },
@@ -68,13 +68,6 @@ fun CreateNewAlbumDialog(
     val isEnabled by remember { mutableStateOf(true) }
     val isError by remember { mutableStateOf(false) }
     val singleLine = true
-    val proscribedString = listOf(
-        stringResource(id = R.string.photos_album_subsection_my_albums),
-        stringResource(id = R.string.photos_album_subsection_shared_albums),
-        stringResource(id = R.string.title_favourites_album),
-        stringResource(id = R.string.photos_album_title_gif),
-        stringResource(id = R.string.photos_album_title_raw),
-    )
     val maxCharacter = 250
 
     val inputColor = if (isInputValid()) {
@@ -223,7 +216,7 @@ fun CreateNewAlbumDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onDialogPositiveButtonClicked(textState, proscribedString)
+                    onDialogPositiveButtonClicked(textState)
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,

@@ -6,10 +6,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import org.junit.Before
 import org.junit.Test
@@ -21,10 +22,14 @@ class DefaultGetTimelinePhotosTest {
     private lateinit var underTest: GetTimelinePhotos
 
     private val photosRepository = mock<PhotosRepository>()
+    private val nodeRepository = mock<NodeRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetTimelinePhotos(photosRepository = photosRepository)
+        underTest = DefaultGetTimelinePhotos(
+            photosRepository = photosRepository,
+            nodeRepository = nodeRepository
+        )
     }
 
     @Test
@@ -33,9 +38,10 @@ class DefaultGetTimelinePhotosTest {
         val expected = listOf(photo)
         photosRepository.stub {
             onBlocking { searchMegaPhotos() }.thenReturn(expected)
+        }
+        nodeRepository.stub {
             onBlocking { monitorNodeUpdates() }.thenReturn(emptyFlow())
         }
-
         underTest().test {
             assertThat(awaitItem()).isEqualTo(expected)
             cancelAndIgnoreRemainingEvents()
@@ -47,13 +53,14 @@ class DefaultGetTimelinePhotosTest {
         runTest {
             val expected = listOf<Photo>(mock())
             val update = NodeUpdate(
-                mapOf(NodeId(1L) to listOf(NodeChanges.New))
+                mapOf(mock<Node>() to listOf(NodeChanges.New))
             )
             photosRepository.stub {
                 onBlocking { searchMegaPhotos() }.thenReturn(emptyList(), expected)
+            }
+            nodeRepository.stub {
                 onBlocking { monitorNodeUpdates() }.thenReturn(flowOf(update))
             }
-
             underTest().test {
                 awaitItem()
                 assertThat(awaitItem()).isEqualTo(expected)
@@ -66,13 +73,14 @@ class DefaultGetTimelinePhotosTest {
         runTest {
             val expected = listOf<Photo>(mock())
             val update = NodeUpdate(
-                mapOf(NodeId(1L) to listOf(NodeChanges.Favourite))
+                mapOf(mock<Node>() to listOf(NodeChanges.Favourite))
             )
             photosRepository.stub {
                 onBlocking { searchMegaPhotos() }.thenReturn(emptyList(), expected)
+            }
+            nodeRepository.stub {
                 onBlocking { monitorNodeUpdates() }.thenReturn(flowOf(update))
             }
-
             underTest().test {
                 awaitItem()
                 assertThat(awaitItem()).isEqualTo(expected)
@@ -85,13 +93,14 @@ class DefaultGetTimelinePhotosTest {
         runTest {
             val expected = listOf<Photo>(mock())
             val update = NodeUpdate(
-                mapOf(NodeId(1L) to listOf(NodeChanges.Attributes))
+                mapOf(mock<Node>() to listOf(NodeChanges.Attributes))
             )
             photosRepository.stub {
                 onBlocking { searchMegaPhotos() }.thenReturn(emptyList(), expected)
+            }
+            nodeRepository.stub {
                 onBlocking { monitorNodeUpdates() }.thenReturn(flowOf(update))
             }
-
             underTest().test {
                 awaitItem()
                 assertThat(awaitItem()).isEqualTo(expected)
@@ -104,13 +113,14 @@ class DefaultGetTimelinePhotosTest {
         runTest {
             val expected = listOf<Photo>(mock())
             val update = NodeUpdate(
-                mapOf(NodeId(1L) to listOf(NodeChanges.Parent))
+                mapOf(mock<Node>() to listOf(NodeChanges.Parent))
             )
             photosRepository.stub {
                 onBlocking { searchMegaPhotos() }.thenReturn(emptyList(), expected)
+            }
+            nodeRepository.stub {
                 onBlocking { monitorNodeUpdates() }.thenReturn(flowOf(update))
             }
-
             underTest().test {
                 awaitItem()
                 assertThat(awaitItem()).isEqualTo(expected)

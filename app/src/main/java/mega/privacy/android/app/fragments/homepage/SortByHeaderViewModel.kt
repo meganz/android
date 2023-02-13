@@ -9,14 +9,16 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
+import mega.privacy.android.app.fragments.homepage.model.SortByHeaderState
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOfflineSortOrder
@@ -25,11 +27,13 @@ import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetOfflineSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import javax.inject.Inject
 
 /**
- * ViewModel in charge of manage actions from sub-headers in which view mode (list or grid)
- * and sort by options can be changed.
+ * ViewModel in charge of manage actions from sub-headers in which the view type and
+ * sort by options can be changed.
  */
 @HiltViewModel
 class SortByHeaderViewModel @Inject constructor(
@@ -37,11 +41,20 @@ class SortByHeaderViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     private val getOfflineSortOrder: GetOfflineSortOrder,
+    private val monitorViewType: MonitorViewType,
     private val setCameraSortOrder: SetCameraSortOrder,
     private val setCloudSortOrder: SetCloudSortOrder,
     private val setOthersSortOrder: SetOthersSortOrder,
     private val setOfflineSortOrder: SetOfflineSortOrder,
+    private val setViewType: SetViewType,
 ) : ViewModel() {
+
+    private val _state = MutableStateFlow(SortByHeaderState())
+
+    /**
+     * Sort By Header State
+     */
+    val state: StateFlow<SortByHeaderState> = _state
 
     private val ordersDefault = SortOrder.ORDER_DEFAULT_ASC
     private val cameraOrderDefault = SortOrder.ORDER_MODIFICATION_DESC
@@ -51,7 +64,7 @@ class SortByHeaderViewModel @Inject constructor(
     /**
      * Camera Sort Order
      */
-    val cameraSortOrder: StateFlow<SortOrder> = _cameraSortOrder
+    private val cameraSortOrder: StateFlow<SortOrder> = _cameraSortOrder
 
     private val _cloudSortOrder = MutableStateFlow(ordersDefault)
 
@@ -74,12 +87,6 @@ class SortByHeaderViewModel @Inject constructor(
      */
     val offlineSortOrder: StateFlow<SortOrder> = _offlineSortOrder
 
-    /**
-     * Boolean for List or Grid
-     */
-    var isList = true
-        private set
-
     private val _showDialogEvent = MutableLiveData<Event<Unit>>()
 
     /**
@@ -87,17 +94,19 @@ class SortByHeaderViewModel @Inject constructor(
      */
     val showDialogEvent: LiveData<Event<Unit>> = _showDialogEvent
 
-    private val _listGridChangeEvent = MutableLiveData<Event<Boolean>>()
+    /**
+     * Checks whether the current View Type is [ViewType.LIST] or not
+     *
+     * @return True if the current View Type is [ViewType.LIST]
+     */
+    fun isListView() = getStateViewType() == ViewType.LIST
 
     /**
-     * List/Grid Change Event
+     * The [ViewType] from [SortByHeaderState]
+     *
+     * @return [ViewType]
      */
-    val listGridChangeEvent: LiveData<Event<Boolean>> = _listGridChangeEvent
-
-    private val listGridChangeObserver = Observer<Boolean> {
-        isList = it
-        _listGridChangeEvent.value = Event(it)
-    }
+    private fun getStateViewType() = _state.value.viewType
 
     /** Triple<SortOrder, SortOrder, SortOrder>:
     - First: Cloud order
@@ -132,10 +141,6 @@ class SortByHeaderViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_ORDER_CHANGE)
             .observeStickyForever(orderChangeObserver as Observer<Any>)
-        LiveEventBus.get(
-            EVENT_LIST_GRID_CHANGE,
-            Boolean::class.java
-        ).observeStickyForever(listGridChangeObserver)
 
         viewModelScope.launch {
             _cameraSortOrder.value = getCameraSortOrder()
@@ -143,6 +148,10 @@ class SortByHeaderViewModel @Inject constructor(
             _othersSortOrder.value = getOthersSortOrder()
             _offlineSortOrder.value = getOfflineSortOrder()
             setOldOrder()
+
+            monitorViewType().collect { viewType ->
+                _state.update { it.copy(viewType = viewType) }
+            }
         }
     }
 
@@ -164,7 +173,7 @@ class SortByHeaderViewModel @Inject constructor(
     /**
      * Set Old Order
      */
-    fun setOldOrder() {
+    private fun setOldOrder() {
         val order = when (this.orderType) {
             Constants.ORDER_CLOUD -> cloudSortOrder.value
             Constants.ORDER_CAMERA -> cameraSortOrder.value
@@ -216,10 +225,17 @@ class SortByHeaderViewModel @Inject constructor(
     }
 
     /**
-     * Switch List/Grid
+     * Switches to a different View type
      */
-    fun switchListGrid() {
-        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java).post(!isList)
+    fun switchViewType() {
+        viewModelScope.launch {
+            when (getStateViewType()) {
+                ViewType.LIST -> setViewType(ViewType.GRID)
+                ViewType.GRID -> setViewType(ViewType.LIST)
+            }
+            LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
+                .post(isListView())
+        }
     }
 
     /**
@@ -236,10 +252,6 @@ class SortByHeaderViewModel @Inject constructor(
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_ORDER_CHANGE)
             .removeObserver(orderChangeObserver as Observer<Any>)
-        LiveEventBus.get(
-            EVENT_LIST_GRID_CHANGE,
-            Boolean::class.java
-        ).removeObserver(listGridChangeObserver)
     }
 
     companion object {

@@ -65,16 +65,16 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
@@ -140,9 +140,11 @@ class SettingsFragment :
     ): View {
         val v = super.onCreateView(inflater, container, savedInstanceState)
         val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        requireContext().bindService(playerServiceIntent,
+        requireContext().bindService(
+            playerServiceIntent,
             mediaServiceConnection,
-            Context.BIND_AUTO_CREATE)
+            Context.BIND_AUTO_CREATE
+        )
         return v
     }
 
@@ -177,7 +179,7 @@ class SettingsFragment :
                         isEnabled = state.deleteEnabled
                     }
 
-                    //        TODO: Move Summaries to initialise and update summaries methods
+
                     val startScreenSummary =
                         resources.getStringArray(R.array.settings_start_screen)[state.startScreen]
                     findPreference<Preference>(KEY_START_SCREEN)?.summary = startScreenSummary
@@ -298,13 +300,19 @@ class SettingsFragment :
                 )
             )
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
-                twoFactorAuthenticationLauncher.launch(Intent(context,
-                    VerifyTwoFactorActivity::class.java).apply {
+                twoFactorAuthenticationLauncher.launch(Intent(
+                    context,
+                    VerifyTwoFactorActivity::class.java
+                ).apply {
                     putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, Constants.DISABLE_2FA)
                 })
             } else {
-                twoFactorAuthenticationLauncher.launch(Intent(context,
-                    TwoFactorAuthenticationActivity::class.java))
+                twoFactorAuthenticationLauncher.launch(
+                    Intent(
+                        context,
+                        TwoFactorAuthenticationActivity::class.java
+                    )
+                )
             }
             KEY_QR_CODE_AUTO_ACCEPT -> {
                 viewModel.toggleAutoAcceptPreference()
@@ -372,7 +380,8 @@ class SettingsFragment :
             )
             KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> {
                 val checked = findPreference<SwitchPreferenceCompat>(
-                    KEY_AUDIO_BACKGROUND_PLAY_ENABLED)?.isChecked == true
+                    KEY_AUDIO_BACKGROUND_PLAY_ENABLED
+                )?.isChecked == true
                 playerServiceViewModelGateway?.toggleBackgroundPlay(checked)
             }
             KEY_START_SCREEN -> startActivity(
@@ -396,7 +405,8 @@ class SettingsFragment :
                         if (checked)
                             MediaDiscoveryViewSettings.ENABLED.ordinal
                         else
-                            MediaDiscoveryViewSettings.DISABLED.ordinal)
+                            MediaDiscoveryViewSettings.DISABLED.ordinal
+                    )
                 }
             }
         }
@@ -555,9 +565,11 @@ class SettingsFragment :
             val fragment = findPreference<Preference>(requestKey)?.fragment
 
             result.getString(fragment)?.let {
-                Snackbar.make(requireActivity().findViewById(android.R.id.content),
+                Snackbar.make(
+                    requireActivity().findViewById(android.R.id.content),
                     it,
-                    Snackbar.LENGTH_LONG).apply {
+                    Snackbar.LENGTH_LONG
+                ).apply {
                     view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                         .maxLines = 5
                 }.show()

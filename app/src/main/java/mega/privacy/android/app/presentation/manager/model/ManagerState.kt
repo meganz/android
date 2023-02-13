@@ -27,4 +27,5 @@ data class ManagerState(
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val pendingActionsCount: Int = 0,
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,
+    val showSyncSection: Boolean = false
 )

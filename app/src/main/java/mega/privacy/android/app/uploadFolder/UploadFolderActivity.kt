@@ -25,6 +25,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -46,6 +47,7 @@ import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
@@ -96,6 +98,9 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         }
     }
 
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -110,11 +115,13 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 result.data?.getParcelableArrayListExtra(
                                     INTENT_EXTRA_COLLISION_RESULTS,
-                                    NameCollisionResult::class.java)
+                                    NameCollisionResult::class.java
+                                )
                             } else {
                                 @Suppress("DEPRECATION")
                                 result.data?.getParcelableArrayListExtra(
-                                    INTENT_EXTRA_COLLISION_RESULTS)
+                                    INTENT_EXTRA_COLLISION_RESULTS
+                                )
                             }
 
                         viewModel.proceedWithUpload(this, collisionsResult)
@@ -138,16 +145,22 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             intent.data?.let { uri ->
                 DocumentFile.fromTreeUri(this@UploadFolderActivity, uri)?.let { documentFile ->
                     viewModel.retrieveFolderContent(
-                        documentFile,
-                        intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE),
-                        sortByHeaderViewModel.order.third,
-                        sortByHeaderViewModel.isList
+                        documentFile = documentFile,
+                        parentHandle = intent.getLongExtra(
+                            INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                            INVALID_HANDLE
+                        ),
+                        order = sortByHeaderViewModel.order.third,
+                        isList = sortByHeaderViewModel.isListView(),
                     )
                 }
             }
         }
     }
 
+    /**
+     * onCreateOptionsMenu
+     */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_upload_folder, menu)
         searchMenuItem = menu.findItem(R.id.action_search).apply {
@@ -169,6 +182,9 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         return super.onCreateOptionsMenu(menu)
     }
 
+    /**
+     * onOptionsItemSelected
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> onBackPressedCallback.handleOnBackPressed()
@@ -177,6 +193,26 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * checkScroll
+     */
+    override fun checkScroll() {
+        val showElevation =
+            binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
+                    || binding.progressBar.isVisible
+
+        binding.appBar.elevation = if (showElevation) elevation else 0F
+
+        if (Util.isDarkMode(this@UploadFolderActivity)) {
+            val color = if (showElevation) elevationColor else noElevationColor
+            window.statusBarColor = color
+            binding.toolbar.setBackgroundColor(color)
+        }
+    }
+
+    /**
+     * Setup the Views of the Activity
+     */
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
@@ -202,8 +238,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         }
 
         binding.fastscroll.setRecyclerView(binding.list)
-
-        switchListGrid(sortByHeaderViewModel.isList)
 
         binding.cancelButton.setOnClickListener {
             setResult(Activity.RESULT_CANCELED)
@@ -246,7 +280,16 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         checkScroll()
     }
 
+    /**
+     * Sets up the Observers
+     */
     private fun setupObservers() {
+        collectFlow(sortByHeaderViewModel.state) { state ->
+            val viewType = state.viewType
+            switchViewType(viewType)
+            viewModel.setIsList(viewType == ViewType.LIST)
+        }
+
         viewModel.getCurrentFolder().observe(this, ::showCurrentFolder)
         viewModel.getFolderItems().observe(this, ::showFolderContent)
         viewModel.getSelectedItems().observe(this, ::updateActionMode)
@@ -260,11 +303,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         sortByHeaderViewModel.orderChangeEvent.observe(this, EventObserver { order ->
             folderContentAdapter.notifyItemChanged(0)
             viewModel.setOrder(order.third)
-        })
-
-        sortByHeaderViewModel.listGridChangeEvent.observe(this, EventObserver { isList ->
-            switchListGrid(isList)
-            viewModel.setIsList(isList)
         })
 
         LiveEventBus.get(EVENT_SCANNING_TRANSFERS_CANCELLED, Boolean::class.java)
@@ -421,7 +459,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
         positions.forEach { position ->
             binding.list.findViewHolderForAdapterPosition(position)?.apply {
                 val imageView: ImageView = when {
-                    sortByHeaderViewModel.isList -> itemView.findViewById(R.id.selected_icon)
+                    sortByHeaderViewModel.isListView() -> itemView.findViewById(R.id.selected_icon)
                     else -> {
                         itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
                         itemView.findViewById(R.id.selected_icon)
@@ -459,43 +497,32 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
     }
 
     /**
-     * Switches the view from list to grid and vice versa.
+     * Switches how Items are being displayed
      *
-     * @param isList True if the view should be list, false if should be grid.
+     * @param viewType The View Type
      */
-    private fun switchListGrid(isList: Boolean) {
+    private fun switchViewType(viewType: ViewType) {
         binding.list.apply {
-            if (isList) {
-                switchToLinear()
+            when (viewType) {
+                ViewType.LIST -> {
+                    switchToLinear()
 
-                if (itemDecorationCount == 0) {
-                    addItemDecoration(itemDecoration)
+                    if (itemDecorationCount == 0) {
+                        addItemDecoration(itemDecoration)
+                    }
                 }
-            } else {
-                switchBackToGrid()
-                (layoutManager as CustomizedGridLayoutManager).spanSizeLookup =
-                    folderContentAdapter.getSpanSizeLookup((layoutManager as CustomizedGridLayoutManager).spanCount)
+                ViewType.GRID -> {
+                    switchBackToGrid()
+                    (layoutManager as CustomizedGridLayoutManager).spanSizeLookup =
+                        folderContentAdapter.getSpanSizeLookup((layoutManager as CustomizedGridLayoutManager).spanCount)
 
-                if (itemDecorationCount > 0) {
-                    post {
-                        removeItemDecoration(itemDecoration)
+                    if (itemDecorationCount > 0) {
+                        post {
+                            removeItemDecoration(itemDecoration)
+                        }
                     }
                 }
             }
-        }
-    }
-
-    override fun checkScroll() {
-        val showElevation =
-            binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
-                    || binding.progressBar.isVisible
-
-        binding.appBar.elevation = if (showElevation) elevation else 0F
-
-        if (Util.isDarkMode(this@UploadFolderActivity)) {
-            val color = if (showElevation) elevationColor else noElevationColor
-            window.statusBarColor = color
-            binding.toolbar.setBackgroundColor(color)
         }
     }
 }

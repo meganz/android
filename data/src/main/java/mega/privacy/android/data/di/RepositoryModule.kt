@@ -15,10 +15,8 @@ import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultChatRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
-import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
-import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
 import mega.privacy.android.data.repository.DefaultGetMeetingsRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
@@ -38,13 +36,16 @@ import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
+import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.GlobalStatesRepository
-import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
+import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
+import mega.privacy.android.data.repository.SyncRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
+import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -62,7 +63,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
-import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -77,9 +77,11 @@ import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.StreamingServerRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.repository.SyncRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
+import mega.privacy.android.domain.repository.ViewTypeRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -116,6 +118,10 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindSupportRepository(implementation: DefaultSupportRepository): SupportRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncRepository(implementation: SyncRepositoryImpl): SyncRepository
 
     @Binds
     abstract fun bindNotificationsRepository(repository: DefaultNotificationsRepository): NotificationsRepository

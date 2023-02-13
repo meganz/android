@@ -6,11 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.wifi.WifiManager
-import android.net.wifi.WifiManager.WifiLock
 import android.os.Build
 import android.os.IBinder
-import android.os.PowerManager
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
 import androidx.exifinterface.media.ExifInterface
@@ -55,6 +52,8 @@ import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
+import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
+import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.BackupState
@@ -175,7 +174,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         const val CU_CACHE_FOLDER = "cu"
 
         private var ignoreAttr = false
-        private var running = false
 
         /**
          * Is Camera Upload running now
@@ -507,13 +505,23 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var resetTotalUploads: ResetTotalUploads
 
     /**
+     * Camera Service Wake Lock Handler
+     */
+    @Inject
+    lateinit var cameraServiceWakeLockHandler: CameraServiceWakeLockHandler
+
+    /**
+     * Camera Service Wifi Lock Handler
+     */
+    @Inject
+    lateinit var cameraServiceWifiLockHandler: CameraServiceWifiLockHandler
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
 
     private var receiver: NetworkTypeChangeReceiver? = null
-    private var wifiLock: WifiLock? = null
-    private var wakeLock: PowerManager.WakeLock? = null
     private var videoCompressor: VideoCompressor? = null
     private var notification: Notification? = null
     private var notificationManager: NotificationManager? = null
@@ -530,7 +538,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var totalToUpload = 0
     private var lastUpdated: Long = 0
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
-    private val cuTransfers: MutableList<MegaTransfer> = mutableListOf()
 
     private fun monitorUploadPauseStatus() {
         coroutineScope?.launch {
@@ -1113,7 +1120,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
         startActiveHeartbeat(finalList)
         for (file in finalList) {
-            if (!running) break
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
 
@@ -1125,7 +1131,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
                     // Only retry for 60 seconds
                     var counter = 60
-                    while (ERROR_NOT_ENOUGH_SPACE == newPath && running && counter != 0) {
+                    while (ERROR_NOT_ENOUGH_SPACE == newPath && counter != 0) {
                         counter--
                         try {
                             Timber.d("Waiting for disk space to process")
@@ -1259,22 +1265,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private fun onGlobalTransferUpdated(globalTransfer: GlobalTransfer) {
         when (globalTransfer) {
-            is GlobalTransfer.OnTransferStart -> onTransferStarted(globalTransfer)
             is GlobalTransfer.OnTransferFinish -> onTransferFinished(globalTransfer)
             is GlobalTransfer.OnTransferUpdate -> onTransferUpdated(globalTransfer)
             is GlobalTransfer.OnTransferTemporaryError -> onTransferTemporaryError(globalTransfer)
-            // No further action necessary for this scenario
-            is GlobalTransfer.OnTransferData -> Unit
+            // No further action necessary for these Scenarios
+            is GlobalTransfer.OnTransferStart,
+            is GlobalTransfer.OnTransferData
+            -> Unit
         }
-    }
-
-    /**
-     * Handle logic for when an upload begins
-     *
-     * @param globalTransfer [GlobalTransfer.OnTransferStart]
-     */
-    private fun onTransferStarted(globalTransfer: GlobalTransfer.OnTransferStart) {
-        cuTransfers.add(globalTransfer.transfer)
     }
 
     /**
@@ -1439,8 +1437,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      * When the user is not logged in, perform a Complete Fast Login procedure
      */
     private suspend fun performCompleteFastLogin() {
-        running = true
-
         Timber.d("Waiting for the user to complete the Fast Login procedure")
 
         // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
@@ -1549,19 +1545,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
 
     private fun initService() {
         registerNetworkTypeChangeReceiver()
-
-        val wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF
-        val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
-        wifiLock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock")
-        val pm = getSystemService(POWER_SERVICE) as PowerManager
-        wakeLock =
-            pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock:")
-        if (wakeLock?.isHeld == false) {
-            wakeLock?.acquire()
-        }
-        if (wifiLock?.isHeld == false) {
-            wifiLock?.acquire()
-        }
+        startWakeAndWifiLocks()
 
         stopByNetworkStateChange = false
         lastUpdated = 0
@@ -1569,7 +1553,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         totalToUpload = 0
         canceled = false
         isOverQuota = false
-        running = true
 
         cameraServiceIpChangeHandler.start()
         // end new logic
@@ -1589,18 +1572,32 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
+    /**
+     * When [CameraUploadsService] is initialized, start the Wake and Wifi Locks
+     */
+    private fun startWakeAndWifiLocks() {
+        cameraServiceWakeLockHandler.startWakeLock()
+        cameraServiceWifiLockHandler.startWifiLock()
+    }
+
+    /**
+     * When [CameraUploadsService] ends, Stop both Wake and Wifi Locks
+     */
+    private fun stopWakeAndWifiLocks() {
+        cameraServiceWakeLockHandler.stopWakeLock()
+        cameraServiceWifiLockHandler.stopWifiLock()
+    }
+
     private fun endService() {
         Timber.d("Finish Camera upload process.")
-        releaseLocks()
+        stopWakeAndWifiLocks()
         if (isOverQuota) {
             showStorageOverQuotaNotification()
             JobUtil.fireStopCameraUploadJob(this)
         }
 
         videoCompressor?.stop()
-        cuTransfers.clear()
         canceled = true
-        running = false
         stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
@@ -2181,22 +2178,5 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             return ERROR_CREATE_FILE_IO_ERROR
         }
         return destPath
-    }
-
-    private fun releaseLocks() {
-        if (wifiLock?.isHeld == true) {
-            try {
-                wifiLock?.release()
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
-        if (wakeLock?.isHeld == true) {
-            try {
-                wakeLock?.release()
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
-        }
     }
 }

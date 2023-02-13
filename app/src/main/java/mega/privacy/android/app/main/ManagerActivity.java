@@ -16,7 +16,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_H
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
@@ -287,7 +286,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -368,6 +366,7 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.presentation.settings.model.TargetPreference;
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment;
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter;
@@ -375,6 +374,7 @@ import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewM
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity;
+import mega.privacy.android.app.presentation.sync.SyncFragment;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
@@ -425,6 +425,7 @@ import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
+import mega.privacy.android.domain.entity.preference.ViewType;
 import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -690,6 +691,7 @@ public class ManagerActivity extends TransfersManagementActivity
     // Fragments
     private FileBrowserFragment fileBrowserFragment;
     private RubbishBinFragment rubbishBinFragment;
+    private SyncFragment syncFragment;
     private InboxFragment inboxFragment;
     private MegaNodeBaseFragment incomingSharesFragment;
     private MegaNodeBaseFragment outgoingSharesFragment;
@@ -754,6 +756,7 @@ public class ManagerActivity extends TransfersManagementActivity
     RelativeLayout inboxSection;
     RelativeLayout contactsSection;
     RelativeLayout notificationsSection;
+    private RelativeLayout syncSection;
     private RelativeLayout rubbishBinSection;
     RelativeLayout settingsSection;
     Button upgradeAccount;
@@ -1433,18 +1436,12 @@ public class ManagerActivity extends TransfersManagementActivity
         registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
 
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
-                .observe(this, this::updateView);
+                .observe(this, this::updateViews);
 
         registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .observeForever(refreshAddPhoneNumberButtonObserver);
-
-        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean.class).observe(this, failed -> {
-            if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == TransfersTab.COMPLETED_TAB) {
-                retryTransfers.setVisible(failed);
-            }
-        });
 
         registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 
@@ -1525,27 +1522,17 @@ public class ManagerActivity extends TransfersManagementActivity
         prefs = dbH.getPreferences();
         if (prefs == null) {
             firstTimeAfterInstallation = true;
-            isList = true;
         } else {
             if (prefs.getFirstTime() == null) {
                 firstTimeAfterInstallation = true;
             } else {
                 firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
             }
-            if (prefs.getPreferredViewList() == null) {
-                isList = true;
-            } else {
-                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-            }
         }
 
         if (firstTimeAfterInstallation) {
             setStartScreenTimeStamp(this);
         }
-
-        Timber.d("Preferred View List: %s", isList);
-
-        LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         handler = new Handler();
 
@@ -1646,6 +1633,8 @@ public class ManagerActivity extends TransfersManagementActivity
         findViewById(R.id.offline_section).setOnClickListener(this);
         RelativeLayout transfersSection = findViewById(R.id.transfers_section);
         transfersSection.setOnClickListener(this);
+        syncSection = findViewById(R.id.sync_section);
+        syncSection.setOnClickListener(this);
         rubbishBinSection = findViewById(R.id.rubbish_bin_section);
         rubbishBinSection.setOnClickListener(this);
         settingsSection = findViewById(R.id.settings_section);
@@ -2484,6 +2473,9 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
+            if (managerState.getShowSyncSection()) {
+                syncSection.setVisibility(View.VISIBLE);
+            }
             if (managerState.getNodeUpdateReceived()) {
                 // Invalidate the menu will collapse/expand the search view and set the query text to ""
                 // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -2503,6 +2495,10 @@ public class ManagerActivity extends TransfersManagementActivity
                 TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
                 tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
             }
+            return Unit.INSTANCE;
+        });
+        ViewExtensionsKt.collectFlow(this, viewModel.getOnViewTypeChanged(), Lifecycle.State.STARTED, viewType -> {
+            updateViewType(viewType);
             return Unit.INSTANCE;
         });
 
@@ -2537,6 +2533,16 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             return Unit.INSTANCE;
         });
+    }
+
+    /**
+     * Updates the View Type
+     *
+     * @param viewType The new View Type
+     */
+    private void updateViewType(ViewType viewType) {
+        Timber.d("The updated View Type is %s", viewType.name());
+        isList = viewType == ViewType.LIST;
     }
 
     /**
@@ -3906,7 +3912,7 @@ public class ManagerActivity extends TransfersManagementActivity
     /**
      * When the user is in Photos, this sets the correct Toolbar Icon depending on
      * certain conditions.
-     *
+     * <p>
      * This is only called when there are no unread notifications
      */
     private void setPhotosNavigationToolbarIcon() {
@@ -4487,6 +4493,16 @@ public class ManagerActivity extends TransfersManagementActivity
                 supportInvalidateOptionsMenu();
                 setToolbarTitle();
                 showFabButton();
+                break;
+            }
+            case SYNC: {
+                syncFragment = (SyncFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.SYNC.getTag());
+                if (syncFragment == null) {
+                    syncFragment = SyncFragment.newInstance();
+                }
+                setBottomNavigationMenuItemChecked(NO_BNV);
+                supportInvalidateOptionsMenu();
+                replaceFragment(syncFragment, FragmentTag.SYNC.getTag());
                 break;
             }
             case HOMEPAGE: {
@@ -5357,8 +5373,9 @@ public class ManagerActivity extends TransfersManagementActivity
         switch (id) {
             case android.R.id.home: {
                 if (isFirstNavigationLevel() && drawerItem != DrawerItem.SEARCH) {
-                    if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX
-                            || drawerItem == DrawerItem.NOTIFICATIONS || drawerItem == DrawerItem.TRANSFERS) {
+                    if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.RUBBISH_BIN
+                            || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
+                            || drawerItem == DrawerItem.TRANSFERS) {
 
                         backToDrawerItem(bottomNavigationCurrentItem);
                         if (transfersToImageViewer) {
@@ -5617,14 +5634,11 @@ public class ManagerActivity extends TransfersManagementActivity
         startActivity(intent);
     }
 
-    private void updateView(boolean isList) {
-        if (this.isList != isList) {
-            this.isList = isList;
-            dbH.setPreferredViewList(isList);
-        }
-
-        LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
-
+    /**
+     * Updates the views of different Fragments
+     */
+    private void updateViews(boolean isList) {
+        dbH.setPreferredViewList(isList);
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
 
@@ -5732,6 +5746,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     performOnBack();
                 }
             }
+        } else if (drawerItem == DrawerItem.SYNC) {
+            backToDrawerItem(bottomNavigationCurrentItem);
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             rubbishBinFragment = (RubbishBinFragment) getSupportFragmentManager()
                     .findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
@@ -7631,6 +7647,12 @@ public class ManagerActivity extends TransfersManagementActivity
                 drawerItem = DrawerItem.TRANSFERS;
                 break;
 
+            case R.id.sync_section: {
+                sectionClicked = true;
+                drawerItem = DrawerItem.SYNC;
+                break;
+            }
+
             case R.id.rubbish_bin_section:
                 sectionClicked = true;
                 drawerItem = DrawerItem.RUBBISH_BIN;
@@ -8455,7 +8477,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
 
-                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+
                 try {
                     ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
@@ -8478,7 +8500,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                 intent.setAction(ACTION_STORAGE_STATE_CHANGED);
 
-                // TODO: WORKAROUND, NEED TO IMPROVE AND REMOVE THE TRY-CATCH
+
                 try {
                     ContextCompat.startForegroundService(this, intent);
                 } catch (Exception e) {
@@ -9842,14 +9864,6 @@ public class ManagerActivity extends TransfersManagementActivity
         return isList;
     }
 
-    public void setList(boolean isList) {
-        this.isList = isList;
-    }
-
-    public boolean isListCameraUploads() {
-        return false;
-    }
-
     public boolean getFirstLogin() {
         return viewModel.getState().getValue().isFirstLogin();
     }
@@ -11054,6 +11068,7 @@ public class ManagerActivity extends TransfersManagementActivity
         comesFromNotificationHandleSaved = -1;
         refreshCloudDrive();
     }
+
     /**
      * Updates Inbox section visibility depending on if it has children.
      *

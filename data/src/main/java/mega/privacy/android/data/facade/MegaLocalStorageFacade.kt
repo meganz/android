@@ -362,6 +362,34 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearEphemeral() = dbHandler.clearEphemeral()
 
+    override suspend fun clearCredentials() = dbHandler.clearCredentials()
+
+    override suspend fun clearPreferences() = dbHandler.clearPreferences()
+
+    override suspend fun setFirstTime(firstTime: Boolean) = dbHandler.setFirstTime(firstTime)
+
+    override suspend fun clearOffline() = dbHandler.clearOffline()
+
+    override suspend fun clearContacts() = dbHandler.clearContacts()
+
+    override suspend fun clearNonContacts() = dbHandler.clearNonContacts()
+
+    override suspend fun clearChatItems() = dbHandler.clearChatItems()
+
+    override suspend fun clearCompletedTransfers() = dbHandler.clearCompletedTransfers()
+
+    override suspend fun clearPendingMessages() = dbHandler.clearPendingMessage()
+
+    override suspend fun clearAttributes() = dbHandler.clearAttributes()
+
+    override suspend fun deleteAllSyncRecordsTypeAny() = dbHandler.deleteAllSyncRecordsTypeAny()
+
+    override suspend fun clearChatSettings() = dbHandler.clearChatSettings()
+
+    override suspend fun clearBackups() = dbHandler.clearBackups()
+
+    override suspend fun clearMegaContacts() = dbHandler.clearMegaContacts()
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }

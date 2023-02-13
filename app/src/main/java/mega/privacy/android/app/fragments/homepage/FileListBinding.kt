@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.gallery.adapter.GalleryCardAdapter
-import mega.privacy.android.app.gallery.data.GalleryItem
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
@@ -23,36 +21,7 @@ import java.io.File
 @BindingAdapter("items")
 fun setItems(listView: RecyclerView, items: List<NodeItem>?) {
     items?.let {
-        // When the list's adapter is GalleryCardViewAdapter, its item type is GalleryCard, can't cast to NodeItem.
-        // Just avoid the casting.
-        if (listView.adapter !is GalleryCardAdapter) {
-            (listView.adapter as ListAdapter<NodeItem, RecyclerView.ViewHolder>).submitList(it)
-        }
-    }
-}
-
-@Suppress("UNCHECKED_CAST")
-@BindingAdapter("galleryItems")
-fun setGalleryItems(listView: RecyclerView, items: List<GalleryItem>?) {
-    items?.let {
-        // When the list's adapter is GalleryCardViewAdapter, its item type is GalleryCard, can't cast to NodeItem.
-        // Just avoid the casting.
-        if (listView.adapter !is GalleryCardAdapter) {
-            (listView.adapter as ListAdapter<GalleryItem, RecyclerView.ViewHolder>).submitList(it)
-        }
-    }
-}
-
-@BindingAdapter("thumbnail", "selected")
-fun setGridItemThumbnail(imageView: SimpleDraweeView, file: File?, selected: Boolean) {
-    with(imageView) {
-        if (isFileAvailable(file)) {
-            setImageURI(Uri.fromFile(file))
-        } else {
-            setActualImageResource(R.drawable.ic_image_thumbnail)
-        }
-
-        hierarchy.roundingParams = if (selected) getRoundingParams(context) else null
+        (listView.adapter as ListAdapter<NodeItem, RecyclerView.ViewHolder>).submitList(it)
     }
 }
 
@@ -61,12 +30,13 @@ fun setListItemThumbnail(
     imageView: SimpleDraweeView,
     file: File?,
     selected: Boolean,
-    defaultThumbnail: Int
+    defaultThumbnail: Int,
 ) {
     with(imageView) {
         when {
             selected -> {
-                hierarchy.setOverlayImage(ContextCompat.getDrawable(context, R.drawable.ic_select_folder))
+                hierarchy.setOverlayImage(ContextCompat.getDrawable(context,
+                    R.drawable.ic_select_folder))
             }
             isFileAvailable(file) -> {
                 hierarchy.setOverlayImage(null)
@@ -125,9 +95,9 @@ fun getRoundingParamsWithoutBorder(context: Context): RoundingParams? {
     }
 
     roundingParams = RoundingParams.fromCornersRadius(
-            Util.dp2px(
-                    context.resources.getDimension(R.dimen.chat_gallery_files_round_corner_radius),
-            ).toFloat()
+        Util.dp2px(
+            context.resources.getDimension(R.dimen.chat_gallery_files_round_corner_radius),
+        ).toFloat()
     )
 
     return roundingParams

@@ -34,6 +34,10 @@ internal class CacheFolderFacade @Inject constructor(
     companion object {
         private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
         private const val AVATAR_FOLDER = "avatarsMEGA"
+        private const val OLD_TEMPORARY_PIC_DIR = "MEGA/MEGA AppTemp"
+        private const val OLD_PROFILE_PID_DIR = "MEGA/MEGA Profile Images"
+        private const val OLD_ADVANCES_DEVICES_DIR = "MEGA/MEGA Temp"
+        private const val OLD_CHAT_TEMPORARY_DIR = "MEGA/MEGA Temp/Chat"
     }
 
     override fun getCacheFolder(folderName: String): File? =
@@ -141,4 +145,23 @@ internal class CacheFolderFacade @Inject constructor(
         getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.let { thumbnail ->
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
         }?.takeUnless { megaNode.isFolder }
+
+    override suspend fun removeOldTempFolders() {
+        appScope.launch(ioDispatcher) {
+            removeOldTempFolder(OLD_TEMPORARY_PIC_DIR)
+            removeOldTempFolder(OLD_PROFILE_PID_DIR)
+            removeOldTempFolder(OLD_ADVANCES_DEVICES_DIR)
+            removeOldTempFolder(OLD_CHAT_TEMPORARY_DIR)
+        }
+    }
+
+    override suspend fun clearAppData() {
+        Timber.d("clearAppData")
+        try {
+            fileGateway.deleteFolderAndSubFolders(context.filesDir)
+        } catch (e: IOException) {
+            Timber.e(e)
+            Timber.e("Exception deleting private cache", e)
+        }
+    }
 }

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import java.util.Queue
 
@@ -492,4 +493,15 @@ interface CameraUploadRepository {
                 " * provide more data and avoid race conditions. They could change or be removed in the current form.",
     )
     fun getNumberOfPendingUploads(): Int
+
+    /**
+     * compress videos
+     * @param records list of [SyncRecord]
+     * @return flow of [VideoCompressionState]
+     */
+    fun compressVideos(
+        root: String,
+        quality: VideoQuality,
+        records: List<SyncRecord>,
+    ): Flow<VideoCompressionState>
 }

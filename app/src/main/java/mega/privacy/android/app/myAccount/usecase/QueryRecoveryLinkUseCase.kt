@@ -50,7 +50,7 @@ class QueryRecoveryLinkUseCase @Inject constructor(
                     emitter.onSuccess(
                         when (error.errorCode) {
                             API_OK -> request.link
-                            API_EACCESS -> getString(R.string.error_not_logged_with_correct_account)
+                            API_EACCESS -> getString(R.string.account_change_email_error_not_logged_with_correct_account_message)
                             else -> getString(R.string.invalid_link)
                         }
                     )

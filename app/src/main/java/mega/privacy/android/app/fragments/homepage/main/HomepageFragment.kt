@@ -146,7 +146,7 @@ class HomepageFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
@@ -187,7 +187,7 @@ class HomepageFragment : Fragment() {
         if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
             showChooseStartScreenDialog()
         }
-        viewLifecycleOwner.lifecycleScope.launch { 
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.isConnected.flowWithLifecycle(
                 viewLifecycleOwner.lifecycle
             ).collect { isConnected ->
@@ -455,7 +455,8 @@ class HomepageFragment : Fragment() {
      */
     private fun setupMask() {
         windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
-        fabMaskLayoutDataBinding = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false)
+        fabMaskLayoutDataBinding =
+            FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false)
     }
 
     /**
@@ -503,7 +504,7 @@ class HomepageFragment : Fragment() {
             }
 
             setBottomSheetMaxHeight()
-            false // TODO Refactor this behavior, is a bad practice to keep a GlobalLayoutObserver alive
+            false
         }
     }
 
@@ -628,10 +629,12 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     private fun openNewChatActivity() = doIfOnline(true) {
-        activity?.startActivityForResult(Intent(activity, StartConversationActivity::class.java),
-            REQUEST_CREATE_CHAT)
+        activity?.startActivityForResult(
+            Intent(activity, StartConversationActivity::class.java),
+            REQUEST_CREATE_CHAT
+        )
     }
 
     private fun showUploadPanel() = doIfOnline(true) {

@@ -77,14 +77,12 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment;
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment;
 import mega.privacy.android.app.main.providers.ProviderPageAdapter;
@@ -94,7 +92,9 @@ import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.entity.user.UserCredentials;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1626,7 +1626,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Override
     public void onReloadNeeded(MegaApiJava api) {
-        // TODO Auto-generated method stub
+
 
     }
 
@@ -1643,7 +1643,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Override
     public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-        // TODO Auto-generated method stub
+
 
     }
 
@@ -1715,7 +1715,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Override
     public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-        // TODO Auto-generated method stub
+
 
     }
 
@@ -1730,20 +1730,20 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
                                   byte[] buffer) {
-        // TODO Auto-generated method stub
+
         return false;
     }
 
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-        // TODO Auto-generated method stub
+
 
     }
 
     @Override
     public void onContactRequestsUpdate(MegaApiJava api,
                                         ArrayList<MegaContactRequest> requests) {
-        // TODO Auto-generated method stub
+
 
     }
 

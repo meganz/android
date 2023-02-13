@@ -267,6 +267,30 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/sync_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/sync_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="start|center_vertical"
+                    android:text="Sync"
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/grey_012_white_012" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:id="@+id/rubbish_bin_section"
                 android:layout_width="match_parent"
                 android:layout_height="56dp">

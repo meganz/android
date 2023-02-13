@@ -80,22 +80,6 @@ internal class UIPreferencesDatastore @Inject constructor(
         }
     }
 
-    override fun monitorStartScreenLoginTimestamp(): Flow<Long?> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setStartScreenLoginTimestamp(value: Long) {
-        TODO("Not yet implemented")
-    }
-
-    override fun monitorDoNotAlertAboutStartScreen(): Flow<Boolean?> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setDoNotAlertAboutStartScreen(value: Boolean) {
-        TODO("Not yet implemented")
-    }
-
     override fun monitorHideRecentActivity(): Flow<Boolean?> = context.uiPreferenceDataStore.data
         .catch { exception ->
             if (exception is IOException) {

@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -29,7 +30,7 @@ class DefaultGetAllFavoritesTest {
     private val nodeRepository = mock<NodeRepository> {
         on { monitorNodeUpdates() }.thenReturn(
             flowOf(
-                emptyList()
+                NodeUpdate(emptyMap())
             )
         )
     }
@@ -70,7 +71,7 @@ class DefaultGetAllFavoritesTest {
     fun `test that favourites returns result of getAllFavorites when a node update occur`() =
         runTest {
             whenever(favouritesRepository.getAllFavorites()).thenReturn(emptyList())
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(mock()))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
             Truth.assertThat(underTest().count()).isEqualTo(2)
         }
 }

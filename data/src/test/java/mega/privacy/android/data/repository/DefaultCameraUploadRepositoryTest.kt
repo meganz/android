@@ -8,11 +8,13 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.syncStatusToInt
+import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
@@ -45,6 +47,7 @@ class DefaultCameraUploadRepositoryTest {
     private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
+    private val videoCompressorGateway = mock<VideoCompressorGateway>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -77,7 +80,9 @@ class DefaultCameraUploadRepositoryTest {
             appEventGateway = mock(),
             broadcastReceiverGateway = mock(),
             videoQualityMapper = ::toVideoQuality,
-            syncStatusIntMapper = ::syncStatusToInt
+            syncStatusIntMapper = ::syncStatusToInt,
+            videoCompressorGateway = videoCompressorGateway,
+            videoAttachmentMapper = ::toVideoAttachment
         )
     }
 

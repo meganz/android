@@ -163,7 +163,7 @@ interface MegaChatApiGateway {
      * After request is finished, you can call to MegaChatApi::getUserFirstnameFromCache,
      * MegaChatApi::getUserLastnameFromCache, MegaChatApi::getUserFullnameFromCache,
      * MegaChatApi::getUserEmailFromCache (email will not available in anonymous mode)
-     * 
+     *
      * @param chatId Handle of the chat whose member attributes requested
      * @param userList List of user whose attributes has been requested
      * @param listener MegaChatRequestListener to track this request
@@ -330,6 +330,20 @@ interface MegaChatApiGateway {
      */
     fun fetchScheduledMeetingOccurrencesByChat(
         chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param since     Timestamp from which API will generate more occurrences
+     * @param listener MegaChatRequestListener to track this request
+     * @return The list of scheduled meetings occurrences.
+     */
+    fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        since: Long,
         listener: MegaChatRequestListenerInterface,
     )
 

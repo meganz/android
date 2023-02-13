@@ -43,6 +43,10 @@ class DocumentsViewModel @Inject constructor(
 
     private var _query = MutableLiveData<String>()
 
+    /**
+     * Serves as the original View Type.
+     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed
+     */
     var isList = true
     var skipNextAutoScroll = false
     var searchMode = false
@@ -152,6 +156,28 @@ class DocumentsViewModel @Inject constructor(
             sortOrder = getCloudSortOrder()
             loadDocuments(true)
         }
+    }
+
+    /**
+     * Readies the Search Functionality
+     */
+    fun readySearch() {
+        if (searchMode) return
+
+        searchMode = true
+        searchQuery = ""
+        refreshUi()
+    }
+
+    /**
+     * Exits the Search Functionality
+     */
+    fun exitSearch() {
+        if (!searchMode) return
+
+        searchMode = false
+        searchQuery = ""
+        refreshUi()
     }
 
     /**

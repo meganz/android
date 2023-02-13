@@ -19,6 +19,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -60,12 +61,16 @@ import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
+/**
+ * [Fragment] that handles Documents-related operations
+ */
 @AndroidEntryPoint
 class DocumentsFragment : Fragment(), HomepageSearchable {
 
@@ -83,6 +88,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
+    /**
+     * Used to access SDK-related functions
+     */
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -97,10 +105,13 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentDocumentsBinding.inflate(inflater, container, false).apply {
             viewModel = this@DocumentsFragment.viewModel
@@ -113,13 +124,18 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.cancelSearch()
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .removeObserver(fabChangeObserver)
+    /**
+     * onSaveInstanceState
+     */
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
@@ -144,24 +160,88 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            if ((state.viewType == ViewType.LIST) != viewModel.isList) {
+                // Changing the adapter will cause the scroll position to be lost
+                // To avoid that, the adapter will only change when the list/grid view
+                // really changes
+                switchViewType(state.viewType)
+                viewModel.refreshUi()
+            }
+        }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        viewModel.skipNextAutoScroll = true
+    /**
+     * onDestroyView
+     */
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.cancelSearch()
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
+            .removeObserver(fabChangeObserver)
     }
 
+    /**
+     * shouldShowSearchMenu
+     */
+    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
+
+    /**
+     * searchReady
+     */
+    override fun searchReady() {
+        // Rotate screen in action mode, the keyboard would pop up again, hide it
+        if (actionMode != null) {
+            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
+        }
+
+        viewModel.readySearch()
+
+        binding.addFabButton.hide()
+    }
+
+    /**
+     * exitSearch
+     */
+    override fun exitSearch() {
+        itemDecoration.setDrawAllDividers(false)
+        disableRecyclerViewAnimator(listView)
+        viewModel.exitSearch()
+
+        binding.addFabButton.show()
+
+    }
+
+    /**
+     * searchQuery
+     */
+    override fun searchQuery(query: String) {
+        if (viewModel.searchQuery == query) return
+        viewModel.searchQuery = query
+        viewModel.loadDocuments()
+    }
+
+    /**
+     * Setup empty hint behavior
+     */
     private fun setupEmptyHint() {
         with(binding.emptyHint) {
             emptyHintImage.isVisible = false
             emptyHintImage.setImageResource(R.drawable.ic_homepage_empty_document)
             emptyHintText.isVisible = false
-            emptyHintText.text = formatEmptyScreenText(requireContext(),
-                getString(R.string.homepage_empty_hint_documents))
+            emptyHintText.text = formatEmptyScreenText(
+                requireContext(),
+                getString(R.string.homepage_empty_hint_documents)
+            )
         }
     }
 
+    /**
+     * Perform a specific operation when online
+     *
+     * @param operation lambda that specifies the operation to be executed
+     */
     private fun doIfOnline(operation: () -> Unit) {
         if (viewModel.isConnected) {
             operation()
@@ -177,6 +257,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Setup the navigation of this feature
+     */
     private fun setupNavigation() {
         itemOperationViewModel.openItemEvent.observe(viewLifecycleOwner, EventObserver {
             openDoc(it.node, it.index)
@@ -202,53 +285,52 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.onOrderChange()
         })
-
-        sortByHeaderViewModel.listGridChangeEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { isList ->
-                if (isList != viewModel.isList) {
-                    // change adapter will cause lose scroll position,
-                    // to avoid that, we only change adapter when the list/grid view
-                    // really change.
-                    switchListGridView(isList)
-                }
-                viewModel.refreshUi()
-            })
     }
 
-    private fun switchListGridView(isList: Boolean) {
-        viewModel.isList = isList
-        if (isList) {
-            listView.switchToLinear()
-            listView.adapter = listAdapter
+    /**
+     * Switches how Audio items are being displayed
+     *
+     * @param viewType The View Type
+     */
+    private fun switchViewType(viewType: ViewType) {
+        viewModel.isList = viewType == ViewType.LIST
+        listView.apply {
+            when (viewType) {
+                ViewType.LIST -> {
+                    switchToLinear()
+                    adapter = listAdapter
 
-            if (listView.itemDecorationCount == 0) {
-                listView.addItemDecoration(itemDecoration)
-            }
-        } else {
-            listView.switchBackToGrid()
-            listView.adapter = gridAdapter
-            listView.removeItemDecoration(itemDecoration)
+                    if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
+                }
+                ViewType.GRID -> {
+                    switchBackToGrid()
+                    adapter = gridAdapter
+                    removeItemDecoration(itemDecoration)
 
-            (listView.layoutManager as CustomizedGridLayoutManager).apply {
-                spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                    (layoutManager as CustomizedGridLayoutManager).apply {
+                        spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
+                    }
+                }
             }
         }
     }
 
     /**
-     * Only refresh the list items of uiDirty = true
+     * Updates the UI by refreshing the list content
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList(it)
 
-        if (sortByHeaderViewModel.isList) {
+        if (sortByHeaderViewModel.isListView()) {
             listAdapter.submitList(newList)
         } else {
             gridAdapter.submitList(newList)
         }
     }
 
+    /**
+     * Establishes the List View
+     */
     private fun setupListView() {
         listView = binding.documentList
         with(listView) {
@@ -268,6 +350,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         itemDecoration = PositionDividerItemDecoration(context, displayMetrics())
     }
 
+    /**
+     * Establishes the Action Mode
+     */
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
             requireActivity() as ManagerActivity, actionModeViewModel, megaApi
@@ -279,11 +364,17 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         observeActionModeDestroy()
     }
 
+    /**
+     * Performs certain behavior when a long press is observed
+     */
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
             doIfOnline { actionModeViewModel.enterActionMode(it) }
         })
 
+    /**
+     * Observe selected Nodes from [ActionModeViewModel]
+     */
     private fun observeSelectedItems() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
@@ -310,6 +401,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
         }
 
+    /**
+     * Observes item animation
+     */
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
@@ -347,7 +441,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 listView.findViewHolderForAdapterPosition(pos)?.let { viewHolder ->
                     val itemView = viewHolder.itemView
 
-                    val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
+                    val imageView: ImageView? = if (sortByHeaderViewModel.isListView()) {
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
@@ -373,6 +467,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Performs certain behavior when the Action Mode is destroyed
+     */
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
@@ -382,8 +479,14 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
         })
 
+    /**
+     * Setup fast scroller for the [RecyclerView]
+     */
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
+    /**
+     * Setup the List Adapter
+     */
     private fun setupListAdapter() {
         listAdapter =
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
@@ -401,9 +504,19 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
         })
 
-        switchListGridView(sortByHeaderViewModel.isList)
+        switchViewType(sortByHeaderState().viewType)
     }
 
+    /**
+     * The UI State from [SortByHeaderViewModel]
+     *
+     * @return The UI State
+     */
+    private fun sortByHeaderState() = sortByHeaderViewModel.state.value
+
+    /**
+     * Immediately scroll to the top of the list
+     */
     private fun autoScrollToTop() {
         if (!viewModel.skipNextAutoScroll) {
             listView.layoutManager?.scrollToPosition(0)
@@ -411,46 +524,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         viewModel.skipNextAutoScroll = false
     }
 
-    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
-
-    override fun searchReady() {
-        // Rotate screen in action mode, the keyboard would pop up again, hide it
-        if (actionMode != null) {
-            RunOnUIThreadUtils.post { callManager { it.hideKeyboardSearch() } }
-        }
-
-        itemDecoration.setDrawAllDividers(true)
-        disableRecyclerViewAnimator(listView)
-
-        if (viewModel.searchMode) return
-
-        viewModel.searchMode = true
-        viewModel.searchQuery = ""
-        viewModel.refreshUi()
-
-        binding.addFabButton.hide()
-    }
-
-    override fun exitSearch() {
-        itemDecoration.setDrawAllDividers(false)
-        disableRecyclerViewAnimator(listView)
-
-        if (!viewModel.searchMode) return
-
-        viewModel.searchMode = false
-        viewModel.searchQuery = ""
-        viewModel.refreshUi()
-
-        binding.addFabButton.show()
-
-    }
-
-    override fun searchQuery(query: String) {
-        if (viewModel.searchQuery == query) return
-        viewModel.searchQuery = query
-        viewModel.loadDocuments()
-    }
-
+    /**
+     * Opens a Document
+     *
+     * @param node The [MegaNode] to be opened
+     * @param index The [MegaNode] index
+     */
     private fun openDoc(node: MegaNode?, index: Int) {
         if (node == null) {
             return
@@ -473,11 +552,13 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
 
             val paramsSetSuccessfully =
                 if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                    FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
+                    FileUtil.setLocalIntentParams(
+                        activity, node, intent, localPath, false,
                         requireActivity() as ManagerActivity
                     )
                 } else {
-                    FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                    FileUtil.setStreamingIntentParams(
+                        activity, node, megaApi, intent,
                         requireActivity() as ManagerActivity
                     )
                 }
@@ -507,6 +588,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Setup the Fab button
+     */
     private fun setupAddFabButton() {
         binding.addFabButton.setOnClickListener {
             (requireActivity() as ManagerActivity).showUploadPanel(DOCUMENTS_UPLOAD)
@@ -527,7 +611,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         binding.addFabButton.show()
     }
 
-
+    /**
+     * Establish the mini audio player
+     */
     private fun setupMiniAudioPlayer() {
         val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
             shouldVisible = true

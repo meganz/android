@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.exception.ParentNotAFolderException
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
@@ -46,7 +47,7 @@ class DefaultGetFavouriteFolderInfoTest {
 
     @Test
     fun `test that subsequent items are returned when nodes update`() = runTest {
-        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(emptyList()))
+        whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(emptyMap())))
         val first = "first"
         val second = "second"
         val folderNode = mock<FolderNode> {

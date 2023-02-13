@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,6 +65,7 @@ class ManagerViewModelTest {
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val getInboxNode = mock<GetInboxNode>()
     private val monitorStorageState = mock<MonitorStorageStateEvent>()
+    private val monitorViewType = mock<MonitorViewType>()
     private val getPrimarySyncHandle = mock<GetPrimarySyncHandle>()
     private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
     private val checkCameraUpload = mock<CheckCameraUpload>()
@@ -104,6 +107,7 @@ class ManagerViewModelTest {
             ioDispatcher = StandardTestDispatcher(),
             getInboxNode = getInboxNode,
             monitorStorageStateEvent = monitorStorageState,
+            monitorViewType = monitorViewType,
             getPrimarySyncHandle = getPrimarySyncHandle,
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
@@ -268,17 +272,23 @@ class ManagerViewModelTest {
     @Test
     fun `test that contact request updates live data is set when contact request updates triggered from use case`() =
         runTest {
-            whenever(monitorContactRequestUpdates()).thenReturn(flowOf(listOf(
-                ContactRequest(
-                    handle = 1L,
-                    sourceEmail = "",
-                    sourceMessage = null,
-                    targetEmail = "",
-                    creationTime = 1L,
-                    modificationTime = 1L,
-                    status = ContactRequestStatus.Unresolved,
-                    isOutgoing = false,
-                    isAutoAccepted = false))))
+            whenever(monitorContactRequestUpdates()).thenReturn(
+                flowOf(
+                    listOf(
+                        ContactRequest(
+                            handle = 1L,
+                            sourceEmail = "",
+                            sourceMessage = null,
+                            targetEmail = "",
+                            creationTime = 1L,
+                            modificationTime = 1L,
+                            status = ContactRequestStatus.Unresolved,
+                            isOutgoing = false,
+                            isAutoAccepted = false
+                        )
+                    )
+                )
+            )
             executeTest {
 
                 runCatching {
@@ -336,7 +346,7 @@ class ManagerViewModelTest {
 
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            monitorNodeUpdates.emit(listOf(mock()))
+            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
             assertThat(awaitItem()).isTrue()
         }
     }
@@ -347,7 +357,7 @@ class ManagerViewModelTest {
 
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
-            monitorNodeUpdates.emit(listOf(mock()))
+            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
             assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
             assertThat(awaitItem()).isFalse()

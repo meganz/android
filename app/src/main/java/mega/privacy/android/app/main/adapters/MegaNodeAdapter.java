@@ -85,10 +85,10 @@ import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.main.ContactFileListFragment;
-import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
@@ -231,11 +231,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap().get(orderType));
 
+            if (type == FOLDER_LINK_ADAPTER) {
+                binding.sortByLayout.setVisibility(View.GONE);
+                binding.enterMediaDiscovery.setVisibility(View.GONE);
+            } else {
+                binding.sortByLayout.setVisibility(View.VISIBLE);
+                setMediaDiscoveryVisibility(binding);
+            }
+
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE
                     : View.VISIBLE);
-
-            setMediaDiscoveryVisibility(binding);
         }
     }
 
@@ -426,7 +432,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public void selectAll() {
-        for (int i = 0; i < nodes.size(); i ++) {
+        for (int i = 0; i < nodes.size(); i++) {
             selectedItems.put(i, true);
             notifyItemChanged(i);
         }
@@ -438,7 +444,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
 
-        for (int i = 0; i < nodes.size(); i ++) {
+        for (int i = 0; i < nodes.size(); i++) {
             selectedItems.delete(i);
             notifyItemChanged(i);
         }
@@ -554,14 +560,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /**
      * Checks if should show sort by header.
      * It should show the header if the list of nodes is not empty and if the adapter is not:
-     * FOLDER_LINK_ADAPTER, CONTACT_SHARED_FOLDER_ADAPTER or CONTACT_FILE_ADAPTER.
+     * CONTACT_SHARED_FOLDER_ADAPTER or CONTACT_FILE_ADAPTER.
      *
      * @param nodes List of nodes to check if is empty or not.
      * @return True if should show the sort by header, false otherwise.
      */
     private boolean shouldShowSortByHeader(List<MegaNode> nodes) {
-        return !nodes.isEmpty() && type != FOLDER_LINK_ADAPTER
-                && type != CONTACT_SHARED_FOLDER_ADAPTER && type != CONTACT_FILE_ADAPTER;
+        return !nodes.isEmpty() && type != CONTACT_SHARED_FOLDER_ADAPTER && type != CONTACT_FILE_ADAPTER;
     }
 
     @NotNull
@@ -831,8 +836,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.videoInfoLayout.setVisibility(View.GONE);
 
         if (node.isTakenDown()) {
-            holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
-            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.textViewFileNameForFile.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
+            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
@@ -1001,7 +1006,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
             holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
@@ -1054,7 +1059,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
                 if (node.isTakenDown()) {
-                    holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
                     holder.takenDownImage.setVisibility(View.VISIBLE);
                 } else {
                     holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
@@ -1097,6 +1102,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
+                if(isMandatoryFingerprintVerificationNeeded) {
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
+                }
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
                 boolean hasUnverifiedNodes = isMandatoryFingerprintVerificationNeeded
@@ -1198,7 +1206,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getItemViewType(int position) {
         return !nodes.isEmpty() && position == 0
-                && type != FOLDER_LINK_ADAPTER
                 && type != CONTACT_SHARED_FOLDER_ADAPTER
                 && type != CONTACT_FILE_ADAPTER
                 ? ITEM_VIEW_TYPE_HEADER

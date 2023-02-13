@@ -1,9 +1,6 @@
 package mega.privacy.android.app.main.listeners;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_CHAT_IMPORT;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_CONTACTS_SEND_INBOX;
-import static mega.privacy.android.app.utils.Constants.MULTIPLE_FILES_SEND_INBOX;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
@@ -44,7 +41,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-        // TODO Auto-generated method stub
+
 
     }
 

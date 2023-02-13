@@ -152,7 +152,7 @@ pipeline {
         }
         stage('Fetch native symbols') {
             when {
-                expression { triggeredByDeliverAppStore() }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -164,63 +164,6 @@ pipeline {
 
                         common.downloadAndExtractNativeSymbols()
                     }
-                }
-            }
-        }
-        stage('Fetch SDK Submodules') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Fetch SDK Submodules'
-
-                    common.fetchSdkSubmodules()
-                }
-            }
-        }
-        stage('Select SDK Version') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Select SDK Version'
-                }
-                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    script {
-                        if (common.isDefined(SDK_TAG)) {
-                            common.checkoutSdkByTag(SDK_TAG)
-                        } else {
-                            common.checkoutSdkByBranch(SDK_BRANCH)
-                        }
-
-                        if (common.isDefined(MEGACHAT_TAG)) {
-                            common.checkoutMegaChatSdkByTag(MEGACHAT_TAG)
-                        } else {
-                            common.checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
-                        }
-                    }
-                }
-            }
-        }
-        stage('Download Dependency Lib for SDK') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Download Dependency Lib for SDK'
-                    sh """
-
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
-
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        pwd
-                        ls -lh
-                    """
                 }
             }
         }
@@ -244,24 +187,6 @@ pipeline {
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
-                }
-            }
-        }
-        stage('Build SDK') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build SDK'
-
-                    common.cleanSdk()
-
-                    sh """
-                        echo "=== START SDK BUILD===="
-                        cd ${WORKSPACE}/sdk/src/main/jni
-                        bash build.sh all
-                    """
                 }
             }
         }
@@ -478,16 +403,17 @@ private String releaseSuccessMessage(String lineBreak, Object common) {
  * @return the composed message
  */
 private String getBuildVersionInfo(Object common) {
-
+    println("entering getBuildVersionInfo")
     String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${common.artifactoryUploadPath()}"
     String artifactVersion = common.readAppVersion2()
 
     String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
     String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
 
+    String sdkVersion = common.readPrebuiltSdkVersion()
     String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + common.appCommitId()
-    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.sdkCommitId()
-    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.megaChatSdkCommitId()
+    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.queryPrebuiltSdkProperty("sdk-commit", sdkVersion)
+    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.queryPrebuiltSdkProperty("chat-commit", sdkVersion)
 
     String appBranch = env.gitlabSourceBranch
 

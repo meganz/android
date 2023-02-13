@@ -32,15 +32,15 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATE
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -189,7 +189,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         return super.onOptionsItemSelected(item)
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
@@ -268,18 +268,21 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         collectFlow(viewModel.state) { state ->
             binding.headerLayout.firstLineToolbar.text = state.name
+            binding.progressBar.isVisible = state.isLoading
+
             state.changeEmailResult?.let {
                 showChangeEmailResult(it)
                 viewModel.markHandleChangeEmailResult()
+            }
+
+            state.changeUserNameResult?.let {
+                updateName(it.isSuccess)
+                viewModel.markHandleChangeUserNameResult()
             }
         }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
             binding.headerLayout.secondLineToolbar.text = viewModel.getEmail()
-        }
-
-        viewModel.isProcessingFile().observe(this) { isProcessing ->
-            binding.progressBar.isVisible = isProcessing
         }
 
         lifecycleScope.launchWhenStarted {
@@ -296,8 +299,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
      * @param success True if the name was changed successfully, false otherwise.
      */
     private fun updateName(success: Boolean) {
-        binding.progressBar.isVisible = false
-
         showSnackbar(
             StringResourcesUtils.getString(
                 if (success) R.string.success_changing_user_attributes
@@ -587,13 +588,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                     }
 
                     if (!errorShown) {
-                        binding.progressBar.isVisible =
-                            viewModel.changeName(
-                                editProfileViewModel.getFirstName(),
-                                editProfileViewModel.getLastName(),
-                                dialogBinding.firstNameField.text.toString(),
-                                dialogBinding.lastNameField.text.toString()
-                            ) { success -> updateName(success) }
+                        viewModel.changeName(
+                            editProfileViewModel.getFirstName(),
+                            editProfileViewModel.getLastName(),
+                            dialogBinding.firstNameField.text.toString(),
+                            dialogBinding.lastNameField.text.toString()
+                        )
 
                         dismiss()
                     }

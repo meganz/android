@@ -177,11 +177,11 @@
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
     <string name="tos">我同意MEGA的[A]服務條款[/A]</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">我了解[B]如果我遺失密碼，我可能會弄丟我的資料[/B]。參考更多關於[A]MEGA點對點加密技術[/A]。</string>
+    <string name="top">我瞭解[B]如果我遺失密碼，我可能會弄丟我的資料[/B]。參考更多關於[A]MEGA點對點加密技術[/A]。</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">您需要接受服務條款</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
-    <string name="create_account_no_top">您需要同意您了解遺失密碼的風險</string>
+    <string name="create_account_no_top">您需要同意您瞭解遺失密碼的風險</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
     <string name="error_enter_username">請輸入您的名字</string>
     <!-- Warning dialog -->
@@ -768,7 +768,7 @@
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">您的密碼可解鎖您的還原金鑰</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">您的資料只能透過由您主密鑰所進行的解密操作鏈存取，而我們透過您的密碼儲存此加密密鑰。這代表著，如果您遺失了密碼，您的主密鑰將無法再解密，也就是說，您將無法再存取您的資料。</string>
+    <string name="backup_first_paragraph">您的資料只能透過由您主金鑰所進行的解密操作鏈存取，而我們透過您的密碼儲存此加密金鑰。這代表著如果您遺失了密碼，您的主金鑰將無法再解密，也就是說，您將無法再存取您的資料。</string>
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">正在匯出您的還原金鑰，請妥善保管。您的還原金鑰可以使您不會因為重新設定密碼而遺失過去上傳的資料。</string>
     <!-- Third paragraph of the screen to backup the master key -->
@@ -778,7 +778,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">儲存</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">已成功複製還原金鑰</string>
+    <string name="copy_MK_confirmation">還原金鑰已複製到剪貼簿。請將它保存在一個安全的地方，以便您以後可以輕鬆的存取。</string>
     <!-- Button to change the password -->
     <string name="change_pass">變更</string>
     <!-- Positive button to perform a general action -->
@@ -916,7 +916,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">由於多次違反我們的服務條款，相關的用戶帳戶已被終止使用權。</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">您提供的資料夾連結解密密鑰無效。</string>
+    <string name="general_error_invalid_decryption_key">您提供的資料夾連結解密金鑰無效。</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">對話</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -1010,7 +1010,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">此系統能確保您收到的資料是真實無誤地來自原寄件人，且其內容在傳輸過程中也不會被更動。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_confidentiality_empty_screen">只有作者和指定收件人才能解密和閱讀內容。</string>
+    <string name="mega_confidentiality_empty_screen">只有作者和指定的接收者才能解密和閱讀內容。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_info_empty_screen">MEGA</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1880,9 +1880,9 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">開始設定</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">掃描或複製種子密鑰到您的身份驗證應用程式。</string>
+    <string name="explain_qr_seed_2fa_1">掃描或複製種子金鑰到您的身份驗證應用程式。</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
-    <string name="explain_qr_seed_2fa_2">請務必將此種子密鑰備份於安全的地方，以防您的裝置遺失。</string>
+    <string name="explain_qr_seed_2fa_2">請務必將此種子金鑰備份於安全的地方，以防您的裝置遺失。</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <!-- Text button -->
@@ -1890,7 +1890,7 @@
     <!-- Text button -->
     <string name="general_next">下一步</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
-    <string name="qr_seed_text_error">生成種子密鑰或二維條碼時出錯，請再試一次。</string>
+    <string name="qr_seed_text_error">生成種子金鑰或二維條碼時出錯，請再試一次。</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">已啟用雙重驗證</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -3054,7 +3054,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">您的隱私</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">我們使用Cookies和類似技術（“Cookies”）來提供並增強您對我們服務的體驗。在您開始到訪時就接受我們所使用的Cookies或在Cookie設定中自訂Cookies選項。您可以在我們的[A]Cookie政策[/A]了解更多訊息。</string>
+    <string name="dialog_cookie_alert_message">我們使用Cookies和類似技術（“Cookies”）來提供並增強您對我們服務的體驗。在您開始到訪時就接受我們所使用的Cookies或在Cookie設定中自訂Cookies選項。您可以在我們的[A]Cookie政策[/A]瞭解更多訊息。</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie設定未儲存。</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3068,7 +3068,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">性能與分析Cookies</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">協助我們了解您如何使用我們的服務，並提供我們可用來改進的資訊。不接受這些Cookies意味著我們將缺少可用來幫助我們改進設計的資訊。</string>
+    <string name="preference_cookies_performance_summary">協助我們瞭解您如何使用我們的服務，並提供我們可用來改進的資訊。不接受這些Cookies意味著我們將缺少可用來幫助我們改進設計的資訊。</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">總是啟用</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3490,11 +3490,11 @@
     <!-- Text of buy new subscription button -->
     <string name="button_buy_new_subscription">購買新的訂閱</string>
     <!-- Dialog message when the existing subscription is from Android platform (Google and Huawei)  -->
-    <string name="message_subscription_from_android_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請透過%1$s來取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
+    <string name="message_subscription_from_android_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請透過%1$s來取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Dialog message when the existing subscription is from iTunes  -->
-    <string name="message_subscription_from_itunes">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請從您的iTunes帳戶取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
+    <string name="message_subscription_from_itunes">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請從您的iTunes帳戶取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請在電腦版或手機版網頁瀏覽器中登入MEGA來取消您目前的訂閱。訪問我們的幫助中心了解更多訊息。</string>
+    <string name="message_subscription_from_other_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請在電腦版或手機版網頁瀏覽器中登入MEGA來取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">請至設定授予MEGA使用藍牙連線存取您附近裝置的權限。</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
@@ -3502,11 +3502,11 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s訂閱</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">您目前在%1$s有一個現行的MEGA訂閱。您必須在%2$s中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
+    <string name="message_android_platform_subscription">您目前在%1$s有一個現行的MEGA訂閱。您必須在%2$s中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">您有一個現行的MEGA訂閱。它會在帳戶刪除後自動取消，訪問我們的幫助中心了解更多訊息。</string>
+    <string name="message_other_platform_subscription">您有一個現行的MEGA訂閱。它會在帳戶刪除後自動取消，造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">您在Apple有一個現行的MEGA訂閱。您必須從您的iTunes帳戶中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心了解更多訊息。</string>
+    <string name="message_itunes_platform_subscription">您在Apple有一個現行的MEGA訂閱。您必須從您的iTunes帳戶中個別取消它，因為MEGA無法為您取消訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">造訪%1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3811,8 +3811,6 @@
     <string name="chat_recent_list_empty_action">開始對話</string>
     <!--Description text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_description">在任何裝置上與任何人安全而私密的進行對話，沒有人可以讀取您們的對話記錄，即使是MEGA也不行。</string>
-    <!-- Title of the option on the meeting list to archive a meeting -->
-    <string name="archive_meeting_option">封存會議</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">立即開始會議</string>
     <!-- Label for call option on settings -->
@@ -3905,8 +3903,6 @@
     <string name="chat_add_participants_no_contacts_left_to_add_message">您已經將所有聯絡人加入此對話。如果您想加入更多與會者，請先邀請他們成為您的聯絡人。</string>
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">截圖已儲存到您裝置的相簿</string>
-    <!-- Title of renewal date for my account usage page. -->
-    <string name="account_info_renewal_date">[A]續訂日期：[/A][B]%s[/B]</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">輸入相簿名稱</string>
     <!-- Album creation input name placeholder -->
@@ -3958,7 +3954,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">定期會議</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label">每周 %s</string>
+    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">媒體探索檢視</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4019,6 +4015,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">授予權限</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">不要授予</string>
+    <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
         <item quantity="other">已從「%s」移除%d個項目</item>
     </plurals>
@@ -4032,4 +4029,60 @@
     <string name="video_playback_position_dialog_resume_button">繼續</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">重頭播放</string>
+    <!-- User Alert notification for new scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <!-- User Alert notification for scheduled meeting title change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled meeting description change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled meeting fields change -->
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <!-- Title of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_title_media_permissions_denied">存取拒絕</string>
+    <!-- Content of the dialog when permission is denied and it's required to upload content -->
+    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
+    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
+    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
+    <!-- Option of a recurring meeting in meeting list to view occurrences -->
+    <string name="meetings_list_recurring_meeting_occurrences_option">事件</string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <!-- Label of button in recurring meeting info when more occurrences can be shown -->
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <!-- Label for scheduled monthly meetings -->
+    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <!-- Label for scheduled daily meetings -->
+    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <!-- User Alert notification for new scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <!-- User Alert notification for scheduled recurring meeting description change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <!-- User Alert notification for scheduled recurring meeting fields change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <!-- User Alert notification for scheduled recurring meeting time change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <!-- User Alert notification for scheduled recurring meeting frequency change -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
+    <!-- User Alert notification for canceled scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
 </resources>

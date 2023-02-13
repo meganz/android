@@ -11,6 +11,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import org.junit.Before
 import org.junit.Rule
@@ -72,7 +75,7 @@ class RubbishBinViewModelTest {
         runTest {
             val newValue = 123456789L
             whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(ArrayList())
-            monitorNodeUpdates.emit(listOf())
+            monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
             underTest.setRubbishBinHandle(newValue)
             Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
         }
@@ -81,9 +84,17 @@ class RubbishBinViewModelTest {
     fun `test that on setting rubbish bin handle rubbish bin node returns some items in list`() =
         runTest {
             val newValue = 123456789L
-            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(listOf(mock(),
-                mock()))
-            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(
+                listOf(
+                    mock(),
+                    mock()
+                )
+            )
+            val update = mapOf<Node, List<NodeChanges>>(
+                mock<Node>() to emptyList(),
+                mock<Node>() to emptyList()
+            )
+            monitorNodeUpdates.emit(NodeUpdate(update))
             underTest.setRubbishBinHandle(newValue)
             Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(2)
         }
@@ -103,9 +114,17 @@ class RubbishBinViewModelTest {
             val lastFirstVisiblePosition = 123456
             val newValue = 12345L
 
-            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(listOf(mock(),
-                mock()))
-            monitorNodeUpdates.emit(listOf(mock(), mock()))
+            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(
+                listOf(
+                    mock(),
+                    mock()
+                )
+            )
+            val update = mapOf<Node, List<NodeChanges>>(
+                mock<Node>() to emptyList(),
+                mock<Node>() to emptyList()
+            )
+            monitorNodeUpdates.emit(NodeUpdate(update))
             underTest.setRubbishBinHandle(newValue)
 
             underTest.onFolderItemClicked(lastFirstVisiblePosition, newValue)

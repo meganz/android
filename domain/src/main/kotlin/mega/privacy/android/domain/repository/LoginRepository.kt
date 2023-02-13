@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * Login repository.
  */
@@ -23,4 +25,22 @@ interface LoginRepository {
      * Performs a fetch nodes.
      */
     suspend fun fetchNodes()
+
+    /**
+     * Monitors logout.
+     *
+     * @return Flow of Boolean.
+     */
+    fun monitorLogout(): Flow<Boolean>
+
+    /**
+     * Broadcast logout.
+     *
+     */
+    suspend fun broadcastLogout()
+
+    /**
+     * Logouts of the MEGA account without invalidating the session.
+     */
+    suspend fun localLogout()
 }

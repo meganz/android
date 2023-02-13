@@ -10,7 +10,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
 
@@ -53,7 +56,7 @@ class RubbishBinViewModel @Inject constructor(
         viewModelScope.launch {
             refreshNodes()
             monitorNodeUpdates().collect {
-                refreshNodes()
+                checkForDeletedNodes(it.changes)
             }
         }
     }
@@ -116,5 +119,24 @@ class RubbishBinViewModel @Inject constructor(
     fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
         pushPositionOnStack(lastFirstVisiblePosition)
         setRubbishBinHandle(handle)
+    }
+
+    /**
+     * This will update handle for rubbishBin if any node is deleted from browser and
+     * we are in same screen else will simply refresh nodes with parentID
+     * if restored and we are inside folder, it will simply refresh rubbish node
+     * @param changes [Map] of [Node], list of [NodeChanges]
+     */
+    private fun checkForDeletedNodes(changes: Map<Node, List<NodeChanges>>) {
+        changes.forEach { (key, value) ->
+            if (value.contains(NodeChanges.Remove) && _state.value.rubbishBinHandle == key.id.longValue) {
+                setRubbishBinHandle(key.parentId.longValue)
+                return@forEach
+            } else if (value.contains(NodeChanges.Parent)) {
+                setRubbishBinHandle(-1)
+                return@forEach
+            }
+        }
+        refreshNodes()
     }
 }

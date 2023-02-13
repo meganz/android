@@ -7,7 +7,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEX
 import static mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.WAIT_TIME_BEFORE_UPDATE;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
@@ -386,10 +385,6 @@ public class UploadService extends Service {
                         stopForeground(true);
                         mNotificationManager.cancel(NOTIFICATION_UPLOAD);
                     }
-
-                    LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
-                            .post(MegaTransfer.TYPE_UPLOAD);
-
                     break;
             }
 
@@ -733,9 +728,6 @@ public class UploadService extends Service {
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (isCUOrChatTransfer(transfer)) return null;
 
-                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
-                        .post(MegaTransfer.TYPE_UPLOAD);
-
                 String appData = transfer.getAppData();
 
                 if (appData != null) {
@@ -783,9 +775,6 @@ public class UploadService extends Service {
                     if (transfer.getState() == MegaTransfer.STATE_FAILED) {
                         transfersManagement.setAreFailedTransfers(true);
                     }
-
-                    LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
-                            .post(MegaTransfer.TYPE_UPLOAD);
                 }
 
                 if (transfer.getAppData() != null) {
@@ -1011,9 +1000,6 @@ public class UploadService extends Service {
             Timber.d("onTransferUpdate");
             if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
                 if (isCUOrChatTransfer(transfer)) return null;
-
-                LiveEventBus.get(EVENT_TRANSFER_UPDATE, Integer.class)
-                        .post(MegaTransfer.TYPE_UPLOAD);
 
                 String appData = transfer.getAppData();
 

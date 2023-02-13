@@ -46,10 +46,13 @@ import java.util.Collections
 @AndroidEntryPoint
 class IncomingSharesFragment : MegaNodeBaseFragment() {
 
-    private val viewModel: IncomingSharesViewModel by activityViewModels()
+    private val viewModel by activityViewModels<IncomingSharesViewModel>()
 
     private fun state() = viewModel.state.value
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,12 +68,22 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             else getGridView(inflater, container)
 
         initAdapter()
-        observe()
         selectNewlyAddedNodes()
 
         return view
     }
 
+    /**
+     * onViewCreated
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupObservers()
+    }
+
+    /**
+     * activateActionMode
+     */
     override fun activateActionMode() {
         if (adapter?.isMultipleSelect == true) return
 
@@ -213,9 +226,9 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         get() = state().incomingHandle
 
     /**
-     * Observe viewModel
+     * Setup ViewModel observers
      */
-    private fun observe() {
+    private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
@@ -322,8 +335,10 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
         if (isInvalidHandle) {
             emptyImageView?.let {
-                setImageViewAlphaIfDark(requireContext(),
-                    it, ColorUtils.DARK_IMAGE_ALPHA)
+                setImageViewAlphaIfDark(
+                    requireContext(),
+                    it, ColorUtils.DARK_IMAGE_ALPHA
+                )
             }
             if (Util.isScreenInPortrait(requireContext())) {
                 emptyImageView?.setImageResource(R.drawable.incoming_shares_empty)
@@ -347,8 +362,10 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             }
 
             if (selected.size == 1
-                && megaApi.checkAccessErrorExtended(selected[0],
-                    MegaShare.ACCESS_FULL).errorCode == MegaError.API_OK
+                && megaApi.checkAccessErrorExtended(
+                    selected[0],
+                    MegaShare.ACCESS_FULL
+                ).errorCode == MegaError.API_OK
             ) {
                 control.rename().isVisible = true
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
@@ -359,7 +376,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             }
 
             if (state().incomingTreeDepth > 0 && selected.isNotEmpty() && allHaveFullAccess(
-                    selected)
+                    selected
+                )
             ) {
                 control.move().isVisible = true
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {

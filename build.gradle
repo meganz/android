@@ -1,3 +1,4 @@
+apply from: "tools/util.gradle"
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.gradleVersion = '7.2.2'
@@ -59,7 +60,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "7.3"
+    appVersion = "7.4"
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -68,7 +69,7 @@ ext {
     buildToolsVerion = '33.0.1'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20230203.121327-dev'
+    megaSdkVersion = '20230210.104734-dev'
 
     // App dependencies
     accompanistLayoutVersion = '0.24.13-rc'
@@ -102,6 +103,7 @@ ext {
     gsonVersion = '2.8.5'
     hiltAndroidXCompilerVersion = '1.0.0'
     hiltAndroidXVersion = '1.0.0-alpha03'
+    hiltNavigationComposeVersion = '1.0.0'
     junitVersion = '4.13.2'
     ktxVersion = '1.7.0'
     legacySupportVersion = 'v4:1.0.0'
@@ -132,8 +134,10 @@ ext {
     billingVersion = '5.1.0'
 }
 
-ext.isCiBuild = { ->
-    return System.getenv("BUILD_NUMBER") != null
+ext.shouldSuppressWarnings = { ->
+    return isCiBuild() && System.getenv("DO_NOT_SUPPRESS_WARNINGS") != 'true'
 }
 
-apply from: "$project.rootDir/tools/prebuilt-sdk.gradle"
+if (!shouldUsePrebuiltSdk() || isCiBuild()) {
+    apply from: "$project.rootDir/tools/prebuilt-sdk.gradle"
+}

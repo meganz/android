@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.model.GlobalUpdate.OnSetElementsUpdate
@@ -38,6 +39,7 @@ class DefaultAlbumRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val userSetMapper: UserSetMapper = ::createUserSet
+    private val albumStringResourceGateway = mock<AlbumStringResourceGateway>()
 
     private val testName = "Album1"
 
@@ -46,6 +48,7 @@ class DefaultAlbumRepositoryTest {
         underTest = DefaultAlbumRepository(
             megaApiGateway = megaApiGateway,
             userSetMapper = userSetMapper,
+            albumStringResourceGateway = albumStringResourceGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -218,7 +221,6 @@ class DefaultAlbumRepositoryTest {
         underTest.monitorUserSetsUpdate().test {
             val actualUserSets = awaitItem()
             assertThat(expectedUserSets).isEqualTo(actualUserSets)
-            awaitComplete()
         }
     }
 
@@ -324,6 +326,30 @@ class DefaultAlbumRepositoryTest {
         val actualName = underTest.updateAlbumName(AlbumId(1L), newName)
 
         assertEquals(newName, actualName)
+    }
+
+    @Test
+    fun `test that getProscribedAlbumTitles return a list of strings`() = runTest {
+        whenever(albumStringResourceGateway.getSystemAlbumNames()).thenReturn(listOf("abc"))
+        whenever(albumStringResourceGateway.getProscribedStrings()).thenReturn(listOf("123"))
+
+        val actualStringsList = underTest.getProscribedAlbumTitles()
+
+        verify(albumStringResourceGateway).getSystemAlbumNames()
+        verify(albumStringResourceGateway).getProscribedStrings()
+        assertEquals(listOf("abc", "123"), actualStringsList)
+    }
+
+    @Test
+    fun `test that update album cover executes properly`() = runTest {
+        val albumId = AlbumId(1L)
+        val elementId = NodeId(2L)
+
+        try {
+            underTest.updateAlbumCover(albumId, elementId)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
+        }
     }
 
     private fun createUserSet(

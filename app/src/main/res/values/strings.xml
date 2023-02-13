@@ -4193,6 +4193,14 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
+    <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <!-- Select album cover -->
+    <string name="photos_album_select_cover">Select album cover</string>
+    <!-- Album cover updated -->
+    <string name="photos_album_cover_updated">Album cover updated</string>
     <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
     <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you’ve seen this message for this account before, tap Cancel.</string>
     <string name="shared_items_security_upgrade_dialog_node_sharing_info">You’re currently sharing the following folders: %s</string>

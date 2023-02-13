@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.Assert.*
@@ -20,7 +19,6 @@ class DefaultResetContactLinkTest {
     fun setup() {
         underTest = DefaultResetContactLink(
             accountRepository = accountRepository,
-            ioDispatcher = UnconfinedTestDispatcher()
         )
     }
 

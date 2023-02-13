@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -25,7 +26,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -86,7 +86,7 @@ class RubbishBinFragment : Fragment() {
     lateinit var megaApi: MegaApiAndroid
 
     private val managerViewModel: ManagerViewModel by activityViewModels()
-    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
 
     private var recyclerView: RecyclerView? = null
@@ -145,7 +145,12 @@ class RubbishBinFragment : Fragment() {
             }
         }
 
-        requireActivity().display?.getMetrics(outMetrics)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            requireActivity().display?.getMetrics(outMetrics)
+        } else {
+            @Suppress("DEPRECATION")
+            activity?.windowManager?.defaultDisplay?.getMetrics(outMetrics)
+        }
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
         (requireActivity() as ManagerActivity).invalidateOptionsMenu()

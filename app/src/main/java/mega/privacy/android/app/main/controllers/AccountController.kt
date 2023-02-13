@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.print.PrintHelper
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -38,7 +37,6 @@ import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
@@ -46,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.clearSettings
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.psa.PsaManager.stopChecking
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -66,7 +65,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.app.utils.ZoomUtil.resetZoomLevel
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -74,6 +72,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PushesRepository
+import mega.privacy.android.domain.usecase.BroadcastLogout
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -112,6 +111,8 @@ class AccountController @Inject constructor(
         fun pushRepository(): PushesRepository
 
         fun billingRepository(): BillingRepository
+
+        fun broadcastLogout(): BroadcastLogout
     }
 
     fun existsAvatar(): Boolean {
@@ -402,11 +403,13 @@ class AccountController @Inject constructor(
                     AccountControllerEntryPoint::class.java
                 )
             sharingScope.launch(Dispatchers.IO) {
-                entryPoint.callsPreferencesGateway().clearPreferences()
-                entryPoint.chatPreferencesGateway().clearPreferences()
-                //clear push token
-                entryPoint.pushRepository().clearPushToken()
-                entryPoint.billingRepository().clearCache()
+                with(entryPoint) {
+                    callsPreferencesGateway().clearPreferences()
+                    chatPreferencesGateway().clearPreferences()
+                    pushRepository().clearPushToken()
+                    billingRepository().clearCache()
+                    broadcastLogout()
+                }
             }
 
             // Clear text editor preference
@@ -419,8 +422,6 @@ class AccountController @Inject constructor(
                 .remove(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION)
                 .apply()
 
-            //reset zoom level
-            resetZoomLevel()
             removeEmojisSharedPreferences()
             LastShowSMSDialogTimeChecker(context).reset()
             stopAudioPlayer(context)
@@ -429,9 +430,6 @@ class AccountController @Inject constructor(
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()
-
-            // Clear get banner success flag
-            LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED).post(null)
         }
 
         fun removeFolder(context: Context?, folder: File?) {

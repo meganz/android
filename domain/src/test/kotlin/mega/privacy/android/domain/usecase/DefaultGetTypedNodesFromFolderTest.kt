@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.ParentNotAFolderException
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
 import org.junit.Test
@@ -59,8 +61,9 @@ class DefaultGetTypedNodesFromFolderTest {
             whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
                 listOf(childNode)
             )
+            val map = mapOf<Node, List<NodeChanges>>(childNode to emptyList())
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
-                flowOf(listOf(childNode))
+                flowOf(NodeUpdate(map))
             )
             underTest(nodeId).test {
                 awaitItem()
@@ -108,8 +111,9 @@ class DefaultGetTypedNodesFromFolderTest {
         whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(
             listOf(childNode)
         )
+        val map = mapOf<Node, List<NodeChanges>>(folderNode to emptyList())
         whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
-            flowOf(listOf(folderNode))
+            flowOf(NodeUpdate(map))
         )
         underTest(folderId).test {
             awaitItem()
@@ -130,7 +134,7 @@ class DefaultGetTypedNodesFromFolderTest {
                 emptyList()
             )
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
-                flowOf(listOf(childNode))
+                flowOf(NodeUpdate(emptyMap()))
             )
             underTest(folderId).test {
                 awaitItem()

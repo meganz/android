@@ -844,17 +844,42 @@ interface MegaApiGateway {
     )
 
     /**
-     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name
+     * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name if set
      *
      * @param nodeToCopy the [MegaNode] to copy
      * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
-     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
      * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
      */
     fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,
-        newNodeName: String,
+        newNodeName: String?,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
+     * Moves a [MegaNode] to a new [MegaNode] while updating its name if set
+     *
+     * @param nodeToMove the [MegaNode] to move
+     * @param newNodeParent the [MegaNode] that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun moveNode(
+        nodeToMove: MegaNode,
+        newNodeParent: MegaNode,
+        newNodeName: String?,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
+     * Deletes the node if it's already in the rubbish bin
+     * @param node MegaNode
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun deleteNode(
+        node: MegaNode,
         listener: MegaRequestListenerInterface?,
     )
 
@@ -1146,6 +1171,26 @@ interface MegaApiGateway {
     fun updateSetName(sid: Long, name: String?)
 
     /**
+     * Request to update the cover of a Set
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParentHandle - Returns id of the Set to be updated
+     * - MegaRequest::getNodeHandle - Returns Element id to be set as the new cover
+     * - MegaRequest::getParamType - Returns OPTION_SET_COVER
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_EARGS - Given Element id was not part of the current Set; Malformed (from API).
+     * - MegaError::API_ENOENT - Set with the given id could not be found (before or after the request).
+     * - MegaError::API_EINTERNAL - Received answer could not be read.
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid the id of the Set to be updated
+     * @param eid the id of the Element to be set as cover
+     */
+    suspend fun putSetCover(sid: Long, eid: Long)
+
+    /**
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
@@ -1173,6 +1218,41 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request.
      */
     fun verifyCredentials(user: MegaUser, listener: MegaRequestListenerInterface)
+
+    /**
+     * Check the current password availability
+     * @param password as password to check
+     * @return true if password is the same as current password, else false
+     */
+    suspend fun isCurrentPassword(password: String): Boolean
+
+    /**
+     * Change the given user's password
+     * @param newPassword as user's chosen new password
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun changePassword(newPassword: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reset the user's password from a link
+     * @param link as reset link
+     * @param newPassword as user's chosen new password
+     * @param masterKey as user's account master key
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun resetPasswordFromLink(
+        link: String,
+        newPassword: String,
+        masterKey: String?,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Check the given password's strength
+     * @param password as password to test
+     * @return password strength level from 0 - 4
+     */
+    suspend fun getPasswordStrength(password: String): Int
 
     /**
      * Requests the currently available country calling codes
@@ -1615,6 +1695,57 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun querySignupLink(link: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get MegaNode given the Node File Link
+     *
+     * @param nodeFileLink  Public link to a file in MEGA
+     * @param listener      MegaRequestListener to track this request
+     */
+    fun getPublicNode(
+        nodeFileLink: String,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Cancels all transfers of the same type.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CANCEL_TRANSFERS
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the first parameter
+     *
+     * @param direction Type of transfers to cancel.
+     *                  Valid values are:
+     *                  - MegaTransfer::TYPE_DOWNLOAD = 0
+     *                  - MegaTransfer::TYPE_UPLOAD = 1
+     */
+    suspend fun cancelTransfers(direction: Int)
+
+    /**
+     * Get verified phone number
+     *
+     * @return verified phone number if present else null
+     */
+    suspend fun getVerifiedPhoneNumber(): String?
+
+    /**
+     * Verify phone number
+     *
+     * @param pin verification pin
+     * @param listener MegaRequestListener to track this request
+     */
+    fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Logouts of the MEGA account without invalidating the session.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_LOGOUT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getFlag - Returns false
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun localLogout(listener: MegaRequestListenerInterface)
 
     /**
      * Function to get unverified incoming shares from [MegaApi]

@@ -37,8 +37,9 @@ import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.main.ChangePasswordActivity
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -232,7 +233,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         super.onSaveInstanceState(outState)
     }
 
-    @Suppress("deprecation") // TODO Migrate to registerForActivityResult()
+    @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         viewModel.manageActivityResult(this, requestCode, resultCode, intent, this)
@@ -641,10 +642,20 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     private fun showConfirmChangeEmailQueryResult(result: String) {
-        if (matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
-            showConfirmChangeEmailDialog()
-        } else {
-            showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+        when {
+            matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS) -> {
+                showConfirmChangeEmailDialog()
+            }
+            result == getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_message) -> {
+                showAlert(
+                    this,
+                    result,
+                    getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_title)
+                )
+            }
+            else -> {
+                showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+            }
         }
     }
 
@@ -775,12 +786,16 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private fun isAppStoreAvailable(): Boolean {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getPackageInfo(BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
-                    PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong()))
+                packageManager.getPackageInfo(
+                    BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_ACTIVITIES.toLong())
+                )
             } else {
                 @Suppress("DEPRECATION")
-                packageManager.getPackageInfo(BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
-                    PackageManager.GET_ACTIVITIES)
+                packageManager.getPackageInfo(
+                    BillingConstant.SUBSCRIPTION_PLATFORM_PACKAGE_NAME,
+                    PackageManager.GET_ACTIVITIES
+                )
             }
             true
         } catch (exception: PackageManager.NameNotFoundException) {

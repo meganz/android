@@ -20,6 +20,8 @@ internal class AppEventFacade @Inject constructor(
 
     private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
+    private val logout = MutableSharedFlow<Boolean>()
+    private val _transferFailed = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
 
@@ -39,6 +41,16 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastTransferOverQuota() {
         _transferOverQuota.emit(true)
+    }
+
+    override fun monitorLogout(): Flow<Boolean> = logout.asSharedFlow()
+
+    override suspend fun broadcastLogout() = logout.emit(true)
+
+    override fun monitorFailedTransfer(): Flow<Boolean> = _transferFailed.asSharedFlow()
+
+    override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
+        _transferFailed.emit(isFailed)
     }
 }
 
