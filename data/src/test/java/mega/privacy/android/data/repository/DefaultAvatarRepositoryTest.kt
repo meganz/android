@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
@@ -22,6 +23,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -122,5 +124,39 @@ internal class DefaultAvatarRepositoryTest {
             whenever(megaApiGateway.getUserAvatar(any(), any())).thenReturn(true)
             delay(300L)
             collectJob.cancel()
+        }
+
+    @Test
+    fun `test that updateMyAvatarWithNewEmail return true when cacheFolderGateway returns the oldFile`() =
+        runTest {
+            val oldEmail = "oldEmail"
+            val newEmail = "newEmail"
+            val oldFile = mock<File> {
+                on { exists() }.thenReturn(true)
+            }
+            val newFile = mock<File>()
+            whenever(cacheFolderGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION))
+                .thenReturn(oldFile)
+            whenever(cacheFolderGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION))
+                .thenReturn(newFile)
+            whenever(oldFile.renameTo(newFile)).thenReturn(true)
+            assertTrue(underTest.updateMyAvatarWithNewEmail(oldEmail, newEmail))
+        }
+
+    @Test
+    fun `test that updateMyAvatarWithNewEmail return true when cacheFolderGateway can not returns the oldFile`() =
+        runTest {
+            val oldEmail = "oldEmail"
+            val newEmail = "newEmail"
+            val oldFile = mock<File> {
+                on { exists() }.thenReturn(false)
+            }
+            val newFile = mock<File>()
+            whenever(cacheFolderGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION))
+                .thenReturn(oldFile)
+            whenever(cacheFolderGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION))
+                .thenReturn(newFile)
+            whenever(oldFile.renameTo(newFile)).thenReturn(false)
+            assertFalse(underTest.updateMyAvatarWithNewEmail(oldEmail, newEmail))
         }
 }

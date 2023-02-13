@@ -44,4 +44,13 @@ interface AvatarRepository {
      * @param userHandle  User handle
      */
     suspend fun getAvatarColor(userHandle: Long): Int
+
+    /**
+     * Update my avatar with new email
+     *
+     * @param oldEmail
+     * @param newEmail
+     * @return true if success otherwise false
+     */
+    suspend fun updateMyAvatarWithNewEmail(oldEmail: String, newEmail: String): Boolean
 }
