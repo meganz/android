@@ -15,22 +15,36 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Monitor phone number
+     */
+    MonitorPhoneNumber(
+        "Switch to using the new notification mechanism for monitoring the verified phone number. Enabling this before implementation is complete might result in updates not being received by all screens",
+        false
+    ),
+
+    /**
      * To switch into new photos modularization architecture or not toggle
      */
-    PhotosCompose("Enable compose-world photos feature (modularization)",
-        false),
+    PhotosCompose(
+        "Enable compose-world photos feature (modularization)",
+        false
+    ),
 
     /**
      * Android Sync toggle
      */
-    AndroidSync("Enable a synchronization between folders on local storage and folders on MEGA cloud",
-        false),
+    AndroidSync(
+        "Enable a synchronization between folders on local storage and folders on MEGA cloud",
+        false
+    ),
 
     /**
      * Indicates if the user is cryptographically secure
      */
-    MandatoryFingerprintVerification("Indicates if mandatory fingerprint verification needs to be done",
-        false),
+    MandatoryFingerprintVerification(
+        "Indicates if mandatory fingerprint verification needs to be done",
+        false
+    ),
 
     /**
      * User albums toggle
