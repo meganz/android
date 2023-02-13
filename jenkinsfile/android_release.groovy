@@ -152,7 +152,7 @@ pipeline {
         }
         stage('Fetch native symbols') {
             when {
-                expression { triggeredByDeliverAppStore() }
+                expression { triggeredByDeliverAppStore() || triggeredByUploadSymbol() }
             }
             steps {
                 script {
@@ -164,63 +164,6 @@ pipeline {
 
                         common.downloadAndExtractNativeSymbols()
                     }
-                }
-            }
-        }
-        stage('Fetch SDK Submodules') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Fetch SDK Submodules'
-
-                    common.fetchSdkSubmodules()
-                }
-            }
-        }
-        stage('Select SDK Version') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Select SDK Version'
-                }
-                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    script {
-                        if (common.isDefined(SDK_TAG)) {
-                            common.checkoutSdkByTag(SDK_TAG)
-                        } else {
-                            common.checkoutSdkByBranch(SDK_BRANCH)
-                        }
-
-                        if (common.isDefined(MEGACHAT_TAG)) {
-                            common.checkoutMegaChatSdkByTag(MEGACHAT_TAG)
-                        } else {
-                            common.checkoutMegaChatSdkByBranch(MEGACHAT_BRANCH)
-                        }
-                    }
-                }
-            }
-        }
-        stage('Download Dependency Lib for SDK') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Download Dependency Lib for SDK'
-                    sh """
-
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
-
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        pwd
-                        ls -lh
-                    """
                 }
             }
         }
@@ -244,24 +187,6 @@ pipeline {
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
-                }
-            }
-        }
-        stage('Build SDK') {
-            when {
-                expression { triggeredByUploadSymbol() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build SDK'
-
-                    common.cleanSdk()
-
-                    sh """
-                        echo "=== START SDK BUILD===="
-                        cd ${WORKSPACE}/sdk/src/main/jni
-                        bash build.sh all
-                    """
                 }
             }
         }
