@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.SetSecureFlag
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
+import mega.privacy.android.domain.usecase.UpgradeSecurity
 
 /**
  * Get node module
@@ -150,5 +151,14 @@ abstract class GetNodeModule {
         @Provides
         fun provideOpenShareDialog(megaNodeRepository: MegaNodeRepository): OpenShareDialog =
             OpenShareDialog(megaNodeRepository::openShareDialog)
+
+        /**
+         * Provides [UpgradeSecurity] implementation
+         * @param megaNodeRepository [MegaNodeRepository]
+         * @return [UpgradeSecurity]
+         */
+        @Provides
+        fun provideUpgradeSecurity(megaNodeRepository: MegaNodeRepository): UpgradeSecurity =
+            UpgradeSecurity(megaNodeRepository::upgradeSecurity)
     }
 }
