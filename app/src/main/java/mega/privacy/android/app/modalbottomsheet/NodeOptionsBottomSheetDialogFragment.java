@@ -175,6 +175,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     private IncomingSharesViewModel incomingSharesViewModel;
     private OutgoingSharesViewModel outgoingSharesViewModel;
+    private NodeOptionsBottomSheetViewModel nodeOptionsBottomSheetViewModel;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
         if (mode >= DEFAULT_MODE && mode <= FAVOURITES_MODE) {
@@ -192,6 +193,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
         outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
+        nodeOptionsBottomSheetViewModel = new ViewModelProvider(requireActivity()).get(NodeOptionsBottomSheetViewModel.class);
     }
 
     @Nullable
@@ -735,16 +737,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     setUnverifiedNodeUserName(state.getUnverifiedOutgoingShares());
                     hideNodeActions();
                 }
-
-                if (state.isOpenShareDialogSuccess()) {
-                    showShareFolderOptions();
-                } else {
-                    showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
-                }
-
                 return Unit.INSTANCE;
             });
         }
+
+        ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), nodeOptionsBottomSheetViewModel.getState(), Lifecycle.State.STARTED, state -> {
+            if (state.isOpenShareDialogSuccess()) {
+                showShareFolderOptions();
+            } else {
+                showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     @Override
@@ -1009,7 +1013,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.share_folder_option:
-                outgoingSharesViewModel.callOpenShareDialog(node.getHandle());
+                nodeOptionsBottomSheetViewModel.callOpenShareDialog(node.getHandle());
                 break;
 
             case R.id.clear_share_option:
