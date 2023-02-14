@@ -10,3 +10,4 @@ include ':feature:sync'
 if (!shouldUsePrebuiltSdk() || isCiBuild()) {
     include ':sdk'
 }
+include ':nocturn'

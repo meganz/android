@@ -47,6 +47,8 @@ android {
 
         buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${versionName}_${versionCode}\"")
         buildConfigField("boolean", "ACTIVATE_GREETER", "${shouldActivateGreeter}")
+        buildConfigField("boolean", "ACTIVATE_NOCTURN", "${shouldActivateNocturn}")
+        buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout}")
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
@@ -208,6 +210,7 @@ dependencies {
     implementation project(':domain')
     implementation project(':core-ui')
     implementation project(':data')
+    debugImplementation project(':nocturn')
 
     qaImplementation project(':screenshot')
 
