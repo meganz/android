@@ -104,7 +104,7 @@ import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
@@ -433,10 +433,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getSession: GetSession
 
     /**
-     * Is Node In Rubbish
+     * Is Node In Rubbish or deleted
      */
     @Inject
-    lateinit var isNodeInRubbish: IsNodeInRubbish
+    lateinit var isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted
 
     /**
      * Monitor charging stop status
@@ -990,7 +990,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
-        val isPrimaryFolderInRubbish = isNodeInRubbish(primarySyncHandle)
+        val isPrimaryFolderInRubbish = isNodeInRubbishOrDeleted(primarySyncHandle)
         val result =
             !isPrimaryFolderInRubbish || (getPrimaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
         Timber.d("Primary Folder Established $result")
@@ -1007,7 +1007,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
-        val isSecondaryFolderInRubbish = isNodeInRubbish(getSecondaryFolderHandle())
+        val isSecondaryFolderInRubbish = isNodeInRubbishOrDeleted(getSecondaryFolderHandle())
         val result =
             !isSecondaryFolderInRubbish || (getSecondaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
         Timber.d("Secondary Folder Established $result")
