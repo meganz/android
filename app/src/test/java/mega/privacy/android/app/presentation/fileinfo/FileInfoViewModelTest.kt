@@ -20,11 +20,13 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.DefaultDeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
@@ -54,6 +56,7 @@ internal class FileInfoViewModelTest {
     private lateinit var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle
     private lateinit var copyNodeByHandle: CopyNodeByHandle
     private lateinit var deleteNodeByHandle: DeleteNodeByHandle
+    private lateinit var deleteNodeVersionsByHandle: DefaultDeleteNodeVersionsByHandle
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
 
@@ -82,6 +85,7 @@ internal class FileInfoViewModelTest {
         copyNodeByHandle = mock()
         moveNodeToRubbishByHandle = mock()
         deleteNodeByHandle = mock()
+        deleteNodeVersionsByHandle = mock()
         node = mock()
         nameCollision = mock()
     }
@@ -98,6 +102,7 @@ internal class FileInfoViewModelTest {
             copyNodeByHandle,
             moveNodeToRubbishByHandle,
             deleteNodeByHandle,
+            deleteNodeVersionsByHandle,
         )
         underTest.updateNode(node)
     }
@@ -215,7 +220,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockCollisionMoving()
             underTest.moveNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
+            testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
 
     @Test
@@ -223,7 +228,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockCollisionCopying()
             underTest.copyNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
+            testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
 
     @Test
@@ -232,7 +237,7 @@ internal class FileInfoViewModelTest {
             whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
                 .thenThrow(RuntimeException::class.java)
             underTest.copyNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.GeneralError::class.java)
+            testEventIsOfType(FileInfoOneOffViewEvent.GeneralError::class.java)
         }
 
     @Test
@@ -240,7 +245,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockMoveSuccess()
             underTest.moveNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Moving::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
         }
@@ -250,7 +255,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockMoveFailure()
             underTest.moveNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Moving::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
@@ -260,7 +265,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockMoveToRubbishSuccess()
             underTest.removeNode()
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.MovingToRubbish::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
         }
@@ -270,7 +275,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockMoveToRubbishFailure()
             underTest.removeNode()
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.MovingToRubbish::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
@@ -280,7 +285,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockDeleteSuccess()
             underTest.removeNode()
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Deleting::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
         }
@@ -290,7 +295,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockDeleteFailure()
             underTest.removeNode()
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Deleting::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
             }
         }
@@ -300,7 +305,7 @@ internal class FileInfoViewModelTest {
         runTest {
             mockCopySuccess()
             underTest.copyNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Copying::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
             }
         }
@@ -310,8 +315,47 @@ internal class FileInfoViewModelTest {
         runTest {
             mockCopyFailure()
             underTest.copyNodeCheckingCollisions(parentId)
-            testNextEventIsOfType(FileInfoOneOffViewEvent.Finished.Copying::class.java)?.also {
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test FinishedDeletingVersions event is launched without exceptions when the delete versions finished successfully`() =
+        runTest {
+            mockDeleteVersionsSuccess()
+            underTest.deleteHistoryVersions()
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
+                Truth.assertThat(it.exception).isNull()
+            }
+        }
+
+    @Test
+    fun `test FinishedDeletingVersions event is launched with the proper exceptions when the delete versions finished with an error`() =
+        runTest {
+            mockDeleteVersionsFailure(null)
+            underTest.deleteHistoryVersions()
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
+                Truth.assertThat(it.exception).isNotNull()
+                Truth.assertThat(it.exception)
+                    .isNotInstanceOf(VersionsNotDeletedException::class.java)
+            }
+        }
+
+    @Test
+    fun `test FinishedDeletingVersions event is launched with the proper exceptions when the delete versions finished with some errors`() =
+        runTest {
+            val errors = 3
+            val total = 5
+            mockDeleteVersionsFailure(total, errors)
+            underTest.deleteHistoryVersions()
+            testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
+                Truth.assertThat(it.exception).isNotNull()
+                Truth.assertThat(it.exception).isInstanceOf(VersionsNotDeletedException::class.java)
+                (it.exception as? VersionsNotDeletedException)?.let { exception ->
+                    Truth.assertThat(exception.totalNotDeleted).isEqualTo(errors)
+                    Truth.assertThat(exception.totalRequestedToDelete).isEqualTo(total)
+                }
             }
         }
 
@@ -385,6 +429,20 @@ internal class FileInfoViewModelTest {
             testProgressIsSetWhileDeletingAndUnset()
         }
 
+    @Test
+    fun `test FileInfoJobInProgressState is set while deleting versions successfully, and unset at the end`() =
+        runTest {
+            mockDeleteVersionsSuccess()
+            testProgressIsSetWhileDeletingVersionsAndUnset()
+        }
+
+    @Test
+    fun `test FileInfoJobInProgressState is set while deleting versions with an error, and unset at the end`() =
+        runTest {
+            mockDeleteVersionsFailure()
+            testProgressIsSetWhileDeletingVersionsAndUnset()
+        }
+
 
     @Test
     fun `test on-off event is removed from state once is consumed`() {
@@ -397,16 +455,27 @@ internal class FileInfoViewModelTest {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private suspend fun <T : FileInfoOneOffViewEvent> testNextEventIsOfType(
+    private suspend fun <T : FileInfoOneOffViewEvent> testEventIsOfType(
         clazz: Class<T>,
     ): T? {
-        return getNextEvent().also {
+        return getEvent().also {
             Truth.assertThat(it).isInstanceOf(clazz)
         } as? T?
     }
 
-    private suspend fun getNextEvent(): FileInfoOneOffViewEvent =
-        underTest.uiState.mapNotNull { it.oneOffViewEvent }.first()
+    private suspend fun <T : FileInfoJobInProgressState> testNextEventIsOfTypeFinishedAndJobIsOfType(
+        finishedJobClass: Class<T>,
+    ): FileInfoOneOffViewEvent.Finished? {
+        return getEvent().also {
+            Truth.assertThat(it).isInstanceOf(FileInfoOneOffViewEvent.Finished::class.java)
+            val jobFinished = (it as FileInfoOneOffViewEvent.Finished).jobFinished
+            Truth.assertThat(jobFinished).isInstanceOf(finishedJobClass)
+        } as? FileInfoOneOffViewEvent.Finished?
+    }
+
+    private suspend fun getEvent(): FileInfoOneOffViewEvent =
+        underTest.uiState.value.oneOffViewEvent
+            ?: underTest.uiState.mapNotNull { it.oneOffViewEvent }.first()
 
 
     private suspend fun mockCollisionCopying() {
@@ -459,6 +528,23 @@ internal class FileInfoViewModelTest {
         whenever(deleteNodeByHandle.invoke(nodeId)).thenReturn(Unit)
     }
 
+    private suspend fun mockDeleteVersionsSuccess() {
+        whenever(deleteNodeVersionsByHandle.invoke(nodeId)).thenReturn(Unit)
+    }
+
+    private suspend fun mockDeleteVersionsFailure(
+        totalRequested: Int? = null,
+        totalFailure: Int? = null,
+    ) {
+        whenever(deleteNodeVersionsByHandle.invoke(nodeId)).thenThrow(
+            if (totalFailure == null) {
+                RuntimeException("fake exception")
+            } else {
+                VersionsNotDeletedException(totalRequested ?: (totalFailure + 1), totalFailure)
+            }
+        )
+    }
+
     private suspend fun mockDeleteFailure() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
         underTest.updateNode(node)
@@ -476,13 +562,18 @@ internal class FileInfoViewModelTest {
         }
 
     private suspend fun testProgressIsSetWhileMovingToRubbishBinAndUnset() =
-        testProgressSetAndUnset(FileInfoJobInProgressState.MovingToRubbishBin) {
+        testProgressSetAndUnset(FileInfoJobInProgressState.MovingToRubbish) {
             underTest.removeNode()
         }
 
     private suspend fun testProgressIsSetWhileDeletingAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.Deleting) {
             underTest.removeNode()
+        }
+
+    private suspend fun testProgressIsSetWhileDeletingVersionsAndUnset() =
+        testProgressSetAndUnset(FileInfoJobInProgressState.DeletingVersions) {
+            underTest.deleteHistoryVersions()
         }
 
     private suspend fun testProgressSetAndUnset(

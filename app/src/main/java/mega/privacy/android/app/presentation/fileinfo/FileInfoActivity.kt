@@ -170,6 +170,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         }
 
         override fun onNodesUpdate(api: MegaApiJava, nodes: java.util.ArrayList<MegaNode>?) {
+            nodes?.find {
+                it.handle == viewModel.node.handle
+                        || it.parentHandle == viewModel.node.handle
+                        || it.handle == viewModel.node.parentHandle
+            }?.let {
+                viewModel.updateNode()
+            }
             this@FileInfoActivity.onNodesUpdate(nodes)
         }
 
@@ -274,9 +281,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         }
     }
     private var actionMode: ActionMode? = null
-    private var versionsToRemove = 0
-    private var versionsRemoved = 0
-    private var errorVersionRemove = 0
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
     private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
@@ -545,15 +549,18 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     private fun updateOptionsMenu(state: FileInfoViewState) {
-        if (state.jobInProgressState == FileInfoJobInProgressState.InitialLoading) return
-        menuHelper.updateOptionsMenu(
-            node = viewModel.node,
-            isInInbox = state.isNodeInInbox,
-            isInRubbish = state.isNodeInRubbish,
-            fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
-            firstIncomingLevel = firstIncomingLevel,
-            nodeAccess = megaApi.getAccess(viewModel.node),
-        )
+        if (state.jobInProgressState == null) {
+            menuHelper.updateOptionsMenu(
+                node = viewModel.node,
+                isInInbox = state.isNodeInInbox,
+                isInRubbish = state.isNodeInRubbish,
+                fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
+                firstIncomingLevel = firstIncomingLevel,
+                nodeAccess = megaApi.getAccess(viewModel.node),
+            )
+        } else {
+            menuHelper.disableMenu()
+        }
     }
 
     private fun consumeEvent(event: FileInfoOneOffViewEvent) {
@@ -573,11 +580,9 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
             is FileInfoOneOffViewEvent.Finished -> {
                 if (event.exception == null) {
-                    showSnackBar(event.successMessage)
+                    showSnackBar(event.jobFinished.successMessage)
                     sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
-                    if (event !is FileInfoOneOffViewEvent.Finished.Copying) {
-
-                        // finish after moving the file because the view will be fully updated automatically
+                    if (event.jobFinished.needsToFinish) {
                         finish()
                     }
                 } else {
@@ -591,13 +596,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         viewModel.consumeOneOffEvent(event)
     }
 
-    private fun showSnackBar(@StringRes resString: Int) =
-        showSnackBar(getFormattedStringOrDefault(resString))
+    private fun showSnackBar(@StringRes resString: Int?) =
+        resString?.let { showSnackBar(getFormattedStringOrDefault(it)) }
 
-    private fun showSnackBar(message: String) {
+    private fun showSnackBar(message: String?) = message?.let {
         showSnackbar(
             Constants.SNACKBAR_TYPE,
-            message,
+            it,
             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         )
     }
@@ -948,11 +953,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     return@registerForActivityResult
                 }
                 if (result == viewModel.node.handle) {
-                    val versions = megaApi.getVersions(viewModel.node)
-                    versionsToRemove = versions.size - 1
-                    for (i in 1 until versions.size) {
-                        megaApi.removeVersion(versions[i], megaRequestListener)
-                    }
+                    viewModel.deleteHistoryVersions()
                 }
             }
     }
@@ -1439,46 +1440,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
                 bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = false
-            }
-        } else if (request.type == MegaRequest.TYPE_REMOVE) {
-            if (versionsToRemove > 0) {
-                Timber.d("Remove request finished")
-                if (e?.errorCode == MegaError.API_OK) {
-                    versionsRemoved++
-                } else {
-                    errorVersionRemove++
-                }
-                if (versionsRemoved + errorVersionRemove == versionsToRemove) {
-                    if (versionsRemoved == versionsToRemove) {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getFormattedStringOrDefault(R.string.version_history_deleted),
-                            -1
-                        )
-                    } else {
-                        val firstLine = getFormattedStringOrDefault(
-                            R.string.version_history_deleted_erroneously
-                        )
-                        val secondLine = getQuantityStringOrDefault(
-                            R.plurals.versions_deleted_succesfully,
-                            versionsRemoved,
-                            versionsRemoved
-                        )
-                        val thirdLine = getQuantityStringOrDefault(
-                            R.plurals.versions_not_deleted,
-                            errorVersionRemove,
-                            errorVersionRemove
-                        )
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            "$firstLine\n$secondLine\n$thirdLine",
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                        )
-                    }
-                    versionsToRemove = 0
-                    versionsRemoved = 0
-                    errorVersionRemove = 0
-                }
             }
         } else if (request.type == MegaApiJava.USER_ATTR_AVATAR) {
             try {

@@ -76,6 +76,21 @@ internal class FileInfoToolbarHelper(
     private var deleteMenuItem: MenuItem? = null
     private var leaveMenuItem: MenuItem? = null
     private var sendToChatMenuItem: MenuItem? = null
+    private val allMenuItems
+        get() = arrayListOf(
+            downloadMenuItem,
+            shareMenuItem,
+            getLinkMenuItem,
+            editLinkMenuItem,
+            removeLinkMenuItem,
+            renameMenuItem,
+            moveMenuItem,
+            copyMenuItem,
+            rubbishMenuItem,
+            deleteMenuItem,
+            leaveMenuItem,
+            sendToChatMenuItem,
+        )
 
     private var currentColorFilter = 0
 
@@ -135,6 +150,10 @@ internal class FileInfoToolbarHelper(
         firstIncomingLevel: Boolean,
         nodeAccess: Int,
     ) {
+        allMenuItems.forEach {
+            it?.isVisible = false
+            it?.isEnabled = true
+        }
         setIconsColorFilter()
         setupOptionsToolbar(
             node = node,
@@ -145,6 +164,10 @@ internal class FileInfoToolbarHelper(
         )
         // Check if read-only properties should be applied on MenuItems
         shouldApplyMenuItemReadOnlyState(isInInbox)
+    }
+
+    fun disableMenu() {
+        allMenuItems.forEach { it?.isEnabled = true }
     }
 
     /**
