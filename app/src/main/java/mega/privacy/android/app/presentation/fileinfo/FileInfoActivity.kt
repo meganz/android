@@ -98,8 +98,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncoming
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.PreviewUtils
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
@@ -512,6 +510,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     private fun updateView(viewState: FileInfoViewState) {
+        menuHelper.setPreview(viewState.actualPreviewUriString)
         with(bindingContent) {
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
@@ -1044,27 +1043,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 bindingContent.filePropertiesInfoDataCreated.text = ""
             }
 
-            val preview = PreviewUtils.getPreviewFromCache(viewModel.node)
-                ?: PreviewUtils.getPreviewFromFolder(viewModel.node, this)
-            if (preview == null) {
-                if (viewModel.node.hasPreview()) {
-                    val previewFile =
-                        File(
-                            PreviewUtils.getPreviewFolder(this),
-                            "${viewModel.node.base64Handle}.jpg"
-                        )
-                    megaApi.getPreview(
-                        viewModel.node,
-                        previewFile.absolutePath,
-                        megaRequestListener
-                    )
-                }
-            }
-            (preview ?: ThumbnailUtils.getThumbnailFromCache(viewModel.node)
-            ?: ThumbnailUtils.getThumbnailFromFolder(viewModel.node, this))?.let {
-                menuHelper.setPreview(it)
-            }
-
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
             if (!viewState.isNodeInInbox && megaApi.hasVersions(viewModel.node)) {
@@ -1378,20 +1356,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             hideMultipleSelect()
         }
         Timber.d("onRequestFinish: %d__%s", request.type, request.requestString)
-        if (request.type == MegaRequest.TYPE_GET_ATTR_FILE) {
-            if (e?.errorCode == MegaError.API_OK) {
-                val previewDir = PreviewUtils.getPreviewFolder(this)
-                val preview = File(previewDir, viewModel.node.base64Handle + ".jpg")
-                if (preview.exists()) {
-                    if (preview.length() > 0) {
-                        PreviewUtils.getBitmapForCache(preview, this)?.also { bitmap ->
-                            PreviewUtils.previewCache.put(viewModel.node.handle, bitmap)
-                            menuHelper.setPreview(bitmap)
-                        }
-                    }
-                }
-            }
-        } else if (request.type == MegaRequest.TYPE_FOLDER_INFO) {
+        if (request.type == MegaRequest.TYPE_FOLDER_INFO) {
 
             // If the Folder belongs to Backups, hide all Folder Version layouts
             if (viewModel.isNodeInInbox()) {

@@ -14,6 +14,8 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -25,6 +27,7 @@ import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import nz.mega.sdk.MegaNode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -43,6 +46,8 @@ class FileInfoViewModel @Inject constructor(
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     private val deleteNodeByHandle: DeleteNodeByHandle,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
+    private val getThumbnail: GetThumbnail,
+    private val getPreview: GetPreview,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -73,6 +78,22 @@ class FileInfoViewModel @Inject constructor(
                     isNodeInRubbish = isNodeInRubbish(node.handle),
                     jobInProgressState = if (clearProgressState) null else it.jobInProgressState,
                 )
+            }
+        }
+        updatePreview()
+    }
+
+    private fun updatePreview() {
+        viewModelScope.launch {
+            if (_uiState.value.thumbnailUriString == null) {
+                _uiState.update {
+                    it.copy(thumbnailUriString = getThumbnail(node.handle)?.uriStringIfExists())
+                }
+            }
+            if (node.hasPreview() && _uiState.value.previewUriString == null) {
+                _uiState.update {
+                    it.copy(previewUriString = getPreview(node.handle)?.uriStringIfExists())
+                }
             }
         }
     }
@@ -265,4 +286,6 @@ class FileInfoViewModel @Inject constructor(
                 jobInProgressState = null,
             )
         }
+
+    private fun File?.uriStringIfExists() = this?.takeIf { it.exists() }?.toURI()?.toString()
 }

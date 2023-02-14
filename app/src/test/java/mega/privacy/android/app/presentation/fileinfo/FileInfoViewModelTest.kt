@@ -20,6 +20,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -40,6 +42,8 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.io.File
+import java.net.URI
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -59,6 +63,11 @@ internal class FileInfoViewModelTest {
     private lateinit var deleteNodeVersionsByHandle: DefaultDeleteNodeVersionsByHandle
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
+    private lateinit var getThumbnail: GetThumbnail
+    private lateinit var getPreview: GetPreview
+
+    private lateinit var thumbFile: File
+    private lateinit var previewFile: File
 
 
     @get:Rule
@@ -88,31 +97,42 @@ internal class FileInfoViewModelTest {
         deleteNodeVersionsByHandle = mock()
         node = mock()
         nameCollision = mock()
+        getThumbnail = mock()
+        getPreview = mock()
+        previewFile = mock()
+        thumbFile = mock()
     }
 
     private fun initUnderTestViewModel() {
         underTest = FileInfoViewModel(
-            monitorStorageStateEvent,
-            monitorConnectivity,
-            getFileHistoryNumVersions,
-            isNodeInInbox,
-            isNodeInRubbish,
-            checkNameCollision,
-            moveNodeByHandle,
-            copyNodeByHandle,
-            moveNodeToRubbishByHandle,
-            deleteNodeByHandle,
-            deleteNodeVersionsByHandle,
+            monitorStorageStateEvent = monitorStorageStateEvent,
+            monitorConnectivity = monitorConnectivity,
+            getFileHistoryNumVersions = getFileHistoryNumVersions,
+            isNodeInInbox = isNodeInInbox,
+            isNodeInRubbish = isNodeInRubbish,
+            checkNameCollision = checkNameCollision,
+            moveNodeByHandle = moveNodeByHandle,
+            copyNodeByHandle = copyNodeByHandle,
+            moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
+            deleteNodeByHandle = deleteNodeByHandle,
+            deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
+            getThumbnail = getThumbnail,
+            getPreview = getPreview
         )
         underTest.updateNode(node)
     }
 
     private suspend fun initDefaultMockBehaviour() {
         whenever(node.handle).thenReturn(NODE_HANDLE)
+        whenever(node.hasPreview()).thenReturn(true)
         whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
         whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
         whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
+        whenever(previewFile.exists()).thenReturn(true)
+        whenever(thumbFile.exists()).thenReturn(true)
+        whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
+        whenever(thumbFile.toURI()).thenReturn(URI.create(thumbUri))
     }
 
     @After
@@ -454,6 +474,42 @@ internal class FileInfoViewModelTest {
         }
     }
 
+    @Test
+    fun `test preview is assigned when node is updated`() = runTest {
+        whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
+        whenever(getThumbnail.invoke(NODE_HANDLE)).thenReturn(null)
+        underTest.updateNode(node)
+        underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
+            val state = awaitItem()
+            Truth.assertThat(state).isEqualTo(previewUri)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test thumbnail is assigned when node is updated and there are no preview`() = runTest {
+        whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(null)
+        whenever(getThumbnail.invoke(NODE_HANDLE)).thenReturn(thumbFile)
+        underTest.updateNode(node)
+        underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
+            val state = awaitItem()
+            Truth.assertThat(state).isEqualTo(thumbUri)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test preview has priority over thumbnail`() = runTest {
+        whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
+        whenever(getThumbnail.invoke(NODE_HANDLE)).thenReturn(thumbFile)
+        underTest.updateNode(node)
+        underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
+            val state = awaitItem()
+            Truth.assertThat(state).isEqualTo(previewUri)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : FileInfoOneOffViewEvent> testEventIsOfType(
         clazz: Class<T>,
@@ -594,5 +650,7 @@ internal class FileInfoViewModelTest {
         private const val PARENT_NODE_HANDLE = 12L
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
+        private const val thumbUri = "thumb"
+        private const val previewUri = "preview"
     }
 }
