@@ -13,7 +13,6 @@ import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity;
-import mega.privacy.android.app.utils.permission.PermissionUtils;
 import timber.log.Timber;
 
 
@@ -42,30 +41,6 @@ public class UploadUtil {
     }
 
     /**
-     * Opens the system file picker to choose files to upload.
-     *
-     * @param activity Activity to start the Intent.
-     */
-    public static void chooseFiles(Activity activity) {
-        activity.startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT)
-                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                .setType("*/*"), null), Constants.REQUEST_CODE_GET_FILES);
-
-        PermissionUtils.checkNotificationsPermission(activity);
-    }
-
-    /**
-     * Opens the system file picker to choose a folder to upload.
-     *
-     * @param activity Activity to start the Intent.
-     */
-    public static void chooseFolder(Activity activity) {
-        activity.startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), null), Constants.REQUEST_CODE_GET_FOLDER);
-        PermissionUtils.checkNotificationsPermission(activity);
-    }
-
-    /**
      * Opens the UploadFolderActivity to choose a folder content to upload.
      *
      * @param activity     Activity to start the Intent.
@@ -86,28 +61,5 @@ public class UploadUtil {
                         .setData(uri)
                         .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentHandle),
                 Constants.REQUEST_CODE_GET_FOLDER_CONTENT);
-    }
-
-    /**
-     * The method is to return sdcard root of the file
-     *
-     * @param sd the sd card file
-     * @return where the file's sd card root is
-     */
-    public static String getSDCardRoot(File sd) {
-        String s = sd.getPath();
-        int i = 0, x = 0;
-        for (;
-             x < s.toCharArray().length;
-             x++) {
-            char c = s.toCharArray()[x];
-            if (c == '/') {
-                i++;
-            }
-            if (i == 3) {
-                break;
-            }
-        }
-        return s.substring(0, x);
     }
 }

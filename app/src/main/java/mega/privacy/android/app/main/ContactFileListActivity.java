@@ -1,9 +1,12 @@
 package mega.privacy.android.app.main;
 
+import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE;
 import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFilesManually;
+import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFolderManually;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.EXTRA_ACTION_RESULT;
@@ -33,8 +36,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFile
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getTemporalTakePictureFile;
 import static mega.privacy.android.app.utils.Util.checkTakePicture;
@@ -54,6 +55,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -67,6 +69,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -229,6 +233,22 @@ public class ContactFileListActivity extends PasscodeActivity
         super.onSaveInstanceState(outState);
     }
 
+    /**
+     * When manually uploading Files and the device is running Android 13 and above, this Launcher
+     * is called to request the Notification Permission (if possible) and upload Files regardless
+     * if the Notification Permission is granted or not
+     */
+    private final ActivityResultLauncher<String> manualUploadFilesLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> uploadFilesManually(this));
+
+    /**
+     * When manually uploading a Folder and the device is running Android 13 and above, this Launcher
+     * is called to request the Notification Permission whenever possible, and upload the Folder
+     * regardless if the Notification Permission is granted or not
+     */
+    private final ActivityResultLauncher<String> manualUploadFolderLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> uploadFolderManually(this));
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Timber.d("onOptionsItemSelected");
@@ -244,12 +264,20 @@ public class ContactFileListActivity extends PasscodeActivity
 
     @Override
     public void uploadFiles() {
-        chooseFiles(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            manualUploadFilesLauncher.launch(POST_NOTIFICATIONS);
+        } else {
+            uploadFilesManually(this);
+        }
     }
 
     @Override
     public void uploadFolder() {
-        chooseFolder(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            manualUploadFolderLauncher.launch(POST_NOTIFICATIONS);
+        } else {
+            uploadFolderManually(this);
+        }
     }
 
     @Override
@@ -901,7 +929,6 @@ public class ContactFileListActivity extends PasscodeActivity
                         }
 
                         if (!withoutCollisions.isEmpty()) {
-                            PermissionUtils.checkNotificationsPermission(this);
                             String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
                             uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main;
 
+import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS;
@@ -34,6 +35,8 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFilesManually;
+import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFolderManually;
 import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.fileBrowserState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.inboxState;
@@ -115,8 +118,6 @@ import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getTemporalTakePictureFile;
 import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
@@ -206,6 +207,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -1147,6 +1150,22 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
         }
     }
+
+    /**
+     * When manually uploading Files and the device is running Android 13 and above, this Launcher
+     * is called to request the Notification Permission (if possible) and upload Files regardless
+     * if the Notification Permission is granted or not
+     */
+    private final ActivityResultLauncher<String> manualUploadFilesLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> uploadFilesManually(this));
+
+    /**
+     * When manually uploading a Folder and the device is running Android 13 and above, this Launcher
+     * is called to request the Notification Permission whenever possible, and upload the Folder
+     * regardless if the Notification Permission is granted or not
+     */
+    private final ActivityResultLauncher<String> manualUploadFolderLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> uploadFolderManually(this));
 
     public void setTypesCameraPermission(int typesCameraPermission) {
         this.typesCameraPermission = typesCameraPermission;
@@ -2784,7 +2803,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         boolean notificationsGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS);
+                || hasPermissions(this, POST_NOTIFICATIONS);
 
         boolean writeStorageGranted = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         String[] PERMISSIONS = new String[]{
@@ -6573,12 +6592,20 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void uploadFiles() {
-        chooseFiles(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            manualUploadFilesLauncher.launch(POST_NOTIFICATIONS);
+        } else {
+            uploadFilesManually(this);
+        }
     }
 
     @Override
     public void uploadFolder() {
-        chooseFolder(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            manualUploadFolderLauncher.launch(POST_NOTIFICATIONS);
+        } else {
+            uploadFolderManually(this);
+        }
     }
 
     @Override
@@ -8850,7 +8877,6 @@ public class ManagerActivity extends TransfersManagementActivity
                                 if (info.isContact) {
                                     requestContactsPermissions(info, parentNode);
                                 } else {
-                                    PermissionUtils.checkNotificationsPermission(this);
                                     uploadUseCase.upload(this, info, null, parentNode.getHandle())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
