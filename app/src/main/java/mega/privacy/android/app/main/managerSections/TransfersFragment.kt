@@ -34,6 +34,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -55,6 +56,13 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * MegaApiFolder injection
+     */
+    @Inject
+    @MegaApiFolder
+    lateinit var megaApiFolder: MegaApiAndroid
 
     private var adapter: MegaTransfersAdapter? = null
 
@@ -86,12 +94,15 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         viewModel.setActiveTransfers((requireActivity() as ManagerActivity).transfersInProgress)
 
         binding.transfersListView.let { recyclerView ->
-            adapter = MegaTransfersAdapter(context = requireActivity(),
+            adapter = MegaTransfersAdapter(
+                context = requireActivity(),
                 transfers = viewModel.getActiveTransfers(),
                 listView = recyclerView,
                 selectModeInterface = this,
                 transfersViewModel = viewModel,
-                megaApi = megaApi)
+                megaApi = megaApi,
+                megaApiFolder = megaApiFolder
+            )
 
             adapter?.setMultipleSelect(false)
             recyclerView.adapter = adapter
