@@ -139,18 +139,20 @@
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="8dp"
                 android:gravity="center"
                 android:text="@string/add_to_cloud" />
 
             <Button
                 android:id="@+id/folder_link_file_link_button_download"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?attr/borderlessButtonStyle"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="8dp"
                 android:gravity="center"
-                android:layout_marginEnd="16dp"
-                android:text="@string/general_save_to_device"/>
+                android:text="@string/general_save_to_device" />
         </LinearLayout>
 
         <View
@@ -176,20 +178,28 @@
                     android:id="@+id/folder_link_file_link_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="80dp"
                     android:gravity="left"
-                    android:orientation="vertical" >
+                    android:orientation="vertical">
 
                     <ImageView
                         android:id="@+id/folder_link_file_link_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="200dp" />
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_centerHorizontal="true" />
 
                     <TextView
                         android:id="@+id/folder_link_file_link_name"
-                        android:layout_below="@id/folder_link_file_link_icon"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/folder_link_file_link_icon"
+                        android:layout_marginStart="60dp"
+                        android:layout_marginBottom="20dp"
+                        android:ellipsize="middle"
+                        android:maxLines="1"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
                     <View
                         android:id="@+id/folder_link_separator_1"
@@ -231,6 +241,8 @@
                                 android:id="@+id/folder_link_file_link_info_menu_size"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginTop="15dp"
                                 android:text="@string/file_properties_info_size_file"
                                 android:textAppearance="?attr/textAppearanceSubtitle1" />
 
@@ -239,6 +251,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/folder_link_file_link_info_menu_size"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginBottom="15dp"
                                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
                         </RelativeLayout>
                     </LinearLayout>
