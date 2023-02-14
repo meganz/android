@@ -85,6 +85,7 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -128,6 +129,7 @@ class MyAccountViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val changeEmail: ChangeEmail,
     private val updateCurrentUserName: UpdateCurrentUserName,
+    private val getCurrentUserEmail: GetCurrentUserEmail,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -171,12 +173,27 @@ class MyAccountViewModel @Inject constructor(
     init {
         refreshNumberOfSubscription(false)
         refreshUserName(false)
+        refreshCurrentUserEmail()
         viewModelScope.launch {
             monitorUserUpdates()
-                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname }
+                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
                 .collect {
-                    refreshUserName(true)
+                    when (it) {
+                        UserChanges.Email -> refreshCurrentUserEmail()
+                        UserChanges.Firstname,
+                        UserChanges.Lastname,
+                        -> refreshUserName(true)
+                        else -> Unit
+                    }
                 }
+        }
+    }
+
+    private fun refreshCurrentUserEmail() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(email = getCurrentUserEmail().orEmpty())
+            }
         }
     }
 
@@ -309,7 +326,7 @@ class MyAccountViewModel @Inject constructor(
 
     fun getName(): String = state.value.name
 
-    fun getEmail(): String? = megaApi.myEmail
+    fun getEmail(): String = state.value.email
 
     fun getAccountType(): Int = myAccountInfo.accountType
 

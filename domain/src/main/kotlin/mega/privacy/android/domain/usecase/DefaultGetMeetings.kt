@@ -13,8 +13,11 @@ import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import java.time.Instant
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 /**
@@ -68,7 +71,9 @@ class DefaultGetMeetings @Inject constructor(
                                 schedId = updatedItem.schedId,
                                 scheduledStartTimestamp = updatedItem.scheduledStartTimestamp,
                                 scheduledEndTimestamp = updatedItem.scheduledEndTimestamp,
-                                isRecurring = updatedItem.isRecurring,
+                                isRecurringDaily = updatedItem.isRecurringDaily,
+                                isRecurringWeekly = updatedItem.isRecurringWeekly,
+                                isRecurringMonthly = updatedItem.isRecurringMonthly,
                                 isPending = updatedItem.isPending,
                             )
                             set(newIndex, newUpdatedItem)
@@ -170,7 +175,9 @@ class DefaultGetMeetings @Inject constructor(
                                     schedId = updatedItem.schedId,
                                     scheduledStartTimestamp = updatedItem.scheduledStartTimestamp,
                                     scheduledEndTimestamp = updatedItem.scheduledEndTimestamp,
-                                    isRecurring = updatedItem.isRecurring,
+                                    isRecurringDaily = updatedItem.isRecurringDaily,
+                                    isRecurringWeekly = updatedItem.isRecurringWeekly,
+                                    isRecurringMonthly = updatedItem.isRecurringMonthly,
                                     isPending = updatedItem.isPending,
                                 )
                                 set(newIndex, newUpdatedItem)
@@ -189,26 +196,33 @@ class DefaultGetMeetings @Inject constructor(
         )
 
     private suspend fun getScheduledMeetingItem(item: MeetingRoomItem): MeetingRoomItem? =
-        chatRepository.getScheduledMeetingsByChat(item.chatId)?.firstOrNull()?.let { schedMeeting ->
-            val isPending = schedMeeting.isPending()
-            var startTimestamp = schedMeeting.startDateTime
-            var endTimestamp = schedMeeting.endDateTime
+        chatRepository.getScheduledMeetingsByChat(item.chatId)
+            ?.firstOrNull()
+            ?.let { schedMeeting ->
+                val isPending = item.isActive && schedMeeting.isPending()
+                val isRecurringDaily = schedMeeting.rules?.freq == OccurrenceFrequencyType.Daily
+                val isRecurringWeekly = schedMeeting.rules?.freq == OccurrenceFrequencyType.Weekly
+                val isRecurringMonthly = schedMeeting.rules?.freq == OccurrenceFrequencyType.Monthly
+                var startTimestamp = schedMeeting.startDateTime
+                var endTimestamp = schedMeeting.endDateTime
 
-            if (isPending && schedMeeting.rules?.until != null) {
-                getNextOccurrence(item.chatId)?.let { nextOccurrence ->
-                    startTimestamp = nextOccurrence.startDateTime
-                    endTimestamp = nextOccurrence.endDateTime
+                if (isPending && schedMeeting.rules != null) {
+                    getNextOccurrence(item.chatId)?.let { nextOccurrence ->
+                        startTimestamp = nextOccurrence.startDateTime
+                        endTimestamp = nextOccurrence.endDateTime
+                    } ?: return null
                 }
-            }
 
-            item.copy(
-                schedId = schedMeeting.schedId,
-                scheduledStartTimestamp = startTimestamp,
-                scheduledEndTimestamp = endTimestamp,
-                isRecurring = schedMeeting.rules != null,
-                isPending = item.isActive && isPending,
-            )
-        }
+                item.copy(
+                    schedId = schedMeeting.schedId,
+                    scheduledStartTimestamp = startTimestamp,
+                    scheduledEndTimestamp = endTimestamp,
+                    isRecurringDaily = isRecurringDaily,
+                    isRecurringWeekly = isRecurringWeekly,
+                    isRecurringMonthly = isRecurringMonthly,
+                    isPending = isPending,
+                )
+            }
 
     private suspend fun MutableList<MeetingRoomItem>.sortMeetings(mutex: Mutex) {
         mutex.withLock {
@@ -239,12 +253,9 @@ class DefaultGetMeetings @Inject constructor(
 
     private suspend fun getNextOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
         runCatching {
-            val now = System.currentTimeMillis() / 1000
-            chatRepository.fetchScheduledMeetingOccurrencesByChat(chatId)
-                ?.filter { (it.startDateTime ?: 0) > now }
-                ?.minByOrNull { it.startDateTime ?: 0 }
-        }.fold(
-            onSuccess = { result -> result },
-            onFailure = { null }
-        )
+            chatRepository.fetchScheduledMeetingOccurrencesByChat(
+                chatId,
+                Instant.now().atZone(ZoneOffset.UTC).toEpochSecond()
+            ).first()
+        }.getOrNull()
 }

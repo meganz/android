@@ -569,7 +569,7 @@ class AlbumsViewModelTest {
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
-                    R.string.photos_create_album_error_message_systems_album,
+                    R.string.invalid_string,
                     item.createDialogErrorMessage
                 )
             }

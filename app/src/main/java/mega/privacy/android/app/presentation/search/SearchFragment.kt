@@ -142,6 +142,8 @@ class SearchFragment : RotatableFragment() {
 
     private var nodes = mutableListOf<MegaNode>()
 
+    private lateinit var activityContext: Context
+
     /**
      * [Boolean] value referenced from [managerActivity]
      *
@@ -155,7 +157,12 @@ class SearchFragment : RotatableFragment() {
      * Returns instance of [ManagerActivity] from [requireActivity]
      */
     private val managerActivity: ManagerActivity
-        get() = (requireActivity() as ManagerActivity)
+        get() = (activityContext as ManagerActivity)
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        activityContext = context
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -877,7 +884,7 @@ class SearchFragment : RotatableFragment() {
                 return
             }
             if (nodes[position].isFolder) {
-                searchViewModel.setSearchParentHandle(nodes.get(position).getHandle())
+                searchViewModel.setSearchParentHandle(nodes[position].handle)
                 searchViewModel.increaseSearchDepth()
 
                 var lastFirstVisiblePosition: Int

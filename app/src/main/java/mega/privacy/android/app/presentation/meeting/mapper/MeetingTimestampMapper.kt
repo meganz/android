@@ -61,6 +61,7 @@ internal fun toScheduledTimeFormatted(meeting: MeetingRoomItem, is24HourFormat: 
  */
 private fun getFormattedHour(instant: Instant, is24HourFormat: Boolean): String =
     DateTimeFormatter
-        .ofPattern(if (is24HourFormat) "HH:mm" else "hh:mm a")
+        .ofPattern(if (is24HourFormat) "HH:mm" else "hh:mma")
         .withZone(ZoneId.systemDefault())
         .format(instant)
+        .lowercase()

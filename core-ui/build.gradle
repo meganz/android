@@ -55,6 +55,7 @@ dependencies {
     implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
     implementation 'androidx.compose.ui:ui-tooling'
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
 
     //Showkase
     implementation "com.airbnb.android:showkase:$showkaseVersion"

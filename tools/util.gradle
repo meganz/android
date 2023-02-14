@@ -231,6 +231,34 @@ boolean shouldActivateGreeter() {
     return false
 }
 
+/**
+ * Get flag to activate Nocturn developer tool from local.properties file.
+ */
+boolean shouldActivateNocturn() {
+    def file = rootProject.file('local.properties')
+    if (file.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(file))
+        return props["activate_nocturn"]?.toBoolean() ?: false
+    }
+    return false
+}
+
+/**
+ * Get timeout in millis for Nocturn to decide the app is in ANR state.
+ */
+Long getNocturnTimeout() {
+    def defaultTimeout = 2000L
+
+    def file = rootProject.file('local.properties')
+    if (file.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(file))
+        return props["nocturn_timeout"]?.toLong() ?: defaultTimeout
+    }
+    return defaultTimeout
+}
+
 ext {
     readVersionCode = this.&readVersionCode
     readVersionNameTag = this.&readVersionNameTag
@@ -245,4 +273,6 @@ ext {
     getSdkGitHash = this.&getSdkGitHash
     getChatGitHash = this.&getChatGitHash
     shouldActivateGreeter = this.&shouldActivateGreeter
+    shouldActivateNocturn = this.&shouldActivateNocturn
+    getNocturnTimeout = this.&getNocturnTimeout
 }

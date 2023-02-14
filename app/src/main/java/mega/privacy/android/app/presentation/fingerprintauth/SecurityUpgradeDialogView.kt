@@ -17,10 +17,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +39,7 @@ import mega.privacy.android.core.ui.theme.subtitle1
  * @param onOkClick     : Ok button click listener
  * @param onCancelClick : Cancel button click listener
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SecurityUpgradeDialogView(
     folderName: String,
@@ -84,8 +87,8 @@ fun SecurityUpgradeDialogView(
                     Spacer(Modifier.height(20.dp))
 
                     Text(modifier = Modifier.testTag("SharedNodeInfo"),
-                        text = stringResource(id = R.string.shared_items_security_upgrade_dialog_node_sharing_info,
-                            folderName),
+                        text = pluralStringResource(id = R.plurals.shared_items_security_upgrade_dialog_node_sharing_info,
+                            1, folderName),
                         style = body2.copy(textAlign = TextAlign.Center),
                         color = if (MaterialTheme.colors.isLight) {
                             Color.Black

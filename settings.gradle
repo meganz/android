@@ -6,6 +6,8 @@ include ':core-ui'
 include ':screenshot'
 include ':data'
 include ':lint'
+include ':feature:sync'
 if (!shouldUsePrebuiltSdk() || isCiBuild()) {
     include ':sdk'
 }
+include ':nocturn'

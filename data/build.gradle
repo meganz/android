@@ -8,6 +8,7 @@ plugins {
 apply plugin: 'jacoco'
 apply from: "$project.rootDir/tools/jacoco.gradle"
 apply from: "$project.rootDir/tools/util.gradle"
+apply from: "$project.rootDir/tools/sdk.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -59,14 +60,6 @@ android {
 
 dependencies {
     implementation project(':domain')
-
-    if (shouldUsePrebuiltSdk()) {
-        println("[data] use remote pre-built SDK")
-        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
-    } else {
-        println("[data] use local SDK")
-        implementation project(':sdk')
-    }
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "com.google.code.gson:gson:$gsonVersion"

@@ -427,11 +427,13 @@ String buildLintSummaryTable(String jsonLintReportLink) {
     // Declare a JsonSlurperClassic object
     def jsonSlurperClassic = new JsonSlurperClassic()
 
-    // Declare the initial value for the String
-    String tableStr = "**Lint Summary:** (${jsonLintReportLink}):" + "\n\n" +
-            "| Module | Fatal | Error | Warning | Information | Error Message |\n" +
+    // Declare the initial value for the Table String
+    String tableStr = "| Module | Fatal | Error | Warning | Information | Error Message |\n" +
             "| :---: | :---: | :---: | :---: | :---: | :---: |\n"
 
+    int fatalCount = 0
+    int errorCount = 0
+    int warningCount = 0
     // Iterate through all the values in LINT_REPORT_SUMMARY_MAP and add a row per module
     // The standard method of iterating a map returns an error when used with a Jenkins pipeline,
     // which is why the map iteration is set up in this manner
@@ -446,10 +448,16 @@ String buildLintSummaryTable(String jsonLintReportLink) {
                 "| $jsonObject.warningCount " +
                 "| $jsonObject.informationCount " +
                 "| $jsonObject.errorMessage |\n"
+        fatalCount +=  jsonObject.fatalCount as int
+        errorCount +=  jsonObject.errorCount as int
+        warningCount +=  jsonObject.warningCount as int
     }
 
-    // Return the final result after iterating through all modules
-    tableStr
+    // Create Summary to be returned after iterating through all modules
+    String lintSummary = "<details><summary><b>Lint Summary:</b> Fatal(${fatalCount}) Error(${errorCount}) Warning(${warningCount})</summary>" + "\n ${jsonLintReportLink} \n\n" + tableStr + "</details>"
+
+    // Return the final result
+    lintSummary
 }
 
 /**
@@ -462,8 +470,9 @@ String buildLintSummaryTable(String jsonLintReportLink) {
 String buildCodeComparisonResults() {
     def latestDevelopResults = new JsonSlurperClassic().parseText(ARTIFACTORY_DEVELOP_CODE_COVERAGE)
 
-    String tableString = "**Code Coverage and Comparison:**".concat("\n\n")
-            .concat("| Module | Test Cases | Coverage | Coverage Change |").concat("\n")
+    String codeComparisonSummary = "<details><summary><b>Code Coverage and Comparison:</b>"
+
+    String tableString = "\n\n".concat("| Module | Test Cases | Coverage | Coverage Change |").concat("\n")
             .concat("|:---|:---|:---|:---|").concat("\n")
 
     def currentModuleTestCases = []
@@ -498,9 +507,12 @@ String buildCodeComparisonResults() {
 
         // Add a Column for every item in the list
         tableString = tableString.concat("| ${latestDevelopModuleResults.name} | $testCasesColumn | $coverageColumn | $coverageChangeColumn |").concat("\n")
+
+        //Build a summary for every item in the list and add it to header
+        codeComparisonSummary += " ${latestDevelopModuleResults.name.replaceAll('\\*', '')}(${coverageChangeColumn.replaceAll('\\*', '')})"
     }
 
-    return tableString
+    return codeComparisonSummary.concat("</summary>").concat(tableString).concat("</details>")
 }
 
 /**

@@ -1,0 +1,69 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+apply from: "$project.rootDir/tools/util.gradle"
+apply from: "$project.rootDir/tools/sdk.gradle"
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVerion
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion composeCompilerVersion
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+        suppressWarnings = shouldSuppressWarnings()
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    }
+
+    lint {
+        abortOnError false
+        xmlOutput = file("build/reports/lint-results.xml")
+    }
+}
+
+dependencies {
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":core-ui"))
+
+    implementation platform("androidx.compose:compose-bom:$composeBomVersion")
+    implementation "androidx.activity:activity-compose:$activityComposeVersion"
+    implementation "androidx.core:core-ktx:$ktxVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+    implementation "com.google.android.material:material:$materialVersion"
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material:material'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
+    implementation 'androidx.compose.ui:ui-tooling'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+
+    lintChecks project(':lint')
+
+    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+}

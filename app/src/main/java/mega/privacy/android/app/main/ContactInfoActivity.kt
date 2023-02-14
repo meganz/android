@@ -829,6 +829,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
+            return
+        }
+    }
+
     private fun updateViewBasedOnNetworkAvailability() {
         if (viewModel.isOnline()) {
             Timber.d("online -- network connection")

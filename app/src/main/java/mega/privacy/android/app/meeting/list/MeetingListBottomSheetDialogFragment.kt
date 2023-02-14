@@ -91,7 +91,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.header.txtTitle.text = room.title
         binding.header.txtTimestamp.setText(when {
-            room.isRecurring -> R.string.meetings_list_recurring_meeting_label
+            room.isRecurring() -> R.string.meetings_list_recurring_meeting_label
             room.isPending -> R.string.meetings_list_one_off_meeting_label
             else -> R.string.context_meeting
         })
@@ -129,8 +129,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.btnCancel.isVisible = room.isPending
         binding.dividerArchive.isVisible = binding.btnCancel.isVisible
 
-        binding.btnRecurringMeeting.isVisible = room.isRecurring
-        binding.dividerRecurringMeeting.isVisible = room.isRecurring
+        binding.btnRecurringMeeting.isVisible = room.isRecurring()
+        binding.dividerRecurringMeeting.isVisible = room.isRecurring()
 
         binding.btnRecurringMeeting.setOnClickListener {
             activity?.startActivity(

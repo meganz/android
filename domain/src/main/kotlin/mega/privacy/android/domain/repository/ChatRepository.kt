@@ -135,9 +135,13 @@ interface ChatRepository {
      * Get a list of all scheduled meeting occurrences for a chatroom
      *
      * @param chatId  MegaChatHandle that identifies a chat room
+     * @param count   Number of occurrences to retrieve
      * @return The list of scheduled meetings occurrences.
      */
-    suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>?
+    suspend fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        count: Int = 20,
+    ): List<ChatScheduledMeetingOccurr>
 
     /**
      * Get a list of all scheduled meeting occurrences for a chatroom
@@ -149,7 +153,7 @@ interface ChatRepository {
     suspend fun fetchScheduledMeetingOccurrencesByChat(
         chatId: Long,
         since: Long,
-    ): List<ChatScheduledMeetingOccurr>?
+    ): List<ChatScheduledMeetingOccurr>
 
     /**
      * Invite contacts to chat.

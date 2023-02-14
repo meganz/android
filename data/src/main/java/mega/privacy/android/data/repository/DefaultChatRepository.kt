@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
@@ -239,7 +240,7 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun fetchScheduledMeetingOccurrencesByChat(
         chatId: Long,
         since: Long,
-    ): List<ChatScheduledMeetingOccurr>? =
+    ): List<ChatScheduledMeetingOccurr> =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
@@ -250,19 +251,13 @@ internal class DefaultChatRepository @Inject constructor(
                             val list = request.megaChatScheduledMeetingOccurrList
                             when {
                                 error.errorCode == MegaChatError.ERROR_OK && list != null -> {
-                                    val occurrences =
-                                        mutableListOf<ChatScheduledMeetingOccurr>()
-
+                                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
                                     for (i in 0 until list.size()) {
                                         occurrences.add(
-                                            chatScheduledMeetingOccurrMapper(
-                                                list.at(
-                                                    i
-                                                )
-                                            )
+                                            chatScheduledMeetingOccurrMapper(list.at(i))
                                         )
                                     }
-                                    continuation.resumeWith(Result.success(occurrences))
+                                    continuation.resume(occurrences)
                                 }
                                 else -> {
                                     continuation.failWithError(error)
@@ -273,8 +268,33 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
-    override suspend fun fetchScheduledMeetingOccurrencesByChat(chatId: Long): List<ChatScheduledMeetingOccurr>? =
-        fetchScheduledMeetingOccurrencesByChat(chatId, 0)
+    override suspend fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        count: Int,
+    ): List<ChatScheduledMeetingOccurr> =
+        withContext(ioDispatcher) {
+            val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+            var lastTimeStamp = 0L
+            var fetch: Boolean
+
+            do {
+                val newOccurrences = runCatching {
+                    fetchScheduledMeetingOccurrencesByChat(chatId, lastTimeStamp)
+                }.getOrNull()
+                if (newOccurrences.isNullOrEmpty()) {
+                    fetch = false
+                } else {
+                    occurrences.apply {
+                        addAll(newOccurrences)
+                        sortBy(ChatScheduledMeetingOccurr::startDateTime)
+                    }
+                    lastTimeStamp = newOccurrences.last().startDateTime!!
+                    fetch = occurrences.size < count
+                }
+            } while (fetch)
+
+            occurrences.toList()
+        }
 
     override suspend fun inviteToChat(chatId: Long, contactsData: List<String>) =
         withContext(ioDispatcher) {

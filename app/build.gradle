@@ -9,6 +9,7 @@ apply plugin: 'jacoco'
 apply plugin: 'com.google.gms.google-services'
 
 apply from: "$project.rootDir/tools/util.gradle"
+apply from: "$project.rootDir/tools/sdk.gradle"
 
 configurations {
     jacocoAnt
@@ -46,6 +47,8 @@ android {
 
         buildConfigField("String", "USER_AGENT", "\"MEGAAndroid/${versionName}_${versionCode}\"")
         buildConfigField("boolean", "ACTIVATE_GREETER", "${shouldActivateGreeter}")
+        buildConfigField("boolean", "ACTIVATE_NOCTURN", "${shouldActivateNocturn}")
+        buildConfigField("long", "NOCTURN_TIMEOUT", "${getNocturnTimeout}")
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
@@ -207,15 +210,7 @@ dependencies {
     implementation project(':domain')
     implementation project(':core-ui')
     implementation project(':data')
-
-    // decide SDK dependency
-    if (shouldUsePrebuiltSdk()) {
-        println("[app] use remote pre-built SDK")
-        implementation "nz.mega.sdk:sdk:$megaSdkVersion"
-    } else {
-        println("[app] use local SDK")
-        implementation project(':sdk')
-    }
+    debugImplementation project(':nocturn')
 
     qaImplementation project(':screenshot')
 
@@ -438,6 +433,7 @@ dependencies {
     kapt "com.google.auto.value:auto-value:$autovalueVersion"
     lintChecks project(':lint')
 
+    implementation(project(":feature:sync"))
 }
 
 

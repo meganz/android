@@ -179,7 +179,7 @@ class MyCodeViewModel @Inject constructor(
 
         val userFullName = getCurrentUserFullName(
             forceRefresh = false,
-            defaultFirstName = context.getString(R.string.name_text),
+            defaultFirstName = context.getString(R.string.first_name_text),
             defaultLastName = context.getString(R.string.lastname_text)
         )
 
