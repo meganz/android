@@ -17,6 +17,8 @@ import nz.mega.sdk.MegaNode
  * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
  * @param unverifiedOutgoingShares List of unverified outgoing [ShareData]
  * @param unVerifiedOutgoingNodeHandles List of Unverified outgoing node handles
+ * @param isOpenShareDialogSuccess if openShareDialog API call is a success or failure
+ * @param errorMessage Error message to show on UI
  */
 data class OutgoingSharesState(
     val outgoingHandle: Long = -1L,
@@ -29,6 +31,8 @@ data class OutgoingSharesState(
     val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val unverifiedOutgoingShares: List<ShareData> = emptyList(),
     val unVerifiedOutgoingNodeHandles: List<Long> = emptyList(),
+    val isOpenShareDialogSuccess: Boolean = false,
+    val errorMessage: String? = null
 ) {
 
     /**

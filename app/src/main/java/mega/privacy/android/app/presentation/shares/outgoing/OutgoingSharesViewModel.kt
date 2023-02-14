@@ -210,9 +210,21 @@ class OutgoingSharesViewModel @Inject constructor(
      * @param nodeHandle: [MegaNode] handle
      */
     fun callOpenShareDialog(nodeHandle: Long) {
-        viewModelScope.launch {
-            getNodeByHandle(nodeHandle)?.let { megaNode ->
-                openShareDialog(megaNode)
+        kotlin.runCatching {
+            viewModelScope.launch {
+                if (!isInvalidHandle(nodeHandle)) {
+                    getNodeByHandle(nodeHandle)?.let { megaNode ->
+                        openShareDialog(megaNode)
+                    }
+                }
+            }
+        }.onSuccess {
+            _state.update {
+                it.copy(isOpenShareDialogSuccess = true)
+            }
+        }.onFailure { error ->
+            _state.update {
+                it.copy(errorMessage = error.message)
             }
         }
     }
