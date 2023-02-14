@@ -40,6 +40,8 @@ internal class ChangePasswordViewModelTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
         underTest = ChangePasswordViewModel(
             monitorConnectivity = monitorConnectivity,
             isCurrentPassword = isCurrentPassword,
@@ -48,7 +50,6 @@ internal class ChangePasswordViewModelTest {
             resetPassword = resetPassword,
             multiFactorAuthSetting = multiFactorAuthSetting
         )
-        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @After
@@ -91,27 +92,15 @@ internal class ChangePasswordViewModelTest {
     }
 
     @Test
-    fun `test that no network SnackBar status should update when isConnectedToNetwork called`() =
+    fun `test that network connection status should return correct value when isConnectedToNetwork called`() =
         runTest {
             val isConnected = Random.nextBoolean()
             testFlow.emit(isConnected)
 
-            val expectedValue = underTest.isConnectedToNetwork()
-
-            assertThat(expectedValue).isEqualTo(isConnected)
+            underTest.isConnectedToNetwork()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isShowNoNetworkSnackBar).isEqualTo(isConnected.not())
-            }
-        }
-
-    @Test
-    fun `test that when onNoNetworkSnackBarShown called should reset isShowNoNetworkSnackBar to false`() =
-        runTest {
-            underTest.onNoNetworkSnackBarShown()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().isShowNoNetworkSnackBar).isEqualTo(false)
+                assertThat(awaitItem().isConnectedToNetwork).isEqualTo(isConnected)
             }
         }
 
