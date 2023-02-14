@@ -463,45 +463,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
-        MimeTypeList.typeForName(name).let { (type, extension) ->
+        MimeTypeList.typeForName(name).let { mimeType ->
             if (isAudio) {
-                isAudio(type, extension) && !isAudioNotSupported(extension)
+                mimeType.isAudio && !mimeType.isAudioNotSupported
             } else {
-                isVideo(type) &&
-                        isVideoMimeType(type, extension) &&
-                        !isVideoNotSupported(extension)
+                mimeType.isVideo && !mimeType.isVideoNotSupported
             }
         }
-
-    /*
-     * Check is MimeType of audio type
-     */
-    private fun isAudio(type: String, extension: String): Boolean =
-        type.startsWith("audio/") ||
-                extension == "opus" ||
-                extension == "weba"
-
-
-    private fun isAudioNotSupported(extension: String): Boolean =
-        extension == "wma" ||
-                extension == "aif" ||
-                extension == "aiff" ||
-                extension == "iff" ||
-                extension == "oga" ||
-                extension == "3ga"
-
-    /*
-     * Check is MimeType of video type
-     */
-    private fun isVideo(type: String): Boolean =
-        type.startsWith("video/")
-
-    private fun isVideoMimeType(type: String, extension: String): Boolean =
-        type.startsWith("video/") ||
-                extension == "vob"
-
-    private fun isVideoNotSupported(extension: String): Boolean =
-        extension == "mpg" || extension == "avi" || extension == "wmv"
 
     /**
      * Get the thumbnail cache file path

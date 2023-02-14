@@ -47,28 +47,44 @@ data class MimeTypeList(
     /**
      * Check if MimeType is Video
      */
-    fun isVideoMimeType() =
-        type.startsWith("video/") || extension == "vob"
+    val isVideoMimeType
+        get() =
+            type.startsWith("video/") || extension == "vob"
 
+    /**
+     * Returns if type is non supported video
+     */
+    val isVideoNotSupported get() = extension == "mpg" || extension == "avi" || extension == "wmv"
 
     /**
      * Check if MimeType is Mp4 or Video
      */
-    fun isMp4Video() =
-        type.startsWith("video/") || extension == "mp4"
+    val isMp4Video get() = type.startsWith("video/") || extension == "mp4"
 
 
     /**
      * Check if MimeType is Zip
      */
-    fun isZip() =
-        type.startsWith("application/zip") || type.startsWith("multipart/x-zip")
+    val isZip
+        get() = (type.startsWith("application/zip") || type.startsWith("multipart/x-zip"))
 
 
     /**
      * Check if MimeType is image
      */
-    fun isImage() =
-        type.startsWith("image/")
+    val isImage
+        get() = type.startsWith("image/")
+
+    /**
+     * Return if type is Audio
+     */
+    val isAudio get() = type.startsWith("audio/") || extension == "opus" || extension == "weba"
+
+    /**
+     * Return if type is Non supported audio
+     */
+    val isAudioNotSupported
+        get() = extension == "wma" || extension == "aif" || extension == "aiff"
+                || extension == "iff" || extension == "oga" || extension == "3ga"
 
 }
