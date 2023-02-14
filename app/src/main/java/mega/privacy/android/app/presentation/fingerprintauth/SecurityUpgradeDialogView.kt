@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fingerprintauth
 
+import android.text.TextUtils
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -42,7 +43,7 @@ import mega.privacy.android.core.ui.theme.subtitle1
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SecurityUpgradeDialogView(
-    folderName: String,
+    folderNames: List<String>,
     onOkClick: () -> Unit,
     onCancelClick: () -> Unit,
 ) {
@@ -88,7 +89,7 @@ fun SecurityUpgradeDialogView(
 
                     Text(modifier = Modifier.testTag("SharedNodeInfo"),
                         text = pluralStringResource(id = R.plurals.shared_items_security_upgrade_dialog_node_sharing_info,
-                            1, folderName),
+                            folderNames.size, TextUtils.join(", ", folderNames)),
                         style = body2.copy(textAlign = TextAlign.Center),
                         color = if (MaterialTheme.colors.isLight) {
                             Color.Black
