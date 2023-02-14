@@ -588,6 +588,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 ChatUtil.initMegaChatApi(gSession, this)
                 megaApi.fastLogin(gSession, this)
             } else {
+                megaApi.addRequestListener(this)
+                megaChatApi.addChatRequestListener(this)
                 Timber.w("Another login is proccessing")
             }
         } else {
@@ -1669,6 +1671,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
      * @param message    Message to display into the progress dialog
      */
     private fun createAndShowProgressDialog(cancelable: Boolean, message: String) {
+        statusDialog?.dismiss()
         val temp: AlertDialog
         try {
             temp = createProgressDialog(this, message)
@@ -2030,8 +2033,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 credentials = UserCredentials(lastEmail, gSession, "", "", myUserHandle)
                 dbH.saveCredentials(credentials ?: return)
                 binding.fileLoggingInLayout.isVisible = false
+                if (isLoggingIn) {
+                    afterLoginAndFetch()
+                }
                 isLoggingIn = false
-                afterLoginAndFetch()
             }
         }
     }
@@ -2098,6 +2103,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     public override fun onDestroy() {
         megaApi.removeGlobalListener(this)
+        megaApi.removeRequestListener(this)
+        megaChatApi.removeChatRequestListener(this)
         val childThumbDir =
             File(ThumbnailUtils.getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER)
 
@@ -2108,7 +2115,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 Timber.w(e, "IOException deleting childThumbDir.")
             }
         }
-
+        dismissAlertDialogIfExists(statusDialog)
         dismissAlertDialogIfExists(newFolderDialog)
         super.onDestroy()
     }
