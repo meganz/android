@@ -1007,11 +1007,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     if (state.isOpenShareDialogSuccess()) {
                         showShareFolderOptions();
                     } else {
-                        if(state.getErrorMessage() != null) {
-                            showSnackbar(requireActivity(), state.getErrorMessage());
-                        } else {
-                            showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
-                        }
+                        showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
                     }
                     return Unit.INSTANCE;
                 });

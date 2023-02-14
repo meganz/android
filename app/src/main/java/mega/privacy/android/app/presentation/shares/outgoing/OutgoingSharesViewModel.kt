@@ -222,9 +222,9 @@ class OutgoingSharesViewModel @Inject constructor(
             _state.update {
                 it.copy(isOpenShareDialogSuccess = true)
             }
-        }.onFailure { error ->
+        }.onFailure {
             _state.update {
-                it.copy(errorMessage = error.message)
+                it.copy(isOpenShareDialogSuccess = false)
             }
         }
     }
