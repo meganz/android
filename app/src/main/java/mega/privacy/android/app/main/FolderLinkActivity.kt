@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.Window
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -191,6 +192,102 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         }
     }
 
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            Timber.d("onBackPressed")
+            retryConnectionsAndSignalPresence()
+            if (fileLinkFolderLink) {
+                binding.folderLinkFileLinkFragmentContainer.visibility = View.GONE
+                binding.folderLinkFragmentContainer.visibility = View.VISIBLE
+
+                setSupportActionBar(binding.toolbarFolderLink)
+                supportActionBar?.apply {
+                    setDisplayHomeAsUpEnabled(true)
+                    setDisplayShowHomeEnabled(true)
+                }
+
+                fileLinkFolderLink = false
+                pN = null
+                val parentNode =
+                    megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle))
+                if (parentNode != null) {
+                    Timber.d("parentNode != NULL")
+                    recyclerView.visibility = View.VISIBLE
+                    binding.folderLinkListEmptyImage.visibility = View.GONE
+                    binding.folderLinkListEmptyText.visibility = View.GONE
+                    supportActionBar?.title = parentNode.name
+                    invalidateOptionsMenu()
+                    parentHandle = parentNode.handle
+                    nodes = megaApiFolder.getChildren(parentNode, sortOrderToInt(orderGetChildren))
+                    adapterList?.setNodes(ArrayList(nodes))
+                    var lastVisiblePosition = 0
+
+                    lastPositionStack?.let {
+                        if (it.isNotEmpty()) {
+                            lastVisiblePosition = it.pop()
+                            Timber.d("Pop of the stack $lastVisiblePosition position")
+                        }
+                    }
+                    Timber.d("Scroll to $lastVisiblePosition position")
+
+                    if (lastVisiblePosition >= 0) {
+                        if (viewModel.isList) {
+                            mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        } else {
+                            gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        }
+                    }
+                    adapterList?.parentHandle = parentHandle
+                    return
+                } else {
+                    Timber.w("parentNode == NULL")
+                    finish()
+                }
+            }
+
+            adapterList?.let {
+                Timber.d("adapter !=null")
+                parentHandle = it.parentHandle
+                val parentNode =
+                    megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle))
+
+                if (parentNode != null) {
+                    Timber.d("parentNode != NULL")
+                    recyclerView.visibility = View.VISIBLE
+                    binding.folderLinkListEmptyImage.visibility = View.GONE
+                    binding.folderLinkListEmptyText.visibility = View.GONE
+                    supportActionBar?.title = parentNode.name
+                    invalidateOptionsMenu()
+                    parentHandle = parentNode.handle
+                    nodes = megaApiFolder.getChildren(parentNode, sortOrderToInt(orderGetChildren))
+                    it.setNodes(ArrayList(nodes))
+                    var lastVisiblePosition = 0
+
+                    lastPositionStack?.let { stack ->
+                        if (stack.isNotEmpty()) {
+                            lastVisiblePosition = stack.pop()
+                            Timber.d("Pop of the stack $lastVisiblePosition position")
+                        }
+                    }
+                    Timber.d("Scroll to $lastVisiblePosition position")
+
+                    if (lastVisiblePosition >= 0) {
+                        if (viewModel.isList) {
+                            mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        } else {
+                            gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                        }
+                    }
+                    it.parentHandle = parentHandle
+                    return
+                } else {
+                    Timber.w("parentNode == NULL")
+                    finish()
+                }
+            }
+        }
+    }
+
     /**
      * Start action mode
      */
@@ -313,7 +410,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Timber.d("onOptionsItemSelected")
         when (item.itemId) {
-            android.R.id.home -> onBackPressed()
+            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
             R.id.share_link -> shareLink(this, url)
             R.id.action_more -> showOptionsPanel(megaApiFolder.getNodeByHandle(parentHandle))
         }
@@ -325,6 +422,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
 
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding = ActivityFolderLinkBinding.inflate(layoutInflater)
 
         val intentReceived = intent
@@ -1261,102 +1359,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         nodeSaver.handleRequestPermissionsResult(requestCode)
-    }
-
-    override fun onBackPressed() {
-        Timber.d("onBackPressed")
-        if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
-        retryConnectionsAndSignalPresence()
-        if (fileLinkFolderLink) {
-            binding.folderLinkFileLinkFragmentContainer.visibility = View.GONE
-            binding.folderLinkFragmentContainer.visibility = View.VISIBLE
-
-            setSupportActionBar(binding.toolbarFolderLink)
-            supportActionBar?.apply {
-                setDisplayHomeAsUpEnabled(true)
-                setDisplayShowHomeEnabled(true)
-            }
-
-            fileLinkFolderLink = false
-            pN = null
-            val parentNode =
-                megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle))
-            if (parentNode != null) {
-                Timber.d("parentNode != NULL")
-                recyclerView.visibility = View.VISIBLE
-                binding.folderLinkListEmptyImage.visibility = View.GONE
-                binding.folderLinkListEmptyText.visibility = View.GONE
-                supportActionBar?.title = parentNode.name
-                invalidateOptionsMenu()
-                parentHandle = parentNode.handle
-                nodes = megaApiFolder.getChildren(parentNode, sortOrderToInt(orderGetChildren))
-                adapterList?.setNodes(ArrayList(nodes))
-                var lastVisiblePosition = 0
-
-                lastPositionStack?.let {
-                    if (it.isNotEmpty()) {
-                        lastVisiblePosition = it.pop()
-                        Timber.d("Pop of the stack $lastVisiblePosition position")
-                    }
-                }
-                Timber.d("Scroll to $lastVisiblePosition position")
-
-                if (lastVisiblePosition >= 0) {
-                    if (viewModel.isList) {
-                        mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    } else {
-                        gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    }
-                }
-                adapterList?.parentHandle = parentHandle
-                return
-            } else {
-                Timber.w("parentNode == NULL")
-                finish()
-            }
-        }
-
-        adapterList?.let {
-            Timber.d("adapter !=null")
-            parentHandle = it.parentHandle
-            val parentNode =
-                megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle))
-
-            if (parentNode != null) {
-                Timber.d("parentNode != NULL")
-                recyclerView.visibility = View.VISIBLE
-                binding.folderLinkListEmptyImage.visibility = View.GONE
-                binding.folderLinkListEmptyText.visibility = View.GONE
-                supportActionBar?.title = parentNode.name
-                invalidateOptionsMenu()
-                parentHandle = parentNode.handle
-                nodes = megaApiFolder.getChildren(parentNode, sortOrderToInt(orderGetChildren))
-                it.setNodes(ArrayList(nodes))
-                var lastVisiblePosition = 0
-
-                lastPositionStack?.let { stack ->
-                    if (stack.isNotEmpty()) {
-                        lastVisiblePosition = stack.pop()
-                        Timber.d("Pop of the stack $lastVisiblePosition position")
-                    }
-                }
-                Timber.d("Scroll to $lastVisiblePosition position")
-
-                if (lastVisiblePosition >= 0) {
-                    if (viewModel.isList) {
-                        mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    } else {
-                        gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-                    }
-                }
-                it.parentHandle = parentHandle
-                return
-            } else {
-                Timber.w("parentNode == NULL")
-                finish()
-            }
-        }
-        super.onBackPressed()
     }
 
     /**
