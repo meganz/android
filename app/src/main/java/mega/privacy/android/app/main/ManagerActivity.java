@@ -2463,6 +2463,11 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
+
+            if (viewModel.getState().getValue().getShouldAlertUserAboutSecurityUpgrade()) {
+                replaceFragment(SecurityUpgradeDialogFragment.Companion.newInstance(), SecurityUpgradeDialogFragment.TAG);
+            }
+
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
             if (managerState.getShowSyncSection()) {
@@ -2522,13 +2527,6 @@ public class ManagerActivity extends TransfersManagementActivity
         ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
             if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
                 addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
-            }
-            return Unit.INSTANCE;
-        });
-
-        ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, state -> {
-            if (viewModel.getState().getValue().getShouldAlertUserAboutSecurityUpgrade()) {
-                replaceFragment(SecurityUpgradeDialogFragment.Companion.newInstance(), SecurityUpgradeDialogFragment.TAG);
             }
             return Unit.INSTANCE;
         });
