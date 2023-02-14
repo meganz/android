@@ -73,7 +73,7 @@ abstract class FeatureFlagModule {
         /**
          * Provides [SetSecureFlag] implementation
          *
-         * @param filesRepository [FilesRepository]
+         * @param megaNodeRepository [MegaNodeRepository]
          * @return [SetSecureFlag]
          */
         @Provides

@@ -898,7 +898,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
         optionVerifyUser.setText(StringResourcesUtils.getString(R.string.shared_items_bottom_sheet_menu_verify_user, getMegaUserNameDB(user)));
         TextView nodeName = contentView.findViewById(R.id.node_name_text);
-        nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+        if(nC.nodeComesFromIncoming(node)) {
+            nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+        } else {
+            nodeName.setText(node.getName());
+        }
         optionVerifyUser.setVisibility(View.VISIBLE);
         optionVerifyUser.setOnClickListener(this);
 
@@ -999,7 +1003,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.share_folder_option:
                 outgoingSharesViewModel.callOpenShareDialog(node.getHandle());
-                showShareFolderOptions();
+                ViewExtensionsKt.collectFlow(requireActivity(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
+                    if (state.isOpenShareDialogSuccess()) {
+                        showShareFolderOptions();
+                    } else {
+                        if(state.getErrorMessage() != null) {
+                            showSnackbar(requireActivity(), state.getErrorMessage());
+                        } else {
+                            showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
+                        }
+                    }
+                    return Unit.INSTANCE;
+                });
                 break;
 
             case R.id.clear_share_option:
