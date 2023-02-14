@@ -717,7 +717,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         super.onViewCreated(view, savedInstanceState);
         if(nC.nodeComesFromIncoming(node)) {
-            ViewExtensionsKt.collectFlow(requireActivity(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
+            ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
                         && mMode == SHARED_ITEMS_MODE
                         && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
@@ -727,13 +727,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 return Unit.INSTANCE;
             });
         } else {
-            ViewExtensionsKt.collectFlow(requireActivity(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
+            ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
                         && mMode == SHARED_ITEMS_MODE
                         && isNodeUnverified(state.getUnVerifiedOutgoingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedOutgoingShares());
                     hideNodeActions();
                 }
+
+                if (state.isOpenShareDialogSuccess()) {
+                    showShareFolderOptions();
+                } else {
+                    showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
+                }
+
                 return Unit.INSTANCE;
             });
         }
@@ -1002,14 +1009,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.share_folder_option:
                 outgoingSharesViewModel.callOpenShareDialog(node.getHandle());
-                ViewExtensionsKt.collectFlow(requireActivity(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                    if (state.isOpenShareDialogSuccess()) {
-                        showShareFolderOptions();
-                    } else {
-                        showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
-                    }
-                    return Unit.INSTANCE;
-                });
                 break;
 
             case R.id.clear_share_option:
