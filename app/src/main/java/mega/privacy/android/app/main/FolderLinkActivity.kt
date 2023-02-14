@@ -2,6 +2,7 @@ package mega.privacy.android.app.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -15,6 +16,10 @@ import android.view.View
 import android.view.Window
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -152,6 +157,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private val viewModel: FolderLinkViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
+    private lateinit var selectImportFolderLauncher: ActivityResultLauncher<Intent>
+
     private val recyclerView: RecyclerView
         get() = if (viewModel.isList) binding.folderLinkListViewBrowser else binding.folderLinkGridViewBrowser
 
@@ -287,6 +294,97 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             }
         }
     }
+
+    @SuppressLint("CheckResult")
+    private val selectImportFolderResult =
+        ActivityResultCallback<ActivityResult> { activityResult ->
+            val resultCode = activityResult.resultCode
+            val intent = activityResult.data
+
+            if (resultCode != Activity.RESULT_OK || intent == null) {
+                return@ActivityResultCallback
+            }
+
+            if (!viewModel.isConnected) {
+                try {
+                    statusDialog?.dismiss()
+                } catch (exception: Exception) {
+                    Timber.e(exception)
+                }
+
+                showSnackbar(R.string.error_server_connection_problem)
+                return@ActivityResultCallback
+            }
+
+            toHandle = intent.getLongExtra("IMPORT_TO", 0)
+            fragmentHandle = intent.getLongExtra("fragmentH", -1)
+            statusDialog =
+                createProgressDialog(
+                    this,
+                    getFormattedStringOrDefault(R.string.general_importing)
+                )
+            statusDialog?.show()
+
+            if (adapterList?.isMultipleSelect == true) {
+                Timber.d("Is multiple select")
+                val nodes = adapterList?.selectedNodes ?: listOf()
+                if (nodes.isEmpty()) {
+                    Timber.w("No selected nodes")
+                    showSnackbar(R.string.context_no_copied)
+                    return@ActivityResultCallback
+                }
+
+                checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { result: Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->
+                        if (throwable == null) {
+                            val collisions: ArrayList<NameCollision> = result.first
+                            if (collisions.isNotEmpty()) {
+                                dismissAlertDialogIfExists(statusDialog)
+                                nameCollisionActivityContract?.launch(collisions)
+                            }
+                            val nodesWithoutCollisions: List<MegaNode> = result.second
+                            if (nodesWithoutCollisions.isNotEmpty()) {
+                                copyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe { copyRequestResult: CopyRequestResult?, copyThrowable: Throwable? ->
+                                        showCopyResult(copyRequestResult, copyThrowable)
+                                    }
+                            }
+                        }
+                    }
+
+            } else if (selectedNode != null) {
+                Timber.d("No multiple select")
+                selectedNode = megaApiFolder.authorizeNode(selectedNode)
+                checkNameCollisionUseCase.check(selectedNode, toHandle, NameCollisionType.COPY)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { collision: NameCollision, throwable: Throwable? ->
+                        if (throwable == null) {
+                            dismissAlertDialogIfExists(statusDialog)
+                            val list: ArrayList<NameCollision> = ArrayList()
+                            list.add(collision)
+                            nameCollisionActivityContract?.launch(list)
+                        } else {
+                            copyNodeUseCase.copy(selectedNode, toHandle)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                    { showCopyResult(null, null) },
+                                    { copyThrowable: Throwable? ->
+                                        showCopyResult(null, copyThrowable)
+                                    })
+                        }
+                    }
+
+            } else {
+                Timber.w("Selected Node is NULL")
+                showSnackbar(R.string.context_no_copied)
+            }
+        }
 
     /**
      * Start action mode
@@ -424,6 +522,11 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding = ActivityFolderLinkBinding.inflate(layoutInflater)
+
+        selectImportFolderLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            selectImportFolderResult
+        )
 
         val intentReceived = intent
         if (intentReceived != null) {
@@ -688,78 +791,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         }
         if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
             return
-        }
-        if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if (!viewModel.isConnected) {
-                try {
-                    statusDialog?.dismiss()
-                } catch (_: Exception) {
-                }
-
-                showSnackbar(R.string.error_server_connection_problem)
-                return
-            }
-            toHandle = intent.getLongExtra("IMPORT_TO", 0)
-            fragmentHandle = intent.getLongExtra("fragmentH", -1)
-            statusDialog =
-                createProgressDialog(this, getFormattedStringOrDefault(R.string.general_importing))
-            statusDialog?.show()
-            if (adapterList?.isMultipleSelect == true) {
-                Timber.d("Is multiple select")
-                val nodes = adapterList?.selectedNodes ?: listOf()
-                if (nodes.isEmpty()) {
-                    Timber.w("No selected nodes")
-                    showSnackbar(R.string.context_no_copied)
-                    return
-                }
-                checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { result: Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->
-                        if (throwable == null) {
-                            val collisions: ArrayList<NameCollision> = result.first
-                            if (collisions.isNotEmpty()) {
-                                dismissAlertDialogIfExists(statusDialog)
-                                nameCollisionActivityContract?.launch(collisions)
-                            }
-                            val nodesWithoutCollisions: List<MegaNode> = result.second
-                            if (nodesWithoutCollisions.isNotEmpty()) {
-                                copyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { copyRequestResult: CopyRequestResult?, throwable: Throwable? ->
-                                        showCopyResult(copyRequestResult, throwable)
-                                    }
-                            }
-                        }
-                    }
-            } else if (selectedNode != null) {
-                Timber.d("No multiple select")
-                selectedNode = megaApiFolder.authorizeNode(selectedNode)
-                checkNameCollisionUseCase.check(selectedNode, toHandle, NameCollisionType.COPY)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { collision: NameCollision, throwable: Throwable? ->
-                        if (throwable == null) {
-                            dismissAlertDialogIfExists(statusDialog)
-                            val list: ArrayList<NameCollision> = ArrayList()
-                            list.add(collision)
-                            nameCollisionActivityContract?.launch(list)
-                        } else {
-                            copyNodeUseCase.copy(selectedNode, toHandle)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                    { showCopyResult(null, null) },
-                                    { copyThrowable: Throwable? ->
-                                        showCopyResult(null, copyThrowable)
-                                    })
-                        }
-                    }
-            } else {
-                Timber.w("Selected Node is NULL")
-                showSnackbar(R.string.context_no_copied)
-            }
         }
     }
 
@@ -1367,7 +1398,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     fun importNode() {
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER)
+        selectImportFolderLauncher.launch(intent)
     }
 
     /**
