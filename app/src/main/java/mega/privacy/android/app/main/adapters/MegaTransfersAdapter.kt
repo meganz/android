@@ -41,6 +41,7 @@ class MegaTransfersAdapter(
     private val selectModeInterface: SelectModeInterface,
     private val transfersViewModel: TransfersViewModel,
     private val megaApi: MegaApiAndroid,
+    private val megaApiFolder: MegaApiAndroid,
 ) : RecyclerView.Adapter<TransferViewHolder>(), RotatableAdapter {
 
     private var transferList: List<MegaTransfer>
@@ -111,10 +112,13 @@ class MegaTransfersAdapter(
                 holder.progressText.setTextColor(ContextCompat.getColor(context,
                     R.color.green_500_green_400))
                 holder.document = transfer.nodeHandle
-
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers)
-                    megaApi.getNodeByHandle(transfer.nodeHandle)?.let { node ->
+                    val nodeFromMegaApi = megaApi.getNodeByHandle(transfer.nodeHandle)
+                    val nodeFromMegaApiFolder = megaApiFolder.getNodeByHandle(transfer.nodeHandle)
+                    // If node that gets from MegaApi is null, getting the node from megaApiFolder
+                    val node = nodeFromMegaApi ?: nodeFromMegaApiFolder
+                    if (node != null) {
                         if (node.hasThumbnail()) {
                             ThumbnailUtils.getThumbnailFromCache(node) ?: let {
                                 ThumbnailUtils.getThumbnailFromFolder(node, context) ?: let {
@@ -140,6 +144,10 @@ class MegaTransfersAdapter(
                             holder.thumbnailIcon.isVisible = true
                             holder.defaultIcon.isVisible = false
                         } ?: showDefaultIcon(holder = holder,
+                            drawableId = MimeTypeList.typeForName(transfer.fileName).iconResourceId)
+                    } else {
+                        // If the node cannot be got from both MegaApi and MegaApiFolder, show default icon
+                        showDefaultIcon(holder = holder,
                             drawableId = MimeTypeList.typeForName(transfer.fileName).iconResourceId)
                     }
                 }
