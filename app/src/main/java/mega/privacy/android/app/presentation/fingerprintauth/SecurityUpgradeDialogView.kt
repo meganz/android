@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fingerprintauth
 
+import android.text.TextUtils
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,18 +17,20 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.presentation.theme.body2
-import mega.privacy.android.presentation.theme.jade_300
-import mega.privacy.android.presentation.theme.subtitle1
+import mega.privacy.android.core.ui.theme.body2
+import mega.privacy.android.core.ui.theme.jade_300
+import mega.privacy.android.core.ui.theme.subtitle1
 
 /**
  * Security upgrade dialog body
@@ -36,9 +39,10 @@ import mega.privacy.android.presentation.theme.subtitle1
  * @param onOkClick     : Ok button click listener
  * @param onCancelClick : Cancel button click listener
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SecurityUpgradeDialogView(
-    folderName: String,
+    folderNames: List<String>,
     onOkClick: () -> Unit,
     onCancelClick: () -> Unit,
 ) {
@@ -83,8 +87,8 @@ fun SecurityUpgradeDialogView(
                     Spacer(Modifier.height(20.dp))
 
                     Text(modifier = Modifier.testTag("SharedNodeInfo"),
-                        text = stringResource(id = R.string.shared_items_security_upgrade_dialog_node_sharing_info,
-                            folderName),
+                        text = pluralStringResource(id = R.plurals.shared_items_security_upgrade_dialog_node_sharing_info,
+                            folderNames.size, TextUtils.join(", ", folderNames)),
                         style = body2.copy(textAlign = TextAlign.Center),
                         color = if (MaterialTheme.colors.isLight) {
                             Color.Black

@@ -33,11 +33,11 @@ class SecurityUpgradeDialogFragment : DialogFragment() {
         MaterialAlertDialogBuilder(requireContext()).setView(
             ComposeView(requireContext()).apply {
                 setContent {
-                    val nodeName = arguments?.getString("nodeName", "Default") as String
+                    val nodeName = arguments?.getStringArrayList("nodeName") as List<String>
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     AndroidTheme(isDark = mode.isDarkMode()) {
-                        SecurityUpgradeDialogView(folderName = nodeName, onCancelClick = {
+                        SecurityUpgradeDialogView(folderNames = nodeName, onCancelClick = {
                             requireActivity().finishAffinity()
                         }, onOkClick = {
                             securityUpgradeViewModel.upgradeAccountSecurity()
