@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.LocalLogoutApp
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.ResetAccountInfo
@@ -96,4 +97,7 @@ object TestAccountModule {
 
     @Provides
     fun provideResetAccountInfo() = mock<ResetAccountInfo>()
+
+    @Provides
+    fun provideLocalLogoutApp() = mock<LocalLogoutApp>()
 }

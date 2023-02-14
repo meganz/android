@@ -1320,7 +1320,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         } else if (request.type == MegaRequest.TYPE_LOGOUT) {
             Timber.d("TYPE_LOGOUT")
             if (error.errorCode == MegaError.API_OK) {
-                localLogoutApp(requireActivity(), sharingScope)
+                viewModel.performLocalLogoutApp()
             }
         } else if (request.type == MegaRequest.TYPE_GET_RECOVERY_LINK) {
             Timber.d("TYPE_GET_RECOVERY_LINK")

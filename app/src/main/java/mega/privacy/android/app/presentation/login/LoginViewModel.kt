@@ -18,15 +18,18 @@ import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
+import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.usecase.CancelTransfers
+import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.GetAccountCredentials
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
+import mega.privacy.android.domain.usecase.LocalLogoutApp
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.QuerySignupLink
@@ -56,6 +59,7 @@ class LoginViewModel @Inject constructor(
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
     private val querySignupLink: QuerySignupLink,
     private val cancelTransfers: CancelTransfers,
+    private val localLogoutApp: LocalLogoutApp,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -337,4 +341,11 @@ class LoginViewModel @Inject constructor(
      * Cancels all transfers, uploads and downloads.
      */
     fun launchCancelTransfers() = viewModelScope.launch { cancelTransfers() }
+
+    /**
+     * Clears all data related to the logged out account.
+     */
+    fun performLocalLogoutApp() = viewModelScope.launch {
+        localLogoutApp(ClearPsa { PsaManager::stopChecking })
+    }
 }
