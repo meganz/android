@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.smsVerification.SMSVerificationTextViewModel
 import mega.privacy.android.app.smsVerification.model.SmsVerificationTextState
+import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 import org.junit.After
 import org.junit.Before
@@ -23,7 +24,7 @@ internal class SMSVerificationTextViewModelTest {
     private lateinit var underTest: SMSVerificationTextViewModel
 
     private val verifyPhoneNumber = mock<VerifyPhoneNumber>()
-    private val verificationTextErrorMapper = mock<(Throwable) -> String>()
+    private val verificationTextErrorMapper = mock<SmsVerificationTextErrorMapper>()
 
     @Before
     fun setUp() {

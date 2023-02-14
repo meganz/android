@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.smsVerification.model.SmsVerificationTextState
+import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 import javax.inject.Inject
 
@@ -17,7 +18,7 @@ import javax.inject.Inject
  */
 class SMSVerificationTextViewModel @Inject constructor(
     private val verifyPhoneNumber: VerifyPhoneNumber,
-    private val verificationTextErrorMapper: (Throwable) -> String,
+    private val verificationTextErrorMapper: SmsVerificationTextErrorMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<SmsVerificationTextState>(SmsVerificationTextState.Empty)
