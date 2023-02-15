@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -261,9 +262,9 @@ interface ChatRepository {
     /**
      * Monitor updates on scheduled meeting occurrences
      *
-     * @return          A flow of scheduledMeetingIds
+     * @return          A flow of ResultOccurrenceUpdate
      */
-    suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long>
+    suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<ResultOccurrenceUpdate>
 
     /**
      * Monitor updates on chat list item.
