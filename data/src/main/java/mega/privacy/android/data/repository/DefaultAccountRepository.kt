@@ -441,7 +441,9 @@ internal class DefaultAccountRepository @Inject constructor(
         }
 
     override val accountEmail: String?
-        get() = megaApiGateway.accountEmail
+        get() = megaApiGateway.accountEmail.also {
+            dbHandler.saveMyEmail(it)
+        }
 
     private suspend fun handleAccountDetail(request: MegaRequest) {
         val newDetail = accountDetailMapper(

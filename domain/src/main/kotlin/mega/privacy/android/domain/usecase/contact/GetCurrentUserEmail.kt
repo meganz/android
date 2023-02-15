@@ -10,5 +10,5 @@ fun interface GetCurrentUserEmail {
      *
      * @return
      */
-    operator fun invoke(): String?
+    suspend operator fun invoke(): String?
 }

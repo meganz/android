@@ -9447,10 +9447,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) {
                             Timber.d("CHANGE_TYPE_EMAIL");
-                            if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("I change my mail");
-                                updateMyEmail(user.getEmail());
-                            } else {
+                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 Timber.d("The contact: %d changes the mail.", user.getHandle());
                                 if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
                                     Timber.w("The contact NOT exists -> DB inconsistency! -> Clear!");
@@ -9468,7 +9465,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else {
                     Timber.w("user == null --> Continue...");
-                    continue;
                 }
             }
         }
@@ -9531,32 +9527,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON);
-    }
-
-    public void updateMyEmail(String email) {
-        Timber.d("New email: %s", email);
-        String oldEmail = dbH.getMyEmail();
-        if (oldEmail != null) {
-            Timber.d("Old email: %s", oldEmail);
-            try {
-                File avatarFile = CacheFolderManager.buildAvatarFile(this, oldEmail + ".jpg");
-                if (isFileAvailable(avatarFile)) {
-                    File newFile = CacheFolderManager.buildAvatarFile(this, email + ".jpg");
-                    if (newFile != null) {
-                        boolean result = avatarFile.renameTo(newFile);
-                        if (result) {
-                            Timber.d("The avatar file was correctly renamed");
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                Timber.e(e, "EXCEPTION renaming the avatar on changing email");
-            }
-        } else {
-            Timber.e("ERROR: Old email is NULL");
-        }
-
-        dbH.saveMyEmail(email);
     }
 
     public void onNodesCloudDriveUpdate() {
