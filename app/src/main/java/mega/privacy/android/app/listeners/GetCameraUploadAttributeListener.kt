@@ -83,7 +83,7 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
                 }
                 else -> {
                     Timber.e("Get Camera Upload Attributes Failed, Error Code: ${error.errorCode}, ${error.errorString}. Stopping Camera Uploads")
-                    JobUtil.fireStopCameraUploadJob(context)
+                    context?.let { JobUtil.fireStopCameraUploadJob(it) }
                 }
             }
         }
@@ -131,7 +131,7 @@ class GetCameraUploadAttributeListener(val context: Context?) : MegaRequestListe
             // stop CameraUpload if destination has changed
             if (shouldStopCameraUpload) {
                 Timber.e("Camera Uploads folder destination has changed. Stopping Camera Uploads")
-                JobUtil.fireStopCameraUploadJob(context)
+                context?.let { JobUtil.fireStopCameraUploadJob(it) }
             }
             CameraUploadUtil.forceUpdateCameraUploadFolderIcon(isSecondary, handle)
         }

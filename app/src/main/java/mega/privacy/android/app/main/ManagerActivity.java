@@ -2413,7 +2413,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             checkCurrentStorageStatus(true);
-            fireCameraUploadJob(ManagerActivity.this, false);
+            fireCameraUploadJob(ManagerActivity.this, false, false);
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
@@ -8475,7 +8475,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 }
                 storageState = newStorageState;
-                fireCameraUploadJob(ManagerActivity.this, false);
+                fireCameraUploadJob(ManagerActivity.this, false, false);
                 break;
 
             case Orange:
@@ -8499,7 +8499,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 storageState = newStorageState;
                 Timber.d("Try to start CU, false.");
-                fireCameraUploadJob(ManagerActivity.this, false);
+                fireCameraUploadJob(ManagerActivity.this, false, false);
                 break;
 
             case Red:
