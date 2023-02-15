@@ -24,16 +24,25 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.appbar.MaterialToolbar
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.smsVerification.model.SmsVerificationTextState
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -41,8 +50,10 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import java.util.Timer
 import java.util.TimerTask
+import javax.inject.Inject
 
-class SMSVerificationTextActivity : PasscodeActivity(), MegaRequestListenerInterface,
+@AndroidEntryPoint
+class SMSVerificationTextActivity : PasscodeActivity(),
     View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
     private lateinit var toolbar: MaterialToolbar
     private var actionBar: ActionBar? = null
@@ -65,6 +76,13 @@ class SMSVerificationTextActivity : PasscodeActivity(), MegaRequestListenerInter
     private var allowResend = false
     private var isUserLocked = false
     private val resendTimeLimit = 30 * 1000
+
+    @Inject
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    private var monitorPhoneFlagEnabled = false
+    private var legacyListener: MegaRequestListenerInterface? = null
+
+    private val viewModel by viewModels<SMSVerificationTextViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
@@ -336,6 +354,101 @@ class SMSVerificationTextActivity : PasscodeActivity(), MegaRequestListenerInter
         textParams.setMargins(0, 0, 0, 0)
         sixthPin.layoutParams = textParams
         sixthPin.previousDigitEditText = fifthPin
+
+        monitorPinResult()
+    }
+
+    private fun monitorPinResult() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                monitorPhoneFlagEnabled = getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)
+                if (monitorPhoneFlagEnabled) {
+                    viewModel.state.collect { state ->
+                        when (state) {
+                            SmsVerificationTextState.Empty -> {
+                                enableConfirmButton()
+                            }
+                            is SmsVerificationTextState.Failed -> {
+                                enableConfirmButton()
+                                showError(state.error)
+                            }
+                            SmsVerificationTextState.VerifiedSuccessfully -> {
+                                enableConfirmButton()
+                                hideError()
+                                onSuccessfullyVerified()
+                            }
+                            SmsVerificationTextState.Loading -> {
+                                disableConfirmButton()
+                            }
+                        }
+                    }
+                } else {
+                    legacyListener = object : MegaRequestListenerInterface {
+                        override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+                            disableConfirmButton()
+                        }
+
+                        override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
+                        override fun onRequestFinish(
+                            api: MegaApiJava,
+                            request: MegaRequest,
+                            e: MegaError,
+                        ) {
+                            enableConfirmButton()
+                            if (request.type == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
+                                Timber.d("send verification code,get %s", e.errorCode)
+                                when (e.errorCode) {
+                                    MegaError.API_EEXPIRED -> {
+                                        Timber.w("The code has been already verified.")
+                                        showError(getString(R.string.verify_account_error_code_verified))
+                                    }
+                                    MegaError.API_EACCESS -> {
+                                        Timber.w("You have reached the verification limits.")
+                                        showError(getString(R.string.verify_account_error_reach_limit))
+                                    }
+                                    MegaError.API_EEXIST -> {
+                                        Timber.w("This number is already associated with an account.")
+                                        showError(getString(R.string.verify_account_error_phone_number_register))
+                                    }
+                                    MegaError.API_EFAILED -> {
+                                        Timber.w("The verification code does not match.")
+                                        showError(getString(R.string.verify_account_error_wrong_code))
+                                    }
+                                    MegaError.API_OK -> {
+                                        Timber.d("verification successful")
+                                        LiveEventBus.get(
+                                            EVENT_REFRESH_PHONE_NUMBER,
+                                            Boolean::class.java
+                                        )
+                                            .post(true)
+                                        onSuccessfullyVerified()
+                                    }
+                                    else -> {
+                                        Timber.w("Invalid code")
+                                        showError(getString(R.string.verify_account_error_invalid_code))
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun onRequestTemporaryError(
+                            api: MegaApiJava,
+                            request: MegaRequest,
+                            e: MegaError,
+                        ) {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun enableConfirmButton() {
+        confirmButton.isClickable = true
+    }
+
+    private fun disableConfirmButton() {
+        confirmButton.isClickable = false
     }
 
     private fun Intent.getPhoneNumber() = getStringExtra(
@@ -511,7 +624,11 @@ class SMSVerificationTextActivity : PasscodeActivity(), MegaRequestListenerInter
             sb.append(sixthPin.text)
             val pin = sb.toString().trim { it <= ' ' }
             Timber.d("PIN: %s", pin)
-            megaApi.checkSMSVerificationCode(pin, this)
+            if (monitorPhoneFlagEnabled) {
+                viewModel.submitPin(pin)
+            } else {
+                megaApi.checkSMSVerificationCode(pin, legacyListener)
+            }
             return
         }
         showError(getString(R.string.verify_account_incorrect_code))
@@ -543,54 +660,16 @@ class SMSVerificationTextActivity : PasscodeActivity(), MegaRequestListenerInter
         actionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        confirmButton.isClickable = false
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        confirmButton.isClickable = true
-        if (request.type == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
-            Timber.d("send verification code,get %s", e.errorCode)
-            when (e.errorCode) {
-                MegaError.API_EEXPIRED -> {
-                    Timber.w("The code has been already verified.")
-                    showError(getString(R.string.verify_account_error_code_verified))
-                }
-                MegaError.API_EACCESS -> {
-                    Timber.w("You have reached the verification limits.")
-                    showError(getString(R.string.verify_account_error_reach_limit))
-                }
-                MegaError.API_EEXIST -> {
-                    Timber.w("This number is already associated with an account.")
-                    showError(getString(R.string.verify_account_error_phone_number_register))
-                }
-                MegaError.API_EFAILED -> {
-                    Timber.w("The verification code does not match.")
-                    showError(getString(R.string.verify_account_error_wrong_code))
-                }
-                MegaError.API_OK -> {
-                    Timber.d("verification successful")
-                    LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-                        .post(true)
-                    showSnackbar(inputContainer, getString(R.string.verify_account_successfully))
-                    //showing the successful text for 2 secs, then finish itself back to previous page.
-                    Handler(Looper.getMainLooper()).postDelayed({ //haven't logged in, if has credential will auto-login
-                        if (api.isLoggedIn == 0 || api.rootNode == null) {
-                            refreshSession()
-                        } else {
-                            setResult(RESULT_OK)
-                        }
-                        finish()
-                    }, 2000)
-                }
-                else -> {
-                    Timber.w("Invalid code")
-                    showError(getString(R.string.verify_account_error_invalid_code))
-                }
+    private fun onSuccessfullyVerified() {
+        showSnackbar(inputContainer, getString(R.string.verify_account_successfully))
+        //showing the successful text for 2 secs, then finish itself back to previous page.
+        Handler(Looper.getMainLooper()).postDelayed({ //haven't logged in, if has credential will auto-login
+            if (megaApi.isLoggedIn == 0 || megaApi.rootNode == null) {
+                refreshSession()
+            } else {
+                setResult(RESULT_OK)
             }
-        }
+            finish()
+        }, 2000)
     }
-
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
 }

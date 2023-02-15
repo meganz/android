@@ -1,10 +1,12 @@
-package mega.privacy.android.app.di
+package mega.privacy.android.app.di.verification
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapper
+import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapperImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
@@ -28,6 +30,9 @@ abstract class SMSVerificationModule {
 
     @Binds
     abstract fun bindMonitorVerifiedPhoneNumber(implementation: DefaultMonitorVerifiedPhoneNumber): MonitorVerifiedPhoneNumber
+
+    @Binds
+    abstract fun bindSmsVerificationTextErrorMapper(implementation: SmsVerificationTextErrorMapperImpl): SmsVerificationTextErrorMapper
 
     companion object {
         /**

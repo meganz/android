@@ -2,6 +2,7 @@ package mega.privacy.android.app.smsVerification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +16,9 @@ import javax.inject.Inject
  *
  * @property verifyPhoneNumber
  * @property verificationTextErrorMapper
+ * @property state
  */
+@HiltViewModel
 class SMSVerificationTextViewModel @Inject constructor(
     private val verifyPhoneNumber: VerifyPhoneNumber,
     private val verificationTextErrorMapper: SmsVerificationTextErrorMapper,
@@ -26,6 +29,7 @@ class SMSVerificationTextViewModel @Inject constructor(
 
     internal fun submitPin(pin: String) {
         viewModelScope.launch {
+            _state.emit(SmsVerificationTextState.Loading)
             kotlin.runCatching { verifyPhoneNumber(pin) }
                 .onSuccess { _state.emit(SmsVerificationTextState.VerifiedSuccessfully) }
                 .onFailure { error ->
