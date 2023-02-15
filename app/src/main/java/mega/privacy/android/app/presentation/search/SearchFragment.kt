@@ -77,7 +77,6 @@ import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import java.util.Collections
-import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -99,8 +98,6 @@ class SearchFragment : RotatableFragment() {
     lateinit var megaApi: MegaApiAndroid
 
     private lateinit var adapter: MegaNodeAdapter
-
-    private val lastPositionStack: Stack<Int> = Stack()
 
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
@@ -820,32 +817,12 @@ class SearchFragment : RotatableFragment() {
      */
     fun onBackPressed(): Int {
         Timber.d("onBackPressed")
-        searchViewModel.cancelSearch()
+        searchViewModel.onBackClicked()
         val levelSearch = searchViewModel.state.value.searchDepth
         if (levelSearch >= 0) {
-            if (levelSearch > 0) {
-                val node = megaApi.getNodeByHandle(searchViewModel.state.value.searchParentHandle)
-                node?.let {
-                    val parentNode = megaApi.getParentNode(it)
-                    parentNode?.let { node ->
-                        searchViewModel.setSearchParentHandle(node.handle)
-                    } ?: run {
-                        searchViewModel.setSearchParentHandle(-1L)
-                    }
-                } ?: run {
-                    searchViewModel.setSearchParentHandle(-1L)
-                }
-            } else {
-                searchViewModel.setSearchParentHandle(-1L)
-            }
-
             searchViewModel.decreaseSearchDepth()
             clickAction()
-            var lastVisiblePosition = 0
-            if (!lastPositionStack.empty()) {
-                lastVisiblePosition = lastPositionStack.pop()
-                Timber.d("Pop of the stack $lastVisiblePosition position")
-            }
+            val lastVisiblePosition = searchViewModel.popLastPositionStack()
             Timber.d("Scroll to $lastVisiblePosition position")
 
             if (lastVisiblePosition >= 0) {
@@ -884,9 +861,6 @@ class SearchFragment : RotatableFragment() {
                 return
             }
             if (nodes[position].isFolder) {
-                searchViewModel.setSearchParentHandle(nodes[position].handle)
-                searchViewModel.increaseSearchDepth()
-
                 var lastFirstVisiblePosition: Int
                 if (isList) {
                     lastFirstVisiblePosition =
@@ -900,9 +874,8 @@ class SearchFragment : RotatableFragment() {
                             (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
                     }
                 }
-
+                searchViewModel.onFolderClicked(nodes[position].handle, lastFirstVisiblePosition)
                 Timber.d("Push to stack $lastFirstVisiblePosition position")
-                lastPositionStack.push(lastFirstVisiblePosition)
                 clickAction()
             } else {
                 openFile(node = nodes[position], position = position)
