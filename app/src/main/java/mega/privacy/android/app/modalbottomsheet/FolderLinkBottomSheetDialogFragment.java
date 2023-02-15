@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.folderlink
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -51,14 +51,17 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForChildren
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.DecryptAlertDialog.DecryptDialogListener
+import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.presentation.clouddrive.FolderLinkViewModel
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity

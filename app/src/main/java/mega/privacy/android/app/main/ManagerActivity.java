@@ -346,6 +346,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.login.LoginActivity;
