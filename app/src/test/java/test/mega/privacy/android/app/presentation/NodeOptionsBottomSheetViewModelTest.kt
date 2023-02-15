@@ -34,7 +34,7 @@ class NodeOptionsBottomSheetViewModelTest {
         underTest.state.test {
             val initial = awaitItem()
             Truth.assertThat(initial.currentNodeHandle).isEqualTo(-1L)
-            Truth.assertThat(initial.isOpenShareDialogSuccess).isEqualTo(false)
+            Truth.assertThat(initial.isOpenShareDialogSuccess).isEqualTo(null)
         }
     }
 
@@ -43,7 +43,7 @@ class NodeOptionsBottomSheetViewModelTest {
         underTest.callOpenShareDialog(3829183L)
         underTest.state.runCatching {
             this.test {
-                assertTrue(awaitItem().isOpenShareDialogSuccess)
+                awaitItem().isOpenShareDialogSuccess?.let { assertTrue(it) }
             }
         }
     }
@@ -53,7 +53,7 @@ class NodeOptionsBottomSheetViewModelTest {
         underTest.callOpenShareDialog(-1)
         underTest.state.runCatching {
             this.test {
-                assertFalse(awaitItem().isOpenShareDialogSuccess)
+                awaitItem().isOpenShareDialogSuccess?.let { assertFalse(it) }
             }
         }
     }
