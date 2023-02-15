@@ -372,7 +372,7 @@ public class ChatManagement {
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(() -> {
-                                }, (error) -> Timber.e("Error %s", error));
+                                }, (error) -> Timber.e(error));
                     }
                 }
             }.start();

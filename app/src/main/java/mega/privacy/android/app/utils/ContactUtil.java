@@ -23,10 +23,10 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
+import mega.privacy.android.data.model.MegaContactDB;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
@@ -217,7 +217,7 @@ public class ContactUtil {
             byte[] data = Base64.decode(nicknameEncoded, Base64.URL_SAFE);
             return new String(data, StandardCharsets.UTF_8);
         } catch (java.lang.Exception e) {
-            Timber.e("Error retrieving new nickname %s", e);
+            Timber.e(e, "Error retrieving new nickname");
             return null;
         }
     }

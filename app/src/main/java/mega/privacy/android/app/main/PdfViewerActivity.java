@@ -1827,7 +1827,7 @@ public class PdfViewerActivity extends PasscodeActivity
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
         for (PdfDocument.Bookmark b : tree) {
 
-            Timber.d(String.format("%s %s, p %d", sep, b.getTitle(), b.getPageIdx()));
+            Timber.d("%s %s, p %d", sep, b.getTitle(), b.getPageIdx());
 
             if (b.hasChildren()) {
                 printBookmarksTree(b.getChildren(), sep + "-");
