@@ -10917,6 +10917,15 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     /**
+     * Checks if the current screen is Media Discovery Fragment.
+     *
+     * @return True if the current screen is MD, false otherwise.
+     */
+    public boolean isInMDMode(){
+        return drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode;
+    }
+
+    /**
      * Create the instance of FileBackupManager
      */
     private void initFileBackupManager() {
