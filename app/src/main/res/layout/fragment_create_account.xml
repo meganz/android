@@ -380,6 +380,7 @@
             </LinearLayout>
 
             <include
+                android:id="@+id/checkbox_top"
                 layout="@layout/checkbox_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
