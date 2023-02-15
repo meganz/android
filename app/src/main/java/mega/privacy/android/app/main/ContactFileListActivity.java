@@ -3,7 +3,6 @@ package mega.privacy.android.app.main;
 import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE;
-import static mega.privacy.android.app.main.FileExplorerActivity.EXTRA_SELECTED_FOLDER;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFilesManually;
 import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFolderManually;
@@ -17,12 +16,10 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_FILES;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_FOLDER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_FOLDER_CONTENT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SCAN_DOCUMENT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_READ_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
@@ -102,7 +99,6 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
-import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.namecollision.data.NameCollision;
@@ -809,32 +805,6 @@ public class ContactFileListActivity extends PasscodeActivity
                 }
 
                 showSnackbar(SNACKBAR_TYPE, result);
-            }
-        } else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
-            if (intent == null) {
-                return;
-            }
-            if (!viewModel.isOnline()) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
-                return;
-            }
-
-            final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-            final long folderHandle = intent.getLongExtra(EXTRA_SELECTED_FOLDER, 0);
-
-            final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
-
-            if (parent.isFolder()) {
-                MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
-                dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-                final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-                dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-                    statusDialog = createProgressDialog(this, getString(R.string.context_sharing_folder));
-                    permissionsDialog.dismiss();
-                    new NodeController(this).shareFolder(parent, selectedContacts, item);
-                });
-                permissionsDialog = dialogBuilder.create();
-                permissionsDialog.show();
             }
         } else if (requestCode == TAKE_PHOTO_CODE) {
             Timber.d("TAKE_PHOTO_CODE");

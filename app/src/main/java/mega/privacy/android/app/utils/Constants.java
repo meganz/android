@@ -18,9 +18,7 @@ public class Constants {
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
     public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     public static final int REQUEST_CODE_REFRESH = 1005;
-    public static final int REQUEST_CODE_SORT_BY = 1006;
     public static final int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
-    public static final int REQUEST_CODE_SELECT_FOLDER = 1008;
     public static final int REQUEST_CODE_SELECT_CONTACT = 1009;
     public static final int TAKE_PHOTO_CODE = 1010;
     public static final int WRITE_SD_CARD_REQUEST_CODE = 1011;

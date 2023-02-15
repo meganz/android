@@ -7878,30 +7878,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             nodeAttacher.handleSelectFileResult(intent, this);
-        } else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
-            Timber.d("REQUEST_CODE_SELECT_FOLDER");
-
-            if (intent == null) {
-                Timber.d("Intent NULL");
-                return;
-            }
-
-            final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-            final long folderHandle = intent.getLongExtra("SELECT", 0);
-
-            MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
-            dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-            final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-            dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    permissionsDialog.dismiss();
-                    nC.shareFolder(megaApi.getNodeByHandle(folderHandle), selectedContacts, item);
-                }
-            });
-            dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-            permissionsDialog = dialogBuilder.create();
-            permissionsDialog.show();
-
         } else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
             Timber.d("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
 
@@ -8073,24 +8049,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
             } else {
                 Timber.w("TAKE_PHOTO_CODE--->ERROR!");
-            }
-        } else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK) {
-
-            if (intent == null) {
-                Timber.w("Intent NULL");
-                return;
-            }
-
-            int orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
-            if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-                if (parentNode != null) {
-                    if (isCloudAdded()) {
-                        fileBrowserViewModel.refreshNodes();
-                    }
-                }
-            } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                onNodesSharedUpdate();
             }
         } else if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
             Timber.d("REQUEST_CREATE_CHAT OK");
