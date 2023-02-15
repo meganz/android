@@ -129,7 +129,7 @@
                 android:id="@+id/option_dispute"
                 style="@style/BottomSheetOption"
                 android:text="@string/dispute_takendown_file"
-                app:drawableStartCompat="@drawable/ic_input_warning" />
+                app:drawableStartCompat="@drawable/ic_taken_down_bottom_sheet" />
 
             <View
                 android:id="@+id/separator_label"
