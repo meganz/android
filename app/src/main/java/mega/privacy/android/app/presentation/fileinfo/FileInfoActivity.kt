@@ -983,6 +983,17 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     }
 
     /**
+     * Listen an propagate results to node saver.
+     */
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, data)) {
+            return
+        }
+    }
+
+    /**
      * Starts a new Intent to share the folder to different contacts
      */
     private fun shareFolder() {
