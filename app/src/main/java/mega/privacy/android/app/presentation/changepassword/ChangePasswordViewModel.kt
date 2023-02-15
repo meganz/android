@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.model.ActionResult
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.domain.usecase.ChangePassword
@@ -63,9 +64,20 @@ internal class ChangePasswordViewModel @Inject constructor(
 
     fun onUserClickChangePassword(newPassword: String) {
         viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    loadingMessage = R.string.my_account_changing_password
+                )
+            }
+
             multiFactorAuthSetting().also { isEnabled ->
                 if (isEnabled) {
-                    _uiState.update { it.copy(isMultiFactorAuthEnabled = true) }
+                    _uiState.update {
+                        it.copy(
+                            isPromptedMultiFactorAuth = true,
+                            loadingMessage = null
+                        )
+                    }
                 } else {
                     onExecuteChangePassword(newPassword)
                 }
@@ -75,8 +87,32 @@ internal class ChangePasswordViewModel @Inject constructor(
 
     private suspend fun onExecuteChangePassword(newPassword: String) {
         changePassword(newPassword).also { isSuccess ->
-            _uiState.update { it.copy(isChangePassword = getActionResult(isSuccess)) }
+            _uiState.update {
+                if (isSuccess) {
+                    it.copy(
+                        isPasswordChanged = true,
+                        loadingMessage = null
+                    )
+                } else {
+                    it.copy(
+                        snackBarMessage = R.string.general_text_error,
+                        loadingMessage = null
+                    )
+                }
+            }
         }
+    }
+
+    fun onMultiFactorAuthShown() {
+        _uiState.update { it.copy(isPromptedMultiFactorAuth = false) }
+    }
+
+    fun onSnackBarShown() {
+        _uiState.update { it.copy(snackBarMessage = null) }
+    }
+
+    fun onChangedPasswordShown() {
+        _uiState.update { it.copy(isPasswordChanged = false) }
     }
 
     private fun getActionResult(isSuccess: Boolean): ActionResult =

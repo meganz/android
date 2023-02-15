@@ -624,7 +624,7 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun changePassword(newPassword: String) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.flag }
+            val listener = continuation.getRequestListener { it.newPassword == newPassword }
             megaApiGateway.changePassword(newPassword, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
