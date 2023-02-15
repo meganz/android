@@ -1,11 +1,13 @@
 package mega.privacy.android.data.repository
 
+import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -22,6 +24,7 @@ import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.toContactCredentials
+import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -41,6 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
@@ -61,6 +65,9 @@ class DefaultContactsRepositoryTest {
     private val contactDataMapper = mock<ContactDataMapper>()
     private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
+    private val contactWrapper: ContactWrapper = mock()
+    private val databaseHandler: DatabaseHandler = mock()
+    private val context: Context = mock()
 
     private val contactCredentialsMapper: ContactCredentialsMapper =
         { credentials: String?, email: String, name: String ->
@@ -96,6 +103,9 @@ class DefaultContactsRepositoryTest {
             contactCredentialsMapper = contactCredentialsMapper,
             inviteContactRequestMapper = inviteContactRequestMapper,
             localStorageGateway = localStorageGateway,
+            contactWrapper = contactWrapper,
+            databaseHandler = databaseHandler,
+            context = context,
         )
 
         whenever(megaApiGateway.handleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
@@ -202,6 +212,7 @@ class DefaultContactsRepositoryTest {
             on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
             on { paramType }.thenReturn(MegaApiJava.USER_ATTR_FIRSTNAME)
             on { text }.thenReturn(testName)
+            on { email }.thenReturn(userEmail)
         }
 
         whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
@@ -209,7 +220,10 @@ class DefaultContactsRepositoryTest {
                 mock(), request, success
             )
         }
-        val result = underTest.getUserFirstName(userHandle, true)
+        val result =
+            underTest.getUserFirstName(handle = userHandle, skipCache = true, shouldNotify = false)
+        verify(databaseHandler, times(1)).setContactName(testName, userEmail)
+        verifyNoInteractions(contactWrapper)
 
         assertThat(result).isEqualTo(testName)
     }
@@ -220,6 +234,8 @@ class DefaultContactsRepositoryTest {
             whenever(megaChatApiGateway.getUserFirstnameFromCache(any())).thenReturn(testName)
 
             val result = underTest.getUserFirstName(userHandle, false)
+            verifyNoInteractions(contactWrapper)
+            verifyNoInteractions(databaseHandler)
 
             assertThat(result).isEqualTo(testName)
         }

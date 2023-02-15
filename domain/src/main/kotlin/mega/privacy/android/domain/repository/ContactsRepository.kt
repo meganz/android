@@ -122,9 +122,14 @@ interface ContactsRepository {
      *
      * @param handle User identifier.
      * @param skipCache Skip cached result.
+     * @param shouldNotify
      * @return User first name.
      */
-    suspend fun getUserFirstName(handle: Long, skipCache: Boolean = false): String
+    suspend fun getUserFirstName(
+        handle: Long,
+        skipCache: Boolean = false,
+        shouldNotify: Boolean = false,
+    ): String
 
     /**
      * Gets the name of the given user: The alias if any, the full name in other case.
@@ -132,9 +137,14 @@ interface ContactsRepository {
      *
      * @param handle User identifier.
      * @param skipCache Skip cached result.
+     * @param shouldNotify
      * @return User last name.
      */
-    suspend fun getUserLastName(handle: Long, skipCache: Boolean = false): String
+    suspend fun getUserLastName(
+        handle: Long,
+        skipCache: Boolean = false,
+        shouldNotify: Boolean = false,
+    ): String
 
     /**
      * Get the full name of the given user.
