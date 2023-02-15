@@ -22,7 +22,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -31,7 +30,6 @@ import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -622,9 +620,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             onProcessAsyncInfo(info)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
-
-        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
-            .observe(this) { isList: Boolean -> refreshViewNodes(isList) }
     }
 
     private fun afterLoginAndFetch() {
@@ -1125,7 +1120,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     newChatMenuItem?.isVisible = false
 
                     if (isMultiselect) {
-                        searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty == false
+                        searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
                     }
                 }
                 CHAT_TAB -> {
@@ -2403,17 +2398,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         cDriveExplorer = cloudExplorerFragment
         cDriveExplorer?.orderNodes(order)
         iSharesExplorer = incomingExplorerFragment
-        iSharesExplorer?.orderNodes(order)
-    }
-
-    private fun refreshViewNodes(isList: Boolean) {
-        this.isList = isList
-        iSharesExplorer = incomingExplorerFragment
-
-        iSharesExplorer?.let {
-            supportFragmentManager.beginTransaction().detach(it).commitNowAllowingStateLoss()
-            supportFragmentManager.beginTransaction().attach(it).commitNowAllowingStateLoss()
-        }
+        iSharesExplorer?.updateNodesByOrder(order)
     }
 
     /**
