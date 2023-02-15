@@ -69,4 +69,15 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Change the value of isOpenShareDialogSuccess to false after it is consumed.
+     */
+    fun resetIsOpenShareDialogSuccess() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isOpenShareDialogSuccess = null)
+            }
+        }
+    }
 }

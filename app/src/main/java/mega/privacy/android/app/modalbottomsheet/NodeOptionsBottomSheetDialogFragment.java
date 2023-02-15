@@ -193,7 +193,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
         outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
-        nodeOptionsBottomSheetViewModel = new ViewModelProvider(requireActivity()).get(NodeOptionsBottomSheetViewModel.class);
+        nodeOptionsBottomSheetViewModel = new ViewModelProvider(this).get(NodeOptionsBottomSheetViewModel.class);
     }
 
     @Nullable
@@ -742,11 +742,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), nodeOptionsBottomSheetViewModel.getState(), Lifecycle.State.STARTED, state -> {
-            if (state.isOpenShareDialogSuccess()) {
-                showShareFolderOptions();
-            } else {
-                showSnackbar(requireActivity(), requireActivity().getString(R.string.general_something_went_wrong_error));
+            if(state.isOpenShareDialogSuccess() != null) {
+                if (state.isOpenShareDialogSuccess()) {
+                    showShareFolderOptions();
+                } else {
+                    showSnackbar(requireActivity(), getString(R.string.general_something_went_wrong_error));
+                }
             }
+            nodeOptionsBottomSheetViewModel.resetIsOpenShareDialogSuccess();
             return Unit.INSTANCE;
         });
     }

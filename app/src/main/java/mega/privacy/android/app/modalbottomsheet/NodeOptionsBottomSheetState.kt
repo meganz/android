@@ -8,5 +8,5 @@ package mega.privacy.android.app.modalbottomsheet
  */
 data class NodeOptionsBottomSheetState(
     val currentNodeHandle: Long = -1L,
-    val isOpenShareDialogSuccess: Boolean = false,
+    val isOpenShareDialogSuccess: Boolean? = null,
 )
