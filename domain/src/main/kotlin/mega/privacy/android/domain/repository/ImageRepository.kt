@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
@@ -107,4 +108,19 @@ interface ImageRepository {
         highPriority: Boolean,
         isMeteredConnection: Boolean,
     ): Flow<ImageResult>
+
+    /**
+     * Get Image Result given Offline File
+     *
+     * @param offlineNodeInformation    OfflineNodeInformation
+     * @param file                      Image Offline File
+     * @param highPriority              Flag to request image with high priority
+     *
+     * @return ImageResult
+     */
+    suspend fun getImageByOfflineFile(
+        offlineNodeInformation: OfflineNodeInformation,
+        file: File,
+        highPriority: Boolean,
+    ): ImageResult
 }

@@ -87,6 +87,8 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
 
+    implementation "com.facebook.fresco:fresco:$frescoVersion"
+
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

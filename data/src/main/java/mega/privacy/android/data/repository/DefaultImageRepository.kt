@@ -8,6 +8,16 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import com.facebook.common.executors.CallerThreadExecutor
+import com.facebook.common.references.CloseableReference
+import com.facebook.datasource.DataSource
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.common.Priority
+import com.facebook.imagepipeline.common.ResizeOptions
+import com.facebook.imagepipeline.common.RotationOptions
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
+import com.facebook.imagepipeline.image.CloseableImage
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
@@ -19,6 +29,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.extensions.encodeBase64
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getPreviewFileName
@@ -36,6 +47,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.FullImageDownloadResult
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
@@ -50,6 +62,7 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * The repository implementation class regarding thumbnail feature.
@@ -247,6 +260,104 @@ internal class DefaultImageRepository @Inject constructor(
             return@let getImageByNode(it, fullSize, highPriority, isMeteredConnection)
         } ?: throw IllegalArgumentException("Node is null")
     }
+
+    private suspend fun getThumbnailFile(fileName: String): File? =
+        cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
+
+    override suspend fun getImageByOfflineFile(
+        offlineNodeInformation: OfflineNodeInformation,
+        file: File,
+        highPriority: Boolean,
+    ): ImageResult = withContext(ioDispatcher) {
+        val isVideo = MimeTypeList.typeForName(offlineNodeInformation.name).isVideo
+
+        val fileName =
+            "${offlineNodeInformation.handle.encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        val thumbnailFile = getThumbnailFile(fileName)
+        var previewFile = getPreviewFile(fileName)
+
+        if (previewFile?.exists() != true) {
+            previewFile = if (isVideo) {
+                getVideoThumbnail(fileName = fileName, videoUri = file.toUri())?.toUri()?.toFile()
+            } else {
+                getImagePreview(
+                    fileName = fileName,
+                    imageUri = file.toUri(),
+                    highPriority = highPriority
+                )?.toUri()?.toFile()
+            }
+        }
+
+        return@withContext ImageResult(
+            isVideo = isVideo,
+            thumbnailUri = thumbnailFile?.takeIf { it.exists() }?.toUri().toString(),
+            previewUri = previewFile?.takeIf { it.exists() }?.toUri().toString(),
+            fullSizeUri = file.toUri().toString(),
+            isFullyLoaded = true
+        )
+    }
+
+    private suspend fun getImagePreview(
+        fileName: String,
+        imageUri: Uri,
+        highPriority: Boolean,
+    ): String? =
+        withContext(ioDispatcher) {
+            val imageFile = imageUri.toFile().takeIf { it.exists() && it.length() > SIZE_1_MB }
+            imageFile?.let { getPreviewFile(fileName) }?.let { previewFile ->
+                if (previewFile.exists()) return@withContext previewFile.toUri().toString()
+
+                val screenSize = context.getScreenSize()
+                val imageRequest = ImageRequestBuilder.newBuilderWithSource(imageUri)
+                    .setRotationOptions(RotationOptions.autoRotate())
+                    .setRequestPriority(if (highPriority) Priority.HIGH else Priority.LOW)
+                    .setResizeOptions(
+                        ResizeOptions.forDimensions(
+                            screenSize.width,
+                            screenSize.height
+                        )
+                    )
+                    .build()
+
+                return@withContext suspendCancellableCoroutine { continuation ->
+                    val dataSource =
+                        Fresco.getImagePipeline().fetchDecodedImage(imageRequest, imageUri)
+                    dataSource.subscribe(object : BaseBitmapDataSubscriber() {
+                        override fun onNewResultImpl(bitmap: Bitmap?) {
+                            bitmap?.let {
+                                BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                                    this.use {
+                                        bitmap.compress(
+                                            Bitmap.CompressFormat.JPEG,
+                                            BITMAP_COMPRESS_QUALITY,
+                                            it
+                                        )
+                                    }
+                                }
+                                bitmap.recycle()
+                                continuation.resumeWith(
+                                    Result.success(
+                                        previewFile.toUri().toString()
+                                    )
+                                )
+                                dataSource.close()
+                            } ?: run {
+                                continuation.resumeWithException(NullPointerException())
+                                dataSource.close()
+                            }
+                        }
+
+                        override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+                            continuation.resumeWithException(dataSource.failureCause ?: return)
+                            dataSource.close()
+                        }
+                    }, CallerThreadExecutor.getInstance())
+                    continuation.invokeOnCancellation {
+                        dataSource.close()
+                    }
+                }
+            }
+        }
 
     private suspend fun getPublicNode(nodeFileLink: String): MegaNode =
         suspendCancellableCoroutine { continuation ->
@@ -490,8 +601,8 @@ internal class DefaultImageRepository @Inject constructor(
     suspend fun getVideoThumbnail(fileName: String, videoUri: Uri): String? =
         withContext(ioDispatcher) {
             val videoFile = videoUri.toFile().takeIf { it.exists() }
-            return@withContext videoFile?.let { getPreviewFile(fileName) }?.let { previewFile ->
-                if (previewFile.exists()) previewFile.toUri().toString()
+            videoFile?.let { getPreviewFile(fileName) }?.let { previewFile ->
+                if (previewFile.exists()) return@withContext previewFile.toUri().toString()
 
                 val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     ThumbnailUtils.createVideoThumbnail(
@@ -517,7 +628,7 @@ internal class DefaultImageRepository @Inject constructor(
                         }
                     }
                     bitmap.recycle()
-                    previewFile.toUri().toString()
+                    return@withContext previewFile.toUri().toString()
                 }
             }
         }
