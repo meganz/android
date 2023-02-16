@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -156,6 +157,8 @@ class MyAccountViewModel @Inject constructor(
 
     private val _numberOfSubscription = MutableStateFlow(INVALID_VALUE.toLong())
 
+    private var resetJob: Job? = null
+
     /**
      * Number of subscription
      */
@@ -187,6 +190,11 @@ class MyAccountViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        resetJob?.cancel()
     }
 
     private fun refreshCurrentUserEmail() {
@@ -850,16 +858,16 @@ class MyAccountViewModel @Inject constructor(
      * @param action         Action to perform after reset the phone number if modifying.
      */
     fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
-        resetPhoneNumberUseCase.reset()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { getUserData(isModify, snackbarShower, action) },
-                onError = { error ->
-                    Timber.w("Reset phone number failed: ${error.message}")
+        resetJob = viewModelScope.launch {
+            kotlin.runCatching { resetPhoneNumberUseCase() }
+                .onSuccess {
+                    getUserData(isModify, snackbarShower, action)
+                }
+                .onFailure {
+                    Timber.e(it, "Reset phone number failed")
                     snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
-                })
-            .addTo(composite)
+                }
+        }
     }
 
     /**
@@ -1024,10 +1032,12 @@ class MyAccountViewModel @Inject constructor(
     fun refreshAccountInfo() {
         viewModelScope.launch {
             getAccountDetails(forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty())
-            getExtendedAccountDetail(forceRefresh = false,
+            getExtendedAccountDetail(
+                forceRefresh = false,
                 sessions = true,
                 purchases = false,
-                transactions = false)
+                transactions = false
+            )
             getPaymentMethod(false)
         }
     }
