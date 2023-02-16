@@ -35,8 +35,6 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
-import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFilesManually;
-import static mega.privacy.android.app.presentation.extensions.ActivityExtensionsKt.uploadFolderManually;
 import static mega.privacy.android.app.presentation.fileinfo.FileInfoActivity.NODE_HANDLE;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.fileBrowserState;
 import static mega.privacy.android.app.presentation.manager.ManagerActivityExtensionsKt.inboxState;
@@ -102,12 +100,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WA
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
@@ -206,8 +198,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -317,6 +307,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
+import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
@@ -408,7 +399,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
-import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
@@ -429,7 +419,6 @@ import mega.privacy.android.domain.entity.preference.ViewType;
 import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.feature.sync.ui.SyncFragment;
-import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -551,6 +540,8 @@ public class ManagerActivity extends TransfersManagementActivity
     ActivityLifecycleHandler activityLifecycleHandler;
     @Inject
     MegaNodeUtilWrapper megaNodeUtilWrapper;
+    @Inject
+    ManagerUploadBottomSheetDialogActionHandler uploadBottomSheetDialogActionHandler;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -721,8 +712,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private AlertDialog presenceStatusDialog;
     private AlertDialog alertDialogStorageStatus;
     private AlertDialog alertDialogSMSVerification;
-    private AlertDialog newTextFileDialog;
-    private AlertDialog newFolderDialog;
 
     private MenuItem searchMenuItem;
     private MenuItem doNotDisturbMenuItem;
@@ -1150,23 +1139,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
         }
     }
-
-    /**
-     * When manually uploading Files and the device is running Android 13 and above, this Launcher
-     * is called to request the Notification Permission (if possible) and upload Files regardless
-     * if the Notification Permission is granted or not
-     */
-    private final ActivityResultLauncher<String> manualUploadFilesLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> uploadFilesManually(this));
-
-    /**
-     * When manually uploading a Folder and the device is running Android 13 and above, this Launcher
-     * is called to request the Notification Permission whenever possible, and upload the Folder
-     * regardless if the Notification Permission is granted or not
-     */
-    private final ActivityResultLauncher<String> manualUploadFolderLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(), isGranted -> uploadFolderManually(this));
-
     public void setTypesCameraPermission(int typesCameraPermission) {
         this.typesCameraPermission = typesCameraPermission;
     }
@@ -1236,10 +1208,9 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS.getTag(), photosFragment);
         }
 
-        checkNewTextFileDialogState(newTextFileDialog, outState);
-
         nodeAttacher.saveState(outState);
         nodeSaver.saveState(outState);
+        uploadBottomSheetDialogActionHandler.onSaveInstanceState(outState);
 
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 
@@ -1280,8 +1251,6 @@ public class ManagerActivity extends TransfersManagementActivity
             outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
             backupWarningDialog.dismiss();
         }
-
-        checkNewFolderDialogState(newFolderDialog, outState);
     }
 
     @Override
@@ -1421,10 +1390,6 @@ public class ManagerActivity extends TransfersManagementActivity
             backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
             backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
             backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE);
-
-            if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
-                showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
-            }
         } else {
             Timber.d("Bundle is NULL");
             this.setPathNavigationOffline(OFFLINE_ROOT);
@@ -2448,9 +2413,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         PsaManager.INSTANCE.startChecking();
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-            showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
-        }
+        uploadBottomSheetDialogActionHandler.onRestoreInstanceState(savedInstanceState);
 
         Timber.d("END onCreate");
         new RatingHandlerImpl(this).showRatingBaseOnTransaction();
@@ -3438,13 +3401,8 @@ public class ManagerActivity extends TransfersManagementActivity
             confirmationTransfersDialog.dismiss();
         }
 
-        if (newTextFileDialog != null) {
-            newTextFileDialog.dismiss();
-        }
-
         dismissAlertDialogIfExists(processFileDialog);
         dismissAlertDialogIfExists(openLinkDialog);
-        dismissAlertDialogIfExists(newFolderDialog);
 
         nodeSaver.destroy();
 
@@ -6592,72 +6550,39 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void uploadFiles() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            manualUploadFilesLauncher.launch(POST_NOTIFICATIONS);
-        } else {
-            uploadFilesManually(this);
-        }
+        uploadBottomSheetDialogActionHandler.uploadFiles();
     }
 
     @Override
     public void uploadFolder() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            manualUploadFolderLauncher.launch(POST_NOTIFICATIONS);
-        } else {
-            uploadFolderManually(this);
-        }
+        uploadBottomSheetDialogActionHandler.uploadFolder();
     }
 
     @Override
     public void takePictureAndUpload() {
-        if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-            setTypesCameraPermission(TAKE_PICTURE_OPTION);
-            requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
-            return;
-        }
-        if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return;
-        }
-        checkTakePicture(this, TAKE_PHOTO_CODE);
+        uploadBottomSheetDialogActionHandler.takePictureAndUpload();
     }
 
     @Override
     public void scanDocument() {
-        String[] saveDestinations = {
-                StringResourcesUtils.getString(R.string.section_cloud_drive),
-                StringResourcesUtils.getString(R.string.section_chat)
-        };
-        Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
-        startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
+        uploadBottomSheetDialogActionHandler.scanDocument();
     }
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
-        if (parent == null) {
-            return;
-        }
-
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
+        uploadBottomSheetDialogActionHandler.showNewFolderDialog(typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
-        if (parent == null) {
-            return;
-        }
-
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
-                drawerItem == DrawerItem.HOMEPAGE);
+        uploadBottomSheetDialogActionHandler.showNewTextFileDialog(typedName);
     }
 
     public long getParentHandleBrowser() {
         return fileBrowserViewModel.getSafeBrowserParentHandle();
     }
 
-    private long getCurrentParentHandle() {
+    public long getCurrentParentHandle() {
         long parentHandle = -1;
 
         switch (drawerItem) {
@@ -6726,7 +6651,8 @@ public class ManagerActivity extends TransfersManagementActivity
         return parentHandle;
     }
 
-    private MegaNode getCurrentParentNode(long parentHandle, int error) {
+    @Nullable
+    public MegaNode getCurrentParentNode(long parentHandle, int error) {
         String errorString = null;
 
         if (error != -1) {
@@ -8140,20 +8066,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             onNodesSharedUpdate();
-        } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
-            if (resultCode == RESULT_OK) {
-                String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
-                Intent fileIntent = new Intent(this, FileExplorerActivity.class);
-                if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
-                    fileIntent.setAction(FileExplorerActivity.ACTION_UPLOAD_TO_CHAT);
-                } else {
-                    fileIntent.setAction(FileExplorerActivity.ACTION_SAVE_TO_CLOUD);
-                    fileIntent.putExtra(FileExplorerActivity.EXTRA_PARENT_HANDLE, getCurrentParentHandle());
-                }
-                fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
-                fileIntent.setType(intent.getType());
-                startActivity(fileIntent);
-            }
         } else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 switch (requestCode) {
