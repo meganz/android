@@ -16,7 +16,7 @@ import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
-import mega.privacy.android.domain.entity.VerifiedPhoneNumber
+import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.SMSVerificationException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
