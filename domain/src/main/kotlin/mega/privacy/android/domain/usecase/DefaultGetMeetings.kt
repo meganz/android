@@ -19,6 +19,7 @@ import mega.privacy.android.domain.repository.GetMeetingsRepository
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 /**
@@ -257,8 +258,8 @@ class DefaultGetMeetings @Inject constructor(
             val now = Instant.now().atZone(ZoneOffset.UTC)
             chatRepository.fetchScheduledMeetingOccurrencesByChat(
                 chatId,
-                now.toLocalDate().atStartOfDay(ZoneOffset.UTC).toEpochSecond()
-            ).first { occurr ->
+                now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
+            ).firstOrNull { occurr ->
                 occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
                         || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true
             }
