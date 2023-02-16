@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -37,6 +38,7 @@ class FileBrowserViewModelTest {
     private lateinit var underTest: FileBrowserViewModel
 
     private val getRootFolder = mock<GetRootFolder>()
+    private val isNodeInRubbish = mock<IsNodeInRubbish>()
     private val getBrowserChildrenNode = mock<GetBrowserChildrenNode>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
         on { invoke() }.thenReturn(
@@ -61,7 +63,8 @@ class FileBrowserViewModelTest {
             getBrowserChildrenNode = getBrowserChildrenNode,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             monitorNodeUpdates = monitorNodeUpdates,
-            getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle
+            getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
+            getIsNodeInRubbish = isNodeInRubbish
         )
     }
 

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import nz.mega.sdk.MegaApiJava
 import java.util.Stack
@@ -31,6 +32,7 @@ import javax.inject.Inject
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
  * @param monitorNodeUpdates Monitor node updates
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
+ * @param getIsNodeInRubbish To get current node is in rubbish
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -39,6 +41,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
+    private val getIsNodeInRubbish: IsNodeInRubbish,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -52,6 +55,7 @@ class FileBrowserViewModel @Inject constructor(
      * Stack to maintain folder navigation clicks
      */
     private val lastPositionStack = Stack<Int>()
+    private val handleStack = Stack<Long>()
 
     init {
         monitorMediaDiscovery()
@@ -93,13 +97,18 @@ class FileBrowserViewModel @Inject constructor(
      * moved to rubbish bin
      * we are in same screen else will simply refresh nodes with parentID
      * @param changes [Map] of [Node], list of [NodeChanges]
-     `*/
-    private fun checkForNodeIsInRubbish(changes: Map<Node, List<NodeChanges>>) {
+     */
+    private suspend fun checkForNodeIsInRubbish(changes: Map<Node, List<NodeChanges>>) {
         changes.forEach { (node, _) ->
             if (node is FolderNode) {
                 if (node.isInRubbishBin && _state.value.fileBrowserHandle == node.id.longValue) {
-                    setBrowserParentHandle(node.parentId.longValue)
-                    return@forEach
+                    while (handleStack.isNotEmpty() && getIsNodeInRubbish(handleStack.peek())) {
+                        handleStack.pop()
+                    }
+                    handleStack.takeIf { stack -> stack.isNotEmpty() }?.peek()?.let { parent ->
+                        setBrowserParentHandle(parent)
+                        return
+                    }
                 }
             }
         }
@@ -112,6 +121,7 @@ class FileBrowserViewModel @Inject constructor(
      * @param handle the id of the current browser handle to set
      */
     fun setBrowserParentHandle(handle: Long) = viewModelScope.launch {
+        handleStack.push(handle)
         _state.update {
             it.copy(
                 fileBrowserHandle = handle,
@@ -178,6 +188,7 @@ class FileBrowserViewModel @Inject constructor(
     fun onBackPressed() {
         _state.value.parentHandle?.let {
             setBrowserParentHandle(it)
+            handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
         }
     }
 
