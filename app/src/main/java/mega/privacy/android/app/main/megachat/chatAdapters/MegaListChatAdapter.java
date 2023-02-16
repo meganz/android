@@ -1049,7 +1049,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
             Timber.d("MessageType: %s", messageType);
             String lastMessageString = converterShortCodes(chat.getLastMessage());
 
-            if (messageType == MegaChatMessage.TYPE_INVALID) {
+            if (messageType == MegaChatMessage.TYPE_INVALID || messageType == MegaChatMessage.TYPE_SCHED_MEETING) {
                 Timber.d("Message Type -> INVALID");
                 ((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.no_conversation_history));
                 ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
