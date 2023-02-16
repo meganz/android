@@ -3,6 +3,7 @@ package mega.privacy.android.app.main.qrcode
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.StatFs
@@ -29,6 +30,7 @@ import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.app.utils.CacheFolderManager.buildQrFile
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import timber.log.Timber
@@ -293,6 +295,17 @@ class QRCodeActivity : PasscodeActivity() {
 
                 val newQrFile =
                     File(parentPath, "$myEmail${MyCodeFragment.QR_IMAGE_FILE_NAME}")
+
+                // For Android 11+ device, force to refresh MediaStore. Otherwise it is possible
+                // that target file cannot be written.
+                if (Util.isAndroid11OrUpper()) {
+                    MediaScannerConnection.scanFile(
+                        this,
+                        arrayOf(newQrFile.absolutePath),
+                        arrayOf("image/jpeg"),
+                        null
+                    )
+                }
 
                 try {
                     newQrFile.createNewFile()
