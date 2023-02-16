@@ -93,7 +93,6 @@ import static mega.privacy.android.app.utils.FileUtil.createTemporalTextFile;
 import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
@@ -2414,7 +2413,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             checkCurrentStorageStatus(true);
-            fireCameraUploadJob(ManagerActivity.this, false, false);
+            fireCameraUploadJob(ManagerActivity.this, false);
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
@@ -8476,7 +8475,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 }
                 storageState = newStorageState;
-                fireCameraUploadJob(ManagerActivity.this, false, false);
+                fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
             case Orange:
@@ -8500,7 +8499,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 }
                 storageState = newStorageState;
                 Timber.d("Try to start CU, false.");
-                fireCameraUploadJob(ManagerActivity.this, false, false);
+                fireCameraUploadJob(ManagerActivity.this, false);
                 break;
 
             case Red:
@@ -9652,7 +9651,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
                     megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
                     megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-                    fireCancelCameraUploadJob(ManagerActivity.this);
+                    fireStopCameraUploadJob(ManagerActivity.this);
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 })

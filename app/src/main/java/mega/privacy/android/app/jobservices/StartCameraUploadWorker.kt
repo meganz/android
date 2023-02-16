@@ -10,8 +10,6 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import mega.privacy.android.app.jobservices.CameraUploadsService.Companion.EXTRA_IGNORE_ATTR_CHECK
-import mega.privacy.android.app.jobservices.CameraUploadsService.Companion.EXTRA_PRIMARY_SYNC_SUCCESS
-import mega.privacy.android.app.utils.JobUtil.IS_PRIMARY_HANDLE_SYNC_DONE
 import mega.privacy.android.app.utils.JobUtil.SHOULD_IGNORE_ATTRIBUTES
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -44,7 +42,6 @@ class StartCameraUploadWorker @AssistedInject constructor(
         if (isStopped) return Result.failure()
         Timber.d("CameraUploadWork: doWork()")
         val ignoreAttributes = inputData.getBoolean(SHOULD_IGNORE_ATTRIBUTES, false)
-        val isPrimaryHandleSynced = inputData.getBoolean(IS_PRIMARY_HANDLE_SYNC_DONE, false)
         return try {
             val isOverQuota = jobUtilWrapper.isOverQuota()
             val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -64,7 +61,6 @@ class StartCameraUploadWorker @AssistedInject constructor(
             if (!cameraUploadsServiceWrapper.isServiceRunning() && !isOverQuota && hasMediaPermissions) {
                 val newIntent = Intent(appContext, CameraUploadsService::class.java)
                 newIntent.putExtra(EXTRA_IGNORE_ATTR_CHECK, ignoreAttributes)
-                newIntent.putExtra(EXTRA_PRIMARY_SYNC_SUCCESS, isPrimaryHandleSynced)
                 ContextCompat.startForegroundService(appContext, newIntent)
                 Result.success()
             } else {

@@ -1063,7 +1063,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     fun disableCameraUpload() {
         getContext()?.let {
-            JobUtil.fireCancelCameraUploadJob(it)
+            JobUtil.fireStopCameraUploadJob(it)
             JobUtil.stopCameraUploadSyncHeartbeatWorkers(it)
         }
         CameraUploadUtil.disableCameraUploadSettingProcess()

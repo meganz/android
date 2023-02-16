@@ -9,7 +9,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import mega.privacy.android.app.di.getDbHandler
-import mega.privacy.android.app.jobservices.CancelCameraUploadWorker
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker
 import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker
@@ -38,11 +37,6 @@ object JobUtil {
     const val SHOULD_IGNORE_ATTRIBUTES = "SHOULD_IGNORE_ATTRIBUTES"
 
     /**
-     * Is primary handle sync done intent data
-     */
-    const val IS_PRIMARY_HANDLE_SYNC_DONE = "IS_PRIMARY_HANDLE_SYNC_DONE"
-
-    /**
      * Worker tags
      */
     private const val CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG"
@@ -50,7 +44,6 @@ object JobUtil {
     private const val HEART_BEAT_TAG = "HEART_BEAT_TAG"
     private const val SINGLE_HEART_BEAT_TAG = "SINGLE_HEART_BEAT_TAG"
     private const val STOP_CAMERA_UPLOAD_TAG = "STOP_CAMERA_UPLOAD_TAG"
-    private const val CANCEL_UPLOADS_TAG = "CANCEL_UPLOADS_TAG"
 
     /**
      * Schedule job of camera upload
@@ -163,7 +156,6 @@ object JobUtil {
     fun fireCameraUploadJob(
         context: Context,
         shouldIgnoreAttributes: Boolean,
-        isPrimaryHandleSyncDone: Boolean = false,
     ): Int {
         if (isCameraUploadDisabled) {
             Timber.d("fireCameraUploadJob() FAIL")
@@ -176,7 +168,6 @@ object JobUtil {
             .setInputData(
                 Data.Builder()
                     .putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes)
-                    .putBoolean(IS_PRIMARY_HANDLE_SYNC_DONE, isPrimaryHandleSyncDone)
                     .build()
             )
             .build()
@@ -227,33 +218,6 @@ object JobUtil {
     }
 
     /**
-     * Cancel all camera upload related jobs immediately, e.g. when all transfers are cancelled.
-     *
-     * @param context From which the action is done.
-     */
-    @JvmStatic
-    @Synchronized
-    fun fireCancelCameraUploadJob(context: Context) {
-        val cancelWorkRequest = OneTimeWorkRequest.Builder(
-            CancelCameraUploadWorker::class.java
-        )
-            .addTag(CANCEL_UPLOADS_TAG)
-            .build()
-        WorkManager.getInstance(context)
-            .enqueueUniqueWork(
-                CANCEL_UPLOADS_TAG,
-                ExistingWorkPolicy.KEEP,
-                cancelWorkRequest
-            )
-        Timber.d(
-            "CameraUpload Cancel Job Work Status: ${
-                WorkManager.getInstance(context).getWorkInfosByTag(CANCEL_UPLOADS_TAG)
-            }"
-        )
-        Timber.d("fireCancelCameraUploadJob() SUCCESS")
-    }
-
-    /**
      * Reschedule Camera Upload with time interval
      */
     fun rescheduleCameraUpload(context: Context) {
@@ -284,7 +248,6 @@ object JobUtil {
             .setInputData(
                 Data.Builder()
                     .putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes)
-                    .putBoolean(IS_PRIMARY_HANDLE_SYNC_DONE, false)
                     .build()
             )
             .build()
