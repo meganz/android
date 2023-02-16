@@ -333,8 +333,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 Constants.ACTION_OVERQUOTA_TRANSFER -> showGeneralTransferOverQuotaWarning()
             }
         }
-
-        intent = null
     }
 
     override fun onPause() {

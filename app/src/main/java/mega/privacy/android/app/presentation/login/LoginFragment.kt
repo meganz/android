@@ -51,13 +51,13 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
 import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
-import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.messageId
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_OPEN_APP
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
@@ -1107,20 +1107,23 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     var intent: Intent?
                     if (uiState.isAlreadyLoggedIn) {
                         intent = Intent(requireContext(), ManagerActivity::class.java)
+                        setStartScreenTimeStamp(requireContext())
+                        when (intentAction) {
+                            Constants.ACTION_EXPORT_MASTER_KEY -> {
+                                Timber.d("ACTION_EXPORT_MK")
+                                intent.action = Constants.ACTION_EXPORT_MASTER_KEY
+                            }
+                            Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
+                                if (intentDataString != null) {
+                                    intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
+                                    intent.data = Uri.parse(intentDataString)
+                                }
+                            }
+                            else -> intent = handleLinkNavigation(loginActivity)
+                        }
                         if (uiState.isFirstTime) {
                             Timber.d("First time")
                             intent.putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
-                        }
-                        setStartScreenTimeStamp(requireContext())
-                        if (intentAction != null) {
-                            Timber.d("Action not NULL")
-                            if (intentAction == Constants.ACTION_EXPORT_MASTER_KEY) {
-                                Timber.d("ACTION_EXPORT_MK")
-                                intent.action = intentAction
-                            } else if (intentAction == Constants.ACTION_JOIN_OPEN_CHAT_LINK && intentDataString != null) {
-                                intent.action = intentAction
-                                intent.data = Uri.parse(intentDataString)
-                            }
                         }
                     } else {
                         var initialCam = false
@@ -1141,39 +1144,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         }
                         if (!initialCam) {
                             Timber.d("NOT initialCam")
-                            intent = Intent(requireContext(), ManagerActivity::class.java)
-                            if (intentAction != null) {
-                                Timber.d("The action is: %s", intentAction)
-                                when (intentAction) {
-                                    Constants.ACTION_FILE_PROVIDER -> {
-                                        intent = Intent(requireContext(),
-                                            FileProviderActivity::class.java)
-                                        intentExtras?.let { intent?.putExtras(it) }
-                                        intent.data = intentData
-                                    }
-                                    Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                                        intent =
-                                            Intent(requireContext(), FileLinkActivity::class.java)
-                                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                        intent.data = intentData
-                                    }
-                                    Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                                        intent =
-                                            Intent(requireContext(), FolderLinkActivity::class.java)
-                                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                        intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-                                        intent.data = intentData
-                                    }
-                                    Constants.ACTION_OPEN_CONTACTS_SECTION -> intent.putExtra(
-                                        Constants.CONTACT_HANDLE,
-                                        loginActivity.intent?.getLongExtra(Constants.CONTACT_HANDLE,
-                                            -1))
-                                }
-                                intent.action = intentAction
-                                intentDataString?.let { intent?.data = Uri.parse(it) }
-                            } else {
-                                Timber.w("The intent action is NULL")
-                            }
+                            intent = handleLinkNavigation(loginActivity)
                         } else {
                             Timber.d("initialCam YES")
                             intent = Intent(requireContext(), ManagerActivity::class.java)
@@ -1214,6 +1185,42 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 loginActivity.finish()
             }
         }
+    }
+
+    private fun handleLinkNavigation(loginActivity: LoginActivity): Intent {
+        var intent = Intent(requireContext(), ManagerActivity::class.java)
+        if (intentAction != null) {
+            Timber.d("The action is: %s", intentAction)
+            when (intentAction) {
+                Constants.ACTION_FILE_PROVIDER -> {
+                    intent = Intent(requireContext(), FileProviderActivity::class.java)
+                    intentExtras?.let { intent.putExtras(it) }
+                    intent.data = intentData
+                }
+                Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
+                    intent = Intent(requireContext(), FileLinkActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    intent.data = intentData
+                }
+                Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
+                    intent = Intent(requireContext(), FolderLinkActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
+                    intent.data = intentData
+                }
+                Constants.ACTION_OPEN_CONTACTS_SECTION -> {
+                    intent.putExtra(
+                        Constants.CONTACT_HANDLE,
+                        loginActivity.intent?.getLongExtra(Constants.CONTACT_HANDLE, -1),
+                    )
+                }
+            }
+            intent.action = intentAction
+            intentDataString?.let { intent.data = Uri.parse(it) }
+        } else {
+            Timber.w("The intent action is NULL")
+        }
+        return intent
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
