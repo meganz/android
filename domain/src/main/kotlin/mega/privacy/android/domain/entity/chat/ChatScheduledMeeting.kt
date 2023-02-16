@@ -48,8 +48,8 @@ data class ChatScheduledMeeting constructor(
         val now = ZonedDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
         return startDateTime?.toZonedDateTime()?.isAfter(now) == true
                 || endDateTime?.toZonedDateTime()?.isAfter(now) == true
-                || (rules != null &&
-                (rules.until == null || rules.until.toZonedDateTime().isAfter(now)))
+                || (rules != null && (rules.until == null || rules.until == 0L
+                || rules.until.toZonedDateTime().isAfter(now)))
     }
 
     private fun Long.toZonedDateTime(): ZonedDateTime =
