@@ -297,6 +297,30 @@ internal class DefaultImageRepository @Inject constructor(
         )
     }
 
+    override suspend fun getImageFromFile(file: File, highPriority: Boolean): ImageResult =
+        withContext(ioDispatcher) {
+            val isVideo = MimeTypeList.typeForName(file.name).isVideo
+            val previewName =
+                "${(file.name + file.length()).encodeBase64()}${FileConstant.JPG_EXTENSION}"
+
+            val previewUri = if (isVideo) {
+                getVideoThumbnail(fileName = previewName, videoUri = file.toUri())
+            } else {
+                getImagePreview(
+                    fileName = previewName,
+                    imageUri = file.toUri(),
+                    highPriority = highPriority
+                )
+            }
+
+            return@withContext ImageResult(
+                previewUri = previewUri,
+                fullSizeUri = file.toUri().toString(),
+                isVideo = isVideo,
+                isFullyLoaded = true
+            )
+        }
+
     private suspend fun getImagePreview(
         fileName: String,
         imageUri: Uri,
