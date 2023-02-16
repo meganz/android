@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import javax.inject.Inject
 
 /**
- * Default Implementation of DisableCameraUploadSettings
+ * Default Implementation of [DisableCameraUploadSettings]
  *
  */
 class DefaultDisableCameraUploadSettings @Inject constructor(
@@ -13,7 +13,7 @@ class DefaultDisableCameraUploadSettings @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) : DisableCameraUploadSettings {
 
-    override suspend fun invoke(clearCamSyncRecords: Boolean) {
+    override suspend fun invoke() {
         settingsRepository.setEnableCameraUpload(false)
         cameraUploadRepository.setSecondaryEnabled(false)
     }

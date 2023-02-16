@@ -9,7 +9,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultDisableCameraUploadSettingsTest {
@@ -27,22 +26,10 @@ class DefaultDisableCameraUploadSettingsTest {
     }
 
     @Test
-    fun `test that invoke with true camera upload settings are updated`() =
-        runTest {
-            whenever(cameraUploadRepository.shouldClearSyncRecords()).thenReturn(true)
-            underTest(true)
-            verify(settingsRepository,
-                times(1)).setEnableCameraUpload(false)
-            verify(cameraUploadRepository, times(1)).setSecondaryEnabled(false)
-        }
+    fun `test that camera upload settings are updated when the use case is invoked`() = runTest {
+        underTest()
 
-    @Test
-    fun `test that invoke with false camera upload settings are updated`() =
-        runTest {
-            whenever(cameraUploadRepository.shouldClearSyncRecords()).thenReturn(true)
-            underTest(true)
-            verify(settingsRepository,
-                times(1)).setEnableCameraUpload(false)
-            verify(cameraUploadRepository, times(1)).setSecondaryEnabled(false)
-        }
+        verify(settingsRepository, times(1)).setEnableCameraUpload(false)
+        verify(cameraUploadRepository, times(1)).setSecondaryEnabled(false)
+    }
 }

@@ -10,10 +10,18 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.ClearCacheDirectory
+import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
+import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -28,15 +36,23 @@ class SettingsCameraUploadsViewModelTest {
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
+    private val clearCacheDirectory = mock<ClearCacheDirectory>()
+    private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
+    private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
+    private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
+    private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = SettingsCameraUploadsViewModel(
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
-            restorePrimaryTimestamps = mock(),
-            restoreSecondaryTimestamps = mock(),
+            clearCacheDirectory = clearCacheDirectory,
+            disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
             monitorConnectivity = mock(),
+            resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
+            restorePrimaryTimestamps = restorePrimaryTimestamps,
+            restoreSecondaryTimestamps = restoreSecondaryTimestamps,
         )
     }
 
@@ -183,5 +199,40 @@ class SettingsCameraUploadsViewModelTest {
                 val state = awaitItem()
                 assertFalse(state.shouldShowNotificationPermissionRationale)
             }
+        }
+
+    @Test
+    fun `test that restorePrimaryTimestamps is invoked when calling restorePrimaryTimestampsAndSyncRecordProcess`() =
+        runTest {
+            underTest.restorePrimaryTimestampsAndSyncRecordProcess()
+
+            verify(restorePrimaryTimestamps, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that restoreSecondaryTimestamps is invoked when calling restoreSecondaryTimestampsAndSyncRecordProcess`() =
+        runTest {
+            underTest.restoreSecondaryTimestampsAndSyncRecordProcess()
+
+            verify(restoreSecondaryTimestamps, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that resetCameraUploadTimeStamps and clearCacheDirectory are invoked in order when calling resetTimestampsAndCacheDirectory`() =
+        runTest {
+            underTest.resetTimestampsAndCacheDirectory()
+
+            with(inOrder(clearCacheDirectory, resetCameraUploadTimeStamps)) {
+                verify(resetCameraUploadTimeStamps, times(1)).invoke(clearCamSyncRecords = true)
+                verify(clearCacheDirectory, times(1)).invoke()
+            }
+        }
+
+    @Test
+    fun `test that disableCameraUploadsInDatabase is invoked when calling disableCameraUploadsInDB`() =
+        runTest {
+            underTest.disableCameraUploadsInDB()
+
+            verify(disableCameraUploadsInDatabase, times(1)).invoke()
         }
 }

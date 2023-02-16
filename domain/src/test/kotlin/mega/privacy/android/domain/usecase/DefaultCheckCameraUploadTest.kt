@@ -132,7 +132,7 @@ internal class DefaultCheckCameraUploadTest {
             assertThat(true).isEqualTo(expected.shouldSendEvent)
             verify(resetCameraUploadTimeStamps, times(1)).invoke(false)
             verify(clearCacheDirectory, times(1)).invoke()
-            verify(disableCameraUploadSettings, times(1)).invoke(false)
+            verify(disableCameraUploadSettings, times(1)).invoke()
             verify(clearSyncRecords, times(1)).invoke()
         }
 }
