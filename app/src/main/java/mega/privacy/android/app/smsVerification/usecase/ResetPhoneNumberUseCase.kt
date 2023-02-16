@@ -1,39 +1,44 @@
 package mega.privacy.android.app.smsVerification.usecase
 
 import com.jeremyliao.liveeventbus.LiveEventBus
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
 
 class ResetPhoneNumberUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
      * Launches a request to remove current verified phone number.
-     *
-     * @return Completable onComplete() if the request finished with success, error if not.
      */
-    fun reset(): Completable =
-        Completable.create { emitter ->
-            megaApi.resetSmsVerifiedPhoneNumber(
-                OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                    when (error.errorCode) {
-                        API_OK, API_ENOENT -> {
-                            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-                                .post(true)
-
-                            emitter.onComplete()
-                        }
-                        else -> emitter.onError(error.toThrowable())
+    suspend operator fun invoke() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                when (error.errorCode) {
+                    API_OK, API_ENOENT -> {
+                        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+                            .post(true)
+                        continuation.resumeWith(Result.success(Unit))
                     }
-                })
-            )
+                    else -> continuation.failWithError(error)
+                }
+            })
+            megaApi.resetSmsVerifiedPhoneNumber(listener)
+
+            continuation.invokeOnCancellation {
+                megaApi.removeRequestListener(listener)
+            }
         }
+    }
 }

@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.util.forEach
 import androidx.core.view.isVisible
 import androidx.core.view.setMargins
@@ -37,8 +36,6 @@ import mega.privacy.android.app.main.IncomingSharesExplorerFragment
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-import mega.privacy.android.app.presentation.favourites.model.Favourite
-import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
@@ -340,8 +337,7 @@ class MegaExplorerAdapter(
         (view.tag as ViewHolderExplorer).let { holder ->
             when (fragment) {
                 is CloudDriveExplorerFragment -> fragment.itemClick(holder.absoluteAdapterPosition)
-                is IncomingSharesExplorerFragment -> fragment.itemClick(view,
-                    holder.absoluteAdapterPosition)
+                is IncomingSharesExplorerFragment -> fragment.itemClick(holder.absoluteAdapterPosition)
             }
         }
     }
@@ -471,7 +467,7 @@ class MegaExplorerAdapter(
         val visible = itemCount >= MIN_ITEMS_SCROLLBAR
 
         when (fragment) {
-            is IncomingSharesExplorerFragment -> fragment.fastScroller.isVisible = visible
+            is IncomingSharesExplorerFragment -> fragment.getFastScroller().isVisible = visible
             is CloudDriveExplorerFragment -> fragment.getFastScroller().isVisible = visible
         }
     }
@@ -479,7 +475,7 @@ class MegaExplorerAdapter(
     /**
      * TextView set text and text color
      * @param textView TextView
-     * @param info Favourite
+     * @param node MegaNode
      */
     private fun textViewSettings(textView: TextView, node: MegaNode) {
         with(textView) {

@@ -54,9 +54,8 @@ import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
-import mega.privacy.android.app.main.FolderLinkActivity
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.controllers.AccountController.Companion.localLogoutApp
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -1320,7 +1319,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         } else if (request.type == MegaRequest.TYPE_LOGOUT) {
             Timber.d("TYPE_LOGOUT")
             if (error.errorCode == MegaError.API_OK) {
-                localLogoutApp(requireActivity(), sharingScope)
+                viewModel.performLocalLogoutApp()
             }
         } else if (request.type == MegaRequest.TYPE_GET_RECOVERY_LINK) {
             Timber.d("TYPE_GET_RECOVERY_LINK")

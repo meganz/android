@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
 import mega.privacy.android.app.presentation.changepassword.model.ActionResult
 import mega.privacy.android.domain.usecase.ChangePassword
@@ -40,6 +41,8 @@ internal class ChangePasswordViewModelTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
         underTest = ChangePasswordViewModel(
             monitorConnectivity = monitorConnectivity,
             isCurrentPassword = isCurrentPassword,
@@ -48,7 +51,6 @@ internal class ChangePasswordViewModelTest {
             resetPassword = resetPassword,
             multiFactorAuthSetting = multiFactorAuthSetting
         )
-        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     @After
@@ -67,7 +69,7 @@ internal class ChangePasswordViewModelTest {
     }
 
     @Test
-    fun `test that when multi factor auth enabled ui state should be true and change password should be default`() =
+    fun `test that when multi factor auth enabled ui state should be true and isPasswordChanged should be false`() =
         runTest {
             whenever(multiFactorAuthSetting()).thenReturn(true)
 
@@ -75,49 +77,46 @@ internal class ChangePasswordViewModelTest {
 
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.isMultiFactorAuthEnabled).isTrue()
-                assertThat(state.isChangePassword).isEqualTo(ActionResult.DEFAULT)
+                assertThat(state.isPromptedMultiFactorAuth).isTrue()
+                assertThat(state.isPasswordChanged).isEqualTo(false)
             }
         }
 
     @Test
-    fun `test that when multi factor auth disabled and change password is successful isChangePassword should be SUCCESS`() {
-        verifyChangePasswordUiState(true, ActionResult.SUCCESS)
+    fun `test that loading message should change when user click change password`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().loadingMessage).isNull()
+            underTest.onUserClickChangePassword("")
+            assertThat(awaitItem().loadingMessage).isEqualTo(R.string.my_account_changing_password)
+        }
     }
 
     @Test
-    fun `test that when multi factor auth disabled and change password fails isChangePassword should be FAILED`() {
-        verifyChangePasswordUiState(false, ActionResult.FAILED)
+    fun `test that when multi factor auth disabled and change password is successful isPasswordChanged should be true`() {
+        verifyChangePasswordUiState(isSuccessChangePassword = true, expected = true)
     }
 
     @Test
-    fun `test that no network SnackBar status should update when isConnectedToNetwork called`() =
+    fun `test that when multi factor auth disabled and change password fails isPasswordChanged should be false`() {
+        verifyChangePasswordUiState(isSuccessChangePassword = false, expected = false)
+    }
+
+    @Test
+    fun `test that network connection status should return correct value when isConnectedToNetwork called`() =
         runTest {
             val isConnected = Random.nextBoolean()
             testFlow.emit(isConnected)
 
-            val expectedValue = underTest.isConnectedToNetwork()
-
-            assertThat(expectedValue).isEqualTo(isConnected)
+            underTest.isConnectedToNetwork()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isShowNoNetworkSnackBar).isEqualTo(isConnected.not())
-            }
-        }
-
-    @Test
-    fun `test that when onNoNetworkSnackBarShown called should reset isShowNoNetworkSnackBar to false`() =
-        runTest {
-            underTest.onNoNetworkSnackBarShown()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().isShowNoNetworkSnackBar).isEqualTo(false)
+                assertThat(awaitItem().isConnectedToNetwork).isEqualTo(isConnected)
             }
         }
 
     private fun verifyChangePasswordUiState(
         isSuccessChangePassword: Boolean,
-        expected: ActionResult,
+        expected: Boolean,
     ) = runTest {
         whenever(changePassword(any())).thenReturn(isSuccessChangePassword)
         whenever(multiFactorAuthSetting()).thenReturn(false)
@@ -126,8 +125,8 @@ internal class ChangePasswordViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.isMultiFactorAuthEnabled).isFalse()
-            assertThat(state.isChangePassword).isEqualTo(expected)
+            assertThat(state.isPromptedMultiFactorAuth).isFalse()
+            assertThat(state.isPasswordChanged).isEqualTo(expected)
         }
     }
 

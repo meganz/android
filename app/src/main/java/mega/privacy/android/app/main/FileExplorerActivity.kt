@@ -22,7 +22,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -31,7 +30,6 @@ import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -588,6 +586,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 ChatUtil.initMegaChatApi(gSession, this)
                 megaApi.fastLogin(gSession, this)
             } else {
+                megaApi.addRequestListener(this)
+                megaChatApi.addChatRequestListener(this)
                 Timber.w("Another login is proccessing")
             }
         } else {
@@ -620,9 +620,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             onProcessAsyncInfo(info)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
-
-        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
-            .observe(this) { isList: Boolean -> refreshViewNodes(isList) }
     }
 
     private fun afterLoginAndFetch() {
@@ -1123,7 +1120,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     newChatMenuItem?.isVisible = false
 
                     if (isMultiselect) {
-                        searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty == false
+                        searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
                     }
                 }
                 CHAT_TAB -> {
@@ -1669,6 +1666,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
      * @param message    Message to display into the progress dialog
      */
     private fun createAndShowProgressDialog(cancelable: Boolean, message: String) {
+        statusDialog?.dismiss()
         val temp: AlertDialog
         try {
             temp = createProgressDialog(this, message)
@@ -2030,8 +2028,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 credentials = UserCredentials(lastEmail, gSession, "", "", myUserHandle)
                 dbH.saveCredentials(credentials ?: return)
                 binding.fileLoggingInLayout.isVisible = false
+                if (isLoggingIn) {
+                    afterLoginAndFetch()
+                }
                 isLoggingIn = false
-                afterLoginAndFetch()
             }
         }
     }
@@ -2098,6 +2098,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     public override fun onDestroy() {
         megaApi.removeGlobalListener(this)
+        megaApi.removeRequestListener(this)
+        megaChatApi.removeChatRequestListener(this)
         val childThumbDir =
             File(ThumbnailUtils.getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER)
 
@@ -2108,7 +2110,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 Timber.w(e, "IOException deleting childThumbDir.")
             }
         }
-
+        dismissAlertDialogIfExists(statusDialog)
         dismissAlertDialogIfExists(newFolderDialog)
         super.onDestroy()
     }
@@ -2396,17 +2398,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         cDriveExplorer = cloudExplorerFragment
         cDriveExplorer?.orderNodes(order)
         iSharesExplorer = incomingExplorerFragment
-        iSharesExplorer?.orderNodes(order)
-    }
-
-    private fun refreshViewNodes(isList: Boolean) {
-        this.isList = isList
-        iSharesExplorer = incomingExplorerFragment
-
-        iSharesExplorer?.let {
-            supportFragmentManager.beginTransaction().detach(it).commitNowAllowingStateLoss()
-            supportFragmentManager.beginTransaction().attach(it).commitNowAllowingStateLoss()
-        }
+        iSharesExplorer?.updateNodesByOrder(order)
     }
 
     /**

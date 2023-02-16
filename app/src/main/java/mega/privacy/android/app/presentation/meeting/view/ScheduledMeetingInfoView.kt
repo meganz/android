@@ -73,10 +73,6 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
@@ -89,6 +85,10 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -971,10 +971,14 @@ private fun ParticipantItemView(
                     .height(72.dp)
             ) {
                 Box {
+                    val avatarModifier = Modifier
+                        .padding(16.dp)
+                        .size(40.dp)
+                        .clip(CircleShape)
                     if (participant.fileUpdated) {
-                        ParticipantAvatar(participant = participant)
+                        ParticipantAvatar(participant = participant, modifier = avatarModifier)
                     } else {
-                        ParticipantAvatar(participant = participant)
+                        ParticipantAvatar(participant = participant, modifier = avatarModifier)
                     }
 
                     if (participant.areCredentialsVerified) {
@@ -1214,19 +1218,19 @@ fun getStringForDndTime(seconds: Long): String {
  */
 @Composable
 private fun ParticipantAvatar(
-    modifier: Modifier = Modifier
-        .padding(16.dp)
-        .size(40.dp)
-        .clip(CircleShape),
+    modifier: Modifier = Modifier,
     participant: ChatParticipant,
 ) {
     if (participant.data.avatarUri != null) {
-        UriAvatar(modifier = modifier, uri = participant.data.avatarUri.toString())
+        UriAvatar(
+            modifier = modifier,
+            uri = participant.data.avatarUri.toString(),
+        )
     } else {
         DefaultContactAvatar(
             modifier = modifier,
             color = Color(participant.defaultAvatarColor),
-            content = participant.getAvatarFirstLetter()
+            content = participant.getAvatarFirstLetter(),
         )
     }
 }

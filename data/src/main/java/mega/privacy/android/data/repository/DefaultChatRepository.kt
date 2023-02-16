@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -452,10 +453,10 @@ internal class DefaultChatRepository @Inject constructor(
             .flowOn(ioDispatcher)
 
 
-    override suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<Long> =
+    override suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<ResultOccurrenceUpdate> =
         megaChatApiGateway.scheduledMeetingUpdates
             .filterIsInstance<ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
-            .mapNotNull { it.chatId }
+            .mapNotNull { ResultOccurrenceUpdate(it.chatId, it.append) }
             .flowOn(ioDispatcher)
 
 

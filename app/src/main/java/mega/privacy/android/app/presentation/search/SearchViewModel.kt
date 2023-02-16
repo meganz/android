@@ -23,14 +23,15 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExists
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -40,6 +41,7 @@ import javax.inject.Inject
  * @param rootNodeExists Check if the root node exists
  * @param searchNodesUseCase Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
+ * @param getSearchParentNodeHandle Get parent node for current node
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -49,6 +51,7 @@ class SearchViewModel @Inject constructor(
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val getSearchParentNodeHandle: GetParentNodeHandle,
 ) : ViewModel() {
 
     /**
@@ -67,6 +70,19 @@ class SearchViewModel @Inject constructor(
      * after migrating SearchFragment to kotlin
      */
     val stateLiveData = _state.map { Event(it) }.asLiveData()
+
+    /**
+     * Stack to maintain folder navigation clicks
+     */
+    private val lastPositionStack: Stack<Int> = Stack()
+
+    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
+
+    /**
+     * State for [MandatoryFingerPrintVerification] feature flag value
+     */
+    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
+        _mandatoryFingerPrintVerificationState
 
     /**
      * Monitor global node updates
@@ -141,9 +157,18 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
+     * Handles Folder item clicked on [SearchFragment]
+     */
+    fun onFolderClicked(handle: Long, lastFirstVisiblePosition: Int) {
+        setSearchParentHandle(handle)
+        increaseSearchDepth()
+        lastPositionStack.push(lastFirstVisiblePosition)
+    }
+
+    /**
      * Increase by 1 the search depth
      */
-    fun increaseSearchDepth() = viewModelScope.launch {
+    private fun increaseSearchDepth() = viewModelScope.launch {
         _state.update { it.copy(searchDepth = it.searchDepth + 1) }
     }
 
@@ -341,4 +366,32 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Handles back click [SearchFragment]
+     */
+    fun onBackClicked() {
+        cancelSearch()
+        val levelSearch = _state.value.searchDepth
+        if (levelSearch >= 0) {
+            if (levelSearch > 0) {
+                viewModelScope.launch {
+                    getSearchParentNodeHandle(_state.value.searchParentHandle)?.let {
+                        setSearchParentHandle(it)
+                    } ?: run {
+                        setSearchParentHandle(-1)
+                    }
+                }
+            } else {
+                setSearchParentHandle(-1)
+            }
+        }
+    }
+
+    /**
+     * Pop scroll position for previous depth
+     *
+     * @return last position saved
+     */
+    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
 }

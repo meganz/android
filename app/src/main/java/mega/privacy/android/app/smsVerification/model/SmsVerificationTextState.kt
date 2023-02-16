@@ -22,4 +22,9 @@ sealed interface SmsVerificationTextState {
      * @property error
      */
     data class Failed(val error: String) : SmsVerificationTextState
+
+    /**
+     * Loading
+     */
+    object Loading : SmsVerificationTextState
 }

@@ -541,7 +541,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                             megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
                             buttonPreviewContent.setVisibility(View.VISIBLE);
                         } else {
-                            if (MimeTypeList.typeForName(document.getName()).isVideoReproducible()
+                            if (MimeTypeList.typeForName(document.getName()).isVideoMimeType()
                                     || MimeTypeList.typeForName(document.getName()).isAudio()
                                     || MimeTypeList.typeForName(document.getName()).isPdf()
                                     || MimeTypeList.typeForName(document.getName()).isOpenableTextFile(document.getSize())) {
@@ -728,7 +728,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         if (MimeTypeList.typeForName(document.getName()).isImage()) {
             Intent intent = ImageViewerActivity.getIntentForSingleNode(this, url);
             startActivity(intent);
-        } else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio()) {
+        } else if (MimeTypeList.typeForName(document.getName()).isVideoMimeType() || MimeTypeList.typeForName(document.getName()).isAudio()) {
             Timber.d("Is video");
 
             String mimeType = MimeTypeList.typeForName(document.getName()).getType();

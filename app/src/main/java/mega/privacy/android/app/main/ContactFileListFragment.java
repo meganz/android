@@ -488,7 +488,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                     putThumbnailLocation(intent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
                     startActivity(intent);
                     ((ContactFileListActivity) context).overridePendingTransition(0, 0);
-                } else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
+                } else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoMimeType() || MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
                     MegaNode file = contactNodes.get(position);
                     String mimeType = MimeTypeList.typeForName(file.getName()).getType();
                     Timber.d("Node Handle: %s", file.getHandle());

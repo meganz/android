@@ -48,6 +48,7 @@ class DefaultAlbumRepositoryTest {
         underTest = DefaultAlbumRepository(
             megaApiGateway = megaApiGateway,
             userSetMapper = userSetMapper,
+            isNodeInRubbish = { false },
             albumStringResourceGateway = albumStringResourceGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
@@ -145,6 +146,11 @@ class DefaultAlbumRepositoryTest {
         }
         whenever(megaApiGateway.getSets()).thenReturn(megaSetList)
 
+        val megaSetElementList = mock<MegaSetElementList> {
+            on { size() }.thenReturn(0L)
+        }
+        whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
+
         val actualUserSets = underTest.getAllUserSets()
 
         assertThat(actualUserSets.size).isEqualTo(1)
@@ -168,6 +174,11 @@ class DefaultAlbumRepositoryTest {
                 on { get(any()) }.thenReturn(megaSet)
             }
             whenever(megaApiGateway.getSets()).thenReturn(megaSetList)
+
+            val megaSetElementList = mock<MegaSetElementList> {
+                on { size() }.thenReturn(0L)
+            }
+            whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
 
             val actualUserSets = underTest.getAllUserSets()
 
@@ -201,7 +212,7 @@ class DefaultAlbumRepositoryTest {
             createUserSet(
                 id = it,
                 name = "Album $it",
-                cover = 0L,
+                cover = -1L,
                 modificationTime = it,
             )
         }
@@ -259,7 +270,7 @@ class DefaultAlbumRepositoryTest {
         val expectedUserSet = createUserSet(
             id = 1L,
             name = "Album 1",
-            cover = 0L,
+            cover = -1L,
             modificationTime = 0L,
         )
 
@@ -269,8 +280,12 @@ class DefaultAlbumRepositoryTest {
                 on { name() }.thenReturn(name)
             }
         }
-
         whenever(megaApiGateway.getSet(any())).thenReturn(megaSet)
+
+        val megaSetElementList = mock<MegaSetElementList> {
+            on { size() }.thenReturn(0L)
+        }
+        whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
 
         val actualUserSet = underTest.getUserSet(albumId)
         assertThat(expectedUserSet).isEqualTo(actualUserSet)

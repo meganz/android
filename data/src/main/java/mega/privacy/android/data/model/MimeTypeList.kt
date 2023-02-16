@@ -42,33 +42,49 @@ data class MimeTypeList(
      * Return if type is video
      */
     val isVideo
-        get() = type.startsWith("video/") || extension == "mkv"
+        get() = type.startsWith("video/")
 
     /**
-     * Check if MimeType is Video Reproducible
+     * Check if MimeType is Video
      */
-    fun isVideoReproducible() =
-        type.startsWith("video/") || extension == "mkv" || extension == "flv" || extension == "vob" || extension == "avi" || extension == "wmv" || extension == "mpg" || extension == "mts"
+    val isVideoMimeType
+        get() =
+            type.startsWith("video/") || extension == "vob"
 
+    /**
+     * Returns if type is non supported video
+     */
+    val isVideoNotSupported get() = extension == "mpg" || extension == "avi" || extension == "wmv"
 
     /**
      * Check if MimeType is Mp4 or Video
      */
-    fun isMp4Video() =
-        type.startsWith("video/") || extension == "mp4"
+    val isMp4Video get() = type.startsWith("video/") || extension == "mp4"
 
 
     /**
      * Check if MimeType is Zip
      */
-    fun isZip() =
-        type.startsWith("application/zip") || type.startsWith("multipart/x-zip")
+    val isZip
+        get() = (type.startsWith("application/zip") || type.startsWith("multipart/x-zip"))
 
 
     /**
      * Check if MimeType is image
      */
-    fun isImage() =
-        type.startsWith("image/")
+    val isImage
+        get() = type.startsWith("image/")
+
+    /**
+     * Return if type is Audio
+     */
+    val isAudio get() = type.startsWith("audio/") || extension == "opus" || extension == "weba"
+
+    /**
+     * Return if type is Non supported audio
+     */
+    val isAudioNotSupported
+        get() = extension == "wma" || extension == "aif" || extension == "aiff"
+                || extension == "iff" || extension == "oga" || extension == "3ga"
 
 }

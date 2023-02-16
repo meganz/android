@@ -100,7 +100,7 @@ public class FileUtil {
     }
 
     public static boolean isAudioOrVideo(MegaNode node) {
-        return MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio();
+        return MimeTypeList.typeForName(node.getName()).isVideoMimeType() || MimeTypeList.typeForName(node.getName()).isAudio();
     }
 
     public static boolean isInternalIntent(MegaNode node) {
@@ -1196,7 +1196,7 @@ public class FileUtil {
         if (file.isFile() && file.exists() && file.canRead()) {
             MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
             return mimeTypeList.isImage() || mimeTypeList.isGIF()
-                    || mimeTypeList.isVideoReproducible() || mimeTypeList.isMp4Video();
+                    || mimeTypeList.isVideoMimeType() || mimeTypeList.isMp4Video();
         } else {
             return false;
         }

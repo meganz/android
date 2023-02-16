@@ -357,7 +357,7 @@ import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
@@ -5605,7 +5605,7 @@ public class ChatActivity extends PasscodeActivity
                 Timber.d("Image without preview - open with");
                 openWith(this, node);
             }
-        } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
+        } else if (MimeTypeList.typeForName(node.getName()).isVideoMimeType() || MimeTypeList.typeForName(node.getName()).isAudio()) {
             String mimeType = MimeTypeList.typeForName(node.getName()).getType();
             Intent mediaIntent;
             boolean internalIntent;

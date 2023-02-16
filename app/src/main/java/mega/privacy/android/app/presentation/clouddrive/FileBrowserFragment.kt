@@ -685,7 +685,7 @@ class FileBrowserFragment : RotatableFragment() {
             )
             startActivity(intent)
             (activity as? ManagerActivity)?.overridePendingTransition(0, 0)
-        } else if (MimeTypeList.typeForName(node.name).isVideoReproducible || MimeTypeList.typeForName(
+        } else if (MimeTypeList.typeForName(node.name).isVideoMimeType || MimeTypeList.typeForName(
                 node.name
             ).isAudio
         ) {

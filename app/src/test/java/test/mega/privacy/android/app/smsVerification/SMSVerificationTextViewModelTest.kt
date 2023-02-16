@@ -4,7 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -32,7 +33,7 @@ internal class SMSVerificationTextViewModelTest {
             verifyPhoneNumber = verifyPhoneNumber,
             verificationTextErrorMapper = verificationTextErrorMapper,
         )
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(StandardTestDispatcher())
     }
 
     @After
@@ -48,13 +49,25 @@ internal class SMSVerificationTextViewModelTest {
     }
 
     @Test
-    fun `test that successfully verifying sets the state to VerifiedSuccessfully`() = runTest {
+    fun `test that loading state is returned while awaiting response`() = runTest {
+        underTest.state
+            .filterNot { it is SmsVerificationTextState.Empty }
+            .test {
+                underTest.submitPin("234")
+                assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.Loading)
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
 
-        underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.Empty)
-            underTest.submitPin("234")
-            assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.VerifiedSuccessfully)
-        }
+    @Test
+    fun `test that successfully verifying sets the state to VerifiedSuccessfully`() = runTest {
+        underTest.state
+            .filterNot { it is SmsVerificationTextState.Empty }
+            .filterNot { it is SmsVerificationTextState.Loading }
+            .test {
+                underTest.submitPin("234")
+                assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.VerifiedSuccessfully)
+            }
     }
 
     @Test
@@ -68,10 +81,12 @@ internal class SMSVerificationTextViewModelTest {
             onBlocking { invoke(any()) }.thenAnswer { throw Throwable() }
         }
 
-        underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.Empty)
-            underTest.submitPin("234")
-            assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.Failed(error))
-        }
+        underTest.state
+            .filterNot { it is SmsVerificationTextState.Empty }
+            .filterNot { it is SmsVerificationTextState.Loading }
+            .test {
+                underTest.submitPin("234")
+                assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.Failed(error))
+            }
     }
 }

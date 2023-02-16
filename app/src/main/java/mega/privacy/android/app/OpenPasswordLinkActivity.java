@@ -21,7 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.main.DecryptAlertDialog;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;

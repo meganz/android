@@ -13,7 +13,7 @@ interface JobUtilWrapper {
      *
      * @return Whether the account is Over quota
      */
-    fun isOverQuota(): Boolean = JobUtil.isOverQuota()
+    fun isOverQuota(): Boolean = JobUtil.isOverQuota
 
     /**
      * Wrapper method that calls [JobUtil.fireCameraUploadJob]

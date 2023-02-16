@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -464,51 +463,13 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
-        MimeTypeList.typeForName(name).let { (type, extension) ->
+        MimeTypeList.typeForName(name).let { mimeType ->
             if (isAudio) {
-                isAudio(type, extension) && !isAudioNotSupported(extension)
+                mimeType.isAudio && !mimeType.isAudioNotSupported
             } else {
-                isVideo(type, extension) &&
-                        isVideoReproducible(type, extension) &&
-                        !isVideoNotSupported(extension)
+                mimeType.isVideo && !mimeType.isVideoNotSupported
             }
         }
-
-    /*
-     * Check is MimeType of audio type
-     */
-    private fun isAudio(type: String, extension: String): Boolean =
-        type.startsWith("audio/") ||
-                extension == "opus" ||
-                extension == "weba"
-
-
-    private fun isAudioNotSupported(extension: String): Boolean =
-        extension == "wma" ||
-                extension == "aif" ||
-                extension == "aiff" ||
-                extension == "iff" ||
-                extension == "oga" ||
-                extension == "3ga"
-
-    /*
-     * Check is MimeType of video type
-     */
-    private fun isVideo(type: String, extension: String): Boolean =
-        type.startsWith("video/") || extension == "mkv"
-
-    private fun isVideoReproducible(type: String, extension: String): Boolean =
-        type.startsWith("video/") ||
-                extension == "mkv" ||
-                extension == "flv" ||
-                extension == "vob" ||
-                extension == "avi" ||
-                extension == "wmv" ||
-                extension == "mpg" ||
-                extension == "mts"
-
-    private fun isVideoNotSupported(extension: String): Boolean =
-        extension == "mpg" || extension == "avi" || extension == "wmv"
 
     /**
      * Get the thumbnail cache file path

@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -182,7 +183,7 @@ public class TimeUtils implements Comparator<Calendar> {
     public static String formatDate(long timestamp, int format, boolean humanized) {
         ZonedDateTime timestampDateTime = ZonedDateTime.ofInstant(
                 Instant.ofEpochSecond(timestamp),
-                ZoneId.systemDefault()
+                ZoneOffset.UTC
         );
 
         DateTimeFormatter dateTimeFormatter;
@@ -214,9 +215,7 @@ public class TimeUtils implements Comparator<Calendar> {
                 break;
             case DATE_LONG_FORMAT:
             default:
-                dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT)
-                        .withLocale(getUserLocale())
-                        .withZone(ZoneId.systemDefault());
+                dateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT);
                 break;
         }
 
@@ -232,31 +231,19 @@ public class TimeUtils implements Comparator<Calendar> {
             } else if (timestampDate == todayDate.plusDays(1)) {
                 DateTimeFormatter tomorrowFormat = DateTimeFormatter.ofPattern(
                         getBestDateTimePattern(getUserLocale(), "d MMM yyyy")
-                );
+                ).withZone(ZoneId.systemDefault());
                 return getString(R.string.tomorrow_date, tomorrowFormat.format(timestampDateTime));
             } else if (format != DATE_WEEK_DAY_FORMAT && timestampDate.isBefore(todayDate.plusWeeks(1))) {
                 DateTimeFormatter futureFormat = DateTimeFormatter.ofPattern(
                         getBestDateTimePattern(getUserLocale(), "EEEE, d MMM yyyy")
-                );
+                ).withZone(ZoneId.systemDefault());
                 return futureFormat.format(timestampDateTime);
             }
         }
 
-        return dateTimeFormatter.format(timestampDateTime);
-    }
-
-    public static String formatShortDateTime(long timestamp) {
-
-        DateFormat df;
-
-        df = SimpleDateFormat.getDateTimeInstance(
-                SimpleDateFormat.SHORT, SimpleDateFormat.SHORT, getUserLocale()
-        );
-
-        Calendar cal = calculateDateFromTimestamp(timestamp);
-        Date date = cal.getTime();
-        String formattedDate = df.format(date);
-        return formattedDate;
+        return dateTimeFormatter.withZone(ZoneId.systemDefault())
+                .withLocale(getUserLocale())
+                .format(timestampDateTime);
     }
 
     public static String formatLongDateTime(long timestamp) {

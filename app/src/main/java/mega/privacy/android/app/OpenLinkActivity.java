@@ -71,7 +71,7 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.AccountController;

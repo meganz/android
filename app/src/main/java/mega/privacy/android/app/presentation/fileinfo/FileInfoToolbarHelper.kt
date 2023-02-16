@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.fileinfo
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Bitmap
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
@@ -10,13 +9,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
+import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.appbar.AppBarLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
@@ -37,7 +36,7 @@ internal class FileInfoToolbarHelper(
     private val toolbar: Toolbar,
     private val collapsingToolbarLayout: CollapsingToolbarLayout,
     private val supportActionBar: ActionBar?,
-    private val fileInfoToolbarImage: ImageView,
+    private val fileInfoToolbarImage: SimpleDraweeView,
     private val fileInfoImageLayout: ViewGroup,
     private val fileInfoIconLayout: ViewGroup,
 ) {
@@ -76,6 +75,21 @@ internal class FileInfoToolbarHelper(
     private var deleteMenuItem: MenuItem? = null
     private var leaveMenuItem: MenuItem? = null
     private var sendToChatMenuItem: MenuItem? = null
+    private val allMenuItems
+        get() = arrayListOf(
+            downloadMenuItem,
+            shareMenuItem,
+            getLinkMenuItem,
+            editLinkMenuItem,
+            removeLinkMenuItem,
+            renameMenuItem,
+            moveMenuItem,
+            copyMenuItem,
+            rubbishMenuItem,
+            deleteMenuItem,
+            leaveMenuItem,
+            sendToChatMenuItem,
+        )
 
     private var currentColorFilter = 0
 
@@ -135,6 +149,10 @@ internal class FileInfoToolbarHelper(
         firstIncomingLevel: Boolean,
         nodeAccess: Int,
     ) {
+        allMenuItems.forEach {
+            it?.isVisible = false
+            it?.isEnabled = true
+        }
         setIconsColorFilter()
         setupOptionsToolbar(
             node = node,
@@ -147,6 +165,10 @@ internal class FileInfoToolbarHelper(
         shouldApplyMenuItemReadOnlyState(isInInbox)
     }
 
+    fun disableMenu() {
+        allMenuItems.forEach { it?.isEnabled = true }
+    }
+
     /**
      * sets the node name as a title in the toolbar
      */
@@ -157,10 +179,10 @@ internal class FileInfoToolbarHelper(
     /**
      * sets the preview of the node in the collapsing toolbar
      */
-    fun setPreview(bitmap: Bitmap) {
-        fileInfoToolbarImage.setImageBitmap(bitmap)
-        fileInfoImageLayout.isVisible = true
-        fileInfoIconLayout.isVisible = false
+    fun setPreview(previewUriString: String?) {
+        fileInfoToolbarImage.setImageURI(previewUriString)
+        fileInfoImageLayout.isVisible = previewUriString != null
+        fileInfoIconLayout.isVisible = previewUriString == null
     }
 
     private fun getActionBarDrawables() {

@@ -10,15 +10,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
@@ -31,13 +28,10 @@ import java.util.Locale
 /**
  * Notification View in Compose
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NotificationView(
     state: NotificationState,
-    modifier: Modifier = Modifier.semantics {
-        testTagsAsResourceId = true
-    },
+    modifier: Modifier = Modifier,
     onClick: (Notification) -> Unit = {},
     onNotificationsLoaded: () -> Unit = {},
 ) {

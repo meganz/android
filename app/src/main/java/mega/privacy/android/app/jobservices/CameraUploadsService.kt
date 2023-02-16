@@ -104,7 +104,7 @@ import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
@@ -154,19 +154,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         const val ACTION_STOP = "STOP_SYNC"
 
         /**
-         * Cancel all actions
-         */
-        const val ACTION_CANCEL_ALL = "CANCEL_ALL"
-
-        /**
          * Ignore extra attributes
          */
         const val EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK"
-
-        /**
-         * Primary sync handle successfully set
-         */
-        const val EXTRA_PRIMARY_SYNC_SUCCESS = "EXTRA_PRIMARY_SYNC_SUCCESS"
 
         /**
          * Camera Uploads Cache Folder
@@ -433,10 +423,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var getSession: GetSession
 
     /**
-     * Is Node In Rubbish
+     * Is Node In Rubbish or deleted
      */
     @Inject
-    lateinit var isNodeInRubbish: IsNodeInRubbish
+    lateinit var isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted
 
     /**
      * Monitor charging stop status
@@ -521,6 +511,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     private var coroutineScope: CoroutineScope? = null
 
+    /**
+     * Temporary Flag to know if the service has been cancelled
+     * Should be removed once every process is handled through coroutine
+     * and replaced with coroutine is active condition check instead
+     */
+    private var cancelled = false
+
     private var receiver: NetworkTypeChangeReceiver? = null
     private var videoCompressor: VideoCompressor? = null
     private var notification: Notification? = null
@@ -531,7 +528,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var pendingIntent: PendingIntent? = null
     private var tempRoot: String? = null
     private var isOverQuota = false
-    private var canceled = false
     private var stopByNetworkStateChange = false
     private var isPrimaryHandleSynced = false
     private var totalUploaded = 0
@@ -552,10 +548,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             monitorBatteryInfo().collect {
                 deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
                 if (!deviceAboveMinimumBatteryLevel) {
-                    cancelAllPendingTransfers()
-                    sendTransfersInterruptedInfoToBackupCenter()
-                    coroutineScope?.cancel("Low Battery - Cancel Camera Upload")
-                    endService()
+                    endService(
+                        cancelMessage = "Low Battery - Cancel Camera Upload",
+                        aborted = true
+                    )
                 }
             }
         }
@@ -616,10 +612,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             stopByNetworkStateChange =
                 type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
             if (stopByNetworkStateChange) {
-                cancelAllPendingTransfers()
-                sendTransfersInterruptedInfoToBackupCenter()
-                coroutineScope?.cancel("Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload")
-                endService()
+                endService(
+                    cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
+                    aborted = true
+                )
             }
         }
     }
@@ -634,38 +630,20 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         startForegroundNotification()
         initService()
 
-        if (intent != null && intent.action != null) {
-            Timber.d("onStartCommand intent action is %s", intent.action)
-
-            when (intent.action) {
-                ACTION_STOP -> {
-                    Timber.d("Stop all Camera Uploads Transfers")
-                    coroutineScope?.launch {
-                        cancelAllPendingTransfers()
-                        sendTransfersInterruptedInfoToBackupCenter()
-                    }
-                }
-                ACTION_CANCEL_ALL -> {
-                    Timber.d("Cancel all Camera Uploads Transfers")
-                    coroutineScope?.launch {
-                        cancelAllPendingTransfers()
-                        sendTransfersCancelledInfoToBackupCenter()
-                    }
-                }
-                else -> Unit
+        when (intent?.action) {
+            ACTION_STOP -> {
+                Timber.d("Stop all Camera Uploads Transfers")
+                endService(
+                    cancelMessage = "Camera Upload Stop Intent Action - Stop Camera Upload",
+                    aborted = true
+                )
             }
-            coroutineScope?.cancel("Camera Upload Stop/Cancel Intent Action - Stop Camera Upload")
-            endService()
-            return START_NOT_STICKY
+            else -> {
+                Timber.d("Start Service")
+                ignoreAttr = intent?.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false) ?: false
+                coroutineScope?.launch { startWorker() }
+            }
         }
-
-        if (intent != null) {
-            ignoreAttr = intent.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false)
-            isPrimaryHandleSynced = intent.getBooleanExtra(EXTRA_PRIMARY_SYNC_SUCCESS, false)
-        }
-
-        Timber.d("Start Service - Create Coroutine")
-        coroutineScope?.launch { startWorker() }
 
         return START_NOT_STICKY
     }
@@ -775,7 +753,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         }.onFailure { exception ->
             Timber.e("Calling startWorker() failed with exception $exception")
-            endService()
+            endService(aborted = true)
         }
     }
 
@@ -842,17 +820,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT,
             -> {
                 Timber.e("Stop Camera Uploads due to $state")
-                endService()
+                endService(aborted = true)
             }
             StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER -> {
                 Timber.e("Local Primary Folder is disabled. Stop Camera Uploads")
                 handleLocalPrimaryFolderDisabled()
-                endService()
+                endService(aborted = true)
             }
             StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER -> {
                 Timber.e("Local Secondary Folder is disabled. Stop Camera Uploads")
                 handleLocalSecondaryFolderDisabled()
-                endService()
+                endService(aborted = true)
             }
             StartCameraUploadsState.LOGGED_OUT_USER -> {
                 Timber.w("User is logged out. Perform a Complete Fast Login")
@@ -866,7 +844,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.w("Primary and/or Secondary Folders do not exist. Establish the folders")
                 runCatching { establishFolders() }
                     .onSuccess { startWorker() }
-                    .onFailure { endService() }
+                    .onFailure { endService(aborted = true) }
             }
             else -> Unit
         }
@@ -990,7 +968,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
-        val isPrimaryFolderInRubbish = isNodeInRubbish(primarySyncHandle)
+        val isPrimaryFolderInRubbish = isNodeInRubbishOrDeleted(primarySyncHandle)
         val result =
             !isPrimaryFolderInRubbish || (getPrimaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
         Timber.d("Primary Folder Established $result")
@@ -1007,7 +985,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
-        val isSecondaryFolderInRubbish = isNodeInRubbish(getSecondaryFolderHandle())
+        val isSecondaryFolderInRubbish = isNodeInRubbishOrDeleted(getSecondaryFolderHandle())
         val result =
             !isSecondaryFolderInRubbish || (getSecondaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
         Timber.d("Secondary Folder Established $result")
@@ -1067,7 +1045,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
         if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
-            endService()
+            endService(aborted = true)
             return
         }
         val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
@@ -1144,7 +1122,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                         @Suppress("DEPRECATION")
                         if (megaApi.numPendingUploads == 0) {
                             Timber.w("Stop service due to out of space issue")
-                            endService()
+                            endService(aborted = true)
                             val title = getString(R.string.title_out_of_space)
                             val message = getString(R.string.error_not_enough_free_space)
                             val intent = Intent(this, ManagerActivity::class.java)
@@ -1248,7 +1226,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             copyFileAsyncList.joinAll()
         }
         if (totalToUpload == totalUploaded) {
-            if (compressedVideoPending() && !canceled && isCompressorAvailable()) {
+            if (compressedVideoPending() && !cancelled && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress.")
                 startVideoCompression()
             } else {
@@ -1307,10 +1285,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     @Synchronized
     private fun onTransferUpdated(globalTransfer: GlobalTransfer.OnTransferUpdate) {
         val transfer = globalTransfer.transfer
-        if (canceled) {
+        if (cancelled) {
             Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
             coroutineScope?.launch { cancelPendingTransfer(transfer) }
-            endService()
+            endService(aborted = true)
             return
         }
         if (isOverQuota) {
@@ -1332,7 +1310,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             if (error.value != 0L) Timber.w("Transfer Over Quota Error: ${error.errorCode}")
             else Timber.w("Storage Over Quota Error: ${error.errorCode}")
             isOverQuota = true
-            endService()
+            endService(aborted = true)
         }
     }
 
@@ -1452,7 +1430,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             startWorker()
         } else {
             Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}. Stop CameraUploadsService")
-            endService()
+            endService(aborted = true)
         }
     }
 
@@ -1551,7 +1529,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         lastUpdated = 0
         totalUploaded = 0
         totalToUpload = 0
-        canceled = false
+        cancelled = false
         isOverQuota = false
 
         cameraServiceIpChangeHandler.start()
@@ -1588,16 +1566,34 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         cameraServiceWifiLockHandler.stopWifiLock()
     }
 
-    private fun endService() {
+    /**
+     * Proceed with the end of the service
+     * Clean up the resources
+     *
+     * @param cancelMessage message associated to cancel
+     * @param aborted true if the service is ended prematurely
+     */
+    private fun endService(
+        cancelMessage: String = "Ending Service",
+        aborted: Boolean = false,
+    ) {
         Timber.d("Finish Camera upload process.")
         stopWakeAndWifiLocks()
+
+        coroutineScope?.launch {
+            if (aborted)
+                sendTransfersInterruptedInfoToBackupCenter()
+
+            cancelAllPendingTransfers()
+            cancel(cancelMessage)
+        }
+
         if (isOverQuota) {
             showStorageOverQuotaNotification()
-            JobUtil.fireStopCameraUploadJob(this)
         }
 
         videoCompressor?.stop()
-        canceled = true
+        cancelled = true
         stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
@@ -1733,13 +1729,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         } else if (e.errorCode == MegaError.API_EOVERQUOTA) {
             Timber.w("Over quota error: %s", e.errorCode)
             isOverQuota = true
-            endService()
+            endService(aborted = true)
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
-        if (canceled) {
+        if (cancelled) {
             Timber.w("Image sync cancelled: %s", transfer.nodeHandle)
-            endService()
+            endService(aborted = true)
         }
         updateUpload()
     }
@@ -1764,7 +1760,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     private suspend fun updateUpload() {
-        if (!canceled) {
+        if (!cancelled) {
             updateProgressNotification()
         }
         totalUploaded++
@@ -1777,7 +1773,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         )
         if (totalToUpload == totalUploaded) {
             Timber.d("Photo upload finished, now checking videos")
-            if (compressedVideoPending() && !canceled && isCompressorAvailable()) {
+            if (compressedVideoPending() && !cancelled && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress")
                 startVideoCompression()
             } else {
@@ -1822,7 +1818,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             }
         } else {
             Timber.d("Compression queue bigger than setting, show notification to user.")
-            endService()
+            endService(aborted = true)
             val intent = Intent(this, ManagerActivity::class.java)
             intent.action = Constants.ACTION_SHOW_SETTINGS
             val pendingIntent =
@@ -1850,7 +1846,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onInsufficientSpace() {
         Timber.w("Insufficient space for video compression.")
-        endService()
+        endService(aborted = true)
         val intent = Intent(this, ManagerActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -1864,7 +1860,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Synchronized
     override fun onCompressUpdateProgress(progress: Int) {
-        if (!canceled) {
+        if (!cancelled) {
             val message = getString(R.string.message_compress_video, "$progress%")
             val subText = getString(
                 R.string.title_compress_video,
@@ -1939,7 +1935,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     override fun onCompressFinished(currentIndexString: String) {
         coroutineScope?.launch {
-            if (!canceled) {
+            if (!cancelled) {
                 Timber.d("Preparing to upload compressed video.")
                 val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
                 if (compressedList.isNotEmpty()) {

@@ -330,7 +330,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                 launchIntent(intent, true, position)
             }
 
-            (mimeType.isVideoReproducible || mimeType.isAudio) -> {
+            (mimeType.isVideoMimeType || mimeType.isAudio) -> {
                 var opusFile = false
 
                 if (mimeType.isVideoNotSupported || mimeType.isAudioNotSupported) {

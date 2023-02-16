@@ -303,7 +303,7 @@
             android:name=".main.FileStorageActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".main.FolderLinkActivity"
+            android:name=".presentation.folderlink.FolderLinkActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".main.megachat.ContactAttachmentActivity"

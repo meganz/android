@@ -26,6 +26,8 @@ import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
+import mega.privacy.android.domain.usecase.contact.GetUserFirstName
+import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.InviteContact
 
 /**
@@ -112,5 +114,13 @@ internal abstract class ContactsModule {
         @Provides
         fun provideGetCurrentUserEmail(accountRepository: AccountRepository): GetCurrentUserEmail =
             GetCurrentUserEmail { accountRepository.accountEmail }
+
+        @Provides
+        fun provideGetUserFirstName(contactsRepository: ContactsRepository): GetUserFirstName =
+            GetUserFirstName(contactsRepository::getUserFirstName)
+
+        @Provides
+        fun provideGetUserLastName(contactsRepository: ContactsRepository): GetUserLastName =
+            GetUserLastName(contactsRepository::getUserLastName)
     }
 }

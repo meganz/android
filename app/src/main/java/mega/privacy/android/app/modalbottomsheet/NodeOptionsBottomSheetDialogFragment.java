@@ -66,6 +66,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
@@ -310,6 +311,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             viewInFolder.setOnClickListener(null);
         }
 
+        View separatorInfo = contentView.findViewById(R.id.separator_info_option);
         LinearLayout separatorOpen = contentView.findViewById(R.id.separator_open_options);
         LinearLayout separatorDownload = contentView.findViewById(R.id.separator_download_options);
         LinearLayout separatorShares = contentView.findViewById(R.id.separator_share_options);
@@ -337,6 +339,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionOpenWith.setVisibility(View.GONE);
         }
 
+        if (isTakenDown) {
+            nodeName.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_800_red_400));
+        }
+
         //Due to requirement change, not just hide slideshow entry in node context menu
         optionSlideshow.setVisibility(View.GONE);
 
@@ -358,13 +364,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionSendChat.setVisibility(View.GONE);
             } else {
                 if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
-                        && accessLevel >= MegaShare.ACCESS_READWRITE) {
+                        && accessLevel >= MegaShare.ACCESS_READWRITE && !isTakenDown) {
                     optionEdit.setVisibility(View.VISIBLE);
                 }
 
                 nodeInfo.setText(getFileInfo(node));
 
-                if (megaApi.hasVersions(node)) {
+                if (megaApi.hasVersions(node) && !isTakenDown) {
                     nodeVersionsIcon.setVisibility(View.VISIBLE);
                     optionVersionsLayout.setVisibility(View.VISIBLE);
                     versions.setText(String.valueOf(megaApi.getNumVersions(node)));
@@ -400,6 +406,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 counterSave--;
                 optionOffline.setVisibility(View.GONE);
             }
+            separatorInfo.setVisibility(View.GONE);
+            optionRename.setVisibility(View.VISIBLE);
         } else {
             offlineSwitch.setChecked(availableOffline(requireContext(), node));
         }

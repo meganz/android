@@ -239,7 +239,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                 when {
                     isImage ->
                         imageFileOpen(position, file)
-                    isVideoReproducible || isAudio ->
+                    isVideoMimeType || isAudio ->
                         mediaFileOpen(file, position)
                     isPdf ->
                         pdfFileOpen(file, position)

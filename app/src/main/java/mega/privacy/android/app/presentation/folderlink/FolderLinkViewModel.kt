@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.clouddrive
+package mega.privacy.android.app.presentation.folderlink
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,7 +9,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import javax.inject.Inject
 
 /**
- * View Model class for [mega.privacy.android.app.main.FolderLinkActivity]
+ * View Model class for [FolderLinkActivity]
  */
 @HiltViewModel
 class FolderLinkViewModel @Inject constructor(

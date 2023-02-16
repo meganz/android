@@ -200,7 +200,7 @@ class DefaultVerificationRepositoryTest {
     }
 
     @Test
-    fun `test that verified phone number is updated when reset call returns`() = runTest {
+    fun `test that verified phone number is updated when reset call returns OK`() = runTest {
         val verifiedPhoneNumber = "123"
         val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
         megaApiGateway.stub {
@@ -220,6 +220,33 @@ class DefaultVerificationRepositoryTest {
             assertThat(awaitItem()).isEqualTo(VerifiedPhoneNumber.NoVerifiedPhoneNumber)
         }
     }
+
+    @Test
+    fun `test that verified phone number is updated when reset call returns API_ENOENT`() =
+        runTest {
+            val verifiedPhoneNumber = "123"
+            val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ENOENT) }
+            megaApiGateway.stub {
+                onBlocking { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber, null)
+                on { resetSmsVerifiedPhoneNumber(any()) }.thenAnswer {
+                    (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        mock(),
+                        okResponse
+                    )
+                }
+            }
+
+            underTest.monitorVerifiedPhoneNumber().test {
+                assertThat(awaitItem()).isEqualTo(
+                    VerifiedPhoneNumber.PhoneNumber(
+                        verifiedPhoneNumber
+                    )
+                )
+                underTest.resetSMSVerifiedPhoneNumber()
+                assertThat(awaitItem()).isEqualTo(VerifiedPhoneNumber.NoVerifiedPhoneNumber)
+            }
+        }
 
     @Test
     fun `test that verified phone number is updated when verify phone number call returns`() =

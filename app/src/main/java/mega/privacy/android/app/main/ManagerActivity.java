@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main;
 
+import static android.Manifest.permission.POST_NOTIFICATIONS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS;
@@ -90,7 +91,6 @@ import static mega.privacy.android.app.utils.FileUtil.createTemporalTextFile;
 import static mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
@@ -100,12 +100,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DIALOG_WA
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_ITEM;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_HANDLED_NODE;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NODE_TYPE;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
@@ -115,8 +109,6 @@ import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
-import static mega.privacy.android.app.utils.UploadUtil.chooseFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getTemporalTakePictureFile;
 import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
@@ -315,6 +307,7 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
+import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
@@ -343,6 +336,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
@@ -406,7 +400,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
-import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
@@ -427,7 +420,6 @@ import mega.privacy.android.domain.entity.preference.ViewType;
 import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import mega.privacy.android.feature.sync.ui.SyncFragment;
-import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -549,6 +541,8 @@ public class ManagerActivity extends TransfersManagementActivity
     ActivityLifecycleHandler activityLifecycleHandler;
     @Inject
     MegaNodeUtilWrapper megaNodeUtilWrapper;
+    @Inject
+    ManagerUploadBottomSheetDialogActionHandler uploadBottomSheetDialogActionHandler;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -719,8 +713,6 @@ public class ManagerActivity extends TransfersManagementActivity
     private AlertDialog presenceStatusDialog;
     private AlertDialog alertDialogStorageStatus;
     private AlertDialog alertDialogSMSVerification;
-    private AlertDialog newTextFileDialog;
-    private AlertDialog newFolderDialog;
 
     private MenuItem searchMenuItem;
     private MenuItem doNotDisturbMenuItem;
@@ -1147,7 +1139,6 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
         }
     }
-
     public void setTypesCameraPermission(int typesCameraPermission) {
         this.typesCameraPermission = typesCameraPermission;
     }
@@ -1217,10 +1208,9 @@ public class ManagerActivity extends TransfersManagementActivity
             getSupportFragmentManager().putFragment(outState, FragmentTag.PHOTOS.getTag(), photosFragment);
         }
 
-        checkNewTextFileDialogState(newTextFileDialog, outState);
-
         nodeAttacher.saveState(outState);
         nodeSaver.saveState(outState);
+        uploadBottomSheetDialogActionHandler.onSaveInstanceState(outState);
 
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 
@@ -1261,8 +1251,6 @@ public class ManagerActivity extends TransfersManagementActivity
             outState.putInt(BACKUP_DIALOG_WARN, backupDialogType);
             backupWarningDialog.dismiss();
         }
-
-        checkNewFolderDialogState(newFolderDialog, outState);
     }
 
     @Override
@@ -1402,10 +1390,6 @@ public class ManagerActivity extends TransfersManagementActivity
             backupNodeType = savedInstanceState.getInt(BACKUP_NODE_TYPE, -1);
             backupActionType = savedInstanceState.getInt(BACKUP_ACTION_TYPE, -1);
             backupDialogType = savedInstanceState.getInt(BACKUP_DIALOG_WARN, BACKUP_DIALOG_SHOW_NONE);
-
-            if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
-                showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
-            }
         } else {
             Timber.d("Bundle is NULL");
             this.setPathNavigationOffline(OFFLINE_ROOT);
@@ -2424,9 +2408,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
         PsaManager.INSTANCE.startChecking();
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-            showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
-        }
+        uploadBottomSheetDialogActionHandler.onRestoreInstanceState(savedInstanceState);
 
         Timber.d("END onCreate");
         new RatingHandlerImpl(this).showRatingBaseOnTransaction();
@@ -2806,7 +2788,7 @@ public class ManagerActivity extends TransfersManagementActivity
         }
 
         boolean notificationsGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || hasPermissions(this, Manifest.permission.POST_NOTIFICATIONS);
+                || hasPermissions(this, POST_NOTIFICATIONS);
 
         boolean writeStorageGranted = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         String[] PERMISSIONS = new String[]{
@@ -3441,13 +3423,8 @@ public class ManagerActivity extends TransfersManagementActivity
             confirmationTransfersDialog.dismiss();
         }
 
-        if (newTextFileDialog != null) {
-            newTextFileDialog.dismiss();
-        }
-
         dismissAlertDialogIfExists(processFileDialog);
         dismissAlertDialogIfExists(openLinkDialog);
-        dismissAlertDialogIfExists(newFolderDialog);
 
         nodeSaver.destroy();
 
@@ -6572,64 +6549,39 @@ public class ManagerActivity extends TransfersManagementActivity
 
     @Override
     public void uploadFiles() {
-        chooseFiles(this);
+        uploadBottomSheetDialogActionHandler.uploadFiles();
     }
 
     @Override
     public void uploadFolder() {
-        chooseFolder(this);
+        uploadBottomSheetDialogActionHandler.uploadFolder();
     }
 
     @Override
     public void takePictureAndUpload() {
-        if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-            setTypesCameraPermission(TAKE_PICTURE_OPTION);
-            requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
-            return;
-        }
-        if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return;
-        }
-        checkTakePicture(this, TAKE_PHOTO_CODE);
+        uploadBottomSheetDialogActionHandler.takePictureAndUpload();
     }
 
     @Override
     public void scanDocument() {
-        String[] saveDestinations = {
-                StringResourcesUtils.getString(R.string.section_cloud_drive),
-                StringResourcesUtils.getString(R.string.section_chat)
-        };
-        Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
-        startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
+        uploadBottomSheetDialogActionHandler.scanDocument();
     }
 
     @Override
     public void showNewFolderDialog(String typedText) {
-        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
-        if (parent == null) {
-            return;
-        }
-
-        newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this, parent, typedText);
+        uploadBottomSheetDialogActionHandler.showNewFolderDialog(typedText);
     }
 
     @Override
     public void showNewTextFileDialog(String typedName) {
-        MegaNode parent = getCurrentParentNode(getCurrentParentHandle(), INVALID_VALUE);
-        if (parent == null) {
-            return;
-        }
-
-        newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this, parent, typedName,
-                drawerItem == DrawerItem.HOMEPAGE);
+        uploadBottomSheetDialogActionHandler.showNewTextFileDialog(typedName);
     }
 
     public long getParentHandleBrowser() {
         return fileBrowserViewModel.getSafeBrowserParentHandle();
     }
 
-    private long getCurrentParentHandle() {
+    public long getCurrentParentHandle() {
         long parentHandle = -1;
 
         switch (drawerItem) {
@@ -6698,7 +6650,8 @@ public class ManagerActivity extends TransfersManagementActivity
         return parentHandle;
     }
 
-    private MegaNode getCurrentParentNode(long parentHandle, int error) {
+    @Nullable
+    public MegaNode getCurrentParentNode(long parentHandle, int error) {
         String errorString = null;
 
         if (error != -1) {
@@ -7850,30 +7803,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             nodeAttacher.handleSelectFileResult(intent, this);
-        } else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
-            Timber.d("REQUEST_CODE_SELECT_FOLDER");
-
-            if (intent == null) {
-                Timber.d("Intent NULL");
-                return;
-            }
-
-            final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-            final long folderHandle = intent.getLongExtra("SELECT", 0);
-
-            MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
-            dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-            final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-            dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    permissionsDialog.dismiss();
-                    nC.shareFolder(megaApi.getNodeByHandle(folderHandle), selectedContacts, item);
-                }
-            });
-            dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-            permissionsDialog = dialogBuilder.create();
-            permissionsDialog.show();
-
         } else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
             Timber.d("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
 
@@ -8046,24 +7975,6 @@ public class ManagerActivity extends TransfersManagementActivity
             } else {
                 Timber.w("TAKE_PHOTO_CODE--->ERROR!");
             }
-        } else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK) {
-
-            if (intent == null) {
-                Timber.w("Intent NULL");
-                return;
-            }
-
-            int orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
-            if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                MegaNode parentNode = megaApi.getNodeByHandle(fileBrowserState(ManagerActivity.this).getFileBrowserHandle());
-                if (parentNode != null) {
-                    if (isCloudAdded()) {
-                        fileBrowserViewModel.refreshNodes();
-                    }
-                }
-            } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                onNodesSharedUpdate();
-            }
         } else if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
             Timber.d("REQUEST_CREATE_CHAT OK");
 
@@ -8154,20 +8065,6 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             onNodesSharedUpdate();
-        } else if (requestCode == REQUEST_CODE_SCAN_DOCUMENT) {
-            if (resultCode == RESULT_OK) {
-                String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
-                Intent fileIntent = new Intent(this, FileExplorerActivity.class);
-                if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
-                    fileIntent.setAction(FileExplorerActivity.ACTION_UPLOAD_TO_CHAT);
-                } else {
-                    fileIntent.setAction(FileExplorerActivity.ACTION_SAVE_TO_CLOUD);
-                    fileIntent.putExtra(FileExplorerActivity.EXTRA_PARENT_HANDLE, getCurrentParentHandle());
-                }
-                fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
-                fileIntent.setType(intent.getType());
-                startActivity(fileIntent);
-            }
         } else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 switch (requestCode) {
@@ -8849,7 +8746,6 @@ public class ManagerActivity extends TransfersManagementActivity
                                 if (info.isContact) {
                                     requestContactsPermissions(info, parentNode);
                                 } else {
-                                    PermissionUtils.checkNotificationsPermission(this);
                                     uploadUseCase.upload(this, info, null, parentNode.getHandle())
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
@@ -9420,10 +9316,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) {
                             Timber.d("CHANGE_TYPE_EMAIL");
-                            if (user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("I change my mail");
-                                updateMyEmail(user.getEmail());
-                            } else {
+                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
                                 Timber.d("The contact: %d changes the mail.", user.getHandle());
                                 if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
                                     Timber.w("The contact NOT exists -> DB inconsistency! -> Clear!");
@@ -9441,7 +9334,6 @@ public class ManagerActivity extends TransfersManagementActivity
                     }
                 } else {
                     Timber.w("user == null --> Continue...");
-                    continue;
                 }
             }
         }
@@ -9504,32 +9396,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public void updateUserAlerts(List<MegaUserAlert> userAlerts) {
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON);
-    }
-
-    public void updateMyEmail(String email) {
-        Timber.d("New email: %s", email);
-        String oldEmail = dbH.getMyEmail();
-        if (oldEmail != null) {
-            Timber.d("Old email: %s", oldEmail);
-            try {
-                File avatarFile = CacheFolderManager.buildAvatarFile(this, oldEmail + ".jpg");
-                if (isFileAvailable(avatarFile)) {
-                    File newFile = CacheFolderManager.buildAvatarFile(this, email + ".jpg");
-                    if (newFile != null) {
-                        boolean result = avatarFile.renameTo(newFile);
-                        if (result) {
-                            Timber.d("The avatar file was correctly renamed");
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                Timber.e(e, "EXCEPTION renaming the avatar on changing email");
-            }
-        } else {
-            Timber.e("ERROR: Old email is NULL");
-        }
-
-        dbH.saveMyEmail(email);
     }
 
     public void onNodesCloudDriveUpdate() {
@@ -9696,7 +9562,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
                     megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
                     megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-                    fireCancelCameraUploadJob(ManagerActivity.this);
+                    fireStopCameraUploadJob(ManagerActivity.this);
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 })
@@ -10909,6 +10775,15 @@ public class ManagerActivity extends TransfersManagementActivity
      */
     public boolean isInPhotosPage() {
         return drawerItem == DrawerItem.PHOTOS;
+    }
+
+    /**
+     * Checks if the current screen is Media Discovery Fragment.
+     *
+     * @return True if the current screen is MD, false otherwise.
+     */
+    public boolean isInMDMode(){
+        return drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode;
     }
 
     /**

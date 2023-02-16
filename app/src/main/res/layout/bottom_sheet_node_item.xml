@@ -126,6 +126,7 @@
                 app:drawableStartCompat="@drawable/ic_change_permissions"/>
 
             <View
+                android:id="@+id/separator_info_option"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
@@ -229,7 +230,7 @@
                 <TextView
                     style="@style/BottomSheetOption"
                     android:text="@string/dispute_takendown_file"
-                    app:drawableStartCompat="@drawable/ic_input_warning"/>
+                    app:drawableStartCompat="@drawable/ic_taken_down_bottom_sheet"/>
 
                 <View
                     android:layout_width="match_parent"

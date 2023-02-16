@@ -13,12 +13,15 @@ import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
@@ -27,25 +30,26 @@ internal class UserInfoViewModelTest {
     private lateinit var underTest: UserInfoViewModel
     private val getCurrentUserFullName: GetCurrentUserFullName = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
+    private val updateMyAvatarWithNewEmail: UpdateMyAvatarWithNewEmail = mock()
     private val fakeMonitorUserUpdates = MutableSharedFlow<UserChanges>()
     private val monitorUserUpdates: MonitorUserUpdates = mock {
         on { invoke() }.thenReturn(fakeMonitorUserUpdates)
     }
     private val context: Context = mock()
-    private val dispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(dispatcher)
+        Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
     }
 
     private fun initViewModel() {
         underTest = UserInfoViewModel(
-            getCurrentUserFullName,
-            getCurrentUserEmail,
-            monitorUserUpdates,
-            context,
+            getCurrentUserFullName = getCurrentUserFullName,
+            getCurrentUserEmail = getCurrentUserEmail,
+            monitorUserUpdates = monitorUserUpdates,
+            updateMyAvatarWithNewEmail = updateMyAvatarWithNewEmail,
+            context = context,
         )
     }
 
@@ -57,9 +61,11 @@ internal class UserInfoViewModelTest {
     @Test
     fun `test that email returns correctly when GetCurrentUserEmail returns the value`() = runTest {
         val expectedEmail = "myEmail"
+        whenever(context.getString(any())).thenReturn("")
         whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
         underTest.getUserInfo()
         underTest.state.test {
+            awaitItem()
             val item = awaitItem()
             assertEquals(expectedEmail, item.email)
         }
@@ -76,6 +82,28 @@ internal class UserInfoViewModelTest {
                 awaitItem()
                 val item = awaitItem()
                 assertEquals(expectedName, item.fullName)
+            }
+        }
+
+    @Test
+    fun `test that email update correctly when monitorUserUpdates emit UserChanges Email`() =
+        runTest {
+            val expectedEmail = "myEmail"
+            whenever(context.getString(any())).thenReturn("")
+            whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
+            underTest.getUserInfo()
+            underTest.state.test {
+                awaitItem()
+                val item = awaitItem()
+                assertEquals(expectedEmail, item.email)
+            }
+            val expectedNewEmail = "myNewEmail"
+            whenever(getCurrentUserEmail()).thenReturn(expectedNewEmail)
+            fakeMonitorUserUpdates.emit(UserChanges.Email)
+            verify(updateMyAvatarWithNewEmail, times(1)).invoke(expectedEmail, expectedNewEmail)
+            underTest.state.test {
+                val item = awaitItem()
+                assertEquals(expectedNewEmail, item.email)
             }
         }
 }

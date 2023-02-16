@@ -942,7 +942,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (isAudioPlayer) {
                 mime.isAudio && !mime.isAudioNotSupported
             } else {
-                mime.isVideo && mime.isVideoReproducible && !mime.isVideoNotSupported
+                mime.isVideo && mime.isVideoMimeType && !mime.isVideoNotSupported
             }
         }
 

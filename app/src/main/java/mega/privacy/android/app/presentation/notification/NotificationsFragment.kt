@@ -6,7 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import collectAsStateWithLifecycle
@@ -14,9 +18,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.notification.view.NotificationView
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -55,16 +59,24 @@ class NotificationsFragment : Fragment() {
     /**
      * NotificationView
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun NotificationView(viewModel: NotificationViewModel) {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         (activity as ManagerActivity?)?.let {
-            NotificationView(uiState, onClick = { notification ->
-                notification.onClick(it)
-            }, onNotificationsLoaded = {
-                viewModel.onNotificationsLoaded()
-            })
+            NotificationView(
+                state = uiState,
+                onClick = { notification ->
+                    notification.onClick(it)
+                },
+                onNotificationsLoaded = {
+                    viewModel.onNotificationsLoaded()
+                },
+                modifier = Modifier.semantics {
+                    testTagsAsResourceId = true
+                }
+            )
         }
     }
 

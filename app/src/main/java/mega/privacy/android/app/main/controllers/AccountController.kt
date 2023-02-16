@@ -319,6 +319,12 @@ class AccountController @Inject constructor(
             activity.startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER)
         }
 
+        @Deprecated(
+            message = "It has been deprecated in favour of LocalLogoutApp",
+            replaceWith = ReplaceWith(
+                expression = "mega.privacy.android.domain.usecase.LocalLogoutApp"
+            )
+        )
         @JvmStatic
         fun localLogoutApp(context: Context, sharingScope: CoroutineScope) {
             val app = MegaApplication.getInstance()

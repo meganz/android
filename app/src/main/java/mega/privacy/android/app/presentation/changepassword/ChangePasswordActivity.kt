@@ -27,11 +27,14 @@ import mega.privacy.android.app.databinding.ActivityChangePasswordBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
-import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
+import mega.privacy.android.app.main.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
+import mega.privacy.android.app.main.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
+import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.ColorUtils.getThemeColorHexString
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -204,15 +207,65 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
 
     private fun collectUIState() {
         this.collectFlow(viewModel.uiState) { state ->
-            handleNetworkConnectionState(state)
+            handleSnackBarMessageState(state)
+            handleLoadingProgressState(state)
+            handleMultiFactorAuthState(state)
+            handlePasswordChangedState(state)
         }
     }
 
-    private fun handleNetworkConnectionState(uiState: ChangePasswordUIState) {
-        if (uiState.isShowNoNetworkSnackBar) {
-            showSnackbar(getString(R.string.error_server_connection_problem))
-            viewModel.onNoNetworkSnackBarShown()
+    private fun handleSnackBarMessageState(state: ChangePasswordUIState) {
+        if (state.snackBarMessage != null) {
+            showSnackbar(getString(state.snackBarMessage))
+            viewModel.onSnackBarShown()
         }
+    }
+
+    private fun handleLoadingProgressState(state: ChangePasswordUIState) {
+        if (state.loadingMessage != null) {
+            progress.apply {
+                setMessage(getString(state.loadingMessage))
+                show()
+            }
+        } else {
+            progress.dismiss()
+        }
+    }
+
+    private fun handleMultiFactorAuthState(uiState: ChangePasswordUIState) {
+        if (uiState.isPromptedMultiFactorAuth) {
+            navigateToMultiFactorAuthScreen()
+            viewModel.onMultiFactorAuthShown()
+        }
+    }
+
+    private fun handlePasswordChangedState(state: ChangePasswordUIState) {
+        if (state.isPasswordChanged) {
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+            if (intent?.getBooleanExtra(KEY_IS_LOGOUT, false) == true) {
+                AccountController.logout(this, megaApi, sharingScope)
+            } else {
+                //Intent to MyAccount
+                val intent = Intent(this, ManagerActivity::class.java).apply {
+                    action = Constants.ACTION_PASS_CHANGED
+                    putExtra(Constants.RESULT, MegaError.API_OK)
+                }
+                startActivity(intent)
+                finish()
+            }
+
+            viewModel.onChangedPasswordShown()
+        }
+    }
+
+    private fun navigateToMultiFactorAuthScreen() {
+        val intent = Intent(this, VerifyTwoFactorActivity::class.java).apply {
+            putExtra(KEY_VERIFY_TYPE, CHANGE_PASSWORD_2FA)
+            putExtra(KEY_NEW_PASSWORD, binding.changePasswordNewPassword1.text.toString())
+            putExtra(KEY_IS_LOGOUT, intent?.getBooleanExtra(KEY_IS_LOGOUT, false) == true)
+        }
+
+        startActivity(intent)
     }
 
     @Deprecated("Deprecated in Java")
@@ -496,6 +549,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     private fun onResetPasswordClick(hasMk: Boolean) {
         Timber.d("hasMk: %s", hasMk)
         if (viewModel.isConnectedToNetwork().not()) {
+            showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
         if (!validateForm(false)) {
@@ -517,6 +571,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     private fun onChangePasswordClick() {
         Timber.d("onChangePasswordClick")
         if (viewModel.isConnectedToNetwork().not()) {
+            showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
         if (!validateForm(true)) {
@@ -524,7 +579,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
         imm.hideSoftInputFromWindow(binding.changePasswordNewPassword1.windowToken, 0)
         imm.hideSoftInputFromWindow(binding.changePasswordNewPassword2.windowToken, 0)
-        megaApi.multiFactorAuthCheck(megaApi.myEmail, this)
+        viewModel.onUserClickChangePassword(binding.changePasswordNewPassword1.text.toString())
     }
 
     /*
@@ -590,15 +645,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         return null
     }
 
-    private fun changePassword(newPassword: String) {
-        Timber.d("changePassword")
-        megaApi.changePassword(null, newPassword, this)
-        progress.apply {
-            setMessage(getString(R.string.my_account_changing_password))
-            show()
-        }
-    }
-
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         Timber.d("onRequestStart: %s", request.name)
     }
@@ -606,40 +652,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
         when (request.type) {
-            MegaRequest.TYPE_CHANGE_PW -> {
-                Timber.d("TYPE_CHANGE_PW")
-                if (e.errorCode != MegaError.API_OK) {
-                    Timber.w(
-                        "e.getErrorCode = %d__ e.getErrorString = %s",
-                        e.errorCode,
-                        e.errorString
-                    )
-                    try {
-                        progress.dismiss()
-                    } catch (ex: Exception) {
-                        Timber.w(ex, "Exception dismissing progress dialog")
-                    }
-                    showSnackbar(getString(R.string.general_text_error))
-                } else {
-                    Timber.d("Pass changed OK")
-                    try {
-                        progress.dismiss()
-                    } catch (ex: Exception) {
-                        Timber.w(ex, "Exception dismissing progress dialog")
-                    }
-                    window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-                    if (intent != null && intent.getBooleanExtra(KEY_IS_LOGOUT, false)) {
-                        logout(this, megaApi, sharingScope)
-                    } else {
-                        //Intent to MyAccount
-                        val resetPassIntent = Intent(this, ManagerActivity::class.java)
-                        resetPassIntent.action = Constants.ACTION_PASS_CHANGED
-                        resetPassIntent.putExtra(Constants.RESULT, e.errorCode)
-                        startActivity(resetPassIntent)
-                        finish()
-                    }
-                }
-            }
             MegaRequest.TYPE_CONFIRM_RECOVERY_LINK -> {
                 Timber.d("TYPE_CONFIRM_RECOVERY_LINK")
                 try {
@@ -671,30 +683,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 resetPassIntent.putExtra(Constants.RESULT, e.errorCode)
                 startActivity(resetPassIntent)
                 finish()
-            }
-            MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    if (request.flag) {
-                        val intent = Intent(this, VerifyTwoFactorActivity::class.java)
-                        intent.putExtra(
-                            VerifyTwoFactorActivity.KEY_VERIFY_TYPE,
-                            Constants.CHANGE_PASSWORD_2FA
-                        )
-                        intent.putExtra(
-                            VerifyTwoFactorActivity.KEY_NEW_PASSWORD,
-                            binding.changePasswordNewPassword1.text.toString()
-                        )
-                        intent.putExtra(
-                            KEY_IS_LOGOUT,
-                            getIntent() != null && getIntent().getBooleanExtra(
-                                KEY_IS_LOGOUT, false
-                            )
-                        )
-                        startActivity(intent)
-                    } else {
-                        changePassword(binding.changePasswordNewPassword1.text.toString())
-                    }
-                }
             }
         }
     }

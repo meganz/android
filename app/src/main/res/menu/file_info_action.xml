@@ -73,7 +73,7 @@
 
     <item
         android:id="@+id/cab_menu_file_info_rubbish"
-        android:orderInCategory="110"
+        android:orderInCategory="120"
         android:title="@string/context_move_to_trash"
         android:visible="false"
         app:showAsAction="never" />
@@ -81,14 +81,14 @@
     <item
         android:id="@+id/cab_menu_file_info_leave"
         android:icon="@drawable/ic_leave_share_w"
-        android:orderInCategory="100"
+        android:orderInCategory="120"
         android:title="@string/general_leave"
         android:visible="false"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_file_info_delete"
-        android:orderInCategory="110"
+        android:orderInCategory="120"
         android:title="@string/general_remove"
         android:visible="false"
         app:showAsAction="never" />

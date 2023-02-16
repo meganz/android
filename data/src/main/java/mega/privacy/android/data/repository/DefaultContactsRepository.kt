@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository
 
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.findItemByHandle
 import mega.privacy.android.data.extensions.getDecodedAliases
@@ -34,6 +37,7 @@ import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -88,6 +92,9 @@ internal class DefaultContactsRepository @Inject constructor(
     private val contactCredentialsMapper: ContactCredentialsMapper,
     private val inviteContactRequestMapper: InviteContactRequestMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val contactWrapper: ContactWrapper,
+    private val databaseHandler: DatabaseHandler,
+    @ApplicationContext private val context: Context,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -297,7 +304,11 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    override suspend fun getUserFirstName(handle: Long, skipCache: Boolean): String =
+    override suspend fun getUserFirstName(
+        handle: Long,
+        skipCache: Boolean,
+        shouldNotify: Boolean,
+    ): String =
         withContext(ioDispatcher) {
             if (!skipCache) {
                 val cachedName = megaChatApiGateway.getUserFirstnameFromCache(handle)
@@ -313,10 +324,21 @@ internal class DefaultContactsRepository @Inject constructor(
                         onRequestFinish = onRequestGetUserNameCompleted(continuation)
                     )
                 )
-            }
+            }.also { request ->
+                if (!request.email.isNullOrEmpty()) {
+                    databaseHandler.setContactName(request.text, request.email)
+                }
+                if (shouldNotify) {
+                    contactWrapper.notifyFirstNameUpdate(context, handle)
+                }
+            }.text
         }
 
-    override suspend fun getUserLastName(handle: Long, skipCache: Boolean): String =
+    override suspend fun getUserLastName(
+        handle: Long,
+        skipCache: Boolean,
+        shouldNotify: Boolean,
+    ): String =
         withContext(ioDispatcher) {
             if (!skipCache) {
                 val cachedName = megaChatApiGateway.getUserLastnameFromCache(handle)
@@ -332,7 +354,14 @@ internal class DefaultContactsRepository @Inject constructor(
                         onRequestFinish = onRequestGetUserNameCompleted(continuation)
                     )
                 )
-            }
+            }.also { request ->
+                if (!request.email.isNullOrEmpty()) {
+                    databaseHandler.setContactLastName(request.text, request.email)
+                }
+                if (shouldNotify) {
+                    contactWrapper.notifyLastNameUpdate(context, handle)
+                }
+            }.text
         }
 
     override suspend fun getUserFullName(handle: Long, skipCache: Boolean): String =
@@ -349,10 +378,10 @@ internal class DefaultContactsRepository @Inject constructor(
             megaChatApiGateway.getUserFullNameFromCache(handle) ?: error("Can't retrieve full name")
         }
 
-    private fun onRequestGetUserNameCompleted(continuation: Continuation<String>) =
+    private fun onRequestGetUserNameCompleted(continuation: Continuation<MegaRequest>) =
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
-                continuation.resumeWith(Result.success(request.text))
+                continuation.resumeWith(Result.success(request))
             } else {
                 continuation.failWithError(error)
             }

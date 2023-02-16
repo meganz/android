@@ -11,5 +11,5 @@ fun interface UpdateMyAvatarWithNewEmail {
      * @param oldEmail
      * @param newEmail
      */
-    suspend fun invoke(oldEmail: String, newEmail: String)
+    suspend operator fun invoke(oldEmail: String, newEmail: String): Boolean
 }

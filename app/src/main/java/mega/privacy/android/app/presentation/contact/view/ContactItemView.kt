@@ -31,15 +31,15 @@ import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserStatus
-import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.user.UserVisibility
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -54,14 +54,21 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
             .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Box {
-                ContactAvatar(contactItem = contactItem)
+                ContactAvatar(
+                    contactItem = contactItem,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(40.dp)
+                        .clip(CircleShape),
+                )
                 if (contactItem.areCredentialsVerified) {
                     Image(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(10.dp),
                         painter = painterResource(id = R.drawable.ic_verified),
-                        contentDescription = "Verified user")
+                        contentDescription = "Verified user"
+                    )
                 }
             }
             Column {
@@ -70,10 +77,12 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
                         contactData.alias ?: contactData.fullName ?: email
                     }
 
-                    Text(text = contactName,
+                    Text(
+                        text = contactName,
                         style = MaterialTheme.typography.subtitle1,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis)
+                        overflow = TextOverflow.Ellipsis
+                    )
 
                     if (contactItem.status != UserStatus.Invalid) {
                         ContactStatus(status = contactItem.status)
@@ -89,16 +98,20 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
                             getLastSeenString(contactItem.lastSeen) ?: statusText
                         }
 
-                    MarqueeText(text = secondLineText,
+                    MarqueeText(
+                        text = secondLineText,
                         color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                        style = MaterialTheme.typography.subtitle2)
+                        style = MaterialTheme.typography.subtitle2
+                    )
                 }
             }
         }
 
-        Divider(modifier = Modifier.padding(start = 72.dp),
+        Divider(
+            modifier = Modifier.padding(start = 72.dp),
             color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-            thickness = 1.dp)
+            thickness = 1.dp
+        )
     }
 }
 
@@ -152,7 +165,7 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 
 @Composable
 fun ContactStatus(
-    modifier: Modifier = Modifier.padding(start = 5.dp, top = 2.dp),
+    modifier: Modifier = Modifier,
     status: UserStatus,
 ) {
     val isLightTheme = MaterialTheme.colors.isLight
@@ -171,17 +184,16 @@ fun ContactStatus(
             else R.drawable.ic_offline_dark_standard
     }
 
-    Image(modifier = modifier,
+    Image(
+        modifier = modifier.padding(start = 5.dp, top = 2.dp),
         painter = painterResource(id = statusIcon),
-        contentDescription = "Contact status")
+        contentDescription = "Contact status"
+    )
 }
 
 @Composable
 fun ContactAvatar(
-    modifier: Modifier = Modifier
-        .padding(16.dp)
-        .size(40.dp)
-        .clip(CircleShape),
+    modifier: Modifier = Modifier,
     contactItem: ContactItem,
 ) {
     val avatarUri = contactItem.contactData.avatarUri
@@ -189,21 +201,25 @@ fun ContactAvatar(
     if (avatarUri != null) {
         UriAvatar(modifier = modifier, uri = avatarUri)
     } else {
-        DefaultContactAvatar(modifier = modifier,
+        DefaultContactAvatar(
+            modifier = modifier,
             color = Color(contactItem.defaultAvatarColor.toColorInt()),
-            content = contactItem.getAvatarFirstLetter())
+            content = contactItem.getAvatarFirstLetter()
+        )
     }
 }
 
 @Composable
 fun UriAvatar(modifier: Modifier, uri: String) {
-    Image(modifier = modifier,
+    Image(
+        modifier = modifier,
         painter = rememberAsyncImagePainter(model = uri),
-        contentDescription = "User avatar")
+        contentDescription = "User avatar"
+    )
 }
 
 @Composable
-fun DefaultContactAvatar(modifier: Modifier = Modifier.size(40.dp), color: Color, content: String) {
+fun DefaultContactAvatar(modifier: Modifier = Modifier, color: Color, content: String) {
     Box(contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color = color, shape = CircleShape)
@@ -230,14 +246,17 @@ fun DefaultContactAvatar(modifier: Modifier = Modifier.size(40.dp), color: Color
 @Preview
 @Composable
 fun PreviewContactItem() {
-    ContactItemView(contactItem = ContactItem(
-        handle = -1,
-        email = "email@mega.nz",
-        contactData = ContactData("Full name", "Alias", null),
-        defaultAvatarColor = "",
-        visibility = UserVisibility.Visible,
-        timestamp = 2345262L,
-        areCredentialsVerified = true,
-        status = UserStatus.Online,
-        lastSeen = null)) { }
+    ContactItemView(
+        contactItem = ContactItem(
+            handle = -1,
+            email = "email@mega.nz",
+            contactData = ContactData("Full name", "Alias", null),
+            defaultAvatarColor = "",
+            visibility = UserVisibility.Visible,
+            timestamp = 2345262L,
+            areCredentialsVerified = true,
+            status = UserStatus.Online,
+            lastSeen = null
+        )
+    ) { }
 }

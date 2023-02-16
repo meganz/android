@@ -342,7 +342,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         MimeTypeList.typeForName(favourite.typedNode.name).apply {
             when {
                 isImage ||
-                        (isVideoReproducible || isAudio) ||
+                        (isVideoMimeType || isAudio) ||
                         isPdf -> {
                     launchIntent(
                         openFileWrapper.getIntentForOpenFile(

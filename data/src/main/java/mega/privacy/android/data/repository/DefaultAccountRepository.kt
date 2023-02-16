@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.app.NotificationManager
 import android.content.Context
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -440,7 +441,9 @@ internal class DefaultAccountRepository @Inject constructor(
         }
 
     override val accountEmail: String?
-        get() = megaApiGateway.accountEmail
+        get() = megaApiGateway.accountEmail.also {
+            dbHandler.saveMyEmail(it)
+        }
 
     private suspend fun handleAccountDetail(request: MegaRequest) {
         val newDetail = accountDetailMapper(
@@ -571,36 +574,30 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun clearSharedPreferences() = withContext(ioDispatcher) {
         with(context) {
-            getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE)
-                .edit().clear().apply()
+            // Remove time stamp preference
+            getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE).edit { clear() }
 
-            getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-                .edit().clear().apply()
-
-
-            PreferenceManager.getDefaultSharedPreferences(this)
-                .edit()
-                .putBoolean(SHOW_LINE_NUMBERS, false)
-                .putBoolean(SHOW_OFFLINE_WARNING, true)
-                .remove(KEY_MOBILE_DATA_HIGH_RESOLUTION)
-                .apply()
+            //Remove UI preferences
+            getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE).edit { clear() }
 
             //Remove emoji preferences
-            getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE)
-                .edit().clear().apply()
-
-            getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE)
-                .edit().clear().apply()
-
-            getSharedPreferences(PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE)
-                .edit().clear().apply()
-
-            getSharedPreferences(PREFERENCE_VARIANT_REACTION, Context.MODE_PRIVATE)
-                .edit().clear().apply()
+            getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE).edit { clear() }
+            getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE).edit { clear() }
+            getSharedPreferences(PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE).edit { clear() }
+            getSharedPreferences(PREFERENCE_VARIANT_REACTION, Context.MODE_PRIVATE).edit { clear() }
 
             //Remove sms dialog time checker preference
-            getSharedPreferences(LAST_SHOW_SMS_FILE, Context.MODE_PRIVATE)
-                .edit().clear().apply()
+            getSharedPreferences(LAST_SHOW_SMS_FILE, Context.MODE_PRIVATE).edit { clear() }
+
+            //Remove Text editor, Offline warning, mobile data resolution and Audio player preferences
+            PreferenceManager.getDefaultSharedPreferences(this).edit {
+                remove(SHOW_LINE_NUMBERS)
+                remove(SHOW_OFFLINE_WARNING)
+                remove(KEY_MOBILE_DATA_HIGH_RESOLUTION)
+                remove(KEY_AUDIO_BACKGROUND_PLAY_ENABLED)
+                remove(KEY_AUDIO_SHUFFLE_ENABLED)
+                remove(KEY_AUDIO_REPEAT_MODE)
+            }
         }
     }
 
@@ -627,7 +624,7 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun changePassword(newPassword: String) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.flag }
+            val listener = continuation.getRequestListener { it.newPassword == newPassword }
             megaApiGateway.changePassword(newPassword, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
@@ -664,5 +661,8 @@ internal class DefaultAccountRepository @Inject constructor(
         private const val PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager"
         private const val PREFERENCE_VARIANT_REACTION = "variant-reaction-manager"
         private const val LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp"
+        private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
+        private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
+        private const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
     }
 }

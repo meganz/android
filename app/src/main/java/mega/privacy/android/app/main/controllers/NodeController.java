@@ -43,7 +43,7 @@ import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.main.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage;

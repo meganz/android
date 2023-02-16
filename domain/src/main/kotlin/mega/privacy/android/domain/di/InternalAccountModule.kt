@@ -9,6 +9,7 @@ import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultGetAccountDetails
 import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
+import mega.privacy.android.domain.usecase.DefaultLocalLogoutApp
 import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.DeleteContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.LocalLogoutApp
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QuerySignupLink
@@ -60,6 +62,9 @@ internal abstract class InternalAccountModule {
      */
     @Binds
     abstract fun bindIsUserLoggedIn(useCase: DefaultIsUserLoggedIn): IsUserLoggedIn
+
+    @Binds
+    abstract fun bindLocalLogoutApp(useCase: DefaultLocalLogoutApp): LocalLogoutApp
 
 
     companion object {
