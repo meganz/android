@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -358,60 +359,32 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }
 
     /**
+     * Check if is the current scheduled meeting
+     *
+     * @param scheduledMeetReceived [ChatScheduledMeeting]
+     * @return True, if it's same. False otherwise.
+     */
+    private fun isSameScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting): Boolean =
+        state.value.chatId == scheduledMeetReceived.chatId
+
+    /**
      * Get scheduled meeting updates
      */
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
-                when (scheduledMeetReceived.changes) {
-                    ScheduledMeetingChanges.NewScheduledMeeting -> {
-                        if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
-                            _state.update {
-                                it.copy(
-                                    scheduledMeeting = ScheduledMeetingItem(
-                                        chatId = scheduledMeetReceived.chatId,
-                                        scheduledMeetingId = scheduledMeetReceived.schedId,
-                                        title = scheduledMeetReceived.title,
-                                        description = scheduledMeetReceived.description,
-                                        startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                        endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                        isPast = ZonedDateTime.now()
-                                            .withZoneSameInstant(ZoneOffset.UTC)
-                                            .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    ScheduledMeetingChanges.Title -> {
-                        _state.value.scheduledMeeting?.let {
-                            if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
-                                _state.update { state ->
-                                    state.copy(scheduledMeeting = state.scheduledMeeting?.copy(title = scheduledMeetReceived.title))
-                                }
-                            }
-                        }
-                    }
-                    ScheduledMeetingChanges.Description -> {
-                        _state.value.scheduledMeeting?.let {
-                            if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
-                                _state.update { state ->
-                                    state.copy(
-                                        scheduledMeeting = state.scheduledMeeting?.copy(
-                                            description = scheduledMeetReceived.description
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    ScheduledMeetingChanges.StartDate -> {
-                        _state.value.scheduledMeeting?.let {
-                            if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
-                                _state.update { state ->
-                                    state.copy(
-                                        scheduledMeeting = state.scheduledMeeting?.copy(
+                if (isSameScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)) {
+                    Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
+                    when (scheduledMeetReceived.changes) {
+                        ScheduledMeetingChanges.NewScheduledMeeting -> {
+                            if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+                                _state.update {
+                                    it.copy(
+                                        scheduledMeeting = ScheduledMeetingItem(
+                                            chatId = scheduledMeetReceived.chatId,
+                                            scheduledMeetingId = scheduledMeetReceived.schedId,
+                                            title = scheduledMeetReceived.title,
+                                            description = scheduledMeetReceived.description,
                                             startDate = scheduledMeetReceived.startDateTime?.parseDate(),
                                             endDate = scheduledMeetReceived.endDateTime?.parseDate(),
                                             isPast = ZonedDateTime.now()
@@ -422,8 +395,51 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 }
                             }
                         }
+                        ScheduledMeetingChanges.Title -> {
+                            _state.value.scheduledMeeting?.let {
+                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                    _state.update { state ->
+                                        state.copy(
+                                            scheduledMeeting = state.scheduledMeeting?.copy(
+                                                title = scheduledMeetReceived.title
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        ScheduledMeetingChanges.Description -> {
+                            _state.value.scheduledMeeting?.let {
+                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                    _state.update { state ->
+                                        state.copy(
+                                            scheduledMeeting = state.scheduledMeeting?.copy(
+                                                description = scheduledMeetReceived.description
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        ScheduledMeetingChanges.StartDate -> {
+                            _state.value.scheduledMeeting?.let {
+                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                    _state.update { state ->
+                                        state.copy(
+                                            scheduledMeeting = state.scheduledMeeting?.copy(
+                                                startDate = scheduledMeetReceived.startDateTime?.parseDate(),
+                                                endDate = scheduledMeetReceived.endDateTime?.parseDate(),
+                                                isPast = ZonedDateTime.now()
+                                                    .withZoneSameInstant(ZoneOffset.UTC)
+                                                    .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        else -> {}
                     }
-                    else -> {}
                 }
             }
         }
