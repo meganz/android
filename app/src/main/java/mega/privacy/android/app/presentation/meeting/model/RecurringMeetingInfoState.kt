@@ -25,7 +25,7 @@ data class RecurringMeetingInfoState(
     val chatId: Long = -1,
     val schedId: Long = -1,
     val schedTitle: String? = "",
-    val schedUntil: Long? = null,
+    val schedUntil: Long = 0L,
     val typeOccurs: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val occurrencesList: List<ChatScheduledMeetingOccurr> = emptyList(),
     val firstParticipant: ChatParticipant? = null,

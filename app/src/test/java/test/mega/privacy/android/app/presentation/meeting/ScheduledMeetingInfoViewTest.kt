@@ -351,7 +351,9 @@ class ScheduledMeetingInfoViewTest {
             scheduledMeetingId = -1,
             title = "Scheduled title",
             description = "Scheduled description",
-            date = "Scheduled date"
+            startDateTime = -1,
+            endDateTime = -1,
+            rules = null,
         )
 
     private fun initComposeRuleContent(

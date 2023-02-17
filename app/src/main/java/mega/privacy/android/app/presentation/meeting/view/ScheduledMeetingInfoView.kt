@@ -67,7 +67,15 @@ import mega.privacy.android.app.presentation.contact.UriAvatar
 import mega.privacy.android.app.presentation.contact.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import mega.privacy.android.app.presentation.extensions.getCompleteStartDate
+import mega.privacy.android.app.presentation.extensions.getEndDate
+import mega.privacy.android.app.presentation.extensions.getEndTime
+import mega.privacy.android.app.presentation.extensions.getStartDate
+import mega.privacy.android.app.presentation.extensions.getStartTime
 import mega.privacy.android.app.presentation.extensions.icon
+import mega.privacy.android.app.presentation.extensions.isPast
+import mega.privacy.android.app.presentation.extensions.isToday
+import mega.privacy.android.app.presentation.extensions.isTomorrow
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
@@ -85,6 +93,9 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.WeekOfMonth
+import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
@@ -112,8 +123,6 @@ fun ScheduledMeetingInfoView(
     onInviteParticipantsDialog: () -> Unit,
     onSnackbarShown: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -124,7 +133,7 @@ fun ScheduledMeetingInfoView(
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
                 Snackbar(snackbarData = data,
-                    backgroundColor = black.takeIf { isLight } ?: white)
+                    backgroundColor = black.takeIf { isLight() } ?: white)
             }
         },
         topBar = {
@@ -315,7 +324,7 @@ private fun ScheduledMeetingInfoAppBar(
     titleId: Int,
     elevation: Boolean,
 ) {
-    val iconColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
+    val iconColor = black.takeIf { isLight() } ?: white
 
     TopAppBar(
         title = {
@@ -365,10 +374,8 @@ private fun ScheduledMeetingInfoAppBar(
  *
  * @param state [ScheduledMeetingInfoState]
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
-    val isLight = MaterialTheme.colors.isLight
     Column {
         Row(
             modifier = Modifier
@@ -392,41 +399,1027 @@ private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
                         it.title?.let { title ->
                             Text(text = title,
                                 style = MaterialTheme.typography.subtitle1,
-                                color = black.takeIf { isLight } ?: white,
+                                color = black.takeIf { isLight() } ?: white,
                                 fontWeight = FontWeight.Medium,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis)
                         }
                     }
                 }
-                state.scheduledMeeting?.let {
-                    if (it.isPast) {
-                        Text(text = pluralStringResource(
-                            R.plurals.subtitle_of_group_chat,
-                            state.numOfParticipants,
-                            state.numOfParticipants
-                        ),
-                            style = MaterialTheme.typography.body1,
-                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                            fontSize = 12.sp,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis)
-                    } else {
-                        it.date?.let { date ->
-                            Text(text = date,
-                                style = MaterialTheme.typography.subtitle2,
-                                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                                fontWeight = FontWeight.Normal,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis)
-                        }
-                    }
-                }
+
+                ScheduledMeetingSubtitle(state = state)
             }
         }
 
         CustomDivider(withStartPadding = false)
     }
+}
+
+@Composable
+private fun isLight(): Boolean = MaterialTheme.colors.isLight
+
+
+/**
+ * Scheduled meeting subtitle
+ *
+ * @param state [ScheduledMeetingInfoState]
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
+    state.scheduledMeeting?.let { schedMeet ->
+        if (schedMeet.isPast()) {
+            Text(text = pluralStringResource(
+                R.plurals.subtitle_of_group_chat,
+                state.numOfParticipants,
+                state.numOfParticipants
+            ),
+                style = MaterialTheme.typography.body1,
+                color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054,
+                fontSize = 12.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis)
+        } else {
+            val text = getScheduledMeetingDate(state = state).replace("[A]", "").replace("[/A]", "")
+                .replace("[B]", "").replace("[/B]", "")
+            if (text.isNotEmpty()) {
+                Text(text = text,
+                    style = MaterialTheme.typography.subtitle2,
+                    color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
+}
+
+/**
+ * Get the string corresponding to the day of the week
+ *
+ * @param day [Weekday]
+ * @return String of day of the week
+ */
+@Composable
+fun getWeekDay(day: Weekday): String =
+    when (day) {
+        Weekday.Monday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_mon)
+        Weekday.Tuesday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_tue)
+        Weekday.Wednesday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_wed)
+        Weekday.Thursday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_thu)
+        Weekday.Friday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_fri)
+        Weekday.Saturday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_sat)
+        Weekday.Sunday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_sun)
+    }
+
+/**
+ * Get Text of subtitle for one off meeting
+ *
+ * @param schedMeet     [ScheduledMeetingItem]
+ * @param startTime     Start time
+ * @param endTime       End time
+ * @return Text of one off meeting
+ */
+@Composable
+private fun getTextForOneOffMeeting(
+    schedMeet: ScheduledMeetingItem,
+    startTime: String,
+    endTime: String,
+): String {
+    val completeStartDate = schedMeet.getCompleteStartDate()
+    when {
+        schedMeet.isToday() -> return stringResource(
+            id = R.string.meetings_one_off_occurrence_info_today,
+            completeStartDate,
+            startTime,
+            endTime
+        )
+        schedMeet.isTomorrow() -> return stringResource(
+            id = R.string.meetings_one_off_occurrence_info_tomorrow,
+            completeStartDate,
+            startTime,
+            endTime
+        )
+    }
+
+    return stringResource(
+        id = R.string.notification_subtitle_scheduled_meeting_one_off,
+        completeStartDate,
+        startTime,
+        endTime
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun getScheduledMeetingDate(state: ScheduledMeetingInfoState): String {
+    state.scheduledMeeting?.let { schedMeet ->
+        val rules = schedMeet.rules
+        val startTime = schedMeet.getStartTime(state.is24HourFormat)
+        val endTime = schedMeet.getEndTime(state.is24HourFormat)
+        val startDate = schedMeet.getStartDate()
+        val endDate = schedMeet.getEndDate()
+
+        if (rules == null) {
+            return getTextForOneOffMeeting(schedMeet, startTime, endTime)
+        }
+
+        when (rules.freq) {
+            OccurrenceFrequencyType.Invalid -> return getTextForOneOffMeeting(
+                schedMeet,
+                startTime,
+                endTime
+            )
+            OccurrenceFrequencyType.Daily -> {
+                when (rules.until) {
+                    0L -> return stringResource(
+                        id = R.string.notification_subtitle_scheduled_meeting_recurring_daily_forever,
+                        startDate,
+                        startTime,
+                        endTime
+                    )
+                    else -> return stringResource(
+                        id = R.string.notification_subtitle_scheduled_meeting_recurring_daily_until,
+                        startDate,
+                        endDate,
+                        startTime,
+                        endTime
+                    )
+                }
+            }
+            OccurrenceFrequencyType.Weekly -> {
+                rules.weekDayList?.let { weekDaysList ->
+                    val interval = if (rules.interval == 0) 1 else rules.interval
+                    if (weekDaysList.size == 1) {
+                        val weekDay = getWeekDay(weekDaysList.first())
+                        when (rules.until) {
+                            0L -> return pluralStringResource(
+                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever,
+                                interval,
+                                weekDay,
+                                interval,
+                                startDate,
+                                startTime,
+                                endTime
+                            )
+                            else -> return pluralStringResource(
+                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until,
+                                interval,
+                                weekDay,
+                                interval,
+                                startDate,
+                                endDate,
+                                startTime,
+                                endTime
+                            )
+                        }
+                    } else {
+                        var weekdayStringList: String
+                        mutableListOf<String>().apply {
+                            weekDaysList.sorted().forEach { day ->
+                                val index = weekDaysList.indexOf(day)
+                                val lastPos = weekDaysList.size - 1
+                                if (index != lastPos) {
+                                    this@apply.add(getWeekDay(day))
+                                }
+                            }
+                            val separator = ", "
+                            weekdayStringList = this@apply.joinToString(separator)
+                        }
+                        val lastWeekDay = getWeekDay(weekDaysList.last())
+                        when (rules.until) {
+                            0L -> return pluralStringResource(
+                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever,
+                                interval,
+                                weekdayStringList,
+                                lastWeekDay,
+                                interval,
+                                startDate,
+                                startTime,
+                                endTime
+                            )
+                            else -> return pluralStringResource(
+                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until,
+                                interval,
+                                weekdayStringList,
+                                lastWeekDay,
+                                interval,
+                                startDate,
+                                endDate,
+                                startTime,
+                                endTime
+                            )
+                        }
+                    }
+                }
+            }
+            OccurrenceFrequencyType.Monthly -> {
+                val interval = if (rules.interval == 0) 1 else rules.interval
+                rules.monthDayList?.let { monthDayList ->
+                    val dayOfTheMonth = monthDayList.first()
+                    when (rules.until) {
+                        0L -> {
+                            return pluralStringResource(
+                                R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever,
+                                interval,
+                                dayOfTheMonth,
+                                interval,
+                                startDate,
+                                startTime,
+                                endTime
+                            )
+                        }
+                        else -> {
+                            return pluralStringResource(
+                                R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until,
+                                interval,
+                                dayOfTheMonth,
+                                interval,
+                                startDate,
+                                endDate,
+                                startTime,
+                                endTime
+                            )
+                        }
+                    }
+                }
+
+
+                rules.monthWeekDayList?.let { monthWeekDayList ->
+                    val monthWeekDayItem = monthWeekDayList.first()
+                    val weekOfMonth = monthWeekDayItem.weekOfMonth
+                    when (monthWeekDayItem.weekDaysList.first()) {
+                        Weekday.Monday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Weekday.Tuesday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Weekday.Wednesday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Weekday.Thursday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Weekday.Friday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Weekday.Saturday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Weekday.Sunday -> {
+                            when (weekOfMonth) {
+                                WeekOfMonth.First -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_first,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Second -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_second,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Third -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_third,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fourth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fourth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                                WeekOfMonth.Fifth -> {
+                                    when (rules.until) {
+                                        0L -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                        else -> return pluralStringResource(
+                                            R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fifth,
+                                            interval,
+                                            interval,
+                                            startDate,
+                                            endDate,
+                                            startTime,
+                                            endTime
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return ""
 }
 
 /**
@@ -439,7 +1432,7 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
         DefaultMeetingAvatarView(
             title = state.chatTitle,
-            colorBackground = grey_alpha_012.takeIf { MaterialTheme.colors.isLight }
+            colorBackground = grey_alpha_012.takeIf { isLight() }
                 ?: white_alpha_012)
     } else if (state.isSingleMeeting()) {
         state.firstParticipant?.let {
@@ -480,7 +1473,6 @@ private fun ActionButton(
     action: ScheduledMeetingInfoAction,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
-    val isLight = MaterialTheme.colors.isLight
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
@@ -543,7 +1535,7 @@ private fun ActionButton(
                         ),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
-                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
+                            color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
                     }
 
                     CustomDivider(withStartPadding = false)
@@ -559,7 +1551,7 @@ private fun ActionButton(
                     ),
                         style = MaterialTheme.typography.subtitle1,
                         text = stringResource(id = action.title),
-                        color = black.takeIf { isLight } ?: white)
+                        color = black.takeIf { isLight() } ?: white)
 
                     action.description?.let { description ->
                         Text(modifier = Modifier.padding(
@@ -570,7 +1562,7 @@ private fun ActionButton(
                         ),
                             style = MaterialTheme.typography.subtitle2,
                             text = stringResource(id = description),
-                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
+                            color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
                     }
 
                     CustomDivider(withStartPadding = false)
@@ -649,7 +1641,7 @@ private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
         text = stringResource(id = R.string.participants_number, state.participantItemList.size),
         style = MaterialTheme.typography.body2,
         fontWeight = FontWeight.Medium,
-        color = black.takeIf { MaterialTheme.colors.isLight } ?: white)
+        color = black.takeIf { isLight() } ?: white)
 }
 
 /**
@@ -750,7 +1742,7 @@ private fun LeaveGroupButton(
         Text(textAlign = TextAlign.Center,
             style = MaterialTheme.typography.button,
             text = stringResource(id = R.string.meetings_scheduled_meeting_info_leave_group_label),
-            color = red_600.takeIf { MaterialTheme.colors.isLight } ?: red_300)
+            color = red_600.takeIf { isLight() } ?: red_300)
     }
 }
 
@@ -761,8 +1753,6 @@ private fun LeaveGroupButton(
  */
 @Composable
 private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
-    val isLight = MaterialTheme.colors.isLight
-
     state.scheduledMeeting?.let { schedMeet ->
         schedMeet.description?.let { description ->
             CustomDivider(withStartPadding = false)
@@ -787,7 +1777,7 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
                     ) {
                         Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
                             contentDescription = "Scheduled meeting description icon",
-                            tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
+                            tint = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
                     }
 
                     Column(
@@ -799,12 +1789,12 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
                             .padding(start = 32.dp, bottom = 6.dp),
                             style = MaterialTheme.typography.subtitle1,
                             text = stringResource(id = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label),
-                            color = black.takeIf { isLight } ?: white)
+                            color = black.takeIf { isLight() } ?: white)
                         Text(modifier = Modifier
                             .padding(start = 32.dp),
                             style = MaterialTheme.typography.subtitle2,
                             text = description,
-                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054,
                             fontWeight = FontWeight.Normal)
                     }
                 }
@@ -825,7 +1815,7 @@ fun CustomDivider(withStartPadding: Boolean) {
             start = 72.dp,
             end = 0.dp
         ) else Modifier.padding(start = 0.dp, end = 0.dp),
-        color = grey_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_012,
+        color = grey_alpha_012.takeIf { isLight() } ?: white_alpha_012,
         thickness = 1.dp)
 }
 
@@ -861,7 +1851,7 @@ private fun ActionOption(
                 action.icon?.let { icon ->
                     Icon(painter = painterResource(id = icon),
                         contentDescription = "${action.name} icon",
-                        tint = grey_alpha_054.takeIf { MaterialTheme.colors.isLight }
+                        tint = grey_alpha_054.takeIf { isLight() }
                             ?: white_alpha_054)
                 }
             }
@@ -915,7 +1905,7 @@ private fun ActionSubtitleText(text: String) {
         .padding(start = 32.dp, end = 23.dp),
         style = MaterialTheme.typography.subtitle2,
         text = text,
-        color = grey_alpha_054.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_054)
+        color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
 }
 
 /**
@@ -940,7 +1930,7 @@ private fun ActionText(actionText: Int) {
         .padding(start = 32.dp, end = 23.dp),
         style = MaterialTheme.typography.subtitle1,
         text = stringResource(id = actionText),
-        color = black.takeIf { MaterialTheme.colors.isLight } ?: white)
+        color = black.takeIf { isLight() } ?: white)
 }
 
 /**
@@ -956,7 +1946,6 @@ private fun ParticipantItemView(
     showDivider: Boolean,
     onParticipantClicked: (ChatParticipant) -> Unit = {},
 ) {
-    val isLight = MaterialTheme.colors.isLight
     Column {
         Row(modifier = Modifier
             .clickable {
@@ -1025,7 +2014,7 @@ private fun ParticipantItemView(
                             }
 
                         MarqueeText(text = secondLineText,
-                            color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                            color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054,
                             style = MaterialTheme.typography.subtitle2)
                     }
                 }
@@ -1040,14 +2029,14 @@ private fun ParticipantItemView(
                     Icon(modifier = Modifier.padding(start = 30.dp),
                         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
-                        tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
+                        tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
                 }
             }
         }
 
         if (showDivider) {
             Divider(modifier = Modifier.padding(start = 72.dp),
-                color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
+                color = grey_alpha_012.takeIf { isLight() } ?: white_alpha_012,
                 thickness = 1.dp)
         }
     }
@@ -1060,25 +2049,24 @@ private fun ParticipantItemView(
  */
 @Composable
 private fun ParticipantsPermissionView(participant: ChatParticipant) {
-    val isLight = MaterialTheme.colors.isLight
     when (participant.privilege) {
         ChatRoomPermission.Moderator -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_full_access),
                 contentDescription = "Permissions icon",
-                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
+                tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
         ChatRoomPermission.Standard -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_read_write),
                 contentDescription = "Permissions icon",
-                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
+                tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
         ChatRoomPermission.ReadOnly -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_read_only),
                 contentDescription = "Permissions icon",
-                tint = grey_alpha_038.takeIf { isLight } ?: white_alpha_038)
+                tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
         else -> {}
     }
@@ -1247,7 +2235,6 @@ fun PreviewActionButton() {
             scheduledMeeting = ScheduledMeetingItem(
                 chatId = -1,
                 scheduledMeetingId = -1,
-                date = "date",
                 description = "description"
             )
         ),
@@ -1268,7 +2255,6 @@ fun PreviewAddParticipantsButton() {
             scheduledMeeting = ScheduledMeetingItem(
                 chatId = -1,
                 scheduledMeetingId = -1,
-                date = "date",
                 description = "description"
             )
         ), onAddParticipantsClicked = {})
@@ -1288,7 +2274,6 @@ fun PreviewScheduledMeetingInfoView() {
                 scheduledMeeting = ScheduledMeetingItem(
                     chatId = -1,
                     scheduledMeetingId = -1,
-                    date = "date",
                     description = "description"
                 )
             ),

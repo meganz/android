@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.entity.chat
 
-import java.time.ZonedDateTime
-
 /**
  * Meeting item
  *
@@ -9,18 +7,16 @@ import java.time.ZonedDateTime
  * @property scheduledMeetingId         Scheduled meeting id
  * @property title                      Scheduled meeting title
  * @property description                Scheduled meeting description
- * @property date                       Scheduled meeting date
- * @property startDate                  [ZonedDateTime]
- * @property endDate                    [ZonedDateTime]
- * @property isPast                     True, the scheduled meeting has passed. False, otherwise.
+ * @property startDateTime              TimeStamp of Start date time
+ * @property endDateTime                TimeStamp of End date time
+ * @property rules                      [ChatScheduledRules]
  */
 data class ScheduledMeetingItem constructor(
     val chatId: Long = -1,
     val scheduledMeetingId: Long = -1,
     val title: String? = "",
     val description: String? = "",
-    val date: String? = "",
-    val startDate: ZonedDateTime? = null,
-    val endDate: ZonedDateTime? = null,
-    val isPast: Boolean = false,
+    val startDateTime: Long? = null,
+    val endDateTime: Long? = null,
+    val rules: ChatScheduledRules? = null,
 )

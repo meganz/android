@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
@@ -65,9 +66,6 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /**
@@ -99,6 +97,7 @@ import javax.inject.Inject
  * @property monitorConnectivity            [MonitorConnectivity]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
  * @property cameraGateway                  [CameraGateway]
+ * @property deviceGateway                  [DeviceGateway]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
 
  */
@@ -130,10 +129,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val cameraGateway: CameraGateway,
+    private val deviceGateway: DeviceGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
     val state: StateFlow<ScheduledMeetingInfoState> = _state
+
+    private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     private var scheduledMeetingId: Long = MEGACHAT_INVALID_HANDLE
 
@@ -179,20 +181,23 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun setChatId(newChatId: Long, newScheduledMeetingId: Long) {
         if (newChatId != MEGACHAT_INVALID_HANDLE && newChatId != state.value.chatId) {
+            _state.update {
+                it.copy(
+                    chatId = newChatId
+                )
+            }
             scheduledMeetingId = newScheduledMeetingId
-            getChat(newChatId)
+            getChat()
         }
     }
 
     /**
      * Get chat room
-     *
-     * @param newChatId Chat id.
      */
-    private fun getChat(newChatId: Long) =
+    private fun getChat() =
         viewModelScope.launch {
             runCatching {
-                getChatRoom(newChatId)
+                getChatRoom(state.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Chat room does not exist, finish $exception")
                 finishActivity()
@@ -241,7 +246,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     Timber.e(exception)
                 }
                 .collectLatest { list ->
-                    Timber.d("Updated list of participants")
+                    Timber.d("Updated list of participants: list ${list.size}")
                     _state.update {
                         it.copy(participantItemList = list, numOfParticipants = list.size)
                     }
@@ -281,25 +286,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
-                        if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
-                            Timber.d("Scheduled meeting exists")
-                            _state.update {
-                                it.copy(
-                                    scheduledMeeting = ScheduledMeetingItem(
-                                        chatId = scheduledMeetReceived.chatId,
-                                        scheduledMeetingId = scheduledMeetReceived.schedId,
-                                        title = scheduledMeetReceived.title,
-                                        description = scheduledMeetReceived.description,
-                                        startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                        endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                        isPast = ZonedDateTime.now()
-                                            .withZoneSameInstant(ZoneOffset.UTC)
-                                            .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
-                                    )
-                                )
-                            }
-                            return@forEach
-                        }
+                        updateScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)
+                        return@forEach
                     }
                 }
             }
@@ -359,13 +347,37 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }
 
     /**
-     * Check if is the current scheduled meeting
+     * Update scheduled meeting
      *
      * @param scheduledMeetReceived [ChatScheduledMeeting]
-     * @return True, if it's same. False otherwise.
      */
-    private fun isSameScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting): Boolean =
-        state.value.chatId == scheduledMeetReceived.chatId
+    private fun updateScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting) {
+        if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
+            _state.update {
+                it.copy(
+                    scheduledMeeting = ScheduledMeetingItem(
+                        chatId = scheduledMeetReceived.chatId,
+                        scheduledMeetingId = scheduledMeetReceived.schedId,
+                        title = scheduledMeetReceived.title,
+                        description = scheduledMeetReceived.description,
+                        startDateTime = scheduledMeetReceived.startDateTime,
+                        endDateTime = scheduledMeetReceived.endDateTime,
+                        rules = scheduledMeetReceived.rules
+                    ),
+                    is24HourFormat = is24HourFormat
+                )
+            }
+        }
+    }
+
+    /**
+     * Check if is the current scheduled meeting
+     *
+     * @param scheduledMeet [ChatScheduledMeeting]
+     * @ return True, if it's same. False otherwise.
+     */
+    private fun isSameScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
+        state.value.chatId == scheduledMeet.chatId
 
     /**
      * Get scheduled meeting updates
@@ -373,27 +385,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-                if (isSameScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)) {
+                if (isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
                     Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
                     when (scheduledMeetReceived.changes) {
                         ScheduledMeetingChanges.NewScheduledMeeting -> {
-                            if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
-                                _state.update {
-                                    it.copy(
-                                        scheduledMeeting = ScheduledMeetingItem(
-                                            chatId = scheduledMeetReceived.chatId,
-                                            scheduledMeetingId = scheduledMeetReceived.schedId,
-                                            title = scheduledMeetReceived.title,
-                                            description = scheduledMeetReceived.description,
-                                            startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                            endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                            isPast = ZonedDateTime.now()
-                                                .withZoneSameInstant(ZoneOffset.UTC)
-                                                .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
-                                        )
-                                    )
-                                }
-                            }
+                            updateScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)
                         }
                         ScheduledMeetingChanges.Title -> {
                             _state.value.scheduledMeeting?.let {
@@ -427,11 +423,20 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     _state.update { state ->
                                         state.copy(
                                             scheduledMeeting = state.scheduledMeeting?.copy(
-                                                startDate = scheduledMeetReceived.startDateTime?.parseDate(),
-                                                endDate = scheduledMeetReceived.endDateTime?.parseDate(),
-                                                isPast = ZonedDateTime.now()
-                                                    .withZoneSameInstant(ZoneOffset.UTC)
-                                                    .isAfter(scheduledMeetReceived.endDateTime?.parseDate())
+                                                startDateTime = scheduledMeetReceived.startDateTime,
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        ScheduledMeetingChanges.EndDate -> {
+                            _state.value.scheduledMeeting?.let {
+                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                    _state.update { state ->
+                                        state.copy(
+                                            scheduledMeeting = state.scheduledMeeting?.copy(
+                                                endDateTime = scheduledMeetReceived.endDateTime,
                                             )
                                         )
                                     }
@@ -443,6 +448,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
+
 
     /**
      * Get chat list item updates
@@ -975,29 +981,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     fun openSendToChat(shouldOpen: Boolean) {
         _state.update { it.copy(openSendToChat = shouldOpen) }
     }
-
-    /**
-     * Set the scheduled date of the meeting
-     *
-     * @param date
-     */
-    fun setScheduledMeetingDate(date: String) {
-        _state.update { state ->
-            state.copy(
-                scheduledMeeting = state.scheduledMeeting?.copy(
-                    date = date
-                )
-            )
-        }
-    }
-
-    /**
-     * Parse ZonedDateTime from an EpochSecond
-     *
-     * @return  ZonedDateTime
-     */
-    private fun Long.parseDate(): ZonedDateTime =
-        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100

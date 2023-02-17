@@ -102,7 +102,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                             var until: Long = -1
                             scheduledMeetReceived.rules?.let { rules ->
                                 freq = rules.freq
-                                until = rules.until ?: -1
+                                until = rules.until
                             }
 
                             _state.update {
@@ -188,29 +188,32 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     /**
      * Check if is the current scheduled meeting
      *
-     * @param scheduledMeetReceived [ChatScheduledMeeting]
+     * @param scheduledMeet [ChatScheduledMeeting]
      * @return True, if it's same. False otherwise.
      */
-    private fun isSameScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting): Boolean =
-        state.value.chatId == scheduledMeetReceived.chatId
+    private fun isSameScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
+        state.value.chatId == scheduledMeet.chatId
 
+    /**
+     * Get scheduled meeting updates
+     */
     /**
      * Get scheduled meeting updates
      */
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-                if (isSameScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)) {
+                if (isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
                     Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
                     when (scheduledMeetReceived.changes) {
                         ScheduledMeetingChanges.NewScheduledMeeting -> {
                             if (scheduledMeetReceived.parentSchedId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
                                 Timber.d("Scheduled meeting exists")
                                 var freq = OccurrenceFrequencyType.Invalid
-                                var until: Long = -1
+                                var until = 0L
                                 scheduledMeetReceived.rules?.let { rules ->
                                     freq = rules.freq
-                                    until = rules.until ?: -1
+                                    until = rules.until
                                 }
 
                                 _state.update {
@@ -235,10 +238,11 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                         ScheduledMeetingChanges.RepetitionRules -> {
                             if (scheduledMeetReceived.schedId == state.value.schedId) {
                                 var freq = OccurrenceFrequencyType.Invalid
-                                var until: Long = -1
+                                var until = 0L
+
                                 scheduledMeetReceived.rules?.let { rules ->
                                     freq = rules.freq
-                                    until = rules.until ?: -1
+                                    until = rules.until
                                 }
 
                                 _state.update {
@@ -276,13 +280,15 @@ class RecurringMeetingInfoViewModel @Inject constructor(
             return
         }
 
-        state.value.schedUntil?.let { until ->
-            state.value.occurrencesList.last().startDateTime?.let { time ->
-                _state.update {
-                    it.copy(showSeeMoreButton = time < until)
+        state.value.schedUntil.let { until ->
+            if (until != 0L) {
+                state.value.occurrencesList.last().startDateTime?.let { time ->
+                    _state.update {
+                        it.copy(showSeeMoreButton = time < until)
+                    }
+                    return
                 }
             }
-            return
         }
 
         _state.update {
