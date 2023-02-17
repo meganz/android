@@ -23,12 +23,17 @@ class SecurityUpgradeDialogTest {
 
     private fun initComposeRule() {
         composeTestRule.setContent {
-            SecurityUpgradeDialogView(folderName = "folder name", onOkClick = { }, onCancelClick = {})
+            SecurityUpgradeDialogView(folderNames = listOf("folder name 1 ",
+                "folder name 2 ",
+                "folder name 3 "),
+                onOkClick = { },
+                onCancelClick = {})
         }
     }
+
     @Test
     fun test_that_imageview_resource_is_as_expected() {
-            initComposeRule()
+        initComposeRule()
         composeTestRule.run {
             onNodeWithTag("HeaderImage").assertIsDisplayed()
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_title).assertIsDisplayed()
