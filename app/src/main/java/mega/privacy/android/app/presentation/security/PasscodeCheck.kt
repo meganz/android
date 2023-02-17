@@ -5,4 +5,6 @@ package mega.privacy.android.app.presentation.security
  *
  * Empty interface for the PasscodeFacade.  All code is encapsulated in the implementation.
  */
-interface PasscodeCheck
+interface PasscodeCheck {
+    fun disablePasscode()
+}

@@ -129,7 +129,7 @@ class PasscodeFacade @Inject constructor(
         bundleOf(SCREEN_ORIENTATION to context.resources.configuration.orientation)
 
 
-    fun disablePasscode() {
+    override fun disablePasscode() {
         isDisabled = true
     }
 

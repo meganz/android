@@ -707,8 +707,8 @@ public class PDFView extends RelativeLayout {
 
         jumpTo(defaultPage, false);
 
-        pdfViewer.loading = false;
-        pdfViewer.progressBar.setVisibility(GONE);
+        PdfViewerActivity.loading = false;
+        pdfViewer.getProgressBar().setVisibility(GONE);
     }
 
     void showErrorDialog(final Throwable t) {
