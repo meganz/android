@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -354,4 +355,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideResetTotalUploads() = mock<ResetTotalUploads>()
+
+    @Provides
+    fun provideCompressVideos() = mock<CompressVideos>()
 }

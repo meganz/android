@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -26,7 +27,6 @@ import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.VideoCompressor
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
@@ -75,7 +75,6 @@ import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.conversion.VideoCompressionCallback
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.qualifier.MegaApi
@@ -83,9 +82,11 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompleteFastLogin
+import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -97,7 +98,6 @@ import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
-import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
@@ -132,8 +132,7 @@ import kotlin.math.roundToInt
  * Service to handle upload of photos and videos
  */
 @AndroidEntryPoint
-class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
-    VideoCompressionCallback {
+class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
     companion object {
 
@@ -307,12 +306,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var setSyncRecordPendingByPath: SetSyncRecordPendingByPath
-
-    /**
-     * GetVideoQuality
-     */
-    @Inject
-    lateinit var getVideoQuality: GetVideoQuality
 
     /**
      * GetChargingOnSizeString
@@ -514,6 +507,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     lateinit var disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase
 
     /**
+     * Compress Videos
+     */
+    @Inject
+    lateinit var compressVideos: CompressVideos
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -526,7 +525,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var cancelled = false
 
     private var receiver: NetworkTypeChangeReceiver? = null
-    private var videoCompressor: VideoCompressor? = null
     private var notification: Notification? = null
     private var notificationManager: NotificationManager? = null
     private var builder: NotificationCompat.Builder? = null
@@ -541,6 +539,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private var totalToUpload = 0
     private var lastUpdated: Long = 0
     private var getAttrUserListener: GetCameraUploadAttributeListener? = null
+    private var videoCompressionJob: Job? = null
+    private var totalVideoSize = 0L
 
     private fun monitorUploadPauseStatus() {
         coroutineScope?.launch {
@@ -567,9 +567,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     private fun monitorChargingStoppedStatus() {
         coroutineScope?.launch {
             monitorChargingStoppedState().collect {
-                if (isChargingRequired((videoCompressor?.totalInputSize ?: 0) / (1024 * 1024))) {
+                if (isChargingRequired(totalVideoSize)) {
                     Timber.d("Detected device stops charging.")
-                    videoCompressor?.stop()
+                    videoCompressionJob?.cancel()
                 }
             }
         }
@@ -1606,7 +1606,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             showStorageOverQuotaNotification()
         }
 
-        videoCompressor?.stop()
+        videoCompressionJob?.cancel()
         cancelled = true
         stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
@@ -1802,50 +1802,83 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
         }
     }
 
-    private fun isCompressorAvailable() = !(videoCompressor?.isVideoDownSamplingRunning() ?: false)
+    private fun isCompressorAvailable() = !(videoCompressionJob?.isActive ?: false)
 
     private suspend fun startVideoCompression() {
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
-        @Suppress("DEPRECATION")
-        resetTotalUploads()
-        totalUploaded = 0
-        totalToUpload = 0
-
-        videoCompressor = VideoCompressor(
-            context = this,
-            callback = this,
-            videoQuality = getVideoQuality(),
-        )
-        videoCompressor?.setPendingList(fullList)
-        videoCompressor?.setOutputRoot(tempRoot)
-        val totalPendingSizeInMB = (videoCompressor?.totalInputSize ?: 0) / (1024 * 1024)
-        Timber.d(
-            "Total videos count are %d, %d mb to Conversion",
-            fullList.size,
-            totalPendingSizeInMB
-        )
-
-        if (shouldStartVideoCompression(totalPendingSizeInMB)) {
-            coroutineScope?.launch {
-                Timber.d("Starting compressor")
-                videoCompressor?.start()
-            }
-        } else {
-            Timber.d("Compression queue bigger than setting, show notification to user.")
-            endService(aborted = true)
-            val intent = Intent(this, ManagerActivity::class.java)
-            intent.action = Constants.ACTION_SHOW_SETTINGS
-            val pendingIntent =
-                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-            val title = getString(R.string.title_compression_size_over_limit)
-            val size = getChargingOnSizeString()
-            val message = getString(
-                R.string.message_compression_size_over_limit,
-                getString(R.string.label_file_size_mega_byte, size)
+        if (fullList.isNotEmpty()) {
+            @Suppress("DEPRECATION")
+            resetTotalUploads()
+            totalUploaded = 0
+            totalToUpload = 0
+            totalVideoSize = getTotalVideoSizeInMB(fullList)
+            Timber.d(
+                "Total videos count are %d, %d mb to Conversion",
+                fullList.size,
+                totalVideoSize
             )
-            showNotification(title, message, pendingIntent, true)
+            if (shouldStartVideoCompression(totalVideoSize)) {
+                videoCompressionJob = coroutineScope?.launch {
+                    Timber.d("Starting compressor")
+                    tempRoot?.let { root ->
+                        compressVideos(root, fullList).collect {
+                            when (it) {
+                                is VideoCompressionState.Failed -> {
+                                    onCompressFailed(fullList.first { record -> record.id == it.id })
+                                }
+                                VideoCompressionState.Finished -> {
+                                    onCompressFinished()
+                                }
+                                is VideoCompressionState.FinishedCompression -> {
+                                    Timber.d("Video compressed path: ${it.returnedFile} success:${it.isSuccess} ")
+                                }
+                                VideoCompressionState.Initial -> {
+                                    Timber.d("Video Compression Started")
+                                }
+                                VideoCompressionState.InsufficientStorage -> {
+                                    onInsufficientSpace()
+                                }
+                                is VideoCompressionState.Progress -> {
+                                    onCompressUpdateProgress(
+                                        progress = it.progress,
+                                        currentFileIndex = it.currentIndex,
+                                        totalCount = it.totalCount
+                                    )
+                                }
+                                is VideoCompressionState.Successful -> {
+                                    onCompressSuccessful(fullList.first { record -> record.id == it.id })
+                                }
+                            }
+                        }
+                    } ?: run {
+                        Timber.w("Root path doesn't exist")
+                        endService(aborted = true)
+                    }
+                }
+            } else {
+                Timber.d("Compression queue bigger than setting, show notification to user.")
+                showVideCompressionErrorNotification()
+                endService(aborted = true)
+            }
         }
     }
+
+    private suspend fun showVideCompressionErrorNotification() {
+        val intent = Intent(this, ManagerActivity::class.java)
+        intent.action = Constants.ACTION_SHOW_SETTINGS
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val title = getString(R.string.title_compression_size_over_limit)
+        val size = getChargingOnSizeString()
+        val message = getString(
+            R.string.message_compression_size_over_limit,
+            getString(R.string.label_file_size_mega_byte, size)
+        )
+        showNotification(title, message, pendingIntent, true)
+    }
+
+    private fun getTotalVideoSizeInMB(records: List<SyncRecord>) =
+        records.sumOf { it.localPath?.let { path -> File(path).length() } ?: 0 } / (1024 * 1024)
 
     private suspend fun shouldStartVideoCompression(queueSize: Long): Boolean {
         if (isChargingRequired(queueSize) && !Util.isCharging(this)) {
@@ -1858,9 +1891,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     /**
      * Not enough space available
      */
-    override fun onInsufficientSpace() {
+    private fun onInsufficientSpace() {
         Timber.w("Insufficient space for video compression.")
+        showOutOfSpaceNotification()
         endService(aborted = true)
+    }
+
+    private fun showOutOfSpaceNotification() {
         val intent = Intent(this, ManagerActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -1872,14 +1909,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     /**
      * Update compression progress
      */
-    @Synchronized
-    override fun onCompressUpdateProgress(progress: Int) {
+    private fun onCompressUpdateProgress(progress: Int, currentFileIndex: Int, totalCount: Int) {
         if (!cancelled) {
             val message = getString(R.string.message_compress_video, "$progress%")
             val subText = getString(
                 R.string.title_compress_video,
-                videoCompressor?.currentFileIndex,
-                videoCompressor?.totalCount
+                currentFileIndex,
+                totalCount
             )
             showProgressNotification(progress, pendingIntent, message, subText, "")
         }
@@ -1888,8 +1924,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     /**
      * Compression successful
      */
-    @Synchronized
-    override fun onCompressSuccessful(record: SyncRecord) {
+    private fun onCompressSuccessful(record: SyncRecord) {
         coroutineScope?.launch {
             Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
             setSyncRecordPendingByPath(record.localPath, record.isSecondary)
@@ -1897,22 +1932,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     }
 
     /**
-     * Compression not supported
-     */
-    @Synchronized
-    override fun onCompressNotSupported(record: SyncRecord) {
-        Timber.d("Compression failed, no support for file with timestamp: %s", record.timestamp)
-    }
-
-    /**
      * Compression failed
      */
-    @Synchronized
-    override fun onCompressFailed(record: SyncRecord) {
+    private suspend fun onCompressFailed(record: SyncRecord) {
         val localPath = record.localPath
         val isSecondary = record.isSecondary
         Timber.w("Compression failed for file with timestamp:  %s", record.timestamp)
-
         val srcFile = localPath?.let { File(it) }
         if (srcFile != null && srcFile.exists()) {
             try {
@@ -1922,9 +1947,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
                     val newPath = record.newPath
                     val temp = newPath?.let { File(it) }
-                    coroutineScope?.launch {
-                        setSyncRecordPendingByPath(localPath, isSecondary)
-                    }
+                    setSyncRecordPendingByPath(localPath, isSecondary)
                     if (newPath != null && tempRoot?.let { newPath.startsWith(it) } == true && temp != null && temp.exists()) {
                         temp.delete()
                     }
@@ -1935,11 +1958,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.e(ex)
             }
         } else {
-            coroutineScope?.launch {
-                Timber.w("Compressed video not exists, remove from DB")
-                localPath?.let {
-                    deleteSyncRecordByLocalPath(localPath, isSecondary)
-                }
+            Timber.w("Compressed video not exists, remove from DB")
+            localPath?.let {
+                deleteSyncRecordByLocalPath(localPath, isSecondary)
             }
         }
     }
@@ -1947,7 +1968,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
     /**
      * Compression finished
      */
-    override fun onCompressFinished(currentIndexString: String) {
+    private fun onCompressFinished() {
+        Timber.d("Video Compression Finished")
+        videoCompressionJob?.cancel()
+        videoCompressionJob = null
         coroutineScope?.launch {
             if (!cancelled) {
                 Timber.d("Preparing to upload compressed video.")

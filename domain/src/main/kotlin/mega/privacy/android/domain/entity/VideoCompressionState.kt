@@ -29,9 +29,9 @@ sealed interface VideoCompressionState {
          */
         val currentIndex: Int,
         /**
-         * total Video Size Processed
+         * total Video count
          */
-        val totalSizeProcessed: Long,
+        val totalCount: Int,
         /**
          * path of the output file
          */

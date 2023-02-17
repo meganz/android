@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.data.compression.video.InputSurface
 import mega.privacy.android.data.compression.video.OutputSurface
 import mega.privacy.android.data.gateway.VideoCompressorGateway
@@ -25,6 +26,7 @@ import java.io.IOException
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /**
  * Implementation of [VideoCompressorGateway]
@@ -42,8 +44,6 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
         const val OUTPUT_AUDIO_MIME_TYPE = "audio/mp4a-latm"
         const val OUTPUT_AUDIO_BIT_RATE = 128 * 1024
         const val OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE
-        const val SHORT_SIDE_SIZE_MEDIUM = 1080
-        const val SHORT_SIDE_SIZE_LOW = 720
     }
 
     override fun setVideoQuality(videoQuality: VideoQuality) {
@@ -83,7 +83,7 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                                     VideoCompressionState.Progress(
                                         progress,
                                         currentFileIndex,
-                                        totalSizeProcessed,
+                                        config.total,
                                         attachment.newPath
                                     )
                                 )
@@ -99,11 +99,13 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     }.onSuccess {
                         send(VideoCompressionState.Successful(attachment?.id))
                     }.onFailure {
+                        Timber.d("Video Compression Failed $it")
                         send(VideoCompressionState.Failed(attachment?.id))
                     }
                 }
             }
         } catch (exception: Exception) {
+            Timber.d("Video Compression Failed $exception")
             send(VideoCompressionState.Failed())
         }
         send(VideoCompressionState.Finished)
@@ -124,20 +126,26 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
 
     override fun addItems(videoAttachments: List<VideoAttachment>) {
         config.queue.addAll(videoAttachments)
+        config.total += videoAttachments.size
     }
 
+    /**
+     * Prepare Encoder and Decoders and Change the resolution,bitrate  and mux Audio and Video
+     * @param videoAttachment [VideoAttachment]
+     * @param block a callback to return video compression progress
+     */
     private suspend fun prepareAndChangeResolution(
         videoAttachment: VideoAttachment,
-        block: suspend (Int) -> Unit,
-    ) {
+        block: (Int) -> Unit,
+    ) = suspendCancellableCoroutine {
         Timber.d("prepareAndChangeResolution")
         var exception: Exception? = null
         val inputFile = videoAttachment.originalPath
         val outputFile = videoAttachment.newPath
         val videoCodecInfo = selectCodec(OUTPUT_VIDEO_MIME_TYPE)
-            ?: return
+            ?: return@suspendCancellableCoroutine
         val audioCodecInfo = selectCodec(OUTPUT_AUDIO_MIME_TYPE)
-            ?: return
+            ?: return@suspendCancellableCoroutine
         var videoExtractor: MediaExtractor? = null
         var audioExtractor: MediaExtractor? = null
         var outputSurface: OutputSurface? = null
@@ -147,136 +155,10 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
         var audioEncoder: MediaCodec? = null
         var muxer: MediaMuxer? = null
         var inputSurface: InputSurface? = null
-        try {
-            videoExtractor = createExtractor(outputFile)
-            val videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor)
-            val inputFormat = videoExtractor.getTrackFormat(videoInputTrack)
-            val metadataRetriever = MediaMetadataRetriever()
-            metadataRetriever.setDataSource(inputFile)
-            getOriginalWidthAndHeight(metadataRetriever)
-            config.resultWidth = config.width
-            config.resultHeight = config.height
-            var bitrate =
-                (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
-                    ?: return)
-                    .toInt()
-            var shortSideByQuality =
-                if (config.videoQuality == VideoQuality.MEDIUM) SHORT_SIDE_SIZE_MEDIUM else SHORT_SIDE_SIZE_LOW
-            val shortSide = config.width.coerceAtMost(config.height)
-            var frameRate =
-                if (inputFormat.containsKey(MediaFormat.KEY_FRAME_RATE)) inputFormat.getInteger(
-                    MediaFormat.KEY_FRAME_RATE
-                ) else OUTPUT_VIDEO_FRAME_RATE
-            Timber.d("Video original width: ${config.width}, original height: ${config.height}, average bitrate: $bitrate, frame rate: $frameRate")
-            if (config.videoQuality == VideoQuality.HIGH) {
-                // Since the METADATA_KEY_BITRATE is not the right value of the final bitrate
-                // of a video but the average one, we can assume a 2% less to ensure the final size
-                // is a bit less than the original one.
-                bitrate *= 0.98.toInt()
-            } else {
-                bitrate =
-                    if (config.videoQuality == VideoQuality.MEDIUM) bitrate / 2 else bitrate / 3
-                frameRate = frameRate.coerceAtMost(OUTPUT_VIDEO_FRAME_RATE)
-                if (shortSide > shortSideByQuality) {
-                    configureCodecResolution(shortSideByQuality)
-                }
-            }
-            Timber.d("Video result width: ${config.resultWidth}, result height: ${config.resultHeight}, encode bitrate: $bitrate, encode frame rate: $frameRate")
-            val capabilities = videoCodecInfo
-                .getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE).videoCapabilities
-            var supported = capabilities.areSizeAndRateSupported(
-                config.resultWidth,
-                config.resultHeight,
-                frameRate.toDouble()
-            )
 
-            //local function
-            fun checkSupported(index: Int): Boolean {
-                configureCodecResolution(index)
-                supported = capabilities.areSizeAndRateSupported(
-                    config.resultWidth,
-                    config.resultHeight,
-                    frameRate.toDouble()
-                )
-                return supported
-            }
-            if (!supported) {
-                Timber.w("Sizes width: ${config.resultWidth} height: ${config.resultHeight} not supported.")
-                for (i in shortSideByQuality until shortSide) {
-                    supported = checkSupported(i)
-                    if (supported) {
-                        break
-                    }
-                }
-            }
-            if (!supported && config.videoQuality == VideoQuality.MEDIUM) {
-                Timber.w("Sizes still not supported. Second try.")
-                shortSideByQuality--
-                for (i in shortSideByQuality downTo SHORT_SIDE_SIZE_LOW + 1) {
-                    supported = checkSupported(i)
-                    if (supported) {
-                        break
-                    }
-                }
-            }
-            if (!supported) {
-                val error =
-                    "Latest sizes width: ${config.resultWidth} height: ${config.resultHeight} not supported Video not compressed, uploading original video."
-                Timber.e(error)
-                throw Exception(error).also { exception = it }
-            }
-            val outputVideoFormat =
-                MediaFormat.createVideoFormat(
-                    OUTPUT_VIDEO_MIME_TYPE,
-                    config.resultWidth,
-                    config.resultHeight,
-                )
-            outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT)
-            outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
-            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
-            outputVideoFormat.setInteger(
-                MediaFormat.KEY_I_FRAME_INTERVAL,
-                OUTPUT_VIDEO_IFRAME_INTERVAL
-            )
-            val inputSurfaceReference = AtomicReference<Surface>()
-            videoEncoder =
-                createVideoEncoder(videoCodecInfo, outputVideoFormat, inputSurfaceReference)
-            inputSurface = InputSurface(
-                inputSurfaceReference.get()
-            )
-            inputSurface.makeCurrent()
-            outputSurface = OutputSurface()
-            videoDecoder = createVideoDecoder(inputFormat, outputSurface.surface)
-            audioExtractor = createExtractor(inputFile)
-            val audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor)
-            if (audioInputTrack >= 0) {
-                val inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack)
-                val outputAudioFormat = MediaFormat.createAudioFormat(
-                    inputAudioFormat.getString(MediaFormat.KEY_MIME) ?: return,
-                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-                )
-                outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE)
-                outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE)
-                audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat)
-                audioDecoder = createAudioDecoder(inputAudioFormat)
-            }
-            muxer = MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-            changeResolution(
-                videoExtractor = videoExtractor,
-                audioExtractor = audioExtractor,
-                videoDecoder = videoDecoder,
-                videoEncoder = videoEncoder,
-                audioDecoder = audioDecoder,
-                audioEncoder = audioEncoder,
-                muxer = muxer,
-                inputSurface = inputSurface,
-                outputSurface = outputSurface,
-                video = videoAttachment,
-            ) {
-                block(it)
-            }
-        } finally {
+        // internal function for releasing encoders and decoders
+        fun dispose() {
+            Timber.d("Release Encoders and Decoders")
             try {
                 videoExtractor?.release()
                 audioExtractor?.release()
@@ -293,12 +175,100 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                 inputSurface?.release()
                 outputSurface?.release()
             } catch (e: Exception) {
-                if (exception == null) exception = e
+                Timber.e("Release Exception $e")
             }
+        }
+        try {
+            videoExtractor = createExtractor(inputFile)
+            val videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor)
+            val inputFormat = videoExtractor.getTrackFormat(videoInputTrack)
+            val metadataRetriever = MediaMetadataRetriever()
+            metadataRetriever.setDataSource(inputFile)
+            getOriginalWidthAndHeight(metadataRetriever)
+            val bitrate = getBitrate(
+                (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
+                    ?: return@suspendCancellableCoroutine)
+                    .toInt(), config.videoQuality
+            )
+            val frameRate =
+                if (inputFormat.containsKey(MediaFormat.KEY_FRAME_RATE)) inputFormat.getInteger(
+                    MediaFormat.KEY_FRAME_RATE
+                ) else OUTPUT_VIDEO_FRAME_RATE
+            val duration =
+                (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    ?: return@suspendCancellableCoroutine).toLong()
+            videoAttachment.totalDuration = duration
+
+            Timber.d("Video result width: ${config.resultWidth}, result height: ${config.resultHeight}, encode bitrate: $bitrate, encode frame rate: $frameRate")
+
+            val outputVideoFormat =
+                MediaFormat.createVideoFormat(
+                    OUTPUT_VIDEO_MIME_TYPE,
+                    config.resultWidth,
+                    config.resultHeight,
+                ).apply {
+                    setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT)
+                    setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
+                    setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
+                    setInteger(
+                        MediaFormat.KEY_I_FRAME_INTERVAL,
+                        OUTPUT_VIDEO_IFRAME_INTERVAL
+                    )
+                }
+
+            val inputSurfaceReference = AtomicReference<Surface>()
+            videoEncoder =
+                createVideoEncoder(videoCodecInfo, outputVideoFormat, inputSurfaceReference)
+            inputSurface = InputSurface(
+                inputSurfaceReference.get()
+            )
+            inputSurface.makeCurrent()
+            outputSurface = OutputSurface()
+            videoDecoder = createVideoDecoder(inputFormat, outputSurface.surface)
+            audioExtractor = createExtractor(inputFile)
+            val audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor).takeIf { it >= 0 }
+                ?: throw RuntimeException("Audio information not found")
+            val inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack)
+            val outputAudioFormat = MediaFormat.createAudioFormat(
+                inputAudioFormat.getString(MediaFormat.KEY_MIME)
+                    ?: return@suspendCancellableCoroutine,
+                inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+            )
+            outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE)
+            outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE)
+            audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat)
+            audioDecoder = createAudioDecoder(inputAudioFormat)
+            muxer = MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            changeResolution(
+                videoExtractor = videoExtractor,
+                audioExtractor = audioExtractor,
+                videoDecoder = videoDecoder,
+                videoEncoder = videoEncoder,
+                audioDecoder = audioDecoder,
+                audioEncoder = audioEncoder,
+                muxer = muxer,
+                inputSurface = inputSurface,
+                outputSurface = outputSurface,
+                video = videoAttachment,
+            ) { progress ->
+                Timber.d("Current Video Compression Progress $it")
+                block(progress)
+            }
+        } catch (e: Exception) {
+            exception = e
+            Timber.d("Change Resolution Exception $e")
+        } finally {
+            dispose()
         }
         if (exception != null) {
             Timber.e(exception, "Exception. Video not compressed, uploading original video.")
-            throw exception as Exception
+            it.resumeWith(Result.failure(exception))
+        } else {
+            it.resumeWith(Result.success(Unit))
+        }
+        it.invokeOnCancellation {
+            dispose()
         }
     }
 
@@ -316,7 +286,7 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
      * @param [outputSurface] [OutputSurface]
      * @param [video] [VideoAttachment]
      */
-    private suspend fun changeResolution(
+    private fun changeResolution(
         videoExtractor: MediaExtractor?, audioExtractor: MediaExtractor?,
         videoDecoder: MediaCodec?, videoEncoder: MediaCodec?,
         audioDecoder: MediaCodec?, audioEncoder: MediaCodec?,
@@ -324,45 +294,42 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
         inputSurface: InputSurface,
         outputSurface: OutputSurface,
         video: VideoAttachment,
-        block: suspend (Int) -> Unit,
+        block: (Int) -> Unit,
     ) {
-        Timber.d("changeResolution")
-        val videoDecoderOutputBufferInfo: MediaCodec.BufferInfo?
-        val videoEncoderOutputBufferInfo: MediaCodec.BufferInfo?
-        videoDecoderOutputBufferInfo = MediaCodec.BufferInfo()
-        videoEncoderOutputBufferInfo = MediaCodec.BufferInfo()
+        Timber.d("change Resolution")
+        val videoDecoderOutputBufferInfo = MediaCodec.BufferInfo()
+        val videoEncoderOutputBufferInfo = MediaCodec.BufferInfo()
+
+        val audioDecoderOutputBufferInfo = MediaCodec.BufferInfo()
+        val audioEncoderOutputBufferInfo = MediaCodec.BufferInfo()
+
+        var decoderOutputVideoFormat: MediaFormat?
+        var decoderOutputAudioFormat: MediaFormat?
         var encoderOutputVideoFormat: MediaFormat? = null
+        var encoderOutputAudioFormat: MediaFormat? = null
+
         var outputVideoTrack = -1
+        var outputAudioTrack = -1
+
         var videoExtractorDone = false
         var videoDecoderDone = false
         var videoEncoderDone = false
-        var audioDecoderOutputBufferInfo: MediaCodec.BufferInfo? = null
-        var audioEncoderOutputBufferInfo: MediaCodec.BufferInfo? = null
+
         var audioExtractorDone = false
         var audioDecoderDone = false
         var audioEncoderDone = false
-        if (audioDecoder != null && audioEncoder != null) {
-            audioDecoderOutputBufferInfo = MediaCodec.BufferInfo()
-            audioEncoderOutputBufferInfo = MediaCodec.BufferInfo()
-        } else {
-            audioExtractorDone = true
-            audioDecoderDone = true
-            audioEncoderDone = true
-        }
-        var encoderOutputAudioFormat: MediaFormat? = null
-        var outputAudioTrack = -1
+
         var pendingAudioDecoderOutputBufferIndex = -1
         var muxing = false
         while ((!videoEncoderDone || !audioEncoderDone) && isRunning()) {
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
-                var decoderInputBufferIndex =
+                val decoderInputBufferIndex =
                     videoDecoder?.dequeueInputBuffer(TIMEOUT_USEC.toLong()) ?: return
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) break
                 val decoderInputBuffer = videoDecoder.getInputBuffer(decoderInputBufferIndex)
                 val size =
                     (videoExtractor ?: return).readSampleData(decoderInputBuffer ?: return, 0)
                 val presentationTime = videoExtractor.sampleTime
-                video.readSize += size.toLong()
                 if (size >= 0) {
                     videoDecoder.queueInputBuffer(
                         decoderInputBufferIndex,
@@ -372,9 +339,8 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                         videoExtractor.sampleFlags
                     )
                 }
-                videoExtractorDone = !videoExtractor.advance()
+                videoExtractorDone = (!videoExtractor.advance() && size == -1)
                 if (videoExtractorDone) {
-                    decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(-1)
                     videoDecoder.queueInputBuffer(
                         decoderInputBufferIndex,
                         0,
@@ -386,13 +352,12 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                 break
             }
             while (audioDecoder != null && !audioExtractorDone && (encoderOutputAudioFormat == null || muxing)) {
-                var decoderInputBufferIndex = audioDecoder.dequeueInputBuffer(TIMEOUT_USEC.toLong())
+                val decoderInputBufferIndex = audioDecoder.dequeueInputBuffer(TIMEOUT_USEC.toLong())
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) break
                 val decoderInputBuffer = audioDecoder.getInputBuffer(decoderInputBufferIndex)
                 val size =
                     (audioExtractor ?: return).readSampleData(decoderInputBuffer ?: return, 0)
                 val presentationTime = audioExtractor.sampleTime
-                video.readSize += size.toLong()
                 if (size >= 0) audioDecoder.queueInputBuffer(
                     decoderInputBufferIndex,
                     0,
@@ -400,9 +365,8 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     presentationTime,
                     audioExtractor.sampleFlags
                 )
-                audioExtractorDone = !audioExtractor.advance()
+                audioExtractorDone = (!audioExtractor.advance() && size == -1)
                 if (audioExtractorDone) {
-                    decoderInputBufferIndex = audioDecoder.dequeueInputBuffer(-1)
                     audioDecoder.queueInputBuffer(
                         decoderInputBufferIndex,
                         0,
@@ -419,6 +383,11 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     TIMEOUT_USEC.toLong()
                 ) ?: return
                 if (decoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) break
+                if (decoderOutputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    decoderOutputVideoFormat = videoDecoder.outputFormat
+                    Timber.d("Current Video Format $decoderOutputVideoFormat")
+                    break
+                }
                 if (videoDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     videoDecoder.releaseOutputBuffer(decoderOutputBufferIndex, false)
                     break
@@ -430,6 +399,10 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     outputSurface.drawImage()
                     inputSurface.setPresentationTime(videoDecoderOutputBufferInfo.presentationTimeUs * 1000)
                     inputSurface.swapBuffers()
+                    val progress =
+                        ((videoDecoderOutputBufferInfo.presentationTimeUs.toFloat() / video.totalDuration.toFloat()) / 10).toInt()
+                    video.currentDuration = videoDecoderOutputBufferInfo.presentationTimeUs
+                    block(progress)
                 }
                 if (videoDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
                     videoDecoderDone = true
@@ -439,9 +412,14 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
             }
             while (audioDecoder != null && !audioDecoderDone && (encoderOutputAudioFormat == null || muxing)) {
                 val decoderOutputBufferIndex = audioDecoder.dequeueOutputBuffer(
-                    audioDecoderOutputBufferInfo ?: return, TIMEOUT_USEC.toLong()
+                    audioDecoderOutputBufferInfo, TIMEOUT_USEC.toLong()
                 )
                 if (decoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) break
+                if (decoderOutputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    decoderOutputAudioFormat = audioDecoder.outputFormat
+                    Timber.d("Current Audio Format $decoderOutputAudioFormat")
+                    break
+                }
                 if (audioDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     audioDecoder.releaseOutputBuffer(decoderOutputBufferIndex, false)
                     break
@@ -452,16 +430,17 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
             while (audioEncoder != null && pendingAudioDecoderOutputBufferIndex != -1) {
                 val encoderInputBufferIndex = audioEncoder.dequeueInputBuffer(TIMEOUT_USEC.toLong())
                 val encoderInputBuffer = audioEncoder.getInputBuffer(encoderInputBufferIndex)
-                val size = (audioDecoderOutputBufferInfo ?: return).size
+                val size = audioDecoderOutputBufferInfo.size
                 val presentationTime = audioDecoderOutputBufferInfo.presentationTimeUs
                 if (size >= 0) {
                     val decoderOutputBuffer =
-                        audioEncoder.getOutputBuffer(pendingAudioDecoderOutputBufferIndex)
+                        audioDecoder?.getOutputBuffer(pendingAudioDecoderOutputBufferIndex)
+                            ?.duplicate()
                     decoderOutputBuffer?.let {
-                        decoderOutputBuffer.position(audioDecoderOutputBufferInfo.offset)
-                        decoderOutputBuffer.limit(audioDecoderOutputBufferInfo.offset + size)
+                        it.position(audioDecoderOutputBufferInfo.offset)
+                        it.limit(audioDecoderOutputBufferInfo.offset + size)
                         encoderInputBuffer?.position(0)
-                        encoderInputBuffer?.put(decoderOutputBuffer)
+                        encoderInputBuffer?.put(it)
                     }
                     audioEncoder.queueInputBuffer(
                         encoderInputBufferIndex,
@@ -476,8 +455,9 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     false
                 )
                 pendingAudioDecoderOutputBufferIndex = -1
-                if (audioDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) audioDecoderDone =
-                    true
+                if (audioDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                    audioDecoderDone = true
+                }
                 break
             }
             while (!videoEncoderDone && (encoderOutputVideoFormat == null || muxing)) {
@@ -510,7 +490,7 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
             }
             while (audioEncoder != null && !audioEncoderDone && (encoderOutputAudioFormat == null || muxing)) {
                 val encoderOutputBufferIndex = audioEncoder.dequeueOutputBuffer(
-                    audioEncoderOutputBufferInfo ?: return, TIMEOUT_USEC.toLong()
+                    audioEncoderOutputBufferInfo, TIMEOUT_USEC.toLong()
                 )
                 if (encoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     break
@@ -524,28 +504,42 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false)
                     break
                 }
-                if (audioEncoderOutputBufferInfo.size != 0) muxer.writeSampleData(
-                    outputAudioTrack,
-                    encoderOutputBuffer ?: return,
-                    audioEncoderOutputBufferInfo
-                )
-                if (audioEncoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) audioEncoderDone =
-                    true
+                if (audioEncoderOutputBufferInfo.size != 0) {
+                    muxer.writeSampleData(
+                        outputAudioTrack,
+                        encoderOutputBuffer ?: return,
+                        audioEncoderOutputBufferInfo
+                    )
+                }
+                if (audioEncoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                    audioEncoderDone =
+                        true
+                }
                 audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false)
                 break
             }
-            if (!muxing && encoderOutputVideoFormat != null) {
+            if (!muxing && encoderOutputVideoFormat != null && encoderOutputAudioFormat != null) {
                 outputVideoTrack = muxer.addTrack(encoderOutputVideoFormat)
-                if (encoderOutputAudioFormat != null) {
-                    outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat)
-                }
+                outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat)
                 muxer.start()
                 muxing = true
             }
-            video.compressionPercentage = (100 * video.readSize / video.size).toInt()
-            block(video.compressionPercentage)
         }
-        video.compressionPercentage = 100
+        // send video progress 100% event
+        block(100)
+    }
+
+
+    private fun getBitrate(
+        bitrate: Int,
+        quality: VideoQuality,
+    ): Int {
+        return when (quality) {
+            VideoQuality.LOW -> (bitrate * 0.2).roundToInt()
+            VideoQuality.MEDIUM -> (bitrate * 0.3).roundToInt()
+            VideoQuality.HIGH -> (bitrate * 0.4).roundToInt()
+            VideoQuality.ORIGINAL -> bitrate
+        }
     }
 
 
@@ -555,47 +549,62 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
      * @param metadataRetriever The video metadata
      */
     private fun getOriginalWidthAndHeight(metadataRetriever: MediaMetadataRetriever) {
-        config.width =
-            (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
-                ?: return).toInt()
-        config.height =
-            (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
-                ?: return)
-                .toInt()
-        val thumbnail = metadataRetriever.frameAtTime
-        val inputWidth = (thumbnail ?: return).width
-        val inputHeight = thumbnail.height
-        if (inputWidth > inputHeight) {
-            if (config.width < config.height) {
-                val w = config.width
-                config.width = config.height
-                config.height = w
+        with(config) {
+            try {
+                width =
+                    (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
+                        ?: return).toInt()
+                height =
+                    (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
+                        ?: return)
+                        .toInt()
+            } catch (e: Exception) {
+                Timber.e("Metadata Retrieval Exception: $e")
             }
-        } else {
-            if (config.width > config.height) {
-                val w = config.width
-                config.width = config.height
-                config.height = w
-            }
+            val (newWidth, newHeight) = generateWidthAndHeight(width, height)
+            config.resultWidth = newWidth
+            config.resultHeight = newHeight
         }
+
     }
 
     /**
-     * configure resolution to compress the video.
-     *
-     * @param resolution Short side size.
+     * Generate new width and height for source file
+     * @param width file's original width
+     * @param height file's original height
+     * @return new width and height pair
      */
-    private fun configureCodecResolution(resolution: Int) {
-        with(config) {
-            if (width > height) {
-                resultWidth = width * resolution / height
-                resultHeight = resolution
-            } else {
-                resultWidth = resolution
-                resultHeight = height * resolution / width
+    private fun generateWidthAndHeight(
+        width: Int,
+        height: Int,
+    ): Pair<Int, Int> {
+        val newWidth: Int
+        val newHeight: Int
+        when {
+            width >= 1920 || height >= 1920 -> {
+                newWidth = generateWidthHeightValue(width, 0.5)
+                newHeight = generateWidthHeightValue(height, 0.5)
+            }
+            width >= 1280 || height >= 1280 -> {
+                newWidth = generateWidthHeightValue(width, 0.75)
+                newHeight = generateWidthHeightValue(height, 0.75)
+            }
+            width >= 960 || height >= 960 -> {
+                newWidth = generateWidthHeightValue(width, 0.95)
+                newHeight = generateWidthHeightValue(height, 0.95)
+            }
+            else -> {
+                newWidth = generateWidthHeightValue(width, 0.9)
+                newHeight = generateWidthHeightValue(height, 0.9)
             }
         }
+        return Pair(newWidth, newHeight)
     }
+
+    private fun roundEven(value: Int): Int = value + 1 and 1.inv()
+
+    private fun generateWidthHeightValue(value: Int, factor: Double): Int =
+        roundEven((((value * factor) / 16).roundToInt() * 16))
 
     /**
      * Checks if the [MediaFormat] is a video format
@@ -754,6 +763,21 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
         return -1
     }
 
+    /**
+     * Current Configuration for VideCompression
+     *
+     * @param isRunning [Boolean] video compression is running or not
+     * @param videoQuality [VideoQuality] Video Quality based on the User Settings
+     * @param width [Int] Original width of the video
+     * @param height [Int] Original height of the video
+     * @param resultWidth [Int] Calculated new width of the video
+     * @param resultHeight [Int] Calculated new height of the video
+     * @param outputRoot [String] root path to check whether enough disk space is available or not
+     * @param currentFileIndex [Int] current video index which is being compressed
+     * @param totalSizeProcessed [Long] total size processed for the current video
+     * @param total [Int] total video count
+     * @param queue [ConcurrentLinkedQueue] of [VideoAttachment] a queue to hold the videos to be processed one by one
+     */
     inner class VideoCompressionConfig(
         var isRunning: Boolean = true,
         var videoQuality: VideoQuality = VideoQuality.ORIGINAL,
@@ -764,6 +788,7 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
         var outputRoot: String? = null,
         var currentFileIndex: Int = 0,
         var totalSizeProcessed: Long = 0,
+        var total: Int = 0,
         val queue: ConcurrentLinkedQueue<VideoAttachment> = ConcurrentLinkedQueue(),
     )
 }

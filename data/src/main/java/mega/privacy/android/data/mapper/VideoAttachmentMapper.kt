@@ -16,5 +16,5 @@ typealias VideoAttachmentMapper = (@JvmSuppressWildcards List<@JvmSuppressWildca
  */
 internal fun toVideoAttachment(records: List<@JvmSuppressWildcards SyncRecord>) =
     records.filter { it.localPath.isNullOrEmpty().not() && it.newPath.isNullOrEmpty().not() }.map {
-        VideoAttachment(it.localPath!!, it.newPath!!, File(it.localPath!!).length(), null, it.id)
+        VideoAttachment(it.localPath!!, it.newPath!!, File(it.localPath!!).length(), it.id)
     }
