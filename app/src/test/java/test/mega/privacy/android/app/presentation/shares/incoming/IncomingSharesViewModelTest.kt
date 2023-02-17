@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
@@ -23,7 +22,6 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
@@ -58,13 +56,6 @@ class IncomingSharesViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    private val getFeatureFlagValue =
-        mock<GetFeatureFlagValue> {
-            onBlocking {
-                invoke(AppFeatures.MandatoryFingerprintVerification)
-            }.thenReturn(true)
-        }
-
     private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares> {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
@@ -90,7 +81,6 @@ class IncomingSharesViewModelTest {
             getCloudSortOrder,
             getOtherSortOrder,
             monitorNodeUpdates,
-            getFeatureFlagValue,
             getUnverifiedIncomingShares,
         )
     }

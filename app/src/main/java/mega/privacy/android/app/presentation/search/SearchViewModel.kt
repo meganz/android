@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -25,12 +24,13 @@ import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExists
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -40,6 +40,7 @@ import javax.inject.Inject
  * @param rootNodeExists Check if the root node exists
  * @param searchNodesUseCase Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
+ * @param getSearchParentNodeHandle Get parent node for current node
  */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -48,7 +49,7 @@ class SearchViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val getSearchParentNodeHandle: GetParentNodeHandle,
 ) : ViewModel() {
 
     /**
@@ -69,6 +70,11 @@ class SearchViewModel @Inject constructor(
     val stateLiveData = _state.map { Event(it) }.asLiveData()
 
     /**
+     * Stack to maintain folder navigation clicks
+     */
+    private val lastPositionStack: Stack<Int> = Stack()
+
+    /**
      * Monitor global node updates
      */
     var updateNodes =
@@ -77,10 +83,6 @@ class SearchViewModel @Inject constructor(
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
             .map { Event(it) }
             .asLiveData()
-
-    init {
-        isMandatoryFingerprintRequired()
-    }
 
     /**
      * Current search cancel token after a search request has been performed
@@ -141,9 +143,18 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
+     * Handles Folder item clicked on [SearchFragment]
+     */
+    fun onFolderClicked(handle: Long, lastFirstVisiblePosition: Int) {
+        setSearchParentHandle(handle)
+        increaseSearchDepth()
+        lastPositionStack.push(lastFirstVisiblePosition)
+    }
+
+    /**
      * Increase by 1 the search depth
      */
-    fun increaseSearchDepth() = viewModelScope.launch {
+    private fun increaseSearchDepth() = viewModelScope.launch {
         _state.update { it.copy(searchDepth = it.searchDepth + 1) }
     }
 
@@ -332,13 +343,30 @@ class SearchViewModel @Inject constructor(
     fun getOrder() = runBlocking { getCloudSortOrder() }
 
     /**
-     * Gets the feature flag value & updates state
+     * Handles back click [SearchFragment]
      */
-    private fun isMandatoryFingerprintRequired() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(isMandatoryFingerPrintVerificationRequired = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
+    fun onBackClicked() {
+        cancelSearch()
+        val levelSearch = _state.value.searchDepth
+        if (levelSearch >= 0) {
+            if (levelSearch > 0) {
+                viewModelScope.launch {
+                    getSearchParentNodeHandle(_state.value.searchParentHandle)?.let {
+                        setSearchParentHandle(it)
+                    } ?: run {
+                        setSearchParentHandle(-1)
+                    }
+                }
+            } else {
+                setSearchParentHandle(-1)
             }
         }
     }
+
+    /**
+     * Pop scroll position for previous depth
+     *
+     * @return last position saved
+     */
+    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
 }

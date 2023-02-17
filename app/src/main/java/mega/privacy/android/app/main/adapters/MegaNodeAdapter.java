@@ -89,6 +89,7 @@ import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFrag
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
@@ -97,13 +98,11 @@ import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragm
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaContactDB;
-import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -149,7 +148,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private SortByHeaderViewModel sortByViewModel;
     private final Set<Long> unverifiedIncomingNodeHandles = new HashSet<>();
     private final Set<Long> unverifiedOutgoingNodeHandles = new HashSet<>();
-    private boolean isMandatoryFingerprintVerificationNeeded;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -242,8 +240,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE
                     : View.VISIBLE);
-
-            setMediaDiscoveryVisibility(binding);
         }
     }
 
@@ -434,7 +430,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public void selectAll() {
-        for (int i = 0; i < nodes.size(); i ++) {
+        for (int i = 0; i < nodes.size(); i++) {
             selectedItems.put(i, true);
             notifyItemChanged(i);
         }
@@ -446,7 +442,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
 
-        for (int i = 0; i < nodes.size(); i ++) {
+        for (int i = 0; i < nodes.size(); i++) {
             selectedItems.delete(i);
             notifyItemChanged(i);
         }
@@ -1092,8 +1088,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     } else {
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
-                    boolean hasUnverifiedNodes = isMandatoryFingerprintVerificationNeeded
-                            && !unverifiedIncomingNodeHandles.isEmpty()
+                    boolean hasUnverifiedNodes = !unverifiedIncomingNodeHandles.isEmpty()
                             && unverifiedIncomingNodeHandles.contains(node.getHandle());
                     if (hasUnverifiedNodes) {
                         showUnverifiedNodeUi(holder, true);
@@ -1104,10 +1099,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-                boolean hasUnverifiedNodes = isMandatoryFingerprintVerificationNeeded
-                        && !unverifiedOutgoingNodeHandles.isEmpty()
+                boolean hasUnverifiedNodes = !unverifiedOutgoingNodeHandles.isEmpty()
                         && unverifiedOutgoingNodeHandles.contains(node.getHandle());
                 if (hasUnverifiedNodes) {
                     showUnverifiedNodeUi(holder, false);
@@ -1205,7 +1200,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getItemViewType(int position) {
         return !nodes.isEmpty() && position == 0
-                && type != FOLDER_LINK_ADAPTER
                 && type != CONTACT_SHARED_FOLDER_ADAPTER
                 && type != CONTACT_FILE_ADAPTER
                 ? ITEM_VIEW_TYPE_HEADER
@@ -1521,10 +1515,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public void onCancelClicked() {
         unHandledItem = -1;
-    }
-
-    public void setMandatoryFingerprintVerificationValue(boolean isVerificationNeeded) {
-        this.isMandatoryFingerprintVerificationNeeded = isVerificationNeeded;
     }
 
     /**
