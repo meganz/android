@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -56,9 +55,9 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import nz.mega.sdk.MegaEvent
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -71,7 +70,6 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param monitorGlobalUpdates Monitor global updates
- * @param getRubbishBinChildrenNode Fetch the rubbish bin nodes
  * @param monitorContactRequestUpdates
  * @param getInboxNode
  * @param getNumUnreadUserAlerts
@@ -83,12 +81,14 @@ import javax.inject.Inject
  * @param monitorStorageStateEvent monitor global storage state changes
  * @param monitorViewType
  * @param getCloudSortOrder
+ * @param getFeatureFlagValue
+ * @param getUnverifiedIncomingShares
+ * @param getUnverifiedOutgoingShares
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
-    private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getInboxNode: GetInboxNode,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
@@ -150,7 +150,6 @@ class ManagerViewModel @Inject constructor(
     )
 
     init {
-
         viewModelScope.launch {
             monitorNodeUpdates().collect {
                 val nodeList = it.changes.keys.toList()
@@ -168,9 +167,8 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _state.update {
-                it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
-            }
+            val showSyncSection = getFeatureFlagValue(AppFeatures.AndroidSync)
+            _state.value = _state.value.copy(showSyncSection = showSyncSection)
         }
 
         viewModelScope.launch {
@@ -189,7 +187,7 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateGlobalEvents.collect { megaEvent ->
-                if (_state.value.isMandatoryFingerprintVerificationNeeded && megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
+                if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
                     _state.update {
                         it.copy(shouldAlertUserAboutSecurityUpgrade = true)
                     }
@@ -203,12 +201,6 @@ class ManagerViewModel @Inject constructor(
      */
     @Suppress("DEPRECATION")
     private val _updates = monitorGlobalUpdates()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-    /**
-     * Monitor global node updates
-     */
-    private val _updateNodes = monitorNodeUpdates()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
@@ -260,16 +252,6 @@ class ManagerViewModel @Inject constructor(
     val updateContactsRequests: LiveData<Event<List<ContactRequest>>> =
         _updateContactRequests
             .also { Timber.d("onContactRequestsUpdate") }
-            .map { Event(it) }
-            .asLiveData()
-
-    /**
-     * Update Rubbish Nodes when a node update callback happens
-     */
-    val updateRubbishBinNodes: LiveData<Event<List<MegaNode>>> =
-        _updateNodes
-            .also { Timber.d("onRubbishNodesUpdate") }
-            .mapNotNull { getRubbishBinChildrenNode(_state.value.rubbishBinParentHandle) }
             .map { Event(it) }
             .asLiveData()
 

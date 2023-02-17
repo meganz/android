@@ -234,7 +234,6 @@ class LinksFragment : MegaNodeBaseFragment() {
 
         adapter?.isMultipleSelect = false
         recyclerView?.adapter = adapter
-        adapter?.setMandatoryFingerprintVerificationValue(viewModel.mandatoryFingerPrintVerificationState.value)
     }
 
     /**
