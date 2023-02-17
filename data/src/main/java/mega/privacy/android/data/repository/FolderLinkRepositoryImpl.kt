@@ -7,7 +7,6 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
-import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import nz.mega.sdk.MegaError
@@ -18,7 +17,7 @@ import javax.inject.Inject
  * Implementation of [FolderLinkRepository]
  */
 class FolderLinkRepositoryImpl @Inject constructor(
-    @MegaApiFolder private val megaApiFolderGateway: MegaApiFolderGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val folderLoginStatusMapper: FolderLoginStatusMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FolderLinkRepository {

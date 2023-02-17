@@ -27,6 +27,8 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +37,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -145,7 +148,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private var statusDialog: AlertDialog? = null
     private val orderGetChildren = SortOrder.ORDER_DEFAULT_ASC
     private var prefs: MegaPreferences? = null
-    private var decryptionIntroduced = false
     private var actionMode: ActionMode? = null
     private var pN: MegaNode? = null
     private var fileLinkFolderLink = false
@@ -421,8 +423,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             }
         }
         Timber.d("Folder link to import: $urlWithKey")
-        decryptionIntroduced = true
-        megaApiFolder.loginToFolder(urlWithKey, folderLinkActivity)
+        viewModel.folderLogin(urlWithKey, true)
     }
 
     override fun onDialogPositiveClick(key: String?) {
@@ -588,7 +589,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                 }
                             }
                         }
-                        megaApiFolder.loginToFolder(url, this)
+                        viewModel.folderLogin(url)
                     } ?: Timber.w("url NULL")
                 }
             }
@@ -709,6 +710,37 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         collectFlow(viewModel.onViewTypeChanged, Lifecycle.State.STARTED) { viewType: ViewType ->
             updateViewType(viewType)
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect {
+                    when {
+                        it.isInitialState -> {
+                            return@collect
+                        }
+                        it.isLoginComplete && !it.isNodesFetched -> {
+                            megaApiFolder.fetchNodes(this@FolderLinkActivity)
+                            // Get cookies settings after login.
+                            getInstance().checkEnabledCookies()
+                        }
+                        it.isLoginComplete && it.isNodesFetched -> {}
+                        it.askForDecryptionKeyDialog -> {
+                            askForDecryptionKeyDialog()
+                        }
+                        else -> {
+                            try {
+                                Timber.w("Show error dialog")
+                                showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
+
+                            } catch (ex: Exception) {
+                                showSnackbar(it.snackBarMessage)
+                                finish()
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -823,49 +855,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     @SuppressLint("NewApi")
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: ${request.requestString}")
-        if (request.type == MegaRequest.TYPE_LOGIN) {
-            if (e.errorCode == MegaError.API_OK) {
-                megaApiFolder.fetchNodes(this)
-
-                // Get cookies settings after login.
-                getInstance().checkEnabledCookies()
-            } else {
-                Timber.w("Error: ${e.errorCode}")
-                if (e.errorCode == MegaError.API_EINCOMPLETE) {
-                    decryptionIntroduced = false
-                    askForDecryptionKeyDialog()
-                    return
-                } else if (e.errorCode == MegaError.API_EARGS) {
-                    if (decryptionIntroduced) {
-                        Timber.w("Incorrect key, ask again!")
-                        decryptionIntroduced = false
-                        askForDecryptionKeyDialog()
-                        return
-                    } else {
-                        try {
-                            Timber.w("API_EARGS - show alert dialog")
-                            showErrorDialog(R.string.general_error_word, R.string.link_broken)
-
-                        } catch (ex: Exception) {
-                            showSnackbar(R.string.general_error_folder_not_found)
-                            finish()
-                        }
-                    }
-                } else {
-                    try {
-                        Timber.w("No link - show alert dialog")
-                        showErrorDialog(
-                            R.string.general_error_word,
-                            R.string.general_error_folder_not_found
-                        )
-
-                    } catch (ex: Exception) {
-                        showSnackbar(R.string.general_error_folder_not_found)
-                        finish()
-                    }
-                }
-            }
-        } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
+        if (request.type == MegaRequest.TYPE_FETCH_NODES) {
+            viewModel.updateIsNodesFetched(true)
             if (e.errorCode == MegaError.API_OK) {
                 Timber.d("DOCUMENTNODEHANDLEPUBLIC: ${request.nodeHandle}")
                 if (request.nodeHandle != MegaApiJava.INVALID_HANDLE) {
