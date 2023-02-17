@@ -9,17 +9,14 @@ import javax.inject.Inject
 class DefaultSetupPrimaryFolder @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val resetPrimaryTimeline: ResetPrimaryTimeline,
-    private val updateFolderIconBroadcast: UpdateFolderIconBroadcast,
-    private val updateFolderDestinationBroadcast: UpdateFolderDestinationBroadcast,
+    private val setPrimarySyncHandle: SetPrimarySyncHandle,
 ) : SetupPrimaryFolder {
     override suspend fun invoke(primaryHandle: Long) {
         cameraUploadRepository.setupPrimaryFolder(primaryHandle)
             .takeIf { it != cameraUploadRepository.getInvalidHandle() }
             ?.let {
                 resetPrimaryTimeline()
-                cameraUploadRepository.setPrimarySyncHandle(it)
-                updateFolderIconBroadcast(it, false)
-                updateFolderDestinationBroadcast(it, false)
+                setPrimarySyncHandle(it)
             }
     }
 }

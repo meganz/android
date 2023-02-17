@@ -44,8 +44,6 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
-import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
@@ -111,7 +109,9 @@ import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetTotalUploads
+import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
+import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
@@ -645,6 +645,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                     aborted = true
                 )
             }
+
             else -> {
                 Timber.d("Start Service")
                 ignoreAttr = intent?.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false) ?: false
@@ -829,30 +830,36 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
                 Timber.e("Stop Camera Uploads due to $state")
                 endService(aborted = true)
             }
+
             StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER -> {
                 Timber.e("Local Primary Folder is disabled. Stop Camera Uploads")
                 handleLocalPrimaryFolderDisabled()
                 endService(aborted = true)
             }
+
             StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER -> {
                 Timber.e("Local Secondary Folder is disabled. Stop Camera Uploads")
                 handleLocalSecondaryFolderDisabled()
                 endService(aborted = true)
             }
+
             StartCameraUploadsState.LOGGED_OUT_USER -> {
                 Timber.w("User is logged out. Perform a Complete Fast Login")
                 performCompleteFastLogin()
             }
+
             StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
                 Timber.w("Handle the missing Camera Uploads user attribute")
                 handleMissingCameraUploadsUserAttribute()
             }
+
             StartCameraUploadsState.UNESTABLISHED_FOLDERS -> {
                 Timber.w("Primary and/or Secondary Folders do not exist. Establish the folders")
                 runCatching { establishFolders() }
                     .onSuccess { startWorker() }
                     .onFailure { endService(aborted = true) }
             }
+
             else -> Unit
         }
     }
@@ -1255,7 +1262,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             is GlobalTransfer.OnTransferTemporaryError -> onTransferTemporaryError(globalTransfer)
             // No further action necessary for these Scenarios
             is GlobalTransfer.OnTransferStart,
-            is GlobalTransfer.OnTransferData
+            is GlobalTransfer.OnTransferData,
             -> Unit
         }
     }

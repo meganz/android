@@ -10,7 +10,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -24,16 +24,14 @@ class DefaultSetupPrimaryFolderTest {
         }.thenReturn(invalidHandle)
     }
     private val resetPrimaryTimeline = mock<ResetPrimaryTimeline>()
-    private val updateFolderIconBroadcast = mock<UpdateFolderIconBroadcast>()
-    private val updateFolderDestinationBroadcast = mock<UpdateFolderDestinationBroadcast>()
+    private val setPrimarySyncHandle = mock<SetPrimarySyncHandle>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetupPrimaryFolder(
             cameraUploadRepository = cameraUploadRepository,
             resetPrimaryTimeline = resetPrimaryTimeline,
-            updateFolderIconBroadcast = updateFolderIconBroadcast,
-            updateFolderDestinationBroadcast = updateFolderDestinationBroadcast
+            setPrimarySyncHandle = setPrimarySyncHandle
         )
     }
 
@@ -44,9 +42,7 @@ class DefaultSetupPrimaryFolderTest {
             whenever(cameraUploadRepository.setupPrimaryFolder(any())).thenReturn(69L)
             underTest(any())
             verify(resetPrimaryTimeline).invoke()
-            verify(cameraUploadRepository).setPrimarySyncHandle(result)
-            verify(updateFolderIconBroadcast).invoke(result, false)
-            verify(updateFolderDestinationBroadcast).invoke(result, false)
+            verify(setPrimarySyncHandle).invoke(result)
         }
 
     @Test
@@ -56,7 +52,7 @@ class DefaultSetupPrimaryFolderTest {
             underTest(any())
             verify(cameraUploadRepository).setupPrimaryFolder(any())
             verify(cameraUploadRepository).getInvalidHandle()
-            verifyNoMoreInteractions(cameraUploadRepository)
+            verifyNoInteractions(setPrimarySyncHandle)
         }
 
     @Test

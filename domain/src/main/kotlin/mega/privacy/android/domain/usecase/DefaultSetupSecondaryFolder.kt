@@ -9,17 +9,14 @@ import javax.inject.Inject
 class DefaultSetupSecondaryFolder @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val resetSecondaryTimeline: ResetSecondaryTimeline,
-    private val updateFolderIconBroadcast: UpdateFolderIconBroadcast,
-    private val updateFolderDestinationBroadcast: UpdateFolderDestinationBroadcast,
+    private val setSecondarySyncHandle: SetSecondarySyncHandle,
 ) : SetupSecondaryFolder {
     override suspend fun invoke(secondaryHandle: Long) {
         cameraUploadRepository.setupSecondaryFolder(secondaryHandle)
             .takeIf { it != cameraUploadRepository.getInvalidHandle() }
             ?.let {
                 resetSecondaryTimeline()
-                cameraUploadRepository.setSecondarySyncHandle(it)
-                updateFolderIconBroadcast(it, true)
-                updateFolderDestinationBroadcast(it, true)
+                setSecondarySyncHandle(it)
             }
     }
 }

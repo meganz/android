@@ -46,8 +46,6 @@ import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
-import mega.privacy.android.app.domain.usecase.SetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -89,6 +87,8 @@ import mega.privacy.android.domain.usecase.DefaultResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.DefaultResetTotalUploads
 import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultRestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
+import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.DefaultSetupPrimaryFolder
 import mega.privacy.android.domain.usecase.DefaultSetupSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
@@ -137,7 +137,9 @@ import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
+import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
+import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
@@ -454,20 +456,6 @@ abstract class CameraUploadUseCases {
             GetChildMegaNode(megaNodeRepository::getChildNode)
 
         /**
-         * Provide the [SetPrimarySyncHandle] implementation
-         */
-        @Provides
-        fun provideSetPrimarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetPrimarySyncHandle =
-            SetPrimarySyncHandle(cameraUploadRepository::setPrimarySyncHandle)
-
-        /**
-         * Provide the [SetSecondarySyncHandle] implementation
-         */
-        @Provides
-        fun provideSetSecondarySyncHandle(cameraUploadRepository: CameraUploadRepository): SetSecondarySyncHandle =
-            SetSecondarySyncHandle(cameraUploadRepository::setSecondarySyncHandle)
-
-        /**
          * Provide the [IsNodeInRubbish] implementation
          */
         @Provides
@@ -579,6 +567,18 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSetupSecondaryFolder(setupSecondaryFolder: DefaultSetupSecondaryFolder): SetupSecondaryFolder
+
+    /**
+     * Provide the [SetPrimarySyncHandle] implementation
+     */
+    @Binds
+    abstract fun bindSetPrimarySyncHandle(setPrimarySyncHandle: DefaultSetPrimarySyncHandle): SetPrimarySyncHandle
+
+    /**
+     * Provide the [SetSecondarySyncHandle] implementation
+     */
+    @Binds
+    abstract fun bindSetSecondarySyncHandle(setSecondarySyncHandle: DefaultSetSecondarySyncHandle): SetSecondarySyncHandle
 
     /**
      * Provide the [GetCameraUploadFolderName] implementation

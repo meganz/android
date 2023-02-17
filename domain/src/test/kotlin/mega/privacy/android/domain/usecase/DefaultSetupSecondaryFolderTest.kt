@@ -10,7 +10,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -24,16 +24,14 @@ class DefaultSetupSecondaryFolderTest {
         }.thenReturn(invalidHandle)
     }
     private val resetSecondaryTimeline = mock<ResetSecondaryTimeline>()
-    private val updateFolderIconBroadcast = mock<UpdateFolderIconBroadcast>()
-    private val updateFolderDestinationBroadcast = mock<UpdateFolderDestinationBroadcast>()
+    private val setSecondarySyncHandle = mock<SetSecondarySyncHandle>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetupSecondaryFolder(
             cameraUploadRepository = cameraUploadRepository,
             resetSecondaryTimeline = resetSecondaryTimeline,
-            updateFolderIconBroadcast = updateFolderIconBroadcast,
-            updateFolderDestinationBroadcast = updateFolderDestinationBroadcast
+            setSecondarySyncHandle = setSecondarySyncHandle
         )
     }
 
@@ -44,9 +42,7 @@ class DefaultSetupSecondaryFolderTest {
             whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(69L)
             underTest(any())
             verify(resetSecondaryTimeline).invoke()
-            verify(cameraUploadRepository).setSecondarySyncHandle(result)
-            verify(updateFolderIconBroadcast).invoke(result, true)
-            verify(updateFolderDestinationBroadcast).invoke(result, true)
+            verify(setSecondarySyncHandle).invoke(result)
         }
 
     @Test
@@ -56,7 +52,7 @@ class DefaultSetupSecondaryFolderTest {
             underTest(any())
             verify(cameraUploadRepository).setupSecondaryFolder(any())
             verify(cameraUploadRepository).getInvalidHandle()
-            verifyNoMoreInteractions(cameraUploadRepository)
+            verifyNoInteractions(setSecondarySyncHandle)
         }
 
     @Test
