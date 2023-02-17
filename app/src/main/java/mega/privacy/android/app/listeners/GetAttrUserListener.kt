@@ -104,7 +104,7 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                         }
                     }
                     MegaApiJava.USER_ATTR_ALIAS -> if (e.errorCode == MegaError.API_OK) {
-                        ContactUtil.updateDBNickname(api, context, megaStringMap)
+                        ContactUtil.updateDBNickname(api.contacts, context, megaStringMap)
                     } else {
                         Timber.e("Error recovering the alias %s", e.errorCode)
                     }

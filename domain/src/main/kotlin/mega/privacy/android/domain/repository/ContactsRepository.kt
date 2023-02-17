@@ -227,4 +227,10 @@ interface ContactsRepository {
      * @param message Message for the user (can be NULL)
      */
     suspend fun inviteContact(email: String, handle: Long, message: String?): InviteContactRequest
+
+    /**
+     * Get aliases
+     * @return the map of key is user handle and value is user nick name
+     */
+    suspend fun getCurrentUserAliases(): Map<Long, String>
 }

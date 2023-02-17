@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
@@ -47,6 +48,7 @@ internal class UserInfoViewModelTest {
     }
     private val getUserFirstName: GetUserFirstName = mock()
     private val getUserLastName: GetUserLastName = mock()
+    private val getCurrentUserAliases: GetCurrentUserAliases = mock()
     private val context: Context = mock()
 
     @Before
@@ -64,6 +66,7 @@ internal class UserInfoViewModelTest {
             getUserFirstName = getUserFirstName,
             getUserLastName = getUserLastName,
             monitorContactUpdates = monitorContactUpdates,
+            getCurrentUserAliases = getCurrentUserAliases,
             context = context,
         )
     }
@@ -169,6 +172,18 @@ internal class UserInfoViewModelTest {
                 shouldNotify = true
             )
             verifyNoInteractions(getUserFirstName)
+        }
+
+    @Test
+    fun `test that call to GetCurrentUserAliases use case when monitorOtherUsersUpdates emit Alias`() =
+        runTest {
+            initViewModelState()
+            val userId = UserId(123L)
+            val map = mapOf(userId to listOf(UserChanges.Alias))
+            fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
+            verify(getCurrentUserAliases, times(1)).invoke()
+            verifyNoInteractions(getUserFirstName)
+            verifyNoInteractions(getUserLastName)
         }
 
     private suspend fun initViewModelState() {

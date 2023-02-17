@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
@@ -34,6 +35,7 @@ internal class UserInfoViewModel @Inject constructor(
     private val monitorContactUpdates: MonitorContactUpdates,
     private val getUserFirstName: GetUserFirstName,
     private val getUserLastName: GetUserLastName,
+    private val getCurrentUserAliases: GetCurrentUserAliases,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val _state = MutableStateFlow(UserInfoUiState())
@@ -73,6 +75,8 @@ internal class UserInfoViewModel @Inject constructor(
                         skipCache = true,
                         shouldNotify = true
                     )
+                }.onFailure {
+                    Timber.e(it)
                 }
             }
 
@@ -84,6 +88,15 @@ internal class UserInfoViewModel @Inject constructor(
                         skipCache = true,
                         shouldNotify = true
                     )
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
+
+            if (entry.value.contains(UserChanges.Alias)) {
+                Timber.d("I changed the user: ${entry.key.id} nickname")
+                runCatching { getCurrentUserAliases() }.onFailure {
+                    Timber.e(it)
                 }
             }
         }

@@ -53,6 +53,7 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -404,7 +405,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 }
 
                 if (changes.contains(UserChanges.Alias)) {
-                    runCatching { getAliases() }.fold(
+                    runCatching { getCurrentUserAliases() }.fold(
                         onSuccess = { aliases -> aliases },
                         onFailure = { null }
                     )?.let { aliases ->
@@ -466,7 +467,7 @@ internal class DefaultContactsRepository @Inject constructor(
         )
     }
 
-    private suspend fun getAliases(): Map<Long, String> = withContext(ioDispatcher) {
+    override suspend fun getCurrentUserAliases(): Map<Long, String> = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.myUser?.let {
                 megaApiGateway.getUserAttribute(
@@ -476,14 +477,16 @@ internal class DefaultContactsRepository @Inject constructor(
                         onRequestFinish = onRequestGetAliasesCompleted(continuation)
                     )
                 )
-            }
-        }
+            } ?: continuation.resumeWith(Result.failure(NullPointerException("myUser null")))
+        }.also {
+            contactWrapper.updateDBNickname(megaApiGateway.getContacts(), context, it)
+        }.getDecodedAliases()
     }
 
-    private fun onRequestGetAliasesCompleted(continuation: Continuation<Map<Long, String>>) =
+    private fun onRequestGetAliasesCompleted(continuation: Continuation<MegaStringMap>) =
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
-                continuation.resumeWith(Result.success(request.megaStringMap.getDecodedAliases()))
+                continuation.resumeWith(Result.success(request.megaStringMap))
             } else {
                 continuation.failWithError(error)
             }

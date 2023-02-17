@@ -20,6 +20,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
@@ -149,9 +150,9 @@ public class ContactUtil {
         return "";
     }
 
-    public static void updateDBNickname(MegaApiJava api, Context context, MegaStringMap map) {
-        ArrayList<MegaContactAdapter> contactsDB = getContactsDBList(api);
-        if (contactsDB == null || contactsDB.isEmpty()) return;
+    public static void updateDBNickname(List<MegaUser> contacts, Context context, MegaStringMap map) {
+        ArrayList<MegaContactAdapter> contactsDB = getContactsDBList(contacts);
+        if (contactsDB.isEmpty()) return;
         //No nicknames
         if (map == null || map.size() == 0) {
             for (int i = 0; i < contactsDB.size(); i++) {
@@ -178,7 +179,7 @@ public class ContactUtil {
                 }
             }
             String oldNickname = contactsDB.get(i).getMegaContactDB().getNickname();
-            if ((newNickname == null && oldNickname == null) || (newNickname != null && oldNickname != null && newNickname.equals(oldNickname))) {
+            if ((newNickname == null && oldNickname == null) || (newNickname != null && newNickname.equals(oldNickname))) {
                 continue;
             } else {
                 MegaApplication.getInstance().getDbH().setContactNickname(newNickname, contactDBHandle);
@@ -222,9 +223,8 @@ public class ContactUtil {
         }
     }
 
-    private static ArrayList<MegaContactAdapter> getContactsDBList(MegaApiJava api) {
+    private static ArrayList<MegaContactAdapter> getContactsDBList(List<MegaUser> contacts) {
         ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
-        ArrayList<MegaUser> contacts = api.getContacts();
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();

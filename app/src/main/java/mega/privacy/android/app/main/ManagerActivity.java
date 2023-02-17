@@ -9286,11 +9286,6 @@ public class ManagerActivity extends TransfersManagementActivity
                         Timber.d("NOT OWN change");
                         Timber.d("Changes: %s", user.getChanges());
 
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
-                            Timber.d("I changed the user: %d nickname", user.getHandle());
-                            megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_ALIAS, new GetAttrUserListener(this));
-                        }
-
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) {
                             Timber.d("CHANGE_TYPE_EMAIL");
                             if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
