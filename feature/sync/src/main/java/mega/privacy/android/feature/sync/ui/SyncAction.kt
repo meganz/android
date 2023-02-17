@@ -9,11 +9,6 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 sealed interface SyncAction {
 
     /**
-     * @param enabled - is auto sync enabled
-     */
-    data class AutoSyncChecked(val enabled: Boolean) : SyncAction
-
-    /**
      * @param remoteFolder - selected remote folder
      */
     data class RemoteFolderSelected(val remoteFolder: RemoteFolder) : SyncAction
@@ -27,4 +22,9 @@ sealed interface SyncAction {
      * Sync button clicked
      */
     object SyncClicked : SyncAction
+
+    /**
+     * Sync button clicked
+     */
+    object RemoveFolderPairClicked : SyncAction
 }

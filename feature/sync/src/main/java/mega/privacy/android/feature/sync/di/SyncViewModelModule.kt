@@ -1,57 +1,46 @@
 package mega.privacy.android.feature.sync.di
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairs
 import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFolders
-import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFoldersImpl
-import mega.privacy.android.feature.sync.domain.usecase.GetSyncLocalPath
-import mega.privacy.android.feature.sync.domain.usecase.GetSyncRemotePath
-import mega.privacy.android.feature.sync.domain.usecase.SetSyncLocalPath
-import mega.privacy.android.feature.sync.domain.usecase.SetSyncRemotePath
+import mega.privacy.android.feature.sync.domain.usecase.DefaultGetRemoteFolders
+import mega.privacy.android.feature.sync.domain.usecase.ObserveSyncState
+import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairs
+import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPair
 
 /**
  * Dagger module for Sync feature
  */
 @Module
 @InstallIn(ViewModelComponent::class)
-internal class SyncViewModelModule {
+internal interface SyncViewModelModule {
 
-    /**
-     * provides SetSyncLocalPath use case
-     */
-    @Provides
-    fun provideSetSyncLocalPath(syncRepository: SyncRepository): SetSyncLocalPath =
-        SetSyncLocalPath(syncRepository::setSyncLocalPath)
+    companion object {
 
-    /**
-     * provides GetSyncLocalPath use case
-     */
-    @Provides
-    fun provideGetSyncLocalPath(syncRepository: SyncRepository): GetSyncLocalPath =
-        GetSyncLocalPath(syncRepository::getSyncLocalPath)
+        @Provides
+        fun provideGetFolderPairs(syncRepository: SyncRepository): GetFolderPairs =
+            GetFolderPairs(syncRepository::getFolderPairs)
 
-    /**
-     * provides GetSyncRemotePath use case
-     */
-    @Provides
-    fun provideGetSyncRemotePath(syncRepository: SyncRepository): GetSyncRemotePath =
-        GetSyncRemotePath(syncRepository::getSyncRemotePath)
+        @Provides
+        fun provideRemoveFolderPairs(syncRepository: SyncRepository): RemoveFolderPairs =
+            RemoveFolderPairs(syncRepository::removeFolderPairs)
 
-    /**
-     * provides SetSyncRemotePath use case
-     */
-    @Provides
-    fun provideSetSyncRemotePath(syncRepository: SyncRepository): SetSyncRemotePath =
-        SetSyncRemotePath(syncRepository::setSyncRemotePath)
+        @Provides
+        fun provideObserveSyncState(syncRepository: SyncRepository): ObserveSyncState =
+            ObserveSyncState(syncRepository::observeSyncState)
 
-    /**
-     * provides GetRemoteFolders use case
-     */
-    @Provides
-    fun provideGetRemoteFolders(megaNodeRepository: MegaNodeRepository): GetRemoteFolders =
-        GetRemoteFoldersImpl(megaNodeRepository)
+        @Provides
+        fun provideSyncFolderPair(syncRepository: SyncRepository): SyncFolderPair =
+            SyncFolderPair { localPath, remotePath ->
+                syncRepository.setupFolderPair(localPath, remotePath.id)
+            }
+    }
+
+    @Binds
+    fun bindGetRemoteFolders(impl: DefaultGetRemoteFolders): GetRemoteFolders
 }

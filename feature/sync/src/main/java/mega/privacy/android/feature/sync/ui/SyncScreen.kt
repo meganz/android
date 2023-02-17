@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
@@ -36,6 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.FolderPairState.LOADING
+import mega.privacy.android.feature.sync.domain.entity.FolderPairState.RUNNING
 
 /**
  * Composable Sync screen
@@ -56,14 +55,14 @@ fun SyncScreen(
             syncClicked = {
                 syncViewModel.handleAction(SyncAction.SyncClicked)
             },
+            removeClicked = {
+                syncViewModel.handleAction(SyncAction.RemoveFolderPairClicked)
+            },
             chooseLocalFolderClicked = {
                 folderPicker.launch(null)
             },
             remoteFolderSelected = {
                 syncViewModel.handleAction(SyncAction.RemoteFolderSelected(it))
-            },
-            autoSyncChecked = { syncChecked ->
-                syncViewModel.handleAction(SyncAction.AutoSyncChecked(syncChecked))
             },
         )
     }
@@ -86,9 +85,9 @@ private fun getFolderPicker(
 fun SyncView(
     state: SyncState,
     syncClicked: () -> Unit,
+    removeClicked: () -> Unit,
     chooseLocalFolderClicked: () -> Unit,
     remoteFolderSelected: (RemoteFolder) -> Unit,
-    autoSyncChecked: (Boolean) -> Unit,
 ) {
     Box(modifier = Modifier
         .fillMaxSize()
@@ -119,15 +118,13 @@ fun SyncView(
                     remoteFolderSelected(it)
                 })
 
-            Row(Modifier.padding(top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Auto-sync on changes", Modifier.padding(end = 8.dp))
-                AutoSyncCheckbox {
-                    autoSyncChecked(it)
-                }
-            }
+            Spacer(modifier = Modifier.padding(16.dp))
 
-            if (state.isSyncing) {
-                CircularProgressIndicator(color = Color.Black)
+            if (state.status in LOADING..RUNNING) {
+                Text(text = "The folders are paired successfully", color = Color.Black)
+                Button(onClick = removeClicked) {
+                    Text(text = "Remove folder pair")
+                }
             } else {
                 Button(onClick = syncClicked) {
                     Text(text = "Sync now")
@@ -173,17 +170,6 @@ fun RemoteFoldersDropDownMenu(
     }
 }
 
-@Composable
-fun AutoSyncCheckbox(
-    checkedListener: (Boolean) -> Unit,
-) {
-    var checkedState by remember { mutableStateOf(false) }
-    Checkbox(checked = checkedState, onCheckedChange = {
-        checkedListener(it)
-        checkedState = it
-    })
-}
-
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -192,9 +178,9 @@ fun SyncViewPreview() {
         SyncView(
             state = SyncState(),
             syncClicked = {},
+            removeClicked = {},
             remoteFolderSelected = {},
             chooseLocalFolderClicked = { },
-            autoSyncChecked = { },
         )
     }
 }

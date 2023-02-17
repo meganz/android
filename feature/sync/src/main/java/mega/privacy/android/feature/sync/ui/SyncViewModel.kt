@@ -9,10 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.FolderPairState
+import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairs
 import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFolders
-import mega.privacy.android.feature.sync.domain.usecase.GetSyncLocalPath
-import mega.privacy.android.feature.sync.domain.usecase.SetSyncLocalPath
+import mega.privacy.android.feature.sync.domain.usecase.ObserveSyncState
+import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairs
+import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPair
 import javax.inject.Inject
 
 /**
@@ -20,9 +25,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SyncViewModel @Inject constructor(
-    private val getSyncLocalPath: GetSyncLocalPath,
     private val getRemoteFolders: GetRemoteFolders,
-    private val setSyncLocalPath: SetSyncLocalPath,
+    private val syncFolderPair: SyncFolderPair,
+    private val getFolderPairs: GetFolderPairs,
+    private val removeFolderPairs: RemoveFolderPairs,
+    private val observeSyncState: ObserveSyncState,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncState())
@@ -33,16 +40,39 @@ class SyncViewModel @Inject constructor(
     val state: StateFlow<SyncState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            getSyncLocalPath().collectLatest {
-                _state.value = _state.value.copy(selectedLocalFolder = it)
-            }
-        }
+        fetchAllMegaFolders()
+        fetchFirstFolderPair()
+        observeSyncStatus()
+    }
 
+    private fun fetchAllMegaFolders() {
         viewModelScope.launch {
             runCatching { getRemoteFolders() }
                 .onSuccess {
                     _state.value = _state.value.copy(rootMegaRemoteFolders = it)
+                }
+        }
+    }
+
+    private fun fetchFirstFolderPair() {
+        viewModelScope.launch {
+            runCatching { getFirstFolderPair() }
+                .onSuccess { folderPair ->
+                    _state.update {
+                        it.copy(
+                            selectedLocalFolder = folderPair.localFolderPath,
+                            selectedMegaFolder = folderPair.remoteFolder
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun observeSyncStatus() {
+        viewModelScope.launch {
+            observeSyncState.invoke()
+                .collectLatest {
+                    _state.value = _state.value.copy(status = it)
                 }
         }
     }
@@ -52,24 +82,42 @@ class SyncViewModel @Inject constructor(
      */
     fun handleAction(syncAction: SyncAction) {
         when (syncAction) {
-            SyncAction.SyncClicked -> {
-                _state.value = _state.value.copy(isSyncing = true)
-                // This will contain code that syncs local folder with MEGA
+            is SyncAction.SyncClicked -> {
+                _state.value.selectedMegaFolder?.let { remoteFolder ->
+                    viewModelScope.launch {
+                        removeFolderPairs()
+                        syncFolderPair(
+                            _state.value.selectedLocalFolder,
+                            remoteFolder
+                        )
+                    }
+                }
             }
 
             is SyncAction.RemoteFolderSelected -> {
                 _state.value = _state.value.copy(selectedMegaFolder = syncAction.remoteFolder)
             }
 
-            is SyncAction.AutoSyncChecked -> {
-                // This will contain code that will auto sync local folder with MEGA on changes
-            }
-
             is SyncAction.LocalFolderSelected -> {
                 saveSelectedSyncPath(syncAction.path)
             }
+
+            is SyncAction.RemoveFolderPairClicked -> {
+                viewModelScope.launch {
+                    removeFolderPairs()
+                    _state.update {
+                        it.copy(selectedLocalFolder = "",
+                            selectedMegaFolder = null,
+                            status = FolderPairState.DISABLED)
+                    }
+                }
+            }
         }
     }
+
+    // For POC, we are only syncing one folder
+    private suspend fun getFirstFolderPair(): FolderPair =
+        getFolderPairs().first()
 
     /**
      * Saves selected sync path with full path. It also converts relative path to absolute.
@@ -77,6 +125,6 @@ class SyncViewModel @Inject constructor(
     private fun saveSelectedSyncPath(path: Uri) {
         val fullPath = Environment.getExternalStorageDirectory().path +
                 "/" + path.lastPathSegment?.split(":")?.last()
-        setSyncLocalPath(fullPath)
+        _state.value = _state.value.copy(selectedLocalFolder = fullPath)
     }
 }

@@ -1,30 +1,32 @@
 package mega.privacy.android.feature.sync.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 
 /**
- * repository for sync feature
+ * Repository for syncing folder pairs
+ *
  */
-internal interface SyncRepository {
+interface SyncRepository {
 
     /**
-     * saves the the path to local folder that will be synced
+     * Establishes a pair between local and remote directories and starts the syncing process
      */
-    fun setSyncLocalPath(localPath: String)
+    suspend fun setupFolderPair(localPath: String, remoteFolderId: Long)
 
     /**
-     * get the path to local folder that will be synced
+     * Returns all setup folder pairs.
      */
-    fun getSyncLocalPath(): Flow<String>
+    suspend fun getFolderPairs(): List<FolderPair>
 
     /**
-     * saves the the path to remote folder that will be synced
+     * Removes all folder pairs
      */
-    fun setSyncRemotePath(remotePath: RemoteFolder)
+    suspend fun removeFolderPairs()
 
     /**
-     * get the path to remote folder that will be synced
+     * Subscribes to status updates of a sync with the given syncId
      */
-    fun getSyncRemotePath(): Flow<RemoteFolder>
+    fun observeSyncState(): Flow<FolderPairState>
 }
