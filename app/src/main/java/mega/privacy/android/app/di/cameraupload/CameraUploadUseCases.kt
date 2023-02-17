@@ -73,6 +73,7 @@ import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
+import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
@@ -96,6 +97,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
+import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
@@ -733,6 +735,16 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindDisableCameraUploadSettings(disableCameraUploadSettings: DefaultDisableCameraUploadSettings): DisableCameraUploadSettings
+
+    /**
+     * Provide the [DisableCameraUploadsInDatabase] implementation
+     *
+     * @param disableCameraUploadsInDatabase [DefaultDisableCameraUploadsInDatabase]
+     *
+     * @return [DisableCameraUploadsInDatabase]
+     */
+    @Binds
+    abstract fun bindDisableCameraUploadsInDatabase(disableCameraUploadsInDatabase: DefaultDisableCameraUploadsInDatabase): DisableCameraUploadsInDatabase
 
     /**
      * Provide the [DisableMediaUploadSettings] implementation

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
@@ -185,60 +186,71 @@ class RecurringMeetingInfoViewModel @Inject constructor(
         }
 
     /**
+     * Check if is the current scheduled meeting
+     *
+     * @param scheduledMeetReceived [ChatScheduledMeeting]
+     * @return True, if it's same. False otherwise.
+     */
+    private fun isSameScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting): Boolean =
+        state.value.chatId == scheduledMeetReceived.chatId
+
+    /**
      * Get scheduled meeting updates
      */
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
-                when (scheduledMeetReceived.changes) {
-                    ScheduledMeetingChanges.NewScheduledMeeting -> {
-                        if (scheduledMeetReceived.parentSchedId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                            Timber.d("Scheduled meeting exists")
-                            var freq = OccurrenceFrequencyType.Invalid
-                            var until: Long = -1
-                            scheduledMeetReceived.rules?.let { rules ->
-                                freq = rules.freq
-                                until = rules.until ?: -1
-                            }
+                if (isSameScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)) {
+                    Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
+                    when (scheduledMeetReceived.changes) {
+                        ScheduledMeetingChanges.NewScheduledMeeting -> {
+                            if (scheduledMeetReceived.parentSchedId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                                Timber.d("Scheduled meeting exists")
+                                var freq = OccurrenceFrequencyType.Invalid
+                                var until: Long = -1
+                                scheduledMeetReceived.rules?.let { rules ->
+                                    freq = rules.freq
+                                    until = rules.until ?: -1
+                                }
 
-                            _state.update {
-                                it.copy(
-                                    schedTitle = scheduledMeetReceived.title,
-                                    schedId = scheduledMeetReceived.schedId,
-                                    schedUntil = until,
-                                    typeOccurs = freq
-                                )
+                                _state.update {
+                                    it.copy(
+                                        schedTitle = scheduledMeetReceived.title,
+                                        schedId = scheduledMeetReceived.schedId,
+                                        schedUntil = until,
+                                        typeOccurs = freq
+                                    )
+                                }
                             }
                         }
-                    }
-                    ScheduledMeetingChanges.Title -> {
-                        if (scheduledMeetReceived.schedId == state.value.schedId) {
-                            _state.update {
-                                it.copy(
-                                    schedTitle = scheduledMeetReceived.title,
-                                )
+                        ScheduledMeetingChanges.Title -> {
+                            if (scheduledMeetReceived.schedId == state.value.schedId) {
+                                _state.update {
+                                    it.copy(
+                                        schedTitle = scheduledMeetReceived.title,
+                                    )
+                                }
                             }
                         }
-                    }
-                    ScheduledMeetingChanges.RepetitionRules -> {
-                        if (scheduledMeetReceived.schedId == state.value.schedId) {
-                            var freq = OccurrenceFrequencyType.Invalid
-                            var until: Long = -1
-                            scheduledMeetReceived.rules?.let { rules ->
-                                freq = rules.freq
-                                until = rules.until ?: -1
-                            }
+                        ScheduledMeetingChanges.RepetitionRules -> {
+                            if (scheduledMeetReceived.schedId == state.value.schedId) {
+                                var freq = OccurrenceFrequencyType.Invalid
+                                var until: Long = -1
+                                scheduledMeetReceived.rules?.let { rules ->
+                                    freq = rules.freq
+                                    until = rules.until ?: -1
+                                }
 
-                            _state.update {
-                                it.copy(
-                                    schedUntil = until,
-                                    typeOccurs = freq,
-                                )
+                                _state.update {
+                                    it.copy(
+                                        schedUntil = until,
+                                        typeOccurs = freq,
+                                    )
+                                }
                             }
                         }
+                        else -> {}
                     }
-                    else -> {}
                 }
             }
         }

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity
+package mega.privacy.android.domain.entity.verification
 
 
 /**
@@ -10,6 +10,11 @@ sealed interface VerifiedPhoneNumber {
      */
     object NoVerifiedPhoneNumber : VerifiedPhoneNumber
 
+    /**
+     * Phone number
+     *
+     * @property phoneNumberString
+     */
     @JvmInline
     value class PhoneNumber(val phoneNumberString: String) : VerifiedPhoneNumber
 }

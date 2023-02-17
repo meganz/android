@@ -710,7 +710,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     }
                 }
                 cameraUploadWhat?.summary = fileUpload
-                CameraUploadUtil.resetCUTimestampsAndCache()
+                viewModel.resetTimestampsAndCacheDirectory()
                 JobUtil.rescheduleCameraUpload(context)
             }
             KEY_CAMERA_UPLOAD_VIDEO_QUALITY -> {
@@ -763,7 +763,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     dbH.setCamSyncLocalPath(it)
                     localCameraUploadFolder?.summary = it
                 }
-                CameraUploadUtil.resetCUTimestampsAndCache()
+                viewModel.resetTimestampsAndCacheDirectory()
                 JobUtil.rescheduleCameraUpload(context)
 
                 // Update Sync when the Primary Local Folder has changed
@@ -1066,7 +1066,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             JobUtil.fireStopCameraUploadJob(it)
             JobUtil.stopCameraUploadSyncHeartbeatWorkers(it)
         }
-        CameraUploadUtil.disableCameraUploadSettingProcess()
+        viewModel.disableCameraUploadsInDB()
         disableCameraUploadUIProcess()
     }
 

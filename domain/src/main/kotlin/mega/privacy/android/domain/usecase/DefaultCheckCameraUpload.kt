@@ -41,7 +41,7 @@ class DefaultCheckCameraUpload @Inject constructor(
                 backupTimeStampsAndFolderHandle()
                 resetCameraUploadTimeStamps(false)
                 clearCacheDirectory()
-                disableCameraUploadSettings(false)
+                disableCameraUploadSettings()
                 clearSyncRecords()
                 result = result.copy(shouldSendEvent = true)
             }

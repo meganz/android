@@ -55,4 +55,13 @@ internal class MegaApiFolderFacade @Inject constructor(
         thumbnailFilePath: String,
         listener: MegaRequestListenerInterface?,
     ) = megaApiFolder.getThumbnail(node, thumbnailFilePath, listener)
+
+    override fun fetchNodes(listener: MegaRequestListenerInterface) =
+        megaApiFolder.fetchNodes(listener)
+
+    override fun loginToFolder(folderLink: String, listener: MegaRequestListenerInterface) =
+        megaApiFolder.loginToFolder(folderLink, listener)
+
+    override fun removeRequestListener(listener: MegaRequestListenerInterface) =
+        megaApiFolder.removeRequestListener(listener)
 }

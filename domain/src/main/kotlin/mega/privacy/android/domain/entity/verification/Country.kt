@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity.smsVerification
+package mega.privacy.android.domain.entity.verification
 
 /**
  * Country

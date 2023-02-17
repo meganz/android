@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.domain.entity.smsVerification.Country
+import mega.privacy.android.domain.entity.verification.Country
 
 /**
  * Map properties to [Country]

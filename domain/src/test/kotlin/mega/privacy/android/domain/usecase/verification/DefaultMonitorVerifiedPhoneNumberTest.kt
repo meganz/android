@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.VerifiedPhoneNumber
+import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.repository.VerificationRepository
 import org.junit.Before
 import org.junit.Test

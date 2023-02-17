@@ -9282,32 +9282,9 @@ public class ManagerActivity extends TransfersManagementActivity
                     // 0 if the change is external.
                     // >0 if the change is the result of an explicit request
                     // -1 if the change is the result of an implicit request made by the SDK internally
-
-                    if (user.isOwnChange() > 0) {
-                        Timber.d("isOwnChange!!!: %s", user.getEmail());
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)) {
-                            Timber.d("Change on CHANGE_TYPE_RICH_PREVIEWS");
-                            megaApi.shouldShowRichLinkWarning(this);
-                            megaApi.isRichPreviewsEnabled(this);
-                        }
-                    } else {
+                    if (user.isOwnChange() <= 0) {
                         Timber.d("NOT OWN change");
-
                         Timber.d("Changes: %s", user.getChanges());
-
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)) {
-                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("The user: %dchanged his first name", user.getHandle());
-                                megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new GetAttrUserListener(this));
-                            }
-                        }
-
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)) {
-                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("The user: %dchanged his last name", user.getHandle());
-                                megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new GetAttrUserListener(this));
-                            }
-                        }
 
                         if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
                             Timber.d("I changed the user: %d nickname", user.getHandle());

@@ -108,7 +108,7 @@ class DefaultContactsRepositoryTest {
             context = context,
         )
 
-        whenever(megaApiGateway.handleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
+        whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
     }
 
     @Test
@@ -222,7 +222,7 @@ class DefaultContactsRepositoryTest {
         }
         val result =
             underTest.getUserFirstName(handle = userHandle, skipCache = true, shouldNotify = false)
-        verify(databaseHandler, times(1)).setContactName(testName, userEmail)
+        verify(databaseHandler, times(1)).setContactFistName(userHandle, testName)
         verifyNoInteractions(contactWrapper)
 
         assertThat(result).isEqualTo(testName)

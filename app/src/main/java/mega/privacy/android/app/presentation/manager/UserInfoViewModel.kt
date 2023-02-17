@@ -7,16 +7,21 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.contact.GetUserFirstName
+import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +31,9 @@ internal class UserInfoViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val updateMyAvatarWithNewEmail: UpdateMyAvatarWithNewEmail,
+    private val monitorContactUpdates: MonitorContactUpdates,
+    private val getUserFirstName: GetUserFirstName,
+    private val getUserLastName: GetUserLastName,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val _state = MutableStateFlow(UserInfoUiState())
@@ -34,6 +42,7 @@ internal class UserInfoViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorUserUpdates()
+                .catch { Timber.e(it) }
                 .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
                 .collect {
                     when (it) {
@@ -44,6 +53,39 @@ internal class UserInfoViewModel @Inject constructor(
                         else -> Unit
                     }
                 }
+        }
+        viewModelScope.launch {
+            monitorContactUpdates()
+                .catch { Timber.e(it) }
+                .collect {
+                    handleOtherUsersUpdate(it)
+                }
+        }
+    }
+
+    private suspend fun handleOtherUsersUpdate(userUpdate: UserUpdate) {
+        userUpdate.changes.forEach { entry ->
+            if (entry.value.contains(UserChanges.Firstname)) {
+                Timber.d("The user: ${entry.key.id} changed his first name")
+                runCatching {
+                    getUserFirstName(
+                        handle = entry.key.id,
+                        skipCache = true,
+                        shouldNotify = true
+                    )
+                }
+            }
+
+            if (entry.value.contains(UserChanges.Lastname)) {
+                Timber.d("The user: ${entry.key.id} changed his last name")
+                runCatching {
+                    getUserLastName(
+                        handle = entry.key.id,
+                        skipCache = true,
+                        shouldNotify = true
+                    )
+                }
+            }
         }
     }
 

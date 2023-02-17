@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.ClearCacheDirectory
+import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import javax.inject.Inject
@@ -26,14 +29,23 @@ import javax.inject.Inject
 /**
  * [ViewModel] class for SettingsCameraUploadsFragment
  *
- * @param checkEnableCameraUploadsStatus Use Case to check the Camera Uploads status before enabling
+ * @property checkEnableCameraUploadsStatus Check the Camera Uploads status before enabling
+ * @property clearCacheDirectory Clear all the contents of the internal cache directory
+ * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
+ * @property monitorConnectivity Monitor the device online status
+ * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
+ * @property restorePrimaryTimestamps Restore the Primary Timestamps
+ * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    private val clearCacheDirectory: ClearCacheDirectory,
+    private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
+    private val monitorConnectivity: MonitorConnectivity,
+    private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
-    private val monitorConnectivity: MonitorConnectivity,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -79,7 +91,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      *
      * @return Boolean value
      */
-    fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
+    private fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true
         } else {
@@ -172,5 +184,21 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setNotificationPermissionRationaleState(shouldShow: Boolean) {
         _state.update { it.copy(shouldShowNotificationPermissionRationale = shouldShow) }
+    }
+
+    /**
+     * Resets all Timestamps and cleans the Cache Directory
+     */
+    fun resetTimestampsAndCacheDirectory() = viewModelScope.launch {
+        resetCameraUploadTimeStamps(clearCamSyncRecords = true)
+        clearCacheDirectory()
+    }
+
+    /**
+     * Call [disableCameraUploadsInDatabase] to disable Camera Uploads by manipulating
+     * values in the database
+     */
+    fun disableCameraUploadsInDB() = viewModelScope.launch {
+        disableCameraUploadsInDatabase()
     }
 }

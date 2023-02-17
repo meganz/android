@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.VerifiedPhoneNumber
+import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 
 /**
  * Verification repository

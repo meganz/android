@@ -2336,6 +2336,28 @@ class SqliteDatabaseHandler(
             null)
     }
 
+    override fun setContactFistName(handle: Long, firstName: String?): Int {
+        Timber.d("setContactFistName: %d %s", handle, firstName)
+        val values = ContentValues().apply {
+            put(KEY_CONTACT_NAME, encrypt(firstName))
+        }
+        return db.update(TABLE_CONTACTS,
+            values,
+            "$KEY_CONTACT_HANDLE = '${encrypt(handle.toString())}'",
+            null)
+    }
+
+    override fun setContactLastName(handle: Long, lastName: String?): Int {
+        Timber.d("setContactLastName: %d %s", handle, lastName)
+        val values = ContentValues().apply {
+            put(KEY_CONTACT_LAST_NAME, encrypt(lastName))
+        }
+        return db.update(TABLE_CONTACTS,
+            values,
+            "$KEY_CONTACT_HANDLE = '${encrypt(handle.toString())}'",
+            null)
+    }
+
     override fun findContactByHandle(handleParam: String?): MegaContactDB? {
         Timber.d("findContactByHandle: %s", handleParam)
         val selectQuery =

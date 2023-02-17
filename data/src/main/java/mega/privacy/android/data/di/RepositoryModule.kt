@@ -38,6 +38,7 @@ import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
+import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
@@ -221,5 +223,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindViewTypeRepository(implementation: ViewTypeRepositoryImpl): ViewTypeRepository
+
+    @Binds
+    abstract fun bindFolderLinkRepository(implementation: FolderLinkRepositoryImpl): FolderLinkRepository
 
 }

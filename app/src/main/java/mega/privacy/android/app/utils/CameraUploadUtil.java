@@ -1,7 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.utils.Constants.SEPARATOR;
-import static mega.privacy.android.app.utils.FileUtil.purgeDirectory;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.data.facade.CameraUploadMediaFacadeKt.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE;
@@ -13,10 +11,6 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
-
-import java.io.File;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -113,26 +107,9 @@ public class CameraUploadUtil {
         return shouldCUStop;
     }
 
-    /**
-     * set all the time stamps to 0 for uploading, clean the cache directory for gps process
-     * and clean the sync record by default
-     */
-    public static void resetCUTimestampsAndCache() {
-        resetCUTimestampsAndCache(true);
-    }
-
     public static void resetMUTimestampsAndCache() {
         dbH.setSecSyncTimeStamp(0);
         dbH.setSecVideoSyncTimeStamp(0);
-    }
-
-    public static void resetCUTimestampsAndCache(boolean clearCamsynRecords) {
-        dbH.setCamSyncTimeStamp(0);
-        dbH.setCamVideoSyncTimeStamp(0);
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-        dbH.saveShouldClearCamsyncRecords(clearCamsynRecords);
-        purgeDirectory(new File(app.getCacheDir().toString() + SEPARATOR));
     }
 
     public static boolean isPrimaryEnabled() {
@@ -145,35 +122,9 @@ public class CameraUploadUtil {
         return prefs != null && Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
     }
 
-    /**
-     * This method is to disable the CU and MU settings in database
-     *
-     * @param clearCamsyncRecords the boolean setting whether to clean the cam record
-     */
-    public static void disableCameraUploadSettingProcess(boolean clearCamsyncRecords) {
-        resetCUTimestampsAndCache(clearCamsyncRecords);
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (dbH.shouldClearCamsyncRecords()) {
-                dbH.deleteAllSyncRecordsTypeAny();
-                dbH.saveShouldClearCamsyncRecords(false);
-            }
-        }, 10 * 1000);
-
-        // disable both primary and secondary.
-        dbH.setCamSyncEnabled(false);
-        dbH.setSecondaryUploadEnabled(false);
-    }
-
     public static void disableMediaUploadProcess() {
         resetMUTimestampsAndCache();
         dbH.setSecondaryUploadEnabled(false);
-    }
-
-    /**
-     * This method is to disable the settings in database, clean the sync records by default
-     */
-    public static void disableCameraUploadSettingProcess() {
-        disableCameraUploadSettingProcess(true);
     }
 
     /**

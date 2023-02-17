@@ -93,6 +93,7 @@ import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
+import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
@@ -505,6 +506,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
      */
     @Inject
     lateinit var cameraServiceWifiLockHandler: CameraServiceWifiLockHandler
+
+    /**
+     * Disable Camera Uploads in Database
+     */
+    @Inject
+    lateinit var disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase
 
     /**
      * Coroutine Scope for camera upload work
@@ -1390,7 +1397,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback,
             R.string.camera_notif_primary_local_unavailable,
             LOCAL_FOLDER_REMINDER_PRIMARY
         )
-        CameraUploadUtil.disableCameraUploadSettingProcess()
+        disableCameraUploadsInDatabase()
         setSyncLocalPath(Constants.INVALID_NON_NULL_VALUE)
         setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment

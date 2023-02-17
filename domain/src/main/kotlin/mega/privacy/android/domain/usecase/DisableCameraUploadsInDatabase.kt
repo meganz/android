@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Disable Camera Upload Setting
+ * Use Case to disable Camera Uploads by manipulating values in the database
  */
-fun interface DisableCameraUploadSettings {
+fun interface DisableCameraUploadsInDatabase {
 
     /**
      * Invocation function
