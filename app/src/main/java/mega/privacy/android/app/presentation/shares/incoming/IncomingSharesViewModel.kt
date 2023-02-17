@@ -11,10 +11,8 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
@@ -36,7 +34,6 @@ class IncomingSharesViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
 ) : ViewModel() {
 
@@ -69,10 +66,6 @@ class IncomingSharesViewModel @Inject constructor(
                     }
                 refreshNodes()?.let { setNodes(it) }
             }
-        }
-
-        viewModelScope.launch {
-            isMandatoryFingerprintRequired()
         }
 
         viewModelScope.launch {
@@ -207,14 +200,5 @@ class IncomingSharesViewModel @Inject constructor(
             .takeUnless { it == -1L || it == INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
             ?: true
-    }
-
-    /**
-     * Gets the feature flag value & updates state
-     */
-    private suspend fun isMandatoryFingerprintRequired() {
-        _state.update {
-            it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
-        }
     }
 }

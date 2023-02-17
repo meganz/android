@@ -10,13 +10,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetCredentials
@@ -41,7 +39,6 @@ class AuthenticityCredentialsViewModel @Inject constructor(
     private val verifyCredentials: VerifyCredentials,
     private val resetCredentials: ResetCredentials,
     monitorConnectivity: MonitorConnectivity,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthenticityCredentialsState())
@@ -54,7 +51,6 @@ class AuthenticityCredentialsViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(myAccountCredentials = getMyCredentials()) }
         }
-        getMandatoryFingerPrintVerificationFeatureFlag()
     }
 
     /**
@@ -147,12 +143,4 @@ class AuthenticityCredentialsViewModel @Inject constructor(
      * Updates state after shown error.
      */
     fun errorShown() = _state.update { it.copy(error = null) }
-
-    private fun getMandatoryFingerPrintVerificationFeatureFlag() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(isMandatoryFingerPrintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
-            }
-        }
-    }
 }

@@ -20,7 +20,6 @@ import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -71,14 +70,7 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
-
-    private val getFeatureFlagValue =
-        mock<GetFeatureFlagValue> {
-            onBlocking {
-                invoke(AppFeatures.MandatoryFingerprintVerification)
-            }.thenReturn(true)
-        }
-
+    private val getFeatureFlagValue = mock<GetFeatureFlagValue>()
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
     private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
 

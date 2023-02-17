@@ -45,14 +45,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     SetSecureFlag("Sets the secure flag value for MegaApi", false),
 
     /**
-     * Indicates if the user is cryptographically secure
-     */
-    MandatoryFingerprintVerification(
-        "Indicates if mandatory fingerprint verification needs to be done",
-        false
-    ),
-
-    /**
      * User albums toggle
      */
     UserAlbums("Enable user albums feature", false),

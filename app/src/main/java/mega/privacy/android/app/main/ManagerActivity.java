@@ -336,8 +336,8 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
 import mega.privacy.android.app.presentation.login.LoginActivity;
@@ -2467,7 +2467,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             // Update pending actions badge on bottom navigation menu
-            if (managerState.isMandatoryFingerprintVerificationNeeded() && managerState.getPendingActionsCount() > 0) {
+            if (managerState.getPendingActionsCount() > 0) {
                 BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
                 View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
                 sharedItemsView.addView(pendingActionsBadge);

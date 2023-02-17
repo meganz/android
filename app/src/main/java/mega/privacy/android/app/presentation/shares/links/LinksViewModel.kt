@@ -10,10 +10,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.shares.links.model.LinksState
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import nz.mega.sdk.MegaApiJava
@@ -33,7 +31,6 @@ class LinksViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getLinksSortOrder: GetLinksSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
 ) : ViewModel() {
 
     /** private UI state */
@@ -45,14 +42,6 @@ class LinksViewModel @Inject constructor(
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
-    private val _mandatoryFingerPrintVerificationState = MutableStateFlow(false)
-
-    /**
-     * State for [MandatoryFingerPrintVerification] feature flag value
-     */
-    val mandatoryFingerPrintVerificationState: StateFlow<Boolean> =
-        _mandatoryFingerPrintVerificationState
-
     init {
         viewModelScope.launch {
             refreshNodes()?.let { setNodes(it) }
@@ -61,7 +50,6 @@ class LinksViewModel @Inject constructor(
                 refreshNodes()?.let { setNodes(it) }
             }
         }
-        isMandatoryFingerprintRequired()
     }
 
     /**
@@ -181,16 +169,5 @@ class LinksViewModel @Inject constructor(
             .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
             ?: true
-    }
-
-    /**
-     * Gets the feature flag value & updates state
-     */
-    private fun isMandatoryFingerprintRequired() {
-        viewModelScope.launch {
-            _mandatoryFingerPrintVerificationState.update {
-                getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification)
-            }
-        }
     }
 }

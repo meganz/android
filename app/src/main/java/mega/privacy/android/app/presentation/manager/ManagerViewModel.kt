@@ -55,9 +55,9 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
-import nz.mega.sdk.MegaEvent
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -172,12 +172,6 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _state.update {
-                it.copy(isMandatoryFingerprintVerificationNeeded = getFeatureFlagValue(AppFeatures.MandatoryFingerprintVerification))
-            }
-        }
-
-        viewModelScope.launch {
             val incomingShares = getUnverifiedIncomingShares(getCloudSortOrder()).size
             _state.update {
                 it.copy(pendingActionsCount = _state.value.pendingActionsCount + incomingShares)
@@ -193,7 +187,7 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             updateGlobalEvents.collect { megaEvent ->
-                if (_state.value.isMandatoryFingerprintVerificationNeeded && megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
+                if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
                     _state.update {
                         it.copy(shouldAlertUserAboutSecurityUpgrade = true)
                     }

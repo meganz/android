@@ -132,56 +132,44 @@ fun ContactCredentials(
     Box(modifier = Modifier
         .fillMaxSize()
         .background(color = if (MaterialTheme.colors.isLight) white else dark_grey)) {
-        val name = if (state.isMandatoryFingerPrintVerificationNeeded) {
-            state.contactCredentials?.name ?: ""
-        } else {
-            stringResource(id = R.string.label_contact_credentials,
-                state.contactCredentials?.name ?: "")
-        }
 
         Column {
-            if (state.isMandatoryFingerPrintVerificationNeeded) {
-                if (isBannerVisible) {
-                    Box(modifier = Modifier
-                        .testTag("CONTACT_VERIFICATION_BANNER_VIEW")
-                        .fillMaxWidth()
-                        .background(color = yellow_100),
-                        contentAlignment = Alignment.CenterEnd) {
-                        Text(modifier = Modifier.padding(start = 24.dp,
-                            top = 14.dp,
-                            bottom = 14.dp,
-                            end = 48.dp),
-                            style = MaterialTheme.typography.body2,
-                            color = black,
-                            text = stringResource(id = R.string.shared_items_verify_credentials_verify_person_banner_label))
+            if (isBannerVisible) {
+                Box(modifier = Modifier
+                    .testTag("CONTACT_VERIFICATION_BANNER_VIEW")
+                    .fillMaxWidth()
+                    .background(color = yellow_100),
+                    contentAlignment = Alignment.CenterEnd) {
+                    Text(modifier = Modifier.padding(start = 24.dp,
+                        top = 14.dp,
+                        bottom = 14.dp,
+                        end = 48.dp),
+                        style = MaterialTheme.typography.body2,
+                        color = black,
+                        text = stringResource(id = R.string.shared_items_verify_credentials_verify_person_banner_label))
 
-                        IconButton(
-                            onClick = { isBannerVisible = false },
-                            modifier = Modifier.padding(start = 310.dp),
-                            enabled = true,
-                            content = {
-                                Icon(painter = painterResource(id = R.drawable.ic_remove_chat_toolbar),
-                                    contentDescription = "")
-                            }
-                        )
-                    }
+                    IconButton(
+                        onClick = { isBannerVisible = false },
+                        modifier = Modifier.padding(start = 310.dp),
+                        enabled = true,
+                        content = {
+                            Icon(painter = painterResource(id = R.drawable.ic_remove_chat_toolbar),
+                                contentDescription = "")
+                        }
+                    )
                 }
-
-                Text(modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp),
-                    style = MaterialTheme.typography.body2,
-                    color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
-                    text = if (state.isMandatoryFingerPrintVerificationNeeded) {
-                        // This lint is expected for now. This will get removed later when more conditions are added to decide the text
-                        stringResource(id = R.string.shared_items_verify_credentials_header_incoming)
-                    } else {
-                        stringResource(id = R.string.shared_items_verify_credentials_header_outgoing)
-                    })
             }
+
+            Text(modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp),
+                style = MaterialTheme.typography.body2,
+                color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
+                text = stringResource(id = R.string.shared_items_verify_credentials_header_outgoing))
 
             Text(modifier = Modifier.padding(top = 19.dp, start = 72.dp, end = 72.dp),
                 style = MaterialTheme.typography.subtitle1,
                 color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
-                text = name)
+                text = stringResource(id = R.string.label_contact_credentials,
+                    state.contactCredentials?.name ?: ""))
 
             Text(modifier = Modifier.padding(start = 72.dp, end = 72.dp),
                 style = MaterialTheme.typography.body2,
@@ -219,14 +207,8 @@ fun ContactCredentials(
 @Composable
 fun MyCredentials(state: AuthenticityCredentialsState) {
 
-    var credentialsExplanation = stringResource(id = R.string.authenticity_credentials_explanation)
-    var yourCredentials = stringResource(id = R.string.label_your_credentials)
-    if (state.isMandatoryFingerPrintVerificationNeeded) {
-        credentialsExplanation =
-            stringResource(id = R.string.shared_items_verify_credentials_information)
-        yourCredentials =
-            stringResource(id = R.string.shared_items_verify_credentials_my_credentials)
-    }
+    val credentialsExplanation = stringResource(id = R.string.authenticity_credentials_explanation)
+    val yourCredentials = stringResource(id = R.string.label_your_credentials)
 
     Text(modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp),
         style = MaterialTheme.typography.body2,
