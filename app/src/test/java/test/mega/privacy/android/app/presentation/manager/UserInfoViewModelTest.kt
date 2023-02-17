@@ -11,10 +11,15 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.contact.GetUserFirstName
+import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +27,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
@@ -32,9 +38,15 @@ internal class UserInfoViewModelTest {
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val updateMyAvatarWithNewEmail: UpdateMyAvatarWithNewEmail = mock()
     private val fakeMonitorUserUpdates = MutableSharedFlow<UserChanges>()
+    private val fakeMonitorOtherUsersUpdates = MutableSharedFlow<UserUpdate>()
     private val monitorUserUpdates: MonitorUserUpdates = mock {
         on { invoke() }.thenReturn(fakeMonitorUserUpdates)
     }
+    private val monitorContactUpdates: MonitorContactUpdates = mock {
+        on { invoke() }.thenReturn(fakeMonitorOtherUsersUpdates)
+    }
+    private val getUserFirstName: GetUserFirstName = mock()
+    private val getUserLastName: GetUserLastName = mock()
     private val context: Context = mock()
 
     @Before
@@ -49,6 +61,9 @@ internal class UserInfoViewModelTest {
             getCurrentUserEmail = getCurrentUserEmail,
             monitorUserUpdates = monitorUserUpdates,
             updateMyAvatarWithNewEmail = updateMyAvatarWithNewEmail,
+            getUserFirstName = getUserFirstName,
+            getUserLastName = getUserLastName,
+            monitorContactUpdates = monitorContactUpdates,
             context = context,
         )
     }
@@ -106,4 +121,67 @@ internal class UserInfoViewModelTest {
                 assertEquals(expectedNewEmail, item.email)
             }
         }
+
+    @Test
+    fun `test that call to getUserFirstName and getUserLastName use case when monitorOtherUsersUpdates emit Firstname and Lastname`() =
+        runTest {
+            initViewModelState()
+            val userId = UserId(123L)
+            val map = mapOf(userId to listOf(UserChanges.Firstname, UserChanges.Lastname))
+            fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
+            verify(getUserFirstName, times(1)).invoke(
+                handle = userId.id,
+                skipCache = true,
+                shouldNotify = true
+            )
+            verify(getUserLastName, times(1)).invoke(
+                handle = userId.id,
+                skipCache = true,
+                shouldNotify = true
+            )
+        }
+
+    @Test
+    fun `test that call to getUserFirstName use case when monitorOtherUsersUpdates emit Firstname`() =
+        runTest {
+            initViewModelState()
+            val userId = UserId(123L)
+            val map = mapOf(userId to listOf(UserChanges.Firstname))
+            fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
+            verify(getUserFirstName, times(1)).invoke(
+                handle = userId.id,
+                skipCache = true,
+                shouldNotify = true
+            )
+            verifyNoInteractions(getUserLastName)
+        }
+
+    @Test
+    fun `test that call to getUserLastName use case when monitorOtherUsersUpdates emit LastName`() =
+        runTest {
+            initViewModelState()
+            val userId = UserId(123L)
+            val map = mapOf(userId to listOf(UserChanges.Lastname))
+            fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
+            verify(getUserLastName, times(1)).invoke(
+                handle = userId.id,
+                skipCache = true,
+                shouldNotify = true
+            )
+            verifyNoInteractions(getUserFirstName)
+        }
+
+    private suspend fun initViewModelState() {
+        val expectedEmail = "myEmail"
+        val expectedName = "myName"
+        whenever(context.getString(any())).thenReturn("")
+        whenever(getCurrentUserFullName(true, "", "")).thenReturn(expectedName)
+        whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
+        underTest.getUserInfo()
+        underTest.state.test {
+            awaitItem()
+            awaitItem()
+            awaitItem()
+        }
+    }
 }

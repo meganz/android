@@ -5,11 +5,11 @@ import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.user.UserCredentials
 
 interface DatabaseHandler {
 
@@ -196,6 +196,8 @@ interface DatabaseHandler {
     fun setContactLastName(lastName: String?, mail: String?): Int
     fun setContactNickname(nickname: String?, handle: Long): Int
     fun setContactMail(handle: Long, mail: String?): Int
+    fun setContactFistName(handle: Long, firstName: String?): Int
+    fun setContactLastName(handle: Long, lastName: String?): Int
 
     fun exists(handle: Long): Boolean
     fun removeById(id: Int): Int

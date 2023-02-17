@@ -325,9 +325,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             }.also { request ->
-                if (!request.email.isNullOrEmpty()) {
-                    databaseHandler.setContactName(request.text, request.email)
-                }
+                databaseHandler.setContactFistName(handle, request.text)
                 if (shouldNotify) {
                     contactWrapper.notifyFirstNameUpdate(context, handle)
                 }
@@ -355,9 +353,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             }.also { request ->
-                if (!request.email.isNullOrEmpty()) {
-                    databaseHandler.setContactLastName(request.text, request.email)
-                }
+                databaseHandler.setContactLastName(handle, request.text)
                 if (shouldNotify) {
                     contactWrapper.notifyLastNameUpdate(context, handle)
                 }
@@ -682,5 +678,5 @@ internal class DefaultContactsRepository @Inject constructor(
     }
 
     private fun Long.toBase64Handle(): String =
-        megaApiGateway.handleToBase64(this)
+        megaApiGateway.userHandleToBase64(this)
 }
