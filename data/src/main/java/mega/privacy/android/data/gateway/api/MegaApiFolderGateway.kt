@@ -102,4 +102,26 @@ interface MegaApiFolderGateway {
         thumbnailFilePath: String,
         listener: MegaRequestListenerInterface? = null,
     )
+
+    /**
+     * Fetch the filesystem in MEGA
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun fetchNodes(listener: MegaRequestListenerInterface)
+
+    /**
+     * Log in to a public folder using a folder link
+     *
+     * @param folderLink Public link to a folder in MEGA
+     * @param listener   MegaRequestListener to track this request
+     */
+    fun loginToFolder(folderLink: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Remove request listener
+     *
+     * @param listener MegaRequestListener to remove
+     */
+    fun removeRequestListener(listener: MegaRequestListenerInterface)
 }
