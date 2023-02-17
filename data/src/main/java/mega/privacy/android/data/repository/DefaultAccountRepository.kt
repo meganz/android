@@ -637,7 +637,7 @@ internal class DefaultAccountRepository @Inject constructor(
         newPassword: String,
         masterKey: String?,
     ) = suspendCancellableCoroutine { continuation ->
-        val listener = continuation.getRequestListener { it.flag }
+        val listener = continuation.getRequestListener { it.email.isNotBlank() }
         megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)
         continuation.invokeOnCancellation {
             megaApiGateway.removeRequestListener(listener)
@@ -661,7 +661,8 @@ internal class DefaultAccountRepository @Inject constructor(
         private const val PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager"
         private const val PREFERENCE_VARIANT_REACTION = "variant-reaction-manager"
         private const val LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp"
-        private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
+        private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED =
+            "settings_audio_background_play_enabled"
         private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
         private const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
     }

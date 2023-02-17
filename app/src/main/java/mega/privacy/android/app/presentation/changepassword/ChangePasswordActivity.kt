@@ -42,14 +42,11 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener,
-    MegaRequestListenerInterface {
+internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener {
     @ApplicationScope
     @Inject
     internal lateinit var sharingScope: CoroutineScope
@@ -69,6 +66,9 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     private val binding: ActivityChangePasswordBinding by lazy(LazyThreadSafetyMode.NONE) {
         ActivityChangePasswordBinding.inflate(layoutInflater)
     }
+
+    private val passwordText: String
+        get() = binding.changePasswordNewPassword1.text.toString()
 
     private val progress: AlertDialog by lazy(LazyThreadSafetyMode.NONE) {
         createProgressDialog(this, getString(R.string.my_account_changing_password))
@@ -211,6 +211,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             handleLoadingProgressState(state)
             handleMultiFactorAuthState(state)
             handlePasswordChangedState(state)
+            handlePasswordResetState(state)
             handlePasswordValidationState(state)
         }
     }
@@ -246,17 +247,44 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             if (intent != null && intent.getBooleanExtra(KEY_IS_LOGOUT, false)) {
                 AccountController.logout(this, megaApi, sharingScope)
             } else {
-                //Intent to MyAccount
-                val intent = Intent(this, ManagerActivity::class.java).apply {
-                    action = Constants.ACTION_PASS_CHANGED
-                    putExtra(Constants.RESULT, MegaError.API_OK)
-                }
-                startActivity(intent)
-                finish()
+                navigateAfterPasswordChanged()
             }
 
-            viewModel.onChangedPasswordShown()
+            viewModel.onPasswordChanged()
         }
+    }
+
+    private fun handlePasswordResetState(state: ChangePasswordUIState) {
+        if (state.isPasswordReset) {
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+            navigateAfterPasswordReset(state.isUserLoggedIn, state.errorCode)
+            viewModel.onPasswordReset()
+        }
+    }
+
+    private fun navigateAfterPasswordChanged() {
+        val intent = Intent(this, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_PASS_CHANGED
+            putExtra(Constants.RESULT, MegaError.API_OK)
+        }
+        startActivity(intent)
+        finish()
+    }
+
+    private fun navigateAfterPasswordReset(isUserLoggedIn: Boolean, errorCode: Int?) {
+        val intent: Intent = if (isUserLoggedIn) {
+            Intent(this, ManagerActivity::class.java)
+        } else {
+            Intent(this, LoginActivity::class.java).apply {
+                putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+            }
+        }.apply {
+            action = Constants.ACTION_PASS_CHANGED
+            putExtra(Constants.RESULT, errorCode)
+        }
+
+        startActivity(intent)
+        finish()
     }
 
     private fun handlePasswordValidationState(state: ChangePasswordUIState) {
@@ -313,13 +341,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                             getString(R.string.general_error_word)
                         )
                     } else {
-                        if (mk == null) {
-                            Timber.d("Proceed to park account")
-                            onResetPasswordClick(false)
-                        } else {
-                            Timber.d("Ok proceed to reset")
-                            onResetPasswordClick(true)
-                        }
+                        onResetPasswordClick()
                     }
                 }
             }
@@ -554,40 +576,32 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
     }
 
-    private fun onResetPasswordClick(hasMk: Boolean) {
-        Timber.d("hasMk: %s", hasMk)
-        if (viewModel.isConnectedToNetwork().not()) {
-            showSnackbar(getString(R.string.error_server_connection_problem))
-            return
-        }
-        if (!validateForm(false)) {
-            return
-        }
-        imm.hideSoftInputFromWindow(binding.changePasswordNewPassword1.windowToken, 0)
-        imm.hideSoftInputFromWindow(binding.changePasswordNewPassword2.windowToken, 0)
-        val newPass1 = binding.changePasswordNewPassword1.text.toString()
-        progress.setMessage(getString(R.string.my_account_changing_password))
-        progress.show()
-        if (hasMk) {
-            Timber.d("reset with mk")
-            megaApi.confirmResetPassword(linkToReset, newPass1, mk, this)
-        } else {
-            megaApi.confirmResetPassword(linkToReset, newPass1, null, this)
+    private fun onResetPasswordClick() {
+        validatePassword(withOldPassword = false) {
+            viewModel.onExecuteResetPassword(linkToReset, passwordText, mk)
         }
     }
 
     private fun onChangePasswordClick() {
-        Timber.d("onChangePasswordClick")
+        validatePassword(withOldPassword = true) {
+            viewModel.onUserClickChangePassword(passwordText)
+        }
+    }
+
+    private fun validatePassword(withOldPassword: Boolean, onValidated: () -> Unit) {
         if (viewModel.isConnectedToNetwork().not()) {
             showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
-        if (!validateForm(true)) {
+        if (!validateForm(withOldPassword)) {
             return
         }
-        imm.hideSoftInputFromWindow(binding.changePasswordNewPassword1.windowToken, 0)
-        imm.hideSoftInputFromWindow(binding.changePasswordNewPassword2.windowToken, 0)
-        viewModel.onUserClickChangePassword(binding.changePasswordNewPassword1.text.toString())
+
+        listOf(binding.changePasswordNewPassword1, binding.changePasswordNewPassword2).forEach {
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+
+        onValidated()
     }
 
     /*
@@ -628,7 +642,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
      * Validate new password1
      */
     private fun getNewPassword1Error(): String? {
-        val value = binding.changePasswordNewPassword1.text.toString()
+        val value = passwordText
         return when {
             value.isEmpty() -> getString(R.string.error_enter_password)
             megaApi.checkPassword(value) -> StringResourcesUtils.getString(R.string.error_same_password)
@@ -644,55 +658,13 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
      */
     private fun getNewPassword2Error(): String? {
         val value = binding.changePasswordNewPassword2.text.toString()
-        val confirm = binding.changePasswordNewPassword1.text.toString()
+        val confirm = passwordText
         if (value.isEmpty()) {
             return getString(R.string.error_enter_password)
         } else if (value != confirm) {
             return getString(R.string.error_passwords_dont_match)
         }
         return null
-    }
-
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart: %s", request.name)
-    }
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish")
-        when (request.type) {
-            MegaRequest.TYPE_CONFIRM_RECOVERY_LINK -> {
-                Timber.d("TYPE_CONFIRM_RECOVERY_LINK")
-                try {
-                    progress.dismiss()
-                } catch (ex: Exception) {
-                    Timber.w(ex, "Exception dismissing progress dialog")
-                }
-                if (e.errorCode != MegaError.API_OK) {
-                    Timber.w(
-                        "e.getErrorCode = %d__ e.getErrorString = %s",
-                        e.errorCode,
-                        e.errorString
-                    )
-                } else {
-                    window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-                }
-                val resetPassIntent: Intent
-                if (megaApi.rootNode == null) {
-                    Timber.d("Not logged in")
-
-                    //Intent to Login
-                    resetPassIntent = Intent(this, LoginActivity::class.java)
-                    resetPassIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                } else {
-                    Timber.d("Logged IN")
-                    resetPassIntent = Intent(this, ManagerActivity::class.java)
-                }
-                resetPassIntent.action = Constants.ACTION_PASS_CHANGED
-                resetPassIntent.putExtra(Constants.RESULT, e.errorCode)
-                startActivity(resetPassIntent)
-                finish()
-            }
-        }
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -738,22 +710,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 binding.changePasswordNewPassword2ErrorIcon.visibility = View.GONE
             }
         }
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaApiJava, request: MegaRequest,
-        e: MegaError,
-    ) {
-        Timber.w("onRequestTemporaryError: %s", request.name)
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-
-    }
-
-    public override fun onDestroy() {
-        megaApi.removeRequestListener(this)
-        super.onDestroy()
     }
 
     private fun showSnackbar(s: String) {
