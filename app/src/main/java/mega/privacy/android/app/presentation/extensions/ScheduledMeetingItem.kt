@@ -123,10 +123,24 @@ fun ScheduledMeetingItem.getZoneStartTime(): ZonedDateTime? = startDateTime?.par
 /**
  * True, the scheduled meeting has passed. False, otherwise.
  */
-fun ScheduledMeetingItem.isPast(): Boolean =
-    ZonedDateTime.now()
+fun ScheduledMeetingItem.isPast(): Boolean {
+    val now = ZonedDateTime.now()
         .withZoneSameInstant(ZoneOffset.UTC)
-        .isAfter(endDateTime?.parseDate())
+
+    this.rules?.let { rules ->
+        if (rules.until == 0L) {
+            return false
+        }
+
+        return now.isAfter(rules.until.parseDate())
+    }
+
+    this.endDateTime?.let { endDateTime ->
+        return now.isAfter(endDateTime.parseDate())
+    }
+
+    return false
+}
 
 private fun Long.parseDate(): ZonedDateTime =
     ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
