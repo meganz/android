@@ -11,8 +11,10 @@ typealias ChatScheduledMeetingOccurrMapper = (@JvmSuppressWildcards MegaChatSche
 internal fun toChatScheduledMeetingOccur(megaChatScheduledMeetingOccurr: MegaChatScheduledMeetingOccurr): ChatScheduledMeetingOccurr =
     ChatScheduledMeetingOccurr(
         megaChatScheduledMeetingOccurr.schedId(),
+        megaChatScheduledMeetingOccurr.parentSchedId(),
         megaChatScheduledMeetingOccurr.cancelled(),
         megaChatScheduledMeetingOccurr.timezone(),
         megaChatScheduledMeetingOccurr.startDateTime(),
         megaChatScheduledMeetingOccurr.endDateTime(),
+        megaChatScheduledMeetingOccurr.overrides(),
     )

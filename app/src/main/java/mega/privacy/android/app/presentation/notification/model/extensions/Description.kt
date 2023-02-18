@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.UpdatedScheduledMeetingCancelAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDateTimeAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingDescriptionAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingFieldsAlert
-import mega.privacy.android.domain.entity.UpdatedScheduledMeetingRulesAlert
 import mega.privacy.android.domain.entity.UpdatedScheduledMeetingTitleAlert
 import mega.privacy.android.domain.entity.UserAlert
 
@@ -127,12 +126,6 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                 }
                 context.getFormattedStringOrDefault(stringRes, email)
                     .spanABTextFontColour(context)
-            }
-            is UpdatedScheduledMeetingRulesAlert -> {
-                context.getFormattedStringOrDefault(
-                    R.string.notification_subtitle_scheduled_recurring_meeting_updated_frequency,
-                    email
-                ).spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingFieldsAlert -> {
                 val stringRes = if (isRecurring) {

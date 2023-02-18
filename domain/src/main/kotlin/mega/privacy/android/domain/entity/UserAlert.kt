@@ -716,35 +716,6 @@ data class UpdatedScheduledMeetingCancelAlert(
 ) : UserAlert, ScheduledMeetingAlert
 
 /**
- * Updated scheduled meeting rules alert
- *
- * @property id
- * @property seen
- * @property createdTime
- * @property isOwnChange
- * @property chatId
- * @property title
- * @property email
- * @property startDate
- * @property endDate
- * @property isRecurring
- * @property isOccurrence
- */
-data class UpdatedScheduledMeetingRulesAlert(
-    override val id: Long,
-    override val seen: Boolean,
-    override val createdTime: Long,
-    override val isOwnChange: Boolean,
-    override val chatId: Long,
-    override val title: String,
-    override val email: String,
-    override val startDate: Long?,
-    override val endDate: Long?,
-    override val isRecurring: Boolean,
-    override val isOccurrence: Boolean,
-) : UserAlert, ScheduledMeetingAlert
-
-/**
  * Updated scheduled meeting fields alert
  *
  * @property id

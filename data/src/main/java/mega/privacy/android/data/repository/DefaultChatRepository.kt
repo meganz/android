@@ -249,23 +249,22 @@ internal class DefaultChatRepository @Inject constructor(
                     since,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                            val list = request.megaChatScheduledMeetingOccurrList
-                            when {
-                                error.errorCode == MegaChatError.ERROR_OK && list != null -> {
-                                    val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                    for (i in 0 until list.size()) {
-                                        occurrences.add(
-                                            chatScheduledMeetingOccurrMapper(list.at(i))
-                                        )
+                            if (error.errorCode == MegaChatError.ERROR_OK
+                                && (request.megaChatScheduledMeetingOccurrList?.size() ?: 0) > 0
+                            ) {
+                                val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                                request.megaChatScheduledMeetingOccurrList.apply {
+                                    for (i in 0 until size()) {
+                                        occurrences.add(chatScheduledMeetingOccurrMapper(at(i)))
                                     }
-                                    continuation.resume(occurrences)
                                 }
-                                else -> {
-                                    continuation.failWithError(error)
-                                }
+                                continuation.resume(occurrences)
+                            } else {
+                                continuation.failWithError(error)
                             }
                         }
-                    ))
+                    )
+                )
             }
         }
 

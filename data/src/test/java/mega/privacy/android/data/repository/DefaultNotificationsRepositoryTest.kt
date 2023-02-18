@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.NodeProvider
 import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
 import mega.privacy.android.data.mapper.UserAlertContactProvider
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.UserAlertScheduledMeetingOccurrProvider
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -42,13 +44,12 @@ class DefaultNotificationsRepositoryTest {
     private lateinit var underTest: NotificationsRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val eventMapper = mock<EventMapper>()
     private val userHandle = 12L
     private val email = "email"
 
     private val userAlertsMapper: UserAlertMapper =
-        { alert: MegaUserAlert, contactProvider: UserAlertContactProvider, _: UserAlertScheduledMeetingProvider, _: NodeProvider ->
+        { alert: MegaUserAlert, contactProvider: UserAlertContactProvider, _: UserAlertScheduledMeetingProvider, _: UserAlertScheduledMeetingOccurrProvider, _: NodeProvider ->
             val contact = contactProvider(userHandle, alert.email)
             ContactChangeContactEstablishedAlert(
                 id = 12L,
@@ -59,17 +60,16 @@ class DefaultNotificationsRepositoryTest {
             )
         }
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
-    private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
+    private val chatRepository = mock<ChatRepository>()
 
     @Before
     fun setUp() {
         underTest = DefaultNotificationsRepository(
             megaApiGateway = megaApiGateway,
-            megaChatApiGateway = megaChatApiGateway,
             userAlertsMapper = userAlertsMapper,
             eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
-            chatScheduledMeetingMapper = chatScheduledMeetingMapper,
+            chatRepository = chatRepository,
             dispatcher = UnconfinedTestDispatcher(),
         )
     }
