@@ -303,7 +303,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
         }
 
         _state.update {
-            it.copy(showSeeMoreButton = false)
+            it.copy(showSeeMoreButton = true)
         }
     }
 

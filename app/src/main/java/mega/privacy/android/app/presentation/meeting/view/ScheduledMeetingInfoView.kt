@@ -439,9 +439,7 @@ private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
                     style = MaterialTheme.typography.subtitle2,
                     color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis)
+                    fontSize = 12.sp)
             }
         }
     }
