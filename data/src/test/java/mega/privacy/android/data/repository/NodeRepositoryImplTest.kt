@@ -20,9 +20,18 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
+import nz.mega.sdk.MegaFolderInfo
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -45,6 +54,8 @@ class NodeRepositoryImplTest {
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val streamingGateway: StreamingGateway = mock()
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
+    private val folderNode: FolderNode = mock()
+
     @Before
     fun setup() {
         underTest = NodeRepositoryImpl(
@@ -76,4 +87,52 @@ class NodeRepositoryImplTest {
             whenever(megaApiGateway.base64ToHandle(base64)).thenReturn(expectedHandle)
             assertThat(underTest.convertBase64ToHandle(base64)).isEqualTo(expectedHandle)
         }
+
+    @Test
+    fun `test getFolderVersionInfo queries megaApiGateway`() =
+        runTest {
+            mockFolderInfoResponse()
+            underTest.getFolderTreeInfo(folderNode)
+            verify(megaApiGateway).getFolderInfo(any(), any())
+        }
+
+    @Test
+    fun `test getFolderVersionInfo is returning correct info from megaApiGateway`() =
+        runTest {
+            mockFolderInfoResponse()
+            val result = underTest.getFolderTreeInfo(folderNode)
+            assertThat(result).isEqualTo(folderInfo)
+        }
+
+    private suspend fun mockFolderInfoResponse() {
+        val fileNode: MegaNode = mock()
+        whenever(folderNode.id).thenReturn(nodeId)
+        whenever(fileNode.isFolder).thenReturn(true)
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(fileNode)
+        val response = mock<MegaRequest>()
+        val megaFolderInfo = mock<MegaFolderInfo>()
+        whenever(response.megaFolderInfo).thenReturn(megaFolderInfo)
+        whenever(megaFolderInfo.numVersions).thenReturn(folderInfo.numberOfVersions)
+        whenever(megaFolderInfo.versionsSize).thenReturn(folderInfo.sizeOfPreviousVersionsInBytes)
+        whenever(megaFolderInfo.currentSize).thenReturn(folderInfo.totalCurrentSizeInBytes)
+        whenever(megaFolderInfo.numFolders).thenReturn(folderInfo.numberOfFolders)
+        whenever(megaFolderInfo.numFiles).thenReturn(folderInfo.numberOfFiles)
+        whenever(megaApiGateway.getFolderInfo(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                mock(), response, mock()
+            )
+        }
+    }
+
+    companion object {
+        private const val nodeHandle = 1L
+        private val nodeId = NodeId(nodeHandle)
+        private val folderInfo = FolderTreeInfo(
+            numberOfVersions = 2,
+            sizeOfPreviousVersionsInBytes = 1000L,
+            numberOfFiles = 4,
+            numberOfFolders = 2,
+            totalCurrentSizeInBytes = 2000L,
+        )
+    }
 }

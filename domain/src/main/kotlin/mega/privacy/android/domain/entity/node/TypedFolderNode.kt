@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.FolderType
  * Typed folder node
  *
  */
-interface TypedFolderNode : TypedNode, FolderNode{
+interface TypedFolderNode : TypedNode, FolderNode {
     /**
      * Type
      */

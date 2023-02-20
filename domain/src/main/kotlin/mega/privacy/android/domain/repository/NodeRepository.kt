@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -72,6 +73,14 @@ interface NodeRepository {
      * @return the history versions of the node, including current one
      */
     suspend fun getNodeHistoryVersions(handle: NodeId): List<UnTypedNode>
+
+    /**
+     * Get [FolderTreeInfo] of the required folder
+     * @param folderNode [FolderNode]
+     *
+     * @return info [FolderTreeInfo]
+     */
+    suspend fun getFolderTreeInfo(folderNode: FolderNode): FolderTreeInfo
 
     /**
      * Deletes a MegaNode's history version referenced by its handle [NodeId]

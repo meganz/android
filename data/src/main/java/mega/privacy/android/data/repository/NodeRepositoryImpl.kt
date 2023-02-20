@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [NodeRepository]
@@ -177,6 +179,27 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
     }
+
+    override suspend fun getFolderTreeInfo(folderNode: FolderNode): FolderTreeInfo =
+        withContext(ioDispatcher) {
+            val megaNode = megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)
+            suspendCoroutine { continuation ->
+                megaApiGateway.getFolderInfo(
+                    megaNode,
+                    continuation.getRequestListener {
+                        with(it.megaFolderInfo) {
+                            FolderTreeInfo(
+                                numberOfFiles = numFiles,
+                                numberOfFolders = numFolders,
+                                totalCurrentSizeInBytes = currentSize,
+                                numberOfVersions = numVersions,
+                                sizeOfPreviousVersionsInBytes = versionsSize,
+                            )
+                        }
+                    }
+                )
+            }
+        }
 
     override suspend fun deleteNodeVersionByHandle(nodeVersionToDelete: NodeId): Unit =
         withContext(ioDispatcher) {
