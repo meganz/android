@@ -1219,17 +1219,16 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     overridePendingTransition(0, 0)
 
                 } else if (typeForName(node.name).isVideoMimeType || typeForName(node.name).isAudio) {
-                    val file = nodes[position]
-                    Timber.d("FILE HANDLE: ${file.handle}")
+                    Timber.d("FILE HANDLE: ${node.handle}")
                     val mediaIntent: Intent
                     val internalIntent: Boolean
                     var opusFile = false
 
-                    if (typeForName(file.name).isVideoNotSupported || typeForName(file.name).isAudioNotSupported) {
+                    if (typeForName(node.name).isVideoNotSupported || typeForName(node.name).isAudioNotSupported) {
                         mediaIntent = Intent(Intent.ACTION_VIEW)
                         internalIntent = false
                         val s: Array<String> =
-                            file.name.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
+                            node.name.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
                                 .toTypedArray()
                         if ((s.size > 1) && (s[s.size - 1] == "opus")) {
                             opusFile = true
@@ -1241,8 +1240,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
                     mediaIntent.putExtra("orderGetChildren", orderGetChildren)
                     mediaIntent.putExtra("isFolderLink", true)
-                    mediaIntent.putExtra("HANDLE", file.handle)
-                    mediaIntent.putExtra("FILENAME", file.name)
+                    mediaIntent.putExtra("HANDLE", node.handle)
+                    mediaIntent.putExtra("FILENAME", node.name)
                     putThumbnailLocation(
                         mediaIntent,
                         recyclerView,
@@ -1269,17 +1268,17 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                         )
                     }
 
-                    val localPath = FileUtil.getLocalFile(file)
+                    val localPath = FileUtil.getLocalFile(node)
                     val api = if (dbH.credentials != null) megaApi else megaApiFolder
                     val paramsSetSuccessfully =
-                        if (FileUtil.isLocalFile(file, megaApiFolder, localPath)) {
+                        if (FileUtil.isLocalFile(node, megaApiFolder, localPath)) {
                             FileUtil.setLocalIntentParams(
-                                this, file, mediaIntent,
+                                this, node, mediaIntent,
                                 localPath, false, this
                             )
                         } else {
                             FileUtil.setStreamingIntentParams(
-                                this, file, api,
+                                this, node, api,
                                 mediaIntent, this
                             )
                         }
