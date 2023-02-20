@@ -11,16 +11,15 @@ import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.OpenShareDialog
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.SetSecureFlag
+import mega.privacy.android.domain.usecase.UpgradeSecurity
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
-import mega.privacy.android.domain.usecase.UpgradeSecurity
 
 /**
  * Get node module
@@ -131,16 +130,6 @@ abstract class GetNodeModule {
             MoveNodeByHandle { nodeToCopy, newNodeParent ->
                 moveNodeUseCase.move(nodeToCopy.longValue, newNodeParent.longValue).await()
             }
-
-        /**
-         * Provides [SetSecureFlag] implementation
-         *
-         * @param megaNodeRepository [MegaNodeRepository]
-         * @return [SetSecureFlag]
-         */
-        @Provides
-        fun provideSetSecureFlag(megaNodeRepository: MegaNodeRepository): SetSecureFlag =
-            SetSecureFlag(megaNodeRepository::setSecureFlag)
 
         /**
          * Provides [OpenShareDialog] implementation
