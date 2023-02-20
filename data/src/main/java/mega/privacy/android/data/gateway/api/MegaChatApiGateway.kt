@@ -5,13 +5,13 @@ import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatLoggerInterface
+import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaHandleList
 
@@ -38,7 +38,7 @@ interface MegaChatApiGateway {
     /**
      * Logouts API.
      */
-    fun logout()
+    fun logout(listener: MegaChatRequestListenerInterface?)
 
     /**
      * Set logger
@@ -483,4 +483,9 @@ interface MegaChatApiGateway {
      * @return The MegaChatMessage object, or NULL if not found.
      */
     fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage?
+
+    /**
+     * Removes chat request listener.
+     */
+    fun removeRequestListener(listener: MegaChatRequestListenerInterface)
 }

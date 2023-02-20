@@ -49,7 +49,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun init(session: String): Int =
         chatApi.init(session)
 
-    override fun logout() = chatApi.logout()
+    override fun logout(listener: MegaChatRequestListenerInterface?) = chatApi.logout(listener)
 
     override fun setLogger(logger: MegaChatLoggerInterface) =
         MegaChatApiAndroid.setLoggerObject(logger)
@@ -378,4 +378,7 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.getMessageFromNodeHistory(chatId, messageId)
 
     override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
+
+    override fun removeRequestListener(listener: MegaChatRequestListenerInterface) =
+        chatApi.removeChatRequestListener(listener)
 }

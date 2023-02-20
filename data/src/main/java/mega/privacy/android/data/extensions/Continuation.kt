@@ -1,8 +1,11 @@
 package mega.privacy.android.data.extensions
 
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -62,6 +65,29 @@ fun <T> Continuation<T>.getRequestListener(
     block: (request: MegaRequest) -> T,
 ): MegaRequestListenerInterface {
     val listener = OptionalMegaRequestListenerInterface(
+        onRequestFinish = { request, error ->
+            if (error.errorCode == MegaError.API_OK) {
+                this.resumeWith(Result.success(block(request)))
+            } else {
+                // log the error code when calling SDK api, it helps us easy to find the cause
+                methodName?.let {
+                    Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                }
+                this.failWithError(error)
+            }
+        }
+    )
+    return listener
+}
+
+/**
+ * Gets a chat request Listener.
+ */
+fun <T> Continuation<T>.getChatRequestListener(
+    methodName: String? = null,
+    block: (request: MegaChatRequest) -> T,
+): MegaChatRequestListenerInterface {
+    val listener = OptionalMegaChatRequestListenerInterface(
         onRequestFinish = { request, error ->
             if (error.errorCode == MegaError.API_OK) {
                 this.resumeWith(Result.success(block(request)))

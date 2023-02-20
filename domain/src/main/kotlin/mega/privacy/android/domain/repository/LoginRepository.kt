@@ -48,4 +48,9 @@ interface LoginRepository {
      * Logs out.
      */
     suspend fun logout()
+
+    /**
+     * Chat log out.
+     */
+    suspend fun chatLogout()
 }

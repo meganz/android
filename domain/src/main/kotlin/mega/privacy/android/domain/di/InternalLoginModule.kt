@@ -7,9 +7,12 @@ import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.Logout
 import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import mega.privacy.android.domain.usecase.login.BroadcastLogout
+import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DefaultBackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.DefaultChatLogout
 import mega.privacy.android.domain.usecase.login.DefaultLocalLogout
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.login.LocalLogout
@@ -31,6 +34,12 @@ internal abstract class InternalLoginModule {
      */
     @Binds
     abstract fun bindLocalLogout(useCase: DefaultLocalLogout): LocalLogout
+
+    /**
+     * Provides [ChatLogout]
+     */
+    @Binds
+    abstract fun bindChatLogout(useCase: DefaultChatLogout): ChatLogout
 
     companion object {
 
@@ -59,5 +68,12 @@ internal abstract class InternalLoginModule {
         @Singleton
         @Provides
         fun provideLoginMutex(): Mutex = Mutex()
+
+
+        /**
+         * Provides the Use Case [Logout]
+         */
+        @Provides
+        fun provideLogout(repository: LoginRepository): Logout = Logout(repository::logout)
     }
 }

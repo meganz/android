@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -53,7 +54,7 @@ internal class DefaultLoginRepository @Inject constructor(
                             MegaChatApi.INIT_ERROR -> {
                                 val exception = ChatNotInitializedException()
                                 Timber.e("Init chat error: ${exception.message}. Logout...")
-                                megaChatApiGateway.logout()
+                                megaChatApiGateway.logout(null)
                                 continuation.resumeWith(Result.failure(exception))
                                 return@suspendCoroutine
                             }
@@ -143,9 +144,25 @@ internal class DefaultLoginRepository @Inject constructor(
             val listener = continuation.getRequestListener {
                 return@getRequestListener
             }
+
             megaApiGateway.logout(listener)
+
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun chatLogout() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener {
+                return@getChatRequestListener
+            }
+
+            megaChatApiGateway.logout(listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
             }
         }
     }
