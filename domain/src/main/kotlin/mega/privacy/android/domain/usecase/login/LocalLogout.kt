@@ -9,6 +9,9 @@ fun interface LocalLogout {
 
     /**
      * Invoke.
+     *
+     * @param disableChatApi Temporary param for disabling megaChatApi.
+     * @param clearPsa       Temporary param for clearing Psa.
      */
-    suspend operator fun invoke(clearPsa: ClearPsa)
+    suspend operator fun invoke(disableChatApi: DisableChatApi, clearPsa: ClearPsa)
 }

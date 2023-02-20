@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
@@ -34,6 +35,8 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
+import mega.privacy.android.domain.usecase.login.ChatLogout
+import mega.privacy.android.domain.usecase.login.DisableChatApi
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import javax.inject.Inject
@@ -60,6 +63,7 @@ class LoginViewModel @Inject constructor(
     private val querySignupLink: QuerySignupLink,
     private val cancelTransfers: CancelTransfers,
     private val localLogout: LocalLogout,
+    private val chatLogout: ChatLogout,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -346,6 +350,16 @@ class LoginViewModel @Inject constructor(
      * Local logout.
      */
     fun performLocalLogout() = viewModelScope.launch {
-        localLogout(ClearPsa { PsaManager::stopChecking })
+        localLogout(
+            DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi },
+            ClearPsa { PsaManager::stopChecking }
+        )
+    }
+
+    /**
+     * ChatLogout.
+     */
+    fun performChatLogout() = viewModelScope.launch {
+        chatLogout(DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi })
     }
 }

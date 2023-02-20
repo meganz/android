@@ -11,9 +11,11 @@ import javax.inject.Inject
 class DefaultLocalLogout @Inject constructor(
     private val loginRepository: LoginRepository,
     private val localLogoutApp: LocalLogoutApp,
+    private val chatLogout: ChatLogout,
 ) : LocalLogout {
 
-    override suspend fun invoke(clearPsa: ClearPsa) {
+    override suspend fun invoke(disableChatApi: DisableChatApi, clearPsa: ClearPsa) {
+        chatLogout(disableChatApi)
         kotlin.runCatching { loginRepository.localLogout() }
             .onSuccess { localLogoutApp(clearPsa) }
     }

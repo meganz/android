@@ -919,7 +919,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     }
                     MegaChatApi.INIT_ERROR -> {
                         Timber.w("ERROR INIT CHAT: %s", ret)
-                        megaChatApi.logout(ChatLogoutListener(requireActivity(), loggingSettings))
+                        viewModel.performChatLogout()
                         disableLoginButton()
                         megaApi.login(email, password, this)
                     }
@@ -1293,7 +1293,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             }
                         }
                         Timber.e("LOGIN_ERROR: %d %s", error.errorCode, error.errorString)
-                        megaChatApi.logout(ChatLogoutListener(requireActivity(), loggingSettings))
+                        viewModel.performChatLogout()
                         if (errorMessage.isNotEmpty()) {
                             if (!uiState.pressedBackWhileLogin) {
                                 (requireActivity() as LoginActivity).showSnackbar(errorMessage)
@@ -1590,7 +1590,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         isLoggingIn = false
                         viewModel.updateIsFetchingNodes(false)
                         viewModel.updateIsAlreadyLoggedIn(true)
-                        megaChatApi.logout(ChatLogoutListener(requireActivity(), loggingSettings))
                         viewModel.performLocalLogout()
                     }
                     DialogInterface.BUTTON_NEGATIVE -> dialog.dismiss()
