@@ -16,15 +16,12 @@ import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_H
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FAILED_TRANSFERS;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TRANSFER_OVER_QUOTA;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
 import static mega.privacy.android.app.constants.IntentConstants.ACTION_OPEN_ACHIEVEMENTS;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ACCOUNT_TYPE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_ASK_PERMISSIONS;
@@ -96,7 +93,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireCancelCameraUploadJob;
 import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
-import static mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER;
@@ -120,7 +116,6 @@ import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.saveOffline;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFiles;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getFolder;
@@ -218,7 +213,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -298,7 +292,6 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
-import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
@@ -324,7 +317,6 @@ import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment;
-import mega.privacy.android.app.main.managerSections.NotificationsFragment;
 import mega.privacy.android.app.main.managerSections.TransfersFragment;
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable;
@@ -355,12 +347,9 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.inbox.InboxViewModel;
-import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.manager.ManagerViewModel;
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType;
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel;
@@ -374,7 +363,6 @@ import mega.privacy.android.app.presentation.photos.PhotosFragment;
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment;
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment;
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment;
-import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel;
 import mega.privacy.android.app.presentation.search.SearchFragment;
@@ -399,7 +387,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.DownloadNodeUseCase;
-import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.RemoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
@@ -439,7 +426,6 @@ import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.preference.ViewType;
-import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
@@ -544,8 +530,6 @@ public class ManagerActivity extends TransfersManagementActivity
     MoveNodeUseCase moveNodeUseCase;
     @Inject
     RemoveNodeUseCase removeNodeUseCase;
-    @Inject
-    GetNodeUseCase getNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
     @Inject
@@ -1449,12 +1433,6 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .observeForever(refreshAddPhoneNumberButtonObserver);
 
-        LiveEventBus.get(EVENT_FAILED_TRANSFERS, Boolean.class).observe(this, failed -> {
-            if (drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == TransfersTab.COMPLETED_TAB) {
-                retryTransfers.setVisible(failed);
-            }
-        });
-
         registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observe(this, callStatusObserver);
@@ -1534,27 +1512,17 @@ public class ManagerActivity extends TransfersManagementActivity
         prefs = dbH.getPreferences();
         if (prefs == null) {
             firstTimeAfterInstallation = true;
-            isList = true;
         } else {
             if (prefs.getFirstTime() == null) {
                 firstTimeAfterInstallation = true;
             } else {
                 firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
             }
-            if (prefs.getPreferredViewList() == null) {
-                isList = true;
-            } else {
-                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-            }
         }
 
         if (firstTimeAfterInstallation) {
             setStartScreenTimeStamp(this);
         }
-
-        Timber.d("Preferred View List: %s", isList);
-
-        LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         handler = new Handler();
 
@@ -2479,7 +2447,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
-     }
+    }
 
     /**
      * collecting Flows from ViewModels
@@ -9865,14 +9833,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean isList() {
         return isList;
-    }
-
-    public void setList(boolean isList) {
-        this.isList = isList;
-    }
-
-    public boolean isListCameraUploads() {
-        return false;
     }
 
     public boolean getFirstLogin() {

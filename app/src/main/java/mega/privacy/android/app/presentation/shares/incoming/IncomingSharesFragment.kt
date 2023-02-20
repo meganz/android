@@ -68,7 +68,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             else getGridView(inflater, container)
 
         initAdapter()
-        observe()
         selectNewlyAddedNodes()
 
         return view

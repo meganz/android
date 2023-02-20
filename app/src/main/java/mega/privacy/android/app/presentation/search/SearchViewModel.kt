@@ -154,7 +154,7 @@ class SearchViewModel @Inject constructor(
     /**
      * Increase by 1 the search depth
      */
-    private fun increaseSearchDepth() = viewModelScope.launch {
+    fun increaseSearchDepth() = viewModelScope.launch {
         _state.update { it.copy(searchDepth = it.searchDepth + 1) }
     }
 
