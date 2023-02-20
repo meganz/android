@@ -89,13 +89,21 @@ class MediaDiscoveryFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun getNewInstance(mediaHandle: Long): MediaDiscoveryFragment {
+        fun getNewInstance(
+            mediaHandle: Long,
+            isOpenByMDIcon: Boolean = false,
+        ): MediaDiscoveryFragment {
             return MediaDiscoveryFragment().apply {
-                arguments = bundleOf(INTENT_KEY_CURRENT_FOLDER_ID to mediaHandle)
+                arguments = bundleOf(
+                    INTENT_KEY_CURRENT_FOLDER_ID to mediaHandle,
+                    INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON to isOpenByMDIcon
+                )
             }
         }
 
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
+        private const val INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON =
+            "OPEN_MEDIA_DISCOVERY_BY_MD_ICON"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -197,7 +205,10 @@ class MediaDiscoveryFragment : Fragment() {
             contentAlignment = Alignment.BottomEnd,
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                if (uiState.mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal) {
+                if (uiState.mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
+                    && arguments?.getBoolean(INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON,
+                        false) == false
+                ) {
                     MediaDiscoveryDialog()
                 }
                 if (uiState.selectedTimeBarTab == TimeBarTab.All) {

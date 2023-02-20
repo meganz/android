@@ -4427,7 +4427,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 } else {
                     Long mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle();
                     skipToMediaDiscoveryFragment(
-                            MediaDiscoveryFragment.getNewInstance(mediaHandle), mediaHandle);
+                            MediaDiscoveryFragment.getNewInstance(mediaHandle, false), mediaHandle);
                 }
 
                 if (openFolderRefresh) {

@@ -460,7 +460,7 @@ class FileBrowserFragment : RotatableFragment() {
         }
 
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
-            .observe(this) { showMediaDiscovery() }
+            .observe(this) { showMediaDiscovery(true) }
         Timber.d("Fragment ADDED")
         if (aB == null) {
             aB = (activity as? AppCompatActivity)?.supportActionBar
@@ -1403,10 +1403,13 @@ class FileBrowserFragment : RotatableFragment() {
     /**
      * Show Media discovery and launch [MediaDiscoveryFragment]
      */
-    private fun showMediaDiscovery() {
+    private fun showMediaDiscovery(isOpenByMDIcon: Boolean = false) {
         activity?.lifecycleScope?.launch {
             (activity as? ManagerActivity)?.skipToMediaDiscoveryFragment(
-                MediaDiscoveryFragment.getNewInstance(fileBrowserViewModel.state.value.mediaHandle),
+                MediaDiscoveryFragment.getNewInstance(
+                    fileBrowserViewModel.state.value.mediaHandle,
+                    isOpenByMDIcon
+                ),
                 fileBrowserViewModel.state.value.mediaHandle
             )
         }
