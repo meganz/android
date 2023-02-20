@@ -8,7 +8,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
 /**
- * Default implementation of [CompleteFastLogin].
+ * Default implementation of [LocalLogoutApp].
  *
  * @property loginRepository [LoginRepository].
  */

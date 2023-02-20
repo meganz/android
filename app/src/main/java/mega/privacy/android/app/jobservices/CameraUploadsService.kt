@@ -85,7 +85,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
-import mega.privacy.android.domain.usecase.CompleteFastLogin
+import mega.privacy.android.domain.usecase.BackgroundFastLogin
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
@@ -405,10 +405,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var monitorBatteryInfo: MonitorBatteryInfo
 
     /**
-     * Complete Fast Login
+     * Background Fast Login
      */
     @Inject
-    lateinit var completeFastLogin: CompleteFastLogin
+    lateinit var backgroundFastLogin: BackgroundFastLogin
 
     /**
      * Get Session
@@ -1434,7 +1434,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
         // app that a Login Procedure is occurring
         MegaApplication.isLoggingIn = true
-        val result = runCatching { completeFastLogin() }
+        val result = runCatching { backgroundFastLogin() }
         MegaApplication.isLoggingIn = false
 
         if (result.isSuccess) {

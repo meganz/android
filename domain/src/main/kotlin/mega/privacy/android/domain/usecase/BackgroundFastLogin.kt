@@ -1,7 +1,8 @@
 package mega.privacy.android.domain.usecase
 
 /**
- * Complete fast login use case.
+ * Background fast login use case.
+ * This fast login does not require to show the login screen.
  * A complete fast login process includes three different requests in this order:
  *      1.- initMegaChat
  *      2.- fastLogin
@@ -10,7 +11,7 @@ package mega.privacy.android.domain.usecase
  * If this is broken at some point, then the app can suffer unexpected behaviors like
  * logout and lose the current user's session.
  */
-interface CompleteFastLogin {
+interface BackgroundFastLogin {
 
     /**
      * Invoke.

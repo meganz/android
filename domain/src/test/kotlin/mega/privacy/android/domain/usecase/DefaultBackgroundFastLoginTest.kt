@@ -13,9 +13,9 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultCompleteFastLoginTest {
+class DefaultBackgroundFastLoginTest {
 
-    private lateinit var underTest: CompleteFastLogin
+    private lateinit var underTest: BackgroundFastLogin
 
     private val loginRepository = mock<LoginRepository>()
     private val initialiseMegaChat = mock<InitialiseMegaChat>()
@@ -25,11 +25,12 @@ class DefaultCompleteFastLoginTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultCompleteFastLogin(
+        underTest = DefaultBackgroundFastLogin(
             loginRepository = loginRepository,
             initialiseMegaChat = initialiseMegaChat,
             getSession = getSession,
-            getRootNodeExists = getRootNodeExists
+            getRootNodeExists = getRootNodeExists,
+            loginMutex = mock()
         )
     }
 

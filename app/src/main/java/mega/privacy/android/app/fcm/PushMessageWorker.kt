@@ -20,7 +20,7 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.CompleteFastLogin
+import mega.privacy.android.domain.usecase.BackgroundFastLogin
 import mega.privacy.android.domain.usecase.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
@@ -29,7 +29,7 @@ import timber.log.Timber
 /**
  * Worker class to manage push notifications.
  *
- * @property completeFastLogin       Required for performing a complete login process with an existing session.
+ * @property backgroundFastLogin       Required for performing a complete login process with an existing session.
  * @property pushReceived            Required for notifying received pushes.
  * @property retryPendingConnections Required for retrying pending connections.
  * @property pushMessageMapper       [PushMessageMapper].
@@ -38,7 +38,7 @@ import timber.log.Timber
 class PushMessageWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val completeFastLogin: CompleteFastLogin,
+    private val backgroundFastLogin: BackgroundFastLogin,
     private val pushReceived: PushReceived,
     private val retryPendingConnections: RetryPendingConnections,
     private val pushMessageMapper: PushMessageMapper,
@@ -56,7 +56,7 @@ class PushMessageWorker @AssistedInject constructor(
             }
 
             MegaApplication.isLoggingIn = true
-            val result = runCatching { completeFastLogin() }
+            val result = runCatching { backgroundFastLogin() }
             MegaApplication.isLoggingIn = false
 
             if (result.isSuccess) {
