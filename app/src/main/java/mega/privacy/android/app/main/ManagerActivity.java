@@ -4426,8 +4426,11 @@ public class ManagerActivity extends TransfersManagementActivity
                     selectDrawerItemCloudDrive();
                 } else {
                     Long mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle();
-                    skipToMediaDiscoveryFragment(
-                            MediaDiscoveryFragment.getNewInstance(mediaHandle, false), mediaHandle);
+                    Fragment mediaDiscoveryFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_DISCOVERY.getTag());
+                    if (mediaDiscoveryFragment == null) {
+                        mediaDiscoveryFragment = MediaDiscoveryFragment.getNewInstance(mediaHandle, false);
+                    }
+                    skipToMediaDiscoveryFragment(mediaDiscoveryFragment, mediaHandle);
                 }
 
                 if (openFolderRefresh) {

@@ -127,8 +127,9 @@ class PhotosFragment : Fragment() {
     private var menu: Menu? = null
 
     // Action mode
-    private var actionMode: ActionMode? = null
-    private lateinit var actionModeCallback: TimelineActionModeCallback
+    private var timelineActionMode: ActionMode? = null
+    private var albumsActionMode: ActionMode? = null
+    private lateinit var timelineActionModeCallback: TimelineActionModeCallback
     private lateinit var albumsActionModeCallback: AlbumsActionModeCallback
 
     private val cameraUploadsPermissionsLauncher =
@@ -154,7 +155,7 @@ class PhotosFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
-        actionModeCallback = TimelineActionModeCallback(this)
+        timelineActionModeCallback = TimelineActionModeCallback(this)
         albumsActionModeCallback = AlbumsActionModeCallback(this)
     }
 
@@ -284,14 +285,14 @@ class PhotosFragment : Fragment() {
 
     private fun handleActionMode(state: TimelineViewState) {
         if (state.selectedPhotoCount > 0) {
-            if (actionMode == null) {
+            if (timelineActionMode == null) {
                 enterActionMode()
             }
-            actionMode?.title = state.selectedPhotoCount.toString()
+            timelineActionMode?.title = state.selectedPhotoCount.toString()
             managerActivity.showHideBottomNavigationView(true)
         } else {
-            actionMode?.finish()
-            actionMode = null
+            timelineActionMode?.finish()
+            timelineActionMode = null
             managerActivity.showHideBottomNavigationView(false)
         }
     }
@@ -320,14 +321,14 @@ class PhotosFragment : Fragment() {
 
     private fun handleAlbumsActionMode(state: AlbumsViewState) {
         if (state.selectedAlbumIds.isNotEmpty()) {
-            if (actionMode == null) {
+            if (albumsActionMode == null) {
                 enterAlbumsActionMode()
             }
-            actionMode?.title = state.selectedAlbumIds.size.toString()
+            albumsActionMode?.title = state.selectedAlbumIds.size.toString()
             managerActivity.showHideBottomNavigationView(true)
         } else {
-            actionMode?.finish()
-            actionMode = null
+            albumsActionMode?.finish()
+            albumsActionMode = null
             managerActivity.showHideBottomNavigationView(false)
         }
     }
@@ -640,13 +641,13 @@ class PhotosFragment : Fragment() {
 
 
     private fun enterActionMode() {
-        actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-            actionModeCallback
+        timelineActionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+            timelineActionModeCallback
         )
     }
 
     private fun enterAlbumsActionMode() {
-        actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+        albumsActionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
             albumsActionModeCallback
         )
     }
