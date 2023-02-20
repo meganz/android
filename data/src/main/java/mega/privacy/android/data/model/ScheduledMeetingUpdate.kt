@@ -20,7 +20,9 @@ sealed class ScheduledMeetingUpdate {
     /**
      * On chat scheduled meeting occurrences item update.
      *
-     * @property chatId
+     * @property chatId     Chat id
+     * @property append     If append is true, new occurrences has been received from API (no need to discard current ones)
      */
-    data class OnSchedMeetingOccurrencesUpdate(val chatId: Long) : ScheduledMeetingUpdate()
+    data class OnSchedMeetingOccurrencesUpdate(val chatId: Long, val append: Boolean) :
+        ScheduledMeetingUpdate()
 }

@@ -280,13 +280,19 @@ internal class MegaChatApiFacade @Inject constructor(
                     trySend(ScheduledMeetingUpdate.OnChatSchedMeetingUpdate(scheduledMeeting))
                 }
 
-                override fun onSchedMeetingOccurrencesUpdate(api: MegaChatApiJava?, chatId: Long) {
-                    trySend(ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate(chatId))
+                override fun onSchedMeetingOccurrencesUpdate(
+                    api: MegaChatApiJava?,
+                    chatId: Long,
+                    append: Boolean,
+                ) {
+                    trySend(ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate(chatId, append))
                 }
             }
 
             chatApi.addSchedMeetingListener(listener)
-            awaitClose { chatApi.removeSchedMeetingListener(listener) }
+            awaitClose {
+                chatApi.removeSchedMeetingListener(listener)
+            }
         }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override fun getAllScheduledMeetings(): List<MegaChatScheduledMeeting>? =

@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExists

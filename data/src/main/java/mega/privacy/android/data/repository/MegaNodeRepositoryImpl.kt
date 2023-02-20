@@ -3,8 +3,10 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -21,6 +23,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.FolderVersionInfo
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
@@ -255,10 +258,42 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
         }
 
+    override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
+                megaShareMapper(it)
+            }
+        }
 
-    override suspend fun getUnVerifiedInComingShares(): Int = 3
-    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
+    override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUnverifiedOutgoingShares(sortOrderIntMapper(order)).map {
+                megaShareMapper(it)
+            }
+        }
 
-    override suspend fun getUnverifiedOutgoingShares(): Int = 5
-    //// TODO Please keep this hardcoded for now. Full functionality will be added after SDK changes are available
+
+    override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.openShareDialog(megaNode, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
+        megaApiGateway.setSecureFlag(enable)
+    }
 }
