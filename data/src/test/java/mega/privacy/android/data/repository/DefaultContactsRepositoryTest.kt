@@ -733,4 +733,41 @@ class DefaultContactsRepositoryTest {
 
             verify(localStorageGateway, times(1)).saveMyLastName(expectedNewLastName)
         }
+
+    @Test
+    fun `test that getContactEmails return correctly when megaApiGateway getContacts returns`() =
+        runTest {
+            val expectedMap = mapOf(1L to "email1", 2L to "email2", 3L to "email3")
+            val users = expectedMap.map { entry ->
+                mock<MegaUser> {
+                    on { handle }.thenReturn(entry.key)
+                    on { email }.thenReturn(entry.value)
+                }
+            }
+            whenever(megaApiGateway.getContacts()).thenReturn(users)
+            assertEquals(expectedMap, underTest.getContactEmails())
+        }
+
+    @Test
+    fun `test that clear contact database when call clearContactDatabase`() =
+        runTest {
+            underTest.clearContactDatabase()
+            verify(databaseHandler, times(1)).clearContacts()
+        }
+
+    @Test
+    fun `test that save contact database when call saveContact with value`() =
+        runTest {
+            val expectedHandle = -1L
+            val expectedEmail = "myEmail"
+            val expectedFirstName = "firstName"
+            val expectedLastName = "lastName"
+            underTest.saveContact(
+                expectedHandle,
+                expectedEmail,
+                expectedFirstName,
+                expectedLastName
+            )
+            verify(databaseHandler, times(1)).setContact(any())
+        }
 }

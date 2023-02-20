@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
+import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.InviteContact
+import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 
 /**
  * Contacts module.
@@ -42,6 +44,9 @@ internal abstract class ContactsModule {
 
     @Binds
     abstract fun bindUpdateCurrentUserName(implementation: DefaultUpdateCurrentUserName): UpdateCurrentUserName
+
+    @Binds
+    abstract fun bindResetContactDatabase(implementation: DefaultReloadContactDatabase): ReloadContactDatabase
 
     companion object {
         @Provides

@@ -37,6 +37,7 @@ import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -55,6 +56,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaUser
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -330,7 +332,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 if (shouldNotify) {
                     contactWrapper.notifyFirstNameUpdate(context, handle)
                 }
-            }.text
+            }.text.orEmpty()
         }
 
     override suspend fun getUserLastName(
@@ -358,7 +360,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 if (shouldNotify) {
                     contactWrapper.notifyLastNameUpdate(context, handle)
                 }
-            }.text
+            }.text.orEmpty()
         }
 
     override suspend fun getUserFullName(handle: Long, skipCache: Boolean): String =
@@ -678,6 +680,29 @@ internal class DefaultContactsRepository @Inject constructor(
         }.also {
             block(it)
         }
+    }
+
+    override suspend fun getContactEmails(): Map<Long, String> = withContext(ioDispatcher) {
+        val contacts = megaApiGateway.getContacts()
+        contacts.associate { it.handle to it.email.orEmpty() }
+    }
+
+    override suspend fun clearContactDatabase() = withContext(ioDispatcher) {
+        Timber.d("clear Database")
+        databaseHandler.clearContacts()
+    }
+
+    override suspend fun saveContact(
+        handle: Long,
+        email: String,
+        firstName: String,
+        lastName: String,
+    ) = withContext(ioDispatcher) {
+        databaseHandler.setContact(MegaContactDB(handle.toString(), email, firstName, lastName))
+    }
+
+    override suspend fun getContactDatabaseSize(): Int = withContext(ioDispatcher) {
+        databaseHandler.contactsSize
     }
 
     private fun Long.toBase64Handle(): String =

@@ -233,4 +233,34 @@ interface ContactsRepository {
      * @return the map of key is user handle and value is user nick name
      */
     suspend fun getCurrentUserAliases(): Map<Long, String>
+
+    /**
+     * Get contact emails
+     *
+     * @return the map of key is handle and value is email
+     */
+    suspend fun getContactEmails(): Map<Long, String>
+
+    /**
+     * Clear contact database
+     *
+     */
+    suspend fun clearContactDatabase()
+
+    /**
+     * Save contact
+     *
+     * @param handle
+     * @param email
+     * @param firstName
+     * @param lastName
+     */
+    suspend fun saveContact(handle: Long, email: String, firstName: String, lastName: String)
+
+    /**
+     * Get contact database size
+     *
+     * @return the number of record in database
+     */
+    suspend fun getContactDatabaseSize(): Int
 }
