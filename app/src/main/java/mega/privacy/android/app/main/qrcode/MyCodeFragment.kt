@@ -98,7 +98,7 @@ class MyCodeFragment : Fragment() {
 
     private fun setupFlow() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { state ->
                     Timber.d("state = $state")
                     with(state) {
