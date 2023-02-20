@@ -137,4 +137,16 @@ internal class DefaultLoginRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun logout() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener
+            }
+            megaApiGateway.logout(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

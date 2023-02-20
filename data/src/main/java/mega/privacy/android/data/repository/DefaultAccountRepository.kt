@@ -375,18 +375,6 @@ internal class DefaultAccountRepository @Inject constructor(
         dbHandler.resetExtendedAccountDetailsTimestamp()
     }
 
-    override suspend fun logout() = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
-                return@getRequestListener
-            }
-            megaApiGateway.logout(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
     override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(

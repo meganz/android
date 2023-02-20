@@ -178,11 +178,6 @@ interface AccountRepository {
     suspend fun resetExtendedAccountDetailsTimestamp()
 
     /**
-     * logout
-     */
-    suspend fun logout()
-
-    /**
      * Create a contact link
      *
      * @param renew – True to invalidate the previous contact link (if any).

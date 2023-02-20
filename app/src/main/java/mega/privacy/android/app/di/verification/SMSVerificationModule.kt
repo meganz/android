@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapperImpl
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
@@ -88,7 +89,7 @@ abstract class SMSVerificationModule {
          * Provides the Use Case [Logout]
          */
         @Provides
-        fun provideLogout(repository: AccountRepository): Logout = Logout(repository::logout)
+        fun provideLogout(repository: LoginRepository): Logout = Logout(repository::logout)
 
         @Provides
         fun provideVerifyPhoneNumber(repository: VerificationRepository): VerifyPhoneNumber =
