@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -4571,20 +4571,6 @@
         <item quantity="one">Fifth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
         <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">Mon</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">Tue</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">Wed</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">Thu</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">Fri</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">Sat</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">Sun</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">Today, %1$s from %2$s to %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -4605,4 +4591,32 @@
         <item quantity="one">[Undecrypted file]</item>
         <item quantity="other">[Undecrypted files]</item>
     </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_mon">Mon</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_tue">Tue</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_wed">Wed</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_thu">Thu</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_fri">Fri</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sat">Sat</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">Sun</string>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">Mon</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_tue">Tue</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_wed">Wed</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_thu">Thu</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_fri">Fri</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Sat</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Sun</string>
 </resources>

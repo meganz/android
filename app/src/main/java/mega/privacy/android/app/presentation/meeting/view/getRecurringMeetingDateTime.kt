@@ -65,7 +65,7 @@ fun getRecurringMeetingDateTime(
                 val interval = scheduledMeeting.getIntervalValue()
                 when (weekDaysList.size) {
                     1 -> {
-                        val weekDay = getWeekDay(weekDaysList.first())
+                        val weekDay = getWeekDay(weekDaysList.first(), true)
                         return when {
                             scheduledMeeting.isForever() -> pluralStringResource(
                                 R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever,
@@ -90,18 +90,19 @@ fun getRecurringMeetingDateTime(
                     }
                     else -> {
                         var weekdayStringList: String
+                        val firstPos = weekDaysList.sorted().indexOf(weekDaysList.minOf { it })
+                        val lastPos = weekDaysList.sorted().indexOf(weekDaysList.maxOf { it })
                         mutableListOf<String>().apply {
                             weekDaysList.sorted().forEach { day ->
                                 val index = weekDaysList.indexOf(day)
-                                val lastPos = weekDaysList.size - 1
                                 if (index != lastPos) {
-                                    this@apply.add(getWeekDay(day))
+                                    this@apply.add(getWeekDay(day, index == firstPos))
                                 }
                             }
                             val separator = ", "
                             weekdayStringList = this@apply.joinToString(separator)
                         }
-                        val lastWeekDay = getWeekDay(weekDaysList.last())
+                        val lastWeekDay = getWeekDay(weekDaysList.last(), false)
                         return when {
                             scheduledMeeting.isForever() ->
                                 pluralStringResource(
@@ -932,16 +933,16 @@ private fun getTextForOneOffMeeting(
  * Get the string corresponding to the day of the week
  *
  * @param day [Weekday]
+ * @param isForSentenceStart True if the weekday string is to be used at the beginning of the sentence, or False otherwise (in the middle of the sentence).
  * @return String of day of the week
  */
 @Composable
-private fun getWeekDay(day: Weekday): String =
-    when (day) {
-        Weekday.Monday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_mon)
-        Weekday.Tuesday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_tue)
-        Weekday.Wednesday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_wed)
-        Weekday.Thursday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_thu)
-        Weekday.Friday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_fri)
-        Weekday.Saturday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_sat)
-        Weekday.Sunday -> stringResource(id = R.string.notification_scheduled_meeting_week_day_sun)
-    }
+private fun getWeekDay(day: Weekday, isForSentenceStart: Boolean): String = when (day) {
+    Weekday.Monday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_mon else R.string.notification_scheduled_meeting_week_day_sentence_middle_mon)
+    Weekday.Tuesday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_tue else R.string.notification_scheduled_meeting_week_day_sentence_middle_tue)
+    Weekday.Wednesday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_wed else R.string.notification_scheduled_meeting_week_day_sentence_middle_wed)
+    Weekday.Thursday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_thu else R.string.notification_scheduled_meeting_week_day_sentence_middle_thu)
+    Weekday.Friday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_fri else R.string.notification_scheduled_meeting_week_day_sentence_middle_fri)
+    Weekday.Saturday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_sat else R.string.notification_scheduled_meeting_week_day_sentence_middle_sat)
+    Weekday.Sunday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_sun else R.string.notification_scheduled_meeting_week_day_sentence_middle_sun)
+}
