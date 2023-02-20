@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.notification.model.extensions.dateT
 import mega.privacy.android.app.presentation.notification.model.extensions.description
 import mega.privacy.android.app.presentation.notification.model.extensions.descriptionMaxWidth
 import mega.privacy.android.app.presentation.notification.model.extensions.onClick
+import mega.privacy.android.app.presentation.notification.model.extensions.recurringScheduledMeeting
 import mega.privacy.android.app.presentation.notification.model.extensions.sectionColour
 import mega.privacy.android.app.presentation.notification.model.extensions.sectionIcon
 import mega.privacy.android.app.presentation.notification.model.extensions.sectionTitle
@@ -35,6 +36,7 @@ internal fun getNotification(alert: UserAlert) = Notification(
     description = alert.description(),
     descriptionMaxWidth = alert.descriptionMaxWidth(),
     chatDateText = alert.chatDateText(),
+    recurringSchedMeeting = alert.recurringScheduledMeeting(),
     dateText = alert.dateText(),
     isNew = !alert.seen,
     backgroundColor = alert.backgroundColor(),

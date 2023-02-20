@@ -12,9 +12,12 @@ internal fun toChatScheduledMeetingOccur(megaChatScheduledMeetingOccurr: MegaCha
     ChatScheduledMeetingOccurr(
         megaChatScheduledMeetingOccurr.schedId(),
         megaChatScheduledMeetingOccurr.parentSchedId(),
-        megaChatScheduledMeetingOccurr.cancelled(),
+        megaChatScheduledMeetingOccurr.isCancelled(),
         megaChatScheduledMeetingOccurr.timezone(),
         megaChatScheduledMeetingOccurr.startDateTime(),
         megaChatScheduledMeetingOccurr.endDateTime(),
         megaChatScheduledMeetingOccurr.overrides(),
     )
+
+private fun MegaChatScheduledMeetingOccurr.isCancelled(): Boolean =
+    cancelled() != null && cancelled() > 0

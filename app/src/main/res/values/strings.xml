@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -4125,7 +4125,7 @@
     <string name="video_playback_position_dialog_resume_button">Resume</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Restart</string>
-    <!-- User Alert notification for new scheduled meeting -->
+    <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
     <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
@@ -4138,7 +4138,7 @@
     <!-- User Alert notification for scheduled meeting description change -->
     <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the meeting details scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Access denied</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4166,7 +4166,7 @@
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s updated[/A][B] the recurring meeting description[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the recurring meeting details scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the details of the recurring meeting scheduled for:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
@@ -4571,20 +4571,6 @@
         <item quantity="one">Fifth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
         <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
     </plurals>
-    <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
-    <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you’ve seen this message for this account before, tap Cancel.</string>
-    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
-    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
-        <item quantity="one">You’re currently sharing the following folder: %s</item>
-        <item quantity="other">You’re currently sharing the following folders: %s</item>
-    </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
-    <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
-    </plurals>
     <!-- In app notification description text representing the meeting repeats every Monday -->
     <string name="notification_scheduled_meeting_week_day_mon">Mon</string>
     <!-- In app notification description text representing the meeting repeats every Tuesday -->
@@ -4605,4 +4591,18 @@
     <string name="meetings_one_off_occurrence_info_tomorrow">Tomorrow, %1$s from %2$s to %3$s</string>
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s updated[/A][B] the recurring meeting date[/B]</string>
+    <!-- This is the title of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
+    <!-- This is the body of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you’ve seen this message for this account before, tap Cancel.</string>
+    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
+    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
+        <item quantity="one">You’re currently sharing the following folder: %s</item>
+        <item quantity="other">You’re currently sharing the following folders: %s</item>
+    </plurals>
+    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
+    <plurals name="cloud_drive_undecrypted_file">
+        <item quantity="one">[Undecrypted file]</item>
+        <item quantity="other">[Undecrypted files]</item>
+    </plurals>
 </resources>

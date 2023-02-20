@@ -49,7 +49,9 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,
+            ))))
         }
         composeRule.onNodeWithTag("NotificationListView").assertIsDisplayed()
     }
@@ -72,7 +74,9 @@ class NotificationViewTest {
                     backgroundColor = { "#D3D3D3" },
                     separatorMargin = { 0 },
                     onClick = {},
-                    chatDateText = { null }),
+                    chatDateText = { null },
+                    recurringSchedMeeting = null,
+                ),
                 Notification(
                     sectionTitle = { "INCOMING SHARES" },
                     sectionColour = R.color.orange_400_orange_300,
@@ -87,7 +91,9 @@ class NotificationViewTest {
                     backgroundColor = { "#D3D3D3" },
                     separatorMargin = { 0 },
                     onClick = {},
-                    chatDateText = { null }))))
+                    chatDateText = { null },
+                    recurringSchedMeeting = null,
+                ))))
         }
         composeRule.onAllNodesWithTag("NotificationItemView").assertCountEquals(2)
     }
@@ -109,7 +115,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("SectionTitle", useUnmergedTree = true).assertIsDisplayed()
     }
@@ -131,7 +138,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("Title").assertIsDisplayed()
     }
@@ -153,7 +161,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("Description").assertIsDisplayed()
     }
@@ -175,7 +184,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("Description").assertDoesNotExist()
     }
@@ -197,7 +207,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("DateText", useUnmergedTree = true).assertIsDisplayed()
     }
@@ -219,7 +230,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("IsNew", useUnmergedTree = true).assertIsDisplayed()
     }
@@ -241,7 +253,8 @@ class NotificationViewTest {
                 backgroundColor = { "#D3D3D3" },
                 separatorMargin = { 0 },
                 onClick = {},
-                chatDateText = { null }))))
+                chatDateText = { null },
+                recurringSchedMeeting = null,))))
         }
         composeRule.onNodeWithTag("IsNew").assertDoesNotExist()
     }

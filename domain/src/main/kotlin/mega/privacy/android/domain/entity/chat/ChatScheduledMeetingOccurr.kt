@@ -5,7 +5,7 @@ package mega.privacy.android.domain.entity.chat
  *
  * @property schedId
  * @property parentSchedId
- * @property cancelled
+ * @property isCancelled
  * @property timezone
  * @property startDateTime
  * @property endDateTime
@@ -14,7 +14,7 @@ package mega.privacy.android.domain.entity.chat
 data class ChatScheduledMeetingOccurr constructor(
     val schedId: Long,
     val parentSchedId: Long = -1,
-    val cancelled: Int? = null,
+    val isCancelled: Boolean = false,
     val timezone: String? = null,
     val startDateTime: Long? = null,
     val endDateTime: Long? = null,

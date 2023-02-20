@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.notification.view
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.text.TextUtils
+import android.text.format.DateFormat
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.core.ui.controls.dpToSp
@@ -54,9 +56,13 @@ internal fun NotificationItemView(
 ) {
     Column(modifier = modifier
         .clickable { onClick() }
-        .background(color = Color(notification
-            .backgroundColor(LocalContext.current)
-            .toColorInt()))
+        .background(
+            color = Color(
+                notification
+                    .backgroundColor(LocalContext.current)
+                    .toColorInt()
+            )
+        )
         .testTag("NotificationItemView")
         .fillMaxWidth()
         .wrapContentHeight()) {
@@ -70,9 +76,22 @@ internal fun NotificationItemView(
             NotificationDescription(notification)
         }
 
-        val chatDateText = notification.chatDateText(LocalContext.current)
-        if (!chatDateText.isNullOrBlank()) {
-            NotificationChatDate(chatDateText)
+        val schedMeetingText = notification.recurringSchedMeeting?.let { meeting ->
+            val is24HourFormat = DateFormat.is24HourFormat(LocalContext.current)
+            getRecurringMeetingDateTime(scheduledMeeting = meeting, is24HourFormat = is24HourFormat)
+                .replace("[A]", "")
+                .replace("[/A]", "")
+                .replace("[B]", "")
+                .replace("[/B]", "")
+        }
+
+        if (!schedMeetingText.isNullOrBlank()) {
+            NotificationSchedMeetingTime(AnnotatedString(schedMeetingText))
+        } else {
+            val chatDateText = notification.chatDateText(LocalContext.current)
+            if (!chatDateText.isNullOrBlank()) {
+                NotificationSchedMeetingTime(chatDateText)
+            }
         }
         NotificationDate(notification)
 
@@ -162,8 +181,10 @@ private fun NotificationTitleRow(
         if (notification.isNew) {
             Box(modifier = Modifier
                 .padding(start = 12.dp)
-                .background(color = MaterialTheme.colors.secondary,
-                    shape = RoundedCornerShape(12.dp))) {
+                .background(
+                    color = MaterialTheme.colors.secondary,
+                    shape = RoundedCornerShape(12.dp)
+                )) {
                 Text(text = stringResource(id = R.string.new_label_notification_item),
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 3.dp)
@@ -206,16 +227,18 @@ private fun NotificationDescription(
 }
 
 @Composable
-private fun NotificationChatDate(dateText: AnnotatedString) {
-    Text(text = dateText,
+private fun NotificationSchedMeetingTime(dateText: AnnotatedString) {
+    Text(
+        text = dateText,
         modifier = Modifier
-            .padding(start = 16.dp, top = 2.dp)
-            .testTag("ChatDateText"),
+            .padding(start = 16.dp, top = 2.dp, end = 16.dp)
+            .testTag("SchedMeetingTime"),
         color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
         style = MaterialTheme.typography.caption,
         fontSize = 12.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis)
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
@@ -257,6 +280,7 @@ private fun PreviewNotificationItemView() {
         description = { "xyz@gmail.com is now a contact" },
         descriptionMaxWidth = { 300 },
         chatDateText = { AnnotatedString("Tue, 30 Jun, 2022 • 10:00 - 11:00") },
+        recurringSchedMeeting = null,
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,
         backgroundColor = { "#D3D3D3" },

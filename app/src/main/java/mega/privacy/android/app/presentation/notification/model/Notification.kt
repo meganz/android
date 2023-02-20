@@ -5,6 +5,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 
 /**
  * Notification
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.Dp
  * @property description
  * @property descriptionMaxWidth
  * @property chatDateText
+ * @property recurringSchedMeeting
  * @property dateText
  * @property isNew
  * @property backgroundColor
@@ -35,6 +37,7 @@ data class Notification constructor(
     val description: (Context) -> CharSequence?,
     val descriptionMaxWidth: (Context) -> Int?,
     val chatDateText: (Context) -> AnnotatedString?,
+    val recurringSchedMeeting: ChatScheduledMeeting?,
     val dateText: (Context) -> String,
     val isNew: Boolean,
     val backgroundColor: (Context) -> String,

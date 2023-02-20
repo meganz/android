@@ -125,16 +125,11 @@ fun ChatScheduledMeeting.getZoneStartTime(): ZonedDateTime? = startDateTime?.par
  *
  * True, the scheduled meeting has passed. False, otherwise.
  */
-
 fun ChatScheduledMeeting.isPast(): Boolean {
     val now = ZonedDateTime.now()
         .withZoneSameInstant(ZoneOffset.UTC)
 
     this.rules?.let { rules ->
-        if (rules.until == 0L) {
-            return false
-        }
-
         return now.isAfter(rules.until.parseDate())
     }
 

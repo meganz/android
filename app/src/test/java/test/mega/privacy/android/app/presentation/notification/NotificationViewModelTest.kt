@@ -83,6 +83,7 @@ class NotificationViewModelTest {
             separatorMargin = { 0 },
             onClick = {},
             chatDateText = { null },
+            recurringSchedMeeting = null,
         )
 
         val alert = mock<UserAlert>()
@@ -116,6 +117,7 @@ class NotificationViewModelTest {
             separatorMargin = { 0 },
             onClick = {},
             chatDateText = { null },
+            recurringSchedMeeting = null,
         )
         val newNotification = initialNotification.copy(title = {"New title"})
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)

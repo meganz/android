@@ -360,7 +360,8 @@ class ScheduledMeetingInfoViewTest {
             overrides = null,
             flags = null,
             rules = null,
-            changes = null
+            changes = null,
+            isCanceled = false,
         )
 
     private fun initComposeRuleContent(

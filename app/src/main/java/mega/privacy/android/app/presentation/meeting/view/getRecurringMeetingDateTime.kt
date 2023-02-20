@@ -61,7 +61,7 @@ fun getRecurringMeetingDateTime(
             )
         }
         OccurrenceFrequencyType.Weekly -> {
-            rules.weekDayList?.let { weekDaysList ->
+            rules.weekDayList?.takeIf { it.isNotEmpty() }?.let { weekDaysList ->
                 val interval = scheduledMeeting.getIntervalValue()
                 when (weekDaysList.size) {
                     1 -> {
@@ -126,14 +126,13 @@ fun getRecurringMeetingDateTime(
                                 endTime
                             )
                         }
-
                     }
                 }
             }
         }
         OccurrenceFrequencyType.Monthly -> {
             val interval = scheduledMeeting.getIntervalValue()
-            rules.monthDayList?.let { monthDayList ->
+            rules.monthDayList?.takeIf { it.isNotEmpty() }?.let { monthDayList ->
                 val dayOfTheMonth = monthDayList.first()
                 return when {
                     scheduledMeeting.isForever() -> pluralStringResource(
@@ -158,7 +157,7 @@ fun getRecurringMeetingDateTime(
                 }
             }
 
-            rules.monthWeekDayList?.let { monthWeekDayList ->
+            rules.monthWeekDayList?.takeIf { it.isNotEmpty() }?.let { monthWeekDayList ->
                 val monthWeekDayItem = monthWeekDayList.first()
                 val weekOfMonth = monthWeekDayItem.weekOfMonth
 

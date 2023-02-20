@@ -324,7 +324,8 @@ internal suspend fun toUserAlert(
                 startDate = meeting?.startDateTime,
                 endDate = meeting?.endDateTime,
                 isRecurring = meeting?.rules != null,
-                isOccurrence = false
+                isOccurrence = false,
+                scheduledMeeting = meeting,
             )
         } else { // Updated Occurrence
             megaUserAlert.getUpdatedMeetingAlert(meeting, scheduledMeetingOccurrProvider)
@@ -343,7 +344,8 @@ internal suspend fun toUserAlert(
             startDate = meeting?.startDateTime,
             endDate = meeting?.endDateTime,
             isRecurring = meeting?.rules != null,
-            isOccurrence = meeting?.parentSchedId.isValid()
+            isOccurrence = meeting?.parentSchedId.isValid(),
+            scheduledMeeting = meeting,
         )
     }
     MegaUserAlert.TYPE_SCHEDULEDMEETING_UPDATED -> {
@@ -366,6 +368,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
     scheduledMeetingOccurrProvider: UserAlertScheduledMeetingOccurrProvider,
 ): UserAlert {
     val createdTime = getTimestamp(CREATED_TIME_INDEX)
+    val isRecurring = meeting?.rules != null
     val isOccurrence = pcrHandle.isValid()
     if (isOccurrence) {
         scheduledMeetingOccurrProvider(nodeHandle)?.firstOrNull { occurr ->
@@ -373,7 +376,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     && occurr.parentSchedId == this.pcrHandle
                     && occurr.overrides == getNumber(0)
         }?.let { updatedOccurrence ->
-            return if ((updatedOccurrence.cancelled ?: 0) > 0) {
+            return if (updatedOccurrence.isCancelled) {
                 UpdatedScheduledMeetingCancelAlert(
                     id = id,
                     seen = seen,
@@ -386,6 +389,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     endDate = meeting?.endDateTime,
                     isRecurring = true,
                     isOccurrence = true,
+                    scheduledMeeting = meeting,
                 )
             } else {
                 val dateTimeChanges = getDateTimeChanges()
@@ -403,12 +407,29 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     hasTimeChanged = dateTimeChanges.second,
                     isRecurring = true,
                     isOccurrence = true,
+                    scheduledMeeting = meeting,
                 )
             }
         }
     }
 
-    val isRecurring = meeting?.rules != null
+    if (meeting?.isCanceled == true) {
+        return UpdatedScheduledMeetingCancelAlert(
+            id = id,
+            seen = seen,
+            createdTime = createdTime,
+            isOwnChange = isOwnChange,
+            chatId = nodeHandle,
+            title = meeting.title ?: title,
+            email = email,
+            startDate = meeting.startDateTime,
+            endDate = meeting.endDateTime,
+            isRecurring = isRecurring,
+            isOccurrence = false,
+            scheduledMeeting = meeting,
+        )
+    }
+
     val changes = getScheduledMeetingChanges()
     return if (changes.size == 1) {
         when (changes.first()) {
@@ -426,6 +447,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     oldTitle = updatedTitle[0],
                     isRecurring = isRecurring,
                     isOccurrence = isOccurrence,
+                    scheduledMeeting = meeting,
                 )
             }
             ScheduledMeetingChangeType.Description -> {
@@ -441,6 +463,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     endDate = meeting?.endDateTime,
                     isRecurring = isRecurring,
                     isOccurrence = isOccurrence,
+                    scheduledMeeting = meeting,
                 )
             }
             ScheduledMeetingChangeType.StartDate, ScheduledMeetingChangeType.EndDate -> {
@@ -459,6 +482,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     hasTimeChanged = dateTimeChanges.second,
                     isRecurring = isRecurring,
                     isOccurrence = isOccurrence,
+                    scheduledMeeting = meeting,
                 )
             }
             ScheduledMeetingChangeType.Canceled -> {
@@ -474,6 +498,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     endDate = meeting?.endDateTime,
                     isRecurring = isRecurring,
                     isOccurrence = isOccurrence,
+                    scheduledMeeting = meeting,
                 )
             }
             else -> {
@@ -489,6 +514,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     endDate = meeting?.endDateTime,
                     isRecurring = isRecurring,
                     isOccurrence = isOccurrence,
+                    scheduledMeeting = meeting,
                 )
             }
         }
@@ -517,6 +543,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                 hasTimeChanged = dateTimeChanges.second,
                 isRecurring = isRecurring,
                 isOccurrence = isOccurrence,
+                scheduledMeeting = meeting,
             )
         } else {
             UpdatedScheduledMeetingFieldsAlert(
@@ -531,6 +558,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                 endDate = meeting?.endDateTime,
                 isRecurring = isRecurring,
                 isOccurrence = isOccurrence,
+                scheduledMeeting = meeting,
             )
         }
     }

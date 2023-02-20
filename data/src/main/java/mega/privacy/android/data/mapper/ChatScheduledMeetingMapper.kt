@@ -33,7 +33,8 @@ internal fun toChatScheduledMeeting(megaChatScheduledMeeting: MegaChatScheduledM
         megaChatScheduledMeeting.overrides(),
         megaChatScheduledMeeting.flags()?.mapFlags(),
         megaChatScheduledMeeting.rules()?.mapRules(),
-        megaChatScheduledMeeting.mapChanges()
+        megaChatScheduledMeeting.mapChanges(),
+        megaChatScheduledMeeting.isCanceled()
     )
 
 private fun MegaChatScheduledFlags.mapFlags(): ChatScheduledFlags =
@@ -145,3 +146,6 @@ private fun MegaChatScheduledMeeting.mapChanges(): ScheduledMeetingChanges = whe
     hasChanged(MegaChatScheduledMeeting.SC_RULES.toLong()) -> ScheduledMeetingChanges.RepetitionRules
     else -> ScheduledMeetingChanges.ScheduledMeetingFlagsSize
 }
+
+private fun MegaChatScheduledMeeting.isCanceled(): Boolean =
+    cancelled() != null && cancelled() > 0

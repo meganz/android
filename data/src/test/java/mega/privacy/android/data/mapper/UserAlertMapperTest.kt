@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.IncomingPendingContactCancelledAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactReminderAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.IncomingShareAlert
-import mega.privacy.android.domain.entity.NewScheduledMeetingAlert
 import mega.privacy.android.domain.entity.NewShareAlert
 import mega.privacy.android.domain.entity.NewSharedNodesAlert
 import mega.privacy.android.domain.entity.PaymentFailedAlert
@@ -155,12 +154,13 @@ class UserAlertMapperTest {
         flags = null,
         rules = null,
         changes = null,
+        isCanceled = false,
     )
 
     private val testSchedMeetingOccurr = ChatScheduledMeetingOccurr(
         schedId = 1L,
         parentSchedId = -1,
-        cancelled = 0,
+        isCancelled = false,
         timezone = null,
         startDateTime = null,
         endDateTime = null,
