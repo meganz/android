@@ -4,14 +4,14 @@ import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**
  * Data class defining the state of [ScheduledMeetingInfoViewModel]
  *
  * @property chatId                                     Chat id.
- * @property scheduledMeeting                           Current scheduled meeting item.
+ * @property scheduledMeeting                           [ChatScheduledMeeting].
  * @property finish                                     True, if the activity is to be terminated.
  * @property openAddContact                             True, if should open Add contact screen. False, if not.
  * @property dndSeconds                                 Do not disturb seconds.
@@ -44,7 +44,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1,
-    val scheduledMeeting: ScheduledMeetingItem? = null,
+    val scheduledMeeting: ChatScheduledMeeting? = null,
     val finish: Boolean = false,
     val openAddContact: Boolean? = null,
     val dndSeconds: Long? = null,
@@ -92,32 +92,32 @@ data class ScheduledMeetingInfoState(
         secondParticipant == null
 
     /**
-     * ScheduledMeetingItem DiffCallback
+     * ChatScheduledMeeting DiffCallback
      */
-    class DiffCallback : DiffUtil.ItemCallback<ScheduledMeetingItem>() {
+    class DiffCallback : DiffUtil.ItemCallback<ChatScheduledMeeting>() {
         /**
-         * ScheduledMeetingItems are the same
+         * ChatScheduledMeetings are the same
          *
-         * @param oldItem [ScheduledMeetingItem]
-         * @param newItem [ScheduledMeetingItem]
+         * @param oldItem [ChatScheduledMeeting]
+         * @param newItem [ChatScheduledMeeting]
          * @return True if are the same, false otherwise.
          */
         override fun areItemsTheSame(
-            oldItem: ScheduledMeetingItem,
-            newItem: ScheduledMeetingItem,
+            oldItem: ChatScheduledMeeting,
+            newItem: ChatScheduledMeeting,
         ): Boolean =
             oldItem.chatId == newItem.chatId
 
         /**
-         * ScheduledMeetingItems contents are the same
+         * ChatScheduledMeetings contents are the same
          *
-         * @param oldItem [ScheduledMeetingItem]
-         * @param newItem [ScheduledMeetingItem]
+         * @param oldItem [ChatScheduledMeeting]
+         * @param newItem [ChatScheduledMeeting]
          * @return True if the contents are the same, false otherwise.
          */
         override fun areContentsTheSame(
-            oldItem: ScheduledMeetingItem,
-            newItem: ScheduledMeetingItem,
+            oldItem: ChatScheduledMeeting,
+            newItem: ChatScheduledMeeting,
         ): Boolean =
             oldItem == newItem
     }

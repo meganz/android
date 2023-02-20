@@ -23,10 +23,10 @@ import java.time.ZonedDateTime
  * @property changes            Changes [ScheduledMeetingChanges].
  */
 data class ChatScheduledMeeting constructor(
-    val chatId: Long,
-    val schedId: Long,
-    val parentSchedId: Long?,
-    val organizerUserId: Long?,
+    val chatId: Long = -1,
+    val schedId: Long = -1,
+    val parentSchedId: Long? = null,
+    val organizerUserId: Long? = null,
     val timezone: String? = null,
     val startDateTime: Long? = null,
     val endDateTime: Long? = null,

@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
@@ -39,7 +40,6 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChanges
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
-import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatCall
@@ -64,7 +64,6 @@ import mega.privacy.android.domain.usecase.StartChatCall
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -130,6 +129,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val cameraGateway: CameraGateway,
     private val deviceGateway: DeviceGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
@@ -137,7 +137,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
 
     private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
-    private var scheduledMeetingId: Long = MEGACHAT_INVALID_HANDLE
+    private var scheduledMeetingId: Long = megaChatApiGateway.getChatInvalidHandle()
 
     /**
      * Monitor connectivity event
@@ -180,7 +180,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param newScheduledMeetingId     Scheduled meeting id.
      */
     fun setChatId(newChatId: Long, newScheduledMeetingId: Long) {
-        if (newChatId != MEGACHAT_INVALID_HANDLE && newChatId != state.value.chatId) {
+        if (newChatId != megaChatApiGateway.getChatInvalidHandle() && newChatId != state.value.chatId) {
             _state.update {
                 it.copy(
                     chatId = newChatId
@@ -286,8 +286,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
-                        updateScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)
-                        return@forEach
+                        if (isMainScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
+                            updateScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)
+                            return@forEach
+                        }
                     }
                 }
             }
@@ -352,21 +354,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param scheduledMeetReceived [ChatScheduledMeeting]
      */
     private fun updateScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting) {
-        if (scheduledMeetReceived.parentSchedId == MEGACHAT_INVALID_HANDLE) {
-            _state.update {
-                it.copy(
-                    scheduledMeeting = ScheduledMeetingItem(
-                        chatId = scheduledMeetReceived.chatId,
-                        scheduledMeetingId = scheduledMeetReceived.schedId,
-                        title = scheduledMeetReceived.title,
-                        description = scheduledMeetReceived.description,
-                        startDateTime = scheduledMeetReceived.startDateTime,
-                        endDateTime = scheduledMeetReceived.endDateTime,
-                        rules = scheduledMeetReceived.rules
-                    ),
-                    is24HourFormat = is24HourFormat
-                )
-            }
+        _state.update {
+            it.copy(
+                scheduledMeeting = scheduledMeetReceived,
+                is24HourFormat = is24HourFormat
+            )
         }
     }
 
@@ -374,10 +366,19 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Check if is the current scheduled meeting
      *
      * @param scheduledMeet [ChatScheduledMeeting]
-     * @ return True, if it's same. False otherwise.
+     * @ return True, if it's same. False if not.
      */
     private fun isSameScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
         state.value.chatId == scheduledMeet.chatId
+
+    /**
+     * Check if is main scheduled meeting
+     *
+     * @param scheduledMeet [ChatScheduledMeeting]
+     * @ return True, if it's the main scheduled meeting. False if not.
+     */
+    private fun isMainScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
+        scheduledMeet.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
 
     /**
      * Get scheduled meeting updates
@@ -385,15 +386,27 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-                if (isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
-                    Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
-                    when (scheduledMeetReceived.changes) {
-                        ScheduledMeetingChanges.NewScheduledMeeting -> {
-                            updateScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)
-                        }
-                        ScheduledMeetingChanges.Title -> {
-                            _state.value.scheduledMeeting?.let {
-                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                if (!isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
+                    return@collectLatest
+                }
+
+                if (!isMainScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
+                    return@collectLatest
+                }
+
+                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
+                when (val changes = scheduledMeetReceived.changes) {
+                    ScheduledMeetingChanges.NewScheduledMeeting -> updateScheduledMeeting(
+                        scheduledMeetReceived = scheduledMeetReceived
+                    )
+                    ScheduledMeetingChanges.Title,
+                    ScheduledMeetingChanges.Description,
+                    ScheduledMeetingChanges.StartDate,
+                    ScheduledMeetingChanges.EndDate,
+                    -> state.value.scheduledMeeting?.let { schedMeet ->
+                        if (scheduledMeetReceived.schedId == schedMeet.schedId) {
+                            when (changes) {
+                                ScheduledMeetingChanges.Title -> {
                                     _state.update { state ->
                                         state.copy(
                                             scheduledMeeting = state.scheduledMeeting?.copy(
@@ -402,11 +415,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
-                            }
-                        }
-                        ScheduledMeetingChanges.Description -> {
-                            _state.value.scheduledMeeting?.let {
-                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                ScheduledMeetingChanges.Description -> {
                                     _state.update { state ->
                                         state.copy(
                                             scheduledMeeting = state.scheduledMeeting?.copy(
@@ -415,11 +424,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
-                            }
-                        }
-                        ScheduledMeetingChanges.StartDate -> {
-                            _state.value.scheduledMeeting?.let {
-                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                ScheduledMeetingChanges.StartDate -> {
                                     _state.update { state ->
                                         state.copy(
                                             scheduledMeeting = state.scheduledMeeting?.copy(
@@ -428,11 +433,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
-                            }
-                        }
-                        ScheduledMeetingChanges.EndDate -> {
-                            _state.value.scheduledMeeting?.let {
-                                if (scheduledMeetReceived.schedId == it.scheduledMeetingId) {
+                                ScheduledMeetingChanges.EndDate -> {
                                     _state.update { state ->
                                         state.copy(
                                             scheduledMeeting = state.scheduledMeeting?.copy(
@@ -441,10 +442,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+                                else -> {}
                             }
+
                         }
-                        else -> {}
                     }
+                    else -> {}
                 }
             }
         }

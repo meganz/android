@@ -23,7 +23,6 @@ import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
-import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -96,24 +95,9 @@ class RecurringMeetingInfoViewModel @Inject constructor(
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
-                        if (scheduledMeetReceived.parentSchedId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                        if (isMainScheduledMeeting(scheduledMeetReceived)) {
                             Timber.d("Scheduled meeting exists")
-                            var freq = OccurrenceFrequencyType.Invalid
-                            var until: Long = -1
-                            scheduledMeetReceived.rules?.let { rules ->
-                                freq = rules.freq
-                                until = rules.until
-                            }
-
-                            _state.update {
-                                it.copy(
-                                    schedTitle = scheduledMeetReceived.title,
-                                    schedId = scheduledMeetReceived.schedId,
-                                    schedUntil = until,
-                                    typeOccurs = freq
-                                )
-                            }
-
+                            updateScheduledMeeting(scheduledMeetReceived)
                             getOccurrencesUpdates()
                             getScheduledMeetingUpdates()
                             getOccurrences()
@@ -186,13 +170,46 @@ class RecurringMeetingInfoViewModel @Inject constructor(
         }
 
     /**
+     * Update scheduled meeting
+     *
+     * @param scheduledMeetReceived [ChatScheduledMeeting]
+     */
+    private fun updateScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting) {
+        var freq = OccurrenceFrequencyType.Invalid
+        var until = 0L
+        scheduledMeetReceived.rules?.let { rules ->
+            freq = rules.freq
+            until = rules.until
+        }
+
+        _state.update {
+            it.copy(
+                schedTitle = scheduledMeetReceived.title,
+                schedId = scheduledMeetReceived.schedId,
+                schedUntil = until,
+                typeOccurs = freq
+            )
+        }
+    }
+
+    /**
      * Check if is the current scheduled meeting
      *
      * @param scheduledMeet [ChatScheduledMeeting]
-     * @return True, if it's same. False otherwise.
+     * @ return True, if it's same. False if not.
      */
     private fun isSameScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
         state.value.chatId == scheduledMeet.chatId
+
+    /**
+     * Check if is main scheduled meeting
+     *
+     * @param scheduledMeet [ChatScheduledMeeting]
+     * @ return True, if it's the main scheduled meeting. False if not.
+     */
+    private fun isMainScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
+        scheduledMeet.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
+
 
     /**
      * Get scheduled meeting updates
@@ -203,58 +220,52 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private fun getScheduledMeetingUpdates() =
         viewModelScope.launch {
             monitorScheduledMeetingUpdates().collectLatest { scheduledMeetReceived ->
-                if (isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
-                    Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
-                    when (scheduledMeetReceived.changes) {
-                        ScheduledMeetingChanges.NewScheduledMeeting -> {
-                            if (scheduledMeetReceived.parentSchedId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                                Timber.d("Scheduled meeting exists")
-                                var freq = OccurrenceFrequencyType.Invalid
-                                var until = 0L
-                                scheduledMeetReceived.rules?.let { rules ->
-                                    freq = rules.freq
-                                    until = rules.until
-                                }
+                if (!isSameScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
+                    return@collectLatest
+                }
 
-                                _state.update {
-                                    it.copy(
-                                        schedTitle = scheduledMeetReceived.title,
-                                        schedId = scheduledMeetReceived.schedId,
-                                        schedUntil = until,
-                                        typeOccurs = freq
-                                    )
-                                }
-                            }
-                        }
-                        ScheduledMeetingChanges.Title -> {
-                            if (scheduledMeetReceived.schedId == state.value.schedId) {
-                                _state.update {
-                                    it.copy(
-                                        schedTitle = scheduledMeetReceived.title,
-                                    )
-                                }
-                            }
-                        }
-                        ScheduledMeetingChanges.RepetitionRules -> {
-                            if (scheduledMeetReceived.schedId == state.value.schedId) {
-                                var freq = OccurrenceFrequencyType.Invalid
-                                var until = 0L
+                if (!isMainScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
+                    return@collectLatest
+                }
 
-                                scheduledMeetReceived.rules?.let { rules ->
-                                    freq = rules.freq
-                                    until = rules.until
+                Timber.d("Monitor scheduled meeting updated, changes ${scheduledMeetReceived.changes}")
+                when (val changes = scheduledMeetReceived.changes) {
+                    ScheduledMeetingChanges.NewScheduledMeeting -> updateScheduledMeeting(
+                        scheduledMeetReceived = scheduledMeetReceived
+                    )
+                    ScheduledMeetingChanges.Title,
+                    ScheduledMeetingChanges.RepetitionRules,
+                    ->
+                        if (scheduledMeetReceived.schedId == state.value.schedId) {
+                            when (changes) {
+                                ScheduledMeetingChanges.Title -> {
+                                    _state.update {
+                                        it.copy(
+                                            schedTitle = scheduledMeetReceived.title,
+                                        )
+                                    }
                                 }
+                                ScheduledMeetingChanges.RepetitionRules -> {
+                                    var freq = OccurrenceFrequencyType.Invalid
+                                    var until = 0L
 
-                                _state.update {
-                                    it.copy(
-                                        schedUntil = until,
-                                        typeOccurs = freq,
-                                    )
+                                    scheduledMeetReceived.rules?.let { rules ->
+                                        freq = rules.freq
+                                        until = rules.until
+                                    }
+
+                                    _state.update {
+                                        it.copy(
+                                            schedUntil = until,
+                                            typeOccurs = freq,
+                                        )
+                                    }
                                 }
+                                else -> {}
                             }
+
                         }
-                        else -> {}
-                    }
+                    else -> {}
                 }
             }
         }

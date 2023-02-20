@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.extensions
 
-import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
  *
  * @return True, if it's today. False, if not.
  */
-fun ScheduledMeetingItem.isToday(): Boolean {
+fun ChatScheduledMeeting.isToday(): Boolean {
     this.getZoneStartTime()?.let {
         return it.toLocalDate() == LocalDate.now(ZoneId.systemDefault())
     }
@@ -26,7 +26,7 @@ fun ScheduledMeetingItem.isToday(): Boolean {
  *
  * @return True, if it's tomorrow. False, if not.
  */
-fun ScheduledMeetingItem.isTomorrow(): Boolean {
+fun ChatScheduledMeeting.isTomorrow(): Boolean {
     this.getZoneStartTime()?.let {
         return it.toLocalDate() == LocalDate.now(ZoneId.systemDefault()).plusDays(1)
     }
@@ -40,7 +40,7 @@ fun ScheduledMeetingItem.isTomorrow(): Boolean {
  * @param is24HourFormat True, if it's 24 hour format.
  * @return Text of start time.
  */
-fun ScheduledMeetingItem.getStartTime(is24HourFormat: Boolean): String {
+fun ChatScheduledMeeting.getStartTime(is24HourFormat: Boolean): String {
     this.startDateTime?.let {
         return getHourFormatter(Instant.ofEpochSecond(it), is24HourFormat).format(it.parseDate())
     }
@@ -54,7 +54,7 @@ fun ScheduledMeetingItem.getStartTime(is24HourFormat: Boolean): String {
  * @param is24HourFormat True, if it's 24 hour format.
  * @return Text of end time.
  */
-fun ScheduledMeetingItem.getEndTime(is24HourFormat: Boolean): String {
+fun ChatScheduledMeeting.getEndTime(is24HourFormat: Boolean): String {
     this.endDateTime?.let {
         return getHourFormatter(Instant.ofEpochSecond(it), is24HourFormat).format(it.parseDate())
     }
@@ -67,7 +67,7 @@ fun ScheduledMeetingItem.getEndTime(is24HourFormat: Boolean): String {
  *
  * @return Text of start date
  */
-fun ScheduledMeetingItem.getCompleteStartDate(): String {
+fun ChatScheduledMeeting.getCompleteStartDate(): String {
     val dateFormatter = getCompleteDateFormatter()
 
     this.startDateTime?.let { start ->
@@ -82,7 +82,7 @@ fun ScheduledMeetingItem.getCompleteStartDate(): String {
  *
  * @return Text of start date
  */
-fun ScheduledMeetingItem.getStartDate(): String {
+fun ChatScheduledMeeting.getStartDate(): String {
     val dateFormatter = getDateFormatter()
 
     this.startDateTime?.let { start ->
@@ -97,7 +97,7 @@ fun ScheduledMeetingItem.getStartDate(): String {
  *
  * @return Text of end date
  */
-fun ScheduledMeetingItem.getEndDate(): String {
+fun ChatScheduledMeeting.getEndDate(): String {
     val dateFormatter = getDateFormatter()
 
     this.rules?.let {
@@ -118,12 +118,15 @@ fun ScheduledMeetingItem.getEndDate(): String {
  *
  * @return [ZonedDateTime]
  */
-fun ScheduledMeetingItem.getZoneStartTime(): ZonedDateTime? = startDateTime?.parseDate()
+fun ChatScheduledMeeting.getZoneStartTime(): ZonedDateTime? = startDateTime?.parseDate()
 
 /**
+ * Check if the scheduled meeting is past
+ *
  * True, the scheduled meeting has passed. False, otherwise.
  */
-fun ScheduledMeetingItem.isPast(): Boolean {
+
+fun ChatScheduledMeeting.isPast(): Boolean {
     val now = ZonedDateTime.now()
         .withZoneSameInstant(ZoneOffset.UTC)
 
@@ -140,6 +143,32 @@ fun ScheduledMeetingItem.isPast(): Boolean {
     }
 
     return false
+}
+
+/**
+ * Check if there is no end date
+ *
+ * @return True if there is no until value. False otherwise.
+ */
+fun ChatScheduledMeeting.isForever(): Boolean {
+    this.rules?.let {
+        return it.until == 0L
+    }
+
+    return true
+}
+
+/**
+ * Get interval value
+ *
+ * @return The interval of a recurring meeting
+ */
+fun ChatScheduledMeeting.getIntervalValue(): Int {
+    this.rules?.let {
+        return if (it.interval == 0) 1 else it.interval
+    }
+
+    return 1
 }
 
 private fun Long.parseDate(): ZonedDateTime =

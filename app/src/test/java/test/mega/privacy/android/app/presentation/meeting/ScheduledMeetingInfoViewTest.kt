@@ -9,7 +9,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoA
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.meeting.view.formatRetentionTimeInSecondsToString
-import mega.privacy.android.domain.entity.chat.ScheduledMeetingItem
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +28,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 isPublic = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.meeting_link).assertExists()
@@ -41,7 +41,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 isPublic = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -58,7 +58,7 @@ class ScheduledMeetingInfoViewTest {
                 isHost = true,
                 isPublic = true,
                 enabledMeetingLinkOption = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.meetings_scheduled_meeting_info_share_meeting_link_label)
@@ -73,7 +73,7 @@ class ScheduledMeetingInfoViewTest {
                 isHost = true,
                 isPublic = true,
                 enabledMeetingLinkOption = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -88,7 +88,7 @@ class ScheduledMeetingInfoViewTest {
     fun `test that chat notifications button is shown`() {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.title_properties_contact_notifications_for_chat)
@@ -102,7 +102,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = false,
                 isOpenInvite = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -118,7 +118,7 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
                 isHost = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.chat_group_chat_info_allow_non_host_participants_option)
@@ -131,7 +131,7 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
                 isHost = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -146,7 +146,7 @@ class ScheduledMeetingInfoViewTest {
     fun `test that shared files button is shown`() {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.title_chat_shared_files_info)
@@ -158,7 +158,7 @@ class ScheduledMeetingInfoViewTest {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
             ScheduledMeetingInfoState(
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -176,7 +176,7 @@ class ScheduledMeetingInfoViewTest {
                 isHost = false,
                 isPublic = true,
                 enabledMeetingLinkOption = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.meetings_scheduled_meeting_info_share_meeting_link_label)
@@ -191,7 +191,7 @@ class ScheduledMeetingInfoViewTest {
                 isHost = false,
                 isPublic = true,
                 enabledMeetingLinkOption = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -207,7 +207,7 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
                 isHost = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.title_properties_manage_chat)
@@ -220,7 +220,7 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
                 isHost = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             ),
             onButtonClicked = onButtonClicked
         )
@@ -237,7 +237,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 isPublic = false,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.title_properties_contact_notifications_for_chat)
@@ -250,7 +250,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = false,
                 isOpenInvite = true,
-                scheduledMeeting = getScheduledMeetingItem()
+                scheduledMeeting = getChatScheduledMeeting()
             )
         )
         composeRule.onNodeWithText(R.string.add_participants_menu_item)
@@ -345,15 +345,22 @@ class ScheduledMeetingInfoViewTest {
         }
     }
 
-    private fun getScheduledMeetingItem(): ScheduledMeetingItem =
-        ScheduledMeetingItem(
+    private fun getChatScheduledMeeting(): ChatScheduledMeeting =
+        ChatScheduledMeeting(
             chatId = -1,
-            scheduledMeetingId = -1,
-            title = "Scheduled title",
-            description = "Scheduled description",
+            schedId = -1,
+            parentSchedId = null,
+            organizerUserId = null,
+            timezone = null,
             startDateTime = -1,
             endDateTime = -1,
+            title = "Scheduled title",
+            description = "Scheduled description",
+            attributes = null,
+            overrides = null,
+            flags = null,
             rules = null,
+            changes = null
         )
 
     private fun initComposeRuleContent(
