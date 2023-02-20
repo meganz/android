@@ -20,8 +20,8 @@ import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.BackgroundFastLogin
-import mega.privacy.android.domain.usecase.InitialiseMegaChat
+import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import timber.log.Timber

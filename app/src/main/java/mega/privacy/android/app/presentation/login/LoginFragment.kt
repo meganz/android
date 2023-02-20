@@ -1323,11 +1323,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 // Get cookies settings after login.
                 getInstance().checkEnabledCookies()
             }
-        } else if (request.type == MegaRequest.TYPE_LOGOUT) {
-            Timber.d("TYPE_LOGOUT")
-            if (error.errorCode == MegaError.API_OK) {
-                viewModel.performLocalLogoutApp()
-            }
         } else if (request.type == MegaRequest.TYPE_GET_RECOVERY_LINK) {
             Timber.d("TYPE_GET_RECOVERY_LINK")
             when (error.errorCode) {
@@ -1596,7 +1591,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         viewModel.updateIsFetchingNodes(false)
                         viewModel.updateIsAlreadyLoggedIn(true)
                         megaChatApi.logout(ChatLogoutListener(requireActivity(), loggingSettings))
-                        megaApi.localLogout(this@LoginFragment)
+                        viewModel.performLocalLogout()
                     }
                     DialogInterface.BUTTON_NEGATIVE -> dialog.dismiss()
                 }

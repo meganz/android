@@ -1,10 +1,12 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.RootNodeExists
 import javax.inject.Inject
 
 /**

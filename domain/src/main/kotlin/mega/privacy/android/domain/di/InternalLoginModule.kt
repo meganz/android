@@ -7,12 +7,13 @@ import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.LoginRepository
-import mega.privacy.android.domain.usecase.BroadcastLogout
-import mega.privacy.android.domain.usecase.BackgroundFastLogin
-import mega.privacy.android.domain.usecase.DefaultBackgroundFastLogin
-import mega.privacy.android.domain.usecase.InitialiseMegaChat
-import mega.privacy.android.domain.usecase.LocalLogout
-import mega.privacy.android.domain.usecase.MonitorLogout
+import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.BroadcastLogout
+import mega.privacy.android.domain.usecase.login.DefaultBackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.DefaultLocalLogout
+import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
+import mega.privacy.android.domain.usecase.login.LocalLogout
+import mega.privacy.android.domain.usecase.login.MonitorLogout
 import javax.inject.Singleton
 
 @Module
@@ -23,7 +24,13 @@ internal abstract class InternalLoginModule {
      * Provides [BackgroundFastLogin] implementation.
      */
     @Binds
-    abstract fun bindCompleteFastLogin(loginRepository: DefaultBackgroundFastLogin): BackgroundFastLogin
+    abstract fun bindCompleteFastLogin(useCase: DefaultBackgroundFastLogin): BackgroundFastLogin
+
+    /**
+     * Provides [LocalLogout]
+     */
+    @Binds
+    abstract fun bindLocalLogout(useCase: DefaultLocalLogout): LocalLogout
 
     companion object {
 
@@ -47,13 +54,6 @@ internal abstract class InternalLoginModule {
         @Provides
         fun provideBroadcastLogout(loginRepository: LoginRepository): BroadcastLogout =
             BroadcastLogout(loginRepository::broadcastLogout)
-
-        /**
-         * Provides [LocalLogout]
-         */
-        @Provides
-        fun provideLocalLogout(loginRepository: LoginRepository): LocalLogout =
-            LocalLogout(loginRepository::localLogout)
 
         @LoginMutex
         @Singleton

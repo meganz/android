@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.flow.Flow
 

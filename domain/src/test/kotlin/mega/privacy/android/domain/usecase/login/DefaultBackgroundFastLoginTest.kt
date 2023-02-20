@@ -1,10 +1,12 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.RootNodeExists
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test

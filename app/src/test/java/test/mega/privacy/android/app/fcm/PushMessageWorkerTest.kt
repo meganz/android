@@ -23,8 +23,8 @@ import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
-import mega.privacy.android.domain.usecase.BackgroundFastLogin
-import mega.privacy.android.domain.usecase.InitialiseMegaChat
+import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import org.junit.Before

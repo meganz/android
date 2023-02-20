@@ -29,12 +29,12 @@ import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
 import mega.privacy.android.domain.usecase.HasPreferences
 import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
-import mega.privacy.android.domain.usecase.LocalLogoutApp
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
+import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import javax.inject.Inject
 
@@ -59,7 +59,7 @@ class LoginViewModel @Inject constructor(
     private val isCameraSyncEnabled: IsCameraSyncEnabled,
     private val querySignupLink: QuerySignupLink,
     private val cancelTransfers: CancelTransfers,
-    private val localLogoutApp: LocalLogoutApp,
+    private val localLogout: LocalLogout,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -343,9 +343,9 @@ class LoginViewModel @Inject constructor(
     fun launchCancelTransfers() = viewModelScope.launch { cancelTransfers() }
 
     /**
-     * Clears all data related to the logged out account.
+     * Local logout.
      */
-    fun performLocalLogoutApp() = viewModelScope.launch {
-        localLogoutApp(ClearPsa { PsaManager::stopChecking })
+    fun performLocalLogout() = viewModelScope.launch {
+        localLogout(ClearPsa { PsaManager::stopChecking })
     }
 }
