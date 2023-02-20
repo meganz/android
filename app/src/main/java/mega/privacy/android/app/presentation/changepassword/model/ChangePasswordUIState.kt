@@ -19,7 +19,7 @@ data class ChangePasswordUIState(
     val isCurrentPassword: Boolean = false,
     val isPromptedMultiFactorAuth: Boolean = false,
     val isConnectedToNetwork: Boolean = false,
-    val passwordStrengthLevel: Int = 0,
+    val passwordStrengthLevel: Int = -1,
     @StringRes val snackBarMessage: Int? = null,
     @StringRes val loadingMessage: Int? = null
 )

@@ -101,7 +101,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 if (s.isNotEmpty()) {
                     val temp = s.toString()
                     binding.containerPasswdElements.visibility = View.VISIBLE
-                    checkPasswordStrength(temp.trim(), false)
+                    viewModel.checkPasswordStrength(temp.trim())
                 } else {
                     passwdValid = false
                     binding.containerPasswdElements.visibility = View.GONE
@@ -211,6 +211,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             handleLoadingProgressState(state)
             handleMultiFactorAuthState(state)
             handlePasswordChangedState(state)
+            handlePasswordValidationState(state)
         }
     }
 
@@ -242,7 +243,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     private fun handlePasswordChangedState(state: ChangePasswordUIState) {
         if (state.isPasswordChanged) {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-            if (intent?.getBooleanExtra(KEY_IS_LOGOUT, false) == true) {
+            if (intent != null && intent.getBooleanExtra(KEY_IS_LOGOUT, false)) {
                 AccountController.logout(this, megaApi, sharingScope)
             } else {
                 //Intent to MyAccount
@@ -258,11 +259,17 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
     }
 
+    private fun handlePasswordValidationState(state: ChangePasswordUIState) {
+        if (state.passwordStrengthLevel > -1 || state.isCurrentPassword) {
+            checkPasswordStrength(state.passwordStrengthLevel, state.isCurrentPassword)
+        }
+    }
+
     private fun navigateToMultiFactorAuthScreen() {
         val intent = Intent(this, VerifyTwoFactorActivity::class.java).apply {
             putExtra(KEY_VERIFY_TYPE, CHANGE_PASSWORD_2FA)
             putExtra(KEY_NEW_PASSWORD, binding.changePasswordNewPassword1.text.toString())
-            putExtra(KEY_IS_LOGOUT, intent?.getBooleanExtra(KEY_IS_LOGOUT, false) == true)
+            putExtra(KEY_IS_LOGOUT, intent != null && intent.getBooleanExtra(KEY_IS_LOGOUT, false))
         }
 
         startActivity(intent)
@@ -344,12 +351,13 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
     }
 
-    private fun checkPasswordStrength(s: String, isSamePassword: Boolean) {
+    private fun checkPasswordStrength(passwordStrength: Int, isCurrentPassword: Boolean) {
         binding.apply {
+            val passwordText = binding.changePasswordNewPassword1.text.toString()
             changePasswordNewPassword1Layout.isErrorEnabled = false
-            val passWordStrength = megaApi.getPasswordStrength(s)
+
             when {
-                isSamePassword || passWordStrength == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length < 4 -> {
+                isCurrentPassword || passwordStrength == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || passwordText.length < 4 -> {
                     shapePasswdFirst.background =
                         ContextCompat.getDrawable(
                             this@ChangePasswordActivity,
@@ -387,7 +395,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
                 }
-                passWordStrength == MegaApiJava.PASSWORD_STRENGTH_WEAK -> {
+                passwordStrength == MegaApiJava.PASSWORD_STRENGTH_WEAK -> {
                     shapePasswdFirst.background =
                         ContextCompat.getDrawable(
                             this@ChangePasswordActivity,
@@ -425,7 +433,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Weak)
                 }
-                passWordStrength == MegaApiJava.PASSWORD_STRENGTH_MEDIUM -> {
+                passwordStrength == MegaApiJava.PASSWORD_STRENGTH_MEDIUM -> {
                     shapePasswdFirst.background =
                         ContextCompat.getDrawable(
                             this@ChangePasswordActivity,
@@ -463,7 +471,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium)
                 }
-                passWordStrength == MegaApiJava.PASSWORD_STRENGTH_GOOD -> {
+                passwordStrength == MegaApiJava.PASSWORD_STRENGTH_GOOD -> {
                     shapePasswdFirst.background =
                         ContextCompat.getDrawable(
                             this@ChangePasswordActivity,
@@ -695,7 +703,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             R.id.change_password_newPassword1 -> {
                 val samePasswordError = StringResourcesUtils.getString(R.string.error_same_password)
                 if (error == samePasswordError) {
-                    checkPasswordStrength(editText.text.toString(), true)
+                    viewModel.checkPasswordStrength(editText.text.toString(), true)
                     binding.changePasswordNewPassword1Layout.hint = samePasswordError
                     binding.changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
                     binding.changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error)

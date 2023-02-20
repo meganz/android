@@ -114,6 +114,35 @@ internal class ChangePasswordViewModelTest {
             }
         }
 
+    @Test
+    fun `test that when checking password strength then passwordStrengthLevel state should be updated and isCurrentPassword should be true when validation enabled`() =
+        runTest {
+            val fakePassword = "password"
+            whenever(getPasswordStrength(fakePassword)).thenReturn(2)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(true)
+
+            underTest.checkPasswordStrength(fakePassword, true)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.passwordStrengthLevel).isEqualTo(2)
+                assertThat(state.isCurrentPassword).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that when password validation is disabled then isCurrentPassword will always return false even when result returns true`() =
+        runTest {
+            val fakePassword = "password"
+            whenever(isCurrentPassword(fakePassword)).thenReturn(true)
+
+            underTest.checkPasswordStrength(fakePassword, false)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isCurrentPassword).isEqualTo(false)
+            }
+        }
+
     private fun verifyChangePasswordUiState(
         isSuccessChangePassword: Boolean,
         expected: Boolean,

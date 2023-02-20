@@ -103,6 +103,20 @@ internal class ChangePasswordViewModel @Inject constructor(
         }
     }
 
+    fun checkPasswordStrength(password: String, shouldValidatePassword: Boolean = false) {
+        viewModelScope.launch {
+            val isCurrentPassword =
+                if (shouldValidatePassword) isCurrentPassword(password = password) else false
+
+            _uiState.update {
+                it.copy(
+                    passwordStrengthLevel = getPasswordStrength(password = password),
+                    isCurrentPassword = isCurrentPassword
+                )
+            }
+        }
+    }
+
     fun onMultiFactorAuthShown() {
         _uiState.update { it.copy(isPromptedMultiFactorAuth = false) }
     }
