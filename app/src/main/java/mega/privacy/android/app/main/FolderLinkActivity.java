@@ -1352,7 +1352,7 @@ public class FolderLinkActivity extends TransfersManagementActivity implements M
                     startActivity(intent);
                     overridePendingTransition(0, 0);
                 } else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
-                    MegaNode file = nodes.get(position);
+                    MegaNode file = node;
 
                     String mimeType = MimeTypeList.typeForName(file.getName()).getType();
                     Timber.d("FILE HANDLE: %s", file.getHandle());
