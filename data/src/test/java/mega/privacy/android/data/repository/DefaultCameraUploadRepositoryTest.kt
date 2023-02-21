@@ -11,6 +11,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.CameraUploadHandlesMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.syncStatusToInt
@@ -47,6 +48,7 @@ class DefaultCameraUploadRepositoryTest {
     private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
+    private val cameraUploadHandlesMapper = mock<CameraUploadHandlesMapper>()
     private val videoCompressorGateway = mock<VideoCompressorGateway>()
 
     private val fakeRecord = SyncRecord(
@@ -76,6 +78,7 @@ class DefaultCameraUploadRepositoryTest {
             cameraUploadMediaGateway = cameraUploadMediaGateway,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
+            cameraUploadHandlesMapper = cameraUploadHandlesMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = mock(),
             broadcastReceiverGateway = mock(),

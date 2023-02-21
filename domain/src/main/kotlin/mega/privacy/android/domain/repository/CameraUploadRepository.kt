@@ -442,6 +442,16 @@ interface CameraUploadRepository {
     suspend fun deleteAllSecondarySyncRecords()
 
     /**
+     * Convert Base 64 string to handle
+     */
+    suspend fun convertBase64ToHandle(base64: String): Long
+
+    /**
+     * Get user attributes as a pair of primary and secondary handles
+     */
+    suspend fun getUserAttribute(): Pair<Long, Long>?
+
+    /**
      * monitor upload service pause State
      */
     fun monitorCameraUploadPauseState(): Flow<Boolean>

@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.AccountTransferDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
+import mega.privacy.android.data.mapper.CameraUploadHandlesMapper
 import mega.privacy.android.data.mapper.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
@@ -96,6 +97,7 @@ import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toAchievementsOverview
+import mega.privacy.android.data.mapper.toCameraUploadHandles
 import mega.privacy.android.data.mapper.toChatCall
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
@@ -528,6 +530,10 @@ internal abstract class MapperModule {
         @Provides
         fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
             ::toOfflineNodeInformation
+
+        @Provides
+        fun provideCameraUploadHandlesMapper(): CameraUploadHandlesMapper =
+            ::toCameraUploadHandles
 
         /**
          * Provide [CountryMapper] mapper

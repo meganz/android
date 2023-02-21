@@ -36,6 +36,7 @@ import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.CopyNode
+import mega.privacy.android.app.domain.usecase.GetCameraUploadAttributes
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
@@ -49,7 +50,6 @@ import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
-import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
@@ -87,7 +87,6 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.ClearSyncRecords
-import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
@@ -111,6 +110,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -121,6 +121,7 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -434,6 +435,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted
 
     /**
+     * Reset camera upload timelines
+     */
+    @Inject
+    lateinit var resetCameraUploadTimelines: ResetCameraUploadTimelines
+
+    /**
      * Monitor charging stop status
      */
     @Inject
@@ -492,6 +499,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     @Inject
     lateinit var setupSecondaryFolder: SetupSecondaryFolder
+
+    /**
+     * Get Camera Upload Attributes
+     */
+    @Inject
+    lateinit var getCameraUploadAttributes: GetCameraUploadAttributes
 
     /**
      * Reset Total Uploads
@@ -557,11 +570,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private var tempRoot: String? = null
     private var isOverQuota = false
     private var stopByNetworkStateChange = false
-    private var isPrimaryHandleSynced = false
     private var totalUploaded = 0
     private var totalToUpload = 0
     private var lastUpdated: Long = 0
-    private var getAttrUserListener: GetCameraUploadAttributeListener? = null
     private var videoCompressionJob: Job? = null
     private var totalVideoSize = 0L
 
@@ -608,7 +619,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
-        getAttrUserListener = GetCameraUploadAttributeListener(this)
     }
 
     /**
@@ -619,7 +629,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         super.onDestroy()
         isServiceRunning = false
         receiver?.let { unregisterReceiver(it) }
-        getAttrUserListener = null
 
         stopActiveHeartbeat()
         coroutineScope?.cancel()
@@ -845,7 +854,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
             StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
                 Timber.w("Handle the missing Camera Uploads user attribute")
-                handleMissingCameraUploadsUserAttribute()
+                runCatching {
+                    getCameraUploadAttributes()?.let {
+                        // received handles from API, update local handles
+                        handleAttributeHandles(it)
+                    } ?: run {
+                        // no handles from API, invalidate local handles to establish folders
+                        setPrimarySyncHandle(MegaApiJava.INVALID_HANDLE)
+                        setSecondarySyncHandle(MegaApiJava.INVALID_HANDLE)
+                    }
+                    ignoreAttr = true
+                }
+                    .onSuccess { startWorker() }
+                    .onFailure { endService() }
             }
 
             StartCameraUploadsState.UNESTABLISHED_FOLDERS -> {
@@ -856,6 +877,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             }
 
             else -> Unit
+        }
+    }
+
+    private suspend fun handleAttributeHandles(handles: Pair<Long, Long>) {
+        handles.first.let { primary ->
+            if (!resetCameraUploadTimelines(primary, false)) {
+                setPrimarySyncHandle(primary)
+            }
+        }
+        handles.second.let { secondary ->
+            if (!resetCameraUploadTimelines(secondary, true)) {
+                setSecondarySyncHandle(secondary)
+            }
         }
     }
 
@@ -949,10 +983,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private fun hasCameraUploadsUserAttribute(): Boolean {
         // Prevent checking while the app is alive, because it has been handled by a global event
         Timber.d("ignoreAttr value is $ignoreAttr")
-        (ignoreAttr || isPrimaryHandleSynced).also {
-            if (!it) Timber.w("The Camera Uploads user attribute is missing. Wait for the user attribute")
-            return it
-        }
+        if (!ignoreAttr) Timber.w("The Camera Uploads user attribute is missing. Wait for the user attribute")
+        return ignoreAttr
     }
 
     /**
@@ -1443,18 +1475,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     }
 
     /**
-     * Executes certain behavior if the User's Camera Uploads attribute is missing
-     */
-    private fun handleMissingCameraUploadsUserAttribute() {
-        Timber.d("Try to get Camera Uploads primary target folder from attribute")
-        megaApi.getUserAttribute(
-            MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
-            getAttrUserListener
-        )
-        Timber.d("Waiting to check the user attribute")
-    }
-
-    /**
      * When local folder is unavailable, CU cannot launch, need to show a notification to let the user know.
      *
      * @param resId  The content text of the notification. Here is the string's res id.
@@ -1665,7 +1685,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      * @param shouldStart If should start worker for camera upload.
      */
     fun onGetPrimaryFolderAttribute(handle: Long, shouldStart: Boolean) {
-        isPrimaryHandleSynced = true
         coroutineScope?.launch {
             Timber.d("Current Handle: $handle, Should Start Camera Uploads Worker: $shouldStart")
             val primarySyncHandle = getPrimarySyncHandle()
@@ -1860,18 +1879,23 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                                 is VideoCompressionState.Failed -> {
                                     onCompressFailed(fullList.first { record -> record.id == it.id })
                                 }
+
                                 VideoCompressionState.Finished -> {
                                     onCompressFinished()
                                 }
+
                                 is VideoCompressionState.FinishedCompression -> {
                                     Timber.d("Video compressed path: ${it.returnedFile} success:${it.isSuccess} ")
                                 }
+
                                 VideoCompressionState.Initial -> {
                                     Timber.d("Video Compression Started")
                                 }
+
                                 VideoCompressionState.InsufficientStorage -> {
                                     onInsufficientSpace()
                                 }
+
                                 is VideoCompressionState.Progress -> {
                                     onCompressUpdateProgress(
                                         progress = it.progress,
@@ -1879,6 +1903,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                                         totalCount = it.totalCount
                                     )
                                 }
+
                                 is VideoCompressionState.Successful -> {
                                     onCompressSuccessful(fullList.first { record -> record.id == it.id })
                                 }

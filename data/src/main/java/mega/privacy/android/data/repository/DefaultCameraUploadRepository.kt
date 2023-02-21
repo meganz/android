@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.CameraUploadHandlesMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
@@ -52,6 +54,11 @@ import kotlin.coroutines.Continuation
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher [CoroutineDispatcher]
+ * @property appEventGateway [AppEventGateway]
+ * @property broadcastReceiverGateway [BroadcastReceiverGateway]
+ * @property videoQualityMapper [VideoQualityMapper]
+ * @property syncStatusIntMapper [SyncStatusIntMapper]
+ * @property cameraUploadHandlesMapper [CameraUploadHandlesMapper]
  */
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -66,6 +73,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
+    private val cameraUploadHandlesMapper: CameraUploadHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
     private val videoAttachmentMapper: VideoAttachmentMapper,
 ) : CameraUploadRepository {
@@ -417,6 +425,44 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
     }
 
+    override suspend fun getUserAttribute() = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            // camera upload handles can be retrieved
+                            continuation.resumeWith(Result.success(request))
+                        }
+                        MegaError.API_ENOENT -> {
+                            // camera upload handles do not exist
+                            continuation.resumeWith(Result.success(null))
+                        }
+                        else -> {
+                            continuation.failWithError(error)
+                        }
+                    }
+                }
+            )
+            megaApiGateway.getUserAttribute(
+                MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
+                listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        return@withContext request?.let { megaRequest ->
+            var primaryHandle = getInvalidHandle()
+            var secondaryHandle = getInvalidHandle()
+            cameraUploadHandlesMapper(megaRequest.megaStringMap).let { handles ->
+                handles.first?.let { primaryHandle = convertBase64ToHandle(it) }
+                handles.second?.let { secondaryHandle = convertBase64ToHandle(it) }
+            }
+            return@let Pair(primaryHandle, secondaryHandle)
+        }
+    }
+
     override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> =
         withContext(ioDispatcher) {
             fileAttributeGateway.getVideoGPSCoordinates(filePath)
@@ -442,6 +488,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun deleteAllSecondarySyncRecords() = withContext(ioDispatcher) {
         localStorageGateway.deleteAllSecondarySyncRecords()
+    }
+
+    override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
+        megaApiGateway.base64ToHandle(base64)
     }
 
     override fun monitorCameraUploadPauseState() = appEventGateway.monitorCameraUploadPauseState

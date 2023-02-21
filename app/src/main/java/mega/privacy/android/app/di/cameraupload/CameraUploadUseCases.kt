@@ -25,6 +25,7 @@ import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.GetCameraUploadAttributes
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -489,6 +490,13 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsNodeInRubbishOrDeleted(nodeRepository: NodeRepository): IsNodeInRubbishOrDeleted =
             IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
+
+        /**
+         * Provide the [GetCameraUploadAttributes] implementation
+         */
+        @Provides
+        fun provideGetCameraUploadAttributes(cameraUploadRepository: CameraUploadRepository): GetCameraUploadAttributes =
+            GetCameraUploadAttributes(cameraUploadRepository::getUserAttribute)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation
