@@ -146,6 +146,7 @@ class ManagerViewModelTest {
             assertThat(initial.shouldSendCameraBroadcastEvent).isFalse()
             assertThat(initial.shouldStopCameraUpload).isFalse()
             assertThat(initial.nodeUpdateReceived).isFalse()
+            assertThat(initial.shouldAlertUserAboutSecurityUpgrade).isFalse()
         }
     }
 

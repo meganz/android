@@ -184,16 +184,6 @@ class ManagerViewModel @Inject constructor(
                 it.copy(pendingActionsCount = _state.value.pendingActionsCount + outgoingShares)
             }
         }
-
-        viewModelScope.launch {
-            updateGlobalEvents.collect { megaEvent ->
-                if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
-                    _state.update {
-                        it.copy(shouldAlertUserAboutSecurityUpgrade = true)
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -452,4 +442,19 @@ class ManagerViewModel @Inject constructor(
      * Active subscription in local cache
      */
     val activeSubscription: MegaPurchase? get() = getActiveSubscription()
+
+    /**
+     * Check global events updates for [MegaEvent.EVENT_UPGRADE_SECURITY]
+     */
+    fun monitorGlobalEventUpgradeForUpgradeSecurity() {
+        viewModelScope.launch {
+            updateGlobalEvents.collect { megaEvent ->
+                if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
+                    _state.update {
+                        it.copy(shouldAlertUserAboutSecurityUpgrade = true)
+                    }
+                }
+            }
+        }
+    }
 }
