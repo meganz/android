@@ -41,6 +41,10 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
             viewModel.requestData(it)
         } ?: finish()
 
+        viewModel.setShowContactVerificationBanner(
+            intent.extras?.getBoolean(Constants.IS_NODE_INCOMING) ?: false
+        )
+
         setContent { AuthenticityCredentialsView() }
     }
 

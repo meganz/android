@@ -143,4 +143,15 @@ class AuthenticityCredentialsViewModel @Inject constructor(
      * Updates state after shown error.
      */
     fun errorShown() = _state.update { it.copy(error = null) }
+
+    /**
+     * Function to update state with the boolean value to show contact verification banner
+     */
+    fun setShowContactVerificationBanner(isNodeIncoming: Boolean = false) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(showContactVerificationBanner = isNodeIncoming)
+            }
+        }
+    }
 }

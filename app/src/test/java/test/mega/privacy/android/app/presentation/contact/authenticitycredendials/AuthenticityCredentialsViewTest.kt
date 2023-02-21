@@ -149,7 +149,8 @@ class AuthenticityCredentialsViewTest {
         initComposeRuleContent(AuthenticityCredentialsState(
             contactCredentials = contactCredentials,
             myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
-        ))
+            showContactVerificationBanner = true,
+            ))
         composeTestRule.onNodeWithTag("CONTACT_VERIFICATION_BANNER_VIEW").assertExists()
         composeTestRule.onNodeWithText(R.string.shared_items_verify_credentials_verify_person_banner_label)
             .assertExists()
