@@ -243,8 +243,8 @@ private fun OccurrenceItemView(
                             )
                         }
                     }
-                    occurrence.getTimeFormatted(state.is24HourFormat)?.let { time ->
-                        Text(text = time,
+                    occurrence.startDateTime?.let {
+                        Text(text = occurrence.getTimeFormatted(state.is24HourFormat),
                             color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
                             style = MaterialTheme.typography.subtitle2)
                     }

@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartChatCall
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
@@ -101,6 +102,13 @@ abstract class ChatModule {
         @Provides
         fun provideFetchScheduledMeetingOccurrencesByChat(chatRepository: ChatRepository): FetchScheduledMeetingOccurrencesByChat =
             FetchScheduledMeetingOccurrencesByChat(chatRepository::fetchScheduledMeetingOccurrencesByChat)
+
+        /**
+         * Provides the Use Case [FetchNumberOfScheduledMeetingOccurrencesByChat]
+         */
+        @Provides
+        fun provideFetchNumberOfScheduledMeetingOccurrencesByChat(chatRepository: ChatRepository): FetchNumberOfScheduledMeetingOccurrencesByChat =
+            FetchNumberOfScheduledMeetingOccurrencesByChat(chatRepository::fetchScheduledMeetingOccurrencesByChat)
 
         /**
          * Provides the Use Case [SetOpenInvite]

@@ -21,9 +21,9 @@ fun ChatScheduledMeetingOccurr.getDateFormatted(): String? {
 /**
  * Get time formatted
  */
-fun ChatScheduledMeetingOccurr.getTimeFormatted(is24HourFormat: Boolean): String? {
-    val startTimestamp = startDateTime ?: return null
-    val endTimestamp = endDateTime ?: return null
+fun ChatScheduledMeetingOccurr.getTimeFormatted(is24HourFormat: Boolean): String {
+    val startTimestamp = startDateTime ?: return ""
+    val endTimestamp = endDateTime ?: return ""
     val startHour = getFormattedHour(Instant.ofEpochSecond(startTimestamp), is24HourFormat)
     val endHour = getFormattedHour(Instant.ofEpochSecond(endTimestamp), is24HourFormat)
     return "$startHour - $endHour"
