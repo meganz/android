@@ -122,11 +122,6 @@ public class CameraUploadUtil {
         return prefs != null && Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
     }
 
-    public static void disableMediaUploadProcess() {
-        resetMUTimestampsAndCache();
-        dbH.setSecondaryUploadEnabled(false);
-    }
-
     /**
      * @see GetDefaultNodeHandle
      */

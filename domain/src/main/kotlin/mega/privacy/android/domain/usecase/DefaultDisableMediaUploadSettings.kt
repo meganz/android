@@ -4,7 +4,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
- * Default Implementation of DisableCameraUploadSettings
+ * Default Implementation of [DisableMediaUploadSettings]
  *
  */
 class DefaultDisableMediaUploadSettings @Inject constructor(

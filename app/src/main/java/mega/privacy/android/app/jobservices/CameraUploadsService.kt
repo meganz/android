@@ -69,7 +69,6 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.start
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.stopActiveHeartbeat
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderBackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderBackupState
-import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
@@ -96,6 +95,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetRemoveGps
@@ -111,6 +111,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
@@ -521,6 +522,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     @Inject
     lateinit var compressVideos: CompressVideos
+
+    /**
+     * Reset Media Upload Time Stamps
+     */
+    @Inject
+    lateinit var resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps
+
+    /**
+     * Disable Media Upload Settings
+     */
+    @Inject
+    lateinit var disableMediaUploadSettings: DisableMediaUploadSettings
 
     /**
      * Coroutine Scope for camera upload work
@@ -1400,7 +1413,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             LOCAL_FOLDER_REMINDER_SECONDARY
         )
         // Disable Media Uploads only
-        CameraUploadUtil.disableMediaUploadProcess()
+        resetMediaUploadTimeStamps()
+        disableMediaUploadSettings()
         setSecondaryFolderPath(SettingsConstants.INVALID_PATH)
         sendBroadcast(Intent(BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING))
     }
