@@ -20,8 +20,10 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import javax.inject.Inject
@@ -32,8 +34,10 @@ import javax.inject.Inject
  * @property checkEnableCameraUploadsStatus Check the Camera Uploads status before enabling
  * @property clearCacheDirectory Clear all the contents of the internal cache directory
  * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
+ * @property disableMediaUploadSettings Disable Media Uploads by manipulating a certain value in the database
  * @property monitorConnectivity Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
+ * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
  */
@@ -42,8 +46,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val clearCacheDirectory: ClearCacheDirectory,
     private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
+    private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val monitorConnectivity: MonitorConnectivity,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
+    private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
 ) : ViewModel() {
@@ -200,5 +206,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun disableCameraUploadsInDB() = viewModelScope.launch {
         disableCameraUploadsInDatabase()
+    }
+
+    /**
+     * Call several Use Cases to disable Media Uploads
+     */
+    fun disableMediaUploads() = viewModelScope.launch {
+        resetMediaUploadTimeStamps()
+        disableMediaUploadSettings()
     }
 }

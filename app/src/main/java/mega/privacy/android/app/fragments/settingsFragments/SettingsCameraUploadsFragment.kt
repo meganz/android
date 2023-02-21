@@ -631,8 +631,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     checkMediaUploadsPath()
                 } else {
                     Timber.d("Disable Media Uploads.")
-                    CameraUploadUtil.resetMUTimestampsAndCache()
-                    dbH.setSecondaryUploadEnabled(false)
+                    viewModel.disableMediaUploads()
                 }
                 checkIfSecondaryFolderExists()
                 JobUtil.rescheduleCameraUpload(context)

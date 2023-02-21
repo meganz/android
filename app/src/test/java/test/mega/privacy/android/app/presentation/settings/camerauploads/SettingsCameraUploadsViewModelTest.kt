@@ -12,7 +12,9 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import org.junit.After
@@ -38,7 +40,9 @@ class SettingsCameraUploadsViewModelTest {
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
+    private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
+    private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
 
@@ -49,8 +53,10 @@ class SettingsCameraUploadsViewModelTest {
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
+            disableMediaUploadSettings = disableMediaUploadSettings,
             monitorConnectivity = mock(),
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
+            resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             restorePrimaryTimestamps = restorePrimaryTimestamps,
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
         )
@@ -235,4 +241,12 @@ class SettingsCameraUploadsViewModelTest {
 
             verify(disableCameraUploadsInDatabase, times(1)).invoke()
         }
+
+    @Test
+    fun `test that media uploads are disabled when calling disableMediaUploads`() = runTest {
+        underTest.disableMediaUploads()
+
+        verify(resetMediaUploadTimeStamps, times(1)).invoke()
+        verify(disableMediaUploadSettings, times(1)).invoke()
+    }
 }

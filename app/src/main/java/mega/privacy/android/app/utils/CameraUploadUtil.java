@@ -107,11 +107,6 @@ public class CameraUploadUtil {
         return shouldCUStop;
     }
 
-    public static void resetMUTimestampsAndCache() {
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-    }
-
     public static boolean isPrimaryEnabled() {
         MegaPreferences prefs = dbH.getPreferences();
         return prefs != null && Boolean.parseBoolean(prefs.getCamSyncEnabled());
