@@ -293,9 +293,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
@@ -333,6 +331,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
@@ -454,7 +453,7 @@ public class ManagerActivity extends TransfersManagementActivity
         MegaTransferListenerInterface, OnClickListener,
         BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
         ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, NotificationNavigationHandler {
+        MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, NotificationNavigationHandler, ParentNodeManager, CameraPermissionManager, NavigationDrawerManager {
 
     public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
     private static final String BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
@@ -1139,6 +1138,8 @@ public class ManagerActivity extends TransfersManagementActivity
                 break;
         }
     }
+
+    @Override
     public void setTypesCameraPermission(int typesCameraPermission) {
         this.typesCameraPermission = typesCameraPermission;
     }
@@ -6584,6 +6585,7 @@ public class ManagerActivity extends TransfersManagementActivity
         return fileBrowserViewModel.getSafeBrowserParentHandle();
     }
 
+    @Override
     public long getCurrentParentHandle() {
         long parentHandle = -1;
 
@@ -6653,6 +6655,7 @@ public class ManagerActivity extends TransfersManagementActivity
         return parentHandle;
     }
 
+    @Override
     @Nullable
     public MegaNode getCurrentParentNode(long parentHandle, int error) {
         String errorString = null;
@@ -9730,6 +9733,7 @@ public class ManagerActivity extends TransfersManagementActivity
         return linksState(this).getLinksTreeDepth();
     }
 
+    @Override
     public DrawerItem getDrawerItem() {
         return drawerItem;
     }
@@ -10757,7 +10761,7 @@ public class ManagerActivity extends TransfersManagementActivity
      *
      * @return True if the current screen is MD, false otherwise.
      */
-    public boolean isInMDMode(){
+    public boolean isInMDMode() {
         return drawerItem == DrawerItem.CLOUD_DRIVE && isInMDMode;
     }
 

@@ -9,15 +9,25 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.app.R
-import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
+import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.main.CameraPermissionManager
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.NavigationDrawerManager
+import mega.privacy.android.app.main.ParentNodeManager
+import mega.privacy.android.app.presentation.bottomsheet.ScanDocumentActionListener
+import mega.privacy.android.app.presentation.bottomsheet.ShowNewFolderDialogActionListener
+import mega.privacy.android.app.presentation.bottomsheet.ShowNewTextFileDialogActionListener
+import mega.privacy.android.app.presentation.bottomsheet.TakePictureAndUploadActionListener
+import mega.privacy.android.app.presentation.bottomsheet.UploadFilesActionListener
+import mega.privacy.android.app.presentation.bottomsheet.UploadFolderActionListener
 import mega.privacy.android.app.presentation.extensions.uploadFilesManually
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.utils.Constants
@@ -31,7 +41,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.checkTakePicture
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import nz.mega.documentscanner.DocumentScannerActivity
 import javax.inject.Inject
 
@@ -42,8 +52,21 @@ import javax.inject.Inject
 @ActivityScoped
 internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     activity: Activity,
-) : DefaultLifecycleObserver, UploadBottomSheetDialogActionListener {
-    private val managerActivity = activity as ManagerActivity
+    private val permissionUtilWrapper: PermissionUtilWrapper,
+) : DefaultLifecycleObserver,
+    UploadFilesActionListener,
+    UploadFolderActionListener,
+    TakePictureAndUploadActionListener,
+    ScanDocumentActionListener,
+    ShowNewFolderDialogActionListener,
+    ShowNewTextFileDialogActionListener {
+
+    private val managerActivity = activity as AppCompatActivity
+    private val parentNodeManager = activity as ParentNodeManager
+    private val cameraPermissionManager = activity as CameraPermissionManager
+    private val navigationDrawerManager = activity as NavigationDrawerManager
+    private val actionNodeCallback = activity as ActionNodeCallback
+
     private var newTextFileDialog: AlertDialog? = null
     private var newFolderDialog: AlertDialog? = null
 
@@ -57,12 +80,13 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     }
 
     fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        savedInstanceState ?: return
-        if (savedInstanceState.getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
-            showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT))
-        }
-        if (savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
-            showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT))
+        savedInstanceState?.run {
+            if (getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
+                showNewFolderDialog(getString(NEW_FOLDER_DIALOG_TEXT))
+            }
+            if (getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
+                showNewTextFileDialog(getString(NEW_TEXT_FILE_TEXT))
+            }
         }
     }
 
@@ -93,24 +117,26 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
 
     private val scanDocumentLauncher =
         managerActivity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            val intent = it.data
-            if (it.resultCode == Activity.RESULT_OK && intent != null) {
-                val savedDestination: String? =
-                    intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION)
-                val fileIntent = Intent(managerActivity, FileExplorerActivity::class.java).apply {
-                    if (StringResourcesUtils.getString(R.string.section_chat) == savedDestination) {
-                        action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
-                    } else {
-                        action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD
-                        putExtra(
-                            FileExplorerActivity.EXTRA_PARENT_HANDLE,
-                            managerActivity.currentParentHandle
-                        )
-                    }
-                    putExtra(Intent.EXTRA_STREAM, intent.data)
-                    type = intent.type
+            if (it.resultCode == Activity.RESULT_OK) {
+                it.data?.let { intent ->
+                    val savedDestination: String? =
+                        intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION)
+                    val fileIntent =
+                        Intent(managerActivity, FileExplorerActivity::class.java).apply {
+                            if (StringResourcesUtils.getString(R.string.section_chat) == savedDestination) {
+                                action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
+                            } else {
+                                action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD
+                                putExtra(
+                                    FileExplorerActivity.EXTRA_PARENT_HANDLE,
+                                    parentNodeManager.currentParentHandle
+                                )
+                            }
+                            putExtra(Intent.EXTRA_STREAM, intent.data)
+                            type = intent.type
+                        }
+                    managerActivity.startActivity(fileIntent)
                 }
-                managerActivity.startActivity(fileIntent)
             }
         }
 
@@ -131,8 +157,8 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     }
 
     override fun takePictureAndUpload() {
-        if (!hasPermissions(managerActivity, Manifest.permission.CAMERA)) {
-            managerActivity.setTypesCameraPermission(Constants.TAKE_PICTURE_OPTION)
+        if (!permissionUtilWrapper.hasPermissions(Manifest.permission.CAMERA)) {
+            cameraPermissionManager.setTypesCameraPermission(Constants.TAKE_PICTURE_OPTION)
             ActivityCompat.requestPermissions(
                 managerActivity,
                 arrayOf(Manifest.permission.CAMERA),
@@ -140,7 +166,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
             )
             return
         }
-        if (!hasPermissions(managerActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (!permissionUtilWrapper.hasPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             ActivityCompat.requestPermissions(
                 managerActivity,
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -161,24 +187,24 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     }
 
     override fun showNewFolderDialog(typedText: String?) {
-        managerActivity.getCurrentParentNode(
-            managerActivity.currentParentHandle,
+        parentNodeManager.getCurrentParentNode(
+            parentNodeManager.currentParentHandle,
             Constants.INVALID_VALUE
         )?.let { parent ->
             newFolderDialog =
-                showNewFolderDialog(managerActivity, managerActivity, parent, typedText)
+                showNewFolderDialog(managerActivity, actionNodeCallback, parent, typedText)
         }
 
     }
 
     override fun showNewTextFileDialog(typedName: String?) {
-        managerActivity.getCurrentParentNode(
-            managerActivity.currentParentHandle,
+        parentNodeManager.getCurrentParentNode(
+            parentNodeManager.currentParentHandle,
             Constants.INVALID_VALUE
         )?.let { parent ->
             newTextFileDialog = showNewTxtFileDialog(
                 managerActivity, parent, typedName,
-                managerActivity.drawerItem === DrawerItem.HOMEPAGE
+                navigationDrawerManager.drawerItem === DrawerItem.HOMEPAGE
             )
         }
     }

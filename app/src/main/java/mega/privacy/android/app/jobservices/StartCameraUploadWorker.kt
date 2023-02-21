@@ -56,7 +56,7 @@ class StartCameraUploadWorker @AssistedInject constructor(
                     getVideoPermissionByVersion()
                 )
             }
-            val hasMediaPermissions = permissionUtilWrapper.hasPermissions(appContext, *permissions)
+            val hasMediaPermissions = permissionUtilWrapper.hasPermissions()
             Timber.d("isOverQuota: $isOverQuota, hasMediaPermissions: $hasMediaPermissions, isRunning: ${cameraUploadsServiceWrapper.isServiceRunning()}, ignoreAttributes: $ignoreAttributes")
             if (!cameraUploadsServiceWrapper.isServiceRunning() && !isOverQuota && hasMediaPermissions) {
                 val newIntent = Intent(appContext, CameraUploadsService::class.java)

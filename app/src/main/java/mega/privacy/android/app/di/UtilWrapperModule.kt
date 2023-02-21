@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
@@ -44,6 +45,9 @@ abstract class UtilWrapperModule {
      */
     @Binds
     abstract fun bindMegaNodeUtilWrapper(implementation: MegaNodeUtilFacade): MegaNodeUtilWrapper
+
+    @Binds
+    abstract fun bindPermissionUtilWrapper(implementation: PermissionUtilWrapperImpl): PermissionUtilWrapper
 
     companion object {
 
@@ -85,10 +89,6 @@ abstract class UtilWrapperModule {
         @Provides
         fun provideJobUtilWrapper(): JobUtilWrapper =
             object : JobUtilWrapper {}
-
-        @Provides
-        fun providePermissionUtilWrapper(): PermissionUtilWrapper =
-            object : PermissionUtilWrapper {}
 
         @Provides
         fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =

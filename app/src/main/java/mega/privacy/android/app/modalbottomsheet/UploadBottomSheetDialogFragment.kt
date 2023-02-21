@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetUploadBinding
-import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener
+import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 
 class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
 
@@ -73,7 +73,7 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
             R.id.upload_folder -> listener.uploadFolder()
             R.id.scan_document_option -> listener.scanDocument()
             R.id.take_picture_option -> listener.takePictureAndUpload()
-            R.id.new_folder_option -> listener.showNewFolderDialog()
+            R.id.new_folder_option -> listener.showNewFolderDialog(null)
             R.id.new_txt_option -> listener.showNewTextFileDialog(null)
         }
 

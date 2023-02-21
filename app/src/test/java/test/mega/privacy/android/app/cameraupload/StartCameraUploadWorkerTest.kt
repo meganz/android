@@ -104,10 +104,7 @@ class StartCameraUploadWorkerTest {
     fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota and the camera upload service is not yet started`() {
 
         whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(
-                context,
-                *permissions
-            )
+            TestWrapperModule.permissionUtilWrapper.hasPermissions()
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
@@ -120,10 +117,7 @@ class StartCameraUploadWorkerTest {
     @Test
     fun `test that the camera upload worker fails to start if read external storage permission is not granted`() {
         whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(
-                context,
-                *permissions
-            )
+            TestWrapperModule.permissionUtilWrapper.hasPermissions()
         ).thenReturn(false)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
@@ -136,10 +130,7 @@ class StartCameraUploadWorkerTest {
     @Test
     fun `test that the camera upload worker fails to start if the user is over quota`() {
         whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(
-                context,
-                *permissions
-            )
+            TestWrapperModule.permissionUtilWrapper.hasPermissions()
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(true)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
@@ -152,10 +143,7 @@ class StartCameraUploadWorkerTest {
     @Test
     fun `test that the camera upload worker fails to start if the camera upload service is already running`() {
         whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(
-                context,
-                *permissions
-            )
+            TestWrapperModule.permissionUtilWrapper.hasPermissions()
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
         whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
