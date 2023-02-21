@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway.api
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -1761,6 +1762,57 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun localLogout(listener: MegaRequestListenerInterface)
+
+    /**
+     * Search query in inshares
+     * @param query Querry String
+     * @param megaCancelToken [MegaCancelToken]
+     * @param order [SortOrder]
+     */
+    suspend fun searchOnInShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int,
+    ): List<MegaNode>
+
+    /**
+     * Search query in Outshares
+     * @param query Querry String
+     * @param megaCancelToken [MegaCancelToken]
+     * @param order [SortOrder]
+     */
+    suspend fun searchOnOutShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int
+    ): List<MegaNode>
+
+    /**
+     * Search query in Linkshares
+     * @param query Querry String
+     * @param megaCancelToken [MegaCancelToken]
+     * @param order [SortOrder]
+     */
+    suspend fun searchOnLinkShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int
+    ): List<MegaNode>
+
+    /**
+     * Search query in node
+     *
+     * @param parent [MegaNode]
+     * @param query Query to be searched
+     * @param megaCancelToken [MegaCancelToken]
+     * @param order [SortOrder]
+     */
+    suspend fun search(
+        parent: MegaNode,
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int,
+    ): List<MegaNode>
 
     /**
      * Function to get unverified incoming shares from [MegaApi]

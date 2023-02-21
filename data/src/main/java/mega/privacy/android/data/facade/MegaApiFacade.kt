@@ -14,6 +14,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -921,6 +922,56 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.checkSMSVerificationCode(pin, listener)
 
     override fun localLogout(listener: MegaRequestListenerInterface) = megaApi.localLogout(listener)
+    override suspend fun searchOnInShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int,
+    ): List<MegaNode> {
+        return megaApi.searchOnInShares(
+            query,
+            megaCancelToken,
+            order
+        )
+    }
+
+    override suspend fun searchOnOutShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int,
+    ): List<MegaNode> {
+        return megaApi.searchOnOutShares(
+            query,
+            megaCancelToken,
+            order
+        )
+    }
+
+    override suspend fun searchOnLinkShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int,
+    ): List<MegaNode> {
+        return megaApi.searchOnPublicLinks(
+            query,
+            megaCancelToken,
+            order
+        )
+    }
+
+    override suspend fun search(
+        parent: MegaNode,
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: Int,
+    ): List<MegaNode> {
+        return megaApi.search(
+            parent,
+            query,
+            megaCancelToken,
+            true,
+            order
+        )
+    }
 
     override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
         megaApi.getUnverifiedIncomingShares(order)

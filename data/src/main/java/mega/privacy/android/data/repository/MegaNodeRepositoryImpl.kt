@@ -28,6 +28,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -55,6 +57,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
+ * @property getLinksSortOrder
  */
 internal class MegaNodeRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -73,6 +76,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
+    private val getLinksSortOrder: GetLinksSortOrder
 ) : MegaNodeRepository {
 
     override suspend fun copyNode(
@@ -347,6 +351,88 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUnverifiedOutgoingShares(): Int = 5
+    override suspend fun searchInShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: SortOrder
+    ): List<MegaNode> {
+        return withContext(ioDispatcher) {
+            return@withContext if (query.isEmpty()) {
+                megaApiGateway.getInShares(sortOrderIntMapper(order))
+            } else {
+                megaApiGateway.searchOnInShares(
+                    query,
+                    megaCancelToken,
+                    sortOrderIntMapper(order)
+                )
+            }
+        }
+    }
+
+    override suspend fun searchOutShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: SortOrder,
+    ): List<MegaNode> {
+        return withContext(ioDispatcher) {
+            return@withContext if (query.isEmpty()) {
+                val searchNodes = ArrayList<MegaNode>()
+                val outShares = megaApiGateway.getOutgoingSharesNode(null)
+                val addedHandles: MutableList<Long> = ArrayList()
+                for (outShare in outShares) {
+                    val node = megaApiGateway.getMegaNodeByHandle(outShare.nodeHandle)
+                    if (node != null && !addedHandles.contains(node.handle)) {
+                        addedHandles.add(node.handle)
+                        searchNodes.add(node)
+                    }
+                }
+                searchNodes
+            } else {
+                megaApiGateway.searchOnOutShares(
+                    query = query,
+                    megaCancelToken = megaCancelToken,
+                    order = sortOrderIntMapper(order)
+                )
+            }
+        }
+    }
+
+    override suspend fun searchLinkShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: SortOrder,
+        isFirstLevelNavigation: Boolean,
+    ): List<MegaNode> {
+        return withContext(ioDispatcher) {
+            return@withContext if (query.isEmpty()) {
+                megaApiGateway.getPublicLinks(
+                    if (isFirstLevelNavigation) sortOrderIntMapper(
+                        getLinksSortOrder()
+                    ) else sortOrderIntMapper(order)
+                )
+            } else {
+                megaApiGateway.searchOnLinkShares(
+                    query,
+                    megaCancelToken,
+                    sortOrderIntMapper(order)
+                )
+            }
+        }
+    }
+
+    override suspend fun search(
+        parentNode: MegaNode,
+        query: String,
+        order: SortOrder,
+        megaCancelToken: MegaCancelToken
+    ): List<MegaNode> {
+        return withContext(ioDispatcher) {
+            return@withContext megaApiGateway.search(
+                parentNode, query, megaCancelToken, sortOrderIntMapper(order)
+            )
+        }
+    }
     override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener { return@getRequestListener }

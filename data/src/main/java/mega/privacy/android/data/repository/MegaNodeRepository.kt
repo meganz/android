@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaShare
@@ -296,6 +297,55 @@ interface MegaNodeRepository {
      *
      * @param megaNode : [MegaNode] object which needs to be shared
      */
+    suspend fun getUnverifiedOutgoingShares(): Int
+
+    /**
+     * Provides searched nodes InShares from query
+     * @param query String to be searched
+     * @param megaCancelToken [MegaCancelToken]
+     */
+    suspend fun searchInShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: SortOrder,
+    ): List<MegaNode>
+
+    /**
+     * Provides searched nodes from OutShares from query
+     * @param query String to be searched
+     * @param megaCancelToken [MegaCancelToken]
+     */
+    suspend fun searchOutShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: SortOrder,
+    ): List<MegaNode>
+
+    /**
+     * Provides searched nodes from Link from query
+     * @param query String to be searched
+     * @param megaCancelToken [MegaCancelToken]
+     */
+    suspend fun searchLinkShares(
+        query: String,
+        megaCancelToken: MegaCancelToken,
+        order: SortOrder,
+        isFirstLevelNavigation: Boolean
+    ): List<MegaNode>
+
+    /**
+     * Search node in parent Node
+     * @param parentNode [MegaNode]
+     * @param query Query string
+     * @param order [SortOrder]
+     * @param megaCancelToken [MegaNode]
+     */
+    suspend fun search(
+        parentNode: MegaNode,
+        query: String,
+        order: SortOrder,
+        megaCancelToken: MegaCancelToken
+    ): List<MegaNode>
     suspend fun openShareDialog(megaNode: MegaNode)
 
     /**
