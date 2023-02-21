@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
+import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.SMSVerificationException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -25,12 +26,24 @@ import nz.mega.sdk.MegaError
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Default verification repository
+ *
+ * @property megaApiGateway
+ * @property ioDispatcher
+ * @property appEventGateway
+ * @property telephonyGateway
+ * @property countryCallingCodeMapper
+ * @property smsPermissionMapper
+ * @property appScope
+ */
 internal class DefaultVerificationRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
     private val telephonyGateway: TelephonyGateway,
     private val countryCallingCodeMapper: CountryCallingCodeMapper,
+    private val smsPermissionMapper: SmsPermissionMapper,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : VerificationRepository {
 
@@ -209,4 +222,8 @@ internal class DefaultVerificationRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun getSmsPermissions() =
+        withContext(ioDispatcher) { smsPermissionMapper(megaApiGateway.getSmsAllowedState()) }
+
 }

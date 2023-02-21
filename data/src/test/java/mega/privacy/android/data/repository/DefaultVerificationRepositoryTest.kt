@@ -42,7 +42,8 @@ class DefaultVerificationRepositoryTest {
             appEventGateway = mock(),
             telephonyGateway = mock(),
             countryCallingCodeMapper = countryCallingCodeMapper,
-            appScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher())
+            appScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher()),
+            smsPermissionMapper = mock(),
         )
     }
 

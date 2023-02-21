@@ -1,6 +1,7 @@
 package mega.privacy.android.data.di
 
 import android.webkit.MimeTypeMap
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -148,6 +149,8 @@ import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
+import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
+import mega.privacy.android.data.mapper.verification.SmsPermissionMapperImpl
 import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
@@ -161,495 +164,505 @@ import nz.mega.sdk.MegaNode
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal class MapperModule {
-    /**
-     * Provide account type mapper
-     */
-    @Provides
-    fun provideAccountTypeMapper(): AccountTypeMapper = ::toAccountType
+internal abstract class MapperModule {
 
-    /**
-     * Provide user update mapper
-     */
-    @Provides
-    fun provideUserUpdateMapper(): UserUpdateMapper = ::mapMegaUserListToUserUpdate
+    @Binds
+    abstract fun bindSmsPermissionMapper(implementation: SmsPermissionMapperImpl): SmsPermissionMapper
 
-    /**
-     * Provide user alert mapper
-     */
-    @Provides
-    fun provideUserAlertMapper(): UserAlertMapper = ::toUserAlert
+    companion object {
+        /**
+         * Provide account type mapper
+         */
+        @Provides
+        fun provideAccountTypeMapper(): AccountTypeMapper = ::toAccountType
 
-    /**
-     * Provide chat request mapper
-     */
-    @Provides
-    fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
+        /**
+         * Provide user update mapper
+         */
+        @Provides
+        fun provideUserUpdateMapper(): UserUpdateMapper = ::mapMegaUserListToUserUpdate
 
-    /**
-     * Provide start screen mapper
-     */
-    @Provides
-    fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
+        /**
+         * Provide user alert mapper
+         */
+        @Provides
+        fun provideUserAlertMapper(): UserAlertMapper = ::toUserAlert
 
-    /**
-     * Provide view type mapper
-     *
-     * @return [ViewTypeMapper]
-     */
-    @Provides
-    fun provideViewTypeMapper(): ViewTypeMapper = { ViewType(it) }
+        /**
+         * Provide chat request mapper
+         */
+        @Provides
+        fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
 
-    /**
-     * Provide user last green mapper
-     */
-    @Provides
-    fun provideUserLastGreenMapper(): UserLastGreenMapper = ::toUserUserLastGreen
+        /**
+         * Provide start screen mapper
+         */
+        @Provides
+        fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
 
-    /**
-     * Provide contact data mapper
-     */
-    @Provides
-    fun provideContactDataMapper(): ContactDataMapper = ::toContactData
+        /**
+         * Provide view type mapper
+         *
+         * @return [ViewTypeMapper]
+         */
+        @Provides
+        fun provideViewTypeMapper(): ViewTypeMapper = { ViewType(it) }
+
+        /**
+         * Provide user last green mapper
+         */
+        @Provides
+        fun provideUserLastGreenMapper(): UserLastGreenMapper = ::toUserUserLastGreen
+
+        /**
+         * Provide contact data mapper
+         */
+        @Provides
+        fun provideContactDataMapper(): ContactDataMapper = ::toContactData
 
 
-    /**
-     * Provide mega transfer mapper
-     */
-    @Provides
-    fun provideMegaTransferMapper(): MegaTransferMapper = ::toTransferModel
+        /**
+         * Provide mega transfer mapper
+         */
+        @Provides
+        fun provideMegaTransferMapper(): MegaTransferMapper = ::toTransferModel
 
-    /**
-     * Provide mega exception mapper
-     */
-    @Provides
-    fun provideMegaExceptionMapper(): MegaExceptionMapper = ::toMegaExceptionModel
+        /**
+         * Provide mega exception mapper
+         */
+        @Provides
+        fun provideMegaExceptionMapper(): MegaExceptionMapper = ::toMegaExceptionModel
 
-    /**
-     * Provide transfer event mapper
-     */
-    @Provides
-    fun provideTransferEventMapper(
-        exceptionMapper: MegaExceptionMapper,
-        transferMapper: MegaTransferMapper,
-    ): TransferEventMapper = { event ->
-        toTransferEventModel(event, transferMapper, exceptionMapper)
+        /**
+         * Provide transfer event mapper
+         */
+        @Provides
+        fun provideTransferEventMapper(
+            exceptionMapper: MegaExceptionMapper,
+            transferMapper: MegaTransferMapper,
+        ): TransferEventMapper = { event ->
+            toTransferEventModel(event, transferMapper, exceptionMapper)
+        }
+
+        /**
+         * Provide images mapper
+         */
+        @Provides
+        fun provideImagesMapper(): ImageMapper = ::toImage
+
+        /**
+         * Provide videos mapper
+         */
+        @Provides
+        fun provideVideosMapper(): VideoMapper = ::toVideo
+
+        /**
+         * Provide event mapper
+         */
+        @Provides
+        fun provideEventMapper(): EventMapper = ::toEvent
+
+        /**
+         * Provide sort order mapper
+         */
+        @Provides
+        fun provideSortOrderMapper(): SortOrderMapper = ::toSortOrder
+
+        /**
+         * Provide sort order int mapper
+         */
+        @Provides
+        fun provideSortOrderIntMapper(): SortOrderIntMapper = ::sortOrderToInt
+
+        /**
+         * Provide sync record type mapper
+         */
+        @Provides
+        fun provideSyncRecordTypeMapper(): SyncRecordTypeMapper = ::toSyncRecordType
+
+        /**
+         * Provide sync record type int mapper
+         */
+        @Provides
+        fun provideSyncRecordTypeIntMapper(): SyncRecordTypeIntMapper = ::toSyncRecordTypeInt
+
+        /**
+         * Provide media store file type mapper
+         */
+        @Provides
+        fun provideMediaStoreFileTypeMapper(): MediaStoreFileTypeMapper = ::toMediaStoreFileType
+
+        /**
+         * Provide media store file type uri mapper
+         */
+        @Provides
+        fun provideMediaStoreFileTypeUriMapper(): MediaStoreFileTypeUriMapper =
+            ::toMediaStoreFileTypeUri
+
+        /**
+         * Provide storage state mapper
+         */
+        @Provides
+        fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
+
+        /**
+         * Provide [StorageState] to [Int] mapper
+         */
+        @Provides
+        fun provideStorageStateIntMapper(): StorageStateIntMapper = ::storageStateToInt
+
+        /**
+         * Provide node update mapper
+         */
+        @Provides
+        fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
+
+        /**
+         * Provide mega chat peer list mapper
+         */
+        @Provides
+        fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
+
+        /**
+         * Provide online status mapper
+         */
+        @Provides
+        fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
+
+        /**
+         * Provide contact item mapper
+         */
+        @Provides
+        fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
+
+        /**
+         * Provide mega share mapper
+         */
+        @Provides
+        fun provideMegaShareMapper(): MegaShareMapper = ::toShareModel
+
+        /**
+         * Provide boolean preference mapper
+         */
+        @Provides
+        fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = ::mapBooleanPreference
+
+        /**
+         * Provide file type info mapper
+         *
+         * @param mimeTypeMapper
+         */
+        @Provides
+        fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper =
+            { node ->
+                getFileTypeInfo(node, mimeTypeMapper)
+            }
+
+        /**
+         * Provide contact request mapper
+         */
+        @Provides
+        fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
+
+        /**
+         * Provide mime type mapper
+         */
+        @Provides
+        fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
+            getMimeType(
+                extension,
+                MimeTypeMap.getSingleton()
+                ::getMimeTypeFromExtension
+            )
+        }
+
+
+        /**
+         * Provide favourite info mapper
+         */
+        @Provides
+        fun provideFavouriteInfoMapper(): NodeMapper = ::toNode
+
+
+        /**
+         * Provide user account mapper
+         */
+        @Provides
+        fun provideUserAccountMapper(): UserAccountMapper =
+            ::UserAccount
+
+        /**
+         * Provide local pricing mapper
+         */
+        @Provides
+        fun provideLocalPricingMapper(): LocalPricingMapper = ::toLocalPricing
+
+        /**
+         * Provide currency mapper
+         */
+        @Provides
+        fun provideCurrencyMapper(): CurrencyMapper = ::Currency
+
+        /**
+         * Provide paymentMethod type mapper
+         */
+        @Provides
+        fun providePaymentMethodTypeMapper(): PaymentMethodTypeMapper = ::toPaymentMethodType
+
+        /**
+         * Provide subscription plan list mapper
+         */
+        @Provides
+        fun provideSubscriptionOptionListMapper(): SubscriptionOptionListMapper =
+            ::toSubscriptionOptionList
+
+        /**
+         * Provide mega achievement mapper
+         */
+        @Provides
+        fun provideMegaAchievementMapper(): MegaAchievementMapper = ::toMegaAchievement
+
+        /**
+         * Provide mega achievements detail mapper
+         */
+        @Provides
+        fun provideAchievementsOverviewMapper(): AchievementsOverviewMapper =
+            ::toAchievementsOverview
+
+        /**
+         * Provide [RecentActionsMapper] mapper
+         */
+        @Provides
+        fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
+
+        /**
+         * Provide [UserSetMapper] mapper
+         */
+        @Provides
+        fun provideUserSetMapper(): UserSetMapper = ::toUserSet
+
+        /**
+         * Provide [RecentActionBucketMapper] mapper
+         */
+        @Provides
+        fun provideRecentActionBucketMapper(): RecentActionBucketMapper = ::toRecentActionBucket
+
+        /**
+         * Provide [SubscriptionStatusMapper] mapper
+         */
+        @Provides
+        fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
+
+        /**
+         * Provide [AccountDetailMapper] mapper
+         */
+        @Provides
+        fun provideAccountDetailMapper(
+            accountStorageDetailMapper: AccountStorageDetailMapper,
+            accountSessionDetailMapper: AccountSessionDetailMapper,
+            accountTransferDetailMapper: AccountTransferDetailMapper,
+            accountLevelDetailMapper: AccountLevelDetailMapper,
+            accountTypeMapper: AccountTypeMapper,
+            subscriptionStatusMapper: SubscriptionStatusMapper,
+        ): AccountDetailMapper = {
+                details: MegaAccountDetails,
+                numDetails: Int,
+                rootNode: MegaNode?,
+                rubbishNode: MegaNode?,
+                inShares: List<MegaNode>,
+            ->
+            toAccountDetail(
+                details,
+                numDetails,
+                rootNode,
+                rubbishNode,
+                inShares,
+                accountStorageDetailMapper,
+                accountSessionDetailMapper,
+                accountTransferDetailMapper,
+                accountLevelDetailMapper,
+                accountTypeMapper,
+                subscriptionStatusMapper,
+            )
+        }
+
+        /**
+         * Provide chat room mapper
+         */
+        @Provides
+        fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
+
+        /**
+         * Provide combined chat room mapper
+         */
+        @Provides
+        fun provideCombinedChatRoomMapper(): CombinedChatRoomMapper = ::toCombinedChatRoom
+
+        /**
+         * Provide [MyAccountCredentialsMapper] mapper
+         */
+        @Provides
+        fun provideMyAccountCredentialsMapper(): MyAccountCredentialsMapper =
+            ::toMyAccountCredentials
+
+        /**
+         * Provide [ContactCredentialsMapper] mapper
+         */
+        @Provides
+        fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
+
+        /**
+         * Provide chat scheduled meeting mapper
+         */
+        @Provides
+        fun provideChatScheduledMeetingMapper(): ChatScheduledMeetingMapper =
+            ::toChatScheduledMeeting
+
+        /**
+         * Provide chat scheduled meeting occurr mapper
+         */
+        @Provides
+        fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
+            ::toChatScheduledMeetingOccur
+
+        @Provides
+        fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
+            ::toOfflineNodeInformation
+
+        /**
+         * Provide [CountryMapper] mapper
+         */
+        @Provides
+        fun provideCountryMapper(): CountryMapper = ::toCountry
+
+        /**
+         * Provide chat list item mapper
+         */
+        @Provides
+        fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
+
+        /**
+         * Provide chat call mapper
+         */
+        @Provides
+        fun provideChatCallMapper(): ChatCallMapper = ::toChatCall
+
+        /**
+         * Provide country calling codes mapper
+         */
+        @Provides
+        fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper =
+            CountryCallingCodeMapper(::toCountryCallingCodes)
+
+        /**
+         * Provide video quality mapper
+         */
+        @Provides
+        fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
+
+        /**
+         * Provide pricing mapper
+         *
+         */
+        @Provides
+        fun providePricingMapper(): PricingMapper = ::toPricing
+
+        /**
+         * Provide video quality int mapper
+         */
+        @Provides
+        fun provideVideoQualityIntMapper(): VideoQualityIntMapper = ::videoQualityToInt
+
+        @Provides
+        fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt
+
+        @Provides
+        fun provideMegaSkuMapper(): MegaSkuMapper = ::toMegaSku
+
+        @Provides
+        fun provideMegaPurchaseMapper(): MegaPurchaseMapper = ::toMegaPurchase
+
+        @Provides
+        fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
+            ::toChatFilesFolderUserAttribute
+
+        /**
+         * Provide subscription platform type mapper
+         */
+        @Provides
+        fun provideSubscriptionPlatformTypeMapper(): PaymentPlatformTypeMapper =
+            ::toPaymentPlatformType
+
+        /**
+         * Provide account transfer detail mapper
+         */
+        @Provides
+        fun provideAccountTransferDetailMapper(): AccountTransferDetailMapper =
+            ::toAccountTransferDetail
+
+        /**
+         * Provide account session detail mapper
+         */
+        @Provides
+        fun provideAccountSessionDetailMapper(): AccountSessionDetailMapper =
+            ::toAccountSessionDetail
+
+        /**
+         * Provide account storage detail mapper
+         */
+        @Provides
+        fun provideAccountStorageDetailMapper(): AccountStorageDetailMapper =
+            ::toAccountStorageDetail
+
+        /**
+         * Provide account level detail mapper
+         */
+        @Provides
+        fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper =
+            ::toAccountLevelDetail
+
+        /**
+         * Provide file duration mapper
+         */
+        @Provides
+        fun provideFileDurationMapper(): FileDurationMapper = ::toDuration
+
+        /**
+         * Provides scanned contact link result mapper
+         */
+        @Provides
+        fun provideScannedContactLinkResultMapper(): ScannedContactLinkResultMapper =
+            ::toScannedContactLinkResult
+
+        /**
+         * Provides invite contact request mapper
+         */
+        @Provides
+        fun provideInviteContactRequestMapper(): InviteContactRequestMapper =
+            ::toInviteContactRequest
+
+        /**
+         * Provides user credentials mapper
+         */
+        @Provides
+        fun provideUserCredentialsMapper(): UserCredentialsMapper = ::toUserCredentialsMapper
+
+        /**
+         * Provides account session mapper
+         */
+        @Provides
+        fun provideAccountSessionMapper(): AccountSessionMapper = ::toAccountSession
+
+        /**
+         * Provides VideoAttachment mapper
+         */
+        @Provides
+        fun provideVideoAttachmentMapper(): VideoAttachmentMapper = ::toVideoAttachment
+
+        /**
+         * Provides FolderLoginStatus mapper
+         */
+        @Provides
+        fun provideFolderLoginStatusMapper(): FolderLoginStatusMapper = ::toFolderLoginStatus
     }
-
-    /**
-     * Provide images mapper
-     */
-    @Provides
-    fun provideImagesMapper(): ImageMapper = ::toImage
-
-    /**
-     * Provide videos mapper
-     */
-    @Provides
-    fun provideVideosMapper(): VideoMapper = ::toVideo
-
-    /**
-     * Provide event mapper
-     */
-    @Provides
-    fun provideEventMapper(): EventMapper = ::toEvent
-
-    /**
-     * Provide sort order mapper
-     */
-    @Provides
-    fun provideSortOrderMapper(): SortOrderMapper = ::toSortOrder
-
-    /**
-     * Provide sort order int mapper
-     */
-    @Provides
-    fun provideSortOrderIntMapper(): SortOrderIntMapper = ::sortOrderToInt
-
-    /**
-     * Provide sync record type mapper
-     */
-    @Provides
-    fun provideSyncRecordTypeMapper(): SyncRecordTypeMapper = ::toSyncRecordType
-
-    /**
-     * Provide sync record type int mapper
-     */
-    @Provides
-    fun provideSyncRecordTypeIntMapper(): SyncRecordTypeIntMapper = ::toSyncRecordTypeInt
-
-    /**
-     * Provide media store file type mapper
-     */
-    @Provides
-    fun provideMediaStoreFileTypeMapper(): MediaStoreFileTypeMapper = ::toMediaStoreFileType
-
-    /**
-     * Provide media store file type uri mapper
-     */
-    @Provides
-    fun provideMediaStoreFileTypeUriMapper(): MediaStoreFileTypeUriMapper =
-        ::toMediaStoreFileTypeUri
-
-    /**
-     * Provide storage state mapper
-     */
-    @Provides
-    fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
-
-    /**
-     * Provide [StorageState] to [Int] mapper
-     */
-    @Provides
-    fun provideStorageStateIntMapper(): StorageStateIntMapper = ::storageStateToInt
-
-    /**
-     * Provide node update mapper
-     */
-    @Provides
-    fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
-
-    /**
-     * Provide mega chat peer list mapper
-     */
-    @Provides
-    fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
-
-    /**
-     * Provide online status mapper
-     */
-    @Provides
-    fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
-
-    /**
-     * Provide contact item mapper
-     */
-    @Provides
-    fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
-
-    /**
-     * Provide mega share mapper
-     */
-    @Provides
-    fun provideMegaShareMapper(): MegaShareMapper = ::toShareModel
-
-    /**
-     * Provide boolean preference mapper
-     */
-    @Provides
-    fun provideBooleanPreferenceMapper(): BooleanPreferenceMapper = ::mapBooleanPreference
-
-    /**
-     * Provide file type info mapper
-     *
-     * @param mimeTypeMapper
-     */
-    @Provides
-    fun provideFileTypeInfoMapper(mimeTypeMapper: MimeTypeMapper): FileTypeInfoMapper = { node ->
-        getFileTypeInfo(node, mimeTypeMapper)
-    }
-
-    /**
-     * Provide contact request mapper
-     */
-    @Provides
-    fun provideContactRequestMapper(): ContactRequestMapper = ::toContactRequest
-
-    /**
-     * Provide mime type mapper
-     */
-    @Provides
-    fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
-        getMimeType(
-            extension,
-            MimeTypeMap.getSingleton()
-            ::getMimeTypeFromExtension
-        )
-    }
-
-
-    /**
-     * Provide favourite info mapper
-     */
-    @Provides
-    fun provideFavouriteInfoMapper(): NodeMapper = ::toNode
-
-
-    /**
-     * Provide user account mapper
-     */
-    @Provides
-    fun provideUserAccountMapper(): UserAccountMapper =
-        ::UserAccount
-
-    /**
-     * Provide local pricing mapper
-     */
-    @Provides
-    fun provideLocalPricingMapper(): LocalPricingMapper = ::toLocalPricing
-
-    /**
-     * Provide currency mapper
-     */
-    @Provides
-    fun provideCurrencyMapper(): CurrencyMapper = ::Currency
-
-    /**
-     * Provide paymentMethod type mapper
-     */
-    @Provides
-    fun providePaymentMethodTypeMapper(): PaymentMethodTypeMapper = ::toPaymentMethodType
-
-    /**
-     * Provide subscription plan list mapper
-     */
-    @Provides
-    fun provideSubscriptionOptionListMapper(): SubscriptionOptionListMapper =
-        ::toSubscriptionOptionList
-
-    /**
-     * Provide mega achievement mapper
-     */
-    @Provides
-    fun provideMegaAchievementMapper(): MegaAchievementMapper = ::toMegaAchievement
-
-    /**
-     * Provide mega achievements detail mapper
-     */
-    @Provides
-    fun provideAchievementsOverviewMapper(): AchievementsOverviewMapper =
-        ::toAchievementsOverview
-
-    /**
-     * Provide [RecentActionsMapper] mapper
-     */
-    @Provides
-    fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
-
-    /**
-     * Provide [UserSetMapper] mapper
-     */
-    @Provides
-    fun provideUserSetMapper(): UserSetMapper = ::toUserSet
-
-    /**
-     * Provide [RecentActionBucketMapper] mapper
-     */
-    @Provides
-    fun provideRecentActionBucketMapper(): RecentActionBucketMapper = ::toRecentActionBucket
-
-    /**
-     * Provide [SubscriptionStatusMapper] mapper
-     */
-    @Provides
-    fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
-
-    /**
-     * Provide [AccountDetailMapper] mapper
-     */
-    @Provides
-    fun provideAccountDetailMapper(
-        accountStorageDetailMapper: AccountStorageDetailMapper,
-        accountSessionDetailMapper: AccountSessionDetailMapper,
-        accountTransferDetailMapper: AccountTransferDetailMapper,
-        accountLevelDetailMapper: AccountLevelDetailMapper,
-        accountTypeMapper: AccountTypeMapper,
-        subscriptionStatusMapper: SubscriptionStatusMapper,
-    ): AccountDetailMapper = {
-            details: MegaAccountDetails,
-            numDetails: Int,
-            rootNode: MegaNode?,
-            rubbishNode: MegaNode?,
-            inShares: List<MegaNode>,
-        ->
-        toAccountDetail(
-            details,
-            numDetails,
-            rootNode,
-            rubbishNode,
-            inShares,
-            accountStorageDetailMapper,
-            accountSessionDetailMapper,
-            accountTransferDetailMapper,
-            accountLevelDetailMapper,
-            accountTypeMapper,
-            subscriptionStatusMapper,
-        )
-    }
-
-    /**
-     * Provide chat room mapper
-     */
-    @Provides
-    fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
-
-    /**
-     * Provide combined chat room mapper
-     */
-    @Provides
-    fun provideCombinedChatRoomMapper(): CombinedChatRoomMapper = ::toCombinedChatRoom
-
-    /**
-     * Provide [MyAccountCredentialsMapper] mapper
-     */
-    @Provides
-    fun provideMyAccountCredentialsMapper(): MyAccountCredentialsMapper = ::toMyAccountCredentials
-
-    /**
-     * Provide [ContactCredentialsMapper] mapper
-     */
-    @Provides
-    fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
-
-    /**
-     * Provide chat scheduled meeting mapper
-     */
-    @Provides
-    fun provideChatScheduledMeetingMapper(): ChatScheduledMeetingMapper = ::toChatScheduledMeeting
-
-    /**
-     * Provide chat scheduled meeting occurr mapper
-     */
-    @Provides
-    fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
-        ::toChatScheduledMeetingOccur
-
-    @Provides
-    fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
-        ::toOfflineNodeInformation
-
-    /**
-     * Provide [CountryMapper] mapper
-     */
-    @Provides
-    fun provideCountryMapper(): CountryMapper = ::toCountry
-
-    /**
-     * Provide chat list item mapper
-     */
-    @Provides
-    fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
-
-    /**
-     * Provide chat call mapper
-     */
-    @Provides
-    fun provideChatCallMapper(): ChatCallMapper = ::toChatCall
-
-    /**
-     * Provide country calling codes mapper
-     */
-    @Provides
-    fun provideCountryCallingCodeMapper(): CountryCallingCodeMapper =
-        CountryCallingCodeMapper(::toCountryCallingCodes)
-
-    /**
-     * Provide video quality mapper
-     */
-    @Provides
-    fun provideVideoQualityMapper(): VideoQualityMapper = ::toVideoQuality
-
-    /**
-     * Provide pricing mapper
-     *
-     */
-    @Provides
-    fun providePricingMapper(): PricingMapper = ::toPricing
-
-    /**
-     * Provide video quality int mapper
-     */
-    @Provides
-    fun provideVideoQualityIntMapper(): VideoQualityIntMapper = ::videoQualityToInt
-
-    @Provides
-    fun provideSyncStatusIntMapper(): SyncStatusIntMapper = ::syncStatusToInt
-
-    @Provides
-    fun provideMegaSkuMapper(): MegaSkuMapper = ::toMegaSku
-
-    @Provides
-    fun provideMegaPurchaseMapper(): MegaPurchaseMapper = ::toMegaPurchase
-
-    @Provides
-    fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
-        ::toChatFilesFolderUserAttribute
-
-    /**
-     * Provide subscription platform type mapper
-     */
-    @Provides
-    fun provideSubscriptionPlatformTypeMapper(): PaymentPlatformTypeMapper =
-        ::toPaymentPlatformType
-
-    /**
-     * Provide account transfer detail mapper
-     */
-    @Provides
-    fun provideAccountTransferDetailMapper(): AccountTransferDetailMapper =
-        ::toAccountTransferDetail
-
-    /**
-     * Provide account session detail mapper
-     */
-    @Provides
-    fun provideAccountSessionDetailMapper(): AccountSessionDetailMapper =
-        ::toAccountSessionDetail
-
-    /**
-     * Provide account storage detail mapper
-     */
-    @Provides
-    fun provideAccountStorageDetailMapper(): AccountStorageDetailMapper =
-        ::toAccountStorageDetail
-
-    /**
-     * Provide account level detail mapper
-     */
-    @Provides
-    fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper =
-        ::toAccountLevelDetail
-
-    /**
-     * Provide file duration mapper
-     */
-    @Provides
-    fun provideFileDurationMapper(): FileDurationMapper = ::toDuration
-
-    /**
-     * Provides scanned contact link result mapper
-     */
-    @Provides
-    fun provideScannedContactLinkResultMapper(): ScannedContactLinkResultMapper =
-        ::toScannedContactLinkResult
-
-    /**
-     * Provides invite contact request mapper
-     */
-    @Provides
-    fun provideInviteContactRequestMapper(): InviteContactRequestMapper = ::toInviteContactRequest
-
-    /**
-     * Provides user credentials mapper
-     */
-    @Provides
-    fun provideUserCredentialsMapper(): UserCredentialsMapper = ::toUserCredentialsMapper
-
-    /**
-     * Provides account session mapper
-     */
-    @Provides
-    fun provideAccountSessionMapper(): AccountSessionMapper = ::toAccountSession
-
-    /**
-     * Provides VideoAttachment mapper
-     */
-    @Provides
-    fun provideVideoAttachmentMapper(): VideoAttachmentMapper = ::toVideoAttachment
-
-    /**
-     * Provides FolderLoginStatus mapper
-     */
-    @Provides
-    fun provideFolderLoginStatusMapper(): FolderLoginStatusMapper = ::toFolderLoginStatus
 }

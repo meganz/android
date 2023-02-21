@@ -939,4 +939,6 @@ internal class MegaApiFacade @Inject constructor(
     @Deprecated("This API is for testing purpose, will be deleted later")
     override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
 
+    override suspend fun getSmsAllowedState() = megaApi.smsAllowedState()
+
 }

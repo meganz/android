@@ -1,10 +1,13 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.verification.SmsPermission
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 
 /**
  * Verification repository
+ *
+ * @constructor Create empty Verification repository
  */
 interface VerificationRepository {
 
@@ -63,4 +66,11 @@ interface VerificationRepository {
      * @param pin
      */
     suspend fun verifyPhoneNumber(pin: String)
+
+    /**
+     * Get sms permissions
+     *
+     * @return list of allowed sms requests
+     */
+    suspend fun getSmsPermissions(): List<SmsPermission>
 }

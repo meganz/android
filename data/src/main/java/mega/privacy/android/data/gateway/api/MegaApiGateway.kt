@@ -1803,4 +1803,11 @@ interface MegaApiGateway {
      */
     @Deprecated("This API is for testing purpose, will be deleted later")
     fun setSecureFlag(enable: Boolean)
+
+    /**
+     * Get sms allowed state
+     *
+     * @return current sms allowed state: 2 = Opt-in and unblock SMS allowed.  1 = Only unblock SMS allowed.  0 = No SMS allowed
+     */
+    suspend fun getSmsAllowedState(): Int
 }
