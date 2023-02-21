@@ -91,9 +91,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
-    override suspend fun isSyncByWifi(): Boolean = dbHandler.preferences?.camSyncWifi.toBoolean()
-
-    override suspend fun isSyncByWifiDefault(): Boolean =
+    override suspend fun isSyncByWifi(): Boolean =
         dbHandler.preferences?.camSyncWifi?.toBoolean() ?: true
 
     override suspend fun getPendingSyncRecords(): List<SyncRecord> =

@@ -93,12 +93,6 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload sync by wifi only default setting`() = runTest {
-        whenever(localStorageGateway.isSyncByWifiDefault()).thenReturn(true)
-        assertThat(underTest.isSyncByWifiDefault()).isTrue()
-    }
-
-    @Test
     fun `test camera upload retrieves sync records`() = runTest {
         whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
         assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
@@ -421,6 +415,7 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     fun `test that reset total uploads is invoked`() = runTest {
         underTest.resetTotalUploads()
         verify(megaApiGateway).resetTotalUploads()

@@ -53,19 +53,14 @@ interface CameraUploadRepository {
     suspend fun setupSecondaryFolder(secondaryHandle: Long): Long
 
     /**
-     * Is camera upload sync by wifi only
+     * Checks if content in Camera Uploads should be uploaded through Wi-Fi only,
+     * or through Wi-Fi or Mobile Data
      *
-     * @return true if sync is by wifi
+     * @return If true, will only upload on Wi-Fi. It will also return true if the option has not
+     * been set (null)
+     * Otherwise, will upload through Wi-Fi or Mobile Data
      */
     suspend fun isSyncByWifi(): Boolean
-
-    /**
-     * Is camera upload sync by wifi only
-     * if not set (null), then sync by wifi only
-     *
-     * @return sync by wifi preference
-     */
-    suspend fun isSyncByWifiDefault(): Boolean
 
     /**
      * Get camera upload sync timestamp

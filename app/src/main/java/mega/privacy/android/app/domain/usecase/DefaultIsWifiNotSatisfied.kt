@@ -17,5 +17,5 @@ class DefaultIsWifiNotSatisfied @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : IsWifiNotSatisfied {
     override suspend fun invoke(): Boolean =
-        cameraUploadRepository.isSyncByWifiDefault() && !isOnWifiWrapper.isOnWifi(context)
+        cameraUploadRepository.isSyncByWifi() && !isOnWifiWrapper.isOnWifi(context)
 }

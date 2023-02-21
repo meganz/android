@@ -92,10 +92,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isSyncByWifi()
     }
 
-    override suspend fun isSyncByWifiDefault() = withContext(ioDispatcher) {
-        localStorageGateway.isSyncByWifiDefault()
-    }
-
     override suspend fun getPendingSyncRecords(): List<SyncRecord> = withContext(ioDispatcher) {
         localStorageGateway.getPendingSyncRecords()
     }

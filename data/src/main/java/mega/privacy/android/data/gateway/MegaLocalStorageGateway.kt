@@ -103,12 +103,6 @@ interface MegaLocalStorageGateway {
     suspend fun isSyncByWifi(): Boolean
 
     /**
-     * Is sync by wifi default
-     * @return if sync is by wifi default
-     */
-    suspend fun isSyncByWifiDefault(): Boolean
-
-    /**
      * Get all pending sync records
      * @return pending sync records
      */
