@@ -12,6 +12,8 @@ import mega.privacy.android.app.presentation.qrcode.mapper.DefaultQRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.DefaultSaveBitmapToFileMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
+import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
+import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapperImpl
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 
@@ -51,4 +53,12 @@ abstract class QRCodeMapperModule {
      */
     @Binds
     abstract fun bindCombineQRCodeAndAvatarMapper(implementation: DefaultCombineQRCodeAndAvatarMapper): CombineQRCodeAndAvatarMapper
+
+    /**
+     * Provide the instance of [MyQRCodeTextErrorMapper]
+     */
+    @Binds
+    abstract fun bindMyQRCodeExceptionTestMapper(
+        implementation: MyQRCodeTextErrorMapperImpl,
+    ): MyQRCodeTextErrorMapper
 }

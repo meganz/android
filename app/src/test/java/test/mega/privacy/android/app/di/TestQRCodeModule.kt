@@ -8,6 +8,7 @@ import mega.privacy.android.app.di.qrcode.QRCodeMapperModule
 import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvatarMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.LoadBitmapFromFileMapper
+import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.SaveBitmapToFileMapper
 import mega.privacy.android.domain.di.QRCodeModule
@@ -38,6 +39,7 @@ class TestQRCodeModule {
     private val saveBitmapToFileMapper = mock<SaveBitmapToFileMapper>()
     private val getCircleBitmapMapper = mock<GetCircleBitmapMapper>()
     private val combineQRCodeAndAvatarMapper = mock<CombineQRCodeAndAvatarMapper>()
+    private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
     
     @Provides
     fun provideDeleteQRCode() = deleteQrCode
@@ -65,5 +67,8 @@ class TestQRCodeModule {
 
     @Provides
     fun provideCombineQRCodeAndAvatarMapper() = combineQRCodeAndAvatarMapper
+
+    @Provides
+    fun provideMyQRCodeExceptionTextMapper() = myQRCodeTextErrorMapper
 
 }
