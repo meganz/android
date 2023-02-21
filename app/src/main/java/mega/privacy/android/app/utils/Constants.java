@@ -582,6 +582,7 @@ public class Constants {
     public static final int SCROLLING_UP_DIRECTION = -1;
     public static final int REQUIRE_PASSCODE_INVALID = -1;
 
+    public static final String IS_NODE_INCOMING = "isNodeIncoming";
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
     public static final String CHAT_ID = "CHAT_ID";

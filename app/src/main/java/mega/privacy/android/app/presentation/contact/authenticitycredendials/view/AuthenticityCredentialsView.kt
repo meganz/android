@@ -134,7 +134,7 @@ fun ContactCredentials(
         .background(color = if (MaterialTheme.colors.isLight) white else dark_grey)) {
 
         Column {
-            if (isBannerVisible) {
+            if (state.showContactVerificationBanner && isBannerVisible) {
                 Box(modifier = Modifier
                     .testTag("CONTACT_VERIFICATION_BANNER_VIEW")
                     .fillMaxWidth()

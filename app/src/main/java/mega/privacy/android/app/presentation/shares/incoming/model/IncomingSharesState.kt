@@ -14,7 +14,6 @@ import nz.mega.sdk.MegaNode
  * @param isInvalidHandle true if parent handle is invalid
  * @param isLoading true if the nodes are loading
  * @param sortOrder current sort order
- * @param isMandatoryFingerprintVerificationNeeded Boolean to get if mandatory finger print verification Needed
  * @param unverifiedIncomingShares List of unverified incoming [ShareData]
  * @param unVerifiedIncomingNodeHandles List of unverified incoming node handles
  */
@@ -26,7 +25,6 @@ data class IncomingSharesState(
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val isMandatoryFingerprintVerificationNeeded: Boolean = false,
     val unverifiedIncomingShares: List<ShareData> = emptyList(),
     val unVerifiedIncomingNodeHandles: List<Long> = emptyList(),
 ) {
