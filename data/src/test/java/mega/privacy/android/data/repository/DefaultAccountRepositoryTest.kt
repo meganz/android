@@ -169,8 +169,13 @@ class DefaultAccountRepositoryTest {
     fun `test that user update is returned when onUsersUpdate is called with non null user list value`() =
         runTest {
             val userList = arrayListOf(mock<MegaUser>())
-            whenever(megaApiGateway.globalUpdates).thenReturn(flowOf(GlobalUpdate.OnUsersUpdate(
-                userList)))
+            whenever(megaApiGateway.globalUpdates).thenReturn(
+                flowOf(
+                    GlobalUpdate.OnUsersUpdate(
+                        userList
+                    )
+                )
+            )
             underTest.monitorUserUpdates().test {
                 assertThat(awaitItem()).isInstanceOf(UserUpdate::class.java)
                 awaitComplete()
@@ -211,10 +216,12 @@ class DefaultAccountRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_OK)
             }
 
-            whenever(subscriptionOptionListMapper(
-                request,
-                currencyMapper,
-            )).thenReturn(
+            whenever(
+                subscriptionOptionListMapper(
+                    request,
+                    currencyMapper,
+                )
+            ).thenReturn(
                 listOf(subscriptionOption)
             )
 
@@ -243,10 +250,12 @@ class DefaultAccountRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_OK + 1)
             }
 
-            whenever(subscriptionOptionListMapper(
-                request,
-                currencyMapper,
-            )).thenReturn(
+            whenever(
+                subscriptionOptionListMapper(
+                    request,
+                    currencyMapper,
+                )
+            ).thenReturn(
                 listOf(subscriptionOption)
             )
 
@@ -265,9 +274,13 @@ class DefaultAccountRepositoryTest {
         val megaAchievementsDetails = mock<MegaAchievementsDetails>()
         val megaAchievement = mock<MegaAchievement>()
 
-        whenever(megaAchievementMapper(megaAchievementsDetails,
-            AchievementType.INVALID_ACHIEVEMENT,
-            0L)).thenReturn(megaAchievement)
+        whenever(
+            megaAchievementMapper(
+                megaAchievementsDetails,
+                AchievementType.INVALID_ACHIEVEMENT,
+                0L
+            )
+        ).thenReturn(megaAchievement)
 
         val megaApiJava = mock<MegaApiJava>()
         val megaError = mock<MegaError> {
@@ -282,7 +295,8 @@ class DefaultAccountRepositoryTest {
             ((it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                 megaApiJava,
                 megaRequest,
-                megaError))
+                megaError
+            ))
         }
 
         val actual = underTest.getAccountAchievements(AchievementType.INVALID_ACHIEVEMENT, 0L)
@@ -311,7 +325,8 @@ class DefaultAccountRepositoryTest {
             ((it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                 megaApiJava,
                 megaRequest,
-                megaError))
+                megaError
+            ))
         }
 
         val actual = underTest.getAccountAchievementsOverview()
@@ -400,11 +415,14 @@ class DefaultAccountRepositoryTest {
                 on { megaAccountDetails }.thenReturn(mock())
             }
 
-            whenever(megaApiGateway.getSpecificAccountDetails(
-                storage = any(),
-                transfer = any(),
-                pro = any(),
-                listener = any())).thenAnswer {
+            whenever(
+                megaApiGateway.getSpecificAccountDetails(
+                    storage = any(),
+                    transfer = any(),
+                    pro = any(),
+                    listener = any()
+                )
+            ).thenAnswer {
                 ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
                     megaRequest,
@@ -429,11 +447,14 @@ class DefaultAccountRepositoryTest {
                 on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
             }
 
-            whenever(megaApiGateway.getSpecificAccountDetails(
-                storage = any(),
-                transfer = any(),
-                pro = any(),
-                listener = any())).thenAnswer {
+            whenever(
+                megaApiGateway.getSpecificAccountDetails(
+                    storage = any(),
+                    transfer = any(),
+                    pro = any(),
+                    listener = any()
+                )
+            ).thenAnswer {
                 ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
                     megaRequest,
@@ -474,11 +495,14 @@ class DefaultAccountRepositoryTest {
                 on { megaAccountDetails }.thenReturn(mock())
             }
 
-            whenever(megaApiGateway.getExtendedAccountDetails(
-                sessions = any(),
-                purchases = any(),
-                transactions = any(),
-                listener = any())).thenAnswer {
+            whenever(
+                megaApiGateway.getExtendedAccountDetails(
+                    sessions = any(),
+                    purchases = any(),
+                    transactions = any(),
+                    listener = any()
+                )
+            ).thenAnswer {
                 ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
                     megaRequest,
@@ -505,11 +529,14 @@ class DefaultAccountRepositoryTest {
                 on { type }.thenReturn(MegaRequest.TYPE_ACCOUNT_DETAILS)
             }
 
-            whenever(megaApiGateway.getExtendedAccountDetails(
-                sessions = any(),
-                purchases = any(),
-                transactions = any(),
-                listener = any())).thenAnswer {
+            whenever(
+                megaApiGateway.getExtendedAccountDetails(
+                    sessions = any(),
+                    purchases = any(),
+                    transactions = any(),
+                    listener = any()
+                )
+            ).thenAnswer {
                 ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     mock(),
                     megaRequest,
@@ -594,9 +621,11 @@ class DefaultAccountRepositoryTest {
         }
         val handle = 100L
 
-        whenever(megaApiGateway.contactLinkDelete(
-            handle = eq(handle),
-            listener = any())
+        whenever(
+            megaApiGateway.contactLinkDelete(
+                handle = eq(handle),
+                listener = any()
+            )
         ).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
@@ -619,9 +648,11 @@ class DefaultAccountRepositoryTest {
         }
         val handle = 100L
 
-        whenever(megaApiGateway.contactLinkDelete(
-            handle = eq(handle),
-            listener = any())
+        whenever(
+            megaApiGateway.contactLinkDelete(
+                handle = eq(handle),
+                listener = any()
+            )
         ).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
@@ -645,10 +676,12 @@ class DefaultAccountRepositoryTest {
             on { type }.thenReturn(MegaRequest.TYPE_CONTACT_LINK_CREATE)
             on { nodeHandle }.thenReturn(expectedHandle)
         }
-        whenever(megaApiGateway.contactLinkCreate(
-            renew = eq(renew),
-            listener = any()
-        )).thenAnswer {
+        whenever(
+            megaApiGateway.contactLinkCreate(
+                renew = eq(renew),
+                listener = any()
+            )
+        ).thenAnswer {
             ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
                 megaRequest,
@@ -669,10 +702,12 @@ class DefaultAccountRepositoryTest {
         val megaRequest = mock<MegaRequest> {
             on { type }.thenReturn(MegaRequest.TYPE_CONTACT_LINK_CREATE)
         }
-        whenever(megaApiGateway.contactLinkCreate(
-            renew = any(),
-            listener = any()
-        )).thenAnswer {
+        whenever(
+            megaApiGateway.contactLinkCreate(
+                renew = any(),
+                listener = any()
+            )
+        ).thenAnswer {
             ((it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
                 megaRequest,
@@ -685,8 +720,8 @@ class DefaultAccountRepositoryTest {
 
 
     @Test
-    fun `test that MegaApiGateway method is invoked when getting accountEmail`() {
-        underTest.accountEmail
+    fun `test that MegaApiGateway method is invoked when getting accountEmail`() = runTest {
+        underTest.getAccountEmail()
         verify(megaApiGateway).accountEmail
     }
 

@@ -200,8 +200,9 @@ interface AccountRepository {
 
     /**
      * Registered email of current account
+     * @return email address or null
      */
-    val accountEmail: String?
+    suspend fun getAccountEmail(): String?
 
     /**
      * Monitor account detail
@@ -295,7 +296,7 @@ interface AccountRepository {
     suspend fun resetPasswordFromLink(
         link: String?,
         newPassword: String,
-        masterKey: String?
+        masterKey: String?,
     ): Boolean
 
     /**

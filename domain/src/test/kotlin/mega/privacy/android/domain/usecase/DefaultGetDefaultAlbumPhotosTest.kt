@@ -32,9 +32,11 @@ class DefaultGetDefaultAlbumPhotosTest {
     @Test
     fun `test that nodes are not updated when node update type is not in monitored types`() =
         runTest {
-            whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
-                createVideo(id = 1L)
-            ))
+            whenever(photosRepository.searchMegaPhotos()).thenReturn(
+                listOf(
+                    createVideo(id = 1L)
+                )
+            )
             val node = mock<Node>()
             whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
                 flowOf(
@@ -63,12 +65,21 @@ class DefaultGetDefaultAlbumPhotosTest {
     @Test
     fun `test that nodes are updated when node update of type NodeChanges New is returned`() =
         runTest {
-            whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
-                createVideo(id = 1L)
-            ))
+            whenever(photosRepository.searchMegaPhotos()).thenReturn(
+                listOf(
+                    createVideo(id = 1L)
+                )
+            )
             val node = mock<Node>()
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                node to listOf(NodeChanges.New)))))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
+                flowOf(
+                    NodeUpdate(
+                        mapOf(
+                            node to listOf(NodeChanges.New)
+                        )
+                    )
+                )
+            )
 
             underTest(listOf())
                 .test {
@@ -81,12 +92,21 @@ class DefaultGetDefaultAlbumPhotosTest {
     @Test
     fun `test that nodes are updated when node update of type NodeChanges Favourite is returned`() =
         runTest {
-            whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
-                createVideo(id = 1L)
-            ))
+            whenever(photosRepository.searchMegaPhotos()).thenReturn(
+                listOf(
+                    createVideo(id = 1L)
+                )
+            )
             val node = mock<Node>()
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                node to listOf(NodeChanges.Favourite)))))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
+                flowOf(
+                    NodeUpdate(
+                        mapOf(
+                            node to listOf(NodeChanges.Favourite)
+                        )
+                    )
+                )
+            )
 
             underTest(listOf())
                 .test {
@@ -99,12 +119,21 @@ class DefaultGetDefaultAlbumPhotosTest {
     @Test
     fun `test that nodes are updated when node update of type NodeChanges Attributes is returned`() =
         runTest {
-            whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
-                createVideo(id = 1L)
-            ))
+            whenever(photosRepository.searchMegaPhotos()).thenReturn(
+                listOf(
+                    createVideo(id = 1L)
+                )
+            )
             val node = mock<Node>()
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                node to listOf(NodeChanges.Attributes)))))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
+                flowOf(
+                    NodeUpdate(
+                        mapOf(
+                            node to listOf(NodeChanges.Attributes)
+                        )
+                    )
+                )
+            )
 
             underTest(listOf())
                 .test {
@@ -117,12 +146,21 @@ class DefaultGetDefaultAlbumPhotosTest {
     @Test
     fun `test that nodes are updated when node update of type NodeChanges Parent is returned`() =
         runTest {
-            whenever(photosRepository.searchMegaPhotos()).thenReturn(listOf(
-                createVideo(id = 1L)
-            ))
+            whenever(photosRepository.searchMegaPhotos()).thenReturn(
+                listOf(
+                    createVideo(id = 1L)
+                )
+            )
             val node = mock<Node>()
-            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(flowOf(NodeUpdate(mapOf(
-                node to listOf(NodeChanges.Parent)))))
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(
+                flowOf(
+                    NodeUpdate(
+                        mapOf(
+                            node to listOf(NodeChanges.Parent)
+                        )
+                    )
+                )
+            )
 
             underTest(listOf())
                 .test {

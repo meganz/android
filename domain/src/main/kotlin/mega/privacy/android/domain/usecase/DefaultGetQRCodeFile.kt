@@ -22,7 +22,7 @@ class DefaultGetQRCodeFile @Inject constructor(
     }
 
     override suspend fun invoke(): File? = withContext(ioDispatcher) {
-        accountRepository.accountEmail?.let { email ->
+        accountRepository.getAccountEmail()?.let { email ->
             qrCodeRepository.getQRFile(email + QR_IMAGE_FILE_NAME)
         }
     }

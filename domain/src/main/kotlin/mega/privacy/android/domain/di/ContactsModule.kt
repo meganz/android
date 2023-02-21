@@ -119,7 +119,7 @@ internal abstract class ContactsModule {
 
         @Provides
         fun provideGetCurrentUserEmail(accountRepository: AccountRepository): GetCurrentUserEmail =
-            GetCurrentUserEmail { accountRepository.accountEmail }
+            GetCurrentUserEmail { accountRepository.getAccountEmail() }
 
         @Provides
         fun provideGetUserFirstName(contactsRepository: ContactsRepository): GetUserFirstName =

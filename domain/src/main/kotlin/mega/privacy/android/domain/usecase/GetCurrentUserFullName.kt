@@ -1,8 +1,13 @@
 package mega.privacy.android.domain.usecase
 
+
 /**
  * Get full name of current user
  */
+@Deprecated(
+    message = "Default display values should be handled in the presentation layer, see [MyCodeFragment] for an example",
+    replaceWith = ReplaceWith("GetUserFullName")
+)
 fun interface GetCurrentUserFullName {
 
     /**

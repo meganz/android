@@ -32,14 +32,14 @@ class DefaultGetQRCodeFileTest {
 
     @Test
     fun `test that QR code file is null if account repository returns null email`() = runTest {
-        whenever(accountRepository.accountEmail).thenReturn(null)
+        whenever(accountRepository.getAccountEmail()).thenReturn(null)
         assertThat(underTest()).isEqualTo(null)
     }
 
     @Test
     fun `test that QR code file is null if QRCodeRepository getQRFile returns null`() = runTest {
         val email = "a@b.c"
-        whenever(accountRepository.accountEmail).thenReturn(email)
+        whenever(accountRepository.getAccountEmail()).thenReturn(email)
         whenever(qrCodeRepository.getQRFile(any())).thenReturn(null)
         assertThat(underTest()).isEqualTo(null)
     }
@@ -48,7 +48,7 @@ class DefaultGetQRCodeFileTest {
     fun `test that QR code file is returned`() = runTest {
         val email = "a@b.c"
         val expectedFile: File = mock()
-        whenever(accountRepository.accountEmail).thenReturn(email)
+        whenever(accountRepository.getAccountEmail()).thenReturn(email)
         whenever(qrCodeRepository.getQRFile(any())).thenReturn(expectedFile)
         assertThat(underTest()).isEqualTo(expectedFile)
     }
