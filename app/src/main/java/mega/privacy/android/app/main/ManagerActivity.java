@@ -313,7 +313,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
-import mega.privacy.android.app.main.tasks.FillDBContactsTask;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
@@ -3512,20 +3511,10 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (!firstTimeAfterInstallation) {
             Timber.d("Its NOT first time");
-            int dbContactsSize = dbH.getContactsSize();
-            int sdkContactsSize = megaApi.getContacts().size();
-            if (dbContactsSize != sdkContactsSize) {
-                Timber.d("Contacts TABLE != CONTACTS SDK %d vs %d", dbContactsSize, sdkContactsSize);
-                dbH.clearContacts();
-                FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
-                fillDBContactsTask.execute();
-            }
+            userInfoViewModel.refreshContactDatabase(false);
         } else {
             Timber.d("Its first time");
-
-            //Fill the contacts DB
-            FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
-            fillDBContactsTask.execute();
+            userInfoViewModel.refreshContactDatabase(true);
             firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
         }
@@ -9298,11 +9287,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                 Timber.d("The contact: %d changes the mail.", user.getHandle());
                                 if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
                                     Timber.w("The contact NOT exists -> DB inconsistency! -> Clear!");
-                                    if (dbH.getContactsSize() != megaApi.getContacts().size()) {
-                                        dbH.clearContacts();
-                                        FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
-                                        fillDBContactsTask.execute();
-                                    }
+                                    userInfoViewModel.refreshContactDatabase(false);
                                 } else {
                                     Timber.d("The contact already exists -> update");
                                     dbH.setContactMail(user.getHandle(), user.getEmail());

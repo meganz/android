@@ -2,10 +2,12 @@ package test.mega.privacy.android.app.presentation.manager
 
 import android.content.Context
 import app.cash.turbine.test
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -21,6 +23,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
+import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -50,6 +53,8 @@ internal class UserInfoViewModelTest {
     private val getUserLastName: GetUserLastName = mock()
     private val getCurrentUserAliases: GetCurrentUserAliases = mock()
     private val context: Context = mock()
+    private val reloadContactDatabase: ReloadContactDatabase = mock()
+    private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
@@ -68,6 +73,8 @@ internal class UserInfoViewModelTest {
             monitorContactUpdates = monitorContactUpdates,
             getCurrentUserAliases = getCurrentUserAliases,
             context = context,
+            reloadContactDatabase = reloadContactDatabase,
+            applicationScope = applicationScope
         )
     }
 
@@ -184,6 +191,20 @@ internal class UserInfoViewModelTest {
             verify(getCurrentUserAliases, times(1)).invoke()
             verifyNoInteractions(getUserFirstName)
             verifyNoInteractions(getUserLastName)
+        }
+
+    @Test
+    fun `test that call to ReloadContactDatabase true when call refreshContactDatabase as true`() =
+        runTest {
+            underTest.refreshContactDatabase(true)
+            verify(reloadContactDatabase, times(1)).invoke(true)
+        }
+
+    @Test
+    fun `test that call to ReloadContactDatabase false when call refreshContactDatabase as false`() =
+        runTest {
+            underTest.refreshContactDatabase(false)
+            verify(reloadContactDatabase, times(1)).invoke(false)
         }
 
     private suspend fun initViewModelState() {

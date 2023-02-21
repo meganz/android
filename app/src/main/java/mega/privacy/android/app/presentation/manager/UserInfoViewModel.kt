@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -15,6 +16,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -23,6 +25,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
+import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,6 +39,8 @@ internal class UserInfoViewModel @Inject constructor(
     private val getUserFirstName: GetUserFirstName,
     private val getUserLastName: GetUserLastName,
     private val getCurrentUserAliases: GetCurrentUserAliases,
+    private val reloadContactDatabase: ReloadContactDatabase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val _state = MutableStateFlow(UserInfoUiState())
@@ -133,6 +138,16 @@ internal class UserInfoViewModel @Inject constructor(
                     defaultLastName = context.getString(R.string.lastname_text),
                 )
             )
+        }
+    }
+
+    /**
+     * Reload contact database
+     * Make it run in application scope so it still running when activity destroyed
+     */
+    fun refreshContactDatabase(isForce: Boolean) {
+        applicationScope.launch {
+            reloadContactDatabase(isForce)
         }
     }
 }
