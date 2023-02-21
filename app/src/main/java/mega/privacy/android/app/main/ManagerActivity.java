@@ -1281,6 +1281,7 @@ public class ManagerActivity extends TransfersManagementActivity
         rubbishBinViewModel = new ViewModelProvider(this).get(RubbishBinViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         userInfoViewModel = new ViewModelProvider(this).get(UserInfoViewModel.class);
+        viewModel.monitorGlobalEventUpgradeForUpgradeSecurity();
         viewModel.getUpdateUsers().observe(this,
                 new EventObserver<>(users -> {
                     updateUsers(users);
