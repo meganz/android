@@ -24,11 +24,13 @@ class StopCameraUploadWorker @AssistedInject constructor(
     override fun doWork(): Result {
         if (isStopped) return Result.failure()
         Timber.d("StopCameraUploadWorker: doWork()")
+        val aborted = inputData.getBoolean(CameraUploadsService.EXTRA_ABORTED, false)
         return try {
             if (cameraUploadsServiceWrapper.isServiceRunning()) {
                 Timber.d("StopCameraUploadWorker: Sending stop action")
                 val stopIntent = Intent(appContext, CameraUploadsService::class.java)
                 stopIntent.action = CameraUploadsService.ACTION_STOP
+                stopIntent.putExtra(CameraUploadsService.EXTRA_ABORTED, aborted)
                 ContextCompat.startForegroundService(appContext, stopIntent)
                 Result.success()
             } else {

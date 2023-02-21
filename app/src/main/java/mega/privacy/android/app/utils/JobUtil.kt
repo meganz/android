@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import mega.privacy.android.app.di.getDbHandler
+import mega.privacy.android.app.jobservices.CameraUploadsService
 import mega.privacy.android.app.jobservices.StartCameraUploadWorker
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker
 import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker
@@ -119,32 +120,6 @@ object JobUtil {
     }
 
     /**
-     * Fire a single camera upload heartbeat
-     *
-     * @param context From which the action is done.
-     */
-    @Synchronized
-    fun fireSingleHeartbeat(context: Context) {
-        val heartbeatWorkRequest = OneTimeWorkRequest.Builder(
-            SyncHeartbeatCameraUploadWorker::class.java
-        )
-            .addTag(SINGLE_HEART_BEAT_TAG)
-            .build()
-        WorkManager.getInstance(context)
-            .enqueueUniqueWork(
-                SINGLE_HEART_BEAT_TAG,
-                ExistingWorkPolicy.KEEP,
-                heartbeatWorkRequest
-            )
-        Timber.d(
-            "CameraUpload Single Heartbeat Work Status: ${
-                WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_HEART_BEAT_TAG)
-            }"
-        )
-        Timber.d("fireSingleHeartbeat() SUCCESS")
-    }
-
-    /**
      * Fire a one time work request of camera upload to upload immediately;
      * It will also schedule the camera upload job inside of CameraUploadsService
      *
@@ -190,10 +165,11 @@ object JobUtil {
      * Fire a request to stop camera upload service.
      *
      * @param context From which the action is done.
+     * @param aborted true if the Camera Uploads has been aborted prematurely
      */
     @JvmStatic
     @Synchronized
-    fun fireStopCameraUploadJob(context: Context) {
+    fun fireStopCameraUploadJob(context: Context, aborted: Boolean = true) {
         if (isCameraUploadDisabled) {
             Timber.d("fireStopCameraUploadJob() FAIL")
             return
@@ -202,6 +178,11 @@ object JobUtil {
             StopCameraUploadWorker::class.java
         )
             .addTag(STOP_CAMERA_UPLOAD_TAG)
+            .setInputData(
+                Data.Builder()
+                    .putBoolean(CameraUploadsService.EXTRA_ABORTED, aborted)
+                    .build()
+            )
             .build()
         WorkManager.getInstance(context)
             .enqueueUniqueWork(

@@ -1410,7 +1410,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                 if (dbH.getPreferences() != null) {
                     dbH.clearPreferences();
                     dbH.setFirstTime(false);
-                    fireStopCameraUploadJob(this);
+                    fireStopCameraUploadJob(this, true);
                 }
             } else {
                 Timber.d("Logged in. Setting account auth token for folder links.");

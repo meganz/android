@@ -1479,7 +1479,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     if (newIntent.getAction().equals(ACTION_EXPORT_MASTER_KEY) || newIntent.getAction().equals(ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)) {
                         openLink = true;
                     } else if (newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                        fireStopCameraUploadJob(getApplicationContext());
+                        fireStopCameraUploadJob(getApplicationContext(), true);
                         finish();
                         return;
                     }
@@ -1907,7 +1907,7 @@ public class ManagerActivity extends TransfersManagementActivity
                         finish();
                         return;
                     } else if (getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)) {
-                        fireStopCameraUploadJob(getApplicationContext());
+                        fireStopCameraUploadJob(getApplicationContext(), true);
                         finish();
                         return;
                     } else if (getIntent().getAction().equals(ACTION_EXPORT_MASTER_KEY)) {
@@ -2487,7 +2487,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 showOnlineMode();
             } else {
                 //stop cu process
-                fireStopCameraUploadJob(ManagerActivity.this);
+                fireStopCameraUploadJob(ManagerActivity.this, true);
                 showOfflineMode();
             }
             return Unit.INSTANCE;
@@ -3149,7 +3149,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
                     builder.setPositiveButton(getString(R.string.general_yes),
                             (dialog, whichButton) -> {
-                                fireStopCameraUploadJob(ManagerActivity.this);
+                                fireStopCameraUploadJob(ManagerActivity.this, true);
                                 dbH.setCamSyncEnabled(false);
                                 sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
                                 transfersFragment.destroyActionMode();
@@ -5660,7 +5660,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private void stopUploadProcessAndSendBroadcast(boolean shouldStopUpload, boolean shouldSendBroadCastEvent) {
         if (shouldStopUpload) {
-            fireStopCameraUploadJob(app);
+            fireStopCameraUploadJob(app, true);
         }
         if (shouldSendBroadCastEvent) {
             sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
@@ -9540,7 +9540,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 .setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
                     megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
                     megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
-                    fireStopCameraUploadJob(ManagerActivity.this);
+                    fireStopCameraUploadJob(ManagerActivity.this, false);
                     refreshFragment(FragmentTag.TRANSFERS.getTag());
                     refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
                 })

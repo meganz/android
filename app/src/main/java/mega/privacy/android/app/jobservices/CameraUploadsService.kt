@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -20,6 +21,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
@@ -152,6 +155,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
          * Stop Camera Sync
          */
         const val ACTION_STOP = "STOP_SYNC"
+
+        /**
+         * Aborted extra properties
+         * Received from external components to notify that the service
+         * is aborted prematurely
+         */
+        const val EXTRA_ABORTED = "EXTRA_ABORTED"
 
         /**
          * Ignore extra attributes
@@ -640,10 +650,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         when (intent?.action) {
             ACTION_STOP -> {
                 Timber.d("Stop all Camera Uploads Transfers")
-                endService(
-                    cancelMessage = "Camera Upload Stop Intent Action - Stop Camera Upload",
-                    aborted = true
-                )
+                val aborted = intent.getBooleanExtra(EXTRA_ABORTED, false)
+                coroutineScope?.launch {
+                    endService(
+                        cancelMessage = "Camera Upload Stop Intent Action - Stop Camera Upload",
+                        aborted = aborted
+                    )
+                }
+
+
             }
 
             else -> {
@@ -683,39 +698,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 resetTotalUploads()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
-    }
-
-    /**
-     * Sends the appropriate Backup States and Heartbeat Statuses on both Primary and
-     * Secondary folders when the active Camera Uploads is interrupted by other means (e.g.
-     * no user credentials, Wi-Fi not turned on)
-     */
-    private fun sendTransfersInterruptedInfoToBackupCenter() {
-        if (isActive()) {
-            // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
-            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
-            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
-
-            // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
-            reportUploadInterrupted()
-        }
-    }
-
-    /**
-     * Sends the appropriate Backup States and Heartbeat Statuses on both Primary and
-     * Secondary folders when the user has cancelled all Transfers.
-     *
-     * In the UI, this is done in the Transfers page where the selects "Cancel all" and
-     * confirms the Dialog
-     */
-    private fun sendTransfersCancelledInfoToBackupCenter() {
-        // Update both Primary and Secondary Backup States to ACTIVE
-        updatePrimaryFolderBackupState(BackupState.ACTIVE)
-        updateSecondaryFolderBackupState(BackupState.ACTIVE)
-
-        // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
-        sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
-        sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
     }
 
     /**
@@ -1081,8 +1063,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 startVideoCompression()
             } else {
                 Timber.d("Nothing to upload.")
-                // Make sure to send inactive heartbeat.
-                JobUtil.fireSingleHeartbeat(this)
                 // Make sure to re schedule the job
                 JobUtil.scheduleCameraUploadJob(this)
                 endService()
@@ -1222,6 +1202,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                                     cancelToken = null,
                                 ).collect { globalTransfer ->
                                     // Handle the GlobalTransfer emitted by the Use Case
+                                    ensureActive()
                                     onGlobalTransferUpdated(globalTransfer)
                                 }
                             }
@@ -1255,7 +1236,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      *
      * @param globalTransfer The [GlobalTransfer] emitted from the Use Case
      */
-    private fun onGlobalTransferUpdated(globalTransfer: GlobalTransfer) {
+    private suspend fun onGlobalTransferUpdated(globalTransfer: GlobalTransfer) {
         when (globalTransfer) {
             is GlobalTransfer.OnTransferFinish -> onTransferFinished(globalTransfer)
             is GlobalTransfer.OnTransferUpdate -> onTransferUpdated(globalTransfer)
@@ -1302,7 +1283,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         if (cancelled) {
             Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
             coroutineScope?.launch { cancelPendingTransfer(transfer) }
-            endService(aborted = true)
             return
         }
         if (isOverQuota) {
@@ -1316,7 +1296,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      *
      * @param globalTransfer [GlobalTransfer.OnTransferTemporaryError]
      */
-    private fun onTransferTemporaryError(globalTransfer: GlobalTransfer.OnTransferTemporaryError) {
+    private suspend fun onTransferTemporaryError(globalTransfer: GlobalTransfer.OnTransferTemporaryError) {
         val error = globalTransfer.error
 
         Timber.w("onTransferTemporaryError: ${globalTransfer.transfer.nodeHandle}")
@@ -1386,7 +1366,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         return source?.lastModified() ?: 0
     }
 
-    private fun onQueueComplete() {
+    private suspend fun onQueueComplete() {
         Timber.d("Stopping foreground!")
         coroutineScope?.launch { resetTotalUploads() }
         totalUploaded = 0
@@ -1587,30 +1567,72 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      * @param cancelMessage message associated to cancel
      * @param aborted true if the service is ended prematurely
      */
-    private fun endService(
+    private suspend fun endService(
         cancelMessage: String = "Ending Service",
         aborted: Boolean = false,
     ) {
         Timber.d("Finish Camera upload process.")
         stopWakeAndWifiLocks()
 
-        coroutineScope?.launch {
-            if (aborted)
-                sendTransfersInterruptedInfoToBackupCenter()
-
-            cancelAllPendingTransfers()
-            cancel(cancelMessage)
-        }
-
         if (isOverQuota) {
             showStorageOverQuotaNotification()
         }
 
-        videoCompressionJob?.cancel()
+        if (coroutineScope?.isActive == true) {
+            sendStatusToBackupCenter(aborted = aborted)
+            cancelAllPendingTransfers()
+            videoCompressionJob?.cancel()
+            coroutineScope?.cancel(CancellationException(cancelMessage))
+        }
+
         cancelled = true
         stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
+    }
+
+    /**
+     * Send the status of Camera Uploads to back up center
+     *
+     * @param aborted true if the Camera Uploads has been stopped prematurely
+     */
+    private fun sendStatusToBackupCenter(aborted: Boolean) {
+        if (aborted)
+            sendTransfersInterruptedInfoToBackupCenter()
+        else
+            sendTransfersUpToDateInfoToBackupCenter()
+    }
+
+    /**
+     * Sends the appropriate Backup States and Heartbeat Statuses on both Primary and
+     * Secondary folders when the active Camera Uploads is interrupted by other means (e.g.
+     * no user credentials, Wi-Fi not turned on)
+     */
+    private fun sendTransfersInterruptedInfoToBackupCenter() {
+        if (isActive()) {
+            // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
+            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+
+            // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
+            reportUploadInterrupted()
+        }
+    }
+
+    /**
+     * Sends the appropriate Backup States and Heartbeat Statuses on both Primary and
+     * Secondary folders when the user complete the CU in a normal manner
+     *
+     * One particular case where these states are sent is when the user "Cancel all" uploads
+     */
+    private fun sendTransfersUpToDateInfoToBackupCenter() {
+        // Update both Primary and Secondary Backup States to ACTIVE
+        updatePrimaryFolderBackupState(BackupState.ACTIVE)
+        updateSecondaryFolderBackupState(BackupState.ACTIVE)
+
+        // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
+        sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
+        sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
     }
 
     private fun cancelNotification() {
@@ -1749,7 +1771,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         }
         if (cancelled) {
             Timber.w("Image sync cancelled: %s", transfer.nodeHandle)
-            endService(aborted = true)
         }
         updateUpload()
     }
@@ -1760,17 +1781,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      * @param node the [MegaNode] to attach the [originalFingerprint] to
      * @param originalFingerprint the fingerprint of the file before modification
      */
-    private fun handleSetOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
-        coroutineScope?.launch {
-            runCatching {
-                setOriginalFingerprint(
-                    node = node,
-                    originalFingerprint = originalFingerprint,
-                )
-            }.onSuccess {
-                Timber.d("Set original fingerprint successful")
-            }.onFailure { error -> Timber.e("Set original fingerprint error: $error") }
-        }
+    private suspend fun handleSetOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
+        runCatching {
+            setOriginalFingerprint(
+                node = node,
+                originalFingerprint = originalFingerprint,
+            )
+        }.onSuccess {
+            Timber.d("Set original fingerprint successful")
+        }.onFailure { error -> Timber.e("Set original fingerprint error: $error") }
     }
 
     private suspend fun updateUpload() {
@@ -1822,6 +1841,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                     Timber.d("Starting compressor")
                     tempRoot?.let { root ->
                         compressVideos(root, fullList).collect {
+                            ensureActive()
                             when (it) {
                                 is VideoCompressionState.Failed -> {
                                     onCompressFailed(fullList.first { record -> record.id == it.id })
@@ -1857,13 +1877,13 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 }
             } else {
                 Timber.d("Compression queue bigger than setting, show notification to user.")
-                showVideCompressionErrorNotification()
+                showVideoCompressionErrorNotification()
                 endService(aborted = true)
             }
         }
     }
 
-    private suspend fun showVideCompressionErrorNotification() {
+    private suspend fun showVideoCompressionErrorNotification() {
         val intent = Intent(this, ManagerActivity::class.java)
         intent.action = Constants.ACTION_SHOW_SETTINGS
         val pendingIntent =
@@ -1891,7 +1911,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     /**
      * Not enough space available
      */
-    private fun onInsufficientSpace() {
+    private suspend fun onInsufficientSpace() {
         Timber.w("Insufficient space for video compression.")
         showOutOfSpaceNotification()
         endService(aborted = true)
