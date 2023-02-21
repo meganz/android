@@ -1,22 +1,28 @@
 package test.mega.privacy.android.app.presentation.settings.camerauploads
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -25,9 +31,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 /**
  * Test class for [SettingsCameraUploadsViewModel]
@@ -41,25 +44,16 @@ class SettingsCameraUploadsViewModelTest {
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
+    private val isCameraUploadByWifi = mock<IsCameraUploadByWifi>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
+    private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = SettingsCameraUploadsViewModel(
-            checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
-            clearCacheDirectory = clearCacheDirectory,
-            disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
-            disableMediaUploadSettings = disableMediaUploadSettings,
-            monitorConnectivity = mock(),
-            resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
-            resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
-            restorePrimaryTimestamps = restorePrimaryTimestamps,
-            restoreSecondaryTimestamps = restoreSecondaryTimestamps,
-        )
     }
 
     @After
@@ -67,15 +61,38 @@ class SettingsCameraUploadsViewModelTest {
         Dispatchers.resetMain()
     }
 
+    /**
+     * Initializes [SettingsCameraUploadsViewModel] for testing
+     */
+    private fun setupUnderTest() {
+        underTest = SettingsCameraUploadsViewModel(
+            checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
+            clearCacheDirectory = clearCacheDirectory,
+            disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
+            disableMediaUploadSettings = disableMediaUploadSettings,
+            isCameraUploadByWifi = isCameraUploadByWifi,
+            monitorConnectivity = mock(),
+            resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
+            resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
+            restorePrimaryTimestamps = restorePrimaryTimestamps,
+            restoreSecondaryTimestamps = restoreSecondaryTimestamps,
+            setCameraUploadsByWifi = setCameraUploadsByWifi,
+        )
+    }
+
     @Test
     fun `test that initial state is returned`() = runTest {
+        setupUnderTest()
+
         underTest.state.test {
             val state = awaitItem()
-            assertFalse(state.shouldShowBusinessAccountPrompt)
-            assertFalse(state.shouldShowBusinessAccountSuspendedPrompt)
-            assertFalse(state.shouldTriggerCameraUploads)
-            assertFalse(state.shouldShowMediaPermissionsRationale)
-            assertFalse(state.shouldShowNotificationPermissionRationale)
+            assertThat(state.howToUploadEnabled).isFalse()
+            assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
+            assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isFalse()
+            assertThat(state.shouldTriggerCameraUploads).isFalse()
+            assertThat(state.shouldShowMediaPermissionsRationale).isFalse()
+            assertThat(state.shouldShowNotificationPermissionRationale).isFalse()
+            assertThat(state.uploadConnectionType).isEqualTo(UploadConnectionType.WIFI)
         }
     }
 
@@ -92,124 +109,148 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatus returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
+            setupUnderTest()
+
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
 
             underTest.state.test {
                 val state = awaitItem()
-                assertTrue(state.shouldShowBusinessAccountPrompt)
+                assertThat(state.shouldShowBusinessAccountPrompt).isTrue()
             }
         }
 
     @Test
     fun `test that shouldShowBusinessAccountSuspendedPrompt is true when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
+            setupUnderTest()
+
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
 
             underTest.state.test {
                 val state = awaitItem()
-                assertTrue(state.shouldShowBusinessAccountSuspendedPrompt)
+                assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isTrue()
             }
         }
 
     @Test
     fun `test that shouldTriggerCameraUploads is true when checkEnableCameraUploadsStatus returns CAN_ENABLE_CAMERA_UPLOADS`() =
         runTest {
+            setupUnderTest()
+
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
 
             underTest.state.test {
                 val state = awaitItem()
-                assertTrue(state.shouldTriggerCameraUploads)
+                assertThat(state.shouldTriggerCameraUploads).isTrue()
             }
         }
 
     @Test
     fun `test that shouldShowBusinessAccountPrompt is false when calling resetBusinessAccountPromptState`() =
         runTest {
+            setupUnderTest()
+
             underTest.resetBusinessAccountPromptState()
 
             underTest.state.test {
                 val state = awaitItem()
-                assertFalse(state.shouldShowBusinessAccountPrompt)
+                assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
             }
         }
 
     @Test
     fun `test that shouldShowBusinessAccountSuspendedPrompt is false when calling resetBusinessAccountSuspendedPromptState`() =
         runTest {
+            setupUnderTest()
+
             underTest.resetBusinessAccountSuspendedPromptState()
 
             underTest.state.test {
                 val state = awaitItem()
-                assertFalse(state.shouldShowBusinessAccountSuspendedPrompt)
+                assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isFalse()
             }
         }
 
-    /**
-     * Performs an assertion test of shouldTriggerCameraUploads
-     * @param assertValue Boolean value assigned to shouldTriggerCameraUploads for assertion
-     */
-    private fun assertShouldTriggerCameraUploads(assertValue: Boolean) = runTest {
-        underTest.setTriggerCameraUploadsState(assertValue)
+    @Test
+    fun `test that shouldTriggerCameraUploads is updated correctly`() = runTest {
+        setupUnderTest()
 
-        underTest.state.test {
-            val state = awaitItem()
-            assertEquals(state.shouldTriggerCameraUploads, assertValue)
+        underTest.setTriggerCameraUploadsState(true)
+
+        underTest.state.map { it.shouldTriggerCameraUploads }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isTrue()
+
+            underTest.setTriggerCameraUploadsState(false)
+            assertThat(awaitItem()).isFalse()
         }
     }
 
     @Test
-    fun `test that shouldTriggerCameraUploads is true when calling setTriggerCameraUploads with true value`() =
-        assertShouldTriggerCameraUploads(true)
+    fun `test that shouldShowMediaPermissionsRationale is updated correctly`() = runTest {
+        setupUnderTest()
 
-    @Test
-    fun `test that shouldTriggerCameraUploads is false when calling setTriggerCameraUploads with false value`() =
-        assertShouldTriggerCameraUploads(false)
-
-    @Test
-    fun `test that shouldShowMediaPermissionsRationale is false when set to false`() = runTest {
-        underTest.setMediaPermissionsRationaleState(false)
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertFalse(state.shouldShowMediaPermissionsRationale)
-        }
-    }
-
-    @Test
-    fun `test that shouldShowMediaPermissionsRationale is true when set to true`() = runTest {
         underTest.setMediaPermissionsRationaleState(true)
 
-        underTest.state.test {
-            val state = awaitItem()
-            assertTrue(state.shouldShowMediaPermissionsRationale)
+        underTest.state.map { it.shouldShowMediaPermissionsRationale }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isTrue()
+
+            underTest.setMediaPermissionsRationaleState(false)
+            assertThat(awaitItem()).isFalse()
         }
     }
 
     @Test
-    fun `test that shouldShowNotificationPermissionRationale is true when set to true`() =
+    fun `test that shouldShowNotificationPermissionRationale is updated correctly`() =
         runTest {
+            setupUnderTest()
+
             underTest.setNotificationPermissionRationaleState(true)
 
-            underTest.state.test {
-                val state = awaitItem()
-                assertTrue(state.shouldShowNotificationPermissionRationale)
-            }
+            underTest.state.map { it.shouldShowNotificationPermissionRationale }
+                .distinctUntilChanged().test {
+                    assertThat(awaitItem()).isTrue()
+
+                    underTest.setNotificationPermissionRationaleState(false)
+                    assertThat(awaitItem()).isFalse()
+                }
         }
 
     @Test
-    fun `test that shouldShowNotificationPermissionRationale is false when set to false`() =
-        runTest {
-            underTest.setNotificationPermissionRationaleState(false)
+    fun `test that howToUploadEnabled is updated correctly`() = runTest {
+        setupUnderTest()
 
-            underTest.state.test {
-                val state = awaitItem()
-                assertFalse(state.shouldShowNotificationPermissionRationale)
+        underTest.setCameraUploadsEnabled(true)
+
+        underTest.state.map { it.howToUploadEnabled }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isTrue()
+
+            underTest.setCameraUploadsEnabled(false)
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that uploadConnectionType is updated correctly when calling changeUploadConnectionType`() =
+        runTest {
+            setupUnderTest()
+
+            whenever(isCameraUploadByWifi()).thenReturn(true)
+            underTest.changeUploadConnectionType(wifiOnly = true)
+
+            underTest.state.map { it.uploadConnectionType }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(UploadConnectionType.WIFI)
+
+                whenever(isCameraUploadByWifi()).thenReturn(false)
+                underTest.changeUploadConnectionType(wifiOnly = false)
+                assertThat(awaitItem()).isEqualTo(UploadConnectionType.WIFI_OR_MOBILE_DATA)
             }
         }
 
     @Test
     fun `test that restorePrimaryTimestamps is invoked when calling restorePrimaryTimestampsAndSyncRecordProcess`() =
         runTest {
+            setupUnderTest()
+
             underTest.restorePrimaryTimestampsAndSyncRecordProcess()
 
             verify(restorePrimaryTimestamps, times(1)).invoke()
@@ -218,6 +259,8 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that restoreSecondaryTimestamps is invoked when calling restoreSecondaryTimestampsAndSyncRecordProcess`() =
         runTest {
+            setupUnderTest()
+
             underTest.restoreSecondaryTimestampsAndSyncRecordProcess()
 
             verify(restoreSecondaryTimestamps, times(1)).invoke()
@@ -226,6 +269,8 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that resetCameraUploadTimeStamps and clearCacheDirectory are invoked in order when calling resetTimestampsAndCacheDirectory`() =
         runTest {
+            setupUnderTest()
+
             underTest.resetTimestampsAndCacheDirectory()
 
             with(inOrder(clearCacheDirectory, resetCameraUploadTimeStamps)) {
@@ -237,6 +282,8 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that disableCameraUploadsInDatabase is invoked when calling disableCameraUploadsInDB`() =
         runTest {
+            setupUnderTest()
+
             underTest.disableCameraUploadsInDB()
 
             verify(disableCameraUploadsInDatabase, times(1)).invoke()
@@ -244,9 +291,21 @@ class SettingsCameraUploadsViewModelTest {
 
     @Test
     fun `test that media uploads are disabled when calling disableMediaUploads`() = runTest {
+        setupUnderTest()
+
         underTest.disableMediaUploads()
 
         verify(resetMediaUploadTimeStamps, times(1)).invoke()
         verify(disableMediaUploadSettings, times(1)).invoke()
     }
+
+    @Test
+    fun `test that setCameraUploadsWifi is invoked when calling changeUploadConnectionType`() =
+        runTest {
+            setupUnderTest()
+
+            underTest.changeUploadConnectionType(wifiOnly = true)
+
+            verify(setCameraUploadsByWifi, times(1)).invoke(wifiOnly = true)
+        }
 }

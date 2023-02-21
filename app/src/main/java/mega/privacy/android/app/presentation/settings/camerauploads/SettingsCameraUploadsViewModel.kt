@@ -17,15 +17,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
+import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import javax.inject.Inject
 
 /**
@@ -35,11 +38,13 @@ import javax.inject.Inject
  * @property clearCacheDirectory Clear all the contents of the internal cache directory
  * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
  * @property disableMediaUploadSettings Disable Media Uploads by manipulating a certain value in the database
+ * @property isCameraUploadByWifi Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property monitorConnectivity Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
  * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
+ * @property setCameraUploadsByWifi Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -47,11 +52,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val clearCacheDirectory: ClearCacheDirectory,
     private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
+    private val isCameraUploadByWifi: IsCameraUploadByWifi,
     private val monitorConnectivity: MonitorConnectivity,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
+    private val setCameraUploadsByWifi: SetCameraUploadsByWifi,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -72,6 +79,10 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     val isConnected: Boolean
         get() = monitorConnectivity().value
+
+    init {
+        setUploadConnectionType()
+    }
 
     /**
      * Handle specific behavior when permissions are granted / denied
@@ -214,5 +225,37 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun disableMediaUploads() = viewModelScope.launch {
         resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
+    }
+
+    /**
+     * Updates the UI State when Camera Uploads is enabled or disabled
+     *
+     * @param enabled True if Camera Uploads is enabled, and false if otherwise
+     */
+    fun setCameraUploadsEnabled(enabled: Boolean) {
+        _state.update { it.copy(howToUploadEnabled = enabled) }
+    }
+
+    /**
+     * Sets the value of [SettingsCameraUploadsState.uploadConnectionType] based on the value of [IsCameraUploadByWifi]
+     */
+    private fun setUploadConnectionType() = viewModelScope.launch {
+        _state.update {
+            it.copy(
+                uploadConnectionType = if (isCameraUploadByWifi())
+                    UploadConnectionType.WIFI else UploadConnectionType.WIFI_OR_MOBILE_DATA
+            )
+        }
+    }
+
+    /**
+     * Change the Upload Connection Type for Camera Uploads and update the UI State afterwards
+     *
+     * @param wifiOnly If true, Camera Uploads will only run through Wi-Fi
+     * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
+     */
+    fun changeUploadConnectionType(wifiOnly: Boolean) = viewModelScope.launch {
+        setCameraUploadsByWifi(wifiOnly)
+        setUploadConnectionType()
     }
 }
