@@ -613,14 +613,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     switch (accessLevel) {
                         case MegaShare.ACCESS_FULL:
                             Timber.d("access FULL");
+                            optionFavourite.setVisibility(View.GONE);
                             if (dBT <= FIRST_NAVIGATION_LEVEL) {
                                 optionRubbishBin.setVisibility(View.GONE);
                                 counterModify--;
                                 optionMove.setVisibility(View.GONE);
                             }
-
                             break;
-
                         case MegaShare.ACCESS_READ:
                             Timber.d("access read");
                             optionLabel.setVisibility(View.GONE);

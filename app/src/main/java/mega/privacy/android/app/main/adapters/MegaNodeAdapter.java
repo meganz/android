@@ -979,7 +979,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
-        holder.imageFavourite.setVisibility(type != FOLDER_LINK_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
+        holder.imageFavourite.setVisibility(type != INCOMING_SHARES_ADAPTER
+                        && type != FOLDER_LINK_ADAPTER
+                        && node.isFavourite() ? View.VISIBLE : View.GONE);
 
         if (type != FOLDER_LINK_ADAPTER && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
             Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
