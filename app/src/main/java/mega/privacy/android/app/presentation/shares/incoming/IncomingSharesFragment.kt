@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
@@ -50,6 +51,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     private fun state() = viewModel.state.value
 
+    private lateinit var nodeController: NodeController
+
     /**
      * onCreateView
      */
@@ -78,6 +81,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        nodeController = NodeController(requireActivity())
         setupObservers()
     }
 
@@ -98,6 +102,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
         val actualPosition = position - 1
         if (state().unVerifiedIncomingNodeHandles.contains(state().nodes[actualPosition].handle)) {
             Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
+                putExtra(Constants.IS_NODE_INCOMING,
+                    nodeController.nodeComesFromIncoming(state().nodes[actualPosition]))
                 putExtra(Constants.EMAIL,
                     ContactUtil.getContactEmailDB(state().nodes[actualPosition].owner))
                 requireActivity().startActivity(this)

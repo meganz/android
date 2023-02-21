@@ -848,6 +848,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public MegaNode viewInFolderNode;
 
+    private ArrayList<String> outgoingFolderNames = new ArrayList<>();
+
     /**
      * Broadcast to update the completed transfers tab.
      */
@@ -2460,9 +2462,20 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
-
             if (viewModel.getState().getValue().getShouldAlertUserAboutSecurityUpgrade()) {
-                replaceFragment(SecurityUpgradeDialogFragment.Companion.newInstance(), SecurityUpgradeDialogFragment.TAG);
+                ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
+                    outgoingFolderNames.clear();
+                    for (int i = 0; i < outgoingSharesState.getNodes().size(); i++) {
+                        outgoingFolderNames.add(outgoingSharesState.getNodes().get(i).getName());
+                    }
+                    SecurityUpgradeDialogFragment dialog = SecurityUpgradeDialogFragment.Companion.newInstance();
+                    Bundle bundle = new Bundle();
+                    bundle.putStringArrayList("nodeNames", outgoingFolderNames);
+                    dialog.setArguments(bundle);
+                    dialog.show(getSupportFragmentManager(), SecurityUpgradeDialogFragment.TAG);
+
+                    return Unit.INSTANCE;
+                });
             }
 
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
@@ -2512,16 +2525,12 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
-            if (incomingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                addUnverifiedIncomingCountBadge(incomingSharesState.getUnverifiedIncomingShares().size());
-            }
+            addUnverifiedIncomingCountBadge(incomingSharesState.getUnverifiedIncomingShares().size());
             return Unit.INSTANCE;
         });
 
         ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
-            if (outgoingSharesState.isMandatoryFingerprintVerificationNeeded()) {
-                addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
-            }
+            addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
             return Unit.INSTANCE;
         });
     }

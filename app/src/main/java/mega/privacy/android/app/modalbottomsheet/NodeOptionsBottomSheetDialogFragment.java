@@ -721,8 +721,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onViewCreated(view, savedInstanceState);
         if(nC.nodeComesFromIncoming(node)) {
             ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (incomingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
-                        && mMode == SHARED_ITEMS_MODE
+                if (mMode == SHARED_ITEMS_MODE
                         && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
                     hideNodeActions();
@@ -731,8 +730,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             });
         } else {
             ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (outgoingSharesViewModel.getState().getValue().isMandatoryFingerprintVerificationNeeded()
-                        && mMode == SHARED_ITEMS_MODE
+                if (mMode == SHARED_ITEMS_MODE
                         && isNodeUnverified(state.getUnVerifiedOutgoingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedOutgoingShares());
                     hideNodeActions();
@@ -1103,6 +1101,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
             case R.id.verify_user_option:
                 Intent authenticityCredentialsIntent = new Intent(getActivity(), AuthenticityCredentialsActivity.class);
+                authenticityCredentialsIntent.putExtra(Constants.IS_NODE_INCOMING, nC.nodeComesFromIncoming(node));
                 authenticityCredentialsIntent.putExtra(Constants.EMAIL, user.getEmail());
                 requireActivity().startActivity(authenticityCredentialsIntent);
                 break;

@@ -42,7 +42,7 @@ import mega.privacy.android.core.ui.theme.subtitle1
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SecurityUpgradeDialogView(
-    folderNames: List<String>,
+    folderNames: List<String> = emptyList(),
     onOkClick: () -> Unit,
     onCancelClick: () -> Unit,
 ) {

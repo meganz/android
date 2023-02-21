@@ -28,12 +28,12 @@ class SecurityUpgradeDialogFragment : DialogFragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
-    
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         MaterialAlertDialogBuilder(requireContext()).setView(
             ComposeView(requireContext()).apply {
                 setContent {
-                    val nodeName = arguments?.getStringArrayList("nodeName") as List<String>
+                    val nodeName = arguments?.getStringArrayList("nodeNames") as List<String>
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     AndroidTheme(isDark = mode.isDarkMode()) {

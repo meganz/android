@@ -32,6 +32,7 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
@@ -75,6 +76,7 @@ class RecentActionsFragment : Fragment() {
     private lateinit var activityHiddenSpanned: Spanned
     private lateinit var listView: RecyclerView
     private lateinit var fastScroller: FastScroller
+    private lateinit var nodeController: NodeController
 
     private val viewModel: RecentActionsViewModel by activityViewModels()
 
@@ -89,7 +91,7 @@ class RecentActionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        nodeController = NodeController(requireActivity())
         setupView()
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECETS)
 
@@ -129,11 +131,17 @@ class RecentActionsFragment : Fragment() {
      */
     private fun initAdapter() {
         adapter.setOnItemClickListener { item, position ->
-
             if (!item.isKeyVerified) {
-                Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
-                    putExtra(Constants.EMAIL, item.bucket.userEmail)
-                    requireActivity().startActivity(this)
+                lifecycleScope.launch {
+                    viewModel.getMegaNode(item.bucket.nodes[0].id.longValue)?.let { megaNode ->
+                        Intent(requireActivity(),
+                            AuthenticityCredentialsActivity::class.java).apply {
+                            putExtra(Constants.IS_NODE_INCOMING,
+                                nodeController.nodeComesFromIncoming(megaNode))
+                            putExtra(Constants.EMAIL, item.bucket.userEmail)
+                            requireActivity().startActivity(this)
+                        }
+                    }
                 }
             } else {
                 // If only one element in the bucket
