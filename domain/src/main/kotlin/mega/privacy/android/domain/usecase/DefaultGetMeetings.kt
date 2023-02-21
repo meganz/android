@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
@@ -40,8 +41,8 @@ class DefaultGetMeetings @Inject constructor(
 
             emitAll(
                 merge(
-                    meetings.updateFields(mutex),
                     meetings.addScheduledMeetings(mutex),
+                    meetings.updateFields(mutex),
                     meetings.monitorMutedChats(mutex),
                     meetings.monitorChatCalls(mutex),
                     meetings.monitorChatItems(mutex),
@@ -143,6 +144,7 @@ class DefaultGetMeetings @Inject constructor(
                         return@apply
                     }
 
+                    delay(500) // Required to wait for new SDK values
                     val newItem = chatRepository.getCombinedChatRoom(chatListItem.chatId)
                         ?.takeIf(CombinedChatRoom::isMeeting)
                         ?.toMeetingRoomItem()
@@ -169,11 +171,20 @@ class DefaultGetMeetings @Inject constructor(
             .map { scheduledMeeting ->
                 apply {
                     val currentItemIndex = indexOfFirst { it.chatId == scheduledMeeting.chatId }
-                    getScheduledMeetingItem(get(currentItemIndex))?.let { updatedItem ->
+
+                    if (scheduledMeeting.isCanceled) {
+                        if (currentItemIndex != -1) {
+                            mutex.withLock { removeAt(currentItemIndex) }
+                        }
+                        return@apply
+                    }
+
+                    val currentItem = get(currentItemIndex)
+                    getScheduledMeetingItem(currentItem)?.let { updatedItem ->
                         mutex.withLock {
                             val newIndex = indexOfFirst { updatedItem.chatId == it.chatId }
                             if (newIndex != -1) {
-                                val newUpdatedItem = get(newIndex).copy(
+                                val newUpdatedItem = currentItem.copy(
                                     schedId = updatedItem.schedId,
                                     scheduledStartTimestamp = updatedItem.scheduledStartTimestamp,
                                     scheduledEndTimestamp = updatedItem.scheduledEndTimestamp,
@@ -183,9 +194,9 @@ class DefaultGetMeetings @Inject constructor(
                                     isPending = updatedItem.isPending,
                                 )
                                 set(newIndex, newUpdatedItem)
-                                sortMeetings(mutex)
                             }
                         }
+                        sortMeetings(mutex)
                     }
                 }
             }
@@ -200,6 +211,7 @@ class DefaultGetMeetings @Inject constructor(
     private suspend fun getScheduledMeetingItem(item: MeetingRoomItem): MeetingRoomItem? =
         chatRepository.getScheduledMeetingsByChat(item.chatId)
             ?.firstOrNull()
+            ?.takeIf { !it.isCanceled }
             ?.let { schedMeeting ->
                 val isPending = item.isActive && schedMeeting.isPending()
                 val isRecurringDaily = schedMeeting.rules?.freq == OccurrenceFrequencyType.Daily
@@ -260,8 +272,9 @@ class DefaultGetMeetings @Inject constructor(
                 chatId,
                 now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
             ).firstOrNull { occurr ->
-                occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
-                        || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true
+                !occurr.isCancelled &&
+                        (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
+                                || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
             }
         }.getOrNull()
 

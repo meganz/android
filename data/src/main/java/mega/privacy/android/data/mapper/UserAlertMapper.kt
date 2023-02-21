@@ -425,7 +425,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
             startDate = meeting.startDateTime,
             endDate = meeting.endDateTime,
             isRecurring = isRecurring,
-            isOccurrence = false,
+            isOccurrence = isOccurrence,
             scheduledMeeting = meeting,
         )
     }
