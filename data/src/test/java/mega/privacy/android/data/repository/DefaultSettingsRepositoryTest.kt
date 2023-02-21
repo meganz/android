@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
@@ -25,10 +26,13 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalContracts::class)
+@ExperimentalCoroutinesApi
 internal class DefaultSettingsRepositoryTest {
     private lateinit var underTest: DefaultSettingsRepository
 
@@ -107,4 +111,11 @@ internal class DefaultSettingsRepositoryTest {
 
             underTest.enableFileVersionsOption(true)
         }
+
+    @Test
+    fun `test that setCamSyncWifi is invoked`() = runTest {
+        underTest.setCamSyncWifi(wifiOnly = true)
+
+        verify(megaLocalStorageGateway, times(1)).setCamSyncWifi(true)
+    }
 }

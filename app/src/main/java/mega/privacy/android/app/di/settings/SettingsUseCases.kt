@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -129,6 +130,10 @@ abstract class SettingsUseCases {
         @Provides
         fun provideIsCameraSyncEnabled(settingsRepository: SettingsRepository): IsCameraSyncEnabled =
             IsCameraSyncEnabled(settingsRepository::isCameraSyncPreferenceEnabled)
+
+        @Provides
+        fun provideSetCameraUploadsByWifi(settingsRepository: SettingsRepository): SetCameraUploadsByWifi =
+            SetCameraUploadsByWifi(settingsRepository::setCamSyncWifi)
 
         @Provides
         fun provideIsMultiFactorAuthAvailable(accountRepository: AccountRepository): IsMultiFactorAuthAvailable =

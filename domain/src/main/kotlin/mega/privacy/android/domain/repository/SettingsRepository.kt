@@ -98,11 +98,12 @@ interface SettingsRepository {
     suspend fun setCameraUploadFileType(syncVideo: Boolean)
 
     /**
-     * Set if use wifi only or cellular as well
+     * Set whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data
      *
-     * @param enableCellularSync
+     * @param wifiOnly If true, Camera Uploads will only run through Wi-Fi
+     * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
      */
-    suspend fun setCamSyncWifi(enableCellularSync: Boolean)
+    suspend fun setCamSyncWifi(wifiOnly: Boolean)
 
     /**
      * Set the camera upload loca path
