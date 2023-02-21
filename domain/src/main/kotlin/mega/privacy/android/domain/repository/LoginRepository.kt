@@ -53,4 +53,17 @@ interface LoginRepository {
      * Chat log out.
      */
     suspend fun chatLogout()
+
+    /**
+     * Monitor Finish Activity
+     *
+     * @return Flow of Boolean.
+     */
+    fun monitorFinishActivity(): Flow<Boolean>
+
+    /**
+     * Broadcast Finish Activity
+     *
+     */
+    suspend fun broadcastFinishActivity()
 }

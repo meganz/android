@@ -166,4 +166,8 @@ internal class DefaultLoginRepository @Inject constructor(
             }
         }
     }
+
+    override fun monitorFinishActivity() = appEventGateway.monitorFinishActivity()
+
+    override suspend fun broadcastFinishActivity() = appEventGateway.broadcastFinishActivity()
 }

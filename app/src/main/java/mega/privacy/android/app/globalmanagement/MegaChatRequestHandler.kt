@@ -2,22 +2,22 @@ package mega.privacy.android.app.globalmanagement
 
 import android.app.Application
 import android.content.Intent
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logoutConfirmed
 import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isHMS
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.BroadcastFinishActivity
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -54,6 +54,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val transfersManagement: TransfersManagement,
     private val chatRequestMapper: ChatRequestMapper,
+    private val broadcastFinishActivity: BroadcastFinishActivity,
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -96,8 +97,12 @@ class MegaChatRequestHandler @Inject constructor(
             MegaApplication.getInstance().disableMegaChatApi()
             try {
                 ShortcutBadger.applyCount(application, 0)
-                application.startService(Intent(application,
-                    BadgeIntentService::class.java).putExtra("badgeCount", 0))
+                application.startService(
+                    Intent(
+                        application,
+                        BadgeIntentService::class.java
+                    ).putExtra("badgeCount", 0)
+                )
             } catch (exc: Exception) {
                 Timber.e(exc, "EXCEPTION removing badge indicator")
             }
@@ -106,17 +111,23 @@ class MegaChatRequestHandler @Inject constructor(
             if (loggedState == 0) {
                 logoutConfirmed(application, sharingScope)
                 //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
-                LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean::class.java).post(true)
+                sharingScope.launch {
+                    broadcastFinishActivity()
+                }
                 if (isLoggingRunning) {
                     Timber.d("Already in Login Activity, not necessary to launch it again")
                     return
                 }
-                val loginIntent = Intent(application,
-                    LoginActivity::class.java).apply {
+                val loginIntent = Intent(
+                    application,
+                    LoginActivity::class.java
+                ).apply {
                     if (MegaApplication.urlConfirmationLink != null) {
                         putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                            .putExtra(Constants.EXTRA_CONFIRMATION,
-                                MegaApplication.urlConfirmationLink)
+                            .putExtra(
+                                Constants.EXTRA_CONFIRMATION,
+                                MegaApplication.urlConfirmationLink
+                            )
                         if (activityLifecycleHandler.isActivityVisible) {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         } else {

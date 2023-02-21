@@ -24,6 +24,7 @@ internal class AppEventFacade @Inject constructor(
     private val _transferFailed = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
+    private val _finishActivity = MutableSharedFlow<Boolean>()
 
     override val monitorCameraUploadPauseState =
         _monitorCameraUploadPauseState.toSharedFlow(appScope)
@@ -52,6 +53,10 @@ internal class AppEventFacade @Inject constructor(
     override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
         _transferFailed.emit(isFailed)
     }
+
+    override fun monitorFinishActivity() = _finishActivity.toSharedFlow(appScope)
+
+    override suspend fun broadcastFinishActivity() = _finishActivity.emit(true)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

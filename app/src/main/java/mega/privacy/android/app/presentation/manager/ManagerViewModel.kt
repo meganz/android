@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
@@ -84,6 +85,7 @@ import javax.inject.Inject
  * @param getFeatureFlagValue
  * @param getUnverifiedIncomingShares
  * @param getUnverifiedOutgoingShares
+ * @param monitorFinishActivity
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -112,6 +114,7 @@ class ManagerViewModel @Inject constructor(
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
+    monitorFinishActivity: MonitorFinishActivity,
 ) : ViewModel() {
 
     /**
@@ -136,6 +139,11 @@ class ManagerViewModel @Inject constructor(
      */
     val monitorConnectivityEvent =
         monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
+
+    /**
+     * Monitor Finish Activity event
+     */
+    val monitorFinishActivityEvent = monitorFinishActivity()
 
     /**
      * Is network connected

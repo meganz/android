@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
@@ -73,6 +74,7 @@ class ManagerViewModelTest {
     private val getFeatureFlagValue = mock<GetFeatureFlagValue>()
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
     private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
+    private val monitorFinishActivity = mock<MonitorFinishActivity>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -113,6 +115,7 @@ class ManagerViewModelTest {
             getFeatureFlagValue = getFeatureFlagValue,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
+            monitorFinishActivity = monitorFinishActivity,
         )
     }
 
@@ -328,11 +331,43 @@ class ManagerViewModelTest {
     fun `test that pending actions count is not null`() = runTest {
         val shareData = ShareData("user", 8766L, 0, 987654678L, true)
         val shareData1 = ShareData("user", 8766L, 0, 987654678L, true)
-        whenever(getUnverifiedIncomingShares(getCloudSortOrder())).thenReturn(listOf(shareData,
-            shareData1))
+        whenever(getUnverifiedIncomingShares(getCloudSortOrder())).thenReturn(
+            listOf(
+                shareData,
+                shareData1
+            )
+        )
         setUnderTest()
         underTest.state.map { it.pendingActionsCount }.distinctUntilChanged().test {
             assertThat(awaitItem()).isEqualTo(2)
         }
     }
+
+    @Test
+    fun `test that monitor finish activity event value matches the true value returned by use case`() =
+        runTest {
+            whenever(monitorFinishActivity.invoke()).thenReturn(
+                flowOf(true)
+            )
+            setUnderTest()
+
+            underTest.monitorFinishActivityEvent.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(true)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitor finish activity event value matches the false value returned by use case`() =
+        runTest {
+            whenever(monitorFinishActivity.invoke()).thenReturn(
+                flowOf(false)
+            )
+            setUnderTest()
+
+            underTest.monitorFinishActivityEvent.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(false)
+                awaitComplete()
+            }
+        }
 }

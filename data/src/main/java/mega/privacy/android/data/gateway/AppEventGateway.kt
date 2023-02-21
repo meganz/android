@@ -56,4 +56,14 @@ internal interface AppEventGateway {
      *
      */
     suspend fun broadcastFailedTransfer(isFailed: Boolean)
+
+    /**
+     * Monitor Finish Activity
+     */
+    fun monitorFinishActivity(): Flow<Boolean>
+
+    /**
+     * Broadcast Finish Activity
+     */
+    suspend fun broadcastFinishActivity()
 }

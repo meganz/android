@@ -17,7 +17,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_H
 import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
@@ -417,6 +416,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
 import mega.privacy.android.domain.entity.preference.ViewType;
 import mega.privacy.android.domain.entity.user.UserCredentials;
 import mega.privacy.android.domain.qualifier.ApplicationScope;
+import mega.privacy.android.domain.usecase.MonitorFinishActivity;
 import mega.privacy.android.feature.sync.ui.SyncFragment;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -541,6 +541,8 @@ public class ManagerActivity extends TransfersManagementActivity
     MegaNodeUtilWrapper megaNodeUtilWrapper;
     @Inject
     ManagerUploadBottomSheetDialogActionHandler uploadBottomSheetDialogActionHandler;
+    @Inject
+    MonitorFinishActivity monitorFinishActivity;
 
     public ArrayList<Integer> transfersInProgress;
     public MegaTransferData transferData;
@@ -1019,9 +1021,6 @@ public class ManagerActivity extends TransfersManagementActivity
         }
     };
 
-    private final Observer<Boolean> finishObserver = finish -> {
-        if (finish) finish();
-    };
 
     private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
         @Override
@@ -1426,8 +1425,6 @@ public class ManagerActivity extends TransfersManagementActivity
         registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).observeForever(refreshObserver);
-
-        LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -2517,6 +2514,15 @@ public class ManagerActivity extends TransfersManagementActivity
             addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
             return Unit.INSTANCE;
         });
+
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getMonitorFinishActivityEvent(), Lifecycle.State.CREATED, finish -> {
+            Timber.d("MonitorFinishActivity flow collected with Finish %s", finish);
+            if (finish) {
+                finish();
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     /**
@@ -3416,7 +3422,6 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(receiverCUAttrChanged);
         unregisterReceiver(transferFinishReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
-        LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
 
         cancelSearch();

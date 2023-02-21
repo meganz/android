@@ -7,7 +7,9 @@ import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.BroadcastFinishActivity
 import mega.privacy.android.domain.usecase.Logout
+import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import mega.privacy.android.domain.usecase.login.BroadcastLogout
 import mega.privacy.android.domain.usecase.login.ChatLogout
@@ -75,5 +77,19 @@ internal abstract class InternalLoginModule {
          */
         @Provides
         fun provideLogout(repository: LoginRepository): Logout = Logout(repository::logout)
+
+        /**
+         * Provides [MonitorFinishActivity]
+         */
+        @Provides
+        fun provideMonitorFinishActivity(loginRepository: LoginRepository): MonitorFinishActivity =
+            MonitorFinishActivity(loginRepository::monitorFinishActivity)
+
+        /**
+         * Provides [BroadcastFinishActivity]
+         */
+        @Provides
+        fun provideBroadcastFinishActivity(loginRepository: LoginRepository): BroadcastFinishActivity =
+            BroadcastFinishActivity(loginRepository::broadcastFinishActivity)
     }
 }
