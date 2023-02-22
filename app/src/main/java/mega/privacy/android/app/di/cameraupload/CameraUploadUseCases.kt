@@ -255,10 +255,9 @@ abstract class CameraUploadUseCases {
         fun provideStartCameraUpload(
             jobUtilWrapper: JobUtilWrapper,
             @ApplicationContext context: Context,
-        ): StartCameraUpload = StartCameraUpload { shouldIgnoreAttributes ->
+        ): StartCameraUpload = StartCameraUpload {
             jobUtilWrapper.fireCameraUploadJob(
                 context,
-                shouldIgnoreAttributes
             )
         }
 
@@ -274,10 +273,9 @@ abstract class CameraUploadUseCases {
         fun provideRestartCameraUpload(
             jobUtilWrapper: JobUtilWrapper,
             @ApplicationContext context: Context,
-        ): RestartCameraUpload = RestartCameraUpload { shouldIgnoreAttributes ->
+        ): RestartCameraUpload = RestartCameraUpload {
             jobUtilWrapper.fireRestartCameraUploadJob(
                 context = context,
-                shouldIgnoreAttributes = shouldIgnoreAttributes,
             )
         }
 

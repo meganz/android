@@ -33,11 +33,6 @@ object JobUtil {
     private const val START_JOB_FAILED_NOT_ENABLED = -2
 
     /**
-     * Ignore attributes intent data
-     */
-    const val SHOULD_IGNORE_ATTRIBUTES = "SHOULD_IGNORE_ATTRIBUTES"
-
-    /**
      * Worker tags
      */
     private const val CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG"
@@ -68,11 +63,6 @@ object JobUtil {
             TimeUnit.MINUTES
         )
             .addTag(CAMERA_UPLOAD_TAG)
-            .setInputData(
-                Data.Builder()
-                    .putBoolean(SHOULD_IGNORE_ATTRIBUTES, false)
-                    .build()
-            )
             .build()
         WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(
@@ -130,7 +120,6 @@ object JobUtil {
     @Synchronized
     fun fireCameraUploadJob(
         context: Context,
-        shouldIgnoreAttributes: Boolean,
     ): Int {
         if (isCameraUploadDisabled) {
             Timber.d("fireCameraUploadJob() FAIL")
@@ -140,11 +129,6 @@ object JobUtil {
             StartCameraUploadWorker::class.java
         )
             .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-            .setInputData(
-                Data.Builder()
-                    .putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes)
-                    .build()
-            )
             .build()
         WorkManager.getInstance(context)
             .enqueueUniqueWork(
@@ -213,10 +197,9 @@ object JobUtil {
      * sequentially through Work Chaining
      *
      * @param context The Context to enqueue work
-     * @param shouldIgnoreAttributes Whether to start Camera Uploads without checking User Attributes
      */
     @Synchronized
-    fun fireRestartCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean) {
+    fun fireRestartCameraUploadJob(context: Context) {
         val stopCameraUploadRequest = OneTimeWorkRequest.Builder(
             StopCameraUploadWorker::class.java
         )
@@ -226,11 +209,6 @@ object JobUtil {
             StartCameraUploadWorker::class.java
         )
             .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-            .setInputData(
-                Data.Builder()
-                    .putBoolean(SHOULD_IGNORE_ATTRIBUTES, shouldIgnoreAttributes)
-                    .build()
-            )
             .build()
         WorkManager.getInstance(context)
             .beginWith(stopCameraUploadRequest)

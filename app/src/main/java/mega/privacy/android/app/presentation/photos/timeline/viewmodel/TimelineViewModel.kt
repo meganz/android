@@ -292,7 +292,7 @@ class TimelineViewModel @Inject constructor(
                 conversionChargingOnSize = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
             )
             Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
-            jobUtilWrapper.fireCameraUploadJob(context, false)
+            jobUtilWrapper.fireCameraUploadJob(context)
         }
     }
 

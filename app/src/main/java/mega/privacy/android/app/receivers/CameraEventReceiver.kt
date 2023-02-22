@@ -9,6 +9,6 @@ import timber.log.Timber
 class CameraEventReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("CameraEventReceiver")
-        JobUtil.fireCameraUploadJob(context, true)
+        JobUtil.fireCameraUploadJob(context)
     }
 }

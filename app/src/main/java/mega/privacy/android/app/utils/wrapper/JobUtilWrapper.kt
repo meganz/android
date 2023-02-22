@@ -19,12 +19,11 @@ interface JobUtilWrapper {
      * Wrapper method that calls [JobUtil.fireCameraUploadJob]
      *
      * @param context [Context]
-     * @param shouldIgnoreAttributes Whether to start Camera Uploads without checking User Attributes
      *
      * @return an Integer value
      */
-    fun fireCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean): Int =
-        JobUtil.fireCameraUploadJob(context, shouldIgnoreAttributes)
+    fun fireCameraUploadJob(context: Context): Int =
+        JobUtil.fireCameraUploadJob(context)
 
     /**
      * Wrapper method that calls [JobUtil.fireStopCameraUploadJob]
@@ -38,10 +37,9 @@ interface JobUtilWrapper {
      * Wrapper method that calls [JobUtil.fireRestartCameraUploadJob]
      *
      * @param context [Context]
-     * @param shouldIgnoreAttributes Whether to start Camera Uploads without checking User Attributes
      */
-    fun fireRestartCameraUploadJob(context: Context, shouldIgnoreAttributes: Boolean) =
-        JobUtil.fireRestartCameraUploadJob(context, shouldIgnoreAttributes)
+    fun fireRestartCameraUploadJob(context: Context) =
+        JobUtil.fireRestartCameraUploadJob(context)
 
     /**
      * Wrapper method that calls [JobUtil.stopCameraUploadSyncHeartbeatWorkers]

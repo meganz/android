@@ -15,7 +15,6 @@ import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.jobservices.StopCameraUploadWorker
-import mega.privacy.android.app.utils.JobUtil.SHOULD_IGNORE_ATTRIBUTES
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +44,7 @@ class StopCameraUploadWorkerTest {
             context,
             WorkerParameters(
                 UUID.randomUUID(),
-                workDataOf(SHOULD_IGNORE_ATTRIBUTES to true),
+                workDataOf(),
                 emptyList(),
                 WorkerParameters.RuntimeExtras(),
                 1,

@@ -166,16 +166,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         const val EXTRA_ABORTED = "EXTRA_ABORTED"
 
         /**
-         * Ignore extra attributes
-         */
-        const val EXTRA_IGNORE_ATTR_CHECK = "EXTRA_IGNORE_ATTR_CHECK"
-
-        /**
          * Camera Uploads Cache Folder
          */
         const val CU_CACHE_FOLDER = "cu"
-
-        private var ignoreAttr = false
 
         /**
          * Is Camera Upload running now
@@ -560,6 +553,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     private var cancelled = false
 
+    /**
+     * True if the camera uploads attributes have already been requested
+     * from the server
+     */
+    private var missingAttributesChecked = false
+
     private var receiver: NetworkTypeChangeReceiver? = null
     private var notification: Notification? = null
     private var notificationManager: NotificationManager? = null
@@ -685,7 +684,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
             else -> {
                 Timber.d("Start Service")
-                ignoreAttr = intent?.getBooleanExtra(EXTRA_IGNORE_ATTR_CHECK, false) ?: false
                 coroutineScope?.launch { startWorker() }
             }
         }
@@ -790,7 +788,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      * 7. The local Primary Folder exists - [hasLocalPrimaryFolder],
      * 8. The local Secondary Folder exists - [hasLocalSecondaryFolder],
      * 9. The user is logged in - [isUserLoggedIn],
-     * 10. The user Camera Uploads attribute exists - [hasCameraUploadsUserAttribute],
+     * 10. The user Camera Uploads attribute exists - [missingAttributesChecked],
      * 11. The Primary Folder exists - [areFoldersEstablished],
      * 12. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
      *
@@ -810,7 +808,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             !hasLocalPrimaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
             !hasLocalSecondaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
             !isUserLoggedIn() -> StartCameraUploadsState.LOGGED_OUT_USER
-            !hasCameraUploadsUserAttribute() -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
+            !missingAttributesChecked -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
             !areFoldersEstablished() -> StartCameraUploadsState.UNESTABLISHED_FOLDERS
             else -> StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS
         }
@@ -863,7 +861,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                         setPrimarySyncHandle(MegaApiJava.INVALID_HANDLE)
                         setSecondarySyncHandle(MegaApiJava.INVALID_HANDLE)
                     }
-                    ignoreAttr = true
+                    missingAttributesChecked = true
                 }
                     .onSuccess { startWorker() }
                     .onFailure { endService() }
@@ -974,18 +972,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         isLocalSecondaryFolderSet().also {
             if (!it) Timber.w("Local Secondary Folder is not set")
         }
-
-    /**
-     * Checks if the user's Camera Uploads attribute exists
-     *
-     * @return true if the attribute exists, and false if otherwise
-     */
-    private fun hasCameraUploadsUserAttribute(): Boolean {
-        // Prevent checking while the app is alive, because it has been handled by a global event
-        Timber.d("ignoreAttr value is $ignoreAttr")
-        if (!ignoreAttr) Timber.w("The Camera Uploads user attribute is missing. Wait for the user attribute")
-        return ignoreAttr
-    }
 
     /**
      * Checks whether both Primary and Secondary Folders are established
@@ -1559,6 +1545,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         totalToUpload = 0
         cancelled = false
         isOverQuota = false
+        missingAttributesChecked = false
 
         cameraServiceIpChangeHandler.start()
         // end new logic

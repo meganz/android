@@ -11,7 +11,7 @@ class ChargeEventReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action.equals(ACTION_POWER_CONNECTED)) {
             Timber.d("ChargeEventReceiver")
-            JobUtil.fireCameraUploadJob(context, true)
+            JobUtil.fireCameraUploadJob(context)
         }
     }
 }

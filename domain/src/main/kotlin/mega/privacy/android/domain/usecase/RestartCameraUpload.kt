@@ -7,8 +7,6 @@ fun interface RestartCameraUpload {
 
     /**
      * Invocation method
-     *
-     * @param shouldIgnoreAttributes Whether to start Camera Uploads without checking User Attributes
      */
-    suspend operator fun invoke(shouldIgnoreAttributes: Boolean)
+    suspend operator fun invoke()
 }

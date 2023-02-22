@@ -108,7 +108,7 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                             prefs.camSyncHandle = nodeHandle.toString()
                             CameraUploadUtil.forceUpdateCameraUploadFolderIcon(false, nodeHandle)
                             Timber.d("Start CU by set primary, try to start CU, true.")
-                            context?.let { JobUtil.fireRestartCameraUploadJob(it, true) }
+                            context?.let { JobUtil.fireRestartCameraUploadJob(it) }
                         }
                         if (parentHandle != MegaApiJava.INVALID_HANDLE) {
                             CameraUploadUtil.resetSecondaryTimeline()
@@ -120,7 +120,7 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                             )
                             //make sure to start the process once secondary is enabled
                             Timber.d("Start CU by set primary, try to start CU, true.")
-                            context?.let { JobUtil.fireRestartCameraUploadJob(it, true) }
+                            context?.let { JobUtil.fireRestartCameraUploadJob(it) }
                         }
                         Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).run {
                             if (nodeHandle != MegaApiJava.INVALID_HANDLE) {

@@ -7,8 +7,6 @@ fun interface StartCameraUpload {
 
     /**
      * Invoke
-     *
-     * @param shouldIgnoreAttributes start camera upload w/o checking attributes
      */
-    suspend operator fun invoke(shouldIgnoreAttributes: Boolean)
+    suspend operator fun invoke()
 }
