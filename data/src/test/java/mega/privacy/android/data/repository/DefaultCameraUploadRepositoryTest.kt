@@ -87,6 +87,7 @@ class DefaultCameraUploadRepositoryTest {
             videoCompressorGateway = videoCompressorGateway,
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = mock(),
+            uploadOptionIntMapper = mock(),
         )
     }
 

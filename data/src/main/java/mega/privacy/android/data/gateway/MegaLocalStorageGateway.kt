@@ -114,6 +114,13 @@ interface MegaLocalStorageGateway {
     suspend fun getCameraSyncFileUpload(): String?
 
     /**
+     * Sets the upload option of Camera Uploads
+     *
+     * @param uploadOption A specific [Int] from MegaPreferences
+     */
+    suspend fun setCameraSyncFileUpload(uploadOption: Int)
+
+    /**
      * Get video quality
      */
     suspend fun getVideoQuality(): String

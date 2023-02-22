@@ -22,6 +22,7 @@ import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -61,6 +63,7 @@ import kotlin.coroutines.Continuation
  * @property syncStatusIntMapper [SyncStatusIntMapper]
  * @property cameraUploadHandlesMapper [CameraUploadHandlesMapper]
  * @property uploadOptionMapper [UploadOptionMapper]
+ * @property uploadOptionIntMapper [UploadOptionIntMapper]
  */
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -79,6 +82,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val videoCompressorGateway: VideoCompressorGateway,
     private val videoAttachmentMapper: VideoAttachmentMapper,
     private val uploadOptionMapper: UploadOptionMapper,
+    private val uploadOptionIntMapper: UploadOptionIntMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -109,6 +113,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun getUploadOption() = withContext(ioDispatcher) {
         uploadOptionMapper(localStorageGateway.getCameraSyncFileUpload())
+    }
+
+    override suspend fun setUploadOption(uploadOption: UploadOption) = withContext(ioDispatcher) {
+        localStorageGateway.setCameraSyncFileUpload(uploadOptionIntMapper(uploadOption))
     }
 
     override suspend fun getVideoQuality(): String = withContext(ioDispatcher) {

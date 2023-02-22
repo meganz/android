@@ -78,11 +78,18 @@ interface CameraUploadRepository {
     suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp)
 
     /**
-     * Retrieves the upload option for Camera Uploads
+     * Retrieves the upload option of Camera Uploads
      *
      * @return The corresponding [UploadOption]
      */
     suspend fun getUploadOption(): UploadOption
+
+    /**
+     * Sets the upload option of Camera Uploads
+     *
+     * @param uploadOption The [UploadOption] to set
+     */
+    suspend fun setUploadOption(uploadOption: UploadOption)
 
     /**
      * Get all pending sync records to prepare for upload
