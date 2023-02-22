@@ -17,7 +17,7 @@ fun ImageItem.shouldShowDisputeOption(): Boolean =
     nodeItem?.node?.isTakenDown == true
 
 fun ImageItem.shouldShowSlideshowOption(): Boolean =
-    imageResult?.isVideo != true
+    imageResult?.isVideo != true && nodeItem?.isFromRubbishBin != true
 
 fun ImageItem.shouldShowOpenWithOption(isUserLoggedIn: Boolean): Boolean =
     this !is ImageItem.ChatNode && isUserLoggedIn && nodeItem?.hasReadAccess == true
