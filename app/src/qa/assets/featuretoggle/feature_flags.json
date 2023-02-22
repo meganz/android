@@ -4,10 +4,6 @@
     "value": true
   },
   {
-    "name": "MandatoryFingerprintVerification",
-    "value": true
-  },
-  {
     "name": "SetSecureFlag",
     "value": false
   }
