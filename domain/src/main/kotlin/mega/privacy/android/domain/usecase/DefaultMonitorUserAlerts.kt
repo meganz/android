@@ -17,9 +17,9 @@ import javax.inject.Inject
 class DefaultMonitorUserAlerts @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
 ) : MonitorUserAlerts {
-    override fun invoke() =
+    override suspend fun invoke() =
         notificationsRepository.monitorUserAlerts().runningFold(
-            initial = runBlocking { notificationsRepository.getUserAlerts() },
+            initial = notificationsRepository.getUserAlerts(),
             operation = { current, updates ->
                 (updates.filterNot { it.isOwnChange } + current).distinctBy { it.id }
             }
