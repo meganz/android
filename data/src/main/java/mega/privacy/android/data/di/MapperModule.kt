@@ -25,8 +25,8 @@ import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.ContactCredentialsMapper
-import mega.privacy.android.data.mapper.ContactDataMapper
-import mega.privacy.android.data.mapper.ContactItemMapper
+import mega.privacy.android.data.mapper.contact.ContactDataMapper
+import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
@@ -81,10 +81,12 @@ import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.ViewTypeMapper
-import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
-import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapperImpl
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
+import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
+import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -111,8 +113,6 @@ import mega.privacy.android.data.mapper.toChatScheduledMeeting
 import mega.privacy.android.data.mapper.toChatScheduledMeetingOccur
 import mega.privacy.android.data.mapper.toCombinedChatRoom
 import mega.privacy.android.data.mapper.toContactCredentials
-import mega.privacy.android.data.mapper.toContactData
-import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
@@ -176,6 +176,12 @@ internal abstract class MapperModule {
     abstract fun bindSmsPermissionMapper(implementation: SmsPermissionMapperImpl): SmsPermissionMapper
 
     @Binds
+    abstract fun bindContactDataMapper(implementation: ContactDataMapperImpl): ContactDataMapper
+
+    @Binds
+    abstract fun bindContactDataItem(implementation: ContactItemMapperImpl): ContactItemMapper
+
+    @Binds
     abstract fun bindUploadOptionMapper(implementation: UploadOptionMapperImpl): UploadOptionMapper
 
     @Binds
@@ -225,13 +231,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideUserLastGreenMapper(): UserLastGreenMapper = ::toUserUserLastGreen
-
-        /**
-         * Provide contact data mapper
-         */
-        @Provides
-        fun provideContactDataMapper(): ContactDataMapper = ::toContactData
-
 
         /**
          * Provide mega transfer mapper
@@ -340,12 +339,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
-
-        /**
-         * Provide contact item mapper
-         */
-        @Provides
-        fun provideContactItemMapper(): ContactItemMapper = ::toContactItem
 
         /**
          * Provide mega share mapper

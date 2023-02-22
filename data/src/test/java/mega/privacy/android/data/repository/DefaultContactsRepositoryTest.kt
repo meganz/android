@@ -21,9 +21,9 @@ import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
+import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
 import mega.privacy.android.data.mapper.toContactCredentials
-import mega.privacy.android.data.mapper.toContactData
-import mega.privacy.android.data.mapper.toContactItem
 import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -67,13 +67,14 @@ class DefaultContactsRepositoryTest {
     private val userUpdateMapper = mock<UserUpdateMapper>()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val onlineStatusMapper = mock<OnlineStatusMapper>()
-    private val contactItemMapper = ::toContactItem
-    private val contactDataMapper = ::toContactData
     private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val contactWrapper: ContactWrapper = mock()
     private val databaseHandler: DatabaseHandler = mock()
     private val context: Context = mock()
+
+    private val contactItemMapper = ContactItemMapperImpl()
+    private val contactDataMapper = ContactDataMapperImpl()
 
     private val contactCredentialsMapper: ContactCredentialsMapper =
         { credentials: String?, email: String, name: String ->
