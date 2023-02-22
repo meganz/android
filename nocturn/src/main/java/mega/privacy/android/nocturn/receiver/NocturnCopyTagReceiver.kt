@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 
-class NocturnCopyTagReceiver : BroadcastReceiver() {
+internal class NocturnCopyTagReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val tag = intent.extras?.getString("tag").orEmpty()
 

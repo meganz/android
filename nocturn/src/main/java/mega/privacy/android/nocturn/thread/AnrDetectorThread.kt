@@ -5,7 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import mega.privacy.android.nocturn.exception.NocturnException
 
-class AnrDetectorThread(
+internal class AnrDetectorThread(
     private val waitTimeout: Long,
     private val onAnrDetected: (tag: String, stackTrace: Array<StackTraceElement>) -> Unit,
 ) : Thread("NocturnThread") {
@@ -16,6 +16,7 @@ class AnrDetectorThread(
     private val isDebuggingSession: Boolean
         get() = Debug.waitingForDebugger() || Debug.isDebuggerConnected()
 
+    @Volatile
     private var waitTime: Long = 0L
 
     private var isAnrDetected: Boolean = false
@@ -43,11 +44,11 @@ class AnrDetectorThread(
         onAnrDetected(tag, stackTrace)
 
         spawn(waitTimeout, onAnrDetected)
-        throw NocturnException(tag).also { it.stackTrace = stackTrace }
+        throw NocturnException("$tag (Timeout = ${waitTimeout}ms)").also { it.stackTrace = stackTrace }
     }
 
     companion object {
-        private const val MONITOR_INTERVAL: Long = 250L
+        private const val MONITOR_INTERVAL: Long = 100L
 
         fun spawn(
             waitTimeout: Long,

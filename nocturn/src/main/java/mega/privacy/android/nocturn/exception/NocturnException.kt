@@ -1,3 +1,3 @@
 package mega.privacy.android.nocturn.exception
 
-class NocturnException(tag: String) : Exception(tag)
+internal class NocturnException(tag: String) : Exception(tag)
