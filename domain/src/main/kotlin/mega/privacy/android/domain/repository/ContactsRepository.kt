@@ -263,4 +263,11 @@ interface ContactsRepository {
      * @return the number of record in database
      */
     suspend fun getContactDatabaseSize(): Int
+
+    /**
+     * Get contact email and save to local database
+     *
+     * @param handle user handle id
+     */
+    suspend fun getContactEmail(handle: Long): String
 }

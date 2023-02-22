@@ -189,14 +189,6 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that user updates live data is not set when no updates triggered from use case`() =
-        runTest {
-            setUnderTest()
-
-            underTest.updateUsers.test().assertNoValue()
-        }
-
-    @Test
     fun `test that user alert updates live data is not set when no updates triggered from use case`() =
         runTest {
             setUnderTest()
@@ -210,31 +202,6 @@ class ManagerViewModelTest {
             setUnderTest()
 
             underTest.updateContactsRequests.test().assertNoValue()
-        }
-
-    @Test
-    fun `test that user updates live data is set when user updates triggered from use case`() =
-        runTest {
-            triggerRepositoryUpdate(listOf(GlobalUpdate.OnUsersUpdate(arrayListOf(mock())))) {
-
-                runCatching {
-                    underTest.updateUsers.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                }.onSuccess { result ->
-                    result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-                }
-            }
-        }
-
-    @Test
-    fun `test that user updates live data is not set when user updates triggered from use case with null`() =
-        runTest {
-            triggerRepositoryUpdate(
-                listOf(
-                    GlobalUpdate.OnUsersUpdate(null),
-                )
-            ) {
-                underTest.updateUsers.test().assertNoValue()
-            }
         }
 
     @Test

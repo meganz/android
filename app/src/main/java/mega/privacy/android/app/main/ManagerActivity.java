@@ -1284,11 +1284,6 @@ public class ManagerActivity extends TransfersManagementActivity
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         userInfoViewModel = new ViewModelProvider(this).get(UserInfoViewModel.class);
         viewModel.monitorGlobalEventUpgradeForUpgradeSecurity();
-        viewModel.getUpdateUsers().observe(this,
-                new EventObserver<>(users -> {
-                    updateUsers(users);
-                    return null;
-                }));
         viewModel.getUpdateUserAlerts().observe(this,
                 new EventObserver<>(userAlerts -> {
                     updateUserAlerts(userAlerts);
@@ -9275,41 +9270,6 @@ public class ManagerActivity extends TransfersManagementActivity
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
                                         MegaError e) {
         Timber.w("onRequestTemporaryError: %s__%d__%s", request.getRequestString(), e.getErrorCode(), e.getErrorString());
-    }
-
-    public void updateUsers(List<MegaUser> users) {
-        if (users != null) {
-            Timber.d("users.size(): %s", users.size());
-            for (int i = 0; i < users.size(); i++) {
-                MegaUser user = users.get(i);
-
-                if (user != null) {
-                    // 0 if the change is external.
-                    // >0 if the change is the result of an explicit request
-                    // -1 if the change is the result of an implicit request made by the SDK internally
-                    if (user.isOwnChange() <= 0) {
-                        Timber.d("NOT OWN change");
-                        Timber.d("Changes: %s", user.getChanges());
-
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) {
-                            Timber.d("CHANGE_TYPE_EMAIL");
-                            if (!user.getEmail().equals(megaApi.getMyUser().getEmail())) {
-                                Timber.d("The contact: %d changes the mail.", user.getHandle());
-                                if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
-                                    Timber.w("The contact NOT exists -> DB inconsistency! -> Clear!");
-                                    userInfoViewModel.refreshContactDatabase(false);
-                                } else {
-                                    Timber.d("The contact already exists -> update");
-                                    dbH.setContactMail(user.getHandle(), user.getEmail());
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    Timber.w("user == null --> Continue...");
-                }
-            }
-        }
     }
 
     /**

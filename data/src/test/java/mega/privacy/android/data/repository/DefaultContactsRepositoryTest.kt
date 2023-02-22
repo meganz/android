@@ -770,4 +770,27 @@ class DefaultContactsRepositoryTest {
             )
             verify(databaseHandler, times(1)).setContact(any())
         }
+
+    @Test
+    fun `test that getContactEmail calls to database and returns value when calling API returns success`() =
+        runTest {
+            val expectedEmail = "contactEmail"
+            val handle = 1L
+
+            val request = mock<MegaRequest> {
+                on { email }.thenReturn(expectedEmail)
+            }
+            whenever(megaApiGateway.getUserEmail(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(), request = request, error = success
+                )
+            }
+
+            assertEquals(
+                expectedEmail,
+                underTest.getContactEmail(handle)
+            )
+
+            verify(databaseHandler, times(1)).setContactMail(handle, expectedEmail)
+        }
 }

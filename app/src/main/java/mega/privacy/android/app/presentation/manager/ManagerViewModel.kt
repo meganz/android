@@ -200,17 +200,6 @@ class ManagerViewModel @Inject constructor(
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
-     * Monitor user updates and dispatch to observers
-     */
-    val updateUsers: LiveData<Event<List<MegaUser>>> =
-        _updates
-            .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
-            .also { Timber.d("onUsersUpdate") }
-            .mapNotNull { it.users?.toList() }
-            .map { Event(it) }
-            .asLiveData(timeoutInMs = Long.MAX_VALUE)
-
-    /**
      * Monitor user alerts updates and dispatch to observers
      */
     val updateUserAlerts: LiveData<Event<List<MegaUserAlert>>> =

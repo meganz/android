@@ -705,6 +705,18 @@ internal class DefaultContactsRepository @Inject constructor(
         databaseHandler.contactsSize
     }
 
+    override suspend fun getContactEmail(handle: Long): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine<String> { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener it.email
+            }
+            megaApiGateway.getUserEmail(handle, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }.also {
+            databaseHandler.setContactMail(handle, it)
+        }
+    }
+
     private fun Long.toBase64Handle(): String =
         megaApiGateway.userHandleToBase64(this)
 }
