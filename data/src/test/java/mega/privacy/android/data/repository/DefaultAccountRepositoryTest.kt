@@ -14,6 +14,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -42,7 +43,6 @@ import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
@@ -81,11 +81,11 @@ class DefaultAccountRepositoryTest {
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val achievementsOverviewMapper = mock<AchievementsOverviewMapper>()
     private val dbHandler = mock<DatabaseHandler>()
-    private val isUserLoggedIn = mock<IsUserLoggedIn>()
     private val userCredentialsMapper = mock<UserCredentialsMapper>()
     private val accountSessionMapper = mock<AccountSessionMapper>()
     private val chatPreferencesGateway = mock<ChatPreferencesGateway>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
+    private val accountPreferencesGateway = mock<AccountPreferencesGateway>()
     private val cacheFolderGateway = mock<CacheFolderGateway>()
 
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
@@ -141,6 +141,7 @@ class DefaultAccountRepositoryTest {
             accountSessionMapper = accountSessionMapper,
             chatPreferencesGateway = chatPreferencesGateway,
             callsPreferencesGateway = callsPreferencesGateway,
+            accountPreferencesGateway = accountPreferencesGateway,
             cacheFolderGateway = cacheFolderGateway,
         )
 
@@ -886,6 +887,46 @@ class DefaultAccountRepositoryTest {
         runTest {
             underTest.clearAccountPreferences()
             verify(chatPreferencesGateway).clearPreferences()
+        }
+
+    @Test
+    fun `test that AccountPreferencesGateway is invoked for clearing account preferences`() =
+        runTest {
+            underTest.clearAccountPreferences()
+            verify(accountPreferencesGateway).clearPreferences()
+        }
+
+    @Test
+    fun `test that monitorShow2FADialog is invoked when get2FADialogPreference called`() = runTest {
+        whenever(accountPreferencesGateway.monitorShow2FADialog()).thenReturn(flowOf(false))
+        underTest.get2FADialogPreference()
+        verify(accountPreferencesGateway).monitorShow2FADialog()
+    }
+
+    @Test
+    fun `test that setDisplay2FADialog is invoked when update2FADialogPreference called`() =
+        runTest {
+            underTest.update2FADialogPreference(true)
+            verify(accountPreferencesGateway).setDisplay2FADialog(true)
+        }
+
+    @Test
+    fun `test that multiFactorAuthEnabled is invoked when is2FAEnabled called`() =
+        runTest {
+            whenever(megaApiGateway.accountEmail).thenReturn("email")
+            whenever(megaApiGateway.multiFactorAuthEnabled(eq("email"), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock {
+                        on { type }.thenReturn(MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK)
+                        on { flag }.thenReturn(true)
+                    },
+                    mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                )
+            }
+            val isEnabled = underTest.is2FAEnabled()
+            assertThat(isEnabled).isTrue()
+            verify(megaApiGateway).multiFactorAuthEnabled(eq("email"), any())
         }
 
     @Test

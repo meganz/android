@@ -310,4 +310,19 @@ interface AccountRepository {
      * Resets account info.
      */
     suspend fun resetAccountInfo()
+
+    /**
+     * update 2FA dialog preference
+     */
+    suspend fun update2FADialogPreference(show2FA: Boolean)
+
+    /**
+     * get 2FA dialog preference
+     */
+    suspend fun get2FADialogPreference(): Boolean
+
+    /**
+     * Checks if user already enabled 2FA
+     */
+    suspend fun is2FAEnabled(): Boolean
 }

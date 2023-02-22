@@ -68,6 +68,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.domain.repository.BillingRepository
@@ -103,6 +104,11 @@ class AccountController @Inject constructor(
          *
          */
         fun callsPreferencesGateway(): CallsPreferencesGateway
+
+        /**
+         * Account preferences gateway
+         */
+        fun accountPreferencesGateway(): AccountPreferencesGateway
 
         /**
          * Push repository
@@ -412,6 +418,7 @@ class AccountController @Inject constructor(
                 with(entryPoint) {
                     callsPreferencesGateway().clearPreferences()
                     chatPreferencesGateway().clearPreferences()
+                    accountPreferencesGateway().clearPreferences()
                     pushRepository().clearPushToken()
                     billingRepository().clearCache()
                     broadcastLogout()

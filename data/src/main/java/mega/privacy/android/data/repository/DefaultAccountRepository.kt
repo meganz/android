@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -24,6 +25,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -112,6 +114,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val userCredentialsMapper: UserCredentialsMapper,
     private val accountSessionMapper: AccountSessionMapper,
     private val chatPreferencesGateway: ChatPreferencesGateway,
+    private val accountPreferencesGateway: AccountPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val cacheFolderGateway: CacheFolderGateway,
 ) : AccountRepository {
@@ -556,6 +559,7 @@ internal class DefaultAccountRepository @Inject constructor(
 
         callsPreferencesGateway.clearPreferences()
         chatPreferencesGateway.clearPreferences()
+        accountPreferencesGateway.clearPreferences()
     }
 
     override suspend fun clearSharedPreferences() = withContext(ioDispatcher) {
@@ -637,6 +641,21 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()
+    override suspend fun update2FADialogPreference(show2FA: Boolean) =
+        accountPreferencesGateway.setDisplay2FADialog(show2FA)
+
+    override suspend fun get2FADialogPreference() =
+        accountPreferencesGateway.monitorShow2FADialog().last()
+
+    override suspend fun is2FAEnabled() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { it.flag }
+            megaApiGateway.multiFactorAuthEnabled(megaApiGateway.accountEmail, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
