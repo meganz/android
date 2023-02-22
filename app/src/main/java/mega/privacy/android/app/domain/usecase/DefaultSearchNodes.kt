@@ -17,13 +17,13 @@ import javax.inject.Inject
  * @property getSearchOutSharesNodes [GetSearchOutSharesNodes]
  * @property getSearchFromMegaNodeParent [GetSearchFromMegaNodeParent]
  */
-class DefaultSearchNodeUseCase @Inject constructor(
+class DefaultSearchNodes @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getSearchLinkSharesNodes: GetSearchLinkSharesNodes,
     private val getSearchOutSharesNodes: GetSearchOutSharesNodes,
     private val getSearchInSharesNodes: GetSearchInSharesNodes,
     private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent,
-) : SearchNodeUseCase {
+) : SearchNodes {
     override suspend fun invoke(
         query: String?,
         parentHandleSearch: Long,

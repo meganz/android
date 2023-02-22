@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,12 +14,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.domain.usecase.SearchNodes
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_GENERAL
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExists
@@ -37,7 +34,7 @@ import javax.inject.Inject
  *
  * @param monitorNodeUpdates Monitor global node updates
  * @param rootNodeExists Check if the root node exists
- * @param searchNodesUseCase Perform a search request
+ * @param searchNodes Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
  * @param getSearchParentNodeHandle Get parent node for current node
  */
@@ -46,7 +43,7 @@ class SearchViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     private val rootNodeExists: RootNodeExists,
     private val getRootFolder: GetRootFolder,
-    private val searchNodesUseCase: SearchNodesUseCase,
+    private val searchNodes: SearchNodes,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getSearchParentNodeHandle: GetParentNodeHandle,
 ) : ViewModel() {
@@ -199,21 +196,16 @@ class SearchViewModel @Inject constructor(
         cancelSearch()
         searchCancelToken = initNewSearch()
         searchCancelToken?.let { token ->
-            searchNodesUseCase.get(
-                query,
-                parentHandleSearch,
-                parentHandle,
-                TYPE_GENERAL,
-                token,
-                drawerItem,
-                sharesTab,
-                isFirstNavigationLevel
+            val nodes = searchNodes(
+                query = query,
+                parentHandleSearch = parentHandleSearch,
+                parentHandle = parentHandle,
+                drawerItem = drawerItem,
+                sharesTab = sharesTab,
+                isFirstLevel = isFirstNavigationLevel,
+                megaCancelToken = token
             )
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { nodes, _ ->
-                    finishSearch(nodes ?: emptyList())
-                }
+            finishSearch(nodes ?: emptyList())
         }
     }
 

@@ -13,17 +13,17 @@ import javax.inject.Inject
  * @property getSearchFromMegaNodeParent [GetSearchFromMegaNodeParent]
  * @property getSearchFromMegaNodeParent [GetSearchInSharesNodes]
  */
-class DefaultIncomingExplorerSearchNodeUseCase @Inject constructor(
+class DefaultIncomingExplorerSearchNode @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent,
     private val getSearchInSharesNodes: GetSearchInSharesNodes,
-) : GetIncomingExplorerSearchNodeUseCase {
+) : GetIncomingExplorerSearchNode {
     override suspend fun invoke(
         query: String?,
         parentHandle: Long,
         parentHandleSearch: Long,
         megaCancelToken: MegaCancelToken,
-    ): List<MegaNode>? {
+    ): List<MegaNode> {
         return query?.let {
             if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                 getSearchInSharesNodes(query, megaCancelToken)

@@ -7,7 +7,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Use case which search nodes.
  */
-interface SearchNodeUseCase {
+interface SearchNodes {
 
     /**
      * Use Case which search Nodes

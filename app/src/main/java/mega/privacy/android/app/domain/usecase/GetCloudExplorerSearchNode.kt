@@ -4,9 +4,9 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 
 /**
- * Use Case which search Nodes in Incoming Explorer
+ * Use Case which search Nodes in CloudExplorer
  */
-interface GetIncomingExplorerSearchNodeUseCase {
+interface GetCloudExplorerSearchNode {
 
     /**
      * Use Case which search Nodes in CloudExplorer
@@ -20,5 +20,5 @@ interface GetIncomingExplorerSearchNodeUseCase {
         parentHandle: Long,
         parentHandleSearch: Long,
         megaCancelToken: MegaCancelToken,
-    ): List<MegaNode>?
+    ): List<MegaNode>
 }

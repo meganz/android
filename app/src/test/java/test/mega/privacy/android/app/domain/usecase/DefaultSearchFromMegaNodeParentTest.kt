@@ -18,7 +18,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetSearchFromMegaNodeParentTest {
+class DefaultSearchFromMegaNodeParentTest {
     private lateinit var underTest: GetSearchFromMegaNodeParent
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()

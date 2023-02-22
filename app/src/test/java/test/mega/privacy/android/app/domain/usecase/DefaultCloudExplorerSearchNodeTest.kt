@@ -3,8 +3,8 @@ package test.mega.privacy.android.app.domain.usecase
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultCloudExplorerSearchNodeUseCase
-import mega.privacy.android.app.domain.usecase.GetCloudExplorerSearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.DefaultCloudExplorerSearchNode
+import mega.privacy.android.app.domain.usecase.GetCloudExplorerSearchNode
 import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
 import mega.privacy.android.data.repository.MegaNodeRepository
 import nz.mega.sdk.MegaCancelToken
@@ -17,15 +17,15 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetCloudExplorerSearchNodeUseCaseTest {
-    private lateinit var underTest: GetCloudExplorerSearchNodeUseCase
+class DefaultCloudExplorerSearchNodeTest {
+    private lateinit var underTest: GetCloudExplorerSearchNode
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent = mock()
     private val megaCancelToken: MegaCancelToken = mock()
 
     @Before
     fun setUp() {
-        underTest = DefaultCloudExplorerSearchNodeUseCase(
+        underTest = DefaultCloudExplorerSearchNode(
             megaNodeRepository = megaNodeRepository,
             getSearchFromMegaNodeParent = getSearchFromMegaNodeParent
         )

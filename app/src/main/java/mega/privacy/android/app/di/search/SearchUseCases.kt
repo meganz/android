@@ -4,24 +4,24 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import mega.privacy.android.app.domain.usecase.GetCloudExplorerSearchNodeUseCase
-import mega.privacy.android.app.domain.usecase.DefaultCloudExplorerSearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.GetCloudExplorerSearchNode
+import mega.privacy.android.app.domain.usecase.DefaultCloudExplorerSearchNode
 import mega.privacy.android.app.domain.usecase.DefaultGetSearchInSharesNodes
 import mega.privacy.android.app.domain.usecase.DefaultGetSearchLinkSharesNodes
 import mega.privacy.android.app.domain.usecase.DefaultGetSearchOutSharesNodes
-import mega.privacy.android.app.domain.usecase.DefaultIncomingExplorerSearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.DefaultIncomingExplorerSearchNode
 import mega.privacy.android.app.domain.usecase.DefaultSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.DefaultSearchNodeUseCase
-import mega.privacy.android.app.domain.usecase.GetIncomingExplorerSearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.DefaultSearchNodes
+import mega.privacy.android.app.domain.usecase.GetIncomingExplorerSearchNode
 import mega.privacy.android.app.domain.usecase.GetSearchInSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchLinkSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchOutSharesNodes
 import mega.privacy.android.app.domain.usecase.GetSearchFromMegaNodeParent
-import mega.privacy.android.app.domain.usecase.SearchNodeUseCase
+import mega.privacy.android.app.domain.usecase.SearchNodes
 
 @Module
 @InstallIn(ViewModelComponent::class)
-abstract class SearchUseCase {
+abstract class SearchUseCases {
     @Binds
     abstract fun bindGetSearchInShare(defaultGetSearchInSharesNodes: DefaultGetSearchInSharesNodes): GetSearchInSharesNodes
 
@@ -32,14 +32,14 @@ abstract class SearchUseCase {
     abstract fun bindGetSearchLinkShare(defaultGetSearchLinkSharesNodes: DefaultGetSearchLinkSharesNodes): GetSearchLinkSharesNodes
 
     @Binds
-    abstract fun bindSearchNode(defaultSearchNodeUseCase: DefaultSearchNodeUseCase): SearchNodeUseCase
+    abstract fun bindSearchNode(defaultSearchNodeUseCase: DefaultSearchNodes): SearchNodes
 
     @Binds
     abstract fun bindSearchFromMegaNodeParent(defaultSearchFromMegaNodeParent: DefaultSearchFromMegaNodeParent): GetSearchFromMegaNodeParent
 
     @Binds
-    abstract fun bindCloudSearchNode(defaultCloudExplorerSearchNodeUseCase: DefaultCloudExplorerSearchNodeUseCase): GetCloudExplorerSearchNodeUseCase
+    abstract fun bindCloudSearchNode(defaultCloudExplorerSearchNode: DefaultCloudExplorerSearchNode): GetCloudExplorerSearchNode
 
     @Binds
-    abstract fun bindIncomingSharesExploreNode(defaultIncomingExplorerSearchNodeUseCase: DefaultIncomingExplorerSearchNodeUseCase): GetIncomingExplorerSearchNodeUseCase
+    abstract fun bindIncomingSharesExploreNode(defaultIncomingExplorerSearchNode: DefaultIncomingExplorerSearchNode): GetIncomingExplorerSearchNode
 }

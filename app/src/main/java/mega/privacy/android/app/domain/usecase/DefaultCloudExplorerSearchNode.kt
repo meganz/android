@@ -11,16 +11,16 @@ import javax.inject.Inject
  * @property megaNodeRepository [MegaNodeRepository]
  * @property getSearchFromMegaNodeParent [GetSearchFromMegaNodeParent]
  */
-class DefaultCloudExplorerSearchNodeUseCase @Inject constructor(
+class DefaultCloudExplorerSearchNode @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
     private val getSearchFromMegaNodeParent: GetSearchFromMegaNodeParent,
-) : GetCloudExplorerSearchNodeUseCase {
+) : GetCloudExplorerSearchNode {
     override suspend fun invoke(
         query: String?,
         parentHandle: Long,
         parentHandleSearch: Long,
         megaCancelToken: MegaCancelToken,
-    ): List<MegaNode>? {
+    ): List<MegaNode> {
         return query?.let {
             val parentNode = megaNodeRepository.getNodeByHandle(parentHandle)
             getSearchFromMegaNodeParent(
