@@ -41,6 +41,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -120,16 +121,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getNodeById(nodeId: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-            nodeMapper(
-                it,
-                cacheFolderGateway::getThumbnailCacheFilePath,
-                megaApiGateway::hasVersion,
-                megaApiGateway::getNumChildFolders,
-                megaApiGateway::getNumChildFiles,
-                fileTypeInfoMapper,
-                megaApiGateway::isPendingShare,
-                megaApiGateway::isInRubbish,
-            )
+            convertToUnTypedNode(it)
         }
     }
 
@@ -138,16 +130,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.getMegaNodeByHandle(folderNode.id.longValue)?.let { parent ->
                 megaApiGateway.getChildrenByNode(parent)
                     .map {
-                        nodeMapper(
-                            it,
-                            cacheFolderGateway::getThumbnailCacheFilePath,
-                            megaApiGateway::hasVersion,
-                            megaApiGateway::getNumChildFolders,
-                            megaApiGateway::getNumChildFiles,
-                            fileTypeInfoMapper,
-                            megaApiGateway::isPendingShare,
-                            megaApiGateway::isInRubbish,
-                        )
+                        convertToUnTypedNode(it)
                     }
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }
@@ -166,16 +149,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getNodeHistoryVersions(handle: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle.longValue)?.let { megaNode ->
             megaApiGateway.getVersions(megaNode).map { version ->
-                nodeMapper(
-                    version,
-                    cacheFolderGateway::getThumbnailCacheFilePath,
-                    megaApiGateway::hasVersion,
-                    megaApiGateway::getNumChildFolders,
-                    megaApiGateway::getNumChildFiles,
-                    fileTypeInfoMapper,
-                    megaApiGateway::isPendingShare,
-                    megaApiGateway::isInRubbish,
-                )
+                convertToUnTypedNode(version)
             }
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
     }
@@ -215,16 +189,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
             .mapNotNull {
                 it.nodeList?.map { megaNode ->
-                    nodeMapper(
-                        megaNode,
-                        cacheFolderGateway::getThumbnailCacheFilePath,
-                        megaApiGateway::hasVersion,
-                        megaApiGateway::getNumChildFolders,
-                        megaApiGateway::getNumChildFiles,
-                        fileTypeInfoMapper,
-                        megaApiGateway::isPendingShare,
-                        megaApiGateway::isInRubbish,
-                    ) to nodeUpdateMapper(megaNode)
+                    convertToUnTypedNode(megaNode) to nodeUpdateMapper(megaNode)
                 }
             }
             .map { nodes ->
@@ -254,4 +219,16 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaLocalStorageGateway.getOfflineInformation(nodeHandle)
                 ?.let { offlineNodeInformationMapper(it) }
         }
+
+    private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
+        nodeMapper(
+            node,
+            cacheFolderGateway::getThumbnailCacheFilePath,
+            megaApiGateway::hasVersion,
+            megaApiGateway::getNumChildFolders,
+            megaApiGateway::getNumChildFiles,
+            fileTypeInfoMapper,
+            megaApiGateway::isPendingShare,
+            megaApiGateway::isInRubbish,
+        )
 }

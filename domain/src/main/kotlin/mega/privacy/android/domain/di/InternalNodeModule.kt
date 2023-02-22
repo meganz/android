@@ -6,7 +6,9 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.DefaultGetFolderTreeInfo
+import mega.privacy.android.domain.usecase.DefaultGetNodeById
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 
@@ -15,13 +17,19 @@ import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
  */
 @Module
 @DisableInstallInCheck
-abstract class InternalFileNodeModule {
+abstract class InternalNodeModule {
 
     /**
      * provides default GetFolderInfo
      */
     @Binds
     abstract fun bindGetFolderVersionInfoByHandle(implementation: DefaultGetFolderTreeInfo): GetFolderTreeInfo
+
+    /**
+     * Provide implementation for [GetNodeById]
+     */
+    @Binds
+    abstract fun bindGetNodeById(implementation: DefaultGetNodeById): GetNodeById
 
     companion object {
         /**

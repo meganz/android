@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
-import mega.privacy.android.domain.usecase.GetNodesByHandles
+import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -51,7 +51,7 @@ class FileInfoViewModel @Inject constructor(
     private val deleteNodeByHandle: DeleteNodeByHandle,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
     private val getPreview: GetPreview,
-    private val getNodesByHandles: GetNodesByHandles,
+    private val getNodeById: GetNodeById,
     private val getFolderTreeInfo: GetFolderTreeInfo,
 ) : ViewModel() {
 
@@ -102,8 +102,7 @@ class FileInfoViewModel @Inject constructor(
     }
 
     private suspend fun updateTypedNode() {
-        //in next tasks a use case to get a single TypedNode will be created
-        typedNode = getNodesByHandles(listOf(node.handle))[0].also { typedNode ->
+        typedNode = getNodeById(NodeId(node.handle)).also { typedNode ->
             _uiState.update { uiState ->
                 when (typedNode) {
                     is TypedFolderNode -> {

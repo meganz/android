@@ -7,6 +7,6 @@ import dagger.hilt.components.SingletonComponent
 /**
  * Domain file node module
  */
-@Module(includes = [InternalFileNodeModule::class])
+@Module(includes = [InternalNodeModule::class])
 @InstallIn(SingletonComponent::class)
-abstract class FileNodeModule
+abstract class NodeModule
