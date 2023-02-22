@@ -19,7 +19,6 @@ import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -85,7 +84,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -511,40 +509,78 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private fun updateView(viewState: FileInfoViewState) {
         menuHelper.setPreview(viewState.actualPreviewUriString)
-        with(bindingContent) {
-            // If the Node belongs to Backups or has no versions, then hide
-            // the Versions layout
-            if (viewState.showHistoryVersions) {
-                filePropertiesVersionsLayout.isVisible = true
-                val text = getQuantityStringOrDefault(
-                    R.plurals.number_of_versions,
-                    viewState.historyVersions,
-                    viewState.historyVersions
-                )
-                filePropertiesTextNumberVersions.text = text
-                separatorVersions.isVisible = true
-            } else {
-                filePropertiesVersionsLayout.isVisible = false
-                separatorVersions.isVisible = false
-            }
-        }
-        with(bindingContent) {
-            if (!viewModel.node.isTakenDown && !viewState.isNodeInRubbish) {
-                filePropertiesSwitch.isEnabled = true
-                filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
-                    filePropertiesSwitch()
-                }
-                filePropertiesAvailableOfflineText.setTextColor(
-                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
-                )
-            } else {
-                filePropertiesSwitch.isEnabled = false
-                filePropertiesAvailableOfflineText.setTextColor(
-                    ContextCompat.getColor(this@FileInfoActivity, R.color.grey_700_026_grey_300_026)
-                )
-            }
-        }
+        updateFileHistoryVersions(viewState.showHistoryVersions, viewState.historyVersions)
+        viewState.sizeString?.let { updateSize(it) }
+        updateFolderContentInfo(
+            viewState.folderTreeInfo != null,
+            viewState.folderContentInfoString
+        )
+        updateFolderHistoryVersions(
+            show = viewState.showFolderHistoryVersions,
+            numVersions = viewState.folderTreeInfo?.numberOfVersions ?: 0,
+            currentVersionsSize = viewState.folderCurrentVersionSizeInBytesString,
+            previousVersionsSize = viewState.folderVersionsSizeInBytesString
+        )
+        updateAvailableOffline(!viewModel.node.isTakenDown && !viewState.isNodeInRubbish)
         refreshProperties(viewState)
+    }
+
+    private fun updateFileHistoryVersions(show: Boolean, versions: Int) = with(bindingContent) {
+        // If the Node belongs to Backups or has no versions, then hide
+        // the Versions layout
+        filePropertiesVersionsLayout.isVisible = show
+        separatorVersions.isVisible = show
+        if (show) {
+            val text = getQuantityStringOrDefault(R.plurals.number_of_versions, versions, versions)
+            filePropertiesTextNumberVersions.text = text
+        }
+    }
+
+    private fun updateSize(size: String) {
+        bindingContent.filePropertiesInfoDataSize.text = size
+    }
+
+    private fun updateFolderContentInfo(show: Boolean, folderContentInfo: String) {
+        bindingContent.filePropertiesContentLayout.isVisible = show
+        bindingContent.filePropertiesInfoDataContent.text = folderContentInfo
+    }
+
+    private fun updateFolderHistoryVersions(
+        show: Boolean,
+        numVersions: Int,
+        currentVersionsSize: String,
+        previousVersionsSize: String,
+    ) = with(bindingContent) {
+        bindingContent.filePropertiesFolderVersionsLayout.isVisible = show
+        bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = show
+        bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = show
+        if (show) {
+            val text = getQuantityStringOrDefault(
+                R.plurals.number_of_versions_inside_folder,
+                numVersions,
+                numVersions
+            )
+            bindingContent.filePropertiesInfoDataFolderVersions.text = text
+            bindingContent.filePropertiesInfoDataFolderCurrentVersions.text = currentVersionsSize
+            bindingContent.filePropertiesInfoDataFolderPreviousVersions.text = previousVersionsSize
+        }
+    }
+
+    private fun updateAvailableOffline(enabled: Boolean) = with(bindingContent) {
+        if (enabled) {
+            filePropertiesSwitch.isEnabled = true
+            filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
+                filePropertiesSwitch()
+            }
+            filePropertiesAvailableOfflineText.setTextColor(
+                ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
+            )
+        } else {
+            filePropertiesSwitch.isEnabled = false
+            filePropertiesAvailableOfflineText.setTextColor(
+                ContextCompat.getColor(this@FileInfoActivity, R.color.grey_700_026_grey_300_026)
+            )
+        }
     }
 
     private fun updateOptionsMenu(state: FileInfoViewState) {
@@ -1020,7 +1056,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesInfoMenuSize.text =
                 getFormattedStringOrDefault(R.string.file_properties_info_size_file)
             bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(viewModel.node.size)
-            bindingContent.filePropertiesContentLayout.isVisible = false
             if (viewModel.node.creationTime != 0L) {
                 try {
                     bindingContent.filePropertiesInfoDataAdded.text =
@@ -1061,13 +1096,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
         } else if (viewModel.node.isFolder) {
             Timber.d("Node is FOLDER")
-            megaApi.getFolderInfo(viewModel.node, megaRequestListener)
-            bindingContent.filePropertiesInfoDataContent.isVisible = true
-            bindingContent.filePropertiesInfoMenuContent.isVisible = true
-            bindingContent.filePropertiesInfoDataContent.text =
-                MegaApiUtils.getMegaNodeFolderInfo(viewModel.node)
-            val sizeFile = megaApi.getSize(viewModel.node)
-            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(sizeFile)
             setIconResource()
             if (from == Constants.FROM_INCOMING_SHARES) {
                 //Show who is the owner
@@ -1367,57 +1395,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             hideMultipleSelect()
         }
         Timber.d("onRequestFinish: %d__%s", request.type, request.requestString)
-        if (request.type == MegaRequest.TYPE_FOLDER_INFO) {
-
-            // If the Folder belongs to Backups, hide all Folder Version layouts
-            if (viewModel.isNodeInInbox()) {
-                bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
-                bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = false
-                bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = false
-                return
-            }
-            if (e?.errorCode == MegaError.API_OK) {
-                val info = request.megaFolderInfo
-                val numVersions = info.numVersions
-                Timber.d("Num versions: %s", numVersions)
-                if (numVersions > 0) {
-                    bindingContent.filePropertiesFolderVersionsLayout.isVisible = true
-                    val text = getQuantityStringOrDefault(
-                        R.plurals.number_of_versions_inside_folder,
-                        numVersions,
-                        numVersions
-                    )
-                    bindingContent.filePropertiesInfoDataFolderVersions.text = text
-                    val currentVersions = info.currentSize
-                    Timber.d("Current versions: %s", currentVersions)
-                    if (currentVersions > 0) {
-                        bindingContent.filePropertiesInfoDataFolderCurrentVersions.text =
-                            Util.getSizeString(currentVersions)
-                        bindingContent.filePropertiesFolderCurrentVersionsLayout.visibility =
-                            View.VISIBLE
-                    }
-                } else {
-                    bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
-                    bindingContent.filePropertiesFolderCurrentVersionsLayout.visibility =
-                        View.GONE
-                }
-                val previousVersions = info.versionsSize
-                Timber.d("Previous versions: %s", previousVersions)
-                if (previousVersions > 0) {
-                    bindingContent.filePropertiesInfoDataFolderPreviousVersions.text =
-                        Util.getSizeString(previousVersions)
-                    bindingContent.filePropertiesFolderPreviousVersionsLayout.visibility =
-                        View.VISIBLE
-                } else {
-                    bindingContent.filePropertiesFolderPreviousVersionsLayout.visibility =
-                        View.GONE
-                }
-            } else {
-                bindingContent.filePropertiesFolderPreviousVersionsLayout.isVisible = false
-                bindingContent.filePropertiesFolderVersionsLayout.isVisible = false
-                bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = false
-            }
-        } else if (request.type == MegaApiJava.USER_ATTR_AVATAR) {
+        if (request.type == MegaApiJava.USER_ATTR_AVATAR) {
             try {
                 progressDialog?.first?.dismiss()
             } catch (ex: Exception) {
@@ -1494,7 +1472,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
         }
         if (updateContentFolder) {
-            megaApi.getFolderInfo(viewModel.node, megaRequestListener)
+            viewModel.updateNode()
         }
         if (!thisNode && !anyChild) {
             Timber.d("Not related to this node")
@@ -1581,10 +1559,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesCopyLayout.isVisible = false
         }
         if (viewModel.node.isFolder) {
-            val sizeFile = megaApi.getSize(viewModel.node)
-            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(sizeFile)
-            bindingContent.filePropertiesInfoDataContent.text =
-                MegaApiUtils.getMegaNodeFolderInfo(viewModel.node)
             setIconResource()
             sl = megaApi.getOutShares(viewModel.node)
             sl?.let { sl ->

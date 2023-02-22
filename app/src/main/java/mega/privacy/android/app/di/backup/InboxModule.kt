@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.usecase.DefaultMonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import javax.inject.Singleton
 
 /**
  * Inbox module
@@ -18,5 +19,6 @@ abstract class InboxModule {
      * Binds the default implementation to [MonitorBackupFolder]
      */
     @Binds
+    @Singleton
     abstract fun bindMonitorBackupFolder(implementation: DefaultMonitorBackupFolder): MonitorBackupFolder
 }

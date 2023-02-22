@@ -14,8 +14,12 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetNodesByHandles
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -46,8 +50,9 @@ class FileInfoViewModel @Inject constructor(
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     private val deleteNodeByHandle: DeleteNodeByHandle,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
-    private val getThumbnail: GetThumbnail,
     private val getPreview: GetPreview,
+    private val getNodesByHandles: GetNodesByHandles,
+    private val getFolderTreeInfo: GetFolderTreeInfo,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -60,8 +65,10 @@ class FileInfoViewModel @Inject constructor(
     /**
      * the node whose information are displayed
      */
-    lateinit var node: MegaNode
+    lateinit var node: MegaNode //this should be removed as all uses should be replaced by typedNode
         private set
+
+    private lateinit var typedNode: TypedNode
 
     /**
      * Sets the node and updates its state
@@ -69,30 +76,47 @@ class FileInfoViewModel @Inject constructor(
     fun updateNode(node: MegaNode = this.node) {
         this.node = node
         viewModelScope.launch {
-            _uiState.update {
+            _uiState.update { uiState ->
                 val clearProgressState =
-                    it.jobInProgressState == FileInfoJobInProgressState.InitialLoading
-                it.copy(
+                    uiState.jobInProgressState == FileInfoJobInProgressState.InitialLoading
+                uiState.copy(
                     historyVersions = getFileHistoryNumVersions(node.handle),
                     isNodeInInbox = isNodeInInbox(node.handle),
                     isNodeInRubbish = isNodeInRubbish(node.handle),
-                    jobInProgressState = if (clearProgressState) null else it.jobInProgressState,
+                    jobInProgressState = if (clearProgressState) null else uiState.jobInProgressState,
                 )
             }
+            updateTypedNode()
         }
         updatePreview()
     }
 
     private fun updatePreview() {
         viewModelScope.launch {
-            if (_uiState.value.thumbnailUriString == null) {
-                _uiState.update {
-                    it.copy(thumbnailUriString = getThumbnail(node.handle)?.uriStringIfExists())
-                }
-            }
             if (node.hasPreview() && _uiState.value.previewUriString == null) {
                 _uiState.update {
-                    it.copy(previewUriString = getPreview(node.handle)?.uriStringIfExists())
+                    it.copy(previewUriString = getPreview(typedNode.id.longValue)?.uriStringIfExists())
+                }
+            }
+        }
+    }
+
+    private suspend fun updateTypedNode() {
+        //in next tasks a use case to get a single TypedNode will be created
+        typedNode = getNodesByHandles(listOf(node.handle))[0].also { typedNode ->
+            _uiState.update { uiState ->
+                when (typedNode) {
+                    is TypedFolderNode -> {
+                        uiState.copy(
+                            folderTreeInfo = getFolderTreeInfo(typedNode),
+                        )
+                    }
+                    is TypedFileNode -> {
+                        uiState.copy(
+                            thumbnailUriString =
+                            (typedNode as? TypedFileNode)?.thumbnailPath,
+                        )
+                    }
                 }
             }
         }
@@ -119,7 +143,7 @@ class FileInfoViewModel @Inject constructor(
         performBlockSettingProgress(FileInfoJobInProgressState.Moving) {
             if (checkCollision(parentHandle, NameCollisionType.MOVE)) {
                 runCatching {
-                    moveNodeByHandle(NodeId(node.handle), parentHandle)
+                    moveNodeByHandle(typedNode.id, parentHandle)
                 }
             } else {
                 null
@@ -136,7 +160,7 @@ class FileInfoViewModel @Inject constructor(
         performBlockSettingProgress(FileInfoJobInProgressState.Copying) {
             if (checkCollision(parentHandle, NameCollisionType.COPY)) {
                 runCatching {
-                    copyNodeByHandle(NodeId(node.handle), parentHandle)
+                    copyNodeByHandle(typedNode.id, parentHandle)
                 }
             } else {
                 null
@@ -165,7 +189,7 @@ class FileInfoViewModel @Inject constructor(
     fun deleteHistoryVersions() {
         performBlockSettingProgress(FileInfoJobInProgressState.DeletingVersions) {
             runCatching {
-                deleteNodeVersionsByHandle(NodeId(node.handle))
+                deleteNodeVersionsByHandle(typedNode.id)
             }
         }
     }
@@ -178,7 +202,7 @@ class FileInfoViewModel @Inject constructor(
     private fun moveNodeToRubbishBin() {
         performBlockSettingProgress(FileInfoJobInProgressState.MovingToRubbish) {
             runCatching {
-                moveNodeToRubbishByHandle(NodeId(node.handle))
+                moveNodeToRubbishByHandle(typedNode.id)
             }
         }
     }
@@ -191,7 +215,7 @@ class FileInfoViewModel @Inject constructor(
     private fun deleteNode() {
         performBlockSettingProgress(FileInfoJobInProgressState.Deleting) {
             runCatching {
-                deleteNodeByHandle(NodeId(node.handle))
+                deleteNodeByHandle(typedNode.id)
             }
         }
     }
@@ -260,7 +284,7 @@ class FileInfoViewModel @Inject constructor(
     private suspend fun checkCollision(parentHandle: NodeId, type: NameCollisionType) =
         try {
             val nameCollision = checkNameCollision(
-                NodeId(node.handle),
+                typedNode.id,
                 parentHandle,
                 type
             )

@@ -20,9 +20,11 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetNodesByHandles
+import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -40,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -63,10 +66,11 @@ internal class FileInfoViewModelTest {
     private lateinit var deleteNodeVersionsByHandle: DefaultDeleteNodeVersionsByHandle
     private lateinit var node: MegaNode
     private lateinit var nameCollision: NameCollision
-    private lateinit var getThumbnail: GetThumbnail
     private lateinit var getPreview: GetPreview
+    private lateinit var getFolderTreeInfo: GetFolderTreeInfo
+    private lateinit var getTypedNode: GetNodesByHandles
 
-    private lateinit var thumbFile: File
+    private lateinit var typedFileNode: TypedFileNode
     private lateinit var previewFile: File
 
 
@@ -97,10 +101,12 @@ internal class FileInfoViewModelTest {
         deleteNodeVersionsByHandle = mock()
         node = mock()
         nameCollision = mock()
-        getThumbnail = mock()
         getPreview = mock()
+        getFolderTreeInfo = mock()
+        getTypedNode = mock()
+
+        typedFileNode = mock()
         previewFile = mock()
-        thumbFile = mock()
     }
 
     private fun initUnderTestViewModel() {
@@ -116,23 +122,24 @@ internal class FileInfoViewModelTest {
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
             deleteNodeByHandle = deleteNodeByHandle,
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
-            getThumbnail = getThumbnail,
-            getPreview = getPreview
+            getPreview = getPreview,
+            getFolderTreeInfo = getFolderTreeInfo,
+            getNodesByHandles = getTypedNode
         )
         underTest.updateNode(node)
     }
 
     private suspend fun initDefaultMockBehaviour() {
         whenever(node.handle).thenReturn(NODE_HANDLE)
+        whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(node.hasPreview()).thenReturn(true)
         whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
         whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
         whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
-        whenever(thumbFile.exists()).thenReturn(true)
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
-        whenever(thumbFile.toURI()).thenReturn(URI.create(thumbUri))
+        whenever(getTypedNode.invoke(any())).thenReturn(listOf(typedFileNode))
     }
 
     @After
@@ -477,7 +484,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test preview is assigned when node is updated`() = runTest {
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
-        whenever(getThumbnail.invoke(NODE_HANDLE)).thenReturn(null)
+        whenever(typedFileNode.thumbnailPath).thenReturn(null)
         underTest.updateNode(node)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
@@ -489,7 +496,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test thumbnail is assigned when node is updated and there are no preview`() = runTest {
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(null)
-        whenever(getThumbnail.invoke(NODE_HANDLE)).thenReturn(thumbFile)
+        whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
         underTest.updateNode(node)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
@@ -501,7 +508,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test preview has priority over thumbnail`() = runTest {
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
-        whenever(getThumbnail.invoke(NODE_HANDLE)).thenReturn(thumbFile)
+        whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
         underTest.updateNode(node)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
@@ -650,7 +657,7 @@ internal class FileInfoViewModelTest {
         private const val PARENT_NODE_HANDLE = 12L
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
-        private const val thumbUri = "thumb"
-        private const val previewUri = "preview"
+        private const val thumbUri = "file:/thumb"
+        private const val previewUri = "file:/preview"
     }
 }
