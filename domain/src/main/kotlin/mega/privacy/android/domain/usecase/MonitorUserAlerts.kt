@@ -13,5 +13,5 @@ fun interface MonitorUserAlerts {
      *
      * @return user alerts as a flow
      */
-    operator fun invoke(): Flow<List<UserAlert>>
+    suspend operator fun invoke(): Flow<List<UserAlert>>
 }
